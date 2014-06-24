@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
-use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +16,22 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class EmailController extends Controller
 {
+    /**
+     * @Route("/my-emails", name="oro_email_myemails")
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function myEmailsAction()
+    {
+        return [];
+    }
+
     /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
      * @Acl(
