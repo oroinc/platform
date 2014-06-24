@@ -5,8 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
-use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestChannelType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 
 class FormUtilsTest extends \PHPUnit_Framework_TestCase
@@ -33,8 +33,8 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
         $testType                  = 'type2';
         $testTypeThatHasConnectors = 'type1';
 
-        $this->typesRegistry->addChannelType($testType, new TestChannelType());
-        $this->typesRegistry->addChannelType($testTypeThatHasConnectors, new TestChannelType());
+        $this->typesRegistry->addChannelType($testType, new TestIntegrationType());
+        $this->typesRegistry->addChannelType($testTypeThatHasConnectors, new TestIntegrationType());
         $this->typesRegistry->addConnectorType(uniqid('type'), $testType, new TestConnector());
         $this->typesRegistry->addConnectorType(uniqid('type'), $testTypeThatHasConnectors, new TestTwoWayConnector());
 

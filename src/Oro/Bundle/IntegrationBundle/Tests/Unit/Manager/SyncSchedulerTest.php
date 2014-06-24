@@ -10,7 +10,7 @@ use JMS\JobQueueBundle\Entity\Job;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestChannelType;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 
@@ -40,15 +40,15 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Connectors not found for channel "testType"
+     * @expectedExceptionMessage Connectors not found for integration "testType"
      */
     public function testScheduleRegistryError()
     {
-        $channel = new Channel();
-        $channel->setType('testType');
-        $channel->setEnabled(true);
+        $integration = new Channel();
+        $integration->setType('testType');
+        $integration->setEnabled(true);
 
-        $this->scheduler->schedule($channel, '');
+        $this->scheduler->schedule($integration, '');
     }
 
     /**
@@ -57,32 +57,33 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
      */
     public function testScheduleConnectorError()
     {
-        $testChannelType   = 'testChannelType';
+        $testIntegrationType   = 'testIntegrationType';
         $testConnectorType = 'testConnectorType';
 
-        $channel = new Channel();
-        $channel->setType($testChannelType);
-        $channel->setEnabled(true);
-        $this->typesRegistry->addChannelType($testChannelType, new TestChannelType());
-        $this->typesRegistry->addConnectorType($testConnectorType, $testChannelType, new TestConnector());
+        $integration = new Channel();
+        $integration->setType($testIntegrationType);
+        $this->typesRegistry->addChannelType($testIntegrationType, new TestIntegrationType());
+        $this->typesRegistry->addConnectorType($testConnectorType, $testIntegrationType, new TestConnector());
+        $integration->setEnabled(true);
 
-        $this->scheduler->schedule($channel, $testConnectorType);
+        $this->scheduler->schedule($integration, $testConnectorType);
     }
 
     public function testSchedule()
     {
-        $testChannelType   = 'testChannelType';
+        $testIntegrationType   = 'testIntegrationType';
         $testConnectorType = 'testConnectorType';
         $testId            = 22;
 
-        $channel = new Channel();
-        $channel->setType($testChannelType);
-        $channel->setEnabled(true);
-        $ref = new \ReflectionProperty(get_class($channel), 'id');
+        $integration = new Channel();
+        $integration->setType($testIntegrationType);
+        $integration->setEnabled(true);
+        $ref = new \ReflectionProperty(get_class($integration), 'id');
+
         $ref->setAccessible(true);
-        $ref->setValue($channel, $testId);
-        $this->typesRegistry->addChannelType($testChannelType, new TestChannelType());
-        $this->typesRegistry->addConnectorType($testConnectorType, $testChannelType, new TestTwoWayConnector());
+        $ref->setValue($integration, $testId);
+        $this->typesRegistry->addChannelType($testIntegrationType, new TestIntegrationType());
+        $this->typesRegistry->addConnectorType($testConnectorType, $testIntegrationType, new TestTwoWayConnector());
 
         $that = $this;
 
@@ -100,7 +101,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function (Job $job) use ($that, $testId, $testConnectorType) {
                         $expectedArgs = [
-                            '--channel=' . $testId,
+                            '--integration=' . $testId,
                             sprintf('--connector=testConnectorType', $testConnectorType),
                             '--params=a:0:{}',
                         ];
@@ -111,6 +112,6 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
             );
         $uow->expects($this->once())->method('computeChangeSet');
 
-        $this->scheduler->schedule($channel, $testConnectorType, [], false);
+        $this->scheduler->schedule($integration, $testConnectorType, [], false);
     }
 }

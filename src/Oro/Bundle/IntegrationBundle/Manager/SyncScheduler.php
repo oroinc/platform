@@ -39,27 +39,26 @@ class SyncScheduler
     /**
      * Schedules backward sync job
      *
-     * @param Channel $channel
+     * @param Channel $integration
      * @param string  $connectorType
      * @param array   $params
      * @param bool    $useFlush
      *
      * @throws \LogicException
      */
-    public function schedule(Channel $channel, $connectorType, $params = [], $useFlush = true)
+    public function schedule(Channel $integration, $connectorType, $params = [], $useFlush = true)
     {
-        if (!$channel->getEnabled()) {
+        if (!$integration->getEnabled()) {
             return;
         }
 
-        $connector = $this->typesRegistry->getConnectorType($channel->getType(), $connectorType);
-
+        $connector = $this->typesRegistry->getConnectorType($integration->getType(), $connectorType);
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
             throw new \LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
         }
 
         $args = [
-            '--channel=' . $channel->getId(),
+            '--integration=' . $integration->getId(),
             '--connector=' . $connectorType,
             '--params=' . serialize($params)
         ];
