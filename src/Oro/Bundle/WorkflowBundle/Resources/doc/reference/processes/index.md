@@ -120,14 +120,16 @@ WorkflowBundle provides two following console commands to work with processes.
 
 This command loads processes configuration from *.yml configuration files to the database. It used
 during application installation and update. Command has two optional options:
-    - **--directories** - specifies directories used to find configuration files (multiple values allowed);
-    - **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
+
+- **--directories** - specifies directories used to find configuration files (multiple values allowed);
+- **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
 
 #### oro:process:execute:job
 
 This command simply executes process job with specified identifier. It used in the JMS jobs to execute delayed
 processes. Command has one required option:
-    - **--id** - identifier of the process job to execute.
+
+- **--id** - identifier of the process job to execute.
 
 REST API
 --------
