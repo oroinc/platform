@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -174,37 +176,40 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_CREATE,
-                    'field' => null,
-                    'queued' => false,
+                    'event'      => ProcessTrigger::EVENT_CREATE,
+                    'field'      => null,
+                    'priority'   => Job::PRIORITY_DEFAULT,
+                    'queued'     => false,
                     'time_shift' => null,
                 ),
             ),
             'integer time shift' => array(
                 'configuration' => array(
-                    'event' => ProcessTrigger::EVENT_UPDATE,
-                    'field' => 'status',
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_UPDATE,
+                    'field'      => 'status',
+                    'priority'   => Job::PRIORITY_HIGH,
+                    'queued'     => true,
                     'time_shift' => 12345
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_UPDATE,
-                    'field' => 'status',
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_UPDATE,
+                    'field'      => 'status',
+                    'queued'     => true,
                     'time_shift' => 12345
                 ),
             ),
             'date interval time shift' => array(
                 'configuration' => array(
-                    'event' => ProcessTrigger::EVENT_DELETE,
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_DELETE,
+                    'queued'     => true,
                     'time_shift' => new \DateInterval('P1D'),
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_DELETE,
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_DELETE,
+                    'field'      => null,
+                    'priority'   => Job::PRIORITY_DEFAULT,
+                    'queued'     => true,
                     'time_shift' => 24 * 3600,
-                    'field' => null,
                 ),
             ),
         );
