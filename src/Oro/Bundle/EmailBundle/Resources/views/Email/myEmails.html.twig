@@ -4,3 +4,8 @@
 {% set gridName = 'users-email-grid' %}
 {# grid params #}
 {% set params = {'userId': app.user.id} %}
+
+{% block breadcrumb %}
+    {% set breadcrumbs = [{'label': app.user.username }, {'label': 'oro.email.menu.my_emails'|trans }] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}

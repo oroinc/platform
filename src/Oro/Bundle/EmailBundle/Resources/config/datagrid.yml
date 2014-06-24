@@ -162,3 +162,19 @@ datagrid:
         action_configuration: @oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure
         views_list : @oro_email.emailtemplate.datagrid_view_list
         options: { entityHint: email template }
+
+    users-email-grid:
+        extends: email-grid
+        source:
+            query:
+                join:
+                    inner:
+                        folder:
+                            join: e.folders
+                            alias: f
+                        origin:
+                            join: f.origin
+                            alias: o
+                where:
+                    and:
+                        - o.id IN (:origin_ids)

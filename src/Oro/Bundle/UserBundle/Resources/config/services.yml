@@ -20,10 +20,8 @@ parameters:
     oro_user.email.owner.provider.class:                    Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
     oro_user.gender_provider.class:                         Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.change_password.subscriber.class:              Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
-    oro_user.event_listener.user_email_grid_listener.class: Oro\Bundle\UserBundle\EventListener\UserEmailGridListener
     oro_user.handler.delete.class:                Oro\Bundle\UserBundle\Handler\UserDeleteHandler
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
-    oro_user.entity_role.listener.class:          Oro\Bundle\UserBundle\Entity\EventListener\UserRoleListener
     oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
 
 services:
@@ -159,14 +157,6 @@ services:
           - @oro_email.datagrid_query_factory
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
-
-    oro_user.event_listener.user_email_grid_listener:
-        class: %oro_user.event_listener.user_email_grid_listener.class%
-        arguments:
-          - @doctrine.orm.entity_manager
-          - @oro_email.email_synchronization_manager
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-email-grid, method: onBuildAfter }
 
     oro_user.event_listener.without_from_user_email_grid_listener:
         class: %oro_user.event_listener.user_email_grid_listener.class%

@@ -246,22 +246,6 @@ datagrid:
                     type: string
                     data_name: r.label
 
-    users-email-grid:
-        extends: email-grid
-        source:
-            query:
-                join:
-                    inner:
-                        folder:
-                            join: e.folders
-                            alias: f
-                        origin:
-                            join: f.origin
-                            alias: o
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
-
     user-relation-grid:
         source:
             type: orm

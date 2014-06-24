@@ -29,9 +29,7 @@ class EmailController extends Controller
      */
     public function myEmailsAction()
     {
-        return [
-            'entity_class' => $this->container->getParameter('oro_email.email.entity.class'),
-        ];
+        return [];
     }
 
     /**
