@@ -9,10 +9,10 @@ use Symfony\Component\DependencyInjection\Reference;
 class ExtensionPass implements CompilerPassInterface
 {
     const GENERATOR_NAME = 'oro_entity_extend.entity_generator';
-    const GENERATOR_TAG  = 'oro_entity_extend.generator_extension';
+    const GENERATOR_TAG  = 'oro_entity_extend.entity_generator_extension';
 
     const DUMPER_NAME = 'oro_entity_extend.tools.dumper';
-    const DUMPER_TAG  = 'oro_entity_extend.dumper_extension';
+    const DUMPER_TAG  = 'oro_entity_extend.entity_config_dumper_extension';
 
     /**
      * {@inheritdoc}

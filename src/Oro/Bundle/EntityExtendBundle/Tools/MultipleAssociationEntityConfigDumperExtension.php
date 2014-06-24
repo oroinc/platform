@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
-abstract class MultipleAssociationExtendConfigDumperExtension extends AbstractAssociationExtendConfigDumperExtension
+abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAssociationEntityConfigDumperExtension
 {
     /**
      * {@inheritdoc}

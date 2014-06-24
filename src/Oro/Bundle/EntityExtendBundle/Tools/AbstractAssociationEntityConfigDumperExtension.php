@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
-abstract class AbstractAssociationExtendConfigDumperExtension extends ExtendConfigDumperExtension
+abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var AssociationBuilder */
     protected $associationBuilder;

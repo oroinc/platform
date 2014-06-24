@@ -5,22 +5,17 @@ namespace Oro\Bundle\NoteBundle\Tools;
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ClassBuilder;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityGeneratorExtension;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
-class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
+class NoteEntityGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     /**
      * {@inheritdoc}
      */
-    public function supports($actionType, array $schemas)
+    public function supports(array $schema)
     {
-        return
-            ExtendEntityGenerator::ACTION_GENERATE === $actionType
-            && $schemas['class'] === Note::ENTITY_NAME
-            && !empty($schemas['relation']);
+        return $schema['class'] === Note::ENTITY_NAME && !empty($schema['relation']);
     }
 
     /**
@@ -28,8 +23,6 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
      */
     public function generate(array $schema, PhpClass $class)
     {
-        $classBuilder = new ClassBuilder();
-
         $relationData = empty($schema['relationData']) ? [] : $schema['relationData'];
 
         $relationNames     = [];
@@ -89,17 +82,17 @@ class NoteExtendEntityGeneratorExtension extends ExtendEntityGeneratorExtension
 
         $class
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('resetTargets', implode("\n", $resetMethodsBody))
                     ->setVisibility('private')
             )
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('getTarget', implode("\n", $getMethodBody))
                     ->setDocblock($getMethodDocblock)
             )
             ->setMethod(
-                $classBuilder
+                $this
                     ->generateClassMethod('setTarget', implode("\n", $setMethodBody), ['target'])
                     ->setDocblock($setMethodDocblock)
             );
