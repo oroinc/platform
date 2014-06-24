@@ -3,19 +3,19 @@ Processes Documentation
 
 Table of Contents
 -----------------
- - [What is Processes?](#what-is-workflow)
+ - [What are Processes?](#what-are-processes)
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
  - [REST API](#rest-api)
 
-What is Processes?
-------------------
+What are Processes?
+-------------------
 
-Processes provide possibility for automate tasks related to entity management. They are using main doctrine events
+Processes provide possibility to automate tasks related to entity management. They are using main doctrine events
 to perform described tasks at the right time. Each process can be performed immediately or after some timeout.
-Processes used JMS Job bundle to provide possibility of delayed startup.
+Processes use JMS Job bundle to provide possibility of delayed startup.
 
 Main Entities
 -------------
@@ -36,13 +36,14 @@ only if value of this field has been changed. Also trigger contains information 
 should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval format).
 
 * **Job** - entity that contain information specific to performing process in case of delayed processing
-(in that case JMS job will be created). According to event job will contain following data:
-    - ``create`` event - entity identity will be saved;
-    - ``update`` event - entity identity and change set (old and new values) will be saved;
-    - ``delete`` event - entity plain fields (without references) will be saved.
-Also each job entity contains relation to the trigger that was used and entity hash (full class name
-of the related entity and identity of the specific entity). This entity hash is needed to find all registered jobs
-for the same specific entity.
+(in this case JMS job will be created). According to event job can contain following data:
+    - ``create`` event - entity identity;
+    - ``update`` event - entity identity and change set (old and new values);
+    - ``delete`` event - entity plain fields (without references).
+
+Also each job entity contains relation to the trigger used to create this job and entity hash (full class name
+of the related entity plus identity of the specific entity). This entity hash is needed to find all registered jobs
+for the same specific entity (f.e. to remove all related jobs).
 
 How it works?
 -------------
@@ -51,7 +52,7 @@ Each of process definition related to the some entity type (i.e. consists full c
 can have several triggers.
 
 When user performs some action with entity which is related to some enabled process definition,
-then all existing triggers for this process will be analyzed and found appropriate ones to execute.
+all existing triggers for this process will be analyzed and found appropriate ones to execute.
 
 There are two ways how trigger can be processed. First is immediate execution - in this case process action will be
 executed right after entity will be flushed to the database. Second is delayed execution - it creates job and puts it
@@ -97,11 +98,11 @@ triggers:                                                    # list of triggers
             time_shift: 60                                   # this process must be executed with 60 seconds delay
 ```
 
-This configuration describes process that relates to the ``Contact`` entity and every time when any contact will be
-created or  ``Assigned To`` field will be changed, then current administrator user will be set as assigned.
+This configuration describes process that relates to the ``Contact`` entity; every time when any contact is
+created or  ``Assigned To`` field is changed, then current administrator user is set as assigned user.
 In other words contact will be assigned to the current administrator.
 
-This logic is implemented using one definition and two triggers.
+Described logic is implemented using one definition and two triggers.
 First trigger will be processed immediately after the contact is be created, and second one creates new process job
 and put it to JMS queue, so job will be processed after ``60`` seconds delay.
 
