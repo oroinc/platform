@@ -9,6 +9,17 @@
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}
 {% endif %}
 
+{% block breadcrumbs %}
+    {{ parent() }}
+    <div class="status-enabled pull-left">
+        {% if entity.enabled %}
+            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+        {% else %}
+            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
 {% block navButtons %}
     {% if entity.id and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
@@ -24,14 +35,32 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
+    {% if entity.id and entity.enabled == true %}
+        {{ UI.button({
+            'path': path('oro_integration_toggle', {'id': entity.id}),
+            'title' : 'oro.integration.deactivate'|trans,
+            'label' : 'oro.integration.deactivate'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% elseif entity.id %}
+        {{ UI.button({
+            'path': path('oro_integration_toggle', {'id': entity.id}),
+            'title' : 'oro.integration.activate'|trans,
+            'label' : 'oro.integration.activate'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+
     {{ UI.cancelButton(path('oro_integration_index')) }}
-    {% if entity.id %}
+
+    {% if entity.id and entity.enabled == true %}
         {{ UI.clientButton({
             'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
             'aCss':   'no-hash schedule-button btn-primary',
             'label' : 'Schedule sync'|trans
         }) }}
     {% endif %}
+
     {% set html = UI.saveAndCloseButton() %}
     {% if form.vars.value.id or resource_granted('oro_integration_update') %}
         {% set html = html ~ UI.saveAndStayButton() %}

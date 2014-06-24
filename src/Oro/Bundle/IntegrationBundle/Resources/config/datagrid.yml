@@ -8,6 +8,7 @@ datagrid:
                     - c.id
                     - c.name
                     - c.type
+                    - c.enabled
                 from:
                     - { table: %oro_integration.entity.class%, alias: c }
         columns:
@@ -69,5 +70,6 @@ datagrid:
                     confirm_ok:      oro.integration.delete_sync_integration_window.button_ok
                     confirm_title:   oro.integration.delete_sync_integration_window.title
                     success:         oro.integration.delete_sync_integration_window.success
+        action_configuration: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration::getIsSyncAvailableCondition()
         options:
             entityHint: channel
