@@ -8,27 +8,19 @@ datagrid:
                     - embedded_form.id
                     - embedded_form.title
                     - embedded_form.formType
-                    - channel.name as channelName
                 from:
                     - { table: Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm, alias: embedded_form }
-                join:
-                    left:
-                        - { join: embedded_form.channel, alias: channel }
         columns:
             title:
                 label: oro.embeddedform.title.label
             formType:
                 label: oro.embeddedform.form_type.label
                 type: embedded_form_type
-            channelName:
-                label: oro.embeddedform.channel.label
 
         sorters:
             columns:
                 title:
                     data_name: embedded_form.title
-                channelName:
-                    data_name: channel.name
             default:
                 title: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
@@ -43,14 +35,6 @@ datagrid:
                     options:
                         field_options:
                             choices: @oro_embedded_form.manager->getAll
-                channelName:
-                    type: entity
-                    data_name: channel.id
-                    options:
-                        field_options:
-                            multiple: true
-                            class: OroIntegrationBundle:Channel
-                            property: name
 
         properties:
             id: ~
