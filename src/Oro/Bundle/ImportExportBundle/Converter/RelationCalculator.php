@@ -22,11 +22,6 @@ class RelationCalculator implements RelationCalculatorInterface
     protected $fieldHelper;
 
     /**
-     * @var FieldHelper
-     */
-    protected $fieldHelper;
-
-    /**
      * @param ManagerRegistry $registry
      * @param FieldHelper $fieldHelper
      */
