@@ -27,7 +27,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     public function generate(array $schema, PhpClass $class)
     {
         if ($schema['type'] === 'Extend') {
-            if (isset($schema['inherit'])) {
+            if (!empty($schema['inherit'])) {
                 $class->setParentClassName($schema['inherit']);
             }
         } else {
@@ -53,10 +53,10 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function generateConstructor(array $schema, PhpClass $class)
     {
         $constructorBody = [];
-        if (isset($schema['inherit'])) {
+        if (!empty($schema['inherit'])) {
             $parent = new \ReflectionClass($schema['inherit']);
             if ($parent->getConstructor()) {
-                $constructorBody[] = 'parent::__construct()';
+                $constructorBody[] = 'parent::__construct();';
             }
         }
         foreach ($schema['addremove'] as $fieldName => $config) {

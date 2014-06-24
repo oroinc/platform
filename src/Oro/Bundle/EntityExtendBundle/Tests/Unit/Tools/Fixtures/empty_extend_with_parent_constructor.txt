@@ -4,6 +4,6 @@ class Entity extends \Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Pa
 {
     public function __construct()
     {
-        parent::__construct()
+        parent::__construct();
     }
 }
