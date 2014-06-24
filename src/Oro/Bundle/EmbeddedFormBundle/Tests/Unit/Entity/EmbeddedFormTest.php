@@ -19,8 +19,6 @@ class EmbeddedFormTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldSetEntityPropertiesAndReturnBack()
     {
-        /** @var Channel $channel */
-        $channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $formType = uniqid('AnyFormType');
         $css = uniqid('styles');
         $title = uniqid('title');
