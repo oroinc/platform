@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\EventListener;
+namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
 use Doctrine\ORM\EntityManager;
 

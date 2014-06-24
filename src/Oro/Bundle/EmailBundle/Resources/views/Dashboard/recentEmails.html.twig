@@ -4,7 +4,7 @@
 {% block content %}
     {% set tabs = [{
         'url': path(
-            'oro_user_dashboard_recent_emails',
+            'oro_email_dashboard_recent_emails',
             {'widget': widgetName, 'activeTab': 'inbox', 'contentType': 'tab'}
         ),
         'name': 'inbox',
@@ -12,7 +12,7 @@
     },
     {
         'url': path(
-            'oro_user_dashboard_recent_emails',
+            'oro_email_dashboard_recent_emails',
             {'widget': widgetName, 'activeTab': 'sent', 'contentType': 'tab'}
         ),
         'name': 'sent',

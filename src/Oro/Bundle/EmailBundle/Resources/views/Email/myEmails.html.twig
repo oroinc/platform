@@ -1,5 +1,8 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 
+{% set name = app.user|oro_format_name|default('N/A') %}
+{% oro_title_set({params : {"%username%": name }}) %}
+
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 {% set gridName = 'my-emails-grid' %}
 {# grid params #}
@@ -7,6 +10,9 @@
 {% oro_title_set({params : {"%username%": app.user.username} }) %}
 
 {% block breadcrumb %}
-    {% set breadcrumbs = [{'label': app.user.username }, {'label': 'oro.email.menu.my_emails'|trans }] %}
+    {% set breadcrumbs = [
+        {'label': name },
+        {'label': 'oro.email.menu.my_emails'|trans }
+    ] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
