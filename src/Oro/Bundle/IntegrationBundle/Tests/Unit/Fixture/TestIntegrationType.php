@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture;
 
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 
-class TestChannelType implements ChannelInterface
+class TestIntegrationType implements ChannelInterface
 {
     /**
      * Returns label for UI

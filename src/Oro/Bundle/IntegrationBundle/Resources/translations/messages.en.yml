@@ -1,8 +1,8 @@
 oro:
     integration:
         menu:
-            channels_submenu.label: Channels
-            channels_list.label: Manage Channels
+            integrations_submenu.label: Integrations
+            integrations_list.label: Manage Integrations
 
         datagrid:
             column:
@@ -14,37 +14,50 @@ oro:
                 schedule_sync: Schedule Sync
 
         controller:
-            channel:
+            integration:
                 message:
-                    saved: Channel saved
+                    saved: Integration saved
 
-        channel_type:
+        integration_type:
             simple:
                 label: Simple
 
         transport:
             simple: Simple
 
-        channel:
-            entity_label:        Channel
-            entity_plural_label: Channels
-            entity_description:  Represent channel
+        integration:
+            entity_label:        Integration
+            entity_plural_label: Integrations
+            entity_description:  Represent integration
             id.label:         Id
             type.label:       Type
             transport.label:  Transport type
             statuses.label:   Statuses
             name.label:       Name
             connectors.label: Connectors
-            is_two_way_sync_enabled.label: Enable two way sync
-            sync_priority.label: Sync priority
+            synchronization_settings.label: Synchronization Settings
             remote_wins.label: Remote wins
             local_wins.label: Local wins
+            default_user_owner.label: Default owner
+            organization.label: Organization
+        channel:
+            entity_label:        Integration
+            entity_plural_label: Integrations
+            entity_description:  Represent integration
+            id.label:         Id
+            type.label:       Type
+            transport.label:  Transport type
+            statuses.label:   Statuses
+            name.label:       Name
+            connectors.label: Connectors
+            synchronization_settings.label: Synchronization Settings
+            organization.label: Organization
             default_user_owner.label: Default owner
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: Failed to add sync job to the queue. Error: %s.
         progress: Check progress.
 
-        delete_sync_channel:
-            content: "Warning: Removing the channel will delete all related data"
-            success: Channel and all related data were deleted
+        delete_sync_integration:
+            content: "Warning: Removing the integration will delete all related data"
+            success: Integration and all related data were deleted

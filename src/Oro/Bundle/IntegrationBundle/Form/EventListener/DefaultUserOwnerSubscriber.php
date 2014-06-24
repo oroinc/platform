@@ -13,6 +13,9 @@ class DefaultUserOwnerSubscriber implements EventSubscriberInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /**
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;

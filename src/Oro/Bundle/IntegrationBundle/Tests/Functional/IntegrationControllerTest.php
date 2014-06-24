@@ -6,12 +6,13 @@ use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
  * @outputBuffering enabled
  * @dbIsolation
  */
-class ChannelControllersTest extends WebTestCase
+class IntegrationControllerTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -21,12 +22,23 @@ class ChannelControllersTest extends WebTestCase
         );
     }
 
+    /**
+     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization|null
+     */
+    public function getOrganization()
+    {
+        return $this->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->findOneByName(LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION);
+    }
+
     public function testIndex()
     {
-        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_index'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_index'));
         $result  = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Channels - System', $crawler->html());
+        $this->assertContains('Integrations - System', $crawler->html());
     }
 
     public function testCreate()
@@ -41,7 +53,8 @@ class ChannelControllersTest extends WebTestCase
         $em->persist($newUser);
         $em->flush($newUser);
 
-        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_channel_create'));
+        $organization = $this->getOrganization();
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
@@ -51,8 +64,15 @@ class ChannelControllersTest extends WebTestCase
             'Should contains predefined default owner - current user'
         );
 
+        $this->assertEquals(
+            $organization->getId(),
+            $form['oro_integration_channel_form[organization]']->getValue(),
+            'Should contains predefined organization'
+        );
+
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = 'Simple channel';
+        $form['oro_integration_channel_form[organization]'] = $organization->getId();
         $form['oro_integration_channel_form[type]'] = 'simple';
         $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
 
@@ -61,9 +81,9 @@ class ChannelControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Channel saved", $crawler->html());
+        $this->assertContains("Integration saved", $crawler->html());
 
-        return compact('name', 'newUser');
+        return compact('name', 'newUser', 'organization');
     }
 
     /**
@@ -76,7 +96,7 @@ class ChannelControllersTest extends WebTestCase
     public function testUpdate($data)
     {
         $response = $this->client->requestGrid(
-            'channels-grid',
+            'oro-integration-grid',
             array('channels[_filter][name][value]' => $data['name'])
         );
 
@@ -86,7 +106,7 @@ class ChannelControllersTest extends WebTestCase
         $channel = $result;
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_integration_channel_update', array('id' => $result['id']))
+            $this->getUrl('oro_integration_update', array('id' => $result['id']))
         );
 
         /** @var Form $form */
@@ -98,6 +118,12 @@ class ChannelControllersTest extends WebTestCase
             'Should save default user owner'
         );
 
+        $this->assertEquals(
+            $data['organization']->getId(),
+            $form['oro_integration_channel_form[organization]']->getValue(),
+            'Should save organization'
+        );
+
         $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
 
@@ -106,7 +132,7 @@ class ChannelControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
-        $this->assertContains("Channel saved", $crawler->html());
+        $this->assertContains("Integration saved", $crawler->html());
 
         $channel['name'] = $name;
         return $channel;
@@ -123,7 +149,7 @@ class ChannelControllersTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_integration_channel_schedule', array('id' => $channel['id']))
+            $this->getUrl('oro_integration_schedule', array('id' => $channel['id']))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -141,14 +167,14 @@ class ChannelControllersTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_channel', array('id' => $channel['id']))
+            $this->getUrl('oro_api_delete_integration', array('id' => $channel['id']))
         );
 
         $response = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($response, 204);
 
         $response = $this->client->requestGrid(
-            'channels-grid',
+            'oro-integration-grid',
             array('channels[_filter][name][value]' => $channel['name'])
         );
 

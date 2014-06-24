@@ -4,18 +4,19 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-interface ChannelDeleteProviderInterface
+interface DeleteProviderInterface
 {
     /**
-     * Is this provider supports given channel type
-     * @param string $channelType
+     * Is this provider supports given integration type
+     *
+     * @param string $type
      *
      * @return bool
      */
-    public function isSupport($channelType);
+    public function supports($type);
 
     /**
-     * Process delete channel related data
+     * Process delete of integration related data
      *
      * @param Channel $channel
      */

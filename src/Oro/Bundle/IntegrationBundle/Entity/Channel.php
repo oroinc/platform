@@ -5,7 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -13,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_integration_channel")
  * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
  * @Config(
- *  routeName="oro_integration_channel_index",
+ *  routeName="oro_integration_index",
  *  defaultValues={
  *      "security"={
  *          "type"="ACL",
@@ -67,20 +69,11 @@ class Channel
     protected $connectors;
 
     /**
-     * @var boolean
+     * @var ConfigObject
      *
-     * @ORM\Column(name="is_two_way_sync_enabled", type="boolean", nullable=true)
-     * @Oro\Versioned()
+     * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
      */
-    protected $isTwoWaySyncEnabled;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="sync_priority", type="string", length=255, nullable=true)
-     * @Oro\Versioned()
-     */
-    protected $syncPriority;
+    protected $synchronizationSettings;
 
     /**
      * @var User
@@ -89,6 +82,14 @@ class Channel
      * @Oro\Versioned()
      */
     protected $defaultUserOwner;
+
+    /**
+     * @var Organization
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $organization;
 
     /**
      * @var Status[]|ArrayCollection
@@ -103,8 +104,8 @@ class Channel
 
     public function __construct()
     {
-        $this->statuses            = new ArrayCollection();
-        $this->isTwoWaySyncEnabled = false;
+        $this->statuses                = new ArrayCollection();
+        $this->synchronizationSettings = ConfigObject::create([]);
     }
 
     /**
@@ -206,6 +207,30 @@ class Channel
     }
 
     /**
+     * @param ConfigObject $synchronizationSettings
+     */
+    public function setSynchronizationSettings($synchronizationSettings)
+    {
+        $this->synchronizationSettings = $synchronizationSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettings()
+    {
+        return clone $this->synchronizationSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettingsReference()
+    {
+        return $this->synchronizationSettings;
+    }
+
+    /**
      * @param Status $status
      *
      * @return $this
@@ -247,46 +272,6 @@ class Channel
     }
 
     /**
-     * @param string $syncPriority
-     *
-     * @return $this
-     */
-    public function setSyncPriority($syncPriority)
-    {
-        $this->syncPriority = $syncPriority;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSyncPriority()
-    {
-        return $this->syncPriority;
-    }
-
-    /**
-     * @param boolean $isTwoWaySyncEnabled
-     *
-     * @return $this
-     */
-    public function setIsTwoWaySyncEnabled($isTwoWaySyncEnabled)
-    {
-        $this->isTwoWaySyncEnabled = $isTwoWaySyncEnabled;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getIsTwoWaySyncEnabled()
-    {
-        return $this->isTwoWaySyncEnabled;
-    }
-
-    /**
      * @param User $owner
      *
      * @return $this
@@ -304,5 +289,21 @@ class Channel
     public function getDefaultUserOwner()
     {
         return $this->defaultUserOwner;
+    }
+
+    /**
+     * @param Organization $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

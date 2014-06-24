@@ -18,6 +18,10 @@ class ConnectorContextMediator
     /** @var ChannelRepository */
     protected $channelRepository;
 
+    /**
+     * @param ServiceLink   $registryLink
+     * @param EntityManager $em
+     */
     public function __construct(ServiceLink $registryLink, EntityManager $em)
     {
         $this->registryLink      = $registryLink;
