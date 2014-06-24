@@ -149,23 +149,6 @@ services:
             - @form.factory
             - @security.context
 
-    oro_user.event_listener.user_email_inbox_grid_listener:
-        class: %oro_user.event_listener.user_email_grid_listener.class%
-        arguments:
-          - @doctrine.orm.entity_manager
-          - @oro_email.email_synchronization_manager
-          - @oro_email.datagrid_query_factory
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
-
-    oro_user.event_listener.without_from_user_email_grid_listener:
-        class: %oro_user.event_listener.user_email_grid_listener.class%
-        arguments:
-          - @doctrine.orm.entity_manager
-          - @oro_email.email_synchronization_manager
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
-
     oro_user.event_listener.role_users_grid_listener:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
         arguments:

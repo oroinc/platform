@@ -1,4 +1,12 @@
 oro:
+    dashboard:
+        recent_emails:
+            title:       Recent Emails
+            inbox:       Inbox
+            sent:        Sent
+            view_all:    View All
+            description: This widget allows you to see most recent additions to your inbox and outbox
+
     email:
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template:                   "Choose a template..."

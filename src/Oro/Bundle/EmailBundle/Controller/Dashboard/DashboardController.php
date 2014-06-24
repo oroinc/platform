@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Controller\Dashboard;
+namespace Oro\Bundle\EmailBundle\Controller\Dashboard;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -10,7 +10,7 @@ class DashboardController extends Controller
     /**
      * @Route(
      *      "/recent_emails/{widget}/{activeTab}/{contentType}",
-     *      name="oro_user_dashboard_recent_emails",
+     *      name="oro_email_dashboard_recent_emails",
      *      requirements={"widget"="[\w-]+", "activeTab"="inbox|sent", "contentType"="full|tab"},
      *      defaults={"activeTab" = "inbox", "contentType" = "full"}
      * )
@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $loggedUserId     = $this->getUser()->getId();
         $renderMethod     = ($contentType === 'tab') ? 'render' : 'renderView';
         $activeTabContent = $this->$renderMethod(
-            'OroUserBundle:Dashboard:recentEmailsGrid.html.twig',
+            'OroEmailBundle:Dashboard:recentEmailsGrid.html.twig',
             [
                 'loggedUserId' => $loggedUserId,
                 'gridName'     => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
@@ -40,7 +40,7 @@ class DashboardController extends Controller
             );
 
             return $this->render(
-                'OroUserBundle:Dashboard:recentEmails.html.twig',
+                'OroEmailBundle:Dashboard:recentEmails.html.twig',
                 $params
             );
         }
