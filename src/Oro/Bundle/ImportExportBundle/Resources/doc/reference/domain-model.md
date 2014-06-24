@@ -190,10 +190,10 @@ One option is required, options are mutually exclusive.
 Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
 
 **Description:**
-Reads entities defined as import templates using Doctrine.
+Reads import templates data for iven entity.
 
 **Configuration Options:**
-* **entityName** - the name or class name of entity to read
+* **entityName** - the name or class name of entity for which fixture loaded
 
 Processor
 ---------
