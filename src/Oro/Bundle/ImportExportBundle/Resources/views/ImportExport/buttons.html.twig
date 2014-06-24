@@ -5,34 +5,48 @@
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
 
 {% if exportAllowed or importAllowed %}
-    {% if hasExportTemplateProcessor %}
+
+    {% if exportAllowed %}
         <div class="btn-group">
             <a type="button"
-                class="btn no-hash"
-                target="_blank"
-                href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
-                {{ 'oro.importexport.import.tempate'|trans }}
+               class="btn export-btn icons-holder-text no-hash"
+               href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
+                <i class="icon-download-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
     {% endif %}
 
-    <div class="btn-group">
-        {% if importAllowed %}
+    {% if importAllowed %}
+        <div class="btn-group">
             <a type="button"
-                class="btn import-btn icons-holder-text no-hash"
-                href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
-                <i class="icon-signin hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+               class="btn import-btn icons-holder-text no-hash"
+               href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
+                <i class="icon-upload-alt  hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
             </a>
-        {% endif %}
 
-        {% if exportAllowed %}
-            <a type="button"
-               class="btn export-btn icons-holder-text no-hash"
-               href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-                <i class="icon-signout hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+        {% if hasExportTemplateProcessor %}
+            <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
             </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a type="button"
+                       class="import-btn icons-holder-text no-hash"
+                       href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
+                        <i class="icon-upload-alt hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+                    </a>
+                </li>
+                <li>
+                    <a type="button"
+                       class="no-hash"
+                       target="_blank"
+                       href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
+                        <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+                    </a>
+                </li>
+            </ul>
         {% endif %}
-    </div>
+    {% endif %}
 
     <script type="text/javascript">
         require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/mediator', 'oroimportexport/js/export-handler'],

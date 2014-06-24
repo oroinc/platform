@@ -3,6 +3,7 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
-class UserMultiSelectType extends UserSelectType
+class UserMultiSelectType extends AbstractType
 {
     /**
      * @var EntityManager
@@ -56,6 +57,14 @@ class UserMultiSelectType extends UserSelectType
                 )
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'oro_jqueryselect2_hidden';
     }
 
     /**

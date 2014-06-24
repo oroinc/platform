@@ -8,13 +8,15 @@ Table of Contents
  - [Export Processor](#export-processor)
  - [Import Strategy](#import-strategy)
  - [Import Processor](#import-processor)
+ - [Fixture Services](#fixture-services)
 
 Adding Normalizers
 ------------------
 
-Serializer is involved both in import and export operations. It's stands on standard Symfony's serializer and uses
-it's interfaces. Responsibility of serializer is converting entities to plain/array representation (serialization)
-and vice versa converting plain/array representation to entity objects (deserialization).
+Serializer is involved both in import and export operations. It's extended from standard Symfony's `Serializer` and uses
+extended `DenormalizerInterface` and `NormalizerInterface` interfaces (with context support for `supportsNormalization`
+and `supportsDenormalization`). Responsibility of serializer is converting entities to plain/array representation
+(serialization) and vice versa converting plain/array representation to entity objects (deserialization).
 
 Serializer uses normalizers to perform converting of objects. So you need to provide normalizers for entities that
 will be imported/exported.
@@ -32,30 +34,24 @@ Generally you should implement both interfaces if you need to add both import an
 
 namespace OroCRM\Bundle\ContactBundle\ImportExport\Serializer\Normalizer;
 
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
+
 use OroCRM\Bundle\ContactBundle\Entity\Group;
 
-class GroupNormalizer implements NormalizerInterface, DenormalizerInterface
+class GroupNormalizer extends ConfigurableEntityNormalizer
 {
     public function normalize($object, $format = null, array $context = array())
     {
-        return array(
-            'id' => $object->getId(),
-            'label' => $object->getLabel(),
-        );
+        $result = parent::normalize($object, $format, $context);
+
+        // call some service to modify $result
     }
 
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $result = new Group();
-        if (!empty($data['id'])) {
-            $result->setId($data['id']);
-        }
-        if (!empty($data['label'])) {
-            $result->setLabel($data['label']);
-        }
-        return $result;
+        // call some service to modify $data
+
+        return parent::denormalize($data, $class, $format, $context);
     }
 
     public function supportsNormalization($data, $format = null, array $context = array())
@@ -82,6 +78,7 @@ parameters:
 services:
     orocrm_contact.importexport.normalizer.group:
         class: %orocrm_contact.importexport.normalizer.group.class%
+        parent: oro_importexport.serializer.configurable_entity_normalizer
         tags:
             - { name: oro_importexport.normalizer }
 ```
@@ -92,12 +89,12 @@ Adding Data Converter
 
 Data converter is responsible for converting header of import/export file. Assume that your entity has some properties
 that should be exposed in export file. You can use default Data Converter
-(Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter) but if there is a need to have custom labels instead of
-names of properties in export/import files, you can extend Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter.
+`Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter` but if there is a need to have custom labels instead of
+names of properties in export/import files, you can extend `Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter`
 
 **Example Of Custom Data Converter**
 
-```
+```php
 <?php
 
 namespace OroCRM\Bundle\ContactBundle\ImportExport\Converter;
@@ -126,8 +123,16 @@ class GroupDataConverter extends AbstractTableDataConverter
 
 ```
 
+**Service**
+
+```
+services:
+    orocrm_contact.importexport.data_converter.group:
+        parent: oro_importexport.data_converter.configurable
+```
+
 Look at more complex example of DataConverter in OroCRMContactBundle
-(OroCRM\Bundle\ContactBundle\ImportExport\Converter\ContactDataConverter).
+`OroCRM\Bundle\MagentoBundle\ImportExport\Converter\OrderAddressDataConverter`.
 
 
 Export Processor
@@ -170,27 +175,40 @@ it can update only existed ones.
 
 **Example of Import Strategy**
 
-```
+```php
 <?php
 
-namespace OroCRM\Bundle\ContactBundle\ImportExport\Strategy\Import;
+namespace OroCRM\Bundle\ContactBundle\ImportExport\Strategy;
 
-use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 
-class AddOrReplaceStrategy implements StrategyInterface
+class ContactAddOrReplaceStrategy extends ConfigurableAddOrReplaceStrategy
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process($entity)
     {
-        $result = $this->findGroup($entity->getId());
-        if (!$result) {
-            $result = $this->createGroup();
+        $entity = parent::process($entity);
+
+        if ($entity) {
+            $this
+                ->updateAddresses($entity);
         }
-        $this->replaceGroupProperties($result, $entity);
-        $this->validateGroup($result);
-        return $result;
+
+        return $entity;
     }
 
     // other methods
+```
+
+**Service**
+
+```
+services:
+    orocrm_contact.importexport.strategy.group.add_or_replace:
+        class: %orocrm_contact.importexport.strategy.group.class%
+        parent: oro_importexport.strategy.configurable_add_or_replace
 ```
 
 Import Processor
@@ -206,7 +224,7 @@ services:
         parent: oro_importexport.processor.import_abstract
         calls:
              - [setDataConverter, [@orocrm_contact.importexport.data_converter.group]]
-             - [setStrategy, [@orocrm_contact.importexport.strategy.import.group.add_or_replace]]
+             - [setStrategy, [@orocrm_contact.importexport.strategy.group.add_or_replace]]
         tags:
             - { name: oro_importexport.processor, type: import, entity: %orocrm_contact.group.entity.class%, alias: orocrm_contact.add_or_replace_group }
             - { name: oro_importexport.processor, type: import_validation, entity: %orocrm_contact.entity.class%, alias: orocrm_contact.add_or_replace_group }
@@ -226,3 +244,81 @@ errors that were occurred. Records with errors can't be imported but errors not 
 
 At the last step import is processed. See controller action OroImportExportBundle:ImportExport:importProcess
 (route "oro_importexport_import_process").
+
+Fixture Services
+----------------
+
+Fixtures implementation based on default import/export process.
+
+**Create class:**
+
+```php
+<?php
+
+namespace OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture;
+
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
+
+use OroCRM\Bundle\ContactBundle\Entity\Contact;
+
+class ContactFixture implements TemplateFixtureInterface
+{
+    /**
+     * @var TemplateFixtureInterface
+     */
+    protected $userFixture;
+
+    /**
+     * @param TemplateFixtureInterface $userFixture
+     */
+    public function __construct(TemplateFixtureInterface $userFixture)
+    {
+        $this->userFixture = $userFixture;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        $contact = new Contact();
+        $contact
+            ->setFirstName('Jerry')
+            ->setLastName('Coleman');
+
+        return new \ArrayIterator(array($contact));
+    }
+}
+
+```
+
+**Define a service:**
+
+```
+parameters:
+    orocrm_contact.importexport.templatefixture.contactfixture.class: OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
+
+services:
+    orocrm_contact.importexport.templatefixture.contactfixture:
+        class: %orocrm_contact.importexport.templatefixture.contactfixture.class%
+        tags:
+            - { name: oro_importexport.template_fixture, entity: %orocrm_contact.entity.class% }
+
+```
+
+**Define fixture converter:**
+```
+    orocrm_contact.importexport.template_fixture.data_converter.contact:
+        parent: oro_importexport.data_converter.template_fixture.configurable
+```
+
+**Define export processor:**
+```
+    orocrm_contact.importexport.processor.export_template:
+        parent: oro_importexport.processor.export_abstract
+        calls:
+            - [setDataConverter, [@orocrm_contact.importexport.template_fixture.data_converter.contact]]
+        tags:
+            - { name: oro_importexport.processor, type: export_template, entity: %orocrm_contact.entity.class%, alias: orocrm_contact }
+
+```
