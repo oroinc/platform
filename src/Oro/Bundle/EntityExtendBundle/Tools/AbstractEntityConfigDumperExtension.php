@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
-abstract class ExtendConfigDumperExtension
+abstract class AbstractEntityConfigDumperExtension
 {
     /**
      * @param string $actionType preUpdate or postUpdate

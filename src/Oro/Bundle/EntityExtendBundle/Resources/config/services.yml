@@ -15,7 +15,8 @@ parameters:
     oro_entity_extend.migration.options_parser.class:         Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
-    oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator
+    oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
+    oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
 
 services:
@@ -38,6 +39,12 @@ services:
         class: %oro_entity_extend.entity_generator.class%
         arguments:
             - %kernel.cache_dir%
+
+    oro_entity_extend.entity_generator.extension:
+        class: %oro_entity_extend.entity_generator.extension.class%
+        arguments:
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
     oro_entity_extend.tools.dumper:
         class: %oro_entity_extend.tools.dumper.class%

@@ -1,7 +1,7 @@
 parameters:
     oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager
-    oro_activity.entity_extend.dumper_extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityExtendConfigDumperExtension
-    oro_activity.entity_extend.generator_extension.class: Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension
+    oro_activity.entity_config_dumper.extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityEntityConfigDumperExtension
+    oro_activity.entity_generator.extension.class:      Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
     oro_activity.widget_provider.activities.class:      Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
     oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
@@ -17,17 +17,17 @@ services:
             - @oro_entity_config.provider.activity
             - @oro_entity_config.provider.entity
 
-    oro_activity.entity_extend.dumper_extension:
-        class: %oro_activity.entity_extend.dumper_extension.class%
+    oro_activity.entity_config_dumper.extension:
+        class: %oro_activity.entity_config_dumper.extension.class%
         parent: oro_entity_extend.config_dumper_extension
         tags:
-            - { name: oro_entity_extend.dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_activity.entity_extend.generator_extension:
-        class: %oro_activity.entity_extend.generator_extension.class%
+    oro_activity.entity_generator.extension:
+        class: %oro_activity.entity_generator.extension.class%
         arguments:
         tags:
-            - { name: oro_entity_extend.generator_extension }
+            - { name: oro_entity_extend.entity_generator_extension }
 
     oro_activity.migration.extension.activity:
         class: %oro_activity.migration.extension.activity.class%

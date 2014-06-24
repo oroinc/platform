@@ -1,34 +1,32 @@
 <?php
 
-
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Tools;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
-use Oro\Bundle\ActivityBundle\Tools\ActivityExtendEntityGeneratorExtension;
+use Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ActivityExtendEntityGeneratorExtension */
+    /** @var ActivityEntityGeneratorExtension */
     protected $extension;
 
     public function setUp()
     {
-        $this->extension = new ActivityExtendEntityGeneratorExtension();
+        $this->extension = new ActivityEntityGeneratorExtension();
     }
 
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports($actionType, $schemas, $expected)
+    public function testSupports($schemas, $expected)
     {
         $this->assertEquals(
             $expected,
-            $this->extension->supports($actionType, $schemas)
+            $this->extension->supports($schemas)
         );
     }
 
@@ -36,7 +34,6 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 [
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
@@ -55,26 +52,6 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 true,
             ],
             [
-                ExtendEntityGenerator::ACTION_PRE_PROCESS,
-                [
-                    'relation'     => ['test' => 'test'],
-                    'relationData' => [
-                        'test' => [
-                            'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    ExtendHelper::buildAssociationName('Entity\Target'),
-                                    'manyToMany'
-                                ),
-                        ],
-                    ]
-                ],
-                false,
-            ],
-            [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 [
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
@@ -93,7 +70,6 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false,
             ],
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 [
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
@@ -112,7 +88,6 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false,
             ],
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 [
                     'relation'     => [],
                     'relationData' => []
@@ -120,41 +95,10 @@ class ActivityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false,
             ],
             [
-                ExtendEntityGenerator::ACTION_GENERATE,
                 [],
                 false,
             ],
         ];
-    }
-
-    public function atestSupports1()
-    {
-        $schemas = [];
-        $result  = $this->extension->supports(ExtendEntityGenerator::ACTION_PRE_PROCESS, $schemas);
-        $this->assertFalse($result, 'Pre processing not supported');
-
-        $result = $this->extension->supports(
-            ExtendEntityGenerator::ACTION_GENERATE,
-            ['class' => 'Test\Entity', 'relation' => 'test']
-        );
-        $this->assertFalse($result, 'Generate action, no relation data');
-
-        $result = $this->extension->supports(
-            ExtendEntityGenerator::ACTION_GENERATE,
-            [
-                'relation'     => ['test' => 'test'],
-                'relationData' => [
-                    'test'    => [
-                        'field_id' => new FieldConfigId('extend', 'Entity\Test', 'name', 'manyToOne'),
-                    ],
-                    'another' => [
-                        'target_entity' => 'Entity\Test',
-                        'field_id'      => new FieldConfigId('extend', 'Entity\Test', 'org_2342', 'manyToMany'),
-                    ],
-                ]
-            ]
-        );
-        $this->assertFalse($result, 'Generate action');
     }
 
     public function testGenerate()

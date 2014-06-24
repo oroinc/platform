@@ -5,6 +5,17 @@ namespace Oro\Bundle\NoteBundle\Model;
 class ExtendNote
 {
     /**
+     * Constructor
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * Gets the entity this note is associated with
      *
      * The real implementation of this method is auto generated.
