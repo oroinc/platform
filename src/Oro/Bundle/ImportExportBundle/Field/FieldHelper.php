@@ -7,27 +7,32 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FieldHelper
 {
-    /**
-     * @var ConfigProviderInterface
-     */
+    /** @var ConfigProviderInterface */
     protected $configProvider;
 
-    /**
-     * @var EntityFieldProvider
-     */
+    /** @var EntityFieldProvider */
     protected $fieldProvider;
 
+    /** @var  FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /**
-     * @param EntityFieldProvider $fieldProvider
+     * @param EntityFieldProvider     $fieldProvider
      * @param ConfigProviderInterface $configProvider
+     * @param FieldTypeHelper         $fieldTypeHelper
      */
-    public function __construct(EntityFieldProvider $fieldProvider, ConfigProviderInterface $configProvider)
-    {
-        $this->fieldProvider = $fieldProvider;
-        $this->configProvider = $configProvider;
+    public function __construct(
+        EntityFieldProvider $fieldProvider,
+        ConfigProviderInterface $configProvider,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
+        $this->fieldProvider   = $fieldProvider;
+        $this->configProvider  = $configProvider;
+        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -65,7 +70,7 @@ class FieldHelper
      * @param string $entityName
      * @param string $fieldName
      * @param string $parameter
-     * @param mixed $default
+     * @param mixed  $default
      * @return mixed|null
      */
     public function getConfigValue($entityName, $fieldName, $parameter, $default = null)
@@ -83,7 +88,7 @@ class FieldHelper
     }
 
     /**
-     * @param string $className
+     * @param string      $className
      * @param null|string $fieldName
      * @return bool
      */
@@ -98,7 +103,15 @@ class FieldHelper
      */
     public function isRelation(array $field)
     {
-        return !empty($field['relation_type']) && !empty($field['related_entity_name']);
+        return
+            !empty($field['relation_type'])
+            && !empty($field['related_entity_name'])
+            && $this->fieldTypeHelper->isRealRelation($field['relation_type']);
+    }
+
+    public function useRelationDenormalizer(array $field)
+    {
+        return $this->fieldTypeHelper->useRelationDenormalizer($field);
     }
 
     /**
@@ -107,8 +120,13 @@ class FieldHelper
      */
     public function isSingleRelation(array $field)
     {
-        return $this->isRelation($field)
-            && in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
+        return //$this->isRelation($field)
+        //&& in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
+        //&&
+            in_array(
+            $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
+            array('ref-one', 'oneToOne', 'manyToOne')
+        );
     }
 
     /**
@@ -118,7 +136,11 @@ class FieldHelper
     public function isMultipleRelation(array $field)
     {
         return $this->isRelation($field)
-            && in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
+        //&& in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
+        && in_array(
+            $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
+            array('ref-many', 'oneToMany', 'manyToMany')
+        );
     }
 
     /**
@@ -140,12 +162,14 @@ class FieldHelper
     {
         try {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
             return $propertyAccessor->getValue($object, $fieldName);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
             if (property_exists($class, $fieldName)) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
                 $reflection->setAccessible(true);
+
                 return $reflection->getValue($object);
             } else {
                 throw $e;
@@ -156,7 +180,7 @@ class FieldHelper
     /**
      * @param object $object
      * @param string $fieldName
-     * @param mixed $value
+     * @param mixed  $value
      * @throws \Exception
      */
     public function setObjectValue($object, $fieldName, $value)

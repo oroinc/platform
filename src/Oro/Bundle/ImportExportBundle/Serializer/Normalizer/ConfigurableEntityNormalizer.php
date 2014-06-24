@@ -48,7 +48,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
                 if ($data[$fieldName] !== null
-                    && ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field))
+                    && ($this->fieldHelper->isRelation($field)
+                        || $this->fieldHelper->isDateTimeField($field)
+                        || $this->fieldHelper->useRelationDenormalizer($field)
+                    )
                 ) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
@@ -119,6 +122,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldValue = $propertyAccessor->getValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
+                $fieldContext['field'] = $field;
+                $fieldContext['entityId'] = $object->getId();
                 $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
 
                 // Do not export relation in short mode if it does not contain identity fields

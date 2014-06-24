@@ -64,7 +64,7 @@ oro_entity_config:
                 # is relation must be represented by all it's fields
                 full:
                     options:
-                        allowed_type:       [ref-one, oneToOne, manyToOne, ref-many, oneToMany, manyToMany]
+                        allowed_type:       [ref-one, oneToOne, manyToOne, ref-many, oneToMany, manyToMany, attachment, attachmentImage]
                     form:
                         type:               choice
                         options:
