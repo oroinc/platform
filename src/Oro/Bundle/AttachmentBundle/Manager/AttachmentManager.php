@@ -5,6 +5,8 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
+use Symfony\Component\HttpFoundation\File\FIle;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
@@ -39,6 +41,22 @@ class AttachmentManager
         $this->filesystem = $filesystemMap->get('attachments');
         $this->router = $router;
         $this->fileIcons = $fileIcons;
+    }
+
+    public function uploadRemoteFile($fileUrl)
+    {
+        $filesystem = new SymfonyFileSystem();
+        $tmpFile = tempnam('upload', uniqid());
+        $filesystem->copy($fileUrl, '/tmp/testFIle', true);
+        $file = new File($tmpFile);
+
+        $attachment = new Attachment();
+        $attachment->setFile($file);
+
+        $this->preUpload($attachment);
+        $this->upload($attachment);
+
+        return $attachment;
     }
 
     /**

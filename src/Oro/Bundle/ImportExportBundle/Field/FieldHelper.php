@@ -103,7 +103,15 @@ class FieldHelper
      */
     public function isRelation(array $field)
     {
-        return !empty($field['relation_type']) && !empty($field['related_entity_name']);
+        return
+            !empty($field['relation_type'])
+            && !empty($field['related_entity_name'])
+            && $this->fieldTypeHelper->isRealRelation($field['relation_type']);
+    }
+
+    public function useRelationDenormalizer(array $field)
+    {
+        return $this->fieldTypeHelper->useRelationDenormalizer($field);
     }
 
     /**
@@ -112,9 +120,10 @@ class FieldHelper
      */
     public function isSingleRelation(array $field)
     {
-        return $this->isRelation($field)
+        return //$this->isRelation($field)
         //&& in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
-        && in_array(
+        //&&
+            in_array(
             $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
             array('ref-one', 'oneToOne', 'manyToOne')
         );

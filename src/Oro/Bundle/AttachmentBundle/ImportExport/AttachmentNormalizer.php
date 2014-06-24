@@ -24,7 +24,7 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return true;
+        return $type == 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
     }
 
     /**
@@ -40,7 +40,7 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        return '1';
+        return $this->attachmentManager->uploadRemoteFile($data);
     }
 
     /**

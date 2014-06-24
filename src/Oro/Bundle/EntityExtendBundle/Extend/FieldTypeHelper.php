@@ -16,6 +16,8 @@ class FieldTypeHelper
         ]
     ];
 
+    protected $realRelationTypes =  ['ref-one', 'ref-many', 'manyToOne', 'oneToMany', 'manyToMany'];
+
     /**
      * @param string $type
      *
@@ -30,5 +32,22 @@ class FieldTypeHelper
         }
 
         return $type;
+    }
+
+    /**
+     * Check if relation is real relation
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isRealRelation($type)
+    {
+        return in_array($type, $this->realRelationTypes);
+    }
+
+    public function useRelationDenormalizer($field)
+    {
+        return isset($field['relation_type']) && !$this->isRealRelation($field['relation_type']);
     }
 }
