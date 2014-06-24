@@ -190,7 +190,7 @@ One option is required, options are mutually exclusive.
 Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
 
 **Description:**
-Reads import templates data for iven entity.
+Reads import templates data for given entity.
 
 **Configuration Options:**
 * **entityName** - the name or class name of entity for which fixture loaded
