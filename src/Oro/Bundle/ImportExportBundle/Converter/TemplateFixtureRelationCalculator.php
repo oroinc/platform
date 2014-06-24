@@ -40,12 +40,17 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
     {
         $maxFields = 0;
         foreach ($this->getFixtureData($entityName) as $fixture) {
-            $fieldValue = $this->fieldHelper->getObjectValue($fixture, $fieldName);
-            if ($fieldValue instanceof \Countable || is_array($fieldValue)) {
-                $itemsCount = count($fieldValue);
-                if ($itemsCount > $maxFields) {
-                    $maxFields = $itemsCount;
+            try {
+                $fieldValue = $this->fieldHelper->getObjectValue($fixture, $fieldName);
+                if ($fieldValue instanceof \Countable || is_array($fieldValue)) {
+                    $itemsCount = count($fieldValue);
+                    if ($itemsCount > $maxFields) {
+                        $maxFields = $itemsCount;
+                    }
                 }
+            } catch (\Exception $e) {
+                // there is no $fieldName in fixture
+                continue;
             }
         }
 
