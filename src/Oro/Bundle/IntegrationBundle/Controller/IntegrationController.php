@@ -123,7 +123,6 @@ class IntegrationController extends Controller
      *      permission="EDIT",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template()
      */
     public function toggleAction(Channel $integration)
     {
