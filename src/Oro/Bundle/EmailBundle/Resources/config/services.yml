@@ -265,6 +265,7 @@ services:
         tags:
             - { name: twig.extension }
 
+    # these two grid listeners are actually the same but for two grid configuration that are slightly different
     oro_email.event_listener.user_email_grid_listener:
         class: %oro_user.event_listener.user_email_grid_listener.class%
         arguments:
@@ -272,3 +273,11 @@ services:
             - @oro_email.email_synchronization_manager
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-email-grid, method: onBuildAfter }
+
+    oro_email.event_listener.my_emails_grid_listener:
+        class: %oro_user.event_listener.user_email_grid_listener.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_email.email_synchronization_manager
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.my-emails-grid, method: onBuildAfter }

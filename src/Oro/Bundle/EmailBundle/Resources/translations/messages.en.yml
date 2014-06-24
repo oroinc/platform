@@ -38,6 +38,10 @@ oro:
                     all: "All"
                 view:
                     system_templates: "System only"
+            emails:
+                action:
+                    view: "View"
+
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."

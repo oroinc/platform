@@ -13,7 +13,7 @@ oro_menu_config:
                 description: 'oro.email.menu.emailtemplate_list.description'
         oro_email_my_emails:
             label: 'oro.email.menu.my_emails'
-            route: 'oro_email_myemails'
+            route: 'oro_email_useremails'
             extras:
                 position: 30
 
@@ -35,4 +35,4 @@ oro_titles:
     oro_email_emailtemplate_update: "Template %%name%% - Edit"
     oro_email_emailtemplate_create: "Create Email Template"
     oro_email_emailtemplate_clone: "Clone Email Template"
-    oro_email_myemails: "My Emails - %%username%%"
+    oro_email_useremails: "My Emails - %%username%%"

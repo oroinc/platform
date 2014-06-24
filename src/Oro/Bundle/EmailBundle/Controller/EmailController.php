@@ -23,7 +23,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 class EmailController extends Controller
 {
     /**
-     * @Route("/my-emails", name="oro_email_myemails")
+     * @Route("/user-emails", name="oro_email_useremails")
      * @AclAncestor("oro_email_view")
      * @Template
      */

@@ -9,15 +9,20 @@
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-        'entity': entity,
-        'indexLabel': 'oro.email.entity_plural_label'|trans,
-        'entityTitle': entity.subject
+        'entity':      entity,
+        'indexLabel':  'oro.email.entity_plural_label'|trans,
+        'entityTitle': entity.subject,
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block breadcrumb %}
+    {% set breadcrumbs = [{'label': app.user.username }, {'label': 'oro.email.menu.my_emails'|trans }, {'label': entity.subject}] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
+
 {% block stats %}
-    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}
