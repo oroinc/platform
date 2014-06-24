@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestChannelDeleteProvider;
@@ -15,9 +15,9 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
     protected $deleteManager;
 
     /**
-     * @var Channel
+     * @var Integration
      */
-    protected $testChannel;
+    protected $testIntegration;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -44,8 +44,8 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
             ->method('beginTransaction');
         $this->deleteManager = new DeleteManager($this->em);
         $this->deleteManager->addProvider(new TestChannelDeleteProvider());
-        $this->testChannel = new Channel();
-        $this->testChannel->setType('test');
+        $this->testIntegration = new Integration();
+        $this->testIntegration->setType('test');
     }
 
     public function testDeleteChannelWithoutErrors()
@@ -54,21 +54,21 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
             ->method('commit');
         $this->em->expects($this->any())
             ->method('remove')
-            ->with($this->equalTo($this->testChannel));
+            ->with($this->equalTo($this->testIntegration));
         $this->em->expects($this->any())
             ->method('flush');
 
-        $this->assertTrue($this->deleteManager->delete($this->testChannel));
+        $this->assertTrue($this->deleteManager->delete($this->testIntegration));
     }
 
     public function testDeleteChannelWithErrors()
     {
         $this->em->expects($this->any())
             ->method('remove')
-            ->with($this->equalTo($this->testChannel))
+            ->with($this->equalTo($this->testIntegration))
             ->will($this->throwException(new \Exception()));
         $this->connection->expects($this->once())
             ->method('rollback');
-        $this->assertFalse($this->deleteManager->delete($this->testChannel));
+        $this->assertFalse($this->deleteManager->delete($this->testIntegration));
     }
 }

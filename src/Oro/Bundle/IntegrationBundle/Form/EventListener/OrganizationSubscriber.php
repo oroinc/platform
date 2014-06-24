@@ -31,7 +31,7 @@ class OrganizationSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Sets default data for create channels form
+     * Sets default data for create integrations form
      *
      * @param FormEvent $event
      */

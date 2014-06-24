@@ -9,8 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
 class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
@@ -27,10 +27,10 @@ class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var ChannelHandler */
+    /** @var IntegrationHandler */
     protected $handler;
 
-    /** @var Channel */
+    /** @var Integration */
     protected $entity;
 
     protected function setUp()
@@ -42,8 +42,8 @@ class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->entity  = new Channel();
-        $this->handler = new ChannelHandler($this->request, $this->form, $this->em, $this->eventDispatcher);
+        $this->entity  = new Integration();
+        $this->handler = new IntegrationHandler($this->request, $this->form, $this->em, $this->eventDispatcher);
     }
 
     public function testProcessUnsupportedRequest()
@@ -99,7 +99,7 @@ class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider eventDataProvider
      *
-     * @param Channel   $entity
+     * @param Integration   $entity
      * @param null|User $newOwner
      * @param bool      $expectedDispatch
      */
@@ -140,23 +140,23 @@ class ChannelHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function eventDataProvider()
     {
-        $newChannel = new Channel();
+        $newIntegration = new Integration();
         $newOwner   = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         $refProperty = new \ReflectionProperty('Oro\Bundle\IntegrationBundle\Entity\Channel', 'id');
         $refProperty->setAccessible(true);
 
-        $oldChannel = new Channel();
-        $refProperty->setValue($oldChannel, 123);
+        $oldIntegration = new Integration();
+        $refProperty->setValue($oldIntegration, 123);
 
         $someOwner           = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $oldChannelWithOwner = clone $oldChannel;
-        $oldChannelWithOwner->setDefaultUserOwner($someOwner);
+        $oldIntegrationWithOwner = clone $oldIntegration;
+        $oldIntegrationWithOwner->setDefaultUserOwner($someOwner);
 
         return [
-            'new entity, should not dispatch'              => [$newChannel, $newOwner, false],
-            'channel is not new, but owner existed before' => [$oldChannelWithOwner, $newOwner, false],
-            'old channel without owner, should dispatch'   => [$oldChannel, $newOwner, true]
+            'new entity, should not dispatch'              => [$newIntegration, $newOwner, false],
+            'integration is not new, but owner existed before' => [$oldIntegrationWithOwner, $newOwner, false],
+            'old integration without owner, should dispatch'   => [$oldIntegration, $newOwner, true]
         ];
     }
 }

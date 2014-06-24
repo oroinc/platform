@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber as IntegrationFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
 
@@ -23,27 +23,27 @@ class ChannelType extends AbstractType
     /** @var DefaultUserOwnerSubscriber */
     protected $defaultUserOwnerSubscriber;
 
-    /** @var ChannelFormSubscriber */
-    protected $channelFormSubscriber;
+    /** @var IntegrationFormSubscriber */
+    protected $integrationFormSubscriber;
 
-    /** @var ChannelFormSubscriber */
+    /** @var IntegrationFormSubscriber */
     protected $organizationSubscriber;
 
     /**
      * @param TypesRegistry              $registry
      * @param DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber
-     * @param ChannelFormSubscriber      $channelFormSubscriber
+     * @param IntegrationFormSubscriber  $integrationFormSubscriber
      * @param OrganizationSubscriber     $organizationSubscriber
      */
     public function __construct(
         TypesRegistry $registry,
         DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber,
-        ChannelFormSubscriber $channelFormSubscriber,
+        IntegrationFormSubscriber $integrationFormSubscriber,
         OrganizationSubscriber $organizationSubscriber
     ) {
         $this->registry                   = $registry;
         $this->defaultUserOwnerSubscriber = $defaultUserOwnerSubscriber;
-        $this->channelFormSubscriber      = $channelFormSubscriber;
+        $this->integrationFormSubscriber  = $integrationFormSubscriber;
         $this->organizationSubscriber     = $organizationSubscriber;
     }
 
@@ -52,7 +52,7 @@ class ChannelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber($this->channelFormSubscriber);
+        $builder->addEventSubscriber($this->integrationFormSubscriber);
         $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
         $builder->addEventSubscriber($this->organizationSubscriber);
 

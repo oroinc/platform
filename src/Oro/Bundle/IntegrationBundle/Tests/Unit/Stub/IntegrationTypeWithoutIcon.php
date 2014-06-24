@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Stub;
 
-use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 
-class IntegrationTypeWithoutIcon implements ChannelInterface
+class IntegrationTypeWithoutIcon implements IntegrationInterface
 {
     const TYPE = 'type2';
 

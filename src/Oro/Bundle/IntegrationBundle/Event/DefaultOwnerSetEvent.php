@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 /**
  * This event is dispatched default owner set for existing integration instance.
@@ -17,23 +17,23 @@ class DefaultOwnerSetEvent extends Event
 {
     const NAME = 'oro_integration.default_owner.set';
 
-    /** @var Channel */
-    protected $channel;
+    /** @var Integration */
+    protected $integration;
 
     /**
-     * @param Channel $channel
+     * @param Integration $integration
      */
-    public function __construct(Channel $channel)
+    public function __construct(Integration $integration)
     {
-        $this->channel = $channel;
+        $this->integration= $integration;
     }
 
     /**
-     * @return Channel
+     * @return Integration
      */
     public function getChannel()
     {
-        return $this->channel;
+        return $this->integration;
     }
 
     /**
@@ -41,6 +41,6 @@ class DefaultOwnerSetEvent extends Event
      */
     public function getDefaultUserOwner()
     {
-        return $this->channel->getDefaultUserOwner();
+        return $this->integration->getDefaultUserOwner();
     }
 }

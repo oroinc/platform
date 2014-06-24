@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
@@ -51,22 +51,22 @@ class ReverseSyncProcessor
     /**
      * Process channel synchronization
      *
-     * @param Channel $channel    Channel object
+     * @param Integration $integration  Integration object
      * @param string  $connector  Connector name
      * @param array   $parameters Connector additional parameters
      *
      * @return $this
      */
-    public function process(Channel $channel, $connector, array $parameters)
+    public function process(Integration $integration, $connector, array $parameters)
     {
-        if (!$channel->getEnabled()) {
+        if (!$integration->getEnabled()) {
             return $this;
         }
 
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
 
-            $realConnector = $this->getRealConnector($channel, $connector);
+            $realConnector = $this->getRealConnector($integration, $connector);
 
             if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
                 throw new \Exception('This connector doesn`t support two-way sync.');
@@ -81,7 +81,7 @@ class ReverseSyncProcessor
                 array_merge(
                     [
                         'entityName' => $realConnector->getImportEntityFQCN(),
-                        'channel'    => $channel->getId()
+                        'channel'    => $integration->getId()
                     ],
                     $parameters
                 ),
@@ -118,13 +118,13 @@ class ReverseSyncProcessor
     /**
      * Clone object here because it will be modified and changes should not be shared between
      *
-     * @param Channel $channel
+     * @param Integration $integration
      * @param string $connector
      *
      * @return TwoWaySyncConnectorInterface
      */
-    protected function getRealConnector(Channel $channel, $connector)
+    protected function getRealConnector(Integration $integration, $connector)
     {
-        return clone $this->registry->getConnectorType($channel->getType(), $connector);
+        return clone $this->registry->getConnectorType($integration->getType(), $connector);
     }
 }

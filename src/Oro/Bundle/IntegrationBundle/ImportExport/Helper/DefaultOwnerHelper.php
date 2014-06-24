@@ -6,7 +6,7 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
@@ -29,14 +29,14 @@ class DefaultOwnerHelper
     }
 
     /**
-     * Populate owner to target entity based on channel configuration and entity's ownership type
+     * Populate owner to target entity based on integration configuration and entity's ownership type
      *
      * @param object  $entity
-     * @param Channel $channel
+     * @param Integration $integration
      */
-    public function populateChannelOwner($entity, Channel $channel)
+    public function populateChannelOwner($entity, Integration $integration)
     {
-        $defaultUserOwner = $channel->getDefaultUserOwner();
+        $defaultUserOwner = $integration->getDefaultUserOwner();
 
         $className         = ClassUtils::getClass($entity);
         $doctrineMetadata  = $this->em->getClassMetadata($className);

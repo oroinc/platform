@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
@@ -44,7 +44,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
      */
     public function testScheduleRegistryError()
     {
-        $integration = new Channel();
+        $integration = new Integration();
         $integration->setType('testType');
         $integration->setEnabled(true);
 
@@ -57,10 +57,10 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
      */
     public function testScheduleConnectorError()
     {
-        $testIntegrationType   = 'testIntegrationType';
-        $testConnectorType = 'testConnectorType';
+        $testIntegrationType = 'testIntegrationType';
+        $testConnectorType   = 'testConnectorType';
 
-        $integration = new Channel();
+        $integration = new Integration();
         $integration->setType($testIntegrationType);
         $this->typesRegistry->addChannelType($testIntegrationType, new TestIntegrationType());
         $this->typesRegistry->addConnectorType($testConnectorType, $testIntegrationType, new TestConnector());
@@ -71,11 +71,11 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testSchedule()
     {
-        $testIntegrationType   = 'testIntegrationType';
-        $testConnectorType = 'testConnectorType';
-        $testId            = 22;
+        $testIntegrationType = 'testIntegrationType';
+        $testConnectorType   = 'testConnectorType';
+        $testId              = 22;
 
-        $integration = new Channel();
+        $integration = new Integration();
         $integration->setType($testIntegrationType);
         $integration->setEnabled(true);
         $ref = new \ReflectionProperty(get_class($integration), 'id');

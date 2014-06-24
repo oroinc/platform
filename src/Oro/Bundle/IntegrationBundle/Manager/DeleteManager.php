@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class DeleteManager
 {
@@ -27,7 +27,7 @@ class DeleteManager
     }
 
     /**
-     * Add delete channel provider
+     * Add delete integration provider
      *
      * @param DeleteProviderInterface $deleteProvider
      */
@@ -37,23 +37,23 @@ class DeleteManager
     }
 
     /**
-     * Delete channel
+     * Delete integration
      *
-     * @param Channel $channel
+     * @param integration $integration
      *
      * @return bool
      */
-    public function delete(Channel $channel)
+    public function delete(Integration $integration)
     {
         try {
             $this->em->getConnection()->beginTransaction();
-            $type = $channel->getType();
+            $type = $integration->getType();
             foreach ($this->deleteProviders as $deleteProvider) {
                 if ($deleteProvider->supports($type)) {
-                    $deleteProvider->deleteRelatedData($channel);
+                    $deleteProvider->deleteRelatedData($integration);
                 }
             }
-            $this->em->remove($channel);
+            $this->em->remove($integration);
             $this->em->flush();
             $this->em->getConnection()->commit();
         } catch (\Exception $e) {

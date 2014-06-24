@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
 use Oro\Bundle\IntegrationBundle\Utils\FormUtils as IntegrationFormUtils;
@@ -54,7 +54,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     public function preSet(FormEvent $event)
     {
         $form = $event->getForm();
-        /** @var Channel $data */
+        /** @var Integration $data */
         $data = $event->getData();
 
         if ($data === null) {
@@ -101,7 +101,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     public function postSet(FormEvent $event)
     {
         $form = $event->getForm();
-        /** @var Channel $data */
+        /** @var Integration $data */
         $data = $event->getData();
 
         if ($data === null) {
@@ -136,7 +136,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        /** @var Channel $originalData */
+        /** @var Integration $originalData */
         $originalData = $form->getData();
         $data         = $event->getData();
 
@@ -172,9 +172,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                     $originalData->getType(),
                     true
                 );
-                // second condition cover case when we have same name for few channel types
+                // second condition cover case when we have same name for few integration types
                 if ($transportType !== $data['transportType'] || $originalData->getType() !== $data['type']) {
-                    /** @var Channel $setEntity */
+                    /** @var Integration $setEntity */
                     $setEntity = $form->getViewData();
                     $setEntity->clearTransport();
                 }
@@ -188,7 +188,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Returns closure that fills transport type choices depends on selected channel type
+     * Returns closure that fills transport type choices depends on selected integration type
      *
      * @param string $type
      *
@@ -209,7 +209,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Returns closure that fills connectors choices depends on selected channel type
+     * Returns closure that fills connectors choices depends on selected integration type
      *
      * @param string $type
      *
@@ -232,21 +232,21 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     /**
      * Returns closure that adds transport field dependent on the rest form data
      *
-     * @param string $channelType
+     * @param string $integrationType
      * @param string $transportType
      *
      * @return callable
      */
-    protected function getTransportModifierClosure($channelType, $transportType)
+    protected function getTransportModifierClosure($integrationType, $transportType)
     {
         $registry = $this->registry;
 
-        return function (FormInterface $form) use ($channelType, $transportType, $registry) {
-            if (!($channelType && $transportType)) {
+        return function (FormInterface $form) use ($integrationType, $transportType, $registry) {
+            if (!($integrationType && $transportType)) {
                 return;
             }
 
-            $formType = $registry->getTransportType($channelType, $transportType)->getSettingsFormType();
+            $formType = $registry->getTransportType($integrationType, $transportType)->getSettingsFormType();
 
             $connectorsKey = 'connectors';
             $children      = $form->getIterator();
@@ -285,19 +285,19 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Disable fields that are not allowed to be modified since channel has at least one sync completed
+     * Disable fields that are not allowed to be modified since integration has at least one sync completed
      *
      * @param FormInterface $form
-     * @param Channel       $channel
+     * @param Integration       $integration
      */
-    protected function muteFields(FormInterface $form, Channel $channel = null)
+    protected function muteFields(FormInterface $form, Integration $integration = null)
     {
-        if (!($channel && $channel->getId())) {
-            // do nothing if channel is new
+        if (!($integration && $integration->getId())) {
+            // do nothing if integration is new
             return;
         }
 
-        if (IntegrationFormUtils::wasSyncedAtLeastOnce($channel)) {
+        if (IntegrationFormUtils::wasSyncedAtLeastOnce($integration)) {
             // disable type field
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
         }

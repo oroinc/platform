@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +51,7 @@ class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider formDataProvider
      *
-     * @param Channel|null $formData
+     * @param Integration|null $formData
      */
     public function testPostSet($formData)
     {
@@ -86,13 +86,13 @@ class OrganizationSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function formDataProvider()
     {
-        $channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $channel->expects($this->any())->method('getId')
+        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration->expects($this->any())->method('getId')
             ->will($this->returnValue(123));
 
         return [
             'without data' => [null],
-            'with data'    => [$channel]
+            'with data'    => [$integration]
         ];
     }
 }

@@ -6,14 +6,14 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
-use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistry
 {
-    /** @var ArrayCollection|ChannelInterface[] */
+    /** @var ArrayCollection|IntegrationInterface[] */
     protected $integrationTypes = [];
 
     /** @var array|ArrayCollection[] */
@@ -30,13 +30,13 @@ class TypesRegistry
     /**
      * Set registered types
      *
-     * @param string           $typeName
-     * @param ChannelInterface $type
+     * @param string               $typeName
+     * @param IntegrationInterface $type
      *
      * @throws \LogicException
      * @return $this
      */
-    public function addChannelType($typeName, ChannelInterface $type)
+    public function addChannelType($typeName, IntegrationInterface $type)
     {
         if (!$this->integrationTypes->containsKey($typeName)) {
             $this->integrationTypes->set($typeName, $type);
@@ -50,7 +50,7 @@ class TypesRegistry
     /**
      * Return registered types
      *
-     * @return ArrayCollection|ChannelInterface[]
+     * @return ArrayCollection|IntegrationInterface[]
      */
     public function getRegisteredChannelTypes()
     {
@@ -65,10 +65,10 @@ class TypesRegistry
     public function getAvailableChannelTypesChoiceList()
     {
         /** @var ArrayCollection $types */
-        $types  = $this->getAvailableChannelTypes();
+        $types  = $this->getAvailableIntegrationTypes();
         $keys   = $types->getKeys();
         $values = $types->map(
-            function (ChannelInterface $type) {
+            function (IntegrationInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();
@@ -84,10 +84,10 @@ class TypesRegistry
     public function getAvailableIntegrationTypesDetailedChoiceList()
     {
         /** @var ArrayCollection $types */
-        $types  = $this->getAvailableChannelTypes();
+        $types  = $this->getAvailableIntegrationTypes();
         $keys   = $types->getKeys();
         $values = $types->map(
-            function (ChannelInterface $type) {
+            function (IntegrationInterface $type) {
                 $result = ['label' => $type->getLabel()];
                 if ($type instanceof IconAwareIntegrationInterface) {
                     $result['icon'] = $type->getIcon();
@@ -100,86 +100,86 @@ class TypesRegistry
     }
 
     /**
-     * Register transport for channel type
+     * Register transport for integration type
      *
      * @param string             $typeName
-     * @param string             $channelTypeName
+     * @param string             $integrationTypeName
      * @param TransportInterface $type
      *
      * @return $this
      * @throws \LogicException
      */
-    public function addTransportType($typeName, $channelTypeName, TransportInterface $type)
+    public function addTransportType($typeName, $integrationTypeName, TransportInterface $type)
     {
-        if (!isset($this->transportTypes[$channelTypeName])) {
-            $this->transportTypes[$channelTypeName] = new ArrayCollection();
+        if (!isset($this->transportTypes[$integrationTypeName])) {
+            $this->transportTypes[$integrationTypeName] = new ArrayCollection();
         }
 
-        if ($this->transportTypes[$channelTypeName]->containsKey($typeName)) {
+        if ($this->transportTypes[$integrationTypeName]->containsKey($typeName)) {
             throw new \LogicException(
                 sprintf(
-                    'Trying to redeclare transport type "%s" for "%s" channel type.',
+                    'Trying to redeclare transport type "%s" for "%s" integration type.',
                     $typeName,
-                    $channelTypeName
+                    $integrationTypeName
                 )
             );
         }
 
-        $this->transportTypes[$channelTypeName]->set($typeName, $type);
+        $this->transportTypes[$integrationTypeName]->set($typeName, $type);
 
         return $this;
     }
 
     /**
-     * @param string $channelType
+     * @param string $integrationTypeName
      * @param string $transportType
      *
      * @return TransportInterface
      * @throws \LogicException
      */
-    public function getTransportType($channelType, $transportType)
+    public function getTransportType($integrationTypeName, $transportType)
     {
-        if (!isset($this->transportTypes[$channelType])) {
-            throw new \LogicException(sprintf('Transports not found for channel "%s".', $channelType));
-        } elseif (!$this->transportTypes[$channelType]->containsKey($transportType)) {
+        if (!isset($this->transportTypes[$integrationTypeName])) {
+            throw new \LogicException(sprintf('Transports not found for integration "%s".', $integrationTypeName));
+        } elseif (!$this->transportTypes[$integrationTypeName]->containsKey($transportType)) {
             throw new \LogicException(
                 sprintf(
-                    'Transports type "%s"  not found for channel "%s".',
+                    'Transports type "%s"  not found for integration "%s".',
                     $transportType,
-                    $channelType
+                    $integrationTypeName
                 )
             );
         }
 
-        return $this->transportTypes[$channelType]->get($transportType);
+        return $this->transportTypes[$integrationTypeName]->get($transportType);
     }
 
     /**
-     * Returns registered transports for channel by type
+     * Returns registered transports for integration by type
      *
-     * @param string $channelType
+     * @param string $integrationType
      *
      * @return ArrayCollection
      */
-    public function getRegisteredTransportTypes($channelType)
+    public function getRegisteredTransportTypes($integrationType)
     {
-        if (!isset($this->transportTypes[$channelType])) {
-            $this->transportTypes[$channelType] = new ArrayCollection();
+        if (!isset($this->transportTypes[$integrationType])) {
+            $this->transportTypes[$integrationType] = new ArrayCollection();
         }
 
-        return $this->transportTypes[$channelType];
+        return $this->transportTypes[$integrationType];
     }
 
     /**
      * Collect available types for choice field
      *
-     * @param string $channelType
+     * @param string $integrationType
      *
      * @return array
      */
-    public function getAvailableTransportTypesChoiceList($channelType)
+    public function getAvailableTransportTypesChoiceList($integrationType)
     {
-        $types  = $this->getRegisteredTransportTypes($channelType);
+        $types  = $this->getRegisteredTransportTypes($integrationType);
         $keys   = $types->getKeys();
         $values = $types->map(
             function (TransportInterface $type) {
@@ -192,16 +192,16 @@ class TypesRegistry
 
     /**
      * @param Transport $transportEntity
-     * @param string    $channelType
+     * @param string    $integrationType
      * @param bool      $typeNameOnly
      *
      * @throws \LogicException
      * @return string|TransportInterface
      */
-    public function getTransportTypeBySettingEntity(Transport $transportEntity, $channelType, $typeNameOnly = false)
+    public function getTransportTypeBySettingEntity(Transport $transportEntity, $integrationType, $typeNameOnly = false)
     {
         $class = ClassUtils::getClass($transportEntity);
-        $types = $this->getRegisteredTransportTypes($channelType)->filter(
+        $types = $this->getRegisteredTransportTypes($integrationType)->filter(
             function (TransportInterface $transport) use ($transportEntity, $class) {
                 return $transport->getSettingsEntityFQCN() === $class;
             }
@@ -210,7 +210,7 @@ class TypesRegistry
         $key   = reset($keys);
 
         if ($key === false) {
-            throw new \LogicException(sprintf('Transport not found for channel type "%s".', $channelType));
+            throw new \LogicException(sprintf('Transport not found for integration type "%s".', $integrationType));
         }
         if ($typeNameOnly) {
             return $key;
@@ -220,92 +220,92 @@ class TypesRegistry
     }
 
     /**
-     * Register connector for channel type
+     * Register connector for integration type
      *
      * @param string             $typeName
-     * @param string             $channelTypeName
+     * @param string             $integrationTypeName
      * @param ConnectorInterface $type
      *
      * @throws \LogicException
      * @return $this
      */
-    public function addConnectorType($typeName, $channelTypeName, ConnectorInterface $type)
+    public function addConnectorType($typeName, $integrationTypeName, ConnectorInterface $type)
     {
-        if (!isset($this->connectorTypes[$channelTypeName])) {
-            $this->connectorTypes[$channelTypeName] = new ArrayCollection();
+        if (!isset($this->connectorTypes[$integrationTypeName])) {
+            $this->connectorTypes[$integrationTypeName] = new ArrayCollection();
         }
 
-        if ($this->connectorTypes[$channelTypeName]->containsKey($typeName)) {
+        if ($this->connectorTypes[$integrationTypeName]->containsKey($typeName)) {
             throw new \LogicException(
                 sprintf(
-                    'Trying to redeclare connector type "%s" for "%s" channel type.',
+                    'Trying to redeclare connector type "%s" for "%s" integration type.',
                     $typeName,
-                    $channelTypeName
+                    $integrationTypeName
                 )
             );
         }
 
-        $this->connectorTypes[$channelTypeName]->set($typeName, $type);
+        $this->connectorTypes[$integrationTypeName]->set($typeName, $type);
 
         return $this;
     }
 
     /**
-     * @param string $channelType
+     * @param string $integrationType
      * @param string $type
      *
      * @return ConnectorInterface
      * @throws \LogicException
      */
-    public function getConnectorType($channelType, $type)
+    public function getConnectorType($integrationType, $type)
     {
-        if (!isset($this->connectorTypes[$channelType])) {
-            throw new \LogicException(sprintf('Connectors not found for integration "%s".', $channelType));
-        } elseif (!$this->connectorTypes[$channelType]->containsKey($type)) {
+        if (!isset($this->connectorTypes[$integrationType])) {
+            throw new \LogicException(sprintf('Connectors not found for integration "%s".', $integrationType));
+        } elseif (!$this->connectorTypes[$integrationType]->containsKey($type)) {
             throw new \LogicException(
                 sprintf(
                     'Connector type "%s"  not found for integration "%s".',
                     $type,
-                    $channelType
+                    $integrationType
                 )
             );
         }
 
-        return $this->connectorTypes[$channelType]->get($type);
+        return $this->connectorTypes[$integrationType]->get($type);
     }
 
     /**
-     * Returns registered connectors for channel by type
+     * Returns registered connectors for integration by type
      *
-     * @param string        $channelType
+     * @param string        $integrationType
      * @param null|\Closure $filterClosure
      *
      * @return ArrayCollection
      */
-    public function getRegisteredConnectorsTypes($channelType, $filterClosure = null)
+    public function getRegisteredConnectorsTypes($integrationType, $filterClosure = null)
     {
-        if (!isset($this->connectorTypes[$channelType])) {
-            $this->connectorTypes[$channelType] = new ArrayCollection();
+        if (!isset($this->connectorTypes[$integrationType])) {
+            $this->connectorTypes[$integrationType] = new ArrayCollection();
         }
 
         if (is_callable($filterClosure)) {
-            return $this->connectorTypes[$channelType]->filter($filterClosure);
+            return $this->connectorTypes[$integrationType]->filter($filterClosure);
         } else {
-            return $this->connectorTypes[$channelType];
+            return $this->connectorTypes[$integrationType];
         }
     }
 
     /**
      * Collect available types for choice field
      *
-     * @param string        $channelType
+     * @param string        $integrationType
      * @param null|\Closure $filterClosure
      *
      * @return array
      */
-    public function getAvailableConnectorsTypesChoiceList($channelType, $filterClosure = null)
+    public function getAvailableConnectorsTypesChoiceList($integrationType, $filterClosure = null)
     {
-        $types  = $this->getRegisteredConnectorsTypes($channelType, $filterClosure);
+        $types  = $this->getRegisteredConnectorsTypes($integrationType, $filterClosure);
         $keys   = $types->getKeys();
         $values = $types->map(
             function (ConnectorInterface $type) {
@@ -319,12 +319,12 @@ class TypesRegistry
     /**
      * @return array
      */
-    protected function getAvailableChannelTypes()
+    protected function getAvailableIntegrationTypes()
     {
         $registry = $this;
         $types    = $registry->getRegisteredChannelTypes();
         $types    = $types->partition(
-            function ($key, ChannelInterface $type) use ($registry) {
+            function ($key, IntegrationInterface $type) use ($registry) {
                 return !$registry->getRegisteredTransportTypes($key)->isEmpty();
             }
         );

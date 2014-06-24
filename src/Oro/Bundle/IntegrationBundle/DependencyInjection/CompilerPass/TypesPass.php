@@ -27,7 +27,7 @@ class TypesPass implements CompilerPassInterface
     }
 
     /**
-     * Pass channel types to a manager
+     * Pass integration types to a manager
      *
      * @param Definition       $managerDefinition
      * @param ContainerBuilder $container
@@ -36,9 +36,9 @@ class TypesPass implements CompilerPassInterface
      */
     protected function processChannelTypes(Definition $managerDefinition, ContainerBuilder $container)
     {
-        $channels = $container->findTaggedServiceIds(self::CHANNEL_TYPES_TAG_NAME);
+        $integrations = $container->findTaggedServiceIds(self::CHANNEL_TYPES_TAG_NAME);
 
-        foreach ($channels as $serviceId => $tags) {
+        foreach ($integrations as $serviceId => $tags) {
             $ref = new Reference($serviceId);
             foreach ($tags as $tagAttrs) {
                 if (!isset($tagAttrs['type'])) {
