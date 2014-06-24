@@ -48,8 +48,11 @@ class SyncScheduler
      */
     public function schedule(Channel $integration, $connectorType, $params = [], $useFlush = true)
     {
-        $connector = $this->typesRegistry->getConnectorType($integration->getType(), $connectorType);
+        if (!$integration->getEnabled()) {
+            return;
+        }
 
+        $connector = $this->typesRegistry->getConnectorType($integration->getType(), $connectorType);
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
             throw new \LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
         }

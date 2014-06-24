@@ -13,18 +13,13 @@ class SettingsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider configProvider
      *
-     * @param array       $config
-     * @param string      $channelType
-     * @param array       $expectedFields
-     * @param bool        $resolvedValue
-     * @param bool|string $exception
+     * @param array  $config
+     * @param string $channelType
+     * @param array  $expectedFields
+     * @param bool   $resolvedValue
      */
-    public function testGetFormSettings($config, $channelType, $expectedFields, $resolvedValue, $exception = false)
+    public function testGetFormSettings($config, $channelType, $expectedFields, $resolvedValue)
     {
-        if (false !== $exception) {
-            $this->setExpectedException($exception);
-        }
-
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $resolver  = new SystemAwareResolver();
         $resolver->setContainer($container);
@@ -74,24 +69,17 @@ class SettingsProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         return [
-            'should return fields'         => [
+            'should return fields'      => [
                 'config'          => $regularConfig,
                 'given type'      => 'other',
                 'fields expected' => ['enabled', 'schedule'],
                 'resolved value'  => true
             ],
-            'should use resolved value'    => [
+            'should use resolved value' => [
                 'config'          => $regularConfig,
                 'given type'      => 'simple',
                 'fields expected' => ['enabled', 'some_setting'],
                 'resolved value'  => false
-            ],
-            'bad config, exception thrown' => [
-                'config'          => ['test' => []],
-                'given type'      => null,
-                'fields expected' => [],
-                'resolved value'  => null,
-                'exception'       => '\LogicException'
             ]
         ];
     }

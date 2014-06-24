@@ -102,6 +102,9 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
         $this->channel->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('testChannel'));
+        $this->channel->expects($this->once())
+            ->method('getEnabled')
+            ->will($this->returnValue(true));
         $realConnector = new TestConnector();
         $this->registry->expects($this->once())
             ->method('getConnectorType')

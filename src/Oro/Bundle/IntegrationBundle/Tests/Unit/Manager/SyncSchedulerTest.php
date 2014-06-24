@@ -46,6 +46,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
     {
         $integration = new Channel();
         $integration->setType('testType');
+        $integration->setEnabled(true);
 
         $this->scheduler->schedule($integration, '');
     }
@@ -63,6 +64,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $integration->setType($testIntegrationType);
         $this->typesRegistry->addChannelType($testIntegrationType, new TestIntegrationType());
         $this->typesRegistry->addConnectorType($testConnectorType, $testIntegrationType, new TestConnector());
+        $integration->setEnabled(true);
 
         $this->scheduler->schedule($integration, $testConnectorType);
     }
@@ -75,7 +77,9 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $integration = new Channel();
         $integration->setType($testIntegrationType);
+        $integration->setEnabled(true);
         $ref = new \ReflectionProperty(get_class($integration), 'id');
+
         $ref->setAccessible(true);
         $ref->setValue($integration, $testId);
         $this->typesRegistry->addChannelType($testIntegrationType, new TestIntegrationType());

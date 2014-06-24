@@ -43,15 +43,15 @@ class IntegrationControllerTest extends WebTestCase
 
     public function testCreate()
     {
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var User $user */
         $user    = $this->getContainer()->get('security.context')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
-        $em->persist($newUser);
-        $em->flush($newUser);
+        $entityManager->persist($newUser);
+        $entityManager->flush($newUser);
 
         $organization = $this->getOrganization();
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
