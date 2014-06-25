@@ -2,7 +2,7 @@ OroEmbeddedFormBundle
 =====================
 
 Bundle provides mechanism to create forms, embed them into third party sites and store and view data submitted via them.
-Basically `EmbeddedForm` is `Channel` plus `FormType`. Also it contains custom css and success message.
+Basically `EmbeddedForm` is `FormType`. Also it contains custom css and success message.
 
 ## UI
 Menu item that leads to list of embedded forms is under `System` menu.
@@ -27,21 +27,8 @@ services:
 
 `label` option is translatable text used in select box on create/update embedded form. If omitted - service id will be used instead.
 
-Other possible option is `type`. If it is defined then it will be used as form type (instead of actual service defined by `class` parameter). This kind of form types appear in drop down list on the create and update embedded form pages.
-
-FormType can be based on `channel_aware_form` which already contains `channel` field:
-```php
-    ....
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'oro_channel_aware_form';
-    }
-    ....
-```
-
+Other possible option is `type`. If it is defined then it will be used as form type (instead of actual service defined by `class` parameter).
+This kind of form types appear in drop down list on the create and update embedded form pages.
 
 ## Default FormType CSS and Success Message
 By default CSS and Success Message fields on the create new embedded form page are empty.

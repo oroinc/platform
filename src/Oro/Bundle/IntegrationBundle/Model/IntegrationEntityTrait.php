@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Model;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 trait IntegrationEntityTrait
 {
     /**
-     * @var Channel
+     * @var Integration
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel")
      * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="SET NULL")
@@ -15,18 +15,18 @@ trait IntegrationEntityTrait
     protected $channel;
 
     /**
-     * @param Channel $channel
+     * @param Integration $integration
      * @return $this
      */
-    public function setChannel(Channel $channel)
+    public function setChannel(Integration $integration)
     {
-        $this->channel = $channel;
+        $this->channel = $integration;
 
         return $this;
     }
 
     /**
-     * @return Channel
+     * @return Integration
      */
     public function getChannel()
     {

@@ -41,7 +41,6 @@ class EmbeddedFormManager
      */
     public function createForm($type, $data = null, $options = [])
     {
-        $options = array_replace($options, ['channel_form_type' => 'oro_entity_identifier']);
         $type    = $this->getTypeInstance($type) ? : $type;
 
         return $this->formFactory->create($type, $data, $options);
