@@ -343,10 +343,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 });
 
                 confirm.on('ok', function () {
-                    var navigation = Navigation.getInstance();
-                    if (navigation) {
-                        navigation.showLoading();
-                    }
+                    mediator.execute('showLoading');
 
                     $.ajax({
                         url: el.data('url'),
@@ -356,20 +353,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                             messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
                             if (el.data('redirect')) {
                                 $.isActive(true);
-                                if (navigation) {
-                                    navigation.setLocation(el.data('redirect'));
-                                } else {
-                                    window.location.href = el.data('redirect');
-                                }
-                            } else if (navigation) {
-                                navigation.hideLoading();
+                                mediator.execute('redirectTo', {url: el.data('redirect')});
+                            } else {
+                                mediator.execute('hideLoading');
                             }
                         },
                         error: function () {
-                            if (navigation) {
-                                navigation.hideLoading();
-                            }
-
+                            mediator.execute('hideLoading');
                             messenger.notificationMessage(
                                 'error',
                                 el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')

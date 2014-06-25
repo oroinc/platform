@@ -1,6 +1,12 @@
 /*global define*/
-define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/delete-confirmation', 'oronavigation/js/navigation'],
-    function ($, Backbone, routing, __, DeleteConfirmation, Navigation) {
+define([
+    'jquery',
+    'backbone',
+    'routing',
+    'oroui/js/mediator',
+    'orotranslation/js/translator',
+    'oroui/js/delete-confirmation'
+], function ($, Backbone, routing, mediator, __, DeleteConfirmation) {
 
         var $formTypeField;
         var $cssField;
@@ -49,10 +55,7 @@ define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/
                 return;
             }
 
-            var navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.showLoading();
-            }
+            mediator.execute('showLoading');
             var url = routing.generate('oro_embedded_form_default_data', {'formType': formType});
             var css = $.get(url)
                 .done(function (data, code, response) {
@@ -63,9 +66,7 @@ define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/
                     rememberedSuccessMessage = data.successMessage;
                     rememberedFormType = formType;
                 }).always(function () {
-                    if (navigation) {
-                        navigation.hideLoading();
-                    }
+                    mediator.execute('hideLoading');
                 });
         }
 

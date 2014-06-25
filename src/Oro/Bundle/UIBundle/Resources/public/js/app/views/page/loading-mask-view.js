@@ -1,6 +1,6 @@
 /*global define*/
 define([
-    '../../../loading-mask'
+    'oroui/js/loading-mask'
 ], function (LoadingMaskView) {
     'use strict';
 
