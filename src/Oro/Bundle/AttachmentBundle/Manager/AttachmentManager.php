@@ -47,24 +47,28 @@ class AttachmentManager
      * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return Attachment entity record
      *
      * @param string $fileUrl
-     * @return Attachment
+     * @return Attachment|null
      */
     public function prepareRemoteFile($fileUrl)
     {
-        $fileName = pathinfo($fileUrl)['basename'];
-        $parametersPosition = strpos($fileName, '?');
-        if ($parametersPosition) {
-            $fileName = substr($fileName, 0, $parametersPosition);
-        }
-        $filesystem = new SymfonyFileSystem();
-        $tmpFile = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
-        $filesystem->copy($fileUrl, $tmpFile, true);
-        $file = new File($tmpFile);
-        $attachment = new Attachment();
-        $attachment->setFile($file);
-        $this->preUpload($attachment);
+        try {
+            $fileName = pathinfo($fileUrl)['basename'];
+            $parametersPosition = strpos($fileName, '?');
+            if ($parametersPosition) {
+                $fileName = substr($fileName, 0, $parametersPosition);
+            }
+            $filesystem = new SymfonyFileSystem();
+            $tmpFile = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
+            $filesystem->copy($fileUrl, $tmpFile, true);
+            $file = new File($tmpFile);
+            $attachment = new Attachment();
+            $attachment->setFile($file);
+            $this->preUpload($attachment);
 
-        return $attachment;
+            return $attachment;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -163,7 +167,7 @@ class AttachmentManager
             $parentEntity->getId(),
             $fieldName,
             $entity,
-            $type = 'get',
+            $type,
             $absolute
         );
     }

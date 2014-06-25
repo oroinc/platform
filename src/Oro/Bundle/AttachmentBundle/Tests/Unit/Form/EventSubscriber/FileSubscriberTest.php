@@ -15,38 +15,16 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $config;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $attachmentConfigProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $form;
-
     public function setUp()
     {
-        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator')
+        $this->validator = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->config = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attachmentConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvide')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('attachment')
-            ->will($this->returnValue($this->attachmentConfigProvider));
         $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->subscriber = new FileSubscriber($this->validator, $configManager, $this->config);
+        $this->subscriber = new FileSubscriber($this->validator);
     }
 
     public function testGetSubscribedEvents()
