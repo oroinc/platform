@@ -36,7 +36,7 @@ It's registered as service `oro_integration.helper.default_owner_helper` and cou
             /** @var object $importedEntity user owner aware entity */
             /** @var Channel $integration could be retrieved from import context */
 
-            $this->defaultOwnerHelper->populateChannelOwner($importedEntity, integration);
+            $this->defaultOwnerHelper->populateChannelOwner($importedEntity, $integration);
 
             // ....
         }
