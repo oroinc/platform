@@ -62,7 +62,7 @@ datagrid:
     activity-email-grid:
         extends: email-grid
 
-    my-emails-grid:
+    user-email-grid:
         extends: email-grid
         source:
             query:
@@ -116,6 +116,7 @@ datagrid:
         properties:
             id: ~
         options:
+            entityHint: email
             toolbarOptions:
                 hide: true
                 pageSize:
@@ -124,8 +125,6 @@ datagrid:
 
     dashboard-recent-emails-inbox-grid:
         extends: dashboard-recent-emails-grid
-        options:
-            entityHint: email
         source:
             query:
                 select:
@@ -154,8 +153,6 @@ datagrid:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     dashboard-recent-emails-sent-grid:
-        options:
-            entityHint: email
         extends: dashboard-recent-emails-grid
         source:
             query:

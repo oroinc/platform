@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 
@@ -22,6 +21,11 @@ class UserEmailGridListener
     /** @var EmailSynchronizationManager */
     protected $emailSyncManager;
 
+    /**
+     * @param EntityManager               $em
+     * @param EmailSynchronizationManager $emailSyncManager
+     * @param EmailQueryFactory           $factory
+     */
     public function __construct(
         EntityManager $em,
         EmailSynchronizationManager $emailSyncManager,

@@ -11,7 +11,7 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      entity,
-        'indexPath':   path('oro_email_useremails'),
+        'indexPath':   path('oro_email_user_emails'),
         'indexLabel':  'oro.email.entity_plural_label'|trans,
         'entityTitle': entity.subject,
     } %}
@@ -19,7 +19,11 @@
 {% endblock pageHeader %}
 
 {% block breadcrumb %}
-    {% set breadcrumbs = [{'label': name }, {'label': 'oro.email.menu.my_emails'|trans }, {'label': entity.subject}] %}
+    {% set breadcrumbs = [
+        {'label': name },
+        {'label': 'oro.email.menu.user_emails'|trans },
+        {'label': entity.subject}
+    ] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
