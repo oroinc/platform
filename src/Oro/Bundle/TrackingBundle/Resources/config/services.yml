@@ -5,8 +5,6 @@ parameters:
     oro_tracking.form.handler.tracking_website.class: Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
 
     oro_tracking.tracking_website.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-
-
 services:
     oro_tracking.form.type.tracking_website:
         class: %oro_tracking.form.type.tracking_website.class%

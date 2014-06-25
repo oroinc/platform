@@ -10,7 +10,7 @@ oro:
             created_at.label:    Created At
             updated_at.label:    Updated At
 
-            saved_message: Website saved
+            saved_message: Website updated
 
         block:
             general: General

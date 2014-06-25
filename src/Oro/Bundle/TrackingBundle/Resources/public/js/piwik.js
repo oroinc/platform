@@ -32,12 +32,12 @@
 /*jslint evil: true, regexp: false, bitwise: true*/
 /*global JSON2:true */
 /*members "", "\b", "\t", "\n", "\f", "\r", "\"", "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
-    lastIndex, length, parse, prototype, push, replace, sort, slice, stringify,
-    test, toJSON, toString, valueOf,
-    objectToJSON
-*/
+ call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+ getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+ lastIndex, length, parse, prototype, push, replace, sort, slice, stringify,
+ test, toJSON, toString, valueOf,
+ objectToJSON
+ */
 
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
@@ -59,23 +59,23 @@ if (typeof JSON2 !== 'object') {
 
         if (objectType === '[object Date]') {
             return isFinite(value.valueOf())
-                ?  value.getUTCFullYear()     + '-' +
-                    f(value.getUTCMonth() + 1) + '-' +
-                    f(value.getUTCDate())      + 'T' +
-                    f(value.getUTCHours())     + ':' +
-                    f(value.getUTCMinutes())   + ':' +
-                    f(value.getUTCSeconds())   + 'Z'
+                ? value.getUTCFullYear() + '-' +
+                f(value.getUTCMonth() + 1) + '-' +
+                f(value.getUTCDate()) + 'T' +
+                f(value.getUTCHours()) + ':' +
+                f(value.getUTCMinutes()) + ':' +
+                f(value.getUTCSeconds()) + 'Z'
                 : null;
         }
 
         if (objectType === '[object String]' ||
-                objectType === '[object Number]' ||
-                objectType === '[object Boolean]') {
+            objectType === '[object Number]' ||
+            objectType === '[object Boolean]') {
             return value.valueOf();
         }
 
         if (objectType !== '[object Array]' &&
-                typeof value.toJSON === 'function') {
+            typeof value.toJSON === 'function') {
             return value.toJSON(key);
         }
 
@@ -94,7 +94,7 @@ if (typeof JSON2 !== 'object') {
             '\n': '\\n',
             '\f': '\\f',
             '\r': '\\r',
-            '"' : '\\"',
+            '"': '\\"',
             '\\': '\\\\'
         },
         rep;
@@ -145,106 +145,106 @@ if (typeof JSON2 !== 'object') {
 // What happens next depends on the value's type.
 
         switch (typeof value) {
-        case 'string':
-            return quote(value);
+            case 'string':
+                return quote(value);
 
-        case 'number':
+            case 'number':
 
 // JSON numbers must be finite. Encode non-finite numbers as null.
 
-            return isFinite(value) ? String(value) : 'null';
+                return isFinite(value) ? String(value) : 'null';
 
-        case 'boolean':
-        case 'null':
+            case 'boolean':
+            case 'null':
 
 // If the value is a boolean or null, convert it to a string. Note:
 // typeof null does not produce 'null'. The case is included here in
 // the remote chance that this gets fixed someday.
 
-            return String(value);
+                return String(value);
 
 // If the type is 'object', we might be dealing with an object or an array or
 // null.
 
-        case 'object':
+            case 'object':
 
 // Due to a specification blunder in ECMAScript, typeof null is 'object',
 // so watch out for that case.
 
-            if (!value) {
-                return 'null';
-            }
+                if (!value) {
+                    return 'null';
+                }
 
 // Make an array to hold the partial results of stringifying this object value.
 
-            gap += indent;
-            partial = [];
+                gap += indent;
+                partial = [];
 
 // Is the value an array?
 
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
+                if (Object.prototype.toString.apply(value) === '[object Array]') {
 
 // The value is an array. Stringify every element. Use null as a placeholder
 // for non-JSON values.
 
-                length = value.length;
-                for (i = 0; i < length; i += 1) {
-                    partial[i] = str(i, value) || 'null';
-                }
+                    length = value.length;
+                    for (i = 0; i < length; i += 1) {
+                        partial[i] = str(i, value) || 'null';
+                    }
 
 // Join all of the elements together, separated with commas, and wrap them in
 // brackets.
 
-                v = partial.length === 0
-                    ? '[]'
-                    : gap
-                    ?  '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
-                    : '[' + partial.join(',') + ']';
-                gap = mind;
+                    v = partial.length === 0
+                        ? '[]'
+                        : gap
+                        ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
+                        : '[' + partial.join(',') + ']';
+                    gap = mind;
 
-                return v;
-            }
+                    return v;
+                }
 
 // If the replacer is an array, use it to select the members to be stringified.
 
-            if (rep && typeof rep === 'object') {
-                length = rep.length;
-                for (i = 0; i < length; i += 1) {
-                    if (typeof rep[i] === 'string') {
-                        k = rep[i];
-                        v = str(k, value);
+                if (rep && typeof rep === 'object') {
+                    length = rep.length;
+                    for (i = 0; i < length; i += 1) {
+                        if (typeof rep[i] === 'string') {
+                            k = rep[i];
+                            v = str(k, value);
 
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            if (v) {
+                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            }
                         }
                     }
-                }
-            } else {
+                } else {
 
 // Otherwise, iterate through all of the keys in the object.
 
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = str(k, value);
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = str(k, value);
 
-                        if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            if (v) {
+                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            }
                         }
                     }
                 }
-            }
 
 // Join all of the member texts together, separated with commas,
 // and wrap them in braces.
 
-            v = partial.length === 0
-                ? '{}'
-                : gap
-                ?  '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
-                : '{' + partial.join(',') + '}';
-            gap = mind;
+                v = partial.length === 0
+                    ? '{}'
+                    : gap
+                    ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
+                    : '{' + partial.join(',') + '}';
+                gap = mind;
 
-            return v;
+                return v;
         }
     }
 
@@ -283,7 +283,7 @@ if (typeof JSON2 !== 'object') {
             rep = replacer;
 
             if (replacer && typeof replacer !== 'function' &&
-                    (typeof replacer !== 'object' ||
+                (typeof replacer !== 'object' ||
                     typeof replacer.length !== 'number')) {
                 throw new Error('JSON2.stringify');
             }
@@ -357,9 +357,9 @@ if (typeof JSON2 !== 'object') {
 // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
 
             if ((new RegExp('^[\\],:{}\\s]*$'))
-                    .test(text.replace(new RegExp('\\\\(?:["\\\\/bfnrt]|u[0-9a-fA-F]{4})', 'g'), '@')
-                        .replace(new RegExp('"[^"\\\\\n\r]*"|true|false|null|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?', 'g'), ']')
-                        .replace(new RegExp('(?:^|:|,)(?:\\s*\\[)+', 'g'), ''))) {
+                .test(text.replace(new RegExp('\\\\(?:["\\\\/bfnrt]|u[0-9a-fA-F]{4})', 'g'), '@')
+                    .replace(new RegExp('"[^"\\\\\n\r]*"|true|false|null|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?', 'g'), ']')
+                    .replace(new RegExp('(?:^|:|,)(?:\\s*\\[)+', 'g'), ''))) {
 
 // In the third stage we use the eval function to compile the text into a
 // JavaScript structure. The '{' operator is subject to a syntactic ambiguity
@@ -372,7 +372,7 @@ if (typeof JSON2 !== 'object') {
 // each name/value pair to a reviver function for possible transformation.
 
                 return typeof reviver === 'function'
-                    ?  walk({'': j}, '')
+                    ? walk({'': j}, '')
                     : j;
             }
 
@@ -391,44 +391,44 @@ if (typeof JSON2 !== 'object') {
 /*global unescape */
 /*global ActiveXObject */
 /*members encodeURIComponent, decodeURIComponent, getElementsByTagName,
-    shift, unshift, piwikAsyncInit,
-    createElement, appendChild, characterSet, charset,
-    addEventListener, attachEvent, removeEventListener, detachEvent, disableCookies,
-    cookie, domain, readyState, documentElement, doScroll, title, text,
-    location, top, onerror, document, referrer, parent, links, href, protocol, name, GearsFactory,
-    performance, mozPerformance, msPerformance, webkitPerformance, timing, requestStart,
-    responseEnd, event, which, button, srcElement, type, target,
-    parentNode, tagName, hostname, className,
-    userAgent, cookieEnabled, platform, mimeTypes, enabledPlugin, javaEnabled,
-    XMLHttpRequest, ActiveXObject, open, setRequestHeader, onreadystatechange, send, readyState, status,
-    getTime, getTimeAlias, setTime, toGMTString, getHours, getMinutes, getSeconds,
-    toLowerCase, toUpperCase, charAt, indexOf, lastIndexOf, split, slice,
-    onload, src,
-    round, random,
-    exec,
-    res, width, height, devicePixelRatio,
-    pdf, qt, realp, wma, dir, fla, java, gears, ag,
-    hook, getHook, getVisitorId, getVisitorInfo, setSiteId, setTrackerUrl, appendToTrackingUrl, getRequest,
-    getAttributionInfo, getAttributionCampaignName, getAttributionCampaignKeyword,
-    getAttributionReferrerTimestamp, getAttributionReferrerUrl,
-    setCustomData, getCustomData,
-    setCustomVariable, getCustomVariable, deleteCustomVariable,
-    setDownloadExtensions, addDownloadExtensions,
-    setDomains, setIgnoreClasses, setRequestMethod,
-    setReferrerUrl, setCustomUrl, setAPIUrl, setDocumentTitle,
-    setDownloadClasses, setLinkClasses,
-    setCampaignNameKey, setCampaignKeywordKey,
-    discardHashTag,
-    setCookieNamePrefix, setCookieDomain, setCookiePath, setVisitorIdCookie,
-    setVisitorCookieTimeout, setSessionCookieTimeout, setReferralCookieTimeout,
-    setConversionAttributionFirstReferrer,
-    disablePerformanceTracking, setGenerationTimeMs,
-    doNotTrack, setDoNotTrack, msDoNotTrack,
-    addListener, enableLinkTracking, enableJSErrorTracking, setLinkTrackingTimer,
-    setHeartBeatTimer, killFrame, redirectFile, setCountPreRendered,
-    trackGoal, trackLink, trackPageView, trackSiteSearch, trackEvent,
-    setEcommerceView, addEcommerceItem, trackEcommerceOrder, trackEcommerceCartUpdate,
-    deleteCookies
+ shift, unshift, piwikAsyncInit,
+ createElement, appendChild, characterSet, charset,
+ addEventListener, attachEvent, removeEventListener, detachEvent, disableCookies,
+ cookie, domain, readyState, documentElement, doScroll, title, text,
+ location, top, onerror, document, referrer, parent, links, href, protocol, name, GearsFactory,
+ performance, mozPerformance, msPerformance, webkitPerformance, timing, requestStart,
+ responseEnd, event, which, button, srcElement, type, target,
+ parentNode, tagName, hostname, className,
+ userAgent, cookieEnabled, platform, mimeTypes, enabledPlugin, javaEnabled,
+ XMLHttpRequest, ActiveXObject, open, setRequestHeader, onreadystatechange, send, readyState, status,
+ getTime, getTimeAlias, setTime, toGMTString, getHours, getMinutes, getSeconds,
+ toLowerCase, toUpperCase, charAt, indexOf, lastIndexOf, split, slice,
+ onload, src,
+ round, random,
+ exec,
+ res, width, height, devicePixelRatio,
+ pdf, qt, realp, wma, dir, fla, java, gears, ag,
+ hook, getHook, getVisitorId, getVisitorInfo, setSiteId, setTrackerUrl, appendToTrackingUrl, getRequest,
+ getAttributionInfo, getAttributionCampaignName, getAttributionCampaignKeyword,
+ getAttributionReferrerTimestamp, getAttributionReferrerUrl,
+ setCustomData, getCustomData,
+ setCustomVariable, getCustomVariable, deleteCustomVariable,
+ setDownloadExtensions, addDownloadExtensions,
+ setDomains, setIgnoreClasses, setRequestMethod,
+ setReferrerUrl, setCustomUrl, setAPIUrl, setDocumentTitle,
+ setDownloadClasses, setLinkClasses,
+ setCampaignNameKey, setCampaignKeywordKey,
+ discardHashTag,
+ setCookieNamePrefix, setCookieDomain, setCookiePath, setVisitorIdCookie,
+ setVisitorCookieTimeout, setSessionCookieTimeout, setReferralCookieTimeout,
+ setConversionAttributionFirstReferrer,
+ disablePerformanceTracking, setGenerationTimeMs,
+ doNotTrack, setDoNotTrack, msDoNotTrack,
+ addListener, enableLinkTracking, enableJSErrorTracking, setLinkTrackingTimer,
+ setHeartBeatTimer, killFrame, redirectFile, setCountPreRendered,
+ trackGoal, trackLink, trackPageView, trackSiteSearch, trackEvent,
+ setEcommerceView, addEcommerceItem, trackEcommerceOrder, trackEcommerceCartUpdate,
+ deleteCookies
  */
 /*global _paq:true */
 /*members push */
@@ -458,38 +458,38 @@ if (typeof Piwik !== 'object') {
 
         var expireDateTime,
 
-            /* plugins */
+        /* plugins */
             plugins = {},
 
-            /* alias frequently used globals for added minification */
+        /* alias frequently used globals for added minification */
             documentAlias = document,
             navigatorAlias = navigator,
             screenAlias = screen,
             windowAlias = window,
 
-            /* performance timing */
+        /* performance timing */
             performanceAlias = windowAlias.performance || windowAlias.mozPerformance || windowAlias.msPerformance || windowAlias.webkitPerformance,
 
-            /* DOM Ready */
+        /* DOM Ready */
             hasLoaded = false,
             registeredOnLoadHandlers = [],
 
-            /* encode */
+        /* encode */
             encodeWrapper = windowAlias.encodeURIComponent,
 
-            /* decode */
+        /* decode */
             decodeWrapper = windowAlias.decodeURIComponent,
 
-            /* urldecode */
+        /* urldecode */
             urldecode = unescape,
 
-            /* asynchronous tracker */
+        /* asynchronous tracker */
             asyncTracker,
 
-            /* iterator */
+        /* iterator */
             iterator,
 
-            /* local Piwik */
+        /* local Piwik */
             Piwik;
 
         /************************************************************
@@ -827,18 +827,18 @@ if (typeof Piwik !== 'object') {
             }
 
             switch (str_len & 3) {
-            case 0:
-                i = 0x080000000;
-                break;
-            case 1:
-                i = str.charCodeAt(str_len - 1) << 24 | 0x0800000;
-                break;
-            case 2:
-                i = str.charCodeAt(str_len - 2) << 24 | str.charCodeAt(str_len - 1) << 16 | 0x08000;
-                break;
-            case 3:
-                i = str.charCodeAt(str_len - 3) << 24 | str.charCodeAt(str_len - 2) << 16 | str.charCodeAt(str_len - 1) << 8 | 0x80;
-                break;
+                case 0:
+                    i = 0x080000000;
+                    break;
+                case 1:
+                    i = str.charCodeAt(str_len - 1) << 24 | 0x0800000;
+                    break;
+                case 2:
+                    i = str.charCodeAt(str_len - 2) << 24 | str.charCodeAt(str_len - 1) << 16 | 0x08000;
+                    break;
+                case 3:
+                    i = str.charCodeAt(str_len - 3) << 24 | str.charCodeAt(str_len - 2) << 16 | str.charCodeAt(str_len - 1) << 8 | 0x80;
+                    break;
             }
 
             word_array.push(i);
@@ -929,8 +929,8 @@ if (typeof Piwik !== 'object') {
                 href = getParameter(href, 'u');
                 hostName = getHostName(href);
             } else if (hostName === 'cc.bingj.com' ||                   // Bing
-                    hostName === 'webcache.googleusercontent.com' ||    // Google
-                    hostName.slice(0, 5) === '74.6.') {                 // Yahoo (via Inktomi 74.6.0.0/16)
+                hostName === 'webcache.googleusercontent.com' ||    // Google
+                hostName.slice(0, 5) === '74.6.') {                 // Yahoo (via Inktomi 74.6.0.0/16)
                 href = documentAlias.links[0].href;
                 hostName = getHostName(href);
             }
@@ -1002,7 +1002,7 @@ if (typeof Piwik !== 'object') {
 
             // check whether we were redirected from the piwik overlay plugin
             var referrerRegExp = new RegExp('index\\.php\\?module=Overlay&action=startOverlaySession'
-                               + '&idSite=([0-9]+)&period=([^&]+)&date=([^&]+)$');
+                + '&idSite=([0-9]+)&period=([^&]+)&date=([^&]+)$');
 
             var match = referrerRegExp.exec(documentAlias.referrer);
 
@@ -1062,14 +1062,14 @@ if (typeof Piwik !== 'object') {
              ************************************************************/
 
             var
-/*<DEBUG>*/
-                /*
-                 * registered test hooks
-                 */
+            /*<DEBUG>*/
+            /*
+             * registered test hooks
+             */
                 registeredHooks = {},
-/*</DEBUG>*/
+            /*</DEBUG>*/
 
-                // Current URL and Referrer URL
+            // Current URL and Referrer URL
                 locationArray = urlFixup(documentAlias.domain, windowAlias.location.href, getReferrer()),
                 domainAlias = domainFixup(locationArray[0]),
                 locationHrefAlias = locationArray[1],
@@ -1077,142 +1077,142 @@ if (typeof Piwik !== 'object') {
 
                 enableJSErrorTracking = false,
 
-                // Request method (GET or POST)
+            // Request method (GET or POST)
                 configRequestMethod = 'GET',
 
-                // Tracker URL
+            // Tracker URL
                 configTrackerUrl = trackerUrl || '',
 
-                // API URL (only set if it differs from the Tracker URL)
+            // API URL (only set if it differs from the Tracker URL)
                 configApiUrl = '',
 
-                // This string is appended to the Tracker URL Request (eg. to send data that is not handled by the existin setters/getters)
+            // This string is appended to the Tracker URL Request (eg. to send data that is not handled by the existin setters/getters)
                 configAppendToTrackingUrl = '',
 
-                // Site ID
+            // Site ID
                 configTrackerSiteId = siteId || '',
 
-                // Document URL
+            // Document URL
                 configCustomUrl,
 
-                // Document title
+            // Document title
                 configTitle = documentAlias.title,
 
-                // Extensions to be treated as download links
+            // Extensions to be treated as download links
                 configDownloadExtensions = '7z|aac|apk|ar[cj]|as[fx]|avi|azw3|bin|csv|deb|dmg|docx?|epub|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mobi|mp(2|3|4|e?g)|mov(ie)?|ms[ip]|od[bfgpst]|og[gv]|pdf|phps|png|pptx?|qtm?|ra[mr]?|rpm|sea|sit|tar|t?bz2?|tgz|torrent|txt|wav|wm[av]|wpd||xlsx?|xml|z|zip',
 
-                // Hosts or alias(es) to not treat as outlinks
+            // Hosts or alias(es) to not treat as outlinks
                 configHostsAlias = [domainAlias],
 
-                // HTML anchor element classes to not track
+            // HTML anchor element classes to not track
                 configIgnoreClasses = [],
 
-                // HTML anchor element classes to treat as downloads
+            // HTML anchor element classes to treat as downloads
                 configDownloadClasses = [],
 
-                // HTML anchor element classes to treat at outlinks
+            // HTML anchor element classes to treat at outlinks
                 configLinkClasses = [],
 
-                // Maximum delay to wait for web bug image to be fetched (in milliseconds)
+            // Maximum delay to wait for web bug image to be fetched (in milliseconds)
                 configTrackerPause = 500,
 
-                // Minimum visit time after initial page view (in milliseconds)
+            // Minimum visit time after initial page view (in milliseconds)
                 configMinimumVisitTime,
 
-                // Recurring heart beat after initial ping (in milliseconds)
+            // Recurring heart beat after initial ping (in milliseconds)
                 configHeartBeatTimer,
 
-                // Disallow hash tags in URL
+            // Disallow hash tags in URL
                 configDiscardHashTag,
 
-                // Custom data
+            // Custom data
                 configCustomData,
 
-                // Campaign names
+            // Campaign names
                 configCampaignNameParameters = [ 'pk_campaign', 'piwik_campaign', 'utm_campaign', 'utm_source', 'utm_medium' ],
 
-                // Campaign keywords
+            // Campaign keywords
                 configCampaignKeywordParameters = [ 'pk_kwd', 'piwik_kwd', 'utm_term' ],
 
-                // First-party cookie name prefix
+            // First-party cookie name prefix
                 configCookieNamePrefix = '_pk_',
 
-                // First-party cookie domain
-                // User agent defaults to origin hostname
+            // First-party cookie domain
+            // User agent defaults to origin hostname
                 configCookieDomain,
 
-                // First-party cookie path
-                // Default is user agent defined.
+            // First-party cookie path
+            // Default is user agent defined.
                 configCookiePath,
 
-                // Cookies are disabled
+            // Cookies are disabled
                 configCookiesDisabled = false,
 
-                // Do Not Track
+            // Do Not Track
                 configDoNotTrack,
 
-                // Count sites which are pre-rendered
+            // Count sites which are pre-rendered
                 configCountPreRendered,
 
-                // Do we attribute the conversion to the first referrer or the most recent referrer?
+            // Do we attribute the conversion to the first referrer or the most recent referrer?
                 configConversionAttributionFirstReferrer,
 
-                // Life of the visitor cookie (in milliseconds)
+            // Life of the visitor cookie (in milliseconds)
                 configVisitorCookieTimeout = 63072000000, // 2 years
 
-                // Life of the session cookie (in milliseconds)
+            // Life of the session cookie (in milliseconds)
                 configSessionCookieTimeout = 1800000, // 30 minutes
 
-                // Life of the referral cookie (in milliseconds)
+            // Life of the referral cookie (in milliseconds)
                 configReferralCookieTimeout = 15768000000, // 6 months
 
-                // Is performance tracking enabled
+            // Is performance tracking enabled
                 configPerformanceTrackingEnabled = true,
 
-                // Generation time set from the server
+            // Generation time set from the server
                 configPerformanceGenerationTime = 0,
 
-                // Custom Variables read from cookie, scope "visit"
+            // Custom Variables read from cookie, scope "visit"
                 customVariables = false,
 
-                // Custom Variables, scope "page"
+            // Custom Variables, scope "page"
                 customVariablesPage = {},
 
-                // Custom Variables, scope "event"
+            // Custom Variables, scope "event"
                 customVariablesEvent = {},
 
-                // Custom Variables names and values are each truncated before being sent in the request or recorded in the cookie
+            // Custom Variables names and values are each truncated before being sent in the request or recorded in the cookie
                 customVariableMaximumLength = 200,
 
-                // Ecommerce items
+            // Ecommerce items
                 ecommerceItems = {},
 
-                // Browser features via client-side data collection
+            // Browser features via client-side data collection
                 browserFeatures = {},
 
-                // Guard against installing the link tracker more than once per Tracker instance
+            // Guard against installing the link tracker more than once per Tracker instance
                 linkTrackingInstalled = false,
 
-                // Guard against installing the activity tracker more than once per Tracker instance
+            // Guard against installing the activity tracker more than once per Tracker instance
                 activityTrackingInstalled = false,
 
-                // Last activity timestamp
+            // Last activity timestamp
                 lastActivityTime,
 
-                // Internal state of the pseudo click handler
+            // Internal state of the pseudo click handler
                 lastButton,
                 lastTarget,
 
-                // Hash function
+            // Hash function
                 hash = sha1,
 
-                // Domain hash value
+            // Domain hash value
                 domainHash,
 
-                // Visitor UUID
+            // Visitor UUID
                 visitorUUID,
 
-                // User ID
+            // User ID
                 configUserId;
 
             /*
@@ -1689,7 +1689,7 @@ if (typeof Piwik !== 'object') {
                     // we only increase visitCount once per Visit window (default 30min)
                     var visitDuration = configSessionCookieTimeout / 1000;
                     if (!lastVisitTs
-                            || (nowTs - lastVisitTs) > visitDuration) {
+                        || (nowTs - lastVisitTs) > visitDuration) {
                         visitCount++;
                         lastVisitTs = currentVisitTs;
                     }
@@ -1700,8 +1700,8 @@ if (typeof Piwik !== 'object') {
                     originalReferrerHostName = referralUrl.length ? getHostName(referralUrl) : '';
 
                     if (currentReferrerHostName.length && // there is a referrer
-                            !isSiteHostName(currentReferrerHostName) && // domain is not the current domain
-                            (!configConversionAttributionFirstReferrer || // attribute to last known referrer
+                        !isSiteHostName(currentReferrerHostName) && // domain is not the current domain
+                        (!configConversionAttributionFirstReferrer || // attribute to last known referrer
                             !originalReferrerHostName.length || // previously empty
                             isSiteHostName(originalReferrerHostName))) { // previously set but in current domain
                         referralUrl = configReferrerUrl;
@@ -1797,7 +1797,7 @@ if (typeof Piwik !== 'object') {
                     return '';
                 }
 
-                var sortedCustomVarPage  = sortObjectByKeys(customVariablesPage);
+                var sortedCustomVarPage = sortObjectByKeys(customVariablesPage);
                 var sortedCustomVarEvent = sortObjectByKeys(customVariablesEvent);
 
                 request += appendCustomVariablesToRequest(sortedCustomVarPage, 'cvar');
@@ -1824,7 +1824,7 @@ if (typeof Piwik !== 'object') {
                     if (configPerformanceGenerationTime) {
                         request += '&gt_ms=' + configPerformanceGenerationTime;
                     } else if (performanceAlias && performanceAlias.timing
-                            && performanceAlias.timing.requestStart && performanceAlias.timing.responseEnd) {
+                        && performanceAlias.timing.requestStart && performanceAlias.timing.responseEnd) {
                         request += '&gt_ms=' + (performanceAlias.timing.responseEnd - performanceAlias.timing.requestStart);
                     }
                 }
@@ -1888,13 +1888,13 @@ if (typeof Piwik !== 'object') {
 
                             // Set price to zero
                             if (!isDefined(ecommerceItems[sku][3])
-                                    || String(ecommerceItems[sku][3]).length === 0) {
+                                || String(ecommerceItems[sku][3]).length === 0) {
                                 ecommerceItems[sku][3] = 0;
                             }
 
                             // Set quantity to 1
                             if (!isDefined(ecommerceItems[sku][4])
-                                    || String(ecommerceItems[sku][4]).length === 0) {
+                                || String(ecommerceItems[sku][4]).length === 0) {
                                 ecommerceItems[sku][4] = 1;
                             }
 
@@ -1909,7 +1909,7 @@ if (typeof Piwik !== 'object') {
 
             function logEcommerceOrder(orderId, grandTotal, subTotal, tax, shipping, discount) {
                 if (String(orderId).length
-                        && isDefined(grandTotal)) {
+                    && isDefined(grandTotal)) {
                     logEcommerce(orderId, grandTotal, subTotal, tax, shipping, discount);
                 }
             }
@@ -1982,13 +1982,13 @@ if (typeof Piwik !== 'object') {
                     return false;
                 }
                 var request = getRequest(
-                        'e_c=' + encodeWrapper(category)
-                            + '&e_a=' + encodeWrapper(action)
-                            + (isDefined(name) ? '&e_n=' + encodeWrapper(name) : '')
-                            + (isDefined(value) ? '&e_v=' + encodeWrapper(value) : ''),
-                        customData,
-                        'event'
-                    );
+                    'e_c=' + encodeWrapper(category)
+                        + '&e_a=' + encodeWrapper(action)
+                        + (isDefined(name) ? '&e_n=' + encodeWrapper(name) : '')
+                        + (isDefined(value) ? '&e_v=' + encodeWrapper(value) : ''),
+                    customData,
+                    'event'
+                );
 
                 sendRequest(request, configTrackerPause);
             }
@@ -1998,8 +1998,8 @@ if (typeof Piwik !== 'object') {
              */
             function logSiteSearch(keyword, category, resultsCount, customData) {
                 var request = getRequest('search=' + encodeWrapper(keyword)
-                                + (category ? '&search_cat=' + encodeWrapper(category) : '')
-                                + (isDefined(resultsCount) ? '&search_count=' + resultsCount : ''), customData, 'sitesearch');
+                    + (category ? '&search_cat=' + encodeWrapper(category) : '')
+                    + (isDefined(resultsCount) ? '&search_count=' + resultsCount : ''), customData, 'sitesearch');
 
                 sendRequest(request, configTrackerPause);
             }
@@ -2042,7 +2042,7 @@ if (typeof Piwik !== 'object') {
             function trackCallback(callback) {
                 var isPreRendered,
                     i,
-                    // Chrome 13, IE10, FF10
+                // Chrome 13, IE10, FF10
                     prefixes = ['', 'webkit', 'ms', 'moz'],
                     prefix;
 
@@ -2101,7 +2101,7 @@ if (typeof Piwik !== 'object') {
                 var downloadPattern = getClassesRegExp(configDownloadClasses, 'download'),
                     linkPattern = getClassesRegExp(configLinkClasses, 'link'),
 
-                    // does file extension indicate that it is a download?
+                // does file extension indicate that it is a download?
                     downloadExtensionsPattern = new RegExp('\\.(' + configDownloadExtensions + ')([?&#]|$)', 'i');
 
                 // optimization of the if..elseif..else construct below
@@ -2118,8 +2118,8 @@ if (typeof Piwik !== 'object') {
 
                 parentElement = sourceElement.parentNode;
                 while (parentElement !== null &&
-                        /* buggy IE5.5 */
-                        isDefined(parentElement)) {
+                    /* buggy IE5.5 */
+                    isDefined(parentElement)) {
                     tag = sourceElement.tagName.toUpperCase();
                     if (tag === 'A' || tag === 'AREA') {
                         break;
@@ -2256,8 +2256,8 @@ if (typeof Piwik !== 'object') {
                     // Safari and Opera
                     // IE6/IE7 navigator.javaEnabled can't be aliased, so test directly
                     if (typeof navigator.javaEnabled !== 'unknown' &&
-                            isDefined(navigatorAlias.javaEnabled) &&
-                            navigatorAlias.javaEnabled()) {
+                        isDefined(navigatorAlias.javaEnabled) &&
+                        navigatorAlias.javaEnabled()) {
                         browserFeatures.java = '1';
                     }
 
@@ -2276,7 +2276,7 @@ if (typeof Piwik !== 'object') {
                 browserFeatures.res = screenAlias.width * devicePixelRatio + 'x' + screenAlias.height * devicePixelRatio;
             }
 
-/*<DEBUG>*/
+            /*<DEBUG>*/
             /*
              * Register a test hook. Using eval() permits access to otherwise
              * privileged members.
@@ -2290,7 +2290,8 @@ if (typeof Piwik !== 'object') {
                     } else if (isString(userHook)) {
                         try {
                             eval('hookObj =' + userHook);
-                        } catch (ignore) { }
+                        } catch (ignore) {
+                        }
                     }
 
                     registeredHooks[hookName] = hookObj;
@@ -2298,7 +2299,8 @@ if (typeof Piwik !== 'object') {
 
                 return hookObj;
             }
-/*</DEBUG>*/
+
+            /*</DEBUG>*/
 
             /************************************************************
              * Constructor
@@ -2310,19 +2312,19 @@ if (typeof Piwik !== 'object') {
             detectBrowserFeatures();
             updateDomainHash();
 
-/*<DEBUG>*/
+            /*<DEBUG>*/
             /*
              * initialize test plugin
              */
             executePluginMethod('run', registerHook);
-/*</DEBUG>*/
+            /*</DEBUG>*/
 
             /************************************************************
              * Public data and methods
              ************************************************************/
 
             return {
-/*<DEBUG>*/
+                /*<DEBUG>*/
                 /*
                  * Test hook accessors
                  */
@@ -2330,7 +2332,7 @@ if (typeof Piwik !== 'object') {
                 getHook: function (hookName) {
                     return registeredHooks[hookName];
                 },
-/*</DEBUG>*/
+                /*</DEBUG>*/
 
                 /**
                  * Get visitor ID (from first party cookie)
@@ -2532,7 +2534,7 @@ if (typeof Piwik !== 'object') {
                     }
 
                     if (!isDefined(cvar)
-                            || (cvar && cvar[0] === '')) {
+                        || (cvar && cvar[0] === '')) {
                         return false;
                     }
 
@@ -2891,7 +2893,7 @@ if (typeof Piwik !== 'object') {
                 /**
                  * Set the server generation time.
                  * If set, the browser's performance.timing API in not used anymore to determine the time.
-                 * 
+                 *
                  * @param int generationTime
                  */
                 setGenerationTimeMs: function (generationTime) {
@@ -3042,7 +3044,7 @@ if (typeof Piwik !== 'object') {
 
                     // On a category page, do not track Product name not defined
                     if ((!isDefined(sku) || !sku.length)
-                            && (!isDefined(name) || !name.length)) {
+                        && (!isDefined(name) || !name.length)) {
                         return;
                     }
 
@@ -3129,7 +3131,7 @@ if (typeof Piwik !== 'object') {
          * Constructor
          ************************************************************/
 
-        // initialize the Piwik singleton
+            // initialize the Piwik singleton
         addEventListener(windowAlias, 'beforeunload', beforeUnloadHandler, false);
         addReadyListener();
 
@@ -3206,7 +3208,9 @@ if (typeof Piwik !== 'object') {
 
         // Expose Piwik as an AMD module
         if (typeof define === 'function' && define.amd) {
-            define('piwik', [], function () { return Piwik; });
+            define('piwik', [], function () {
+                return Piwik;
+            });
         }
 
         return Piwik;
@@ -3254,7 +3258,8 @@ if (typeof piwik_log !== 'function') {
         function getOption(optionName) {
             try {
                 return eval('piwik_' + optionName);
-            } catch (ignore) { }
+            } catch (ignore) {
+            }
 
             return; // undefined
         }

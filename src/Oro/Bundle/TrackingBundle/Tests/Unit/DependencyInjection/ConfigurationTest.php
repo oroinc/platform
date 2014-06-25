@@ -28,11 +28,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function processConfigurationDataProvider()
     {
-        return array(
-            'empty' => array(
-                'configs'  => array(array()),
-                'expected' => array()
-            )
-        );
+        return [
+            'empty' => [
+                'configs'  => [[]],
+                'expected' => []
+            ]
+        ];
     }
 }

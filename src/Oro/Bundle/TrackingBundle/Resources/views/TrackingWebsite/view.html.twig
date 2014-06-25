@@ -7,62 +7,62 @@
 {% block navButtons %}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
-            'path' : path('oro_tracking_website_update', { id: entity.id }),
-            'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
+        'path' : path('oro_tracking_website_update', { id: entity.id }),
+        'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-        'entity': entity,
-        'indexPath': path('oro_tracking_website_index'),
-        'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
-        'entityTitle': entity.identifier
+    'entity': entity,
+    'indexPath': path('oro_tracking_website_index'),
+    'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
+    'entityTitle': entity.identifier
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
 
 {% block content_data %}
     {%- set generalInformation -%}
-        <div class="row-fluid form-horizontal">
-            <div class="responsive-block">
-                {{ UI.renderProperty('oro.tracking.tracking_website.identifier.label'|trans, entity.identifier) }}
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {{ UI.renderProperty('oro.tracking.tracking_website.identifier.label'|trans, entity.identifier) }}
 
-                {%- set url -%}
-                    <a href="{{ entity.url }}">
-                        {{ entity.url }}
-                    </a>
-                {%- endset -%}
-                {{ UI.renderProperty('oro.tracking.tracking_website.url.label'|trans, url) }}
+            {%- set url -%}
+            <a href="{{ entity.url }}">
+                {{ entity.url }}
+            </a>
+            {%- endset -%}
+            {{ UI.renderProperty('oro.tracking.tracking_website.url.label'|trans, url) }}
 
-                {%- set ownerData -%}
-                {%- if entity.owner -%}
-                    {% if resource_granted('oro_user_user_view') %}
-                        <a href="{{ path('oro_user_view', {'id': entity.owner.id}) }}">
-                            {{ entity.owner|oro_format_name|escape }}
-                        </a>
-                    {% else %}
+            {%- set ownerData -%}
+            {%- if entity.owner -%}
+                {% if resource_granted('oro_user_user_view') %}
+                    <a href="{{ path('oro_user_view', {'id': entity.owner.id}) }}">
                         {{ entity.owner|oro_format_name|escape }}
-                    {% endif %}
-                {%- endif -%}
-                {%- endset -%}
-                {{ UI.renderHtmlProperty('oro.tracking.tracking_website.owner.label'|trans, ownerData) }}
-            </div>
-            <div class="responsive-block">
-                {{ entityConfig.renderDynamicFields(entity) }}
-            </div>
+                    </a>
+                {% else %}
+                    {{ entity.owner|oro_format_name|escape }}
+                {% endif %}
+            {%- endif -%}
+            {%- endset -%}
+            {{ UI.renderHtmlProperty('oro.tracking.tracking_website.owner.label'|trans, ownerData) }}
         </div>
+        <div class="responsive-block">
+            {{ entityConfig.renderDynamicFields(entity) }}
+        </div>
+    </div>
     {%- endset -%}
 
     {% set dataBlocks = [
-        {
-            'title': 'oro.tracking.block.general'|trans,
-            'class': 'active',
-            'subblocks': [
-                {'data' : [generalInformation]}
-            ]
-        }
+    {
+    'title': 'oro.tracking.block.general'|trans,
+    'class': 'active',
+    'subblocks': [
+    {'data' : [generalInformation]}
+    ]
+    }
     ] %}
 
     {% set id = 'websiteView' %}

@@ -1,14 +1,14 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% oro_title_set({params : {
-    '%entity.identifier%': entity.identifier,
-    '%entityName%': 'oro.tracking.tracking_website.entity_label'|trans }
+'%entity.identifier%': entity.identifier,
+'%entityName%': 'oro.tracking.tracking_website.entity_label'|trans }
 }) %}
 {% set entityId = entity.id %}
 
 {% set formAction = entityId ?
-    path('oro_tracking_website_update', { 'id': entityId}) :
-    path('oro_tracking_website_create') %}
+path('oro_tracking_website_update', { 'id': entityId}) :
+path('oro_tracking_website_create') %}
 
 {% block navButtons %}
     {% set html = UI.saveAndCloseButton() %}
@@ -22,10 +22,10 @@
 {% block pageHeader %}
     {% if entityId %}
         {% set breadcrumbs = {
-            'entity': entity,
-            'indexPath': path('oro_tracking_website_index'),
-            'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
-            'entityTitle': entity.identifier
+        'entity': entity,
+        'indexPath': path('oro_tracking_website_index'),
+        'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
+        'entityTitle': entity.identifier
         } %}
         {{ parent() }}
     {% else %}
@@ -38,23 +38,23 @@
     {% set id = 'tracking-website-form' %}
 
     {% set dataBlocks = [{
-        'title': 'oro.tracking.block.general'|trans,
-        'class': 'active',
-        'subblocks': [
-            {
-                'title': '',
-                'data': [
-                    form_row(form.identifier),
-                    form_row(form.url),
-                    form_row(form.owner),
-                ]
-            }
-        ]
+    'title': 'oro.tracking.block.general'|trans,
+    'class': 'active',
+    'subblocks': [
+    {
+    'title': '',
+    'data': [
+    form_row(form.identifier),
+    form_row(form.url),
+    form_row(form.owner),
+    ]
+    }
+    ]
     }] %}
 
     {% set data = {
-        'formErrors': form_errors(form)? form_errors(form) : null,
-        'dataBlocks': dataBlocks,
+    'formErrors': form_errors(form)? form_errors(form) : null,
+    'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
 {% endblock content_data %}
