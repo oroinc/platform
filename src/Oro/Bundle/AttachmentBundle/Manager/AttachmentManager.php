@@ -280,4 +280,23 @@ class AttachmentManager
 
         return $this->fileIcons['default'];
     }
+
+    /**
+     * Get image attachment link with liip imagine filter applied to image
+     *
+     * @param Attachment $entity
+     * @param string     $filerName
+     * @return string
+     */
+    public function getFilteredImageUrl(Attachment $entity, $filerName)
+    {
+        return $this->router->generate(
+            'oro_filtered_attachment',
+            [
+                'id' => $entity->getId(),
+                'filename' => $entity->getOriginalFilename(),
+                'filter' => $filerName
+            ]
+        );
+    }
 }

@@ -50,6 +50,7 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
         $functions = [
             'oro_attachment_url',
             'oro_resized_attachment_url',
+            'oro_configured_image_url',
             'oro_attachment_icon',
             'oro_file_view',
             'oro_image_view'

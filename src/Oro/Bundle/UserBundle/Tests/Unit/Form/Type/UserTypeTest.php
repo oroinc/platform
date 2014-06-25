@@ -206,8 +206,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             array('middleName', 'text'),
             array('lastName',   'text'),
             array('nameSuffix', 'text'),
-            array('birthday',   'oro_date'),
-            array('imageFile',  'file')
+            array('birthday',   'oro_date')
         );
 
         foreach ($parameters as $param) {
