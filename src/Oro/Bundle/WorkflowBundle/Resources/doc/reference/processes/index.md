@@ -34,6 +34,7 @@ this process will be invoked. First parameter is trigger event - one of ``create
 second parameter defines entity field name used to listen (used for ``update`` event only) and  process will be invoked
 only if value of this field has been changed. Also trigger contains information about when process
 should be performed - immediately or after some delay (and delay interval in the seconds of PHP date interval format).
+When process should be performed after some delay you can also control execution priority of process jobs.
 
 * **Job** - entity that contain information specific to performing process in case of delayed processing
 (in this case JMS job will be created). According to event job can contain following data:
@@ -56,7 +57,7 @@ all existing triggers for this process will be analyzed and found appropriate on
 
 There are two ways how trigger can be processed. First is immediate execution - in this case process action will be
 executed right after entity will be flushed to the database. Second is delayed execution - it creates job and puts it
-to queue. If some entity has several appropriate process triggers, then all of them will be processed
+to queue with some priority. If some entity has several appropriate process triggers, then all of them will be processed
 in order defined by definition.
 
 After the specific entity item is deleted all job processes related to this entity also will be deleted.
@@ -94,17 +95,18 @@ triggers:                                                    # list of triggers
         -
             event: update                                    # event on which the trigger performed
             field: assignedTo                                # field name to listen
+            priority: 10                                     # priority of the job queue
             queued: true                                     # this process must be executed in queue
             time_shift: 60                                   # this process must be executed with 60 seconds delay
 ```
 
 This configuration describes process that relates to the ``Contact`` entity; every time when any contact is
-created or  ``Assigned To`` field is changed, then current administrator user is set as assigned user.
+created or ``Assigned To`` field is changed, then current administrator user is set as assigned user.
 In other words contact will be assigned to the current administrator.
 
 Described logic is implemented using one definition and two triggers.
 First trigger will be processed immediately after the contact is be created, and second one creates new process job
-and put it to JMS queue, so job will be processed after ``60`` seconds delay.
+and put it to JMS queue with priority to perform ``10``, so job will be processed after ``60`` seconds delay.
 
 **Note:** If you want to test this process configuration in real application, you can put this configuration in file
 ``Oro/Bundle/WorkflowBundle/Resources/config/process.yml`` and reload definitions using console command

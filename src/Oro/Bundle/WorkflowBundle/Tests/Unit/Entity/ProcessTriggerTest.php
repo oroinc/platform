@@ -165,14 +165,19 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity);
     }
 
-    protected function assertProcessTriggerEntitiesEquals($expected_entity, $actual_entity, $isEquals = true)
+    /**
+     * @param ProcessTrigger $expectedEntity
+     * @param ProcessTrigger $actualEntity
+     * @param bool $isEquals
+     */
+    protected function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
     {
         $method = $isEquals ? 'assertEquals' : 'assertNotEquals';
-        $this->$method($expected_entity->getEvent(), $actual_entity->getEvent());
-        $this->$method($expected_entity->getField(), $actual_entity->getField());
-        $this->$method($expected_entity->getPriority(), $actual_entity->getPriority());
-        $this->$method($expected_entity->isQueued(), $actual_entity->isQueued());
-        $this->$method($expected_entity->getTimeShift(), $actual_entity->getTimeShift());
-        $this->$method($expected_entity->getDefinition(), $actual_entity->getDefinition());
+        $this->$method($expectedEntity->getEvent(), $actualEntity->getEvent());
+        $this->$method($expectedEntity->getField(), $actualEntity->getField());
+        $this->$method($expectedEntity->getPriority(), $actualEntity->getPriority());
+        $this->$method($expectedEntity->isQueued(), $actualEntity->isQueued());
+        $this->$method($expectedEntity->getTimeShift(), $actualEntity->getTimeShift());
+        $this->$method($expectedEntity->getDefinition(), $actualEntity->getDefinition());
     }
 }

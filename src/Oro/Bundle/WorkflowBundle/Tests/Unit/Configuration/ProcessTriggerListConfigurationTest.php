@@ -37,8 +37,6 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->configuration->processConfiguration($input));
     }
 
-
-
     /**
      * @return array
      */
