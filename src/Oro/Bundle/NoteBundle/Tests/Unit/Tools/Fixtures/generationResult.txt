@@ -3,35 +3,36 @@ namespace Test;
 class Entity
 {
     /**
-     * Sets the entity this note is associated with
+     * Sets the entity this entity is associated with
      *
-     * @param object $target Any configurable entity that can have notes
+     * @param object $target Any configurable entity that can be associated with this type of entity
      * @return object This object
      */
     public function setTarget($target)
     {
+        if (null === $target) { $this->resetTargets(); return $this; }
         $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
-        // The note can be associated with one entity only
-        if ($className === 'Test\TargetEntity1') { $this->resetTargets(); $this->targetField1 = $target; return $this; }
-        if ($className === 'Test\TargetEntity2') { $this->resetTargets(); $this->targetField2 = $target; return $this; }
+        // This entity can be associated with only one another entity
+        if ($className === 'Test\TargetEntity1') { $this->resetTargets(); $this->target_entity1_4b937764 = $target; return $this; }
+        if ($className === 'Test\TargetEntity2') { $this->resetTargets(); $this->target_entity2_d29a26de = $target; return $this; }
         throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
     }
 
     /**
-     * Gets the entity this note is associated with
+     * Gets the entity this entity is associated with
      *
      * @return object|null Any configurable entity
      */
     public function getTarget()
     {
-        if (null !== $this->targetField1) { return $this->targetField1; }
-        if (null !== $this->targetField2) { return $this->targetField2; }
+        if (null !== $this->target_entity1_4b937764) { return $this->target_entity1_4b937764; }
+        if (null !== $this->target_entity2_d29a26de) { return $this->target_entity2_d29a26de; }
         return null;
     }
 
     private function resetTargets()
     {
-        $this->targetField1 = null;
-        $this->targetField2 = null;
+        $this->target_entity1_4b937764 = null;
+        $this->target_entity2_d29a26de = null;
     }
 }

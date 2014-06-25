@@ -14,7 +14,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->extension = new ExtendEntityGeneratorExtension('');
+        $this->extension = new ExtendEntityGeneratorExtension();
     }
 
     public function testSupports()

@@ -1,32 +1,38 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $groupingConfigProvider;
+    const ASSOCIATION_KIND = 'test';
 
-    /** @var ActivityEntityGeneratorExtension */
+    /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit_Framework_MockObject_MockObject */
     protected $extension;
 
     public function setUp()
     {
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->extension = new ActivityEntityGeneratorExtension($this->groupingConfigProvider);
+        $this->extension = $this->getMockForAbstractClass(
+            'Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension',
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['getAssociationKind', 'getAssociationType']
+        );
+        $this->extension->expects($this->any())
+            ->method('getAssociationKind')
+            ->will($this->returnValue(self::ASSOCIATION_KIND));
+        $this->extension->expects($this->any())
+            ->method('getAssociationType')
+            ->will($this->returnValue('manyToMany'));
     }
 
     /**
@@ -34,81 +40,17 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupports($schemas, $expected)
     {
-        $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
-        $config->set('groups', [ActivityScope::GROUP_ACTIVITY]);
-
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue($config));
-
         $this->assertEquals(
             $expected,
             $this->extension->supports($schemas)
         );
     }
 
-    public function testSupportsForNotConfigurableEntity()
-    {
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue(false));
-        $this->groupingConfigProvider->expects($this->never())
-            ->method('getConfig');
-
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
-    }
-
-    public function testSupportsForEntityNotIncludedInAnyGroup()
-    {
-        $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
-
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue($config));
-
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
-    }
-
-    public function testSupportsForNotActivityEntity()
-    {
-        $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
-        $config->set('groups', ['another_group']);
-
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue(true));
-        $this->groupingConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue($config));
-
-        $this->assertFalse(
-            $this->extension->supports(['class' => 'Test\Entity'])
-        );
-    }
-
     public function supportsProvider()
     {
         return [
-            [
+            'supported'              => [
                 [
-                    'class'        => 'Test\Entity',
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
@@ -117,10 +59,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 new FieldConfigId(
                                     'extend',
                                     'Entity\Test',
-                                    ExtendHelper::buildAssociationName(
-                                        'Entity\Target',
-                                        ActivityScope::ASSOCIATION_KIND
-                                    ),
+                                    ExtendHelper::buildAssociationName('Entity\Target', self::ASSOCIATION_KIND),
                                     'manyToMany'
                                 ),
                         ],
@@ -128,9 +67,26 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 true,
             ],
-            [
+            'another association kind' => [
                 [
-                    'class'        => 'Test\Entity',
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        [
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Test\Entity',
+                                    ExtendHelper::buildAssociationName('Test\TargetEntity', 'another'),
+                                    'manyToMany'
+                                ),
+                            'target_entity' => 'Test\TargetEntity'
+                        ]
+                    ]
+                ],
+                false,
+            ],
+            'unsupported field name' => [
+                [
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
@@ -147,9 +103,8 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 false,
             ],
-            [
+            'unsupported field type' => [
                 [
-                    'class'        => 'Test\Entity',
                     'relation'     => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
@@ -158,10 +113,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                                 new FieldConfigId(
                                     'extend',
                                     'Entity\Test',
-                                    ExtendHelper::buildAssociationName(
-                                        'Entity\Target',
-                                        ActivityScope::ASSOCIATION_KIND
-                                    ),
+                                    ExtendHelper::buildAssociationName('Entity\Target', self::ASSOCIATION_KIND),
                                     'manyToOne'
                                 ),
                         ],
@@ -169,18 +121,19 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 false,
             ],
-            [
+            'empty data'             => [
                 [
-                    'class'        => 'Test\Entity',
                     'relation'     => [],
                     'relationData' => []
                 ],
                 false,
             ],
-            [
-                [
-                    'class' => 'Test\Entity',
-                ],
+            'no relationData'        => [
+                ['relation' => ['test' => 'test']],
+                false,
+            ],
+            'empty'                  => [
+                [],
                 false,
             ],
         ];
@@ -195,7 +148,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         new FieldConfigId(
                             'extend',
                             'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1', ActivityScope::ASSOCIATION_KIND),
+                            ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
                             'manyToMany'
                         ),
                     'target_entity' => 'Test\TargetEntity1',
@@ -205,7 +158,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         new FieldConfigId(
                             'extend',
                             'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2', ActivityScope::ASSOCIATION_KIND),
+                            ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
                             'manyToMany'
                         ),
                     'target_entity' => 'Test\TargetEntity2',
@@ -215,7 +168,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         new FieldConfigId(
                             'extend',
                             'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3', ActivityScope::ASSOCIATION_KIND),
+                            ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
                             'manyToOne'
                         ),
                     'target_entity' => 'Test\TargetEntity3'
@@ -238,7 +191,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->generate($schema, $class);
         $strategy     = new DefaultGeneratorStrategy();
         $classBody    = $strategy->generate($class);
-        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/generationResult.txt');
+        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/many_to_many_association.txt');
 
         $this->assertEquals(trim($expectedBody), $classBody);
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -76,9 +77,11 @@ class ActivityManager
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
 
+            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+
             $item = [
                 'className'       => $activityClassName,
-                'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                'associationName' => $associationName,
                 'label'           => $entityConfig->get('plural_label'),
                 'route'           => $activityConfig->get('route')
             ];
@@ -114,9 +117,11 @@ class ActivityManager
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
             $widget         = $activityConfig->get('action_widget');
             if (!empty($widget)) {
+                $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+
                 $item = [
                     'className'       => $activityClassName,
-                    'associationName' => ExtendHelper::buildAssociationName($entityClass),
+                    'associationName' => $associationName,
                     'widget'          => $widget
                 ];
 
@@ -190,7 +195,7 @@ class ActivityManager
             ->innerJoin(
                 sprintf(
                     'filterActivityEntity.%s',
-                    ExtendHelper::buildAssociationName($entityClass)
+                    ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND)
                 ),
                 'filterTargetEntity'
             )
