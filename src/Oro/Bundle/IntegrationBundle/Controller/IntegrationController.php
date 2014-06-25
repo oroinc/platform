@@ -174,7 +174,6 @@ class IntegrationController extends Controller
                 );
             }
         } catch (\Exception $e) {
-            $e;
         }
         $form = $this->getForm();
 
