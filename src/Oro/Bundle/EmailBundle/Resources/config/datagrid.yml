@@ -77,6 +77,19 @@ datagrid:
                 where:
                     and:
                         - o.id IN (:origin_ids)
+        properties:
+            view_link:
+                type: url
+                route: oro_email_view
+                params: [ id ]
+        actions:
+            update:
+                type:         navigate
+                label:        oro.email.datagrid.emails.action.view
+                link:         view_link
+                icon:         eye-open
+                acl_resource: oro_email_view
+                rowAction:    true
 
     dashboard-recent-emails-grid:
         source:
@@ -103,6 +116,7 @@ datagrid:
         properties:
             id: ~
         options:
+            entityHint: email
             toolbarOptions:
                 hide: true
                 pageSize:
@@ -111,8 +125,6 @@ datagrid:
 
     dashboard-recent-emails-inbox-grid:
         extends: dashboard-recent-emails-grid
-        options:
-            entityHint: email
         source:
             query:
                 select:
@@ -141,8 +153,6 @@ datagrid:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     dashboard-recent-emails-sent-grid:
-        options:
-            entityHint: email
         extends: dashboard-recent-emails-grid
         source:
             query:

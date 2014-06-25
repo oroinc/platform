@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 
-class EmailListener
+class EmailGridListener
 {
     /**
      * @var EmailQueryFactory

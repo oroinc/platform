@@ -17,7 +17,6 @@ parameters:
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:         Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
-    oro_email.event_listener.activity_grid_listener.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_entity.twig.extension.email.class:                 Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -44,8 +43,10 @@ parameters:
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesGridHelper
 
     # Datagrid event listeners
-    oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailListener
+    oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
+    oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.class:  Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
+    oro_email.listener.datagrid.user_emails.main.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
 
     #Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
@@ -250,6 +251,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
+    oro_email.listener.datagrid.activity:
+        class: %oro_email.listener.datagrid.activity.class%
+        arguments:
+            - @oro_activity.manager
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
+
     oro_email.listener.datagrid.user_emails:
         class: %oro_email.listener.datagrid.user_emails.class%
         arguments:
@@ -257,6 +265,11 @@ services:
             - @oro_email.email_synchronization_manager
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
+
+    oro_email.listener.datagrid.user_emails.main:
+        class: %oro_email.listener.datagrid.user_emails.main.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.user-email-grid, method: onBuildBefore }
 
     oro_email.listener.datagrid.recent_emails.inbox:
         class: %oro_email.listener.datagrid.user_emails.class%
@@ -284,13 +297,6 @@ services:
         class: %oro_email.email.activity.manager.class%
         arguments:
             - @oro_entity_config.provider.activity
-
-    oro_email.event_listener.activity_grid_listener:
-        class: %oro_email.event_listener.activity_grid_listener.class%
-        arguments:
-            - @oro_activity.manager
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
     oro_entity.twig.extension.email:
         class: %oro_entity.twig.extension.email.class%

@@ -21,6 +21,11 @@ class UserEmailGridListener
     /** @var EmailSynchronizationManager */
     protected $emailSyncManager;
 
+    /**
+     * @param EntityManager               $em
+     * @param EmailSynchronizationManager $emailSyncManager
+     * @param EmailQueryFactory           $factory
+     */
     public function __construct(
         EntityManager $em,
         EmailSynchronizationManager $emailSyncManager,
@@ -31,6 +36,9 @@ class UserEmailGridListener
         $this->queryFactory     = $factory;
     }
 
+    /**
+     * @param BuildAfter $event
+     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();

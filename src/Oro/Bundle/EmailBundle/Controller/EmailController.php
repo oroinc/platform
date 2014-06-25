@@ -23,16 +23,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 class EmailController extends Controller
 {
     /**
-     * @Route("/my-emails", name="oro_email_myemails")
-     * @AclAncestor("oro_email_view")
-     * @Template
-     */
-    public function myEmailsAction()
-    {
-        return [];
-    }
-
-    /**
      * @Route("/view/{id}", name="oro_email_view", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_email_view",
@@ -170,6 +160,16 @@ class EmailController extends Controller
         return array(
             'datagridParameters' => $request->query->all()
         );
+    }
+
+    /**
+     * @Route("/user-emails", name="oro_email_user_emails")
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function userEmailsAction()
+    {
+        return [];
     }
 
     /**
