@@ -5,6 +5,7 @@ parameters:
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
+    oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
@@ -17,6 +18,7 @@ parameters:
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension
+    oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
 
 services:
@@ -84,6 +86,9 @@ services:
             - @oro_entity_config.tools.command_executor
             - @logger
 
+    oro_entity_extend.extend.field_type_helper:
+        class: %oro_entity_extend.extend.field_type_helper.class%
+
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
         arguments:
@@ -118,6 +123,7 @@ services:
         class: %oro_entity_extend.migration.options_parser.class%
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_entity_extend.extend.field_type_helper
 
     oro_entity_extend.migration.extension.extend:
         class: %oro_entity_extend.migration.extension.extend.class%
@@ -134,10 +140,15 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: rename, priority: -10 }
 
+    oro_entity_extend.relation_builder:
+        class: %oro_entity_extend.relation_builder.class%
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_entity_extend.association_builder:
         class: %oro_entity_extend.association_builder.class%
         arguments:
-            - @oro_entity_config.config_manager
+            - @oro_entity_extend.relation_builder
 
     oro_entity_extend.config_dumper_extension:
         abstract: true

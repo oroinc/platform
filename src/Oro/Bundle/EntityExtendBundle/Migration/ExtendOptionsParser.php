@@ -2,19 +2,26 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+
 class ExtendOptionsParser
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
+
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -25,7 +32,7 @@ class ExtendOptionsParser
      */
     public function parseOptions(array $options)
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper);
+        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper);
 
         $objectKeys = array_filter(
             array_keys($options),

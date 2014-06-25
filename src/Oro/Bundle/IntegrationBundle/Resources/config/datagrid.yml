@@ -1,73 +1,96 @@
 datagrid:
-    channels-grid:
+    oro-integration-grid:
         source:
             type: orm
-            acl_resource: oro_integration_channel_index
+            acl_resource: oro_integration_view
             query:
                 select:
                     - c.id
                     - c.name
                     - c.type
+                    - CASE WHEN c.enabled = 1 THEN 'enabled' ELSE 'disabled' END as enabled
                 from:
-                    - { table: %oro_integration.channel.entity.class%, alias: c }
+                    - { table: %oro_integration.entity.class%, alias: c }
         columns:
             name:
-                label: oro.integration.channel.name.label
+                label:          oro.integration.integration.name.label
             type:
-                label: oro.integration.channel.type.label
+                label:          oro.integration.integration.type.label
+                type:           twig
+                template:       OroIntegrationBundle:Integration:Datagrid/type.html.twig
+                frontend_type:  html
+                context:
+                    choices:  @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
+                    registry: @oro_integration.manager.types_registry
+            enabled:
+                label:          oro.integration.integration.enabled.label
                 frontend_type:  select
-                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+                choices:
+                    enabled:  oro.integration.integration.enabled.active.label
+                    disabled: oro.integration.integration.enabled.inactive.label
         properties:
             id: ~
             update_link:
                 type:    url
-                route:   oro_integration_channel_update
+                route:   oro_integration_update
                 params:  [ id ]
             delete_link:
                 type:    url
-                route:   oro_api_delete_channel
+                route:   oro_api_delete_integration
                 params:  [ id ]
             schedule_link:
                 type:    url
-                route:   oro_integration_channel_schedule
+                route:   oro_integration_schedule
                 params:  [ id ]
         sorters:
             columns:
-                name: { data_name: c.name }
-                type: { data_name: c.type }
+                name:    { data_name: c.name }
+                type:    { data_name: c.type }
+                enabled: { data_name: c.enabled }
         filters:
             columns:
-                name: { data_name: c.name, type: string }
+                name:
+                    data_name: c.name
+                    type: string
                 type:
                     data_name: c.type
                     type: choice
                     options:
                         field_options:
                             choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+                enabled:
+                    data_name: c.enabled
+                    type:      choice
+                    options:
+                        field_options:
+                            choices:
+                                - oro.integration.integration.enabled.inactive.label
+                                - oro.integration.integration.enabled.active.label
         actions:
             update:
                 type:         navigate
                 link:         update_link
-                acl_resource: oro_integration_channel_update
+                acl_resource: oro_integration_update
                 icon:         edit
                 label:        oro.integration.datagrid.action.update
                 rowAction:    true
             schedule:
                 type:         schedule-sync
                 link:         schedule_link
-                acl_resource: oro_integration_channel_update
+                acl_resource: oro_integration_update
                 icon:         refresh
                 label:        oro.integration.datagrid.action.schedule_sync
             delete:
                 type:         delete
                 link:         delete_link
-                acl_resource: oro_integration_channel_delete
+                acl_resource: oro_integration_delete
                 icon:         trash
                 label:        oro.integration.datagrid.action.delete
                 defaultMessages:
-                    confirm_content: oro.integration.delete_sync_channel_window.content
-                    confirm_ok:      oro.integration.delete_sync_channel_window.button_ok
-                    confirm_title:   oro.integration.delete_sync_channel_window.title
-                    success:         oro.integration.delete_sync_channel_window.success
+                    confirm_content: oro.integration.delete_sync_integration_window.content
+                    confirm_ok:      oro.integration.delete_sync_integration_window.button_ok
+                    confirm_title:   oro.integration.delete_sync_integration_window.title
+                    success:         oro.integration.delete_sync_integration_window.success
+        action_configuration: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration::getIsSyncAvailableCondition()
         options:
             entityHint: channel

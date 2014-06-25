@@ -13,6 +13,9 @@ class DefaultUserOwnerSubscriber implements EventSubscriberInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /**
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
@@ -27,7 +30,7 @@ class DefaultUserOwnerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Sets default data for create channels form
+     * Sets default data for create integrations form
      *
      * @param FormEvent $event
      */
