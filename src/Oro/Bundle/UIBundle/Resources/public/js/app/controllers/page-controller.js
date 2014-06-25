@@ -37,6 +37,9 @@ define([
         index: function (params, route, options) {
             var url, cacheItem, args;
 
+            url = this._combineRouteUrl(route);
+            this._setNavigationHandlers(url);
+
             if (!route.previous || options.silent) {
                 // - page just loaded from server, does not require update
                 // - page was updated locally and url is changed, no request required
@@ -58,7 +61,6 @@ define([
                 this.model.set(cacheItem.page, {actionArgs: args});
                 this.onPageUpdated(this.model, null, {actionArgs: args});
             } else {
-                url = this._combineRouteUrl(route);
                 this.model.fetch({
                     url: url,
                     validate: true,
@@ -153,18 +155,34 @@ define([
          */
         _processRedirect: function (data) {
             var url, delimiter, parser;
-            url = data.location;
+            url = data.url || data.location;
 //            $.isActive(true);
             if (data.fullRedirect) {
                 delimiter = url.indexOf('?') !== -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
-            } else {
+            } else if (data.redirect) {
                 parser = document.createElement('a');
                 parser.href = url;
                 url = parser.pathname + (parser.search || '');
                 this.publishEvent('page:redirect');
                 utils.redirectTo({url: url}, {forceStartup: true, force: true});
+            } else {
+                utils.redirectTo({url: url});
             }
+        },
+
+        /**
+         * Register handler for page reload and redirect
+         *
+         * @param {string} url
+         * @private
+         */
+        _setNavigationHandlers: function (url) {
+            Chaplin.mediator.setHandler('redirectTo', this._processRedirect, this);
+            Chaplin.mediator.setHandler('refreshPage', function () {
+                Chaplin.utils.redirectTo({url: url}, {forceStartup: true, force: true});
+                Chaplin.mediator.trigger('page:refreshed');
+            });
         }
     });
 

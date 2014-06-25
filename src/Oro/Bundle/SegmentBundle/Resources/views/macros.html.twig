@@ -107,8 +107,8 @@
 
         <script type="text/javascript">
             require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger',
-                     'oronavigation/js/navigation', 'oroui/js/delete-confirmation', 'oroui/js/mediator'],
-            function ($, __, routing, messenger, Navigation, DeleteConfirmation, mediator) {
+                     'oroui/js/delete-confirmation', 'oroui/js/mediator'],
+            function ($, __, routing, messenger, DeleteConfirmation, mediator) {
                 $(function () {
                     $('.run-button').click(function (e) {
                         e.preventDefault();
@@ -119,36 +119,31 @@
                             content:  __('Please confirm that you want to refresh this segment.')
                         });
 
-                        var url = $(this).data('url'),
-                            navigation = Navigation.getInstance(),
-                                run = function () {
-                                    if (navigation) {
-                                        navigation.showLoading();
-                                    }
+                        var url = $(this).data('url');
+                        function run() {
+                            mediator.execute('showLoading');
 
-                                    var success = false;
-                                    $.post(url,function () {
-                                        success = true;
-                                    }).error(function () {
-                                        messenger.notificationFlashMessage('error', __('An unidentified error has occurred. Please contact your Administrator.'));
-                                    }).always(function () {
-                                        if (navigation) {
-                                            navigation.hideLoading();
-                                        }
-                                        if (success) {
-                                            var successMessage = __('Segment successfully processed.');
+                            var success = false;
+                            $.post(url,function () {
+                                success = true;
+                            }).error(function () {
+                                messenger.notificationFlashMessage('error', __('An unidentified error has occurred. Please contact your Administrator.'));
+                            }).always(function () {
+                                mediator.execute('hideLoading');
+                                if (success) {
+                                    var successMessage = __('Segment successfully processed.');
 
-                                            {% if reloadRequired %}
-                                                mediator.once("page:update", function() {
-                                                    messenger.notificationFlashMessage('success', successMessage);
-                                                });
-                                                navigation.refreshPage();
-                                            {% else %}
-                                                messenger.notificationFlashMessage('success', successMessage);
-                                            {% endif %}
-                                        }
-                                    });
-                                };
+                                    {% if reloadRequired %}
+                                        mediator.once("page:update", function() {
+                                            messenger.notificationFlashMessage('success', successMessage);
+                                        });
+                                        mediator.execute('refreshPage');
+                                    {% else %}
+                                        messenger.notificationFlashMessage('success', successMessage);
+                                    {% endif %}
+                                }
+                            });
+                        }
 
                         confirm.on('ok', run);
                         confirm.open();

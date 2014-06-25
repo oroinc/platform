@@ -42,14 +42,14 @@ define([
                 if (self.checkCurrentUrl()) {
                     $noteEl = $el.find('.pin-status.outdated');
                     self.markNormal($noteEl);
-                    mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
+                    mediator.off('page:refreshed', refreshHandler);
                 }
             };
             if (!event.isCurrentPage && mediator.execute('compareUrl', url, event.path)) {
                 $noteEl = $el.find('.pin-status');
                 if (!$noteEl.is('.outdated')) {
                     this.markOutdated($noteEl);
-                    mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
+                    mediator.on('page:refreshed', refreshHandler);
                 }
             }
         },

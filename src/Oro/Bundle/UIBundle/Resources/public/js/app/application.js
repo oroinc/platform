@@ -15,12 +15,11 @@ define([
             Chaplin.mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
             Chaplin.mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
 
-            // proxy helper methods
-            Chaplin.mediator.setHandler('redirectTo', Chaplin.utils.redirectTo);
-
             // stub handlers, should be defined in some modules
             Chaplin.mediator.setHandler('showLoading', function () {});
             Chaplin.mediator.setHandler('hideLoading', function () {});
+            Chaplin.mediator.setHandler('redirectTo', function () {});
+            Chaplin.mediator.setHandler('refreshPage', function () {});
 
             Application.__super__.initialize.apply(this, arguments);
         },
