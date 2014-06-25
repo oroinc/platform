@@ -1,9 +1,9 @@
-#Default owner for channel related entities
+#Default owner for integration related entities
 
-There is possibility to define owner for related entities on channel level.
-Default user owner setting included to channel configuration and should be configured duting channel creation.
+There is possibility to define owner for related entities on integration level.
+Default user owner setting included to integration configuration and should be configured during integration creation.
 
-Also _OroIntegrationBundle_ brings helper that could be used by import process to perform populating of channel owner.
+Also _OroIntegrationBundle_ brings helper that could be used by import process to perform populating of integration owner.
 It's registered as service `oro_integration.helper.default_owner_helper` and could be easily used as dependency.
 
 ####Usage example:
@@ -34,9 +34,9 @@ It's registered as service `oro_integration.helper.default_owner_helper` and cou
             // ....
 
             /** @var object $importedEntity user owner aware entity */
-            /** @var Channel $channel could be retrieved from import context */
+            /** @var Channel $integration could be retrieved from import context */
 
-            $this->defaultOwnerHelper->populateChannelOwner($importedEntity, $channel);
+            $this->defaultOwnerHelper->populateChannelOwner($importedEntity, $integration);
 
             // ....
         }
