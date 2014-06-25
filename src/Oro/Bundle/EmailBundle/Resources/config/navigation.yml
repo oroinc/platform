@@ -15,7 +15,7 @@ oro_menu_config:
             label: 'oro.email.menu.my_emails'
             route: 'oro_email_useremails'
             extras:
-                position: 30
+                position: 15
 
     tree:
         application_menu:
