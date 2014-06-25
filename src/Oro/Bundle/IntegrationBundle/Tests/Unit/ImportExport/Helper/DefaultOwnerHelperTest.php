@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Helper;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -49,17 +49,17 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider defaultChannelOwnerProvider
+     * @dataProvider defaultIntegrationOwnerProvider
      *
-     * @param Channel $channel
-     * @param string  $ownerType
-     * @param bool    $expectedReload
-     * @param bool    $expectedSet
+     * @param Integration $integration
+     * @param string      $ownerType
+     * @param bool        $expectedReload
+     * @param bool        $expectedSet
      */
-    public function testPopulateChannelOwner(Channel $channel, $ownerType, $expectedReload, $expectedSet)
+    public function testPopulateChannelOwner(Integration $integration, $ownerType, $expectedReload, $expectedSet)
     {
         $entity = new \stdClass();
-        $owner  = $channel->getDefaultUserOwner();
+        $owner  = $integration->getDefaultUserOwner();
 
         $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()->getMock();
@@ -86,26 +86,31 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
             $doctrineMetadata->expects($this->never())->method('setFieldValue');
         }
 
-        $this->helper->populateChannelOwner($entity, $channel);
+        $this->helper->populateChannelOwner($entity, $integration);
     }
 
     /**
      * @return array
      */
-    public function defaultChannelOwnerProvider()
+    public function defaultIntegrationOwnerProvider()
     {
-        $channelEmptyOwner = new Channel();
+        $integrationEmptyOwner = new Integration();
 
-        $user             = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $channelWithOwner = new Channel();
-        $channelWithOwner->setDefaultUserOwner($user);
+        $user                 = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $integrationWithOwner = new Integration();
+        $integrationWithOwner->setDefaultUserOwner($user);
 
         return [
-            'should set, user given and user owned entity'             => [$channelWithOwner, 'USER', false, true],
-            'should set with reload'                                   => [$channelWithOwner, 'USER', true, true],
-            'should not set, user not given even if user owned entity' => [$channelEmptyOwner, 'USER', false, false],
+            'should set, user given and user owned entity'             => [$integrationWithOwner, 'USER', false, true],
+            'should set with reload'                                   => [$integrationWithOwner, 'USER', true, true],
+            'should not set, user not given even if user owned entity' => [
+                $integrationEmptyOwner,
+                'USER',
+                false,
+                false
+            ],
             'should not set, user given and BU owned entity'           => [
-                $channelWithOwner,
+                $integrationWithOwner,
                 'BUSINESS_UNIT',
                 false,
                 false

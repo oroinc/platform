@@ -63,7 +63,8 @@
         "luxifer/doctrine-functions": "1.2.1",
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.7.*",
-        "ocramius/proxy-manager": "0.4.*"
+        "ocramius/proxy-manager": "0.4.*",
+        "knplabs/knp-gaufrette-bundle": "0.1.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -17,11 +17,11 @@ abstract class AbstractSyncCronCommand extends ContainerAwareCommand implements 
     /**
      * Check is job running (from previous schedule)
      *
-     * @param null|int $channelId
+     * @param null|int $integrationId
      *
      * @return bool
      */
-    protected function isJobRunning($channelId)
+    protected function isJobRunning($integrationId)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->getService('doctrine.orm.entity_manager')
@@ -33,15 +33,15 @@ abstract class AbstractSyncCronCommand extends ContainerAwareCommand implements 
             ->setParameter('commandName', $this->getName())
             ->setParameter('stateName', Job::STATE_RUNNING);
 
-        if ($channelId) {
+        if ($integrationId) {
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('j.args', ':channelIdType1'),
-                    $qb->expr()->like('j.args', ':channelIdType2')
+                    $qb->expr()->like('j.args', ':integrationIdType1'),
+                    $qb->expr()->like('j.args', ':integrationIdType2')
                 )
             )
-                ->setParameter('channelIdType1', '%--channel-id=' . $channelId . '%')
-                ->setParameter('channelIdType2', '%-c=' . $channelId . '%');
+                ->setParameter('integrationIdType1', '%--integration-id=' . $integrationId . '%')
+                ->setParameter('integrationIdType2', '%-i=' . $integrationId . '%');
         }
 
         $running = $qb->getQuery()
