@@ -3,15 +3,15 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 
 class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Channel|\PHPUnit_Framework_MockObject_MockObject */
-    protected $channel;
+    /** @var Integration|\PHPUnit_Framework_MockObject_MockObject */
+    protected $integration;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -44,9 +44,9 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->channel  = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log      = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->registry    = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log         = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
     }
 
     /**
@@ -61,6 +61,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      * Return mocked sync processor
      *
      * @param array $mockedMethods
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|SyncProcessor
      */
     protected function getSyncProcessor($mockedMethods = [])
@@ -85,23 +86,26 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $connectors = [];
 
-        $this->channel->expects($this->once())
+        $this->integration->expects($this->once())
             ->method('getConnectors')
             ->will($this->returnValue($connectors));
 
         $processor = $this->getSyncProcessor(['processImport']);
 
-        $processor->process($this->channel);
+        $processor->process($this->integration);
     }
 
     public function testOneChannelConnectorProcess()
     {
         $connector = 'testConnector';
-        $this->channel->expects($this->never())
+        $this->integration->expects($this->never())
             ->method('getConnectors');
-        $this->channel->expects($this->once())
+        $this->integration->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('testChannel'));
+        $this->integration->expects($this->once())
+            ->method('getEnabled')
+            ->will($this->returnValue(true));
         $realConnector = new TestConnector();
         $this->registry->expects($this->once())
             ->method('getConnectorType')
@@ -138,6 +142,6 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             $this->log
         );
 
-        $processor->process($this->channel, $connector, ['testParameter' => 'testValue']);
+        $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 }

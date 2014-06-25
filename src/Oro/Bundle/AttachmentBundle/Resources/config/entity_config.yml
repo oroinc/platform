@@ -1,0 +1,66 @@
+oro_entity_config:
+    attachment:
+        field:
+            items:
+                attachment:
+                    options:
+                        allowed_type:       [attachment, attachmentImage]
+                        auditable:          false
+                    form:
+                        type:               oro_attachment_config
+                        options:
+                            block:          entity
+                            subblock:       properties
+
+                maxsize:
+                    options:
+                        allowed_type:   [attachment, attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - NotBlank:  ~
+                        - Type:      integer
+                        - Range:
+                            min:     1
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.file_size.label
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 1
+                            tooltip:    oro.attachment.max_size
+
+                width:
+                    options:
+                        allowed_type:   [attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.thumb_width.label
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    oro.attachment.thumb_width
+
+                height:
+                    options:
+                        allowed_type:   [attachmentImage]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.thumb_height.label
+                            block:      entity
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    oro.attachment.thumb_height

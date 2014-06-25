@@ -2,24 +2,36 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
+use Doctrine\Common\Util\Inflector;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
+use Oro\Bundle\IntegrationBundle\Utils\FormUtils as IntegrationFormUtils;
+use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
 
 class ChannelFormSubscriber implements EventSubscriberInterface
 {
     /** @var TypesRegistry */
     protected $registry;
 
-    public function __construct(TypesRegistry $registry)
+    /** @var SettingsProvider */
+    protected $settingsProvider;
+
+    /**
+     * @param TypesRegistry    $registry
+     * @param SettingsProvider $settingsProvider
+     */
+    public function __construct(TypesRegistry $registry, SettingsProvider $settingsProvider)
     {
-        $this->registry = $registry;
+        $this->registry         = $registry;
+        $this->settingsProvider = $settingsProvider;
     }
 
     /**
@@ -42,7 +54,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     public function preSet(FormEvent $event)
     {
         $form = $event->getForm();
-        /** @var Channel $data */
+        /** @var Integration $data */
         $data = $event->getData();
 
         if ($data === null) {
@@ -60,6 +72,12 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
         $connectorsModifier = $this->getConnectorsModifierClosure($type);
         $connectorsModifier($form);
+
+        $synchronizationSettingsModifier = $this->getDynamicModifierClosure($type, 'synchronization_settings');
+        $synchronizationSettingsModifier($form);
+
+        $mappingSettingsModifier = $this->getDynamicModifierClosure($type, 'mapping_settings');
+        $mappingSettingsModifier($form);
 
         $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
         $firstChoice = reset($typeChoices);
@@ -83,7 +101,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     public function postSet(FormEvent $event)
     {
         $form = $event->getForm();
-        /** @var Channel $data */
+        /** @var Integration $data */
         $data = $event->getData();
 
         if ($data === null) {
@@ -99,8 +117,10 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         }
         $form->get('transportType')->setData($transportType);
 
+        $integrationType = $form->get('type')->getData();
+
         // populate empty transport type in case when default values from empty entity should be mapped to form
-        if (!$transport = $data->getTransport()) {
+        if ($integrationType && !$transport = $data->getTransport()) {
             $transport = $this->registry->getTransportType($form->get('type')->getData(), $transportType)
                 ->getSettingsEntityFQCN();
             if (class_exists($transport)) {
@@ -118,7 +138,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
 
-        /** @var Channel $originalData */
+        /** @var Integration $originalData */
         $originalData = $form->getData();
         $data         = $event->getData();
 
@@ -131,6 +151,12 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
             $connectorsModifier = $this->getConnectorsModifierClosure($type);
             $connectorsModifier($form);
+
+            $synchronizationSettingsModifier = $this->getDynamicModifierClosure($type, 'synchronization_settings');
+            $synchronizationSettingsModifier($form);
+
+            $mappingSettingsModifier = $this->getDynamicModifierClosure($type, 'mapping_settings');
+            $mappingSettingsModifier($form);
 
             // value that was set on postSet is replaced by null from request
             $typeChoices           = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
@@ -148,9 +174,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                     $originalData->getType(),
                     true
                 );
-                // second condition cover case when we have same name for few channel types
+                // second condition cover case when we have same name for few integration types
                 if ($transportType !== $data['transportType'] || $originalData->getType() !== $data['type']) {
-                    /** @var Channel $setEntity */
+                    /** @var Integration $setEntity */
                     $setEntity = $form->getViewData();
                     $setEntity->clearTransport();
                 }
@@ -164,7 +190,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Returns closure that fills transport type choices depends on selected channel type
+     * Returns closure that fills transport type choices depends on selected integration type
      *
      * @param string $type
      *
@@ -185,7 +211,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Returns closure that fills connectors choices depends on selected channel type
+     * Returns closure that fills connectors choices depends on selected integration type
      *
      * @param string $type
      *
@@ -208,21 +234,21 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     /**
      * Returns closure that adds transport field dependent on the rest form data
      *
-     * @param string $channelType
+     * @param string $integrationType
      * @param string $transportType
      *
      * @return callable
      */
-    protected function getTransportModifierClosure($channelType, $transportType)
+    protected function getTransportModifierClosure($integrationType, $transportType)
     {
         $registry = $this->registry;
 
-        return function (FormInterface $form) use ($channelType, $transportType, $registry) {
-            if (!($channelType && $transportType)) {
+        return function (FormInterface $form) use ($integrationType, $transportType, $registry) {
+            if (!($integrationType && $transportType)) {
                 return;
             }
 
-            $formType = $registry->getTransportType($channelType, $transportType)->getSettingsFormType();
+            $formType = $registry->getTransportType($integrationType, $transportType)->getSettingsFormType();
 
             $connectorsKey = 'connectors';
             $children      = $form->getIterator();
@@ -239,37 +265,43 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Disable fields that are not allowed to be modified since channel has at least one sync completed
+     * @param string $type
+     * @param string $formName
      *
-     * @param FormInterface $form
-     * @param Channel       $channel
+     * @return callable
      */
-    protected function muteFields(FormInterface $form, Channel $channel = null)
+    protected function getDynamicModifierClosure($type, $formName)
     {
-        if (!($channel && $channel->getId())) {
-            // do nothing if channel is new
-            return;
-        }
+        $settingsProvider = $this->settingsProvider;
 
-        if (static::wasChannelSynced($channel)) {
-            // disable type field
-            FormUtils::replaceField($form, 'type', ['disabled' => true]);
-        }
+        return function (FormInterface $form) use ($type, $settingsProvider, $formName) {
+            if (!$type) {
+                return;
+            }
+
+            $fields = $settingsProvider->getFormSettings($formName, $type);
+            if ($fields) {
+                $form->add(Inflector::camelize($formName), new IntegrationSettingsDynamicFormType($fields));
+            }
+        };
     }
 
     /**
-     * Return true if channel was synced at least once
+     * Disable fields that are not allowed to be modified since integration has at least one sync completed
      *
-     * @param Channel $channel
-     *
-     * @return bool
+     * @param FormInterface $form
+     * @param Integration       $integration
      */
-    public static function wasChannelSynced(Channel $channel)
+    protected function muteFields(FormInterface $form, Integration $integration = null)
     {
-        return $channel->getStatuses()->exists(
-            function ($key, Status $status) {
-                return intval($status->getCode()) === Status::STATUS_COMPLETED;
-            }
-        );
+        if (!($integration && $integration->getId())) {
+            // do nothing if integration is new
+            return;
+        }
+
+        if (IntegrationFormUtils::wasSyncedAtLeastOnce($integration)) {
+            // disable type field
+            FormUtils::replaceField($form, 'type', ['disabled' => true]);
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -61,7 +62,7 @@ class DoctrineListener
                     }
                 }
 
-                $this->prepareRelations($config, $cmBuilder);
+                $this->prepareRelations($em, $config, $cmBuilder);
             }
 
             $em->getMetadataFactory()->setMetadataFor($className, $event->getClassMetadata());
@@ -69,11 +70,16 @@ class DoctrineListener
     }
 
     /**
-     * @param ConfigInterface $config
+     *
+     * @param OroEntityManager     $em
+     * @param ConfigInterface      $config
      * @param ClassMetadataBuilder $cmBuilder
      */
-    protected function prepareRelations(ConfigInterface $config, ClassMetadataBuilder $cmBuilder)
-    {
+    protected function prepareRelations(
+        OroEntityManager $em,
+        ConfigInterface $config,
+        ClassMetadataBuilder $cmBuilder
+    ) {
         if ($config->is('relation')) {
             $relations = $config->get('relation');
             foreach ($relations as $relation) {
@@ -103,6 +109,11 @@ class DoctrineListener
                                 false,
                                 'SET NULL'
                             );
+
+                            if ($this->isAttachment($em, $config->getId()->getClassName(), $fieldName)) {
+                                $builder->cascadePersist();
+                            }
+
                             $builder->cascadeDetach();
                             $builder->build();
                             break;
@@ -151,5 +162,23 @@ class DoctrineListener
                 }
             }
         }
+    }
+
+    /**
+     * @param OroEntityManager $em
+     * @param string           $className
+     * @param string           $fieldName
+     *
+     * @return bool
+     */
+    protected function isAttachment($em, $className, $fieldName)
+    {
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $em->getExtendConfigProvider()->getConfigManager()->getProvider('attachment')->getId(
+            $className,
+            $fieldName
+        );
+
+        return in_array($fieldConfigId->getFieldType(), AttachmentScope::$attachmentTypes);
     }
 }
