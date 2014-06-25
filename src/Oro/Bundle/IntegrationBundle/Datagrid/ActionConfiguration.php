@@ -12,7 +12,7 @@ class ActionConfiguration
     public static function getIsSyncAvailableCondition()
     {
         return function (ResultRecordInterface $record) {
-            if (!$record->getValue('enabled')) {
+            if ($record->getValue('enabled') === 'disabled') {
                 return ['schedule' => false];
             }
         };

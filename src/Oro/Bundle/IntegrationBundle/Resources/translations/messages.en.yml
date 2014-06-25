@@ -37,7 +37,10 @@ oro:
             local_wins.label: Local wins
             default_user_owner.label: Default owner
             organization.label: Organization
-            enabled.label: Enabled the channel
+            enabled:
+                label:           Status
+                active.label:    Active
+                inactive.label:  Inactive
         channel:
             entity_label:        Integration
             entity_plural_label: Integrations
