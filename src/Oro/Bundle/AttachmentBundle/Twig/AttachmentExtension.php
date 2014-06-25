@@ -191,7 +191,8 @@ class AttachmentExtension extends \Twig_Extension
         if (!$attachment) {
             $attachment = PropertyAccess::createPropertyAccessor()->getValue($parentEntity, $fieldName);
         }
-        if ($attachment->getFilename()) {
+
+        if ($attachment && $attachment->getFilename()) {
             $entityClass = ClassUtils::getRealClass($parentEntity);
             $config = $this->attachmentConfigProvider->getConfig($entityClass, $fieldName);
 
