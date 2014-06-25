@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -14,6 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -337,14 +337,11 @@ class EntityFieldProvider
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 /**
-                 * Skip association if its state is "Deleted"
+                 * Skip association if it was deleted
                  */
-                if ($this->extendConfigProvider->hasConfig($className, $associationName)
-                    && $this->extendConfigProvider->getConfig($className, $associationName)->is(
-                        'state',
-                        ExtendScope::STATE_DELETED
-                    )
-                ) {
+                /** @var Config $associationConfig */
+                $associationConfig = $this->extendConfigProvider->getConfig($className, $associationName);
+                if ($associationConfig && $associationConfig->is('is_deleted')) {
                     continue;
                 }
 

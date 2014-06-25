@@ -106,20 +106,13 @@ class FieldHelper
         return !empty($field['relation_type']) && !empty($field['related_entity_name']);
     }
 
-    public function useRelationDenormalizer(array $field)
-    {
-        return
-            isset($field['relation_type'])
-            && !$this->fieldTypeHelper->isRealRelation($field['relation_type']);
-    }
-
     /**
      * @param string $className
      * @param string $fieldName
      *
      * @return bool
      */
-    public function processAsScalar($className, $fieldName)
+    public function processRelationAsScalar($className, $fieldName)
     {
         /** @var Config $fieldConfig */
         $fieldConfig = $this->configProvider->getConfig($className, $fieldName);
