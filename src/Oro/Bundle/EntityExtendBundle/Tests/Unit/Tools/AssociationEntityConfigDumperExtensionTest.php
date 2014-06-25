@@ -73,7 +73,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     public function testPreUpdate()
     {
         $extension = $this->getExtensionMock(
-            ['getAssociationEntityClass', 'getAssociationScope']
+            ['getAssociationEntityClass', 'getAssociationScope', 'getAssociationKind']
         );
 
         $extension->expects($this->once())
@@ -82,6 +82,9 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         $extension->expects($this->once())
             ->method('getAssociationScope')
             ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->once())
+            ->method('getAssociationKind')
+            ->will($this->returnValue('test'));
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
         $config1->set(self::ATTR_NAME, true);
@@ -91,7 +94,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
 
         $this->associationBuilder->expects($this->once())
             ->method('createManyToOneAssociation')
-            ->with('Test\SourceEntity', 'Test\Entity1');
+            ->with('Test\SourceEntity', 'Test\Entity1', 'test');
 
         $extendConfigs = [];
         $extension->preUpdate($extendConfigs);
@@ -100,7 +103,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     public function testPreUpdateForManyToMany()
     {
         $extension = $this->getExtensionMock(
-            ['getAssociationEntityClass', 'getAssociationScope', 'getAssociationType']
+            ['getAssociationEntityClass', 'getAssociationScope', 'getAssociationKind', 'getAssociationType']
         );
 
         $extension->expects($this->once())
@@ -109,6 +112,9 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         $extension->expects($this->once())
             ->method('getAssociationScope')
             ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->once())
+            ->method('getAssociationKind')
+            ->will($this->returnValue('test'));
         $extension->expects($this->once())
             ->method('getAssociationType')
             ->will($this->returnValue('manyToMany'));
@@ -121,7 +127,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
 
         $this->associationBuilder->expects($this->once())
             ->method('createManyToManyAssociation')
-            ->with('Test\SourceEntity', 'Test\Entity1');
+            ->with('Test\SourceEntity', 'Test\Entity1', 'test');
 
         $extendConfigs = [];
         $extension->preUpdate($extendConfigs);

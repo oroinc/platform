@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -64,7 +65,8 @@ class ActivityExtension implements ExtendExtensionAwareInterface
         $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(
-            $this->extendExtension->getEntityClassByTableName($targetTableName)
+            $this->extendExtension->getEntityClassByTableName($targetTableName),
+            ActivityScope::ASSOCIATION_KIND
         );
 
         $this->extendExtension->addManyToManyRelation(
