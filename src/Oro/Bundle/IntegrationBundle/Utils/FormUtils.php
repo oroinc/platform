@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
@@ -22,16 +22,16 @@ class FormUtils
     }
 
     /**
-     * Checks whether channel has at least on connector that supports backward sync
+     * Checks whether integration has at least on connector that supports backward sync
      *
-     * @param string $channelType
+     * @param string $integrationType
      *
      * @return bool
      */
-    public function hasTwoWaySyncConnectors($channelType)
+    public function hasTwoWaySyncConnectors($integrationType)
     {
         $connectors = $this->registry->getRegisteredConnectorsTypes(
-            $channelType,
+            $integrationType,
             function (ConnectorInterface $connector) {
                 return $connector instanceof TwoWaySyncConnectorInterface;
             }
@@ -43,13 +43,13 @@ class FormUtils
     /**
      * Return true if integration was synced at least once
      *
-     * @param Channel $channel
+     * @param Integration $integration
      *
      * @return bool
      */
-    public static function wasSyncedAtLeastOnce(Channel $channel)
+    public static function wasSyncedAtLeastOnce(Integration $integration)
     {
-        return $channel->getStatuses()->exists(
+        return $integration->getStatuses()->exists(
             function ($key, Status $status) {
                 return intval($status->getCode()) === Status::STATUS_COMPLETED;
             }

@@ -39,7 +39,13 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $this->rebuildChoiceList($options['choice_list']->getRemainingViews());
+        $isChoiceList = $options['choice_list']->getRemainingViews();
+
+        $this->rebuildChoiceList($isChoiceList);
+
+        if (empty($isChoiceList)) {
+            $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
+        }
 
         $vars = ['configs' => $options['configs']];
 
@@ -87,6 +93,8 @@ class IntegrationTypeSelectType extends AbstractType
 
     /**
      * @param array $choiceList
+     *
+     * @return boolean
      */
     protected function rebuildChoiceList(array $choiceList)
     {

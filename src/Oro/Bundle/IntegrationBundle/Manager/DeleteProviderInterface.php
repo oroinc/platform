@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 interface DeleteProviderInterface
 {
@@ -18,7 +18,7 @@ interface DeleteProviderInterface
     /**
      * Process delete of integration related data
      *
-     * @param Channel $channel
+     * @param Integration $integration
      */
-    public function deleteRelatedData(Channel $channel);
+    public function deleteRelatedData(Integration $integration);
 }

@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 
@@ -53,7 +53,7 @@ class IntegrationController extends Controller
      */
     public function createAction()
     {
-        return $this->update(new Channel());
+        return $this->update(new Integration());
     }
 
     /**
@@ -66,7 +66,7 @@ class IntegrationController extends Controller
      * )
      * @Template()
      */
-    public function updateAction(Channel $integration)
+    public function updateAction(Integration $integration)
     {
         return $this->update($integration);
     }
@@ -75,7 +75,7 @@ class IntegrationController extends Controller
      * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
      * @AclAncestor("oro_integration_update")
      */
-    public function scheduleAction(Channel $integration)
+    public function scheduleAction(Integration $integration)
     {
         $job = new Job(SyncCommand::COMMAND_NAME, ['--integration-id=' . $integration->getId(), '-v']);
 
@@ -116,7 +116,7 @@ class IntegrationController extends Controller
     }
 
     /**
-     * @param Channel $integration
+     * @param Integration $integration
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @Route("/toggle/{id}", requirements={"id"="\d+"}, name="oro_integration_toggle")
@@ -127,7 +127,7 @@ class IntegrationController extends Controller
      *      class="OroIntegrationBundle:Channel"
      * )
      */
-    public function toggleAction(Channel $integration)
+    public function toggleAction(Integration $integration)
     {
         if ($integration->getEnabled()) {
             $integration->setEnabled(false);
@@ -154,13 +154,13 @@ class IntegrationController extends Controller
     }
 
     /**
-     * @param Channel $integration
+     * @param Integration $integration
      *
      * @return array
      */
-    protected function update(Channel $integration)
+    protected function update(Integration $integration)
     {
-        if ($this->get('oro_integration.form.handler.channel')->process($integration)) {
+        if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.integration.controller.integration.message.saved')

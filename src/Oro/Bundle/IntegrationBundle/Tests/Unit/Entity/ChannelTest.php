@@ -7,7 +7,7 @@ use Doctrine\Common\Util\Inflector;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\DataGridBundle\Common\Object;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,12 +17,12 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
     /** @var array */
     protected static $testConnectors = ['customer', 'product'];
 
-    /** @var Channel */
+    /** @var Integration */
     protected $entity;
 
     protected function setUp()
     {
-        $this->entity = new Channel();
+        $this->entity = new Integration();
     }
 
     protected function tearDown()

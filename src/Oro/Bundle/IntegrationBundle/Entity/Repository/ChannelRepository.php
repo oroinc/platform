@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
@@ -37,7 +37,7 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * Find all channels with given type
+     * Find all integrations with given type
      *
      * @param string $type
      *
@@ -46,13 +46,13 @@ class ChannelRepository extends EntityRepository
      */
     protected function getChannelsBytType($type)
     {
-        $channels = $this->createQueryBuilder('c')
+        $integrations = $this->createQueryBuilder('c')
             ->where('c.type = :type')
             ->setParameter('type', $type)
             ->getQuery()
             ->getResult();
 
-        return $channels;
+        return $integrations;
     }
 
     /**
@@ -60,7 +60,7 @@ class ChannelRepository extends EntityRepository
      *
      * @param int $id
      *
-     * @return Channel
+     * @return Integration
      */
     public function getOrLoadById($id)
     {
@@ -76,18 +76,18 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * Adds status to channel, manual persist of newly created statuses
+     * Adds status to integration, manual persist of newly created statuses
      *
-     * @param Channel $channel
+     * @param Integration $integration
      * @param Status  $status
      */
-    public function addStatus(Channel $channel, Status $status)
+    public function addStatus(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
-            $channel = $this->getEntityManager()->merge($channel);
+            $integration = $this->getEntityManager()->merge($integration);
 
             $this->getEntityManager()->persist($status);
-            $channel->addStatus($status);
+            $integration->addStatus($status);
 
             $this->getEntityManager()->flush();
         }

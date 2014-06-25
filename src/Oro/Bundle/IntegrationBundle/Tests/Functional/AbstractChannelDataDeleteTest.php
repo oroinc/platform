@@ -41,37 +41,10 @@ abstract class AbstractChannelDataDeleteTest extends WebTestCase
         $this->em = $this->container->get('doctrine.orm.entity_manager');
     }
 
-    public function testDeleteChannel()
-    {
-        $this->generateTestData();
-        $channelId = $this->channel->getId();
-        $this->container->get('oro_integration.delete_manager')->delete($this->channel);
-
-        $resultChannel = $this->em->getRepository('OroIntegrationBundle:Channel')->find($channelId);
-        $resultForm = $this->em->getRepository($this->entityClassName)
-            ->findOneBy(['channel' => $channelId]);
-
-        $this->assertNull($resultChannel);
-        $this->assertNull($resultForm);
-    }
-
     /**
      * Create related entity
      *
      * @param Channel $channel
      */
     abstract protected function createRelatedEntity(Channel $channel);
-
-    /**
-     * Generate test channel with related entity
-     */
-    protected function generateTestData()
-    {
-        $this->channel = new Channel();
-        $this->channel->setType('simple')
-            ->setName('test');
-        $this->em->persist($this->channel);
-        $this->createRelatedEntity($this->channel);
-        $this->em->flush();
-    }
 }

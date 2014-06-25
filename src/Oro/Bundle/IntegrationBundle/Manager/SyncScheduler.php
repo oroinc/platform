@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 /**
@@ -39,14 +39,14 @@ class SyncScheduler
     /**
      * Schedules backward sync job
      *
-     * @param Channel $integration
-     * @param string  $connectorType
-     * @param array   $params
-     * @param bool    $useFlush
+     * @param Integration $integration
+     * @param string      $connectorType
+     * @param array       $params
+     * @param bool        $useFlush
      *
      * @throws \LogicException
      */
-    public function schedule(Channel $integration, $connectorType, $params = [], $useFlush = true)
+    public function schedule(Integration $integration, $connectorType, $params = [], $useFlush = true)
     {
         if (!$integration->getEnabled()) {
             return;

@@ -4,12 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormBuilder;
 
-use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
+use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType as IntegrationType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
-class ChannelTypeTest extends \PHPUnit_Framework_TestCase
+class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ChannelType */
+    /** @var IntegrationType */
     protected $type;
 
     /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
@@ -26,14 +26,14 @@ class ChannelTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $subscribersNS      = 'Oro\\Bundle\\IntegrationBundle\\Form\\EventListener\\';
-        $channelFS          = $this->getMockBuilder($subscribersNS . 'ChannelFormSubscriber')
+        $integrationFS          = $this->getMockBuilder($subscribersNS . 'ChannelFormSubscriber')
             ->disableOriginalConstructor()->getMock();
         $defaultUserOwnerFS = $this->getMockBuilder($subscribersNS . 'DefaultUserOwnerSubscriber')
             ->disableOriginalConstructor()->getMock();
         $organizationFS     = $this->getMockBuilder($subscribersNS . 'OrganizationSubscriber')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new ChannelType($this->registry, $defaultUserOwnerFS, $channelFS, $organizationFS);
+        $this->type = new IntegrationType($this->registry, $defaultUserOwnerFS, $integrationFS, $organizationFS);
     }
 
     public function tearDown()

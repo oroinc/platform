@@ -14,11 +14,11 @@ class SettingsProviderTest extends \PHPUnit_Framework_TestCase
      * @dataProvider configProvider
      *
      * @param array  $config
-     * @param string $channelType
+     * @param string $integrationType
      * @param array  $expectedFields
      * @param bool   $resolvedValue
      */
-    public function testGetFormSettings($config, $channelType, $expectedFields, $resolvedValue)
+    public function testGetFormSettings($config, $integrationType, $expectedFields, $resolvedValue)
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $resolver  = new SystemAwareResolver();
@@ -34,7 +34,7 @@ class SettingsProviderTest extends \PHPUnit_Framework_TestCase
             );
 
         $provider = new SettingsProvider($config, $resolver);
-        $result   = $provider->getFormSettings('synchronization_settings', $channelType);
+        $result   = $provider->getFormSettings('synchronization_settings', $integrationType);
 
         $this->assertEquals($expectedFields, array_keys($result));
     }
