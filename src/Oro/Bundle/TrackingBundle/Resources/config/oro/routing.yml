@@ -1,0 +1,4 @@
+oro_tracking:
+    resource:     "@OroTrackingBundle/Controller"
+    type:         annotation
+    prefix:       /

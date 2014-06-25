@@ -1,0 +1,15 @@
+Oro\Bundle\TrackingBundle\Entity\TrackingWebsite:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: identifier
+    properties:
+        identifier:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        url:
+            - NotBlank: ~
+            - Url: ~
+            - Length:
+                max: 255
+        owner:
+            - NotBlank: ~

@@ -1,2 +1,28 @@
-parameters: ~
-services: ~
+parameters:
+    oro_tracking.tracking_website.class: Oro\Bundle\TrackingBundle\Entity\TrackingWebsite
+
+    oro_tracking.form.type.tracking_website.class: Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
+    oro_tracking.form.handler.tracking_website.class: Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
+services:
+    oro_tracking.form.type.tracking_website:
+        class: %oro_tracking.form.type.tracking_website.class%
+        arguments:
+            - %oro_tracking.tracking_website.class%
+        tags:
+            - { name: form.type, alias: oro_tracking_website }
+
+    oro_tracking.form.handler.tracking_website:
+        class: %oro_tracking.form.handler.tracking_website.class%
+        scope: request
+        arguments:
+            - @oro_tracking.form.tracking_website
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_tracking.form.tracking_website:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - oro_tracking_website
+            - oro_tracking_website

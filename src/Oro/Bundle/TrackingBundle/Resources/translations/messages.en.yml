@@ -1,1 +1,16 @@
-oro_tracking: ~
+oro:
+    tracking:
+        tracking_website:
+            entity_label:        Website
+            entity_plural_label: Websites
+
+            identifier.label:    Identifier
+            url.label:           Url
+            owner.label:         Owner
+            created_at.label:    Created At
+            updated_at.label:    Updated At
+
+            saved_message: Website saved
+
+        block:
+            general: General
