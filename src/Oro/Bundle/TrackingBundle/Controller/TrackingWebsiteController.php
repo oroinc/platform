@@ -3,18 +3,19 @@
 namespace Oro\Bundle\TrackingBundle\Controller;
 
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Session\Session;
 
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler;
 use Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @Route("/tracking/website")
@@ -71,6 +72,18 @@ class TrackingWebsiteController extends Controller
     public function updateAction(TrackingWebsite $trackingWebsite)
     {
         return $this->update($trackingWebsite);
+    }
+
+    /**
+     * @Route("/view/{id}", name="oro_tracking_website_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_tracking_website_view")
+     * @Template()
+     */
+    public function viewAction(TrackingWebsite $trackingWebsite)
+    {
+        return [
+            'entity' => $trackingWebsite
+        ];
     }
 
     /**

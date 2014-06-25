@@ -14,9 +14,14 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
+ *  routeName="oro_tracking_website_index",
+ *  routeView="oro_tracking_website_view",
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-external-link"
+ *      },
+ *      "security"={
+ *          "type"="ACL"
  *      },
  *      "ownership"={
  *          "owner_type"="USER",
