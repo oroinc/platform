@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
@@ -53,7 +53,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Run sync in force mode, might not be supported by some channel/connector types'
+                'Run sync in force mode, might not be supported by some integration/connector types'
             )
             ->addOption(
                 'transport-batch-size',
@@ -107,7 +107,7 @@ class SyncCommand extends AbstractSyncCronCommand
             $integrations = $repository->getConfiguredChannelsForSync();
         }
 
-        /** @var Channel $integration */
+        /** @var Integration $integration */
         foreach ($integrations as $integration) {
             try {
                 $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
