@@ -193,14 +193,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         layout.pageRendered();
     });
 
-    mediator.bind('hash_navigation_request:before', function () {
+    mediator.bind('page:beforeChange', function () {
         layout.pageRendering();
     });
 
     /**
      * Init page layout js and hide progress bar after hash navigation request is completed
      */
-    mediator.bind("hash_navigation_request:complete", function () {
+    mediator.bind("page:afterChange", function () {
         layout.init();
         layout.hideProgressBar();
         layout.pageRendered();
@@ -308,7 +308,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         $(window).on('resize', adjustHeight);
 
-        mediator.on("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("page:afterChange", adjustReloaded);
 
         mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);

@@ -18,7 +18,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
             form: null,
 
             initialize: function () {
-                mediator.once('hash_navigation_request:start', this._onDestroyHandler, this);
+                mediator.once('page:request', this._onDestroyHandler, this);
 
                 this.form = $('.system-configuration-container').parents('form');
                 $(window).on(this.LOAD_EVENT, _.bind(this._collectHandler, this));
@@ -94,7 +94,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
             _onDestroyHandler: function () {
                 if (_.isNull(this.data)) {
                     // data was not collected disable listener
-                    mediator.off('hash_navigation_request:complete', this._collectHandler, this);
+                    mediator.off('page:afterChange', this._collectHandler, this);
                 } else {
                     this.data = null;
                 }

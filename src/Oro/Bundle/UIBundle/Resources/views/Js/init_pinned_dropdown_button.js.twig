@@ -8,6 +8,6 @@
             });
         }
         $(init);
-        mediator.on('hash_navigation_request:complete', init);
+        mediator.on('page:afterChange', init);
     });
 </script>

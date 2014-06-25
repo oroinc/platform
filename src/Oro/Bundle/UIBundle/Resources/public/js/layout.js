@@ -73,7 +73,7 @@ define(function (require) {
             }).on('focus.popover-hide', 'select, input, textarea', function() {
                 $items.popover('hide');
             });
-        mediator.once('hash_navigation_request:start', function () {
+        mediator.once('page:request', function () {
             $('body').off('click.popover-hide').off('click.popover-prevent').off('focus.popover-hide');
         });
     };

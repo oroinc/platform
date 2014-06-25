@@ -49,7 +49,7 @@ function (
             this.listenTo(this.getCollection(), 'reset', this._onItemsAdded);
 
             var addItem = _.bind(this._addItem, this);
-            mediator.once('hash_navigation_request:start', function () {
+            mediator.once('page:request', function () {
                 mediator.off('note:add', addItem);
             });
             mediator.on('note:add', addItem);
@@ -263,7 +263,7 @@ function (
                     }
                 });
                 this.itemEditDialog.render();
-                mediator.once('hash_navigation_request:start', _.bind(function () {
+                mediator.once('page:request', _.bind(function () {
                     if (this.itemEditDialog) {
                         this.itemEditDialog.remove();
                     }

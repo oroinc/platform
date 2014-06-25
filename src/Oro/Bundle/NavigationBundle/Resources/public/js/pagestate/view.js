@@ -27,7 +27,7 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
              * Init page state after hash navigation request is completed
              */
             mediator.bind(
-                "hash_navigation_request:refresh",
+                "page:update",
                 function() {
                     this.stopCollecting = false;
                     this.init();
@@ -38,7 +38,7 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
              * Clear page state timer after hash navigation request is started
              */
             mediator.bind(
-                "hash_navigation_request:start",
+                "page:request",
                 function() {
                     this.stopCollecting = true;
                     this.clearTimer();

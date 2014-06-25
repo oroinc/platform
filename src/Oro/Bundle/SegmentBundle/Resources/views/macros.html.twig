@@ -139,7 +139,7 @@
                                             var successMessage = __('Segment successfully processed.');
 
                                             {% if reloadRequired %}
-                                                mediator.once("hash_navigation_request:refresh", function() {
+                                                mediator.once("page:update", function() {
                                                     messenger.notificationFlashMessage('success', successMessage);
                                                 });
                                                 navigation.refreshPage();

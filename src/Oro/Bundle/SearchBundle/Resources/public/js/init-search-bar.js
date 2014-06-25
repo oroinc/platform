@@ -13,7 +13,7 @@ function($, _, routing, mediator) {
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
           mediator.bind(
-              'hash_navigation_request:complete',
+              'page:afterChange',
               searchByTagClose,
               this
           );

@@ -99,7 +99,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
             Backbone.View.prototype.initialize.apply(this, arguments);
 
             // destroy events bindings
-            mediator.once('hash_navigation_request:start', function () {
+            mediator.once('page:request', function () {
                 _.each(this.filters, function (filter) {
                     this.stopListening(filter, "update", this._onFilterUpdated);
                     this.stopListening(filter, "disable", this._onFilterDisabled);

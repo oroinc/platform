@@ -31,7 +31,7 @@
                             success: function(response) {
                                 if (navigation) {
                                     if (response.message) {
-                                        mediator.once('hash_navigation_request:complete', function() {
+                                        mediator.once('page:afterChange', function() {
                                             Messenger.notificationFlashMessage('success', response.message);
                                         });
                                     }
@@ -68,7 +68,7 @@
                         el.on('activation_success', function(e, response) {
                             if (navigation) {
                                 if (response.message) {
-                                    mediator.once('hash_navigation_request:complete', function() {
+                                    mediator.once('page:afterChange', function() {
                                         Messenger.notificationFlashMessage('success', response.message);
                                     });
                                 }

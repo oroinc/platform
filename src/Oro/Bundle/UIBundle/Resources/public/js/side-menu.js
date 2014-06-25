@@ -18,7 +18,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function ($, Backbone,
          */
         _create: function () {
             this.listener = $.extend({}, Backbone.Events);
-            this.listener.listenTo(mediator, 'hash_navigation_request:refresh', $.proxy(this._init, this));
+            this.listener.listenTo(mediator, 'page:update', $.proxy(this._init, this));
 
             this.$toggle = $(this.options.toggleSelector);
             this._on(this.$toggle, {click: this.onToggle});

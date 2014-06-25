@@ -132,8 +132,8 @@ define([
      * @param {Array} callbacks
      * @param {Object} obj
      */
-    function refreshHandler(path, callbacks, obj) {
-        if (path === obj.path) {
+    function refreshHandler(path, callbacks) {
+        if (path === current.path) {
             _.each(callbacks, function (callback) {
                 callback(path);
             });
@@ -179,7 +179,7 @@ define([
                 if (!outdatedPageHandlers[path]) {
                     handler = _.partial(refreshHandler, path, callbacks);
                     outdatedPageHandlers[path] = handler;
-                    mediator.on('hash_navigation_request:refresh', handler);
+                    mediator.on('page:update', handler);
                 }
             }
             mediator.trigger('content-manager:content-outdated', {
@@ -272,7 +272,7 @@ define([
             delete pagesCache[path];
 
             if (outdatedPageHandlers[path]) {
-                mediator.off('hash_navigation_request:refresh', outdatedPageHandlers[path]);
+                mediator.off('page:update', outdatedPageHandlers[path]);
                 delete outdatedPageHandlers[path];
             }
         },

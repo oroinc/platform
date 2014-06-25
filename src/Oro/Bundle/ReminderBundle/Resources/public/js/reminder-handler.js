@@ -21,7 +21,7 @@ define(
             init: function (id, wampEnable) {
                 var self = this;
 
-                mediator.on('page-rendered hash_navigation_request:complete', function () {
+                mediator.on('page-rendered page:afterChange', function () {
                     self.showReminders();
                 });
 

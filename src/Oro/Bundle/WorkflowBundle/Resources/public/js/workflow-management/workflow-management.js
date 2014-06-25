@@ -244,7 +244,7 @@ function(_, Backbone, routing, messenger, __,
                         redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
                     }
 
-                    mediator.once('hash_navigation_request:complete', function() {
+                    mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
                     navigation.setLocation(redirectUrl);
