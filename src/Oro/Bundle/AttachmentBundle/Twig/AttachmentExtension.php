@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
@@ -41,6 +42,7 @@ class AttachmentExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('oro_attachment_url', [$this, 'getAttachmentUrl']),
             new \Twig_SimpleFunction('oro_resized_attachment_url', [$this, 'getResizedImageUrl']),
+            new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction(
                 'oro_file_view',
@@ -170,6 +172,30 @@ class AttachmentExtension extends \Twig_Extension
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );
+        }
+
+        return '';
+    }
+
+    /**
+     * Get attachment image resized with config values
+     *
+     * @param object     $parentEntity
+     * @param string     $fieldName
+     * @param Attachment $attachment
+     *
+     * @return string
+     */
+    public function getConfiguredImageUrl($parentEntity, $fieldName, Attachment $attachment = null)
+    {
+        if (!$attachment) {
+            $attachment = PropertyAccess::createPropertyAccessor()->getValue($parentEntity, $fieldName);
+        }
+        if ($attachment->getFilename()) {
+            $entityClass = ClassUtils::getRealClass($parentEntity);
+            $config = $this->attachmentConfigProvider->getConfig($entityClass, $fieldName);
+
+            return $this->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'));
         }
 
         return '';

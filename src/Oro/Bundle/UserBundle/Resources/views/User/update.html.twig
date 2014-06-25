@@ -38,10 +38,9 @@
             'indexPath':   path('oro_user_index'),
             'indexLabel': 'oro.user.entity_plural_label'|trans,
             'entityTitle': fullname,
-            'hasAvatar':   true,
-            'imagePath':   form.vars.value.imagePath,
         }
         %}
+        {% set avatar = oro_configured_image_url(form.vars.value, 'avatar') %}
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.entity_label'|trans}) %}

@@ -12,11 +12,10 @@
                 <div class="row">
                     <div class="pull-left pull-left-extra">
                         {% block pageHeader %}
-                            {% set hasAvatar = breadcrumbs.hasAvatar is defined and breadcrumbs.hasAvatar %}
-                            <div class="clearfix customer-info well-small{% if not hasAvatar %} customer-simple{% endif %}">
-                                {% if hasAvatar %}
+                            <div class="clearfix customer-info well-small{% if avatar is not defined %} customer-simple{% endif %}">
+                                {% if avatar is defined %}
                                     <div class="visual">
-                                        <img src="{{ breadcrumbs.imagePath ? breadcrumbs.imagePath | imagine_filter('avatar_med') : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
+                                        <img src="{{ avatar ? avatar : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
                                     </div>
                                 {% endif %}
                                 <div class="customer-content pull-left">

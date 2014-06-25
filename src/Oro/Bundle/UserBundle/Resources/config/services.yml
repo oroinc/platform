@@ -14,7 +14,6 @@ parameters:
     oro_user.role.manager.api.class:    Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.group.manager.class:       Oro\Bundle\UserBundle\Entity\Manager\GroupManager
     oro_user.group.manager.api.class:   Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.entity_with_image.listener.class:              Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageListener
     oro_user.autocomplete.user.search_handler:              Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
     oro_user.autocomplete.user.search_acl_handler.class:    Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.email.owner.provider.class:                    Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
@@ -94,17 +93,6 @@ services:
         arguments:
             - %oro_user.group.entity.class%
             - @doctrine.orm.entity_manager
-
-    oro_user.entity_with_image.listener:
-        class: %oro_user.entity_with_image.listener.class%
-        arguments:
-            - %kernel.root_dir%
-        tags:
-            - { name: doctrine.event_listener, event: preUpdate }
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: postPersist }
-            - { name: doctrine.event_listener, event: postUpdate }
-            - { name: doctrine.event_listener, event: postRemove }
 
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler:

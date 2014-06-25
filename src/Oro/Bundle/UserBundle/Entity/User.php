@@ -1434,25 +1434,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Get the relative directory path to user avatar
-     *
-     * @param  bool   $forWeb
-     * @return string
-     */
-    public function getUploadDir($forWeb = false)
-    {
-        $ds = DIRECTORY_SEPARATOR;
-
-        if ($forWeb) {
-            $ds = '/';
-        }
-
-        $suffix = $this->getCreatedAt() ? $this->getCreatedAt()->format('Y-m') : date('Y-m');
-
-        return 'uploads' . $ds . 'users' . $ds . $suffix;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getTaggableId()

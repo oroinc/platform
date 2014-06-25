@@ -338,20 +338,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($api, $user->getApi());
     }
 
-    public function testImage()
-    {
-        $user = new User;
-
-        $this->assertNull($user->getImagePath());
-
-        $user->setImage('test');
-
-        $this->assertEquals('test', $user->getImage());
-        $this->assertNotEmpty($user->getUploadDir());
-        $path = $user->getUploadDir(true) . '/' . $user->getImage();
-        $this->assertEquals($path, $user->getImagePath());
-    }
-
     public function testUnserialize()
     {
         $user = new User();
