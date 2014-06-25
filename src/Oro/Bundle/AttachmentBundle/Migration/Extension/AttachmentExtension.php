@@ -62,13 +62,12 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
 
         $relationOptions = [
             'extend' => [
-                'owner'     => ExtendScope::OWNER_SYSTEM,
                 'is_extend' => true
             ],
             'attachment' => $attachmentScopeOptions
         ];
 
-        if (!empty($option)) {
+        if (!empty($options)) {
             $relationOptions = array_merge($relationOptions, $options);
         }
 
@@ -77,8 +76,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
             $entityTable,
             $sourceColumnName,
             self::ATTACHMENT_TABLE_NAME,
-            'id',
-            []
+            'id'
         );
 
         $this->extendOptionsManager->setColumnType($sourceTable, $sourceColumnName, $type);
