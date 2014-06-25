@@ -24,6 +24,8 @@ oro:
         name.label:      Name
         currency.label:  Currency
         business_units.label: Bussines units
+        form:
+            choose_organization: Choose a organization...
 
         businessunit:
             entity_label:        Business Unit

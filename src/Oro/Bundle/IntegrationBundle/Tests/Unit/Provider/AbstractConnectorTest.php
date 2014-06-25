@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 use Symfony\Component\HttpKernel\Log\NullLogger;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -45,8 +45,8 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
         $contextMediatorMock = $this
             ->getMockBuilder('Oro\\Bundle\\IntegrationBundle\\Provider\\ConnectorContextMediator')
             ->disableOriginalConstructor()->getMock();
-        $channel             = new Channel();
-        $channel->setTransport($this->transportSettings);
+        $integration             = new Integration();
+        $integration->setTransport($this->transportSettings);
 
         $context = $contextRegistry->getByStepExecution($this->stepExecutionMock);
         $contextMediatorMock->expects($this->at(0))
@@ -54,7 +54,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($transport));
         $contextMediatorMock->expects($this->at(1))
             ->method('getChannel')->with($this->equalTo($context))
-            ->will($this->returnValue($channel));
+            ->will($this->returnValue($integration));
 
         $connector = $this->getMockBuilder('Oro\\Bundle\\IntegrationBundle\\Provider\\AbstractConnector')
             ->setMethods(['getConnectorSource'])
@@ -73,7 +73,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
         $connector->setStepExecution($this->stepExecutionMock);
 
         $this->assertAttributeSame($transport, 'transport', $connector);
-        $this->assertAttributeSame($channel, 'channel', $connector);
+        $this->assertAttributeSame($integration, 'channel', $connector);
     }
 
     public function initializationDataProvider()

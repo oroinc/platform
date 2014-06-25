@@ -13,6 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -335,6 +336,15 @@ class EntityFieldProvider
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                /**
+                 * Skip association if it was deleted
+                 */
+                /** @var Config $associationConfig */
+                $associationConfig = $this->extendConfigProvider->getConfig($className, $associationName);
+                if ($associationConfig && $associationConfig->is('is_deleted')) {
+                    continue;
+                }
+
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }

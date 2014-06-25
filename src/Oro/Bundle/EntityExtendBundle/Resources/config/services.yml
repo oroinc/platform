@@ -17,6 +17,7 @@ parameters:
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGenerator
+    oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -118,6 +119,7 @@ services:
         class: %oro_entity_extend.migration.options_parser.class%
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_entity_extend.extend.field_type_helper
 
     oro_entity_extend.migration.extension.extend:
         class: %oro_entity_extend.migration.extension.extend.class%
@@ -133,3 +135,6 @@ services:
             - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: rename, priority: -10 }
+
+    oro_entity_extend.extend.field_type_helper:
+        class: %oro_entity_extend.extend.field_type_helper.class%
