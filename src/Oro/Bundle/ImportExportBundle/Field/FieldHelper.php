@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Field;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -54,16 +55,15 @@ class FieldHelper
         $applyExclusions = false,
         $translate = true
     ) {
-        return $this
-            ->fieldProvider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                $withEntityDetails,
-                $withUnidirectional,
-                $applyExclusions,
-                $translate
-            );
+        return $this->fieldProvider->getFields(
+            $entityName,
+            $withRelations,
+            $withVirtualFields,
+            $withEntityDetails,
+            $withUnidirectional,
+            $applyExclusions,
+            $translate
+        );
     }
 
     /**
@@ -103,15 +103,28 @@ class FieldHelper
      */
     public function isRelation(array $field)
     {
-        return
-            !empty($field['relation_type'])
-            && !empty($field['related_entity_name'])
-            && $this->fieldTypeHelper->isRealRelation($field['relation_type']);
+        return !empty($field['relation_type']) && !empty($field['related_entity_name']);
     }
 
     public function useRelationDenormalizer(array $field)
     {
-        return $this->fieldTypeHelper->useRelationDenormalizer($field);
+        return
+            isset($field['relation_type'])
+            && !$this->fieldTypeHelper->isRealRelation($field['relation_type']);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function processAsScalar($className, $fieldName)
+    {
+        /** @var Config $fieldConfig */
+        $fieldConfig = $this->configProvider->getConfig($className, $fieldName);
+
+        return $fieldConfig->is('process_as_scalar');
     }
 
     /**
@@ -120,13 +133,12 @@ class FieldHelper
      */
     public function isSingleRelation(array $field)
     {
-        return //$this->isRelation($field)
-        //&& in_array($field['relation_type'], array('ref-one', 'oneToOne', 'manyToOne'));
-        //&&
-            in_array(
-            $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
-            array('ref-one', 'oneToOne', 'manyToOne')
-        );
+        return
+            $this->isRelation($field)
+            && in_array(
+                $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
+                array('ref-one', 'oneToOne', 'manyToOne')
+            );
     }
 
     /**
@@ -135,12 +147,12 @@ class FieldHelper
      */
     public function isMultipleRelation(array $field)
     {
-        return $this->isRelation($field)
-        //&& in_array($field['relation_type'], array('ref-many', 'oneToMany', 'manyToMany'));
-        && in_array(
-            $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
-            array('ref-many', 'oneToMany', 'manyToMany')
-        );
+        return
+            $this->isRelation($field)
+            && in_array(
+                $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
+                array('ref-many', 'oneToMany', 'manyToMany')
+            );
     }
 
     /**
