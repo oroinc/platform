@@ -62,7 +62,7 @@ datagrid:
     activity-email-grid:
         extends: email-grid
 
-    user-email-grid:
+    my-emails-grid:
         extends: email-grid
         source:
             query:
