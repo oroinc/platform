@@ -1,24 +1,35 @@
 <?php
 
-
-namespace Oro\Bundle\NoteBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use CG\Core\DefaultGeneratorStrategy;
-
 use CG\Generator\PhpClass;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension;
 
-class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var NoteEntityGeneratorExtension */
+    const ASSOCIATION_KIND = 'test';
+
+    /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit_Framework_MockObject_MockObject */
     protected $extension;
 
     public function setUp()
     {
-        $this->extension = new NoteEntityGeneratorExtension();
+        $this->extension = $this->getMockForAbstractClass(
+            'Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension',
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['getAssociationKind']
+        );
+        $this->extension->expects($this->any())
+            ->method('getAssociationKind')
+            ->will($this->returnValue(self::ASSOCIATION_KIND));
     }
 
     /**
@@ -35,17 +46,16 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
     public function supportsProvider()
     {
         return [
-            [
+            'supported'                => [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'relation'     => ['test' => 'test'],
                     'relationData' => [
                         [
                             'field_id'      =>
                                 new FieldConfigId(
                                     'extend',
-                                    Note::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity'),
+                                    'Test\Entity',
+                                    ExtendHelper::buildAssociationName('Test\TargetEntity', self::ASSOCIATION_KIND),
                                     'manyToOne'
                                 ),
                             'target_entity' => 'Test\TargetEntity'
@@ -54,16 +64,33 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 true,
             ],
-            [
+            'another association kind' => [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'relation'     => ['test' => 'test'],
                     'relationData' => [
                         [
                             'field_id'      =>
                                 new FieldConfigId(
                                     'extend',
-                                    Note::ENTITY_NAME,
+                                    'Test\Entity',
+                                    ExtendHelper::buildAssociationName('Test\TargetEntity', 'another'),
+                                    'manyToOne'
+                                ),
+                            'target_entity' => 'Test\TargetEntity'
+                        ]
+                    ]
+                ],
+                false,
+            ],
+            'unsupported field name'   => [
+                [
+                    'relation'     => ['test' => 'test'],
+                    'relationData' => [
+                        [
+                            'field_id'      =>
+                                new FieldConfigId(
+                                    'extend',
+                                    'Test\Entity',
                                     'testField',
                                     'manyToOne'
                                 ),
@@ -73,17 +100,16 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 false,
             ],
-            [
+            'unsupported field type'   => [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'relation'     => ['test' => 'test'],
                     'relationData' => [
                         [
                             'field_id'      =>
                                 new FieldConfigId(
                                     'extend',
-                                    Note::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity'),
+                                    'Test\Entity',
+                                    ExtendHelper::buildAssociationName('Test\TargetEntity', self::ASSOCIATION_KIND),
                                     'manyToMany'
                                 ),
                             'target_entity' => 'Test\TargetEntity'
@@ -92,12 +118,12 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
                 false,
             ],
-            [
-                ['class' => Note::ENTITY_NAME],
+            'no relationData'          => [
+                ['relation' => ['test' => 'test']],
                 false,
             ],
-            [
-                ['class' => 'Test\Entity', 'relation' => 'test'],
+            'empty'                    => [
+                [],
                 false,
             ],
         ];
@@ -112,7 +138,7 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         new FieldConfigId(
                             'extend',
                             'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1'),
+                            ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
                             'manyToOne'
                         ),
                     'target_entity' => 'Test\TargetEntity1',
@@ -122,7 +148,7 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         new FieldConfigId(
                             'extend',
                             'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2'),
+                            ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
                             'manyToOne'
                         ),
                     'target_entity' => 'Test\TargetEntity2',
@@ -131,8 +157,8 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                     'field_id'      =>
                         new FieldConfigId(
                             'extend',
-                            Note::ENTITY_NAME,
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3'),
+                            'Test\Entity',
+                            ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
                             'manyToMany'
                         ),
                     'target_entity' => 'Test\TargetEntity3'
@@ -141,7 +167,7 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                     'field_id'      =>
                         new FieldConfigId(
                             'extend',
-                            Note::ENTITY_NAME,
+                            'Test\Entity',
                             'testField',
                             'manyToOne'
                         ),
@@ -155,7 +181,7 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->generate($schema, $class);
         $strategy     = new DefaultGeneratorStrategy();
         $classBody    = $strategy->generate($class);
-        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/generationResult.txt');
+        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/many_to_one_association.txt');
 
         $this->assertEquals(trim($expectedBody), $classBody);
     }

@@ -21,6 +21,16 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
     }
 
     /**
+     * Gets the kind of the association. For example 'activity', 'sponsorship' etc
+     *
+     * @return string|null The association kind or NULL for unclassified (default) association
+     */
+    protected function getAssociationKind()
+    {
+        return null;
+    }
+
+    /**
      * Gets the type of the association. For example manyToOne or manyToMany
      *
      * @return string
@@ -76,10 +86,18 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
     {
         switch ($this->getAssociationType()) {
             case 'manyToOne':
-                $this->associationBuilder->createManyToOneAssociation($sourceEntityClass, $targetEntityClass);
+                $this->associationBuilder->createManyToOneAssociation(
+                    $sourceEntityClass,
+                    $targetEntityClass,
+                    $this->getAssociationKind()
+                );
                 break;
             case 'manyToMany':
-                $this->associationBuilder->createManyToManyAssociation($sourceEntityClass, $targetEntityClass);
+                $this->associationBuilder->createManyToManyAssociation(
+                    $sourceEntityClass,
+                    $targetEntityClass,
+                    $this->getAssociationKind()
+                );
                 break;
             default:
                 throw new \RuntimeException(

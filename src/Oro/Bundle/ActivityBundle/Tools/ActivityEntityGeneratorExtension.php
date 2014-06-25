@@ -2,134 +2,53 @@
 
 namespace Oro\Bundle\ActivityBundle\Tools;
 
-use CG\Generator\PhpClass;
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityGeneratorExtension;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
-class ActivityEntityGeneratorExtension extends AbstractEntityGeneratorExtension
+class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
+    /** @var ConfigProvider */
+    protected $groupingConfigProvider;
+
     /**
-     * {@inheritdoc}
+     * @param ConfigProvider $groupingConfigProvider
      */
-    public function supports(array $schema)
+    public function __construct(ConfigProvider $groupingConfigProvider)
     {
-        $result = !empty($schema['relation']) && !empty($schema['relationData']);
-        if ($result) {
-            $result = false;
-            foreach ($schema['relationData'] as $relationData) {
-                /** @var FieldConfigId $fieldConfig */
-                $fieldConfig = $relationData['field_id'];
-
-                if ($fieldConfig instanceof FieldConfigId
-                    && $fieldConfig->getFieldType() === 'manyToMany'
-                    && $fieldConfig->getFieldName() === ExtendHelper::buildAssociationName(
-                        $relationData['target_entity']
-                    )
-                ) {
-                    $result = true;
-                    break;
-                }
-            }
-        }
-
-        return $result;
+        $this->groupingConfigProvider = $groupingConfigProvider;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $schema, PhpClass $class)
+    public function supports(array $schema)
     {
-        $relationData = empty($schema['relationData']) ? [] : $schema['relationData'];
-
-        $relationNames     = [];
-        $supportedEntities = [];
-
-        foreach ($relationData as $relationItem) {
-            /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $relationItem['field_id'];
-
-            $fieldName                 = $fieldConfigId->getFieldName();
-            $targetClassName           = $relationItem['target_entity'];
-            $relationNames[$fieldName] = $targetClassName;
-            $supportedEntities[]       = sprintf("'%s'", $targetClassName);
+        if (!$this->groupingConfigProvider->hasConfig($schema['class'])) {
+            return false;
         }
 
-        $getMethodBody    = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);'
-        ];
-        $addMethodBody    = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
-        $removeMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
+        $groups = $this->groupingConfigProvider->getConfig($schema['class'])->get('groups');
 
-        foreach ($relationNames as $fieldName => $targetClassName) {
-            $getMethodBody[]    = sprintf(
-                'if ($className === \'%s\') { return $this->%s; }',
-                $targetClassName,
-                $fieldName
-            );
-            $addMethodBody[]    = str_replace(
-                ['{class}', '{field}'],
-                [$targetClassName, $fieldName],
-                "if (\$className === '{class}') {\n"
-                . "    if (!\$this->{field}->contains(\$target)) { \$this->{field}->add(\$target); }\n"
-                . "    return \$this;\n}"
-            );
-            $removeMethodBody[] = str_replace(
-                ['{class}', '{field}'],
-                [$targetClassName, $fieldName],
-                "if (\$className === '{class}') {\n"
-                . "    if (\$this->{field}->contains(\$target)) { \$this->{field}->removeElement(\$target); }\n"
-                . "    return \$this;\n}"
-            );
-        }
+        return
+            !empty($groups)
+            && in_array(ActivityScope::GROUP_ACTIVITY, $groups)
+            && parent::supports($schema);
+    }
 
-        $throwStmt = 'throw new \RuntimeException('
-            . 'sprintf(\'The association with "%s" entity was not configured.\', $className));';
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationKind()
+    {
+        return ActivityScope::ASSOCIATION_KIND;
+    }
 
-        $getMethodBody[]    = $throwStmt;
-        $addMethodBody[]    = $throwStmt;
-        $removeMethodBody[] = $throwStmt;
-
-        $getMethodDocblock = "/**\n"
-            . " * Gets entities of the given type associated with this activity entity\n"
-            . " *\n"
-            . " * @param string \$targetClass The class name of the target entity\n"
-            . " * @return object[]\n"
-            . " */";
-        $addMethodDocblock = "/**\n"
-            . " * Associates the given entity with this activity entity\n"
-            . " *\n"
-            . " * @param object \$target Any configurable entity that can be associated with this activity\n"
-            . " * @return object This object\n"
-            . " */";
-        $removeMethodDocblock = "/**\n"
-            . " * Removes the association of the given entity with this activity entity\n"
-            . " *\n"
-            . " * @param object \$target Any configurable entity that can be associated with this activity\n"
-            . " * @return object This object\n"
-            . " */";
-
-        $class
-            ->setMethod(
-                $this
-                    ->generateClassMethod('getActivityTargets', implode("\n", $getMethodBody), ['targetClass'])
-                    ->setDocblock($getMethodDocblock)
-            )
-            ->setMethod(
-                $this
-                    ->generateClassMethod('addActivityTarget', implode("\n", $addMethodBody), ['target'])
-                    ->setDocblock($addMethodDocblock)
-            )
-            ->setMethod(
-                $this
-                    ->generateClassMethod('removeActivityTarget', implode("\n", $removeMethodBody), ['target'])
-                    ->setDocblock($removeMethodDocblock)
-            );
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationType()
+    {
+        return 'manyToMany';
     }
 }

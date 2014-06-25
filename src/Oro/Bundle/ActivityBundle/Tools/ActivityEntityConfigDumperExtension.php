@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Tools;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationEntityConfigDumperExtension;
 
 class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
@@ -20,5 +21,13 @@ class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfi
     protected function getAssociationAttributeName()
     {
         return 'activities';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationKind()
+    {
+        return ActivityScope::ASSOCIATION_KIND;
     }
 }

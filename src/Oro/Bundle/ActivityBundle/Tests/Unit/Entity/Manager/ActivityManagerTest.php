@@ -177,14 +177,14 @@ class ActivityManagerTest extends OrmTestCase
             [
                 [
                     'className'       => 'Test\Activity1',
-                    'associationName' => 'entity_2929d33a',
+                    'associationName' => 'entity_1f801d4a',
                     'label'           => 'lbl.activity1',
                     'route'           => 'route1',
                     'acl'             => 'acl1',
                 ],
                 [
                     'className'       => 'Test\Activity2',
-                    'associationName' => 'entity_2929d33a',
+                    'associationName' => 'entity_1f801d4a',
                     'label'           => 'lbl.activity2',
                     'route'           => 'route2',
                     'priority'        => 100,
@@ -241,13 +241,13 @@ class ActivityManagerTest extends OrmTestCase
             [
                 [
                     'className'       => 'Test\Activity1',
-                    'associationName' => 'entity_2929d33a',
+                    'associationName' => 'entity_1f801d4a',
                     'widget'          => 'widget1',
                     'group'           => 'group1',
                 ],
                 [
                     'className'       => 'Test\Activity2',
-                    'associationName' => 'entity_2929d33a',
+                    'associationName' => 'entity_1f801d4a',
                     'widget'          => 'widget2',
                     'priority'        => 100,
                 ],
@@ -272,7 +272,7 @@ class ActivityManagerTest extends OrmTestCase
             . ' WHERE activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
-            . ' INNER JOIN filterActivityEntity.target_bcaa0d48 filterTargetEntity'
+            . ' INNER JOIN filterActivityEntity.target_cb0fccb1 filterTargetEntity'
             . ' WHERE filterTargetEntity.id = :targetEntityId)',
             $qb->getQuery()->getDQL()
         );
@@ -305,7 +305,7 @@ class ActivityManagerTest extends OrmTestCase
             . ' WHERE another.id = activity.id AND activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
-            . ' INNER JOIN filterActivityEntity.target_bcaa0d48 filterTargetEntity'
+            . ' INNER JOIN filterActivityEntity.target_cb0fccb1 filterTargetEntity'
             . ' WHERE filterTargetEntity.id = :targetEntityId)',
             $qb->getQuery()->getDQL()
         );

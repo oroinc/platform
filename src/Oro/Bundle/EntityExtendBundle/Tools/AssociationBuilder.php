@@ -31,10 +31,11 @@ class AssociationBuilder
     /**
      * @param string $sourceEntityClass
      * @param string $targetEntityClass
+     * @param string $associationKind
      */
-    public function createManyToManyAssociation($sourceEntityClass, $targetEntityClass)
+    public function createManyToManyAssociation($sourceEntityClass, $targetEntityClass, $associationKind)
     {
-        $relationName = ExtendHelper::buildAssociationName($targetEntityClass);
+        $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
         $relationKey  = ExtendHelper::buildRelationKey(
             $sourceEntityClass,
             $relationName,
@@ -96,10 +97,11 @@ class AssociationBuilder
     /**
      * @param string $sourceEntityClass
      * @param string $targetEntityClass
+     * @param string $associationKind
      */
-    public function createManyToOneAssociation($sourceEntityClass, $targetEntityClass)
+    public function createManyToOneAssociation($sourceEntityClass, $targetEntityClass, $associationKind)
     {
-        $relationName = ExtendHelper::buildAssociationName($targetEntityClass);
+        $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
         $relationKey  = ExtendHelper::buildRelationKey(
             $sourceEntityClass,
             $relationName,

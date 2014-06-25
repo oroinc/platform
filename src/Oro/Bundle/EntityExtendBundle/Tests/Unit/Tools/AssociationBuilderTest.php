@@ -99,7 +99,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                 'manyToMany|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
             );
 
-        $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS);
+        $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
     public function testCreateManyToOneRelation()
@@ -185,7 +185,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                 'manyToOne|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
             );
 
-        $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS);
+        $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
     public function testPrimaryKeyColumnNames()
