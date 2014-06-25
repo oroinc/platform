@@ -75,7 +75,7 @@ class ExtendConfigDumper
     public function updateConfig($className = null)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
-        $this->clear();
+        $this->clear(true);
 
         $extendProvider = $this->em->getExtendConfigProvider();
 
@@ -120,15 +120,27 @@ class ExtendConfigDumper
         $this->entityGenerator->generate($schemas);
     }
 
-    public function clear()
+    /**
+     * Removes the entity proxies and metadata from the cache
+     *
+     * @param bool $keepEntityProxies Set TRUE if proxies for custom and extend entities should not be deleted
+     */
+    public function clear($keepEntityProxies = false)
     {
         $filesystem   = new Filesystem();
-        $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
-        if ($filesystem->exists($baseCacheDir)) {
-            $filesystem->remove([$baseCacheDir]);
-        }
 
-        $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+        if ($keepEntityProxies) {
+            $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
+            if ($filesystem->exists($aliasesPath)) {
+                $filesystem->remove($aliasesPath);
+            }
+        } else {
+            $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
+            if ($filesystem->exists($baseCacheDir)) {
+                $filesystem->remove([$baseCacheDir]);
+            }
+            $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+        }
 
         /** @var ExtendClassMetadataFactory $metadataFactory */
         $metadataFactory = $this->em->getMetadataFactory();

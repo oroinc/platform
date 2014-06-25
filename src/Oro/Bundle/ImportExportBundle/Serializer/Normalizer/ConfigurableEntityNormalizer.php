@@ -57,6 +57,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     } else {
                         $entityClass = 'DateTime';
                     }
+                    $context = array_merge($context, ['fieldName' => $fieldName]);
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
                 }
 
@@ -119,6 +120,12 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldValue = $propertyAccessor->getValue($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
+
+                $fieldContext['fieldName'] = $fieldName;
+                if (method_exists($object, 'getId')) {
+                    $fieldContext['entityId'] = $object->getId();
+                }
+
                 $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
 
                 // Do not export relation in short mode if it does not contain identity fields

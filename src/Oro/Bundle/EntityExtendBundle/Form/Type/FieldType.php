@@ -32,6 +32,8 @@ class FieldType extends AbstractType
         'float'      => 'oro.entity_extend.form.data_type.float',
         'money'      => 'oro.entity_extend.form.data_type.money',
         'percent'    => 'oro.entity_extend.form.data_type.percent',
+        'attachment'      => 'oro.entity_extend.form.data_type.attachment',
+        'attachmentImage' => 'oro.entity_extend.form.data_type.attachmentImage',
         'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
         'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
         'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',

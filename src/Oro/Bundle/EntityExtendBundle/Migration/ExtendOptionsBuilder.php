@@ -2,31 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
 
-    /**
-     * @var array
-     */
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
+    /** @var array */
     protected $tableToEntityMap = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $result = [];
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -95,7 +97,12 @@ class ExtendOptionsBuilder
         $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
         $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
-        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])
+            || in_array(
+                $this->fieldTypeHelper->getUnderlyingType($columnType),
+                ['oneToMany', 'manyToOne', 'manyToMany']
+            )
+        ) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }

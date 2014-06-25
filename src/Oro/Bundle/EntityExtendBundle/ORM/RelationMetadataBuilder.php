@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -116,6 +117,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             false,
             'SET NULL'
         );
+        if (in_array($fieldId->getFieldType(), AttachmentScope::$attachmentTypes)) {
+            $builder->cascadePersist();
+        }
         $builder->cascadeDetach();
         $builder->build();
     }

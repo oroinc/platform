@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\ORM\Mapping\MappingException;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -179,6 +181,11 @@ class AssociationBuilder
                 ->getClassMetadata($entityClass)
                 ->getIdentifierColumnNames();
         } catch (\ReflectionException $e) {
+            // ignore entity not found exception
+            return ['id'];
+        } catch (MappingException $e) {
+            // ignore any doctrine mapping exceptions
+            // it may happens if the entity has relation to deleted custom entity
             return ['id'];
         }
     }

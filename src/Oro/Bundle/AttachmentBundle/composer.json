@@ -1,0 +1,23 @@
+{
+    "name": "oro/attachment-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Attachment Bundle",
+    "keywords": ["BAP", "Attachment", "File", "Image"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": ">=2.1",
+        "liip/imagine-bundle": "dev-master",
+        "knplabs/knp-gaufrette-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\AttachmentBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/AttachmentBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

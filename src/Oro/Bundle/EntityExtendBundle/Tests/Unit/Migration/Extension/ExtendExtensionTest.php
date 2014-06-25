@@ -32,6 +32,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
                 ->disableOriginalConstructor()
                 ->getMock();
+
+        $fieldTypeHelper = $this->getMock('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper');
+
         $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassByTableName')
             ->will(
@@ -46,7 +49,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldNameByColumnName')
             ->will($this->returnArgument(1));
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper);
+        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper, $fieldTypeHelper);
     }
 
     /**
