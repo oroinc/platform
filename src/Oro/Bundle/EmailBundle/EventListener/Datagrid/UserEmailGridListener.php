@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 
@@ -31,6 +32,27 @@ class UserEmailGridListener
         $this->queryFactory     = $factory;
     }
 
+    /**
+     * @param BuildBefore $event
+     */
+    public function onBuildBefore(BuildBefore $event)
+    {
+        if ($event->getDatagrid()->getName() != 'user-email-grid') {
+            return;
+        }
+
+        // Remove twig column configuration - field should be rendered like plain text
+        // TODO: fix datagrid yaml definition merge in order to make possible override column twig template
+        // or unset some keys from parent grid definition
+        $config = $event->getConfig();
+        $config->offsetUnsetByPath('[columns][subject][type]');
+        $config->offsetUnsetByPath('[columns][subject][frontend_type]');
+        $config->offsetUnsetByPath('[columns][subject][template]');
+    }
+
+    /**
+     * @param BuildAfter $event
+     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();

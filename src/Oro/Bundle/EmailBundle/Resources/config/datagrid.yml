@@ -77,9 +77,6 @@ datagrid:
                 where:
                     and:
                         - o.id IN (:origin_ids)
-
-    my-emails-grid:
-        extends: user-email-grid
         properties:
             view_link:
                 type: url

@@ -264,14 +264,7 @@ services:
             - @oro_email.email_synchronization_manager
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.user-email-grid, method: onBuildAfter }
-
-    oro_email.listener.datagrid.my_emails:
-        class: %oro_email.listener.datagrid.user_emails.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_email.email_synchronization_manager
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.my-emails-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.user-email-grid, method: onBuildBefore }
 
     oro_email.listener.datagrid.recent_emails.inbox:
         class: %oro_email.listener.datagrid.user_emails.class%
@@ -299,13 +292,6 @@ services:
         class: %oro_email.email.activity.manager.class%
         arguments:
             - @oro_entity_config.provider.activity
-
-    oro_email.event_listener.activity_grid_listener:
-        class: %oro_email.event_listener.activity_grid_listener.class%
-        arguments:
-            - @oro_activity.manager
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
     oro_entity.twig.extension.email:
         class: %oro_entity.twig.extension.email.class%
