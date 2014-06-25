@@ -13,9 +13,13 @@
     {{ parent() }}
     <div class="status-enabled pull-left">
         {% if entity.enabled %}
-            <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
+            <div class="badge badge-enabled status-enabled">
+                <i class="icon-status-enabled icon-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}
+            </div>
         {% else %}
-            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-enabled status-disabled">
+                <i class="icon-status-disabled icon-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}
+            </div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
@@ -35,30 +39,24 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {% if entity.id and entity.enabled == true %}
-        {{ UI.button({
-            'path': path('oro_integration_toggle', {'id': entity.id}),
-            'title' : 'oro.integration.deactivate'|trans,
-            'label' : 'oro.integration.deactivate'|trans,
-        }) }}
-        {{ UI.buttonSeparator() }}
-    {% elseif entity.id %}
-        {{ UI.button({
-            'path': path('oro_integration_toggle', {'id': entity.id}),
-            'title' : 'oro.integration.activate'|trans,
-            'label' : 'oro.integration.activate'|trans,
-        }) }}
-        {{ UI.buttonSeparator() }}
-    {% endif %}
-
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
-    {% if entity.id and entity.enabled == true %}
-        {{ UI.clientButton({
-            'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
-            'aCss':   'no-hash schedule-button btn-primary',
-            'label' : 'Schedule sync'|trans
+    {% if entity.id %}
+        {% set toogleStatusLabel = entity.enabled == true ? 'oro.integration.deactivate': 'oro.integration.activate' %}
+        {{ UI.button({
+            'path': path('oro_integration_toggle', {'id': entity.id}),
+            'title' : toogleStatusLabel|trans,
+            'label' : toogleStatusLabel|trans,
         }) }}
+        {{ UI.buttonSeparator() }}
+
+        {% if entity.enabled == true %}
+            {{ UI.clientButton({
+                'dataUrl': path('oro_integration_schedule', { 'id': entity.id }) ,
+                'aCss':   'no-hash schedule-button btn-primary',
+                'label' : 'Schedule sync'|trans
+            }) }}
+        {% endif %}
     {% endif %}
 
     {% set html = UI.saveAndCloseButton() %}
