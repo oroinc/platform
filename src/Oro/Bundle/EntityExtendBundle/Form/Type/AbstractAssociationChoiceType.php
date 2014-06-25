@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -94,7 +95,33 @@ abstract class AbstractAssociationChoiceType extends AbstractType
      *
      * @return bool
      */
-    abstract protected function isReadOnly($options);
+    protected function isReadOnly($options)
+    {
+        /** @var EntityConfigId $configId */
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
+
+        if (!empty($className)) {
+            // disable for dictionary entities
+            $groupingConfigProvider = $this->configManager->getProvider('grouping');
+            if ($groupingConfigProvider->hasConfig($className)) {
+                $groups = $groupingConfigProvider->getConfig($className)->get('groups');
+                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
+                    return true;
+                }
+            }
+            // disable for immutable entities
+            $configProvider = $this->configManager->getProvider($configId->getScope());
+            if ($configProvider->hasConfig($className)) {
+                $immutable = $configProvider->getConfig($className)->get('immutable');
+                if (true === $immutable) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Disables the association choice element

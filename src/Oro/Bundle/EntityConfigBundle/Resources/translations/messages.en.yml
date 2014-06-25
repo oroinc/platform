@@ -12,6 +12,7 @@ oro:
             general.label:       General Information
             fields.label:        Fields
             other.label:         Other
+            import_export.label: Import & Export
             associations.label:  Communication & Collaboration
 
         config_log:

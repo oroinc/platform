@@ -152,7 +152,7 @@ class FieldType extends AbstractType
                     'require_js'   => [],
                     'block_config' => [
                         'general' => [
-                            'title'    => $this->translator->trans('oro.entity_config.form.block.general'),
+                            'title'    => $this->translator->trans('oro.entity_config.block_titles.general.label'),
                             'priority' => 10,
                         ]
                     ]
