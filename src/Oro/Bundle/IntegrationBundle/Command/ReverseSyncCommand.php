@@ -22,11 +22,11 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
  */
 class ReverseSyncCommand extends ContainerAwareCommand
 {
-    const SYNC_PROCESSOR      = 'oro_integration.reverse_sync.processor';
-    const COMMAND_NAME        = 'oro:integration:reverse:sync';
-    const CHANNEL_ARG_NAME    = 'channel';
-    const CONNECTOR_ARG_NAME  = 'connector';
-    const PARAMETERS_ARG_NAME = 'params';
+    const SYNC_PROCESSOR       = 'oro_integration.reverse_sync.processor';
+    const COMMAND_NAME         = 'oro:integration:reverse:sync';
+    const INTEGRATION_ARG_NAME = 'integration';
+    const CONNECTOR_ARG_NAME   = 'connector';
+    const PARAMETERS_ARG_NAME  = 'params';
 
     /**
      * {@inheritdoc}
@@ -35,7 +35,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->addOption(self::CHANNEL_ARG_NAME, 'c', InputOption::VALUE_REQUIRED, 'Channel id')
+            ->addOption(self::INTEGRATION_ARG_NAME, 'i', InputOption::VALUE_REQUIRED, 'Integration id')
             ->addOption(self::CONNECTOR_ARG_NAME, 'con', InputOption::VALUE_REQUIRED, 'Connector type')
             ->addOption(self::PARAMETERS_ARG_NAME, null, InputOption::VALUE_REQUIRED, 'Parameters');
     }
@@ -45,7 +45,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $channelId       = $input->getOption(self::CHANNEL_ARG_NAME);
+        $integrationId   = $input->getOption(self::INTEGRATION_ARG_NAME);
         $connectorType   = $input->getOption(self::CONNECTOR_ARG_NAME);
         $params          = $input->getOption(self::PARAMETERS_ARG_NAME);
         $convertedParams = unserialize(stripslashes($params));
@@ -67,26 +67,26 @@ class ReverseSyncCommand extends ContainerAwareCommand
             ->getConfiguration()
             ->setSQLLogger(null);
 
-        if ($this->isJobRunning($channelId, $connectorType, $params)) {
+        if ($this->isJobRunning($integrationId, $connectorType, $params)) {
             $logger->warning('Job already running. Terminating....');
             return 0;
         }
 
         try {
-            $channel = $repository->getOrLoadById($channelId);
-            if (empty($channel)) {
-                throw new \InvalidArgumentException('Channel with given ID not found');
+            $integration = $repository->getOrLoadById($integrationId);
+            if (empty($integration)) {
+                throw new \InvalidArgumentException('Integration with given ID not found');
             }
 
             $logger->notice(
                 sprintf(
-                    'Run sync for "%s" channel and "%s" connector.',
-                    $channel->getName(),
+                    'Run sync for "%s" integration and "%s" connector.',
+                    $integration->getName(),
                     $connectorType
                 )
             );
 
-            $processor->process($channel, $connectorType, $convertedParams);
+            $processor->process($integration, $connectorType, $convertedParams);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
         }
@@ -109,13 +109,13 @@ class ReverseSyncCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param int    $channelId
+     * @param int    $integrationId
      * @param string $connectorTypeType
      * @param string $params
      *
      * @return bool
      */
-    protected function isJobRunning($channelId, $connectorTypeType, $params)
+    protected function isJobRunning($integrationId, $connectorTypeType, $params)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->getService('doctrine.orm.entity_manager')
@@ -132,7 +132,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
             )
             ->setParameter(
                 'args',
-                '["--channel=' . $channelId . '",' .
+                '["--integration=' . $integrationId . '",' .
                 ' "--connector=' . $connectorTypeType . '",' .
                 ' "--params=\'' . $params . '\'"]'
             );
