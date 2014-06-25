@@ -8,16 +8,26 @@ datagrid:
                     - c.id
                     - c.name
                     - c.type
-                    - c.enabled
+                    - CASE WHEN c.enabled = 1 THEN 'enabled' ELSE 'disabled' END as enabled
                 from:
                     - { table: %oro_integration.entity.class%, alias: c }
         columns:
             name:
-                label: oro.integration.integration.name.label
+                label:          oro.integration.integration.name.label
             type:
-                label: oro.integration.integration.type.label
+                label:          oro.integration.integration.type.label
+                type:           twig
+                template:       OroIntegrationBundle:Integration:Datagrid/type.html.twig
+                frontend_type:  html
+                context:
+                    choices:  @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
+                    registry: @oro_integration.manager.types_registry
+            enabled:
+                label:          oro.integration.integration.enabled.label
                 frontend_type:  select
-                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+                choices:
+                    enabled:  oro.integration.integration.enabled.active.label
+                    disabled: oro.integration.integration.enabled.inactive.label
         properties:
             id: ~
             update_link:
@@ -34,17 +44,28 @@ datagrid:
                 params:  [ id ]
         sorters:
             columns:
-                name: { data_name: c.name }
-                type: { data_name: c.type }
+                name:    { data_name: c.name }
+                type:    { data_name: c.type }
+                enabled: { data_name: c.enabled }
         filters:
             columns:
-                name: { data_name: c.name, type: string }
+                name:
+                    data_name: c.name
+                    type: string
                 type:
                     data_name: c.type
                     type: choice
                     options:
                         field_options:
                             choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+                enabled:
+                    data_name: c.enabled
+                    type:      choice
+                    options:
+                        field_options:
+                            choices:
+                                - oro.integration.integration.enabled.inactive.label
+                                - oro.integration.integration.enabled.active.label
         actions:
             update:
                 type:         navigate
