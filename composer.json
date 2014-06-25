@@ -36,7 +36,7 @@
         "sensio/framework-extra-bundle": "2.3.4",
         "sensio/generator-bundle": "2.3.4",
         "incenteev/composer-parameter-handler": "2.1.0",
-        "jms/job-queue-bundle": "1.0.*",
+        "jms/job-queue-bundle": "1.1.*",
         "jms/serializer": "0.14.0",
         "jms/serializer-bundle": "0.13.0",
         "kriswallsmith/assetic": "1.1.2",

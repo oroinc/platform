@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroProcessBundle implements Migration
+class AddProcessPriority implements Migration
 {
     /**
      * @inheritdoc
@@ -14,6 +14,6 @@ class OroProcessBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_process_trigger');
-        $table->addColumn('priority', 'smallint', ['default' => 0]);
+        $table->addColumn('priority', 'smallint', ['notnull' => true]);
     }
 }

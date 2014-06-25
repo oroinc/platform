@@ -22,7 +22,7 @@ class JmsJob implements Migration
         $table->dropIndex('job_runner');
 
         $table->addColumn('queue', 'string', ['length' => Job::MAX_QUEUE_LENGTH]);
-        $table->addColumn('priority', 'smallint', ['default' => 0]);
+        $table->addColumn('priority', 'smallint', ['notnull' => true]);
 
         $table->changeColumn('state', ['length' => 15]);
 
