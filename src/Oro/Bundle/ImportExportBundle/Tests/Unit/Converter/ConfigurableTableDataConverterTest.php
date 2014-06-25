@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
@@ -499,9 +500,17 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareFieldHelper()
     {
-        $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
-            ->setMethods(array('getConfigValue', 'getFields'))
+            ->getMock();
+        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldTypeHelper = new FieldTypeHelper();
+
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
+            ->setMethods(array('getConfigValue', 'getFields', 'processAsScalar'))
             ->getMock();
         $fieldHelper->expects($this->any())->method('getConfigValue')
             ->will(
@@ -521,7 +530,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-
+        $fieldHelper->expects($this->any())->method('processAsScalar')
+            ->will($this->returnValue(false));
         return $fieldHelper;
     }
 

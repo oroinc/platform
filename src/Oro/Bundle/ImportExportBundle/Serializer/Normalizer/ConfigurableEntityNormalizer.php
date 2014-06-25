@@ -124,8 +124,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
 
-                $fieldContext['field'] = $field;
-                $fieldContext['entityId'] = $object->getId();
+                $fieldContext['fieldName'] = $fieldName;
+                if (method_exists($object, 'getId')) {
+                    $fieldContext['entityId'] = $object->getId();
+                }
 
                 $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
 

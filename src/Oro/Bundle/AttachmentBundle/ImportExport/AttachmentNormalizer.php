@@ -56,11 +56,12 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
     {
         $result = null;
         $entity =  $this->attachmentManager->prepareRemoteFile($data);
-        $violations = $this->validator->validate($context['entityName'], $context['fieldName'], $entity);
-
-        if (!$violations->count()) {
-            $this->attachmentManager->upload($entity);
-            $result = $entity;
+        if ($entity) {
+            $violations = $this->validator->validate($context['entityName'], $context['fieldName'], $entity);
+            if (!$violations->count()) {
+                $this->attachmentManager->upload($entity);
+                $result = $entity;
+            }
         }
 
         return $result;
@@ -74,7 +75,7 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
         return $this->attachmentManager->getAttachment(
             $context['entityName'],
             $context['entityId'],
-            $context['field']['name'],
+            $context['fieldName'],
             $object,
             'download',
             true

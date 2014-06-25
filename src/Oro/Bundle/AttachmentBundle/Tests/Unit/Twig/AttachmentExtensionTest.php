@@ -15,10 +15,10 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentConfigProvider;
 
     /** @var TestAttachment */
@@ -145,7 +145,7 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($template));
         $this->manager->expects($this->once())
             ->method('getResizedImageUrl')
-            ->with($this->attachment, 32, 32);
+            ->with($this->attachment, 16, 16);
         $this->manager->expects($this->once())
             ->method('getAttachmentUrl');
 
