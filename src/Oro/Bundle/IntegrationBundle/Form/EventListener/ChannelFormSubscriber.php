@@ -117,8 +117,10 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         }
         $form->get('transportType')->setData($transportType);
 
+        $integrationType = $form->get('type')->getData();
+
         // populate empty transport type in case when default values from empty entity should be mapped to form
-        if (!$transport = $data->getTransport()) {
+        if ($integrationType && !$transport = $data->getTransport()) {
             $transport = $this->registry->getTransportType($form->get('type')->getData(), $transportType)
                 ->getSettingsEntityFQCN();
             if (class_exists($transport)) {

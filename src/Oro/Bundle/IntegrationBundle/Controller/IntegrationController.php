@@ -160,20 +160,17 @@ class IntegrationController extends Controller
      */
     protected function update(Integration $integration)
     {
-        try {
-            if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
-                $this->get('session')->getFlashBag()->add(
-                    'success',
-                    $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
-                );
+        if ($this->get('oro_integration.form.handler.integration')->process($integration)) {
+            $this->get('session')->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
+            );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_integration_update', 'parameters' => ['id' => $integration->getId()]],
-                    ['route' => 'oro_integration_index'],
-                    $integration
-                );
-            }
-        } catch (\Exception $e) {
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_integration_update', 'parameters' => ['id' => $integration->getId()]],
+                ['route' => 'oro_integration_index'],
+                $integration
+            );
         }
         $form = $this->getForm();
 
