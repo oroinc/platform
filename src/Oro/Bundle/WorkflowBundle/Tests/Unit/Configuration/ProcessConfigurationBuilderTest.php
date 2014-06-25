@@ -53,6 +53,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['event'], $trigger->getEvent());
         $this->assertEquals($expected['field'], $trigger->getField());
         $this->assertEquals($expected['queued'], $trigger->isQueued());
+        $this->assertEquals($expected['priority'], $trigger->getPriority());
         $this->assertSame($expected['time_shift'], $trigger->getTimeShift());
         $this->assertSame($definition, $trigger->getDefinition());
     }
@@ -194,6 +195,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'event'      => ProcessTrigger::EVENT_UPDATE,
                     'field'      => 'status',
+                    'priority'   => Job::PRIORITY_HIGH,
                     'queued'     => true,
                     'time_shift' => 12345
                 ),
