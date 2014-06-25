@@ -2,11 +2,12 @@
 /*global define*/
 define([
     'underscore',
+    'chaplin',
     'orosync/js/sync',
     'oroui/js/mediator',
     'oroui/js/messenger',
     'orotranslation/js/translator'
-], function (_, sync, mediator, messenger, __) {
+], function (_, Chaplin, sync, mediator, messenger, __) {
     'use strict';
 
     /**
@@ -31,21 +32,18 @@ define([
         pagesCache = {},
 
         /**
-         * Hash object with relation page URL -> its tags collections
-         * @type {Object.<string, Array>}
-         */
-        pagesTags = {},
-
-        /**
          * Information about current page (URL and tags for current page)
          * @type {Object}
+         * {
+         *    tags: {Array},
+         *    path: {string},
+         *    query: {string},
+         *    page: {Object.<string, *>}, // object with page content
+         *    state: {Object.<string, *>} // each page component can cache own state
+         * }
          */
         current = {
-            tags: [],
-            path: null,
-            query: null,
-            page: null, // object with page content
-            state: {} // each page component can cache own state
+            tags: [] // collect tags, even if the page is not initialized
         },
 
         /**
@@ -73,18 +71,20 @@ define([
      * @param {string} query
      */
     function changeUrl(path, query) {
-        var oldPath = current.path;
-        if (oldPath !== null && !pagesCache[oldPath]) {
-            delete pagesTags[oldPath];
-        }
+        var oldPath, cached;
+
+        oldPath = current.path;
+        cached = pagesCache[path];
+
         current = {
-            tags: [],
+            // there's no previous page, then collected tags belong to current page
+            tags: oldPath != null && current.tags.length ? current.tags : [],
             path: path,
             query: query,
-            page: null,
-            state: {}
+            // take page and state from cache, if they exist
+            page: cached ? cached.page : null,
+            state: cached ? cached.state : {}
         };
-        pagesTags[current.path] = current.tags;
     }
 
     /**
@@ -146,10 +146,18 @@ define([
      * @param {string} tags
      */
     function onUpdate(tags) {
+        var pages;
         tags = prepareTags(tags);
 
-        _.each(pagesTags, function (items, path) {
-            var handler, callbacks = [];
+        pages = [current].concat(_.values(pagesCache));
+
+        _.each(pages, function (page) {
+            var handler, items, path, callbacks;
+
+            callbacks = [];
+            items = page.tags;
+            path = page.path;
+
             // collect callbacks for outdated contents
             _.each(items, function (options) {
                 if (_.intersection(options.tags, tags).length) {
@@ -260,7 +268,6 @@ define([
                 path = current.path;
             } else {
                 path = fetchPath(path);
-                delete pagesTags[path];
             }
             delete pagesCache[path];
 
@@ -295,9 +302,26 @@ define([
          *
          * @param {string} key
          * @param {*} value
+         * @param {string=} hash
          */
-        saveState: function (key, value) {
+        saveState: function (key, value, hash) {
+            var url, query;
             current.state[key] = value;
+
+            if (!_.isUndefined(hash)) {
+                query = Chaplin.utils.queryParams.parse(current.query);
+                if (hash !== null) {
+                    query[key] = hash;
+                } else {
+                    delete query[key];
+                }
+                query = Chaplin.utils.queryParams.stringify(query);
+                current.query = query;
+
+                url = contentManager.currentUrl();
+                mediator.execute('redirectTo', {url: url}, {silent: true});
+                mediator.trigger('pagestate:change');
+            }
         },
 
         /**

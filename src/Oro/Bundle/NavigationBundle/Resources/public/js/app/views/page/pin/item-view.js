@@ -1,59 +1,23 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
 define([
-    'jquery',
-    'underscore',
     'orotranslation/js/translator',
-    'oroui/js/app/views/base/view',
-    'oroui/js/mediator'
-], function ($, _, __, BaseView, mediator) {
+    'oroui/js/mediator',
+    '../base/item-view'
+], function (__, mediator, ItemView) {
     'use strict';
 
     var PinItemView;
 
-    PinItemView = BaseView.extend({
-        tagName:  'li',
-
+    PinItemView = ItemView.extend({
         events: {
-            'click .btn-close': 'toRemove',
-            'click .close': 'toRemove',
             'click a': 'toMaximize'
-        },
-
-        listen: {
-            'page:afterChange mediator': 'onPageUpdated'
-        },
-
-        /**
-         * Change active item after hash navigation request is completed
-         */
-        onPageUpdated: function () {
-            this.setActiveItem();
-        },
-
-        toRemove: function () {
-            this.model.collection.trigger('toRemove', this.model);
         },
 
         toMaximize: function (e) {
             this.model.collection.trigger('toMaximize', this.model);
             e.stopPropagation();
             e.preventDefault();
-        },
-
-        /**
-         * Compares current url with model's url
-         *
-         * @returns {boolean}
-         */
-        checkCurrentUrl: function () {
-            var url;
-            url = this.model.get('url');
-            return mediator.execute('compareUrl', url);
-        },
-
-        setActiveItem: function () {
-            this.$el.toggleClass('active', this.checkCurrentUrl());
         },
 
         remove: function () {
@@ -67,7 +31,6 @@ define([
             // if cache used highlight tab on content outdated event
             mediator.on('content-manager:content-outdated', this.outdatedContentHandler, this);
             this.setActiveItem();
-            return this;
         },
 
         outdatedContentHandler: function (event) {

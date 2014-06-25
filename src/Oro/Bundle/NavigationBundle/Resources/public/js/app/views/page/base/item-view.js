@@ -3,15 +3,14 @@
 define([
     'jquery',
     'underscore',
-    'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
     'oroui/js/mediator'
-], function ($, _, __, BaseView, mediator) {
+], function ($, _, BaseView, mediator) {
     'use strict';
 
-    var FavoriteItemView;
+    var ItemView;
 
-    FavoriteItemView = BaseView.extend({
+    ItemView = BaseView.extend({
         tagName:  'li',
 
         events: {
@@ -20,6 +19,7 @@ define([
         },
 
         listen: {
+            'change:url model': 'render',
             'page:afterChange mediator': 'onPageUpdated'
         },
 
@@ -50,5 +50,5 @@ define([
         }
     });
 
-    return FavoriteItemView;
+    return ItemView;
 });

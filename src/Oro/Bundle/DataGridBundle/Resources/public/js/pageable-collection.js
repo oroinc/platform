@@ -45,20 +45,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
         }),
 
         /**
-         * Object declares state keys that will be involved in URL-state saving with their shorthands
-         *
-         * @property {Object}
-         */
-        stateShortKeys: {
-            currentPage: 'i',
-            pageSize: 'p',
-            sorters: 's',
-            filters: 'f',
-            gridName: 't',
-            gridView: 'v'
-        },
-
-        /**
          * @property {Object}
          */
         additionalParameters: {
@@ -128,31 +114,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
             if (this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
-        },
-
-        /**
-         * Encode state object to string
-         *
-         * @param {Object} stateObject
-         * @return {String}
-         */
-        encodeStateData: function(stateObject) {
-            var data = _.pick(stateObject, _.keys(this.stateShortKeys));
-            data.gridName = this.inputName;
-            data = tools.invertKeys(data, this.stateShortKeys);
-            return tools.packToQueryString(data);
-        },
-
-        /**
-         * Decode state object from string, operation is invert for encodeStateData.
-         *
-         * @param {String} stateString
-         * @return {Object}
-         */
-        decodeStateData: function(stateString) {
-            var data = tools.unpackFromQueryString(stateString);
-            data = tools.invertKeys(data, _.invert(this.stateShortKeys));
-            return data;
         },
 
         /**

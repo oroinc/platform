@@ -4,17 +4,14 @@ define([
     'underscore',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
-    '../base/button-view',
-    'oroui/js/app/views/base/collection-view',
-    './item-view',
     'oroui/js/tools',
     'oroui/js/error'
-], function (_, mediator, BaseView, ButtonView, CollectionView, ItemView, tools, error) {
+], function (_, mediator, BaseView, tools, error) {
     'use strict';
 
-    var FavoriteView;
+    var MainView;
 
-    FavoriteView = BaseView.extend({
+    MainView = BaseView.extend({
         /**
          * Keeps separately extended options,
          * to prevent disposing the view each time by Composer
@@ -25,7 +22,7 @@ define([
             'toAdd collection': 'toAdd',
             'toRemove collection': 'toRemove',
 
-            'pagestate:change meditor': 'onPageStateChange'
+            'pagestate:change mediator': 'onPageStateChange'
         },
 
         initialize: function (options) {
@@ -37,7 +34,7 @@ define([
             $dataEl.remove();
             this._options = _.defaults({}, options || {}, extraOptions);
 
-            FavoriteView.__super__.initialize.call(this, options);
+            MainView.__super__.initialize.call(this, options);
 
             this.collection.reset(data);
         },
@@ -47,31 +44,7 @@ define([
         },
 
         createSubViews: function (options) {
-            var collection, button,
-                tabView, TabItemView, tabOptions;
-
-            collection = this.collection;
-
-            // button view
-            button = new ButtonView({
-                autoRender: true,
-                el: 'pinButton',
-                collection: collection
-            });
-            this.subview('button', button);
-
-            // tab view
-            TabItemView = ItemView.extend({
-                template: options.tabItemTemplate
-            });
-            tabOptions = _.extend(options.tabOptions, {
-                autoRender: true,
-                el: 'pinTab',
-                collection: collection,
-                itemView: TabItemView
-            });
-            tabView = new CollectionView(tabOptions);
-            this.subview('tab', tabView);
+            // should be implemented in descendants
         },
 
         getCurrentModel: function () {
@@ -97,8 +70,7 @@ define([
         toAdd: function (model) {
             var collection;
             collection = this.collection;
-            model.set('type', 'favorite');
-            model.set('position', this.collection.length);
+            this.actualizeAttributes(model);
             model.save(null, {
                 success: function () {
                     var item;
@@ -114,14 +86,20 @@ define([
             });
         },
 
+        actualizeAttributes: function (model) {
+            // should be implemented in descendants
+        },
+
         onPageStateChange: function () {
             var model, url;
             model = this.getCurrentModel();
-            url = mediator.execute('currentUrl');
-            model.set({url: url});
-            model.save();
+            if (model) {
+                url = mediator.execute('currentUrl');
+                model.set('url', url);
+                model.save();
+            }
         }
     });
 
-    return FavoriteView;
+    return MainView;
 });

@@ -37,7 +37,9 @@ define([
         index: function (params, route, options) {
             var url, cacheItem, args;
 
-            if (!route.previous) {
+            if (!route.previous || options.silent) {
+                // - page just loaded from server, does not require update
+                // - page was updated locally and url is changed, no request required
                 return;
             }
 

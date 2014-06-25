@@ -4,53 +4,23 @@
 define([
     'underscore',
     'oroui/js/mediator',
-    'oroui/js/app/views/base/view',
+    '../base/main-view',
     '../base/button-view',
     './collection-view',
-    './item-view',
-    'oroui/js/tools',
-    'oroui/js/error'
-], function (_, mediator, BaseView, ButtonView, CollectionView, ItemView, tools, error) {
+    './item-view'
+], function (_, mediator, MainView, ButtonView, CollectionView, ItemView) {
     'use strict';
 
     var PinView;
 
-    PinView = BaseView.extend({
+    PinView = MainView.extend({
         maxItems: 7,
-
-        /**
-         * Keeps separately extended options,
-         * to prevent disposing the view each time by Composer
-         */
-        _options: {},
 
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove',
 
-            'toAdd collection': 'toAdd',
-            'toRemove collection': 'toRemove',
-            'toMaximize collection': 'toMaximize',
-
-            'pagestate:change meditor': 'onPageStateChange'
-        },
-
-        initialize: function (options) {
-            var data, extraOptions, $dataEl;
-
-            $dataEl = this.$(options.dataSource);
-            data = $dataEl.data('data');
-            extraOptions = $dataEl.data('options');
-            $dataEl.remove();
-            this._options = _.defaults({}, options || {}, extraOptions);
-
-            PinView.__super__.initialize.call(this, options);
-
-            this.collection.reset(data);
-        },
-
-        render: function () {
-            this.createSubViews(this._options);
+            'toMaximize collection': 'toMaximize'
         },
 
         createSubViews: function (options) {
@@ -102,44 +72,9 @@ define([
             this.subview('tab', tabView);
         },
 
-        getCurrentModel: function () {
-            return this.collection.find(function (model) {
-                return mediator.execute('compareUrl', model.get('url'));
-            });
-        },
-
-        toRemove: function (model) {
-            model.destroy({
-                wait: true,
-                error: function (model, xhr) {
-                    if (xhr.status === 404 && !tools.debug) {
-                        // Suppress error if it's 404 response and not debug mode
-                        //@TODO remove item view
-                    } else {
-                        error.handle({}, xhr, {enforce: true});
-                    }
-                }
-            });
-        },
-
-        toAdd: function (model) {
-            var collection;
-            collection = this.collection;
+        actualizeAttributes: function (model) {
             model.set('type', 'pinbar');
             model.set('position', 0);
-            model.save(null, {
-                success: function () {
-                    var item;
-                    item = collection.find(function (item) {
-                        return item.get('url') === model.get('url');
-                    });
-                    if (item) {
-                        model.destroy();
-                    } else {
-                        collection.unshift(model);
-                    }
-                }
-            });
         },
 
         /**
@@ -165,14 +100,6 @@ define([
             url = model.get('url');
             mediator.execute({name: 'pageCache:remove', silent: true}, url);
             this.reorder();
-        },
-
-        onPageStateChange: function () {
-            var model, url;
-            model = this.getCurrentModel();
-            url = mediator.execute('currentUrl');
-            model.set({url: url});
-            model.save();
         },
 
         /**
