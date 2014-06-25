@@ -101,7 +101,7 @@ class UserAclHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage)
     {
 
-        list ($search, $entityClass, $permission, $entityId) = explode(';', $query);
+        list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
         $entityClass = str_replace('_', '\\', $entityClass);
 
         if ($entityId) {
@@ -118,6 +118,9 @@ class UserAclHandler implements SearchHandlerInterface
             $user = $this->getSecurityContext()->getToken()->getUser();
             $queryBuilder = $this->getSearchQueryBuilder($search);
             $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
+            if((boolean) $excludeCurrentUser){
+                $this->excludeUser($queryBuilder, $user);
+            }
             $results = $queryBuilder->getQuery()->getResult();
 
             $resultsData = [];
@@ -252,5 +255,11 @@ class UserAclHandler implements SearchHandlerInterface
     protected function getSecurityContext()
     {
         return $this->securityContextLink->getService();
+    }
+
+    protected function excludeUser(QueryBuilder $queryBuilder, UserInterface $user)
+    {
+        $queryBuilder->andWhere('users.id != :userId');
+        $queryBuilder->setParameter('userId', $user->getId());
     }
 }
