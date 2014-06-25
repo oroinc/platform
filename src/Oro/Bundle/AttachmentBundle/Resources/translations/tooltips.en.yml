@@ -1,0 +1,5 @@
+oro:
+    attachment:
+        max_size: Max allowed file size to upload in MB.
+        thumb_width: Thumbnail width in PX.
+        thumb_height: Thumbnail height in PX.

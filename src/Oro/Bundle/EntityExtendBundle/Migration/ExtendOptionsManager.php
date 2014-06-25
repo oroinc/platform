@@ -105,7 +105,7 @@ class ExtendOptionsManager
                     sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
                 );
             }
-            if (isset($this->options[$objectKey][$scope])) {
+            if (isset($this->options[$objectKey][$scope]) && is_array($values)) {
                 foreach ($values as $key => $val) {
                     $this->options[$objectKey][$scope][$key] = $val;
                 }
