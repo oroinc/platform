@@ -5,25 +5,28 @@ namespace Oro\Bundle\AttachmentBundle\Tools;
 use Doctrine\Common\Inflector\Inflector;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
-class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
+class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
+    /** @var RelationBuilder */
+    protected $relationBuilder;
+
     /**
-     * @param ConfigManager $configManager
+     * @param RelationBuilder $relationBuilder
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(RelationBuilder $relationBuilder)
     {
-        $this->configManager = $configManager;
+        $this->relationBuilder = $relationBuilder;
     }
 
     /**
@@ -39,6 +42,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
      */
     public function postUpdate(array &$extendConfigs)
     {
+        $configManager = $this->relationBuilder->getConfigManager();
         foreach ($extendConfigs as &$entityExtendConfig) {
             if (!$entityExtendConfig->is('is_extend')) {
                 continue;
@@ -47,7 +51,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
             $entityClassName = $entityExtendConfig->getId()->getClassName();
 
             /** @var FieldConfigId[] $entityCustomFields */
-            $entityCustomFields = $this->configManager->getProvider('extend')->getIds($entityClassName);
+            $entityCustomFields = $configManager->getProvider('extend')->getIds($entityClassName);
 
             $attachmentFields = [];
             if (!empty($entityCustomFields)) {
@@ -83,12 +87,12 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                         );
 
                         // create field
-                        $this->createField(
+                        $this->relationBuilder->addFieldConfig(
                             $entityClassName,
                             $relationName,
                             'manyToOne',
                             [
-                                'extend' => [
+                                'extend'       => [
                                     'owner'         => ExtendScope::OWNER_CUSTOM,
                                     'state'         => ExtendScope::STATE_ACTIVE,
                                     'is_extend'     => true,
@@ -96,7 +100,7 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                                     'target_field'  => 'id',
                                     'relation_key'  => $relationKey,
                                 ],
-                                'entity' => [
+                                'entity'       => [
                                     'label'       => $label,
                                     'description' => '',
                                 ],
@@ -107,17 +111,18 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                         );
 
                         // add relation to owning entity
-                        $this->addManyToOneRelation(
+                        $this->relationBuilder->addManyToOneRelation(
                             AttachmentScope::ATTACHMENT_ENTITY,
                             $entityClassName,
                             $relationName,
-                            $relationKey
+                            $relationKey,
+                            ['assign' => true]
                         );
                     }
                 }
 
-                $this->configManager->persist($entityExtendConfig);
-                $this->configManager->flush();
+                $configManager->persist($entityExtendConfig);
+                $configManager->flush();
             }
         }
     }
@@ -139,90 +144,9 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
 
         $entityExtendConfig->set('schema', $schemaConfig);
 
-        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $configManager        = $this->relationBuilder->getConfigManager();
+        $extendConfigProvider = $configManager->getProvider('extend');
         $extendConfigProvider->persist($entityExtendConfig);
-        $this->configManager->calculateConfigChangeSet($entityExtendConfig);
-    }
-
-    /**
-     *  TODO:
-     *      Next methods (createField, updateFieldConfigs, addManyToOneRelation)
-     *      is copy-past from AssociationExtendConfigDumperExtension
-     *      and as discussed with Bravo team will be refactored.
-     *
-     */
-
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array  $values
-     */
-    protected function createField($className, $fieldName, $fieldType, $values)
-    {
-        $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, 'hidden');
-        $this->updateFieldConfigs(
-            $className,
-            $fieldName,
-            $values
-        );
-    }
-
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param array  $values
-     */
-    protected function updateFieldConfigs($className, $fieldName, array $values)
-    {
-        foreach ($values as $scope => $scopeValues) {
-            $configProvider = $this->configManager->getProvider($scope);
-            $fieldConfig    = $configProvider->getConfig($className, $fieldName);
-            foreach ($scopeValues as $code => $val) {
-                $fieldConfig->set($code, $val);
-            }
-            $this->configManager->persist($fieldConfig);
-            $this->configManager->calculateConfigChangeSet($fieldConfig);
-        }
-    }
-
-    /**
-     * @param string $targetEntityName
-     * @param string $sourceEntityName
-     * @param string $relationName
-     * @param string $relationKey
-     */
-    protected function addManyToOneRelation(
-        $targetEntityName,
-        $sourceEntityName,
-        $relationName,
-        $relationKey
-    ) {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($sourceEntityName);
-
-        // update schema info
-        $schema                            = $extendConfig->get('schema', false, []);
-        $schema['relation'][$relationName] = $relationName;
-        $extendConfig->set('schema', $schema);
-
-        // update index info
-        $index                = $extendConfig->get('index', false, []);
-        $index[$relationName] = null;
-        $extendConfig->set('index', $index);
-
-        // add relation to config
-        $relations               = $extendConfig->get('relation', false, []);
-        $relations[$relationKey] = [
-            'assign'          => true,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
-            'owner'           => true,
-            'target_entity'   => $targetEntityName,
-            'target_field_id' => false
-        ];
-        $extendConfig->set('relation', $relations);
-
-        $extendConfigProvider->persist($extendConfig);
-        $this->configManager->calculateConfigChangeSet($extendConfig);
+        $configManager->calculateConfigChangeSet($entityExtendConfig);
     }
 }

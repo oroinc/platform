@@ -5,21 +5,20 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Doctrine\ORM\Mapping\MappingException;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuilder
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var RelationBuilder */
+    protected $relationBuilder;
 
     /**
-     * @param ConfigManager $configManager
+     * @param RelationBuilder $relationBuilder
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(RelationBuilder $relationBuilder)
     {
-        $this->configManager = $configManager;
+        $this->relationBuilder = $relationBuilder;
     }
 
     /**
@@ -27,7 +26,7 @@ class AssociationBuilder
      */
     public function getConfigManager()
     {
-        return $this->configManager;
+        return $this->relationBuilder->getConfigManager();
     }
 
     /**
@@ -45,7 +44,7 @@ class AssociationBuilder
             $targetEntityClass
         );
 
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $entityConfigProvider = $this->getConfigManager()->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
 
         $label       = $targetEntityConfig->get(
@@ -58,7 +57,7 @@ class AssociationBuilder
         $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
 
         // create field
-        $this->addFieldConfig(
+        $this->relationBuilder->addFieldConfig(
             $sourceEntityClass,
             $relationName,
             'manyToMany',
@@ -88,7 +87,7 @@ class AssociationBuilder
         );
 
         // add relation to owning entity
-        $this->addManyToManyRelation(
+        $this->relationBuilder->addManyToManyRelation(
             $targetEntityClass,
             $sourceEntityClass,
             $relationName,
@@ -111,7 +110,7 @@ class AssociationBuilder
             $targetEntityClass
         );
 
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $entityConfigProvider = $this->getConfigManager()->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
 
         $label       = $targetEntityConfig->get(
@@ -125,7 +124,7 @@ class AssociationBuilder
         $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
 
         // create field
-        $this->addFieldConfig(
+        $this->relationBuilder->addFieldConfig(
             $sourceEntityClass,
             $relationName,
             'manyToOne',
@@ -152,7 +151,7 @@ class AssociationBuilder
         );
 
         // add relation to owning entity
-        $this->addManyToOneRelation(
+        $this->relationBuilder->addManyToOneRelation(
             $targetEntityClass,
             $sourceEntityClass,
             $relationName,
@@ -160,7 +159,7 @@ class AssociationBuilder
         );
 
         // add relation to target entity
-        $this->addManyToOneRelationTargetSide(
+        $this->relationBuilder->addManyToOneRelationTargetSide(
             $targetEntityClass,
             $sourceEntityClass,
             $relationName,
@@ -176,7 +175,7 @@ class AssociationBuilder
     protected function getPrimaryKeyColumnNames($entityClass)
     {
         try {
-            return $this->configManager
+            return $this->getConfigManager()
                 ->getEntityManager()
                 ->getClassMetadata($entityClass)
                 ->getIdentifierColumnNames();
@@ -188,130 +187,5 @@ class AssociationBuilder
             // it may happens if the entity has relation to deleted custom entity
             return ['id'];
         }
-    }
-
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array  $values
-     */
-    protected function addFieldConfig($className, $fieldName, $fieldType, $values)
-    {
-        $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
-        foreach ($values as $scope => $scopeValues) {
-            $configProvider = $this->configManager->getProvider($scope);
-            $fieldConfig    = $configProvider->getConfig($className, $fieldName);
-            foreach ($scopeValues as $code => $val) {
-                $fieldConfig->set($code, $val);
-            }
-            $configProvider->persist($fieldConfig);
-            $this->configManager->calculateConfigChangeSet($fieldConfig);
-        }
-    }
-
-    /**
-     * @param string $targetEntityName
-     * @param string $sourceEntityName
-     * @param string $relationName
-     * @param string $relationKey
-     */
-    protected function addManyToManyRelation(
-        $targetEntityName,
-        $sourceEntityName,
-        $relationName,
-        $relationKey
-    ) {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($sourceEntityName);
-
-        // update index info
-        $index                = $extendConfig->get('index', false, []);
-        $index[$relationName] = null;
-        $extendConfig->set('index', $index);
-
-        // add relation to config
-        $relations               = $extendConfig->get('relation', false, []);
-        $relations[$relationKey] = [
-            'assign'          => false,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToMany'),
-            'owner'           => true,
-            'target_entity'   => $targetEntityName,
-            'target_field_id' => false,
-        ];
-        $extendConfig->set('relation', $relations);
-
-        $extendConfigProvider->persist($extendConfig);
-        $this->configManager->calculateConfigChangeSet($extendConfig);
-    }
-
-    /**
-     * @param string $targetEntityName
-     * @param string $sourceEntityName
-     * @param string $relationName
-     * @param string $relationKey
-     */
-    protected function addManyToOneRelation(
-        $targetEntityName,
-        $sourceEntityName,
-        $relationName,
-        $relationKey
-    ) {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($sourceEntityName);
-
-        // update schema info
-        $schema                            = $extendConfig->get('schema', false, []);
-        $schema['relation'][$relationName] = $relationName;
-        $extendConfig->set('schema', $schema);
-
-        // update index info
-        $index                = $extendConfig->get('index', false, []);
-        $index[$relationName] = null;
-        $extendConfig->set('index', $index);
-
-        // add relation to config
-        $relations               = $extendConfig->get('relation', false, []);
-        $relations[$relationKey] = [
-            'assign'          => false,
-            'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
-            'owner'           => true,
-            'target_entity'   => $targetEntityName,
-            'target_field_id' => false
-        ];
-        $extendConfig->set('relation', $relations);
-
-        $extendConfigProvider->persist($extendConfig);
-        $this->configManager->calculateConfigChangeSet($extendConfig);
-    }
-
-    /**
-     * @param string $targetEntityName
-     * @param string $sourceEntityName
-     * @param string $relationName
-     * @param string $relationKey
-     */
-    protected function addManyToOneRelationTargetSide(
-        $targetEntityName,
-        $sourceEntityName,
-        $relationName,
-        $relationKey
-    ) {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($targetEntityName);
-
-        // add relation to config
-        $relations               = $extendConfig->get('relation', false, []);
-        $relations[$relationKey] = [
-            'assign'          => false,
-            'field_id'        => false,
-            'owner'           => false,
-            'target_entity'   => $sourceEntityName,
-            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne')
-        ];
-        $extendConfig->set('relation', $relations);
-
-        $extendConfigProvider->persist($extendConfig);
-        $this->configManager->calculateConfigChangeSet($extendConfig);
     }
 }

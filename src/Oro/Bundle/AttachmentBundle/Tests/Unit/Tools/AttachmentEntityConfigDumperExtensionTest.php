@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\AttachmentBundle\Tools\AttachmentExtendConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+use Symfony\Component\Yaml\Parser;
+
+use Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -10,12 +13,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Parser;
-
-class AttachmentExtendConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  AttachmentExtendConfigDumperExtension */
+    /** @var  AttachmentEntityConfigDumperExtension */
     protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -27,7 +27,9 @@ class AttachmentExtendConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new AttachmentExtendConfigDumperExtension($this->configManager);
+        $this->extension = new AttachmentEntityConfigDumperExtension(
+            new RelationBuilder($this->configManager)
+        );
     }
 
     public function testSupports()
