@@ -573,3 +573,38 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_entity_create_or_select_inline_widget %}
+    <div id="{{ id }}-el" class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}">
+        <div class="input-append">
+            {{ form_widget(form) }}
+            <button class="add-on btn entity-select-btn"><i class="icon-align-justify"></i></button>
+        </div>
+
+        {% if form.vars.create_enabled %}
+            <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+        {% endif %}
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'oroform/js/select-create-inline-type-handler'],
+        function ($, handler) {
+            $(function() {
+                // Initialize handler
+                {% set createFormUrl = form.vars.create_enabled
+                    ? path(form.vars.create_form_route, form.vars.create_form_route_parameters)
+                    : null
+                %}
+                handler(
+                    $('#{{ id }}-el'),
+                    $('#{{ id }}'),
+                    {{ label|trans|json_encode|raw }},
+                    {{ path('oro_datagrid_widget', {'gridName': form.vars.grid_name})|json_encode|raw }},
+                    {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
+                    {{ form.vars.create_enabled|default(false)|json_encode|raw }},
+                    {{ createFormUrl|json_encode|raw }}
+                );
+            });
+        });
+    </script>
+{% endblock %}
