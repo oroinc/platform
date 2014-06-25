@@ -1,6 +1,6 @@
 /*global define, alert*/
-define(['underscore', 'backbone', 'routing', 'oronavigation/js/navigation', 'orolocale/js/formatter/datetime', 'autolinker'],
-function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
+define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime', 'autolinker'],
+function (_, Backbone, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
     var $ = Backbone.$;
@@ -58,11 +58,6 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
 
             this.$el.empty();
             this.$el.append(html);
-
-            var navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.processClicks(this.$el.find('a'));
-            }
 
             return this;
         },
