@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
@@ -18,8 +19,16 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
+            ->getMock();
+        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldTypeHelper = new FieldTypeHelper();
+
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
             ->setMethods(array('hasConfig', 'getConfigValue', 'getFields', 'getObjectValue'))
             ->getMock();
 
@@ -159,7 +168,10 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 
             if (isset($field['normalizedValue'])) {
                 $fieldValue = $object->$fieldName;
-                $fieldContext = isset($field['fieldContext']) ? $field['fieldContext'] : $context;
+                $fieldContext = $context;
+                if (isset($field['fieldContext'])) {
+                    $fieldContext = $field['fieldContext'];
+                }
                 $normalizedMap[] = array($fieldValue, null, $fieldContext, $field['normalizedValue']);
             }
 
@@ -291,6 +303,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
                         'fieldContext' => array(
+                            'fieldName' => 'relatedObjectWithId',
                             'mode' => ConfigurableEntityNormalizer::FULL_MODE
                         ),
                     ),
@@ -301,6 +314,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'DateTime',
                         'relation_type' => 'ref-one',
                         'fieldContext' => array(
+                            'fieldName' => 'objectNoIds',
                             'mode' => ConfigurableEntityNormalizer::FULL_MODE
                         ),
                     ),
@@ -333,6 +347,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                         'name' => 'relatedObjectWithId',
                         'normalizedValue' => 'obj1',
                         'fieldContext' => array(
+                            'fieldName' => 'relatedObjectWithId',
                             'mode' => ConfigurableEntityNormalizer::SHORT_MODE
                         ),
                         'related_entity_type' => 'stdClass',
@@ -343,6 +358,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                         'name' => 'objectNoIds',
                         'normalizedValue' => 'obj2',
                         'fieldContext' => array(
+                            'fieldName' => 'objectNoIds',
                             'mode' => ConfigurableEntityNormalizer::SHORT_MODE
                         ),
                         'related_entity_type' => 'DateTime',
@@ -389,6 +405,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
             if (isset($field['denormalizedValue'])) {
                 $fieldValue = $data[$fieldName];
                 $entityClass = $field['expectedEntityClass'];
+                $context = array_merge($context, ['fieldName' => $fieldName]);
                 $denormalizedMap[] = array($fieldValue, $entityClass, null, $context, $field['denormalizedValue']);
             }
         }

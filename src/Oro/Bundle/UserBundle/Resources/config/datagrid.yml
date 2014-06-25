@@ -512,3 +512,75 @@ datagrid:
                 sentAt:  { data_name: e.sentAt }
             default:
                 sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+
+    users-select-grid:
+        extended_entity_name: %oro_user.entity.class%
+        options:
+            entityHint: user
+        source:
+            acl_resource: oro_user_user_view
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.username
+                    - u.email
+                    - u.firstName
+                    - u.lastName
+                    - u.enabled
+                from:
+                    - { table: %oro_user.entity.class%, alias: u }
+        columns:
+            username:
+                label: oro.user.username.label
+            email:
+                label: oro.user.email.label
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+
+        properties:
+            id: ~
+        sorters:
+            columns:
+                username:
+                    data_name: u.username
+                email:
+                    data_name: u.email
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                enabled:
+                    data_name: u.enabled
+            default:
+                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: u.username
+                email:
+                    type: string
+                    data_name: u.email
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                false: Inactive
+                                true:  Active

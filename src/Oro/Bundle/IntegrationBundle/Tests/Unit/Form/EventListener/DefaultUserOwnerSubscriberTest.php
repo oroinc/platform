@@ -65,13 +65,13 @@ class DefaultUserOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function formDataProvider()
     {
-        $channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $channel->expects($this->any())->method('getId')
+        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration->expects($this->any())->method('getId')
             ->will($this->returnValue(123));
 
         return [
-            'should set if null value given'     => [null, true],
-            'should not set for saved  channels' => [$channel, false]
+            'should set if null value given'        => [null, true],
+            'should not set for saved integrations' => [$integration, false]
         ];
     }
 }

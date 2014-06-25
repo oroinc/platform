@@ -18,7 +18,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 /**
- * Autocomplite search handler for users with ACL access level protection
+ * Autocomplete search handler for users with ACL access level protection
  *
  * Class UserAclHandler
  * @package Oro\Bundle\UserBundle\Autocomplete
@@ -96,9 +96,9 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function search($query, $page, $perPage)
+    public function search($query, $page, $perPage, $searchById = false)
     {
 
         list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
@@ -138,7 +138,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getProperties()
     {
@@ -146,7 +146,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getEntityName()
     {
@@ -162,7 +162,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function convertItem($user)
     {

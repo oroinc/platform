@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector as TestConnector;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
@@ -11,8 +11,8 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
 
-    /** @var Channel|\PHPUnit_Framework_MockObject_MockObject */
-    protected $channel;
+    /** @var Integration|\PHPUnit_Framework_MockObject_MockObject */
+    protected $integration;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -45,9 +45,9 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->channel  = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log      = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->registry    = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log         = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
 
         $this->log->expects($this->any())
             ->method('info')
@@ -67,8 +67,8 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $connectors = 'test';
-        $params = [];
+        $connectors    = 'test';
+        $params        = [];
         $realConnector = new TestConnector();
 
         $this->registry->expects($this->any())
@@ -76,17 +76,17 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($realConnector));
 
         $processor = $this->getReverseSyncProcessor(['processExport']);
-        $processor->process($this->channel, $connectors, $params);
+        $processor->process($this->integration, $connectors, $params);
     }
 
-    public function testOneChannelConnectorProcess()
+    public function testOneIntegrationConnectorProcess()
     {
         $connector = 'testConnector';
 
-        $this->channel->expects($this->never())
+        $this->integration->expects($this->never())
             ->method('getConnectors');
 
-        $this->channel->expects($this->once())
+        $this->integration->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('testChannel'));
 
@@ -99,6 +99,10 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->never())
             ->method('getRepository');
 
+        $this->integration->expects($this->once())
+            ->method('getEnabled')
+            ->will($this->returnValue(true));
+
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
@@ -110,9 +114,9 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
                 'tstJobName',
                 [
                     'export' => [
-                        'entityName'     => 'testEntity',
-                        'channel'        => 'testChannel',
-                        'testParameter'  => 'testValue'
+                        'entityName'    => 'testEntity',
+                        'channel'       => 'testChannel',
+                        'testParameter' => 'testValue'
                     ]
                 ]
             )
@@ -126,13 +130,14 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             $this->log
         );
 
-        $processor->process($this->channel, $connector, ['testParameter' => 'testValue']);
+        $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 
     /**
      * Return mocked sync processor
      *
      * @param array $mockedMethods
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
      */
     protected function getReverseSyncProcessor($mockedMethods = [])
