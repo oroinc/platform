@@ -30,7 +30,7 @@ oro_menu_config:
                 oro_email_my_emails: ~
 
 oro_titles:
-    oro_email_view: "%%subject%% - Email"
+    oro_email_view: "%%subject%% - My Emails - %%username%%"
     oro_email_emailtemplate_index: ~
     oro_email_emailtemplate_update: "Template %%name%% - Edit"
     oro_email_emailtemplate_create: "Create Email Template"
