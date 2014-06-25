@@ -117,6 +117,16 @@ class Email
     }
 
     /**
+     * Indicates whether entity class and entity id is set
+     *
+     * @return bool
+     */
+    public function hasEntity()
+    {
+        return !empty($this->entityClass) && !empty($this->entityId);
+    }
+
+    /**
      * Get FROM email address
      *
      * @return string

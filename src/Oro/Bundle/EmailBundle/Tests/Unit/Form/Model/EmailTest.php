@@ -37,4 +37,19 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
         ];
     }
+
+    public function testHasEntity()
+    {
+        $obj = new Email();
+        $this->assertFalse($obj->hasEntity());
+
+        $obj->setEntityClass('Test\Entity');
+        $this->assertFalse($obj->hasEntity());
+
+        $obj->setEntityId(123);
+        $this->assertTrue($obj->hasEntity());
+
+        $obj->setEntityClass(null);
+        $this->assertFalse($obj->hasEntity());
+    }
 }
