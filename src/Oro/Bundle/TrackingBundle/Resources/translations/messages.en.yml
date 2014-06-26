@@ -14,3 +14,16 @@ oro:
 
         block:
             general: General
+            tracking: Tracking
+
+        help:
+            script: |
+                Make sure this code is on every page of your website inside head section
+                Replace 'USER_IDENTIFIER' with you user identifier function call
+            event: |
+                Make sure this code is on page where you need to track an event.
+                Replace category, action, [name], [value] with your values
+            event_tooltip: |
+                It will log an event with an event category (Videos, Music, Games…),
+                an event action (Play, Pause, Duration, Add Playlist, Downloaded, Clicked…),
+                and an optional event name and optional numeric value.

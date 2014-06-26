@@ -52,18 +52,41 @@
             {{ entityConfig.renderDynamicFields(entity) }}
         </div>
         <div class="responsive-block">
-            <textarea class="code">
+            {{ entityConfig.renderDynamicFields(entity) }}
+        </div>
+    </div>
+    {%- endset -%}
+    {%- set trackingCode -%}
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            <strong>{{ 'oro.tracking.help.script'|trans }}</strong>
+            <textarea class="code code-script">
                 {%- include 'OroTrackingBundle:TrackingWebsite:script.js.twig' -%}
             </textarea>
+        </div>
+        <div class="responsive-block">
+            <strong>{{ 'oro.tracking.help.event'|trans }}</strong>
+            <textarea class="code code-event">
+                {%- include 'OroTrackingBundle:TrackingWebsite:event.js.twig' -%}
+            </textarea>
+            <p>{{ 'oro.tracking.help.event_tooltip'|trans }}</p>
         </div>
     </div>
     {%- endset -%}
 
-    {% set dataBlocks = [{
+    {% set dataBlocks = [
+    {
         'title': 'oro.tracking.block.general'|trans,
         'class': 'active',
         'subblocks': [
             {'data' : [generalInformation]}
+        ]
+    },
+    {
+        'title': 'oro.tracking.block.tracking'|trans,
+        'class': 'active',
+        'subblocks': [
+            {'data' : [trackingCode]}
         ]
     }] %}
 
