@@ -1,6 +1,11 @@
 oro_entity_config:
     importexport:
         field:
+            form:
+                block_config:
+                    import_export:
+                        title:              oro.importexport.entity_config.block_title
+                        priority:           30
             items:
                 # custom field header, by default field label is used
                 header:

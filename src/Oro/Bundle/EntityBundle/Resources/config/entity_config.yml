@@ -75,9 +75,6 @@ oro_entity_config:
                     general:
                         title:              oro.entity_config.block_titles.general.label
                         priority:           100
-                    import_export:
-                        title:              oro.entity_config.block_titles.import_export.label
-                        priority:           30
                     other:
                         title:              oro.entity_config.block_titles.other.label
                         priority:           -255
