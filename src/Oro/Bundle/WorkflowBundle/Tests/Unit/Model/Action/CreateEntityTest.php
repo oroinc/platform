@@ -54,27 +54,34 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $em->expects($this->once())
             ->method('persist')
-            ->with($this->isInstanceOf($options['class']));
-        $em->expects($this->once())
-            ->method('flush')
-            ->with($this->isInstanceOf($options['class']));
+            ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
+
+        if (!isset($options[CreateEntity::OPTION_KEY_FLUSH]) || $options[CreateEntity::OPTION_KEY_FLUSH]) {
+            $em->expects($this->once())
+                ->method('flush')
+                ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
+        } else {
+            $em->expects($this->never())->method('flush');
+        }
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($options['class'])
+            ->with($options[CreateEntity::OPTION_KEY_CLASS])
             ->will($this->returnValue($em));
 
         $context = new ItemStub(array());
-        $attributeName = (string)$options['attribute'];
+        $attributeName = (string)$options[CreateEntity::OPTION_KEY_ATTRIBUTE];
         $this->action->initialize($options);
         $this->action->execute($context);
         $this->assertNotNull($context->$attributeName);
-        $this->assertInstanceOf($options['class'], $context->$attributeName);
+        $this->assertInstanceOf($options[CreateEntity::OPTION_KEY_CLASS], $context->$attributeName);
 
         /** @var ItemStub $entity */
         $entity = $context->$attributeName;
-        $expectedData = !empty($options['data']) ? $options['data'] : array();
-        $this->assertInstanceOf($options['class'], $entity);
+        $expectedData = !empty($options[CreateEntity::OPTION_KEY_DATA]) ?
+            $options[CreateEntity::OPTION_KEY_DATA] :
+            array();
+        $this->assertInstanceOf($options[CreateEntity::OPTION_KEY_CLASS], $entity);
         $this->assertEquals($expectedData, $entity->getData());
     }
 
@@ -86,15 +93,23 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
         return array(
             'without data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-                    'attribute' => new PropertyPath('test_attribute'),
+                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
                 )
             ),
             'with data' => array(
                 'options' => array(
-                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-                    'attribute' => new PropertyPath('test_attribute'),
-                    'data'      => array('key1' => 'value1', 'key2' => 'value2'),
+                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
+                    CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
+                )
+            ),
+            'without flush' => array(
+                'options' => array(
+                    CreateEntity::OPTION_KEY_CLASS     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
+                    CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
+                    CreateEntity::OPTION_KEY_FLUSH     => false
                 )
             ),
         );
@@ -106,7 +121,10 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteEntityNotManageable()
     {
-        $options = array('class' => 'stdClass', 'attribute' => $this->getPropertyPath());
+        $options = array(
+            CreateEntity::OPTION_KEY_CLASS     => 'stdClass',
+            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
+        );
         $context = array();
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -135,7 +153,10 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($em));
 
-        $options = array('class' => 'stdClass', 'attribute' => $this->getPropertyPath());
+        $options = array(
+            CreateEntity::OPTION_KEY_CLASS     => 'stdClass',
+            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
+        );
         $context = array();
         $this->action->initialize($options);
         $this->action->execute($context);
