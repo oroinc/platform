@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -69,6 +70,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
 
         $relationOptions = [
             'extend' => [
+                'owner'     => ExtendScope::OWNER_SYSTEM,
                 'is_extend' => true
             ],
             'attachment' => $attachmentScopeOptions
@@ -83,10 +85,10 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
             $entityTable,
             $sourceColumnName,
             self::ATTACHMENT_TABLE_NAME,
-            'id'
+            'id',
+            $relationOptions
         );
 
         $this->extendOptionsManager->setColumnType($sourceTable, $sourceColumnName, $type);
-        $this->extendOptionsManager->setColumnOptions($sourceTable, $sourceColumnName, $relationOptions);
     }
 }

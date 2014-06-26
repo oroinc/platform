@@ -4,15 +4,16 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\File;
+
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 
 class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, ContainerAwareInterface
 {
@@ -49,8 +50,8 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         self::addAvatarToUser($schema, $this->attachmentExtension);
 
         //save old avatars to new place
-        $em = $this->container->get('doctrine.orm.entity_manager');
-        $query = 'SELECT id, image, createdAt FROM oro_user WHERE image != ""';
+        $em         = $this->container->get('doctrine.orm.entity_manager');
+        $query      = 'SELECT id, image, createdAt FROM oro_user WHERE image != ""';
         $userImages = $em->getConnection()->executeQuery($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         if (!empty($userImages)) {
@@ -58,7 +59,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                 $filePath = $this->getUploadFileName($userData);
                 $this->container->get('oro_attachment.manager')->copyLocalFileToStorage($filePath, $userData['image']);
 
-                $file = new File($filePath);
+                $file             = new File($filePath);
                 $attachmentEntity = new Attachment();
                 $attachmentEntity->setExtension($file->guessExtension());
                 $attachmentEntity->setOriginalFilename($file->getFileName());
@@ -86,7 +87,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
     }
 
     /**
-     * @param Schema $schema
+     * @param Schema              $schema
      * @param AttachmentExtension $attachmentExtension
      */
     public static function addAvatarToUser(Schema $schema, AttachmentExtension $attachmentExtension)
@@ -97,16 +98,11 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
             'avatar',
             'attachmentImage',
             [
-                'view' => [
+                'view'   => [
                     'is_displayable' => false,
                 ],
-                'form' => [
+                'form'   => [
                     'is_enabled' => false
-                ],
-                'extend' => [
-                    'is_extend' => false,
-                    'owner' => 'System',
-                    'extend' => true
                 ]
             ],
             2,
@@ -117,10 +113,10 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
 
     protected function getUploadFileName($userData)
     {
-        $ds = DIRECTORY_SEPARATOR;
+        $ds         = DIRECTORY_SEPARATOR;
         $dateObject = new \DateTime($userData['createdAt']);
-        $suffix = $dateObject->format('Y-m');
-        $path = $this->container->getParameter('kernel.root_dir')
+        $suffix     = $dateObject->format('Y-m');
+        $path       = $this->container->getParameter('kernel.root_dir')
             . '/../web/uploads' . $ds . 'users' . $ds . $suffix . $ds . $userData['image'];
 
         return realpath($path);
