@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -69,7 +70,7 @@ class ReverseSyncProcessor
             $realConnector = $this->getRealConnector($integration, $connector);
 
             if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
-                throw new \Exception('This connector doesn`t support two-way sync.');
+                throw new LogicException('This connector doesn`t support two-way sync.');
             }
 
         } catch (\Exception $e) {
