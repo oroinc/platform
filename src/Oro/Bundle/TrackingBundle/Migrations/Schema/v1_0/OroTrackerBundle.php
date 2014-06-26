@@ -17,6 +17,7 @@ class OroTrackerBundle implements Migration
         $table = $schema->createTable('oro_tracking_website');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('identifier', 'string', ['length' => 255]);
         $table->addColumn('url', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);

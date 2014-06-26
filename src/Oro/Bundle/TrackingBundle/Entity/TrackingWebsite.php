@@ -52,6 +52,13 @@ class TrackingWebsite
     /**
      * @var string
      *
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     */
+    protected $name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="url", type="string", length=255, nullable=false)
      */
     protected $url;
@@ -83,7 +90,7 @@ class TrackingWebsite
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -91,7 +98,7 @@ class TrackingWebsite
      */
     public function preUpdate()
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -217,5 +224,28 @@ class TrackingWebsite
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * Get website name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set website name.
+     *
+     * @param string $name
+     * @return TrackingWebsite
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 }

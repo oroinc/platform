@@ -28,6 +28,13 @@ class TrackingWebsiteType extends AbstractType
     {
         $builder
             ->add(
+                'name',
+                'text',
+                [
+                    'label' => 'oro.tracking.tracking_website.name.label'
+                ]
+            )
+            ->add(
                 'identifier',
                 'text',
                 [
@@ -39,13 +46,6 @@ class TrackingWebsiteType extends AbstractType
                 'text',
                 [
                     'label' => 'oro.tracking.tracking_website.url.label'
-                ]
-            )
-            ->add(
-                'owner',
-                'oro_user_select',
-                [
-                    'label' => 'oro.tracking.tracking_website.owner.label'
                 ]
             );
     }

@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -15,7 +14,6 @@ use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler;
 use Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @Route("/tracking/website")
@@ -39,7 +37,9 @@ class TrackingWebsiteController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_tracking.tracking_website.class')
+        ];
     }
 
     /**
@@ -66,6 +66,8 @@ class TrackingWebsiteController extends Controller
      *      permission="EDIT"
      * )
      * @Template()
+     * @param TrackingWebsite $trackingWebsite
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function updateAction(TrackingWebsite $trackingWebsite)
     {
@@ -76,6 +78,8 @@ class TrackingWebsiteController extends Controller
      * @Route("/view/{id}", name="oro_tracking_website_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_tracking_website_view")
      * @Template()
+     * @param TrackingWebsite $trackingWebsite
+     * @return array
      */
     public function viewAction(TrackingWebsite $trackingWebsite)
     {
@@ -90,33 +94,23 @@ class TrackingWebsiteController extends Controller
      */
     public function update(TrackingWebsite $trackingWebsite)
     {
-        $form = $this->createForm(
-            $this->getFormType(),
-            $trackingWebsite
+        return $this->get('oro_form.model.update_handler')->handleUpdate(
+            $trackingWebsite,
+            $this->createForm($this->getFormType(), $trackingWebsite),
+            function (TrackingWebsite $entity) {
+                return array(
+                    'route' => 'oro_tracking_website_update',
+                    'parameters' => array('id' => $entity->getId())
+                );
+            },
+            function (TrackingWebsite $entity) {
+                return array(
+                    'route' => 'oro_tracking_website_view',
+                    'parameters' => array('id' => $entity->getId())
+                );
+            },
+            $this->getTranslator()->trans('oro.tracking.tracking_website.saved_message')
         );
-
-        if ($this->getHandler()->process($trackingWebsite)) {
-            $this->getSession()->getFlashBag()->add(
-                'success',
-                $this->getTranslator()->trans('oro.tracking.tracking_website.saved_message')
-            );
-
-            return $this->getRouter()->redirectAfterSave(
-                [
-                    'route'      => 'oro_tracking_website_update',
-                    'parameters' => ['id' => $trackingWebsite->getId()],
-                ],
-                [
-                    'route'      => 'oro_tracking_website_view',
-                    'parameters' => ['id' => $trackingWebsite->getId()],
-                ]
-            );
-        }
-
-        return [
-            'entity' => $trackingWebsite,
-            'form'   => $form->createView()
-        ];
     }
 
     /**
@@ -128,34 +122,10 @@ class TrackingWebsiteController extends Controller
     }
 
     /**
-     * @return TrackingWebsiteHandler
-     */
-    protected function getHandler()
-    {
-        return $this->get('oro_tracking.form.handler.tracking_website');
-    }
-
-    /**
      * @return Translator
      */
     protected function getTranslator()
     {
         return $this->get('translator');
-    }
-
-    /**
-     * @return Router
-     */
-    protected function getRouter()
-    {
-        return $this->get('oro_ui.router');
-    }
-
-    /**
-     * @return Session
-     */
-    protected function getSession()
-    {
-        return $this->get('session');
     }
 }
