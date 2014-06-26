@@ -14,6 +14,7 @@ abstract class AbstractPageEntity extends AbstractPage
     protected $owner;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
+
     /**
      * Save entity
      *
@@ -22,9 +23,9 @@ abstract class AbstractPageEntity extends AbstractPage
     public function save()
     {
         $this->test->byXpath("//button[normalize-space(.) = 'Save and Close']")->click();
-        $this->waitForAjax();
+        sleep(1);
         $this->waitPageToLoad();
-
+        $this->waitForAjax();
         return $this;
     }
 
