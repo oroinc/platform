@@ -159,7 +159,7 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
-     * @param \PHPUnit_Extensions_Selenium2TestCase_Element $rows
+     * @param \PHPUnit_Extensions_Selenium2TestCase_Element[] $rows
      *
      * @return array
      */
@@ -181,6 +181,15 @@ abstract class AbstractPageGrid extends AbstractPage
             $data[] = array_combine($header, $rowData);
         }
         return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllData()
+    {
+        $rows = $this->getRows();
+        return $this->getData($rows);
     }
 
     /**
