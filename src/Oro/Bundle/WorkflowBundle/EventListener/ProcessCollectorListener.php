@@ -268,7 +268,13 @@ class ProcessCollectorListener
         $hasQueuedJobs = false;
         /** @var ProcessJob $processJob */
         while ($processJob = array_shift($this->queuedJobs)) {
-            $jmsJob = new Job(ExecuteProcessJobCommand::NAME, array('--id=' . $processJob->getId()));
+            $jmsJob = new Job(
+                ExecuteProcessJobCommand::NAME,
+                array('--id=' . $processJob->getId()),
+                true,
+                Job::DEFAULT_QUEUE,
+                $processJob->getProcessTrigger()->getPriority()
+            );
 
             $timeShiftInterval = $processJob->getProcessTrigger()->getTimeShiftInterval();
             if ($timeShiftInterval) {

@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -48,6 +50,13 @@ class ProcessTrigger
      * @ORM\Column(name="field", type="string", length=255, nullable=true)
      */
     protected $field;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="priority", type="smallint")
+     */
+    protected $priority = Job::PRIORITY_DEFAULT;
 
     /**
      * Whether process should be queued or processed immediately
@@ -133,6 +142,25 @@ class ProcessTrigger
     public function getField()
     {
         return $this->field;
+    }
+
+    /**
+     * @param integer $priority
+     * @return ProcessTrigger
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+
+        return $this;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getPriority()
+    {
+        return $this->priority;
     }
 
     /**
@@ -312,6 +340,7 @@ class ProcessTrigger
     {
         $this->setEvent($trigger->getEvent())
             ->setField($trigger->getField())
+            ->setPriority($trigger->getPriority())
             ->setQueued($trigger->isQueued())
             ->setTimeShift($trigger->getTimeShift())
             ->setDefinition($trigger->getDefinition());
