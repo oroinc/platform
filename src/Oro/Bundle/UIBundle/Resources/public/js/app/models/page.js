@@ -2,8 +2,9 @@
 /*global define*/
 define([
     'underscore',
+    'oroui/js/mediator',
     './base/model'
-], function (_, BaseModel) {
+], function (_, mediator, BaseModel) {
     'use strict';
 
     var PageModel;
@@ -35,30 +36,22 @@ define([
          * @override
          */
         fetch: function (options) {
+            var headers, headerId;
+            headers = {};
+            headerId = mediator.execute('retrieveOption', 'headerId');
+            if (headerId) {
+                // @TODO discuss if 'x-oro-hash-navigation' header is still necessary
+                headers[headerId] = true;
+            }
+
             options = _.defaults(options || {}, {
                 accepts: {
                     // @TODO refactor server side action point to accept 'application/json'
                     "json": "*/*"
                 },
-                headers: {
-                    // @TODO discuss if this header is still necessary
-                    'x-oro-hash-navigation': 'true'
-                }
+                headers: headers
             });
             PageModel.__super__.fetch.call(this, options);
-        },
-
-        /**
-         * Handles response data
-         *
-         * @param {*} resp
-         * @param {Object} options
-         * @returns {Object}
-         * @override
-         */
-        parse: function (resp, options) {
-            // @TODO handle response data in case error message in response
-            return resp;
         },
 
         /**

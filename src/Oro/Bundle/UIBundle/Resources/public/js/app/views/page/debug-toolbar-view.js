@@ -11,6 +11,10 @@ define([
     var DebugToolbarView;
 
     DebugToolbarView = PageRegionView.extend({
+        listen: {
+            'page:error mediator': 'onPageUpdate'
+        },
+
         /**
          * Handles page load event
          *  - loads debug data

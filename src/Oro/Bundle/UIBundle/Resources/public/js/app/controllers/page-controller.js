@@ -3,16 +3,18 @@
 define([
     'underscore',
     'chaplin',
+    'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page'
-], function (_, Chaplin, BaseController, PageModel) {
+], function (_, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, utils, PageController;
+    var document, location, utils, mediator, PageController;
 
     document = window.document;
     location = window.location;
     utils = Chaplin.utils;
+    mediator = Chaplin.mediator;
 
     PageController = BaseController.extend({
 
@@ -90,6 +92,7 @@ define([
             this.listenTo(page, 'change', this.onPageLoaded);
             this.listenTo(page, 'sync', this.onPageUpdated);
             this.listenTo(page, 'invalid', this.onPageInvalid);
+            this.listenTo(page, 'error', this.onPageError);
 
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
         },
@@ -148,6 +151,47 @@ define([
         },
 
         /**
+         * Handles page loading error
+         *  - tries to parse raw data and keep updating page
+         *
+         * @param {Chaplin.Model} model
+         * @param {XMLHttpRequest} xhr
+         * @param {Object} options
+         */
+        onPageError: function (model, xhr, options) {
+            var rawData, data, payload;
+            rawData = xhr.responseText;
+            data = {};
+
+            if (xhr.status === 200 && rawData.indexOf('http') === 0) {
+                data = {redirect: true, fullRedirect: true, location: rawData};
+                model.set(data, options);
+                return;
+            }
+
+            // @TODO make common handler for 403 response and might for other responses
+            payload = {stopPageProcessing: false};
+            this.publishEvent('page:beforeError', xhr, payload);
+            if (payload.stopPageProcessing) {
+                return;
+            }
+
+            data = this._parseRawData(rawData);
+            if (_.isObject(data)) {
+                model.set(data, options);
+            } else {
+                if (mediator.execute('retrieveOption', 'debug')) {
+                    document.body.innerHTML = rawData;
+                } else {
+                    mediator.execute('showMessage', 'error', __('Sorry, page was not loaded correctly'));
+                }
+            }
+
+            this.publishEvent('page:error', model.getAttributes(), options.actionArgs, xhr);
+            this.publishEvent('page:afterChange');
+        },
+
+        /**
          * Process redirect response
          *
          * @param {Object} data
@@ -159,7 +203,7 @@ define([
             url = data.url || data.location;
 //            $.isActive(true);
             if (data.fullRedirect) {
-                delimiter = url.indexOf('?') !== -1 ? '?' : '&';
+                delimiter = url.indexOf('?') === -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
             } else if (data.redirect) {
                 parser = document.createElement('a');
@@ -179,15 +223,59 @@ define([
          * @private
          */
         _setNavigationHandlers: function (url) {
-            Chaplin.mediator.setHandler('redirectTo', this._processRedirect, this);
-            Chaplin.mediator.setHandler('refreshPage', function () {
-                Chaplin.utils.redirectTo({url: url}, {forceStartup: true, force: true});
-                Chaplin.mediator.trigger('page:refreshed');
+            mediator.setHandler('redirectTo', this._processRedirect, this);
+            mediator.setHandler('refreshPage', function () {
+                utils.redirectTo({url: url}, {forceStartup: true, force: true});
+                mediator.trigger('page:refreshed');
             });
-            Chaplin.mediator.setHandler('afterPageChange', function () {
-                Chaplin.mediator.publishEvent('page:afterChange');
+            mediator.setHandler('afterPageChange', function () {
+                mediator.publishEvent('page:afterChange');
             });
-        }
+        },
+
+
+        /**
+         * Make data more bulletproof.
+         *
+         * @param {string} rawData
+         * @param {number=} prevPos
+         * @returns {Object}
+         */
+        _parseRawData: function (rawData, prevPos) {
+            var jsonStartPos, additionalData, dataObj, data;
+            if (_.isUndefined(prevPos)) {
+                prevPos = -1;
+            }
+            rawData = rawData.trim();
+            jsonStartPos = rawData.indexOf('{', prevPos + 1);
+            additionalData = '';
+            dataObj = null;
+            if (jsonStartPos > 0) {
+                additionalData = rawData.substr(0, jsonStartPos);
+                data = rawData.substr(jsonStartPos);
+                try {
+                    dataObj = JSON.parse(data);
+                } catch (err) {
+                    return this._parseRawData(rawData, jsonStartPos);
+                }
+            } else if (jsonStartPos === 0) {
+                dataObj = JSON.parse(rawData);
+            } else {
+                throw "Unexpected content format";
+            }
+
+            if (additionalData) {
+                additionalData = '<div class="alert alert-info fade in top-messages">' +
+                    '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+                    '<div class="message">' + additionalData + '</div></div>';
+            }
+
+            if (dataObj.content !== undefined) {
+                dataObj.content = additionalData + dataObj.content;
+            }
+
+            return dataObj;
+        },
     });
 
     return PageController;

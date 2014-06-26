@@ -1,27 +1,24 @@
 /*global require*/
 require([
-    'oroui/js/app/controllers/base/controller'
-], function (BaseController) {
+    'oroui/js/app/controllers/base/controller',
+    'oroui/js/app/views/page-view'
+], function (BaseController, PageView) {
     'use strict';
 
     /**
      * Init PageView
      */
-    BaseController.loadBeforeAction([
-        'oroui/js/app/views/base/view'
-    ], function (BaseView) {
-        BaseController.addToReuse('page', BaseView, {
-            el: 'body',
-            keepElement: true,
-            regions: {
-                mainContainer: '#container',
-                mainMenu: '#main-menu',
-                userMenu: '#top-page .user-menu',
-                breadcrumb: '#breadcrumb',
-                loadingMask: '#main .hash-loading-mask',
-                messages: '#flash-messages .flash-messages-holder'
-            }
-        });
+    BaseController.addToReuse('page', PageView, {
+        el: 'body',
+        keepElement: true,
+        regions: {
+            mainContainer: '#container',
+            mainMenu: '#main-menu',
+            userMenu: '#top-page .user-menu',
+            breadcrumb: '#breadcrumb',
+            loadingMask: '#main .hash-loading-mask',
+            messages: '#flash-messages .flash-messages-holder'
+        }
     });
 
     /**
@@ -121,5 +118,19 @@ require([
             }
         });
     });
-
 });
+
+
+/**
+ * Init messenger's handlers
+ */
+require([
+    'oroui/js/mediator',
+    'oroui/js/messenger'
+], function (mediator, messenger) {
+    'use strict';
+
+    mediator.setHandler('showMessage', messenger.notificationMessage, messenger);
+    mediator.setHandler('showFlashMessage', messenger.notificationFlashMessage, messenger);
+});
+
