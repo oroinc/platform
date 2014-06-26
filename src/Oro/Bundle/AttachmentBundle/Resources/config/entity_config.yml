@@ -1,5 +1,20 @@
 oro_entity_config:
     attachment:
+        entity:
+            items:
+                enabled:
+                    options:
+                        priority:           250
+                        default_value:      false
+                        auditable:          false
+                    form:
+                        type:               oro_entity_extend_association_choice
+                        options:
+                            block:          other
+                            required:       true
+                            label:          oro.attachment.enabled
+                            entity_class:   'OroAttachmentBundle:Attachment'
+                            entity_config_scope: attachment
         field:
             items:
                 attachment:
