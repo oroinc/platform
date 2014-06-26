@@ -2,6 +2,8 @@ parameters:
     oro_tracking.tracking_website.class:              Oro\Bundle\TrackingBundle\Entity\TrackingWebsite
     oro_tracking.form.type.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
     oro_tracking.tracking_website.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_tracking.config.listener:                     Oro\Bundle\TrackingBundle\EventListener\ConfigListener
+
 services:
     oro_tracking.form.type.tracking_website:
         class: %oro_tracking.form.type.tracking_website.class%
@@ -23,3 +25,12 @@ services:
         arguments:
             - %oro_tracking.tracking_website.class%
             - @doctrine.orm.entity_manager
+
+    oro_tracking.config.listener:
+        class: %oro_tracking.config.listener%
+        arguments:
+            - @oro_config.global
+            - @router
+            - %kernel.logs_dir%
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
