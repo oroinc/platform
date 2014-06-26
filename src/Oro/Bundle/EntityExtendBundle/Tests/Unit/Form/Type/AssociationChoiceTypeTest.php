@@ -4,29 +4,22 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 
-class AssociationChoiceTypeTest extends TypeTestCase
+class AssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
-
     /** @var AssociationChoiceType */
     protected $type;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
@@ -36,20 +29,6 @@ class AssociationChoiceTypeTest extends TypeTestCase
             ->will($this->returnArgument(0));
 
         $this->type = new AssociationChoiceType($this->configManager, $entityClassResolver);
-
-        parent::setUp();
-    }
-
-    protected function getExtensions()
-    {
-        $configExtension = new ConfigExtension();
-
-        return [
-            new PreloadedExtension(
-                [],
-                [$configExtension->getExtendedType() => [$configExtension]]
-            )
-        ];
     }
 
     public function testSetDefaultOptions()
@@ -72,54 +51,19 @@ class AssociationChoiceTypeTest extends TypeTestCase
      */
     public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
     {
-        $configId = new EntityConfigId('test', 'Test\Entity');
-        $config = new Config($configId);
-        $config->set('enabled', $oldVal);
-        $extendConfigId = new EntityConfigId('extend', 'Test\Entity');
-        $extendConfig = new Config($extendConfigId);
-        $extendConfig->set('state', $state);
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->with('Test\Entity')
-            ->will($this->returnValue($extendConfig));
-        $this->configManager->expects($this->once())
-            ->method('getConfig')
-            ->with($configId)
-            ->will($this->returnValue($config));
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
-
-        $expectedExtendConfig = new Config($extendConfigId);
-        if ($isSetStateExpected) {
-            $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATED);
-            $extendConfigProvider->expects($this->once())
-                ->method('persist')
-                ->with($expectedExtendConfig);
-            $extendConfigProvider->expects($this->once())
-                ->method('flush');
-        } else {
-            $expectedExtendConfig->set('state', $state);
-            $extendConfigProvider->expects($this->never())
-                ->method('persist');
-            $extendConfigProvider->expects($this->never())
-                ->method('flush');
-        }
-
-        $options  = [
-            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\AssocEntity'
-        ];
-        $form = $this->factory->createNamed('enabled', $this->type, $oldVal, $options);
-
-        $form->submit($newVal);
-
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($expectedExtendConfig, $extendConfig);
+        $this->doTestSubmit(
+            'enabled',
+            $this->type,
+            [
+                'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+                'association_class' => 'Test\AssocEntity'
+            ],
+            [],
+            $newVal,
+            $oldVal,
+            $state,
+            $isSetStateExpected
+        );
     }
 
     public function submitProvider()
@@ -135,6 +79,8 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testBuildView()
     {
+        $this->prepareBuildViewTest();
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
@@ -155,6 +101,8 @@ class AssociationChoiceTypeTest extends TypeTestCase
 
     public function testBuildViewForDisabled()
     {
+        $this->prepareBuildViewTest();
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
@@ -165,19 +113,15 @@ class AssociationChoiceTypeTest extends TypeTestCase
         $this->type->buildView($view, $form, $options);
 
         $this->assertEquals(
-            [
-                'disabled' => true,
-                'attr'     => [
-                    'class' => 'disabled-choice'
-                ],
-                'value'    => null
-            ],
+            $this->getDisabledFormView(),
             $view->vars
         );
     }
 
     public function testBuildViewForDisabledWithCssClass()
     {
+        $this->prepareBuildViewTest();
+
         $view    = new FormView();
         $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
@@ -190,13 +134,89 @@ class AssociationChoiceTypeTest extends TypeTestCase
         $this->type->buildView($view, $form, $options);
 
         $this->assertEquals(
+            $this->getDisabledFormView('test-class'),
+            $view->vars
+        );
+    }
+
+    public function testBuildViewForEmptyClass()
+    {
+        $this->prepareBuildViewTest();
+
+        $view    = new FormView();
+        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $options = [
+            'config_id'         => new EntityConfigId('test', null),
+            'association_class' => 'Test\AssocEntity'
+        ];
+
+        $this->type->buildView($view, $form, $options);
+
+        $this->assertEquals(
             [
-                'disabled' => true,
-                'attr'     => [
-                    'class' => 'test-class disabled-choice'
-                ],
-                'value'    => null
+                'attr'  => [],
+                'value' => null
             ],
+            $view->vars
+        );
+    }
+
+    public function testBuildViewForDictionary()
+    {
+        $this->prepareBuildViewTest();
+
+        $groupingConfig = new Config(new EntityConfigId('grouping', 'Test\Entity'));
+        $groupingConfig->set('groups', [GroupingScope::GROUP_DICTIONARY]);
+        $this->groupingConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue(true));
+        $this->groupingConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue($groupingConfig));
+
+        $view    = new FormView();
+        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $options = [
+            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+            'association_class' => 'Test\AssocEntity'
+        ];
+
+        $this->type->buildView($view, $form, $options);
+
+        $this->assertEquals(
+            $this->getDisabledFormView(),
+            $view->vars
+        );
+    }
+
+    public function testBuildViewForImmutable()
+    {
+        $this->prepareBuildViewTest();
+
+        $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
+        $testConfig->set('immutable', true);
+        $this->testConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue(true));
+        $this->testConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue($testConfig));
+
+        $view    = new FormView();
+        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $options = [
+            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+            'association_class' => 'Test\AssocEntity'
+        ];
+
+        $this->type->buildView($view, $form, $options);
+
+        $this->assertEquals(
+            $this->getDisabledFormView(),
             $view->vars
         );
     }
@@ -209,5 +229,20 @@ class AssociationChoiceTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $this->assertEquals('choice', $this->type->getParent());
+    }
+
+    /**
+     * @param string|null $cssClass
+     * @return array
+     */
+    protected function getDisabledFormView($cssClass = null)
+    {
+        return [
+            'disabled' => true,
+            'attr'     => [
+                'class' => empty($cssClass) ? 'disabled-choice' : $cssClass . ' disabled-choice'
+            ],
+            'value'    => null
+        ];
     }
 }

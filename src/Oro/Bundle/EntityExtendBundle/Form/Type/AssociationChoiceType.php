@@ -54,9 +54,14 @@ class AssociationChoiceType extends AbstractAssociationChoiceType
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];
-        $className = $this->entityClassResolver->getEntityClass($options['association_class']);
+        $className = $configId->getClassName();
 
-        return $configId->getClassName() === $className;
+        // disable for owning side entity
+        if ($className === $this->entityClassResolver->getEntityClass($options['association_class'])) {
+            return true;
+        }
+
+        return parent::isReadOnly($options);
     }
 
     /**

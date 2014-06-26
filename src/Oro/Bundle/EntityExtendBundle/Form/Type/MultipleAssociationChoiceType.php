@@ -66,9 +66,15 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
         $this->ensureOwningSideEntitiesLoaded($options['association_class']);
 
         /** @var EntityConfigId $configId */
-        $configId = $options['config_id'];
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
 
-        return in_array($configId->getClassName(), $this->owningSideEntities);
+        // disable for owning side entities
+        if (!empty($className) && in_array($className, $this->owningSideEntities)) {
+            return true;
+        };
+
+        return parent::isReadOnly($options);
     }
 
     /**
@@ -79,16 +85,28 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     protected function ensureOwningSideEntitiesLoaded($groupName)
     {
         if (null === $this->owningSideEntities) {
-            $this->owningSideEntities = [];
-            $groupingConfigProvider   = $this->configManager->getProvider('grouping');
-            $configs                  = $groupingConfigProvider->getConfigs();
-            foreach ($configs as $config) {
-                $groups = $config->get('groups');
-                if (!empty($groups) && in_array($groupName, $groups)) {
-                    $this->owningSideEntities[] = $config->getId()->getClassName();
-                }
+            $this->owningSideEntities = $this->loadOwningSideEntities($groupName);
+        }
+    }
+
+    /**
+     * Loads the list of owning side entities
+     *
+     * @param $groupName
+     * @return string[]
+     */
+    protected function loadOwningSideEntities($groupName)
+    {
+        $result  = [];
+        $configs = $this->configManager->getProvider('grouping')->getConfigs();
+        foreach ($configs as $config) {
+            $groups = $config->get('groups');
+            if (!empty($groups) && in_array($groupName, $groups)) {
+                $result[] = $config->getId()->getClassName();
             }
         }
+
+        return $result;
     }
 
     /**
