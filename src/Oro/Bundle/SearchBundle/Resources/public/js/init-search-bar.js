@@ -18,13 +18,6 @@ function($, _, routing, mediator) {
               this
           );
 
-          mediator.bind('hash_navigation_request:form-start', function (form, settings) {
-              if ($(form).hasClass('search-form')) {
-                  var $searchString = $.trim($(form).find('.search').val());
-                  settings.form_validate = $searchString.length > 0;
-              }
-          }, this);
-
           $(document).on('click', '.search-view-more-link', function(evt) {
               $('#top-search-form').submit();
               return false;

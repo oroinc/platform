@@ -4,9 +4,8 @@ define([
     'underscore',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
-    'oroui/js/tools',
     'oroui/js/error'
-], function (_, mediator, BaseView, tools, error) {
+], function (_, mediator, BaseView, error) {
     'use strict';
 
     var MainView;
@@ -57,7 +56,7 @@ define([
             model.destroy({
                 wait: true,
                 error: function (model, xhr) {
-                    if (xhr.status === 404 && !tools.debug) {
+                    if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {
                         // Suppress error if it's 404 response and not debug mode
                         //@TODO remove item view
                     } else {

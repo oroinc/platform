@@ -10,6 +10,7 @@ require({
             userName: {{ userName|json_encode|raw }},
             root: {{ app.request.getBaseURL()|json_encode|raw }} + '\/',
             debug: Boolean({{ app.debug }}),
+            skipRouting: '[data-nohash=true]',
             controllerPath: 'controllers/',
             controllerSuffix: '-controller',
             // preserves url path as it is (does not add/remove trailing slash)
