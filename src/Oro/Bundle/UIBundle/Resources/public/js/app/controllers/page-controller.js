@@ -151,9 +151,10 @@ define([
          * Process redirect response
          *
          * @param {Object} data
+         * @param {Object} options
          * @private
          */
-        _processRedirect: function (data) {
+        _processRedirect: function (data, options) {
             var url, delimiter, parser;
             url = data.url || data.location;
 //            $.isActive(true);
@@ -165,9 +166,9 @@ define([
                 parser.href = url;
                 url = parser.pathname + (parser.search || '');
                 this.publishEvent('page:redirect');
-                utils.redirectTo({url: url}, {forceStartup: true, force: true});
+                utils.redirectTo({url: url}, _.extend(options, {forceStartup: true, force: true}));
             } else {
-                utils.redirectTo({url: url});
+                utils.redirectTo({url: url}, options);
             }
         },
 
