@@ -6,33 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * @ORM\Table(name="oro_tracking_website", indexes={
- *     @ORM\Index(name="website_identifier_idx", columns={"identifier"})
- * })
+ * @ORM\Table(name="oro_tracking_event")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_tracking_website_index",
- *  routeView="oro_tracking_website_view",
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-external-link"
- *      },
- *      "security"={
- *          "type"="ACL"
- *      },
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
+ *      }
  *  }
  * )
  */
-class TrackingWebsite
+class TrackingEvent
 {
     /**
      * @var integer
@@ -46,31 +33,30 @@ class TrackingWebsite
     /**
      * @var string
      *
-     * @ORM\Column(name="identifier", type="string", length=255, nullable=false, unique=true)
-     * @ConfigField(
-     *  defaultValues={
-     *      "importexport"={
-     *          "identity"=true
-     *      }
-     *  }
-     * )
+     * @ORM\Column(name="category", type="string", length=255, nullable=true)
      */
-    protected $identifier;
+    protected $category;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="url", type="string", length=255, nullable=false)
+     * @ORM\Column(name="action", type="string", length=255, nullable=true)
      */
-    protected $url;
+    protected $action;
 
     /**
-     * @var User
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
-    protected $owner;
+    protected $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     */
+    protected $value;
 
     /**
      * @var \DateTime
@@ -85,6 +71,14 @@ class TrackingWebsite
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     protected $updatedAt;
+
+    /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $website;
 
     /**
      * @ORM\PrePersist
@@ -113,56 +107,102 @@ class TrackingWebsite
     }
 
     /**
-     * Set identifier
+     * Set category
      *
-     * @param string $identifier
-     * @return TrackingWebsite
+     * @param string $category
+     * @return TrackingEvent
      */
-    public function setIdentifier($identifier)
+    public function setCategory($category)
     {
-        $this->identifier = $identifier;
+        $this->category = $category;
 
         return $this;
     }
 
     /**
-     * Get identifier
+     * Get category
      *
      * @return string
      */
-    public function getIdentifier()
+    public function getCategory()
     {
-        return $this->identifier;
+        return $this->category;
     }
 
     /**
-     * Set url
+     * Set action
      *
-     * @param string $url
-     * @return TrackingWebsite
+     * @param string $action
+     * @return TrackingEvent
      */
-    public function setUrl($url)
+    public function setAction($action)
     {
-        $this->url = $url;
+        $this->action = $action;
 
         return $this;
     }
 
     /**
-     * Get url
+     * Get action
      *
      * @return string
      */
-    public function getUrl()
+    public function getAction()
     {
-        return $this->url;
+        return $this->action;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return TrackingEvent
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set value
+     *
+     * @param string $value
+     * @return TrackingEvent
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get value
+     *
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 
     /**
      * Set createdAt
      *
      * @param \DateTime $createdAt
-     * @return TrackingWebsite
+     * @return TrackingEvent
      */
     public function setCreatedAt($createdAt)
     {
@@ -185,7 +225,7 @@ class TrackingWebsite
      * Set updatedAt
      *
      * @param \DateTime $updatedAt
-     * @return TrackingWebsite
+     * @return TrackingEvent
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -205,25 +245,25 @@ class TrackingWebsite
     }
 
     /**
-     * Set owner
+     * Set website
      *
-     * @param User $owner
-     * @return TrackingWebsite
+     * @param TrackingWebsite $website
+     * @return TrackingEvent
      */
-    public function setOwner(User $owner = null)
+    public function setWebsite($website)
     {
-        $this->owner = $owner;
+        $this->website = $website;
 
         return $this;
     }
 
     /**
-     * Get owner
+     * Get website
      *
-     * @return User
+     * @return TrackingWebsite
      */
-    public function getOwner()
+    public function getWebsite()
     {
-        return $this->owner;
+        return $this->website;
     }
 }

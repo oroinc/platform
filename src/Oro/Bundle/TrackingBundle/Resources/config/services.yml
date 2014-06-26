@@ -1,8 +1,12 @@
 parameters:
     oro_tracking.tracking_website.class:              Oro\Bundle\TrackingBundle\Entity\TrackingWebsite
+    oro_tracking.tracking_event.class:                Oro\Bundle\TrackingBundle\Entity\TrackingEvent
+    oro_tracking.tracking_data.class:                 Oro\Bundle\TrackingBundle\Entity\TrackingData
     oro_tracking.form.type.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
     oro_tracking.form.handler.tracking_website.class: Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
     oro_tracking.tracking_website.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_tracking.importexport.reader.log.class:       Oro\Bundle\TrackingBundle\ImportExport\LogReader
+    oro_tracking.importexport.normalizer.data.class:  Oro\Bundle\TrackingBundle\ImportExport\DataNormalizer
 services:
     oro_tracking.form.type.tracking_website:
         class: %oro_tracking.form.type.tracking_website.class%
@@ -32,3 +36,32 @@ services:
         arguments:
             - %oro_tracking.tracking_website.class%
             - @doctrine.orm.entity_manager
+
+    oro_tracking.importexport.reader.log:
+        class: %oro_tracking.importexport.reader.log.class%
+        arguments:
+            - @oro_importexport.context_registry
+        calls:
+             - [setDirectory, ['%kernel.logs_dir%/tracking/']]
+
+    oro_tracking.importexport.data_converter.data:
+        parent: oro_importexport.data_converter.configurable
+
+    oro_tracking.importexport.strategy.data:
+        parent: oro_importexport.strategy.configurable_add_or_replace
+
+    oro_tracking.importexport.normalizer.data:
+        class: %oro_tracking.importexport.normalizer.data.class%
+        parent: oro_importexport.serializer.configurable_entity_normalizer
+        calls:
+             - [setEntityName, [%oro_tracking.tracking_data.class%]]
+        tags:
+            - { name: oro_importexport.normalizer, priority: 10 }
+
+    oro_tracking.importexport.processor.import.data:
+        parent: oro_importexport.processor.import_abstract
+        calls:
+            - [setDataConverter, [@oro_tracking.importexport.data_converter.data]]
+            - [setStrategy, [@oro_tracking.importexport.strategy.data]]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: %oro_tracking.tracking_data.class%, alias: oro_tracking.processor.data }

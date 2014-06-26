@@ -6,33 +6,21 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\UserBundle\Entity\User;
+
 
 /**
- * @ORM\Table(name="oro_tracking_website", indexes={
- *     @ORM\Index(name="website_identifier_idx", columns={"identifier"})
- * })
+ * @ORM\Table(name="oro_tracking_data")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_tracking_website_index",
- *  routeView="oro_tracking_website_view",
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-external-link"
- *      },
- *      "security"={
- *          "type"="ACL"
- *      },
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
+ *      }
  *  }
  * )
  */
-class TrackingWebsite
+class TrackingData
 {
     /**
      * @var integer
@@ -46,31 +34,17 @@ class TrackingWebsite
     /**
      * @var string
      *
-     * @ORM\Column(name="identifier", type="string", length=255, nullable=false, unique=true)
-     * @ConfigField(
-     *  defaultValues={
-     *      "importexport"={
-     *          "identity"=true
-     *      }
-     *  }
-     * )
+     * @ORM\Column(name="data", type="text", nullable=false)
      */
-    protected $identifier;
+    protected $data;
 
     /**
-     * @var string
+     * @var TrackingEvent
      *
-     * @ORM\Column(name="url", type="string", length=255, nullable=false)
+     * @ORM\OneToOne(targetEntity="TrackingEvent", cascade={"persist"})
+     * @ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $url;
-
-    /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
+    protected $event;
 
     /**
      * @var \DateTime
@@ -113,56 +87,33 @@ class TrackingWebsite
     }
 
     /**
-     * Set identifier
+     * Set data
      *
-     * @param string $identifier
-     * @return TrackingWebsite
+     * @param string $data
+     * @return TrackingData
      */
-    public function setIdentifier($identifier)
+    public function setData($data)
     {
-        $this->identifier = $identifier;
+        $this->data = $data;
 
         return $this;
     }
 
     /**
-     * Get identifier
+     * Get data
      *
-     * @return string
+     * @return string 
      */
-    public function getIdentifier()
+    public function getData()
     {
-        return $this->identifier;
-    }
-
-    /**
-     * Set url
-     *
-     * @param string $url
-     * @return TrackingWebsite
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    public function getUrl()
-    {
-        return $this->url;
+        return $this->data;
     }
 
     /**
      * Set createdAt
      *
      * @param \DateTime $createdAt
-     * @return TrackingWebsite
+     * @return TrackingData
      */
     public function setCreatedAt($createdAt)
     {
@@ -174,7 +125,7 @@ class TrackingWebsite
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getCreatedAt()
     {
@@ -185,7 +136,7 @@ class TrackingWebsite
      * Set updatedAt
      *
      * @param \DateTime $updatedAt
-     * @return TrackingWebsite
+     * @return TrackingData
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -197,7 +148,7 @@ class TrackingWebsite
     /**
      * Get updatedAt
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getUpdatedAt()
     {
@@ -205,25 +156,25 @@ class TrackingWebsite
     }
 
     /**
-     * Set owner
+     * Set event
      *
-     * @param User $owner
-     * @return TrackingWebsite
+     * @param TrackingEvent $event
+     * @return TrackingData
      */
-    public function setOwner(User $owner = null)
+    public function setEvent(TrackingEvent $event = null)
     {
-        $this->owner = $owner;
+        $this->event = $event;
 
         return $this;
     }
 
     /**
-     * Get owner
+     * Get event
      *
-     * @return User
+     * @return TrackingEvent
      */
-    public function getOwner()
+    public function getEvent()
     {
-        return $this->owner;
+        return $this->event;
     }
 }
