@@ -74,8 +74,9 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                     $attachmentEntity->getId(),
                     $userData['id']
                 );
-                $em->getConnection()->executeQuery($query)
-                    ->execute();
+
+                $queries->addQuery($query);
+
                 unlink($filePath);
             }
         }
@@ -90,7 +91,20 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
      */
     public static function addAvatarToUser(Schema $schema, AttachmentExtension $attachmentExtension)
     {
-        $attachmentExtension->addAttachmentRelation($schema, 'oro_user', 'avatar', 'attachmentImage', 2, 58, 58);
+        $attachmentExtension->addAttachmentRelation(
+            $schema,
+            'oro_user',
+            'avatar',
+            'attachmentImage',
+            [
+                'view' => [
+                    'is_displayable' => false
+                ]
+            ],
+            2,
+            58,
+            58
+        );
     }
 
     protected function getUploadFileName($userData)
