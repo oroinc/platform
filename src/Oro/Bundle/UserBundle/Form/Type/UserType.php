@@ -149,7 +149,15 @@ class UserType extends AbstractType
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
-            ->add('change_password', 'oro_change_password');
+            ->add('change_password', 'oro_change_password')
+            ->add(
+                'avatar',
+                'oro_image',
+                array(
+                    'label'          => 'oro.user.avatar.label',
+                    'required'       => false
+                )
+            );
 
         $this->addInviteUserField($builder);
     }

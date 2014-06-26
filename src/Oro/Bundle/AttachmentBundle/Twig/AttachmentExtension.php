@@ -42,6 +42,7 @@ class AttachmentExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('oro_attachment_url', [$this, 'getAttachmentUrl']),
             new \Twig_SimpleFunction('oro_resized_attachment_url', [$this, 'getResizedImageUrl']),
+            new \Twig_SimpleFunction('oro_filtered_attachment_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction(
@@ -200,5 +201,10 @@ class AttachmentExtension extends \Twig_Extension
         }
 
         return '';
+    }
+
+    public function getFilteredImageUrl(Attachment $attachment, $filterName)
+    {
+        return $this->manager->getFilteredImageUrl($attachment, $filterName);
     }
 }

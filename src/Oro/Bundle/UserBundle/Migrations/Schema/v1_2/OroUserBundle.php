@@ -98,7 +98,15 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
             'attachmentImage',
             [
                 'view' => [
-                    'is_displayable' => false
+                    'is_displayable' => false,
+                ],
+                'form' => [
+                    'is_enabled' => false
+                ],
+                'extend' => [
+                    'is_extend' => false,
+                    'owner' => 'System',
+                    'extend' => true
                 ]
             ],
             2,

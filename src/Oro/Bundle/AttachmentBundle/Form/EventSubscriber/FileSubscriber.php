@@ -89,7 +89,11 @@ class FileSubscriber implements EventSubscriberInterface
     protected function validate(FormInterface $form, Attachment $entity)
     {
         $fieldName = $form->getName();
-        $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+
+        $dataClass = $form->getParent()->getConfig()->getDataClass();
+        if (!$dataClass) {
+            $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+        }
 
         $violations = $this->validator->validate($dataClass, $fieldName, $entity);
 
