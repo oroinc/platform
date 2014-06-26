@@ -35,12 +35,13 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
-
+        /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $entity */
         $entity = $this->test
             ->elements(
                 $this->test->using('xpath')
                     ->value("{$this->gridPath}//table[contains(@class,'grid')]/tbody/tr[{$entityId}]/td")
             );
+        /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $headers */
         $headers = $this->test
             ->elements(
                 $this->test->using('xpath')
@@ -48,7 +49,7 @@ abstract class AbstractPageGrid extends AbstractPage
             );
 
         $entityData = array();
-        for ($i=0; $i< count($headers); $i++) {
+        for ($i=0; $i < count($headers); $i++) {
             $entityData[$headers[$i]->text()] = $entity[$i]->text();
         }
         return $entityData;
@@ -168,11 +169,12 @@ abstract class AbstractPageGrid extends AbstractPage
         $data = array();
         foreach ($rows as $row) {
             /** @var  $row \PHPUnit_Extensions_Selenium2TestCase_Element */
-            $columns = $row->elements($this->test->using('xpath')->value("//td[not(contains(@style, 'display: none;'))]"));
+            $columns = $row->elements(
+                $this->test->using('xpath')->value("//td[not(contains(@style, 'display: none;'))]")
+            );
 
             $rowData = array();
-            foreach ($columns as $column)
-            {
+            foreach ($columns as $column) {
                 /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element $column*/
                 $rowData[] = $column->text();
             }
@@ -186,10 +188,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getHeadersName()
     {
+        /** @var \PHPUnit_Extensions_Selenium2TestCase_Element[] $headers */
         $headers = $this->getHeaders();
         $data = array();
-        foreach($headers as $header) {
-            /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $header */
+        foreach ($headers as $header) {
             $data[] = $header->text();
         }
 
