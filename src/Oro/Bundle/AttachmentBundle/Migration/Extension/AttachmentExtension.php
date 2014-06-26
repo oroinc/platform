@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -27,6 +26,14 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
     public function __construct(ExtendOptionsManager $extendOptionsManager)
     {
         $this->extendOptionsManager = $extendOptionsManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
     }
 
     /**
@@ -81,13 +88,5 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
 
         $this->extendOptionsManager->setColumnType($sourceTable, $sourceColumnName, $type);
         $this->extendOptionsManager->setColumnOptions($sourceTable, $sourceColumnName, $relationOptions);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
     }
 }
