@@ -130,7 +130,7 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            this.publishEvent('page:afterChange', options.actionArgs);
+            this.publishEvent('page:afterChange');
         },
 
         /**
@@ -182,6 +182,9 @@ define([
             Chaplin.mediator.setHandler('refreshPage', function () {
                 Chaplin.utils.redirectTo({url: url}, {forceStartup: true, force: true});
                 Chaplin.mediator.trigger('page:refreshed');
+            });
+            Chaplin.mediator.setHandler('afterPageChange', function () {
+                Chaplin.mediator.publishEvent('page:afterChange');
             });
         }
     });

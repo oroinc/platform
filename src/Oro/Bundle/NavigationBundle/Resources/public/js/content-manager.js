@@ -43,7 +43,9 @@ define([
          * }
          */
         current = {
-            tags: [] // collect tags, even if the page is not initialized
+            // collect tags and state, even if the page is not initialized
+            tags: [],
+            state: {}
         },
 
         /**
@@ -71,19 +73,27 @@ define([
      * @param {string} query
      */
     function changeUrl(path, query) {
-        var oldPath, cached;
+        var cached, page, state, tags;
 
-        oldPath = current.path;
         cached = pagesCache[path];
 
+        // take page and state from cache, if they exist
+        page = cached ? cached.page : null;
+        state = cached ? cached.state : {};
+        tags = [];
+
+        // there's no previous page, then collected tags and state belong to current page
+        if (current.path == null) {
+            _.extend(state, current.state);
+            tags = current.tags;
+        }
+
         current = {
-            // there's no previous page, then collected tags belong to current page
-            tags: oldPath != null && current.tags.length ? current.tags : [],
             path: path,
             query: query,
-            // take page and state from cache, if they exist
-            page: cached ? cached.page : null,
-            state: cached ? cached.state : {}
+            page: page,
+            state: state,
+            tags: tags
         };
     }
 

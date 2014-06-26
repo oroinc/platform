@@ -109,12 +109,15 @@ require([
     ], function (mediator, DebugToolbarView) {
         BaseController.addToReuse('debugToolbar', {
             compose: function () {
+                var view;
                 if (!mediator.execute('retrieveOption', 'debug')) {
                     return;
                 }
-                this.view = new DebugToolbarView({
+                view = new DebugToolbarView({
                     el: 'body .sf-toolbar'
                 });
+                mediator.setHandler('updateDebugToolbar', view.updateToolbar, view);
+                this.view = view;
             }
         });
     });
