@@ -1,45 +1,50 @@
 <?php
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 return array(
     ProcessConfigurationProvider::NODE_DEFINITIONS => array(
         'test_definition' => array(
-            'label' => 'Test Definition',
+            'label'   => 'Test Definition',
             'enabled' => true,
-            'entity' => 'Oro\Bundle\UserBundle\Entity\User',
-            'order' => 20,
+            'entity'  => 'Oro\Bundle\UserBundle\Entity\User',
+            'order'   => 20,
             'actions_configuration' => array(
                 array('@assign_value' => array('$entity.field', 'value'))
             )
         ),
         'another_definition' => array(
-            'label' => 'Another definition',
-            'enabled' => true,
-            'entity' => 'My\Entity',
-            'order' => 0,
-            'actions_configuration' => array()
+            'label'                 => 'Another definition',
+            'entity'                => 'My\Entity',
+            'actions_configuration' => array(),
+            'enabled'               => true,
+            'order'                 => 0,
         ),
     ),
     ProcessConfigurationProvider::NODE_TRIGGERS => array(
         'test_definition' => array(
             array(
-                'event' => ProcessTrigger::EVENT_UPDATE,
-                'field' => 'some_field',
-                'queued' => true,
+                'event'      => ProcessTrigger::EVENT_UPDATE,
+                'field'      => 'some_field',
+                'priority'   => 10,
+                'queued'     => true,
                 'time_shift' => 123456,
             ),
             array(
-                'event' => ProcessTrigger::EVENT_CREATE,
-                'field' => null,
-                'queued' => true,
+                'event'      => ProcessTrigger::EVENT_CREATE,
+                'queued'     => true,
                 'time_shift' => 86700,
+                'field'      => null,
+                'priority'   => Job::PRIORITY_DEFAULT,
             ),
             array(
-                'event' => ProcessTrigger::EVENT_DELETE,
-                'field' => null,
-                'queued' => false,
+                'event'      => ProcessTrigger::EVENT_DELETE,
+                'field'      => null,
+                'priority'   => Job::PRIORITY_DEFAULT,
+                'queued'     => null,
                 'time_shift' => null,
             )
         )

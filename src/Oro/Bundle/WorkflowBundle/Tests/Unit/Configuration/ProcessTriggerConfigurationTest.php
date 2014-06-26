@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Symfony\Component\Yaml\Yaml;
+use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
+
+use Symfony\Component\Yaml\Yaml;
 
 class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,37 +47,42 @@ class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_CREATE,
-                    'field' => null,
-                    'queued' => false,
+                    'event'      => ProcessTrigger::EVENT_CREATE,
+                    'field'      => null,
+                    'priority'   => Job::PRIORITY_DEFAULT,
+                    'queued'     => false,
                     'time_shift' => null,
                 ),
             ),
             'integer time shift' => array(
                 'input' => array(
-                    'event' => ProcessTrigger::EVENT_UPDATE,
-                    'field' => 'status',
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_UPDATE,
+                    'field'      => 'status',
+                    'priority'   => Job::PRIORITY_LOW,
+                    'queued'     => true,
                     'time_shift' => 12345
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_UPDATE,
-                    'field' => 'status',
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_UPDATE,
+                    'field'      => 'status',
+                    'priority'   => Job::PRIORITY_LOW,
+                    'queued'     => true,
                     'time_shift' => 12345
                 ),
             ),
             'date interval time shift' => array(
                 'input' => array(
-                    'event' => ProcessTrigger::EVENT_DELETE,
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_DELETE,
+                    'priority'   => Job::PRIORITY_HIGH,
+                    'queued'     => true,
                     'time_shift' => 'P1D'
                 ),
                 'expected' => array(
-                    'event' => ProcessTrigger::EVENT_DELETE,
-                    'queued' => true,
+                    'event'      => ProcessTrigger::EVENT_DELETE,
+                    'priority'   => Job::PRIORITY_HIGH,
+                    'queued'     => true,
                     'time_shift' => 24 * 3600,
-                    'field' => null,
+                    'field'      => null,
                 ),
             ),
         );

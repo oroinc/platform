@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use JMS\JobQueueBundle\Entity\Job;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerConfiguration implements ConfigurationInterface
 {
@@ -36,6 +38,9 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('field')
                     ->defaultNull()
+                ->end()
+                ->integerNode('priority')
+                    ->defaultValue(Job::PRIORITY_DEFAULT)
                 ->end()
                 ->booleanNode('queued')
                     ->defaultFalse()

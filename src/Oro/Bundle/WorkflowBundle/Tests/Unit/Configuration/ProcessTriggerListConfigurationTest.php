@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Symfony\Component\Yaml\Yaml;
+use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerListConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
+
+use Symfony\Component\Yaml\Yaml;
 
 class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,14 +52,15 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                     ),
                     'second_definition' => array(
                         array(
-                            'event' => ProcessTrigger::EVENT_UPDATE,
-                            'field' => 'status',
-                            'queued' => true,
+                            'event'      => ProcessTrigger::EVENT_UPDATE,
+                            'field'      => 'status',
+                            'priority'   => Job::PRIORITY_HIGH,
+                            'queued'     => true,
                             'time_shift' => 12345
                         ),
                         array(
-                            'event' => ProcessTrigger::EVENT_DELETE,
-                            'queued' => true,
+                            'event'      => ProcessTrigger::EVENT_DELETE,
+                            'queued'     => true,
                             'time_shift' => 'P1D'
                         ),
                     ),
@@ -65,24 +68,27 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'first_definition' => array(
                         array(
-                            'event' => ProcessTrigger::EVENT_CREATE,
-                            'field' => null,
-                            'queued' => false,
+                            'event'      => ProcessTrigger::EVENT_CREATE,
+                            'field'      => null,
+                            'priority'   => Job::PRIORITY_DEFAULT,
+                            'queued'     => false,
                             'time_shift' => null,
                         ),
                     ),
                     'second_definition' => array(
                         array(
-                            'event' => ProcessTrigger::EVENT_UPDATE,
-                            'field' => 'status',
-                            'queued' => true,
+                            'event'      => ProcessTrigger::EVENT_UPDATE,
+                            'field'      => 'status',
+                            'priority'   => Job::PRIORITY_HIGH,
+                            'queued'     => true,
                             'time_shift' => 12345
                         ),
                         array(
-                            'event' => ProcessTrigger::EVENT_DELETE,
-                            'queued' => true,
+                            'event'      => ProcessTrigger::EVENT_DELETE,
+                            'queued'     => true,
                             'time_shift' => 24 * 3600,
-                            'field' => null,
+                            'field'      => null,
+                            'priority'   => Job::PRIORITY_DEFAULT,
                         ),
                     ),
                 ),
