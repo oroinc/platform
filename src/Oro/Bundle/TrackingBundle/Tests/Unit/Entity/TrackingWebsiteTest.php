@@ -66,6 +66,7 @@ class TrackingWebsiteTest extends \PHPUnit_Framework_TestCase
         $user = new User();
 
         return [
+            ['name', 'test', 'test'],
             ['identifier', 'uniqid', 'uniqid'],
             ['url', 'http://example.com', 'http://example.com'],
             ['createdAt', $date, $date],

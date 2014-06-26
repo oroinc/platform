@@ -1,12 +1,12 @@
 {% set host = app.request.host %}
-{% if app.request.port is not empty %}
+{% if app.request.port is not empty and app.request.port != '80' %}
     {% set host = host ~ ':' ~ app.request.port %}
 {% endif %}
 <script type="text/javascript">
     var _paq = _paq || [];
-    _paq.push(['setUserId', 'USER_IDENTIFIER']);
+    _paq.push(['setUserId', '{USER_IDENTIFIER}']);
     _paq.push(['setConversionAttributionFirstReferrer', false]);
-    _paq.push(['trackPageView']);
+    _paq.push(['trackEvent', '{category}', '{action}', [name], [value]]);
     (function() {
         var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ host|raw }}/";
         _paq.push(['setTrackerUrl', u+'tracking.php']);

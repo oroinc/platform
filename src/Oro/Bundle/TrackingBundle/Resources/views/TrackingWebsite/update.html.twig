@@ -1,13 +1,13 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% oro_title_set({params : {
-    '%entity.identifier%': entity.identifier,
+    '%entity.name%': entity.name,
     '%entityName%': 'oro.tracking.tracking_website.entity_label'|trans }
 }) %}
 {% set entityId = entity.id %}
 
 {% set formAction = entityId ?
-    path('oro_tracking_website_update', { 'id': entityId}) :
+    path('oro_tracking_website_update', {'id': entityId}) :
     path('oro_tracking_website_create') %}
 
 {% block navButtons %}
@@ -25,7 +25,7 @@
             'entity': entity,
             'indexPath': path('oro_tracking_website_index'),
             'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
-            'entityTitle': entity.identifier
+            'entityTitle': entity.name
         } %}
         {{ parent() }}
     {% else %}
@@ -43,6 +43,7 @@
         'subblocks': [{
             'title': '',
             'data': [
+                form_row(form.name),
                 form_row(form.identifier),
                 form_row(form.url),
                 form_row(form.owner),

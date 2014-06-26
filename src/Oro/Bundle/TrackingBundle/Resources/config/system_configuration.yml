@@ -1,0 +1,69 @@
+oro_system_configuration:
+    groups:
+        tracking:
+            title: 'Tracking'
+            icon:  'icon-screenshot'
+        tracking_settings:
+            title: 'Tracking settings'
+            icon:  'icon-screenshot'
+
+    fields:
+        oro_tracking.dynamic_tracking_enabled:
+            type: oro_config_checkbox
+            priority: 50
+            options:
+                label: 'Enable dynamic tracking'
+                tooltip: oro.tracking.form.tooltip.dynamic_tracking_enabled
+                required: true
+
+        oro_tracking.log_rotate_interval:
+            type: choice
+            priority: 40
+            options:
+                label: 'Log Rotation Interval'
+                tooltip: oro.tracking.form.tooltip.log_rotate_interval
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    60: '1 hour'
+                    30: '30 minutes'
+                    20: '20 minutes'
+                    15: '15 minutes'
+                    10: '10 minutes'
+                    5:  '5 minutes'
+
+        oro_tracking.piwik_host:
+            type: text
+            priority: 20
+            options:
+                label: 'Piwik Host'
+                tooltip: oro.tracking.form.tooltip.piwik_host
+                required: false
+                constraints:
+                    - Url: ~
+
+        oro_tracking.piwik_token_auth:
+            type: text
+            priority: 10
+            options:
+                label: 'Piwik Token Auth'
+                tooltip: oro.tracking.form.tooltip.piwik_token_auth
+                required: false
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            tracking:
+                                priority: 50
+                                children:
+                                    tracking_settings:
+                                        priority: 100
+                                        children:
+                                            - oro_tracking.dynamic_tracking_enabled
+                                            - oro_tracking.log_rotate_interval
+                                            - oro_tracking.piwik_host
+                                            - oro_tracking.piwik_token_auth

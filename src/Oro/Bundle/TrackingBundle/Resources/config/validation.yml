@@ -2,6 +2,10 @@ Oro\Bundle\TrackingBundle\Entity\TrackingWebsite:
     constraints:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: identifier
     properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                max: 255
         identifier:
             - NotBlank: ~
             - Length:

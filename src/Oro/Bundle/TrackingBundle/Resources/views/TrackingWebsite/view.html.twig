@@ -2,7 +2,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
-{% oro_title_set({params : {"%entity.identifier%": entity.identifier|default('N/A') }}) %}
+{% oro_title_set({params : {"%entity.name%": entity.name|default('N/A') }}) %}
 
 {% block navButtons %}
     {% if resource_granted('EDIT', entity) %}
@@ -18,7 +18,7 @@
         'entity': entity,
         'indexPath': path('oro_tracking_website_index'),
         'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
-        'entityTitle': entity.identifier
+        'entityTitle': entity.name
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
@@ -27,6 +27,7 @@
     {%- set generalInformation -%}
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
+            {{ UI.renderProperty('oro.tracking.tracking_website.name.label'|trans, entity.name) }}
             {{ UI.renderProperty('oro.tracking.tracking_website.identifier.label'|trans, entity.identifier) }}
 
             {%- set url -%}
@@ -59,17 +60,10 @@
     {%- set trackingCode -%}
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            <strong>{{ 'oro.tracking.help.script'|trans }}</strong>
+            <p>{{ 'oro.tracking.help.event_tooltip'|trans }}</p>
             <textarea class="code code-script">
                 {%- include 'OroTrackingBundle:TrackingWebsite:script.js.twig' -%}
             </textarea>
-        </div>
-        <div class="responsive-block">
-            <strong>{{ 'oro.tracking.help.event'|trans }}</strong>
-            <textarea class="code code-event">
-                {%- include 'OroTrackingBundle:TrackingWebsite:event.js.twig' -%}
-            </textarea>
-            <p>{{ 'oro.tracking.help.event_tooltip'|trans }}</p>
         </div>
     </div>
     {%- endset -%}

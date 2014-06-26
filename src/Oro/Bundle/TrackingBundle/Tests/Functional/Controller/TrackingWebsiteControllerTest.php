@@ -7,7 +7,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class TrackingWebsiteControllerTest extends WebTestCase
 {
@@ -23,6 +22,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
             $this->getUrl('oro_tracking_website_create')
         );
         $form                                     = $crawler->selectButton('Save and Close')->form();
+        $form['oro_tracking_website[name]']       = 'name';
         $form['oro_tracking_website[identifier]'] = 'unique';
         $form['oro_tracking_website[url]']        = 'http://example.com';
         $form['oro_tracking_website[owner]']      = '1';
@@ -54,6 +54,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
         );
 
         $form                                     = $crawler->selectButton('Save and Close')->form();
+        $form['oro_tracking_website[name]']       = 'nameUP';
         $form['oro_tracking_website[identifier]'] = 'unique2';
         $form['oro_tracking_website[url]']        = 'http://example.org';
 

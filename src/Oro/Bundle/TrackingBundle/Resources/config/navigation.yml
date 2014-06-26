@@ -1,5 +1,5 @@
 oro_titles:
     oro_tracking_website_index: ~
-    oro_tracking_website_view: '%%entity.identifier%%'
+    oro_tracking_website_view: '%%entity.name%%'
     oro_tracking_website_create: oro.ui.create_entity
-    oro_tracking_website_update: '%%entity.identifier%% - Edit'
+    oro_tracking_website_update: '%%entity.name%% - Edit'
