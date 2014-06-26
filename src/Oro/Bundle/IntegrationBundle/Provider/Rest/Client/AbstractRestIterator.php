@@ -60,7 +60,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function current()
     {
@@ -68,7 +68,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function next()
     {
@@ -83,7 +83,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function key()
     {
@@ -91,7 +91,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function valid()
     {
@@ -103,7 +103,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function rewind()
     {
@@ -118,7 +118,7 @@ abstract class AbstractRestIterator implements \Iterator
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -136,14 +136,17 @@ abstract class AbstractRestIterator implements \Iterator
      */
     protected function loadNextPage()
     {
-        $this->firstLoaded = true;
         $this->rows = array();
         $this->offset = null;
 
         $pageData = $this->loadPage($this->client);
+        $this->firstLoaded = true;
         if ($pageData) {
             $this->rows = $this->getRowsFromPageData($pageData);
-            $this->totalCount = $this->getTotalCountFromPageData($pageData);
+            $this->totalCount = $this->getTotalCountFromPageData($pageData, $this->totalCount);
+            if (null == $this->totalCount && is_array($this->rows)) {
+                $this->totalCount = count($this->rows);
+            }
             $this->offset = 0;
         }
 
@@ -170,7 +173,8 @@ abstract class AbstractRestIterator implements \Iterator
      * Get total count from page data
      *
      * @param array $data
+     * @param integer $previousValue
      * @return array|null
      */
-    abstract protected function getTotalCountFromPageData(array $data);
+    abstract protected function getTotalCountFromPageData(array $data, $previousValue);
 }
