@@ -30,11 +30,11 @@
             {{ UI.renderProperty('oro.tracking.tracking_website.identifier.label'|trans, entity.identifier) }}
 
             {%- set url -%}
-            <a href="{{ entity.url }}">
+            <a target="_blank" href="{{ entity.url }}">
                 {{ entity.url }}
             </a>
             {%- endset -%}
-            {{ UI.renderProperty('oro.tracking.tracking_website.url.label'|trans, url) }}
+            {{ UI.renderHtmlProperty('oro.tracking.tracking_website.url.label'|trans, url) }}
 
             {%- set ownerData -%}
             {%- if entity.owner -%}
@@ -48,9 +48,13 @@
             {%- endif -%}
             {%- endset -%}
             {{ UI.renderHtmlProperty('oro.tracking.tracking_website.owner.label'|trans, ownerData) }}
+
+            {{ entityConfig.renderDynamicFields(entity) }}
         </div>
         <div class="responsive-block">
-            {{ entityConfig.renderDynamicFields(entity) }}
+            <textarea class="code">
+                {%- include 'OroTrackingBundle:TrackingWebsite:script.js.twig' -%}
+            </textarea>
         </div>
     </div>
     {%- endset -%}
