@@ -6,8 +6,8 @@
 {% block navButtons %}
     {% if resource_granted('oro_tracking_website_create') %}
         {{ UI.addButton({
-        'path': path('oro_tracking_website_create'),
-        'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
+            'path': path('oro_tracking_website_create'),
+            'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock %}

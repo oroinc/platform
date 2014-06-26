@@ -7,18 +7,18 @@
 {% block navButtons %}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
-        'path' : path('oro_tracking_website_update', { id: entity.id }),
-        'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
+            'path' : path('oro_tracking_website_update', { id: entity.id }),
+            'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-    'entity': entity,
-    'indexPath': path('oro_tracking_website_index'),
-    'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
-    'entityTitle': entity.identifier
+        'entity': entity,
+        'indexPath': path('oro_tracking_website_index'),
+        'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
+        'entityTitle': entity.identifier
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
@@ -55,15 +55,13 @@
     </div>
     {%- endset -%}
 
-    {% set dataBlocks = [
-    {
-    'title': 'oro.tracking.block.general'|trans,
-    'class': 'active',
-    'subblocks': [
-    {'data' : [generalInformation]}
-    ]
-    }
-    ] %}
+    {% set dataBlocks = [{
+        'title': 'oro.tracking.block.general'|trans,
+        'class': 'active',
+        'subblocks': [
+            {'data' : [generalInformation]}
+        ]
+    }] %}
 
     {% set id = 'websiteView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}

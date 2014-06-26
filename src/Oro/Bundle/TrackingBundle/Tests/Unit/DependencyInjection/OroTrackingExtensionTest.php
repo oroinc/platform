@@ -10,12 +10,12 @@ class OroBundleTrackingExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var OroTrackingExtension
      */
-    private $extension;
+    protected $extension;
 
     /**
      * @var ContainerBuilder
      */
-    private $container;
+    protected $container;
 
     protected function setUp()
     {

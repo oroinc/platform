@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TrackingBundle\Controller;
 
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -29,7 +29,6 @@ class TrackingWebsiteController extends Controller
      *      requirements={"_format"="html|json"},
      *      defaults={"_format" = "html"}
      * )
-     *
      * @Acl(
      *      id="oro_tracking_website_view",
      *      type="entity",
@@ -66,7 +65,6 @@ class TrackingWebsiteController extends Controller
      *      class="OroTrackingBundle:TrackingWebsite",
      *      permission="EDIT"
      * )
-     *
      * @Template()
      */
     public function updateAction(TrackingWebsite $trackingWebsite)
@@ -88,7 +86,7 @@ class TrackingWebsiteController extends Controller
 
     /**
      * @param TrackingWebsite $trackingWebsite
-     * @return null
+     * @return array|RedirectResponse
      */
     public function update(TrackingWebsite $trackingWebsite)
     {

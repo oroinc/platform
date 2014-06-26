@@ -10,13 +10,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 
-
 class LoadTrackingWebsiteData extends AbstractFixture implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
     /**
      * @param ContainerInterface $container
