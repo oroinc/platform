@@ -161,7 +161,7 @@ class PdoMysql extends BaseDriver
             $qb->select(
                 array(
                     'search as item',
-                    'text',
+                    'textField',
                     "MATCH_AGAINST(textField.value, :$rawValueParameter) AS rankField"
                 )
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
