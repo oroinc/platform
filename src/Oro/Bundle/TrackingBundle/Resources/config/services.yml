@@ -29,7 +29,6 @@ services:
             - %oro_tracking.tracking_website.class%
             - @doctrine.orm.entity_manager
 
-<<<<<<< HEAD
     oro_tracking.importexport.reader.log:
         class: %oro_tracking.importexport.reader.log.class%
         arguments:
@@ -58,7 +57,7 @@ services:
             - [setStrategy, [@oro_tracking.importexport.strategy.data]]
         tags:
             - { name: oro_importexport.processor, type: import, entity: %oro_tracking.tracking_data.class%, alias: oro_tracking.processor.data }
-=======
+
     oro_tracking.config.listener:
         class: %oro_tracking.config.listener%
         arguments:
@@ -67,4 +66,3 @@ services:
             - %kernel.logs_dir%
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
->>>>>>> 958a80f5fe91bf3db3858e3a3adb50bfb67bb71e
