@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
@@ -27,7 +29,9 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
                 'empty_value'       => false,
                 'choices'           => $choices,
                 'multiple'          => true,
-                'association_class' => null // the group name for owning side entities
+                'expanded'          => true,
+                'association_class' => null, // the group name for owning side entities
+                'disabled_items'    => [],
             ]
         );
     }
@@ -40,14 +44,42 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     {
         $this->ensureOwningSideEntitiesLoaded($groupName);
 
-        $result = [];
-
+        $choices = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
         foreach ($this->owningSideEntities as $className) {
-            $result[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
+            $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
         }
 
-        return $result;
+        return $choices;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $disabledActivities = $options['disabled_items'];
+
+        /** @var EntityConfigId $configId */
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
+
+        // disable some choices for immutable entities
+        $configProvider = $this->configManager->getProvider($configId->getScope());
+
+        if ($configProvider->hasConfig($className)) {
+            $immutable = $configProvider->getConfig($className)->get('immutable');
+            if (is_array($immutable)) {
+                $disabledActivities = array_merge($disabledActivities, $immutable);
+            }
+        }
+
+        /** @var FormView $activityView */
+        foreach ($view->children as $activityView) {
+            if (in_array($activityView->vars['value'], $disabledActivities)) {
+                $activityView->vars['disabled'] = true;
+            }
+        }
     }
 
     /**
