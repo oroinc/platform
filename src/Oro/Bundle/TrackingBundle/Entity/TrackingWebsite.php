@@ -90,7 +90,7 @@ class TrackingWebsite
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime();
     }
 
     /**
@@ -98,7 +98,7 @@ class TrackingWebsite
      */
     public function preUpdate()
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime();
     }
 
     /**
