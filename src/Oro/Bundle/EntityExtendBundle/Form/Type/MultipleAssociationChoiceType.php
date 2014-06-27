@@ -31,7 +31,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
                 'multiple'          => true,
                 'expanded'          => true,
                 'association_class' => null, // the group name for owning side entities
-                'disabled_items'    => [],
             ]
         );
     }
@@ -58,26 +57,35 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $disabledActivities = $options['disabled_items'];
+        $this->disableImmutableChoiceItems($view, $options);
+    }
 
+    /**
+     * Disable some choices for immutable entities
+     *
+     * @param FormView $view
+     * @param array    $options
+     */
+    protected function disableImmutableChoiceItems(FormView $view, array $options)
+    {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
-        // disable some choices for immutable entities
-        $configProvider = $this->configManager->getProvider($configId->getScope());
+        $configProvider  = $this->configManager->getProvider($configId->getScope());
+        $disabledChoices = [];
 
         if ($configProvider->hasConfig($className)) {
             $immutable = $configProvider->getConfig($className)->get('immutable');
-            if (is_array($immutable)) {
-                $disabledActivities = array_merge($disabledActivities, $immutable);
+            if (is_array($immutable) && !empty($immutable)) {
+                $disabledChoices = $immutable;
             }
         }
 
         /** @var FormView $activityView */
-        foreach ($view->children as $activityView) {
-            if (in_array($activityView->vars['value'], $disabledActivities)) {
-                $activityView->vars['disabled'] = true;
+        foreach ($view->children as $choiceView) {
+            if (in_array($choiceView->vars['value'], $disabledChoices)) {
+                $choiceView->vars['disabled'] = true;
             }
         }
     }

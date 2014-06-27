@@ -83,7 +83,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
                     'Test\Entity4' => 'Entity4',
                 ],
                 'multiple'          => true,
-                'association_class' => 'test'
+                'association_class' => 'test',
+                'expanded'          => true,
             ],
             $resolver->resolve(['association_class' => 'test'])
         );
@@ -268,6 +269,77 @@ class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
             $this->getDisabledFormView(),
             $view->vars
         );
+    }
+
+    public function finishViewDataProvider()
+    {
+        $expectedCorrect = $expected = [
+            ['value' => 'Entity\Something', 'attr' => []],
+            ['value' => 'Test\Entity', 'attr' => []],
+        ];
+
+        $expectedCorrect[1]['disabled'] = true;
+
+        return [
+            'has no config in provider'  => [false, false, $expected],
+            'has config, immutable null' => [true, null, $expected],
+            'has config, immutable true' => [true, true, $expected],
+            'has config, immutable array' => [
+                true,
+                ['Test\Entity'],
+                $expectedCorrect
+            ],
+            'has config, immutable array with unknown entity' => [
+                true,
+                ['Some\NotKnown\Entity', 'Another\Entity'],
+                $expected
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider     finishViewDataProvider
+     *
+     * @param bool|null  $hasConfig
+     * @param array|bool $immutable
+     * @param array      $expected
+     */
+    public function testFinishView($hasConfig, $immutable, array $expected)
+    {
+        $this->prepareBuildViewTest();
+
+        $this->testConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue($hasConfig));
+
+        $view    = new FormView();
+        $view->children[0] = new FormView($view);
+        $view->children[0]->vars['value'] = 'Entity\Something';
+        $view->children[1] = new FormView($view);
+        $view->children[1]->vars['value'] = 'Test\Entity';
+
+        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $options = [
+            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+            'association_class' => 'test'
+        ];
+
+        if ($hasConfig) {
+            $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
+            $testConfig->set('immutable', $immutable);
+
+            $this->testConfigProvider->expects($this->once())
+                ->method('getConfig')
+                ->with('Test\Entity')
+                ->will($this->returnValue($testConfig));
+        }
+
+        $this->type->finishView($view, $form, $options);
+
+        foreach ($view->children as $i => $child) {
+            $this->assertEquals($expected[$i], $child->vars);
+        }
     }
 
     public function testGetName()
