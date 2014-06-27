@@ -198,7 +198,7 @@ Create Entity
  - class - fully qualified class name of created entity;
  - attribute - attribute that will contain entity instance;
  - flush - when flush in DB should be performed.
-           Immediately after entity creation if ``true`` or later if ``false`` (default value: true);
+           Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
  - data - array of data that should be set to entity.
 
 **Configuration Example**
@@ -220,7 +220,7 @@ OR
 - @create_entity:
     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
     attribute: $conversation
-    flush: false # entity will not be flushed to DB after creation
+    flush: true # entity will be flushed to DB immediately after creation
     data:
         result: $conversation_result
         comment: $conversation_comment

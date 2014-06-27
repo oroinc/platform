@@ -65,6 +65,6 @@ class CreateEntity extends CreateObject
      */
     protected function doFlush()
     {
-        return $this->getOption($this->options, self::OPTION_KEY_FLUSH, true);
+        return $this->getOption($this->options, self::OPTION_KEY_FLUSH, false);
     }
 }

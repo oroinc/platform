@@ -56,7 +56,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
 
-        if (!isset($options[CreateEntity::OPTION_KEY_FLUSH]) || $options[CreateEntity::OPTION_KEY_FLUSH]) {
+        if (!empty($options[CreateEntity::OPTION_KEY_FLUSH])) {
             $em->expects($this->once())
                 ->method('flush')
                 ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
