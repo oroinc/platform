@@ -5,6 +5,7 @@ User interface layouts and controls.
 
 ## Table of Contents
 
+- [TWIG Filters](./Resources/doc/reference/twig_filters.md)
 - [Form Components](./Resources/doc/reference/form_components.md)
 - [JavaScript Tools and Libraries](./Resources/doc/reference/js_tools_and_libraries.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
