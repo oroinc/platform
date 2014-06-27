@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-
 /**
  * @ORM\Table(name="oro_tracking_data")
  * @ORM\Entity()
@@ -43,6 +42,13 @@ class TrackingData
      *
      * @ORM\OneToOne(targetEntity="TrackingEvent", cascade={"persist"})
      * @ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ConfigField(
+     *  defaultValues={
+     *      "importexport"={
+     *          "full"=true
+     *      }
+     *  }
+     * )
      */
     protected $event;
 
