@@ -5,6 +5,8 @@ by combining the tools they need. Built in PHP5 and the Symfony2 framework, it s
 into [OroCRM](http://www.orocrm.com/) or works entirely standalone.
 Developing custom business applications has never been so easy.
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/orocrm/platform/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/orocrm/platform/?branch=master)
+
 ## Installation
 
 Platform is a package that requires an application to run it.
@@ -22,4 +24,4 @@ In order to define dependency on platform in your project just add this to compo
 ```
 ## Documentation
   
-The documentation for the Oro Plataform can be found [here](https://github.com/orocrm/documentation).
+The documentation for the Oro Platform can be found [here](https://github.com/orocrm/documentation).
