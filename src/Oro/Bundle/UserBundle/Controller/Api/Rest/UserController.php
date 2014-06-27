@@ -306,6 +306,7 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['statuses']);
         unset($result['api']);
 
+        //todo: Add user avatar to api
         /*$result['imagePath'] = null;
         if (isset($result['image'])) {
             $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
