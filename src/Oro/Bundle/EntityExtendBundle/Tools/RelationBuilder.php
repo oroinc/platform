@@ -35,6 +35,16 @@ class RelationBuilder
     public function addFieldConfig($className, $fieldName, $fieldType, $values)
     {
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
+        $this->updateFieldConfigs($className, $fieldName, $values);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param array  $values
+     */
+    public function updateFieldConfigs($className, $fieldName, $values)
+    {
         foreach ($values as $scope => $scopeValues) {
             $configProvider = $this->configManager->getProvider($scope);
             $fieldConfig    = $configProvider->getConfig($className, $fieldName);

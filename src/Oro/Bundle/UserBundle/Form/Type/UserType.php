@@ -149,7 +149,8 @@ class UserType extends AbstractType
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
-            ->add('change_password', 'oro_change_password');
+            ->add('change_password', 'oro_change_password')
+            ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
     }
@@ -205,38 +206,7 @@ class UserType extends AbstractType
             ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
-            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add(
-                'imageFile',
-                'file',
-                [
-                    'label' => 'oro.user.image.label',
-                    'required' => false,
-                    'tooltip' => 'oro.user.image.tooltip',
-                    'tooltip_parameters' => ['%file_size%' => $this->comparePhpIniSizes()]
-                ]
-            );
-    }
-
-    /**
-     * Compare upload_max_filesize and post_max_size ini settings and return the lesser
-     *
-     * @return int
-     */
-    protected function comparePhpIniSizes()
-    {
-        $uploadMaxFilesize = ini_get('upload_max_filesize');
-        $postMaxSize = ini_get('post_max_size');
-
-        if ($uploadMaxFilesize <= 0) {
-            return $postMaxSize;
-        }
-
-        if ($postMaxSize <= 0) {
-            return $uploadMaxFilesize;
-        }
-
-        return $this->getBytes($uploadMaxFilesize) <= $this->getBytes($postMaxSize) ? $uploadMaxFilesize : $postMaxSize;
+            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false]);
     }
 
     /**
