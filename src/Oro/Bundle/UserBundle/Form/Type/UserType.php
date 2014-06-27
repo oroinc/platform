@@ -154,8 +154,8 @@ class UserType extends AbstractType
                 'avatar',
                 'oro_image',
                 array(
-                    'label'          => 'oro.user.avatar.label',
-                    'required'       => false
+                    'label'    => 'oro.user.avatar.label',
+                    'required' => false
                 )
             );
 
