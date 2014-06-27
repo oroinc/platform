@@ -131,7 +131,7 @@ oro:
         entity_plural_label:         Users
         first_name.label:            First name
         id.label:                    Id
-        image.label:                 Avatar
+        avatar.label:                Avatar
         imap_configuration.label:    Email synchronization settings
         last_login.label:            Last logged in
         last_name.label:             Last name

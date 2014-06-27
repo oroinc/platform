@@ -247,7 +247,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostFlushQueuedProcessJob()
     {
-        $triggers = $this->getTriggers();
+        $expectedJobId       = 12;
+        $expectedJobPriority = 10;
+
+        $triggers = $this->getTriggers($expectedJobPriority);
         $this->prepareRegistry($triggers);
         $entityManager = $this->getEntityManager();
 
@@ -260,7 +263,6 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
         $expectedTrigger = $triggers['updateEntity'];
         $expectedData = $this->createProcessData(array('data' => $entity));
-        $expectedJobId = 12;
 
         $entityManager->expects($this->at(0))->method('persist')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
@@ -281,9 +283,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
             ->will(
                 $this->returnCallback(
-                    function (Job $jmsJob) use ($expectedJobId) {
+                    function (Job $jmsJob) use ($expectedJobId, $expectedJobPriority) {
                         $this->assertEquals(ExecuteProcessJobCommand::NAME, $jmsJob->getCommand());
                         $this->assertEquals(array('--id=' . $expectedJobId), $jmsJob->getArgs());
+                        $this->assertEquals($expectedJobPriority, $jmsJob->getPriority());
                         $this->assertNotNull($jmsJob->getExecuteAfter());
                         $this->assertGreaterThan(new \DateTime(), $jmsJob->getExecuteAfter());
                     }
@@ -379,30 +382,35 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param int $triggerPriority
      * @return ProcessTrigger[]
      */
-    protected function getTriggers()
+    protected function getTriggers($triggerPriority = 0)
     {
         $definition = new ProcessDefinition();
         $definition->setName('test')->setRelatedEntity(self::ENTITY);
 
         $createTrigger = new ProcessTrigger();
         $createTrigger->setDefinition($definition)
-            ->setEvent(ProcessTrigger::EVENT_CREATE);
+            ->setEvent(ProcessTrigger::EVENT_CREATE)
+            ->setPriority($triggerPriority);
 
         $updateEntityTrigger = new ProcessTrigger();
         $updateEntityTrigger->setDefinition($definition)
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
             ->setQueued(true)
+            ->setPriority($triggerPriority)
             ->setTimeShift(60);
 
         $updateFieldTrigger = new ProcessTrigger();
         $updateFieldTrigger->setDefinition($definition)
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
+            ->setPriority($triggerPriority)
             ->setField(self::FIELD);
 
         $deleteTrigger = new ProcessTrigger();
         $deleteTrigger->setDefinition($definition)
+            ->setPriority($triggerPriority)
             ->setEvent(ProcessTrigger::EVENT_DELETE);
 
         return array(

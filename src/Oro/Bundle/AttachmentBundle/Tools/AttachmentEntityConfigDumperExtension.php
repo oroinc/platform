@@ -6,15 +6,14 @@ use Doctrine\Common\Inflector\Inflector;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
-use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
@@ -78,45 +77,24 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
                     );
 
                     if (!isset($entityExtendConfig->get('relation')[$relationKey])) {
-                        $relationName = Inflector::tableize($attachmentFieldName);
-                        $label        = ConfigHelper::getTranslationKey(
-                            'entity',
-                            'label',
-                            $entityClassName,
-                            $attachmentFieldName
-                        );
-
-                        // create field
-                        $this->relationBuilder->addFieldConfig(
-                            $entityClassName,
-                            $relationName,
-                            'manyToOne',
-                            [
-                                'extend'       => [
-                                    'owner'         => ExtendScope::OWNER_CUSTOM,
-                                    'state'         => ExtendScope::STATE_ACTIVE,
-                                    'is_extend'     => true,
-                                    'target_entity' => AttachmentScope::ATTACHMENT_ENTITY,
-                                    'target_field'  => 'id',
-                                    'relation_key'  => $relationKey,
-                                ],
-                                'entity'       => [
-                                    'label'       => $label,
-                                    'description' => '',
-                                ],
-                                'importexport' => [
-                                    'process_as_scalar' => true
-                                ]
-                            ]
-                        );
-
                         // add relation to owning entity
+                        $relationName = Inflector::tableize($attachmentFieldName);
                         $this->relationBuilder->addManyToOneRelation(
                             AttachmentScope::ATTACHMENT_ENTITY,
                             $entityClassName,
                             $relationName,
                             $relationKey,
                             ['assign' => true]
+                        );
+
+                        $this->relationBuilder->updateFieldConfig(
+                            $entityClassName,
+                            $relationName,
+                            [
+                                'importexport' => [
+                                    'process_as_scalar' => true
+                                ]
+                            ]
                         );
                     }
                 }
@@ -146,6 +124,7 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
 
         $configManager        = $this->relationBuilder->getConfigManager();
         $extendConfigProvider = $configManager->getProvider('extend');
+
         $extendConfigProvider->persist($entityExtendConfig);
         $configManager->calculateConfigChangeSet($entityExtendConfig);
     }
