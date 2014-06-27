@@ -69,14 +69,14 @@ class DataBlockRendererTest extends \PHPUnit_Framework_TestCase
             'class'       => null,
             'subblocks'   => array(
                 0 => array(
-                    'code'        => 'first',
+                    'code'        => 'text_4__subblock',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,
                     'useSpan'     => true
                 ),
                 1 => array(
-                    'code'        => 'text_4__subblock',
+                    'code'        => 'first',
                     'title'       => null,
                     'data'        => array(null),
                     'description' => null,

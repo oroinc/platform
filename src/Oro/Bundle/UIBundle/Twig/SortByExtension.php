@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class SortByExtension extends \Twig_Extension
 {
@@ -27,88 +27,39 @@ class SortByExtension extends \Twig_Extension
     /**
      * Sorts an array by specified property.
      *
-     * Supported options:
-     *  reverse  [boolean]   Indicates whether the sorting should be performed in reverse order
-     *  default  [mixed]     The default property value if it is NULL
-     *  type     [string]    The comparison type. It can be used to select proper comparison method
-     *  case     [boolean]   Indicates whether case-insensitive string comparison should be used or not
+     * This method uses the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability
      *
-     * @param array  $array        The array to be sorted
-     * @param string $propertyPath The path of the property by which the array should be sorted
-     * @param array  $options      The sorting options
+     * Supported options:
+     *  property     [string]  The path of the property by which the array should be sorted
+     *  reverse      [boolean] Indicates whether the sorting should be performed in reverse order
+     *  sorting-type [string]  Can be: number, string or string-case (for case-insensitive sorting). Defaults to number
+     *
+     * @param array $array   The array to be sorted
+     * @param array $options The sorting options
      *
      * @return array The sorted array
      */
-    public function sortBy(array $array, $propertyPath, array $options = [])
+    public function sortBy(array $array, array $options = [])
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $comparisonType   = $this->getOption($options, 'type', 'number');
-        $compareMethodName = $comparisonType . 'Compare';
-        uasort(
-            $array,
-            function ($a, $b) use ($propertyAccessor, $propertyPath, $options, $compareMethodName) {
-                $aVal = $propertyAccessor->getValue($a, $propertyPath);
-                $bVal = $propertyAccessor->getValue($b, $propertyPath);
-
-                return $this->{$compareMethodName}($aVal, $bVal, $options);
+        $sortingType = self::getOption($options, 'sorting-type', 'number');
+        if ($sortingType === 'number') {
+            $sortingFlags = SORT_NUMERIC;
+        } else {
+            $sortingFlags = SORT_STRING;
+            if ($sortingType === 'string-case') {
+                $sortingFlags |= SORT_FLAG_CASE;
             }
+
+        }
+
+        ArrayUtils::sortBy(
+            $array,
+            self::getOption($options, 'reverse', false),
+            self::getOption($options, 'property', 'priority'),
+            $sortingFlags
         );
 
         return $array;
-    }
-
-    /**
-     * @param mixed $aVal
-     * @param mixed $bVal
-     * @param array $options
-     * @return bool
-     */
-    protected function numberCompare($aVal, $bVal, $options)
-    {
-        $default = isset($options['default']) ? $options['default'] : 0;
-        if (null === $aVal) {
-            $aVal = $default;
-        }
-        if (null === $bVal) {
-            $bVal = $default;
-        }
-
-        return $this->getOption($options, 'reverse', false)
-            ? $aVal < $bVal
-            : $aVal > $bVal;
-    }
-
-    /**
-     * @param string|null $aVal
-     * @param string|null $bVal
-     * @param array       $options
-     *
-     * @return int
-     */
-    protected function stringCompare($aVal, $bVal, $options)
-    {
-        $default = isset($options['default']) ? $options['default'] : '';
-        if (null === $aVal) {
-            $aVal = $default;
-        }
-        if (null === $bVal) {
-            $bVal = $default;
-        }
-
-        if ($aVal === $bVal) {
-            return 0;
-        }
-
-        if ($this->getOption($options, 'case', false)) {
-            $result = strcasecmp($aVal, $bVal);
-        } else {
-            $result = strcmp($aVal, $bVal);
-        }
-        if ($this->getOption($options, 'reverse', false)) {
-            $result = 0 - $result;
-        }
-
-        return $result;
     }
 
     /**
@@ -118,8 +69,10 @@ class SortByExtension extends \Twig_Extension
      *
      * @return mixed
      */
-    protected function getOption($options, $name, $defaultValue = null)
+    protected static function getOption($options, $name, $defaultValue = null)
     {
-        return isset($options[$name]) ? $options[$name] : $defaultValue;
+        return isset($options[$name])
+            ? $options[$name]
+            : $defaultValue;
     }
 }
