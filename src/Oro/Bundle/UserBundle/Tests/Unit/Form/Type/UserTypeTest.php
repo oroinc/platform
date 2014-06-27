@@ -128,6 +128,10 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($builder));
         $builder->expects($this->at(++$order))
             ->method('add')
+            ->with('avatar', 'oro_image')
+            ->will($this->returnValue($builder));
+        $builder->expects($this->at(++$order))
+            ->method('add')
             ->with('inviteUser', 'checkbox')
             ->will($this->returnValue($builder));
 
