@@ -3,10 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tools;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Bundle\UIBundle\PropertyAccess\SimpleReadPropertyAccessor;
 
 class ArrayUtils
 {
@@ -87,18 +84,28 @@ class ArrayUtils
      * @param bool                         $caseInsensitive
      *
      * @return array|null
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private static function prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive)
     {
-        $propertyAccessor = self::createPropertyAccessor($propertyPath);
-        $defaultValue     = $stringComparison ? '' : 0;
-        $needSorting      = $reverse;
+        $propertyAccessor     = PropertyAccess::createPropertyAccessor();
+        $isSimplePropertyPath = is_string($propertyPath) && !preg_match('/.\[/', $propertyPath);
+        $defaultValue         = $stringComparison ? '' : 0;
+        $needSorting          = $reverse;
 
         $result  = [];
         $lastVal = null;
         $index   = 0;
         foreach ($array as $key => $value) {
-            $val = $propertyAccessor->getValue($value, $propertyPath);
+            if (is_array($value) && $isSimplePropertyPath) {
+                // get array property directly to speed up
+                $val = isset($value[$propertyPath]) || array_key_exists($propertyPath, $value)
+                    ? $value[$propertyPath]
+                    : null;
+            } else {
+                $val = $propertyAccessor->getValue($value, $propertyPath);
+            }
             if (null === $val) {
                 $val = $defaultValue;
             } elseif ($caseInsensitive) {
@@ -146,19 +153,5 @@ class ArrayUtils
         );
 
         return array_keys($sortable);
-    }
-
-    /**
-     * @param string|PropertyPathInterface $propertyPath
-     *
-     * @return PropertyAccessorInterface
-     */
-    private static function createPropertyAccessor($propertyPath)
-    {
-        if (is_string($propertyPath) && !preg_match('/.\[/', $propertyPath)) {
-            return new SimpleReadPropertyAccessor();
-        }
-
-        return PropertyAccess::createPropertyAccessor();
     }
 }

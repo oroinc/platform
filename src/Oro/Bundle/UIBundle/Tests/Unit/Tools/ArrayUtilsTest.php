@@ -52,6 +52,44 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSortByArraySameOrder()
+    {
+        $array = [
+            ['name' => '1', 'priority' => 100],
+            ['name' => '2', 'priority' => 100],
+            ['name' => '3', 'priority' => 100],
+        ];
+
+        ArrayUtils::sortBy($array);
+        $this->assertSame(
+            [
+                ['name' => '1', 'priority' => 100],
+                ['name' => '2', 'priority' => 100],
+                ['name' => '3', 'priority' => 100],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByArraySameOrderReverse()
+    {
+        $array = [
+            ['name' => '1', 'priority' => 100],
+            ['name' => '2', 'priority' => 100],
+            ['name' => '3', 'priority' => 100],
+        ];
+
+        ArrayUtils::sortBy($array, true);
+        $this->assertSame(
+            [
+                ['name' => '1', 'priority' => 100],
+                ['name' => '2', 'priority' => 100],
+                ['name' => '3', 'priority' => 100],
+            ],
+            $array
+        );
+    }
+
     public function testSortByArrayNumeric()
     {
         $array = [
@@ -174,5 +212,164 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ],
             $array
         );
+    }
+
+    public function testSortByArrayString()
+    {
+        $array = [
+            ['name' => 'a'],
+            ['name' => 'c'],
+            ['name' => 'b'],
+        ];
+
+        ArrayUtils::sortBy($array, false, 'name', SORT_STRING);
+        $this->assertSame(
+            [
+                ['name' => 'a'],
+                ['name' => 'b'],
+                ['name' => 'c'],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByArrayStringReverse()
+    {
+        $array = [
+            ['name' => 'a'],
+            ['name' => 'c'],
+            ['name' => 'b'],
+        ];
+
+        ArrayUtils::sortBy($array, true, 'name', SORT_STRING);
+        $this->assertSame(
+            [
+                ['name' => 'c'],
+                ['name' => 'b'],
+                ['name' => 'a'],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByArrayStringCaseInsensitive()
+    {
+        $array = [
+            ['name' => 'a'],
+            ['name' => 'C'],
+            ['name' => 'B'],
+        ];
+
+        ArrayUtils::sortBy($array, false, 'name', SORT_STRING | SORT_FLAG_CASE);
+        $this->assertSame(
+            [
+                ['name' => 'a'],
+                ['name' => 'B'],
+                ['name' => 'C'],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByArrayStringCaseInsensitiveReverse()
+    {
+        $array = [
+            ['name' => 'a'],
+            ['name' => 'C'],
+            ['name' => 'B'],
+        ];
+
+        ArrayUtils::sortBy($array, true, 'name', SORT_STRING | SORT_FLAG_CASE);
+        $this->assertSame(
+            [
+                ['name' => 'C'],
+                ['name' => 'B'],
+                ['name' => 'a'],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByArrayPath()
+    {
+        $array = [
+            ['name' => '1', 'child' => ['priority' => 1]],
+            ['name' => '2', 'child' => ['priority' => 3]],
+            ['name' => '3', 'child' => ['priority' => 2]],
+        ];
+
+        ArrayUtils::sortBy($array, false, '[child][priority]');
+        $this->assertSame(
+            [
+                ['name' => '1', 'child' => ['priority' => 1]],
+                ['name' => '3', 'child' => ['priority' => 2]],
+                ['name' => '2', 'child' => ['priority' => 3]],
+            ],
+            $array
+        );
+    }
+
+    public function testSortByObject()
+    {
+        $obj1 = $this->createObject(['name' => '1', 'priority' => null]);
+        $obj2 = $this->createObject(['name' => '2', 'priority' => 100]);
+        $obj3 = $this->createObject(['name' => '3', 'priority' => 0]);
+        $array = [
+            $obj1,
+            $obj2,
+            $obj3,
+        ];
+
+        ArrayUtils::sortBy($array);
+        $this->assertSame(
+            [
+                $obj1,
+                $obj3,
+                $obj2,
+            ],
+            $array
+        );
+    }
+
+    public function testSortByObjectPath()
+    {
+        $obj1 = $this->createObject(
+            ['name' => '1', 'child' => $this->createObject(['priority' => null])]
+        );
+        $obj2 = $this->createObject(
+            ['name' => '2', 'child' => $this->createObject(['priority' => 100])]
+        );
+        $obj3 = $this->createObject(
+            ['name' => '3', 'child' => $this->createObject(['priority' => 0])]
+        );
+        $array = [
+            $obj1,
+            $obj2,
+            $obj3,
+        ];
+
+        ArrayUtils::sortBy($array, false, 'child.priority');
+        $this->assertSame(
+            [
+                $obj1,
+                $obj3,
+                $obj2,
+            ],
+            $array
+        );
+    }
+
+    /**
+     * @param array $properties
+     * @return object
+     */
+    protected function createObject($properties)
+    {
+        $obj = new \stdClass();
+        foreach ($properties as $name => $val) {
+            $obj->$name = $val;
+        }
+
+        return $obj;
     }
 }
