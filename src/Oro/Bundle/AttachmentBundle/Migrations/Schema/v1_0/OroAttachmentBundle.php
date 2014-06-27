@@ -16,7 +16,6 @@ class OroAttachmentBundle implements Migration
     {
         $table = $schema->createTable('oro_attachment');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('filename', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('extension', 'string', ['length' => 10, 'notnull' => false]);
         $table->addColumn('mime_type', 'string', ['length' => 100, 'notnull' => false]);
@@ -26,15 +25,5 @@ class OroAttachmentBundle implements Migration
         $table->addColumn('updated_at', 'datetime', []);
 
         $table->setPrimaryKey(['id']);
-
-        $table->addIndex(['owner_id'], 'IDX_FA0FE0817E3C61F9', []);
-
-        $table = $schema->getTable('oro_attachment');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
     }
 }

@@ -99,10 +99,6 @@ class AttachmentExtendConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
             ->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProvider));
-        $this->configManager
-            ->expects($this->once())
-            ->method('createConfigFieldModel')
-            ->will($this->returnSelf());
 
         $this->extension->postUpdate($extendConfigs);
 
