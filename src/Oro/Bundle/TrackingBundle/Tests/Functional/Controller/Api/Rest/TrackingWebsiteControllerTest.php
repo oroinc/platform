@@ -19,16 +19,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
     public function testDelete()
     {
-        $class = $this->client
-            ->getContainer()
-            ->getParameter('oro_tracking.tracking_website.class');
-
-        $website = $this->client
-            ->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass($class)
-            ->getRepository($class)
-            ->findOneBy(['identifier' => 'delete']);
+        $website = $this->getReference('website');
 
         $this->client->request(
             'DELETE',
