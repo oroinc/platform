@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
 class DefaultOwnerSetEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testInterface()
     {
-        $channel   = new Channel();
+        $channel   = new Integration();
         $someOwner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $channel->setDefaultUserOwner($someOwner);
 

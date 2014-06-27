@@ -81,7 +81,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
                 // with class as param
                 $class = $this->getParameter($match[1]);
                 // fall-through
-            case preg_match('#([^\'"%:\s]+)::([\w\.]+)(\([^\)]+\))?#', $val, $match):
+            case preg_match('#([^\'"%:\s]+)::([\w\.]+)(\([^\)]*\))?#', $val, $match):
                 // with class real name
                 if (!isset($class)) {
                     $class = $match[1];
@@ -95,7 +95,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
                 }
                 break;
             // service method call @service->method
-            case preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]+\))?#', $val, $match):
+            case preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match):
                 $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
                 $val    = $this->replaceValue($val, $this->callServiceMethod($match[1], $match[2], $params), $match[0]);
                 break;
