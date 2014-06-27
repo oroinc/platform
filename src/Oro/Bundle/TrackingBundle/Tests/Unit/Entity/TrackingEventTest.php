@@ -29,13 +29,6 @@ class TrackingEventTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $this->event->getCreatedAt());
     }
 
-    public function testPreUpdate()
-    {
-        $this->assertNull($this->event->getUpdatedAt());
-        $this->event->preUpdate();
-        $this->assertInstanceOf('\DateTime', $this->event->getUpdatedAt());
-    }
-
     /**
      * @param string $property
      * @param mixed  $value
@@ -66,13 +59,11 @@ class TrackingEventTest extends \PHPUnit_Framework_TestCase
         $date    = new \DateTime();
 
         return [
-            ['category', 'category', 'category'],
-            ['action', 'action', 'action'],
             ['name', 'name', 'name'],
             ['value', 'value', 'value'],
+            ['user', 'user', 'user'],
             ['website', $website, $website],
             ['createdAt', $date, $date],
-            ['updatedAt', $date, $date],
         ];
     }
 }

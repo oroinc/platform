@@ -19,7 +19,6 @@ class OroTrackerBundle implements Migration
         $table->addColumn('event_id', 'integer', ['notnull' => false]);
         $table->addColumn('data', 'text', []);
         $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['event_id'], 'UNIQ_B3CFDD2D71F7E88B');
         /** End of generate table oro_tracking_data **/
@@ -28,12 +27,10 @@ class OroTrackerBundle implements Migration
         $table = $schema->createTable('oro_tracking_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
-        $table->addColumn('category', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('action', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('value', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('user', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'IDX_AAD45A1E18F45C82', []);
         /** End of generate table oro_tracking_event **/

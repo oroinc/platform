@@ -29,13 +29,6 @@ class TrackingDataTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $this->data->getCreatedAt());
     }
 
-    public function testPreUpdate()
-    {
-        $this->assertNull($this->data->getUpdatedAt());
-        $this->data->preUpdate();
-        $this->assertInstanceOf('\DateTime', $this->data->getUpdatedAt());
-    }
-
     /**
      * @param string $property
      * @param mixed  $value
@@ -69,7 +62,6 @@ class TrackingDataTest extends \PHPUnit_Framework_TestCase
             ['data', '{"test": "test"}', '{"test": "test"}'],
             ['event', $event, $event],
             ['createdAt', $date, $date],
-            ['updatedAt', $date, $date],
         ];
     }
 }
