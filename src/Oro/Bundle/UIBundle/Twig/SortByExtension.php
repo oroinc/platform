@@ -30,9 +30,9 @@ class SortByExtension extends \Twig_Extension
      * This method uses the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability
      *
      * Supported options:
-     *  property     [string]  The path of the property by which the array should be sorted
-     *  reverse      [boolean] Indicates whether the sorting should be performed in reverse order
-     *  sorting-type [string]  Can be: number, string or string-case (for case-insensitive sorting). Defaults to number
+     *  property     [string]  The path of the property by which the array should be sorted. Defaults to 'priority'
+     *  reverse      [boolean] Indicates whether the sorting should be performed in reverse order. Defaults to FALSE
+     *  sorting-type [string]  number, string or string-case (for case-insensitive sorting). Defaults to 'number'
      *
      * @param array $array   The array to be sorted
      * @param array $options The sorting options
