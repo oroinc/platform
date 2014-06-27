@@ -11,7 +11,7 @@ class ArrayUtils
      * Sorts an array by specified property.
      *
      * This method uses the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability
-     * Please use this method only you really need stable sorting because this method is not so fast
+     * Please use this method only if you really need stable sorting because this method is not so fast
      * as native PHP sort functions.
      *
      * @param array                        $array        The array to be sorted
