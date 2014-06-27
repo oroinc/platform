@@ -19,7 +19,5 @@ oro:
 
         help:
             event_tooltip: |
-                Replace category, action, [name], [value] with your values.
-                It will log an event with an event category (Videos, Music, Games…),
-                an event action (Play, Pause, Duration, Add Playlist, Downloaded, Clicked…),
-                and an optional event name and optional numeric value.
+                Replace [name], [value] and [user_identifier] with your values.
+                It will log an event with an an event [name] and optional [value].

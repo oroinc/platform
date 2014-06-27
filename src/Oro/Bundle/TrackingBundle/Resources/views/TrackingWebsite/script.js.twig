@@ -4,9 +4,9 @@
 {% endif %}
 <script type="text/javascript">
     var _paq = _paq || [];
-    _paq.push(['setUserId', '{USER_IDENTIFIER}']);
+    _paq.push(['setUserId', [user_identifier] ]);
     _paq.push(['setConversionAttributionFirstReferrer', false]);
-    _paq.push(['trackEvent', '{category}', '{action}', [name], [value]]);
+    _paq.push(['trackGoal', [name], [value] ]);
     (function() {
         var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ host|raw }}/";
         _paq.push(['setTrackerUrl', u+'tracking.php']);
