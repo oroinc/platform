@@ -57,7 +57,12 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $this->disableImmutableChoiceItems($view, $options);
+        $immutableChildViews = $this->getImmutableChoiceItems($view, $options);
+
+        // Disable some choices for immutable entities
+        foreach ($immutableChildViews as $choiceView) {
+            $choiceView->vars['disabled'] = true;
+        }
     }
 
     /**
@@ -65,8 +70,10 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
      *
      * @param FormView $view
      * @param array    $options
+     *
+     * @return array|FormView[]
      */
-    protected function disableImmutableChoiceItems(FormView $view, array $options)
+    protected function getImmutableChoiceItems(FormView $view, array $options)
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];
@@ -82,12 +89,15 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
             }
         }
 
+        $immutableChoiceViews = [];
         /** @var FormView $activityView */
         foreach ($view->children as $choiceView) {
             if (in_array($choiceView->vars['value'], $disabledChoices)) {
-                $choiceView->vars['disabled'] = true;
+                $immutableChoiceViews[] = $choiceView;
             }
         }
+
+        return $immutableChoiceViews;
     }
 
     /**

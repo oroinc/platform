@@ -32,7 +32,7 @@ class ActivityExtension implements ExtendExtensionAwareInterface
      * @param Schema $schema
      * @param string $activityTableName Activity entity table name. It is owning side of the association
      * @param string $targetTableName   Target entity table name
-     * @param bool   $immutable
+     * @param bool   $immutable         If true - particular activity can't be changed (enabled/disabled)
      */
     public function addActivityAssociation(
         Schema $schema,
