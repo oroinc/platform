@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Config;
 
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+
 class FormConfig implements FormConfigInterface
 {
     /**
@@ -85,11 +87,6 @@ class FormConfig implements FormConfigInterface
 
     protected function sortBlocks()
     {
-        $priority = array();
-        foreach ($this->blocks as $key => $block) {
-            $priority[$key] = $block->getPriority();
-        }
-
-        array_multisort($priority, SORT_DESC, $this->blocks);
+        ArrayUtils::sortBy($this->blocks, true);
     }
 }

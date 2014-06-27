@@ -152,8 +152,8 @@ class DataBlockBuilderTest extends \PHPUnit_Framework_TestCase
                         'second' => ['item1'],
                     ],
                     'Third'  => [
-                        'first'           => ['item5', 'item6'],
                         'item4__subblock' => ['item4'],
+                        'first'           => ['item5', 'item6'],
                     ],
                 ]
             ],
