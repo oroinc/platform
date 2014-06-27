@@ -116,7 +116,7 @@ services:
         class: %oro_user.autocomplete.user.search_handler%
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
-            - @liip_imagine.cache.manager
+            - @oro_attachment.manager
             - %oro_user.entity.class%
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
