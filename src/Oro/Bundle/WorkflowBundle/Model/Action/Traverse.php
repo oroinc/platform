@@ -64,23 +64,23 @@ class Traverse extends AbstractAction
         } elseif (!is_array($options[self::OPTION_KEY_ARRAY])
             && !$options[self::OPTION_KEY_ARRAY] instanceof PropertyPath
         ) {
-            throw new InvalidParameterException('Array parameter must be either array or valid property definition.');
+            throw new InvalidParameterException('Array parameter must be either array or valid property definition');
         }
 
         if (!empty($options[self::OPTION_KEY_KEY]) && !$options[self::OPTION_KEY_KEY] instanceof PropertyPath) {
-            throw new InvalidParameterException('Key must be valid property definition.');
+            throw new InvalidParameterException('Key must be valid property definition');
         }
 
         if (empty($options[self::OPTION_KEY_VALUE])) {
             throw new InvalidParameterException('Value parameter is required');
         } elseif (!$options[self::OPTION_KEY_VALUE] instanceof PropertyPath) {
-            throw new InvalidParameterException('Value must be valid property definition.');
+            throw new InvalidParameterException('Value must be valid property definition');
         }
 
         if (empty($options[self::OPTION_KEY_ACTIONS])) {
             throw new InvalidParameterException('Actions parameter is required');
         } elseif (!is_array($options[self::OPTION_KEY_ACTIONS])) {
-            throw new InvalidParameterException('Actions must be array.');
+            throw new InvalidParameterException('Actions must be array');
         }
 
         $this->options = $options;
