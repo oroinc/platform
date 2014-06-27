@@ -24,7 +24,7 @@ services:
             - @oro_security.security_facade
             - @oro_security.acl_helper
             - @oro_locale.formatter.name
-            - @liip_imagine.cache.manager
+            - @oro_attachment.manager
 
     oro_note.manager.api:
         class: %oro_note.manager.api.class%
