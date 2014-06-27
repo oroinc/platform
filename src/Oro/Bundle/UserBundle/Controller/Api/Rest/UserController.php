@@ -306,11 +306,11 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['statuses']);
         unset($result['api']);
 
-        $result['imagePath'] = null;
+        /*$result['imagePath'] = null;
         if (isset($result['image'])) {
             $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
         }
-        unset($result['image']);
+        unset($result['image']);*/
 
         return $result;
     }
