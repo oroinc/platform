@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
 class ChannelHandler
@@ -48,11 +48,11 @@ class ChannelHandler
     /**
      * Process form
      *
-     * @param Channel $entity
+     * @param Integration $entity
      *
      * @return bool
      */
-    public function process(Channel $entity)
+    public function process(Integration $entity)
     {
         $userOwner   = $entity->getDefaultUserOwner();
         $isNewEntity = !$entity->getId();

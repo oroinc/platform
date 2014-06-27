@@ -67,7 +67,6 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
 class User extends ExtendUser implements
     AdvancedUserInterface,
     \Serializable,
-    EntityUploadedImageInterface,
     Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
@@ -236,29 +235,6 @@ class User extends ExtendUser implements
      * )
      */
     protected $birthday;
-
-    /**
-     * Image filename
-     *
-     * @var string
-     *
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "importexport"={
-     *              "excluded"=true
-     *          }
-     *      }
-     * )
-     */
-    protected $image;
-
-    /**
-     * Image filename
-     *
-     * @var UploadedFile
-     */
-    protected $imageFile;
 
     /**
      * @var boolean
@@ -672,26 +648,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Return image filename
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Return image file
-     *
-     * @return UploadedFile
-     */
-    public function getImageFile()
-    {
-        return $this->imageFile;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getSalt()
@@ -917,42 +873,6 @@ class User extends ExtendUser implements
     public function setBirthday(\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
-
-        return $this;
-    }
-
-    /**
-     * @param  string $image [optional] New image file name. Null by default.
-     * @return User
-     */
-    public function setImage($image = null)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    /**
-     * @param  UploadedFile $imageFile
-     * @return User
-     */
-    public function setImageFile(UploadedFile $imageFile)
-    {
-        $this->imageFile = $imageFile;
-        // this will trigger PreUpdate callback even if only image has been changed
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        return $this;
-    }
-
-    /**
-     * Unset image file.
-     *
-     * @return User
-     */
-    public function unsetImageFile()
-    {
-        $this->imageFile = null;
 
         return $this;
     }
@@ -1293,18 +1213,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return string|null
-     */
-    public function getImagePath()
-    {
-        if ($this->image) {
-            return $this->getUploadDir(true) . '/' . $this->image;
-        }
-
-        return null;
-    }
-
-    /**
      * Generate unique confirmation token
      *
      * @return string Token value
@@ -1431,25 +1339,6 @@ class User extends ExtendUser implements
         $this->emails->removeElement($email);
 
         return $this;
-    }
-
-    /**
-     * Get the relative directory path to user avatar
-     *
-     * @param  bool   $forWeb
-     * @return string
-     */
-    public function getUploadDir($forWeb = false)
-    {
-        $ds = DIRECTORY_SEPARATOR;
-
-        if ($forWeb) {
-            $ds = '/';
-        }
-
-        $suffix = $this->getCreatedAt() ? $this->getCreatedAt()->format('Y-m') : date('Y-m');
-
-        return 'uploads' . $ds . 'users' . $ds . $suffix;
     }
 
     /**

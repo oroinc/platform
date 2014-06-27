@@ -85,6 +85,7 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Data provider for testResolve
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function resolveProvider()
     {
@@ -113,6 +114,10 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
                 array('root' => array('node' => '@test.service1->func1')),
                 array('root' => array('node' => 'func1')),
             ),
+            'service method call (string) with empty braces'         => array(
+                array('root' => array('node' => '@test.service1->func1()')),
+                array('root' => array('node' => 'func1')),
+            ),
             'service method call (string) replace'                   => array(
                 array('root' => array('node' => 'before @test.service1->func1 after')),
                 array('root' => array('node' => 'before func1 after')),
@@ -135,6 +140,10 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
             ),
             'static call (string)'                                   => array(
                 array('root' => array('node' => self::STATIC_CLASS . '::func1')),
+                array('root' => array('node' => 'static_func1')),
+            ),
+            'static call (string) with empty braces'                 => array(
+                array('root' => array('node' => self::STATIC_CLASS . '::func1()')),
                 array('root' => array('node' => 'static_func1')),
             ),
             'static call (string) replace'                           => array(

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager as OrmEntityManager;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
@@ -26,28 +26,28 @@ class EntityManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var CacheManager */
-    protected $imageCacheManager;
+    /** @var AttachmentManager */
+    protected $attachmentManager;
 
     /**
-     * @param OrmEntityManager $em
-     * @param SecurityFacade   $securityFacade
-     * @param AclHelper        $aclHelper
-     * @param NameFormatter    $nameFormatter
-     * @param CacheManager     $imageCacheManager
+     * @param OrmEntityManager  $em
+     * @param SecurityFacade    $securityFacade
+     * @param AclHelper         $aclHelper
+     * @param NameFormatter     $nameFormatter
+     * @param AttachmentManager $attachmentManager
      */
     public function __construct(
         OrmEntityManager $em,
         SecurityFacade $securityFacade,
         AclHelper $aclHelper,
         NameFormatter $nameFormatter,
-        CacheManager $imageCacheManager
+        AttachmentManager $attachmentManager
     ) {
         $this->em                = $em;
         $this->securityFacade    = $securityFacade;
         $this->aclHelper         = $aclHelper;
         $this->nameFormatter     = $nameFormatter;
-        $this->imageCacheManager = $imageCacheManager;
+        $this->attachmentManager = $attachmentManager;
     }
 
     /**
@@ -113,8 +113,8 @@ class EntityManager
             $result[$attrName]               = $this->nameFormatter->format($user);
             $result[$attrName . '_id']       = $user->getId();
             $result[$attrName . '_viewable'] = $this->securityFacade->isGranted('VIEW', $user);
-            $result[$attrName . '_avatar']   = $user->getImagePath()
-                ? $this->imageCacheManager->getBrowserPath($user->getImagePath(), 'avatar_xsmall')
+            $result[$attrName . '_avatar']   = $user->getAvatar()
+                ? $this->attachmentManager->getFilteredImageUrl($user->getAvatar(), 'avatar_xsmall')
                 : null;
         }
     }

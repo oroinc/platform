@@ -1,8 +1,14 @@
 parameters:
-    oro_organization.form.type.business_unit_select.class:       Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
+    oro_organization.form.type.business_unit_select.class:   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
+    oro_organization.form.type.organization_select.class:    Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
 
 services:
     oro_organization.form.type.business_unit_select:
         class: %oro_organization.form.type.business_unit_select.class%
         tags:
             - { name: form.type, alias: oro_business_unit_select }
+
+    oro_organization.form.type.organization_select:
+        class: %oro_organization.form.type.organization_select.class%
+        tags:
+            - { name: form.type, alias: oro_organization_select }
