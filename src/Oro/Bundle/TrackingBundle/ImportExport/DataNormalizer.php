@@ -25,11 +25,20 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $denormalized['data']  = json_encode($data);
-        $denormalized['event'] = $data;
-        $denormalized['event']['website'] = ['identifier' => $denormalized['event']['website']];
+        return parent::denormalize(
+            $this->updateData($data),
+            $class,
+            $format,
+            $context
+        );
+    }
 
-        return parent::denormalize($denormalized, $class, $format, $context);
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize($object, $format = null, array $context = array())
+    {
+        throw new \Exception('Not implemented');
     }
 
     /**
@@ -38,5 +47,31 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
     public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return is_array($data) && $type == $this->entityName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null, array $context = array())
+    {
+        return false;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function updateData(array $data)
+    {
+        $denormalized['data']  = json_encode($data);
+        $denormalized['event'] = $data;
+
+        if (!empty($denormalized['event']['website'])) {
+            $denormalized['event']['website'] = [
+                'identifier' => $denormalized['event']['website']
+            ];
+        }
+
+        return $denormalized;
     }
 }
