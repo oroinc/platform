@@ -29,39 +29,42 @@ class ActivityExtension implements ExtendExtensionAwareInterface
      *
      * The activity entity must be included in 'activity' group ('groups' attribute of 'grouping' scope)
      *
-     * @param Schema   $schema
-     * @param string   $activityTableName         Activity entity table name. It is owning side of the association
-     * @param string   $targetTableName           Target entity table name
-     * @param string[] $targetTitleColumnNames    Column names are used to show a title of target entity
-     * @param string[] $targetDetailedColumnNames Column names are used to show detailed info about target entity
-     * @param string[] $targetGridColumnNames     Column names are used to show target entity in a grid
+     * @param Schema $schema
+     * @param string $activityTableName Activity entity table name. It is owning side of the association
+     * @param string $targetTableName   Target entity table name
+     * @param bool   $immutable         Set TRUE to prohibit disabling the activity association from UI
      */
     public function addActivityAssociation(
         Schema $schema,
         $activityTableName,
         $targetTableName,
-        $targetTitleColumnNames = null,
-        $targetDetailedColumnNames = null,
-        $targetGridColumnNames = null
+        $immutable = false
     ) {
         $targetTable = $schema->getTable($targetTableName);
 
-        if (empty($targetTitleColumnNames)) {
-            $targetTitleColumnNames = $targetTable->getPrimaryKeyColumns();
-        }
-        if (empty($targetDetailedColumnNames)) {
-            $targetDetailedColumnNames = $targetTable->getPrimaryKeyColumns();
-        }
-        if (empty($targetGridColumnNames)) {
-            $targetGridColumnNames = $targetTable->getPrimaryKeyColumns();
-        }
+        // Column names are used to show a title of target entity
+        $targetTitleColumnNames = $targetTable->getPrimaryKeyColumns();
+        // Column names are used to show detailed info about target entity
+        $targetDetailedColumnNames = $targetTable->getPrimaryKeyColumns();
+        // Column names are used to show target entity in a grid
+        $targetGridColumnNames = $targetTable->getPrimaryKeyColumns();
+
+        $activityClassName = $this->extendExtension->getEntityClassByTableName($activityTableName);
 
         $options = new OroOptions();
         $options->append(
             'activity',
             'activities',
-            $this->extendExtension->getEntityClassByTableName($activityTableName)
+            $activityClassName
         );
+        if ($immutable) {
+            $options->append(
+                'activity',
+                'immutable',
+                $activityClassName
+            );
+        }
+
         $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(
