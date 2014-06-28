@@ -32,7 +32,7 @@ class ActivityExtension implements ExtendExtensionAwareInterface
      * @param Schema $schema
      * @param string $activityTableName Activity entity table name. It is owning side of the association
      * @param string $targetTableName   Target entity table name
-     * @param bool   $immutable         If true - particular activity can't be changed (enabled/disabled)
+     * @param bool   $immutable         Set TRUE to prohibit disabling the activity association from UI
      */
     public function addActivityAssociation(
         Schema $schema,
@@ -50,13 +50,13 @@ class ActivityExtension implements ExtendExtensionAwareInterface
         $targetGridColumnNames = $targetTable->getPrimaryKeyColumns();
 
         $activityClassName = $this->extendExtension->getEntityClassByTableName($activityTableName);
+
         $options = new OroOptions();
         $options->append(
             'activity',
             'activities',
             $activityClassName
         );
-
         if ($immutable) {
             $options->append(
                 'activity',

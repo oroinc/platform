@@ -36,6 +36,22 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $disabledValues = $this->getReadOnlyValues($options);
+        if (!empty($disabledValues)) {
+            /** @var FormView $choiceView */
+            foreach ($view->children as $choiceView) {
+                if (in_array($choiceView->vars['value'], $disabledValues)) {
+                    $choiceView->vars['disabled'] = true;
+                }
+            }
+        }
+    }
+
+    /**
      * @param string $groupName
      * @return array
      */
@@ -43,61 +59,13 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     {
         $this->ensureOwningSideEntitiesLoaded($groupName);
 
-        $choices = [];
+        $choices              = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
         foreach ($this->owningSideEntities as $className) {
             $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
         }
 
         return $choices;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        $immutableChildViews = $this->getImmutableChoiceItems($view, $options);
-
-        // Disable some choices for immutable entities
-        foreach ($immutableChildViews as $choiceView) {
-            $choiceView->vars['disabled'] = true;
-        }
-    }
-
-    /**
-     * Disable some choices for immutable entities
-     *
-     * @param FormView $view
-     * @param array    $options
-     *
-     * @return array|FormView[]
-     */
-    protected function getImmutableChoiceItems(FormView $view, array $options)
-    {
-        /** @var EntityConfigId $configId */
-        $configId  = $options['config_id'];
-        $className = $configId->getClassName();
-
-        $configProvider  = $this->configManager->getProvider($configId->getScope());
-        $disabledChoices = [];
-
-        if ($configProvider->hasConfig($className)) {
-            $immutable = $configProvider->getConfig($className)->get('immutable');
-            if (is_array($immutable) && !empty($immutable)) {
-                $disabledChoices = $immutable;
-            }
-        }
-
-        $immutableChoiceViews = [];
-        /** @var FormView $activityView */
-        foreach ($view->children as $choiceView) {
-            if (in_array($choiceView->vars['value'], $disabledChoices)) {
-                $immutableChoiceViews[] = $choiceView;
-            }
-        }
-
-        return $immutableChoiceViews;
     }
 
     /**
@@ -125,6 +93,31 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
         };
 
         return parent::isReadOnly($options);
+    }
+
+    /**
+     * Gets the list of values which state cannot be changed
+     *
+     * @param array $options
+     *
+     * @return string[]
+     */
+    protected function getReadOnlyValues(array $options)
+    {
+        $result = [];
+
+        /** @var EntityConfigId $configId */
+        $configId       = $options['config_id'];
+        $className      = $configId->getClassName();
+        $configProvider = $this->configManager->getProvider($configId->getScope());
+        if ($configProvider->hasConfig($className)) {
+            $immutable = $configProvider->getConfig($className)->get('immutable');
+            if (is_array($immutable) && !empty($immutable)) {
+                $result = $immutable;
+            }
+        }
+
+        return $result;
     }
 
     /**
