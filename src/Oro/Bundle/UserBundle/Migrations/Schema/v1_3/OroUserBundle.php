@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_2;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -29,7 +29,6 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addActivityAssociations($schema, $this->activityExtension);
-        self::migrateUserEmails($queries);
     }
 
     /**
@@ -41,13 +40,5 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
     public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
     {
         $activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
-    }
-
-    /**
-     * @param QueryBag $queries
-     */
-    public static function migrateUserEmails(QueryBag $queries)
-    {
-        $queries->addQuery();
     }
 }

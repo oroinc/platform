@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_1\UserEmailOrigins;
-use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as OroUserBundle1_2;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as OroUserBundle13;
 
 class OroUserBundleInstaller implements Installation, ActivityExtensionAwareInterface
 {
@@ -22,7 +22,7 @@ class OroUserBundleInstaller implements Installation, ActivityExtensionAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -56,7 +56,7 @@ class OroUserBundleInstaller implements Installation, ActivityExtensionAwareInte
         UserEmailOrigins::oroUserEmailOriginForeignKeys($schema);
 
         OroUserBundle::addOwnerToOroEmailAddress($schema);
-        OroUserBundle1_2::addActivityAssociations($schema, $this->activityExtension);
+        OroUserBundle13::addActivityAssociations($schema, $this->activityExtension);
     }
 
     /**
