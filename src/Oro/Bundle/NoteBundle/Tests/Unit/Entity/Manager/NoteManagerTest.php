@@ -3,9 +3,9 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class NoteManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
     protected $nameFormatter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $imageCacheManager;
+    protected $attachmentManager;
 
     /** @var NoteManager */
     protected $manager;
@@ -41,7 +41,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
         $this->nameFormatter     = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->imageCacheManager = $this->getMockBuilder('Liip\ImagineBundle\Imagine\Cache\CacheManager')
+        $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -50,7 +50,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             $this->securityFacade,
             $this->aclHelper,
             $this->nameFormatter,
-            $this->imageCacheManager
+            $this->attachmentManager
         );
     }
 
@@ -99,16 +99,17 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityViewModels()
     {
-        $createdBy = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+        $createdByAvatar = new Attachment();
+        $createdBy       = $this->getMockBuilder('Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser')
             ->disableOriginalConstructor()
             ->getMock();
         $createdBy->expects($this->once())->method('getId')->will($this->returnValue(100));
-        $createdBy->expects($this->once())->method('getImagePath')->will($this->returnValue('image1'));
-        $updatedBy = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+        $createdBy->expects($this->once())->method('getAvatar')->will($this->returnValue($createdByAvatar));
+        $updatedBy = $this->getMockBuilder('Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser')
             ->disableOriginalConstructor()
             ->getMock();
         $updatedBy->expects($this->once())->method('getId')->will($this->returnValue(100));
-        $updatedBy->expects($this->once())->method('getImagePath')->will($this->returnValue(null));
+        $updatedBy->expects($this->once())->method('getAvatar')->will($this->returnValue(null));
 
         $note = new Note();
         $this->setId($note, 123);
@@ -145,9 +146,9 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($updatedBy))
             ->will($this->returnValue('User2'));
 
-        $this->imageCacheManager->expects($this->once())
-            ->method('getBrowserPath')
-            ->with('image1', 'avatar_xsmall')
+        $this->attachmentManager->expects($this->once())
+            ->method('getFilteredImageUrl')
+            ->with($this->identicalTo($createdByAvatar), 'avatar_xsmall')
             ->will($this->returnValue('image1_xsmall'));
 
         $this->assertEquals(

@@ -113,8 +113,9 @@ class NoteManager
             $result[$attrName]               = $this->nameFormatter->format($user);
             $result[$attrName . '_id']       = $user->getId();
             $result[$attrName . '_viewable'] = $this->securityFacade->isGranted('VIEW', $user);
-            $result[$attrName . '_avatar']   = $user->getAvatar()
-                ? $this->attachmentManager->getFilteredImageUrl($user->getAvatar(), 'avatar_xsmall')
+            $avatar                          = $user->getAvatar();
+            $result[$attrName . '_avatar']   = $avatar
+                ? $this->attachmentManager->getFilteredImageUrl($avatar, 'avatar_xsmall')
                 : null;
         }
     }
