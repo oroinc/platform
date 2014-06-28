@@ -38,9 +38,8 @@
         'indexPath':   path('oro_user_index'),
         'indexLabel':  'oro.user.entity_plural_label'|trans,
         'entityTitle': fullname,
-        'hasAvatar':   true,
-        'imagePath':   entity.imagePath,
     } %}
+    {% set avatar = oro_configured_image_url(entity, 'avatar') %}
     {{ parent() }}
 {% endblock pageHeader %}
 

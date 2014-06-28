@@ -80,6 +80,23 @@ class AttachmentController extends Controller
     }
 
     /**
+     * @Route("media/cache/attachment/resize/{id}/{filter}/{filename}",
+     *  name="oro_filtered_attachment",
+     *  requirements={"id"="\d+"}
+     * )
+     */
+    public function getFilteredImageAction($id, $filter, $filename)
+    {
+        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
+        $path = substr($this->getRequest()->getPathInfo(), 1);
+        $binary = $this->get('liip_imagine')->load($this->get('oro_attachment.manager')->getContent($attachment));
+        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
+        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
+
+        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filter);
+    }
+
+    /**
      * Get attachment
      *
      * @param $id
