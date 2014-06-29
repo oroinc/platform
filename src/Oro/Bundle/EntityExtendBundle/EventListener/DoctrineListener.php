@@ -173,11 +173,13 @@ class DoctrineListener
      */
     protected function isAttachment($em, $className, $fieldName)
     {
+        $attachmentConfigProvider = $em->getExtendConfigProvider()->getConfigManager()->getProvider('attachment');
+        if (!$attachmentConfigProvider->hasConfig($className, $fieldName)) {
+            return false;
+        }
+
         /** @var FieldConfigId $fieldConfigId */
-        $fieldConfigId = $em->getExtendConfigProvider()->getConfigManager()->getProvider('attachment')->getId(
-            $className,
-            $fieldName
-        );
+        $fieldConfigId = $attachmentConfigProvider->getId($className, $fieldName);
 
         return in_array($fieldConfigId->getFieldType(), AttachmentScope::$attachmentTypes);
     }
