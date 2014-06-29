@@ -6,7 +6,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
-use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -258,13 +257,13 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddFilterByTargetEntity()
     {
-        $targetEntityId = 123;
-        $targetEntity   = new Target($targetEntityId);
+        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
+        $targetEntityId    = 123;
 
         $qb = $this->em->getRepository('Test:Activity')->createQueryBuilder('activity')
             ->select('activity');
 
-        $this->manager->addFilterByTargetEntity($qb, $targetEntity);
+        $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
 
         $this->assertEquals(
             'SELECT activity'
@@ -284,8 +283,8 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddFilterByTargetEntityWithSeveralRootEntities()
     {
-        $targetEntityId = 123;
-        $targetEntity   = new Target($targetEntityId);
+        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
+        $targetEntityId    = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
@@ -295,7 +294,8 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->manager->addFilterByTargetEntity(
             $qb,
-            $targetEntity,
+            $targetEntityClass,
+            $targetEntityId,
             'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity'
         );
 
@@ -321,12 +321,12 @@ class ActivityManagerTest extends OrmTestCase
      */
     public function testAddFilterByTargetEntityWithEmptyQuery()
     {
-        $targetEntityId = 123;
-        $targetEntity   = new Target($targetEntityId);
+        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
+        $targetEntityId    = 123;
 
         $qb = $this->em->createQueryBuilder();
 
-        $this->manager->addFilterByTargetEntity($qb, $targetEntity);
+        $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
     /**
@@ -335,8 +335,8 @@ class ActivityManagerTest extends OrmTestCase
      */
     public function testAddFilterByTargetEntityWithSeveralRootEntitiesButWithoutActivityEntityClassSpecified()
     {
-        $targetEntityId = 123;
-        $targetEntity   = new Target($targetEntityId);
+        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
+        $targetEntityId    = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
@@ -344,7 +344,7 @@ class ActivityManagerTest extends OrmTestCase
             ->from('Test:Another', 'another')
             ->where('another.id = activity.id');
 
-        $this->manager->addFilterByTargetEntity($qb, $targetEntity);
+        $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
     }
 
     /**
@@ -353,8 +353,8 @@ class ActivityManagerTest extends OrmTestCase
      */
     public function testAddFilterByTargetEntityWithInvalidActivityEntityClassSpecified()
     {
-        $targetEntityId = 123;
-        $targetEntity   = new Target($targetEntityId);
+        $targetEntityClass = 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target';
+        $targetEntityId    = 123;
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
@@ -364,7 +364,8 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->manager->addFilterByTargetEntity(
             $qb,
-            $targetEntity,
+            $targetEntityClass,
+            $targetEntityId,
             'Entity\NotRoot'
         );
     }

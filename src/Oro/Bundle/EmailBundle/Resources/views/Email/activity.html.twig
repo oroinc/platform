@@ -1,5 +1,8 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 <div class="widget-content">
-    {{ dataGrid.renderGrid('activity-email-grid', {entity: entity}) }}
+    {{ dataGrid.renderGrid('activity-email-grid', {
+        entityClass: oro_class_name(entity, true),
+        entityId: entity.id
+    }) }}
 </div>

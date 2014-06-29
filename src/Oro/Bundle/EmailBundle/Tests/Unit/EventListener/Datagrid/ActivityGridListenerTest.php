@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,19 +15,31 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $activityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $entityRoutingHelper;
+
     protected function setUp()
     {
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new ActivityGridListener($this->activityManager);
+        $this->listener = new ActivityGridListener(
+            $this->activityManager,
+            $this->entityRoutingHelper
+        );
     }
 
     public function testOnBuildAfter()
     {
-        $entity = new SomeEntity();
-        $qb     = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $encodedEntityClass = 'Test_Entity';
+        $entityClass        = 'Test\Entity';
+        $entityId           = 123;
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -43,13 +55,22 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($datasource));
         $datagrid->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag(['entity' => $entity])));
+            ->will(
+                $this->returnValue(
+                    new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId])
+                )
+            );
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('decodeClassName')
+            ->with($encodedEntityClass)
+            ->will($this->returnValue($entityClass));
 
         $this->activityManager->expects($this->once())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),
-                $this->identicalTo($entity)
+                $entityClass,
+                $entityId
             );
 
         $event = new BuildAfter($datagrid);
