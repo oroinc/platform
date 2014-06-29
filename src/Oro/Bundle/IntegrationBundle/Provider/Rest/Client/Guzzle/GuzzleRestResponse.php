@@ -25,7 +25,12 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function __toString()
     {
-        return (string)$this->response;
+        try {
+            $result = (string)$this->response;
+        } catch (\Exception $exception) {
+            throw GuzzleRestException::createFromException($exception);
+        }
+        return $result;
     }
 
     /**
@@ -33,7 +38,12 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function getBodyAsString()
     {
-        return $this->response->getBody(true);
+        try {
+            $result = $this->response->getBody(true);
+        } catch (\Exception $exception) {
+            throw GuzzleRestException::createFromException($exception);
+        }
+        return $result;
     }
 
     /**
@@ -49,7 +59,12 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function getMessage()
     {
-        return $this->response->getMessage();
+        try {
+            $result = $this->response->getMessage();
+        } catch (\Exception $exception) {
+            throw GuzzleRestException::createFromException($exception);
+        }
+        return $result;
     }
 
     /**
@@ -217,7 +232,12 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function json()
     {
-        return $this->response->json();
+        try {
+            $result = $this->response->json();
+        } catch (\Exception $exception) {
+            throw GuzzleRestException::createFromException($exception);
+        }
+        return $result;
     }
 
     /**
@@ -225,7 +245,12 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     public function xml()
     {
-        return $this->response->xml();
+        try {
+            $result = $this->response->xml();
+        } catch (\Exception $exception) {
+            throw GuzzleRestException::createFromException($exception);
+        }
+        return $result;
     }
 
     /**

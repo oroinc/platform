@@ -207,9 +207,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
-     * @expectedExceptionMessage REST error: Exception message
-     * [url] https://google.com/api/v2
-     * [method] get
+     * @expectedExceptionMessage Exception message
      */
     public function testPerformRequestThrowException()
     {
@@ -225,13 +223,116 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
         $request->expects($this->once())
             ->method('send')
             ->will($this->throwException(new \Exception('Exception message')));
+
+        $this->client->performRequest($method, $url);
+    }
+
+    /**
+     * @dataProvider getFormattedResultDataProvider
+     */
+    public function testGetFormattedResult($format)
+    {
+        $url = 'https://example.com/api/v2/users.' . $format;
+        $params = ['foo' => 'param'];
+        $headers = ['foo' => 'header'];
+        $options = ['foo' => 'option'];
+        $expectedResult = ['foo' => 'data'];
+        $expectedUrl = $url . '?foo=param';
+        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
+
+        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+
+        $this->sourceClient->expects($this->once())
+            ->method('createRequest')
+            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
+            ->will($this->returnValue($request));
+
+        $request->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue($response));
+
+        $response->expects($this->once())
+            ->method('isSuccessful')
+            ->will($this->returnValue(true));
+
+        $response->expects($this->once())
+            ->method($format)
+            ->will($this->returnValue($expectedResult));
+
+        $getter = 'get' . strtoupper($format);
+        $this->assertEquals($expectedResult, $this->client->$getter($url, $params, $headers, $options));
+    }
+
+    /**
+     * @dataProvider getFormattedResultDataProvider
+     *
+     * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
+     * @expectedExceptionMessage Unsuccessful response\\n[status code]
+     */
+    public function testGetFormattedResultThrowException($format)
+    {
+        $url = 'https://example.com/api/v2/users.' . $format;
+        $params = ['foo' => 'param'];
+        $headers = ['foo' => 'header'];
+        $options = ['foo' => 'option'];
+        $expectedUrl = $url . '?foo=param';
+        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
+        $statusCode = 403;
+        $reasonPhrase = 'Forbidden';
+
+        $response = $this->getMockBuilder('Guzzle\\Http\\Message\\Response')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+
+        $this->sourceClient->expects($this->once())
+            ->method('createRequest')
+            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
+            ->will($this->returnValue($request));
+
+        $request->expects($this->once())
+            ->method('send')
+            ->will($this->returnValue($response));
+
         $request->expects($this->once())
             ->method('getUrl')
             ->will($this->returnValue($url));
-        $request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue($method));
 
-        $this->client->performRequest($method, $url);
+        $response->expects($this->once())
+            ->method('isSuccessful')
+            ->will($this->returnValue(false));
+
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->will($this->returnValue($statusCode));
+
+        $response->expects($this->once())
+            ->method('getReasonPhrase')
+            ->will($this->returnValue($reasonPhrase));
+
+        $this->setExpectedException(
+            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException',
+            "Unsuccessful response\n[status code] $statusCode\n[reason phrase] $reasonPhrase\n[url] $url"
+        );
+
+        $getter = 'get' . strtoupper($format);
+        $this->client->$getter($url, $params, $headers, $options);
+    }
+
+    public function getFormattedResultDataProvider()
+    {
+        return [
+            'json' => [
+                'format' => 'json',
+            ],
+            'xml' => [
+                'format' => 'xml',
+            ],
+        ];
     }
 }

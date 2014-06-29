@@ -3,9 +3,10 @@
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle;
 
 use Guzzle\Http\Client as GuzzleClient;
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Url as GuzzleUrl;
 
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 
 class GuzzleRestClient implements RestClientInterface
@@ -27,9 +28,14 @@ class GuzzleRestClient implements RestClientInterface
     protected $guzzleClient;
 
     /**
-     * @var RestResponseInterface
+     * @var GuzzleRestResponse
      */
     protected $lastResponse;
+
+    /**
+     * @var RequestInterface
+     */
+    protected $lastGuzzleRequest;
 
     /**
      * @param string $baseUrl
@@ -66,6 +72,36 @@ class GuzzleRestClient implements RestClientInterface
     public function get($resource, array $params = [], array $headers = [], array $options = [])
     {
         return $this->performRequest('get', $resource, $params, null, $headers, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
+    {
+        $response = $this->get($resource, $params, $headers, $options);
+        if (!$response->isSuccessful()) {
+            throw GuzzleRestException::createFromException(
+                BadResponseException::factory($this->lastGuzzleRequest, $response->getSourceResponse())
+            );
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array())
+    {
+        $response = $this->get($resource, $params, $headers, $options);
+        if (!$response->isSuccessful()) {
+            throw GuzzleRestException::createFromException(
+                BadResponseException::factory($this->lastGuzzleRequest, $response->getSourceResponse())
+            );
+        }
+
+        return $response->xml();
     }
 
     /**
@@ -145,7 +181,7 @@ class GuzzleRestClient implements RestClientInterface
         }
 
         try {
-            $request = $this->getGuzzleClient()->createRequest(
+            $this->lastGuzzleRequest = $request = $this->getGuzzleClient()->createRequest(
                 $method,
                 $url,
                 $headers,
@@ -154,12 +190,7 @@ class GuzzleRestClient implements RestClientInterface
             );
             $response = $request->send();
         } catch (\Exception $exception) {
-            throw GuzzleRestException::create(
-                null,
-                isset($request) ? $request : null,
-                null,
-                $exception
-            );
+            throw GuzzleRestException::createFromException($exception);
         }
 
         $this->lastResponse = new GuzzleRestResponse($response);

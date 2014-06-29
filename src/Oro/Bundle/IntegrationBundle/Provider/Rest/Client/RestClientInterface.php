@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Exception\RestException;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
 interface RestClientInterface
 {
@@ -17,6 +17,30 @@ interface RestClientInterface
      * @throws RestException
      */
     public function get($resource, array $params = array(), array $headers = array(), array $options = array());
+
+    /**
+     * Send GET request and return decoded JSON as array
+     *
+     * @param string $resource Resource name or url
+     * @param array $params Request parameters
+     * @param mixed $headers
+     * @param mixed $options
+     * @return array
+     * @throws RestException
+     */
+    public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array());
+
+    /**
+     * Send GET request and return \SimpleXMLElement object
+     *
+     * @param string $resource Resource name or url
+     * @param array $params Request parameters
+     * @param mixed $headers
+     * @param mixed $options
+     * @return \SimpleXMLElement
+     * @throws RestException
+     */
+    public function getXML($resource, array $params = array(), array $headers = array(), array $options = array());
 
     /**
      * Send POST request
