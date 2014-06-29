@@ -47,7 +47,7 @@ abstract class AbstractWidgetProviderPass implements CompilerPassInterface
         }
 
         // sort by priority and flatten
-        krsort($providers);
+        ksort($providers);
         $providers = call_user_func_array('array_merge', $providers);
 
         // register

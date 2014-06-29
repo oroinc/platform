@@ -47,7 +47,7 @@ services:
             - @oro_entity.entity_identifier_accessor
             - @oro_entity.routing_helper
         tags:
-            - { name: oro_activity.activity_widget_provider, priority: 10 }
+            - { name: oro_activity.activity_widget_provider }
 
     oro_activity.widget_provider.actions:
         class: %oro_activity.widget_provider.actions.class%
