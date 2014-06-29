@@ -406,6 +406,52 @@ class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
         );
     }
 
+    public function testFinishViewForDisabled()
+    {
+        $this->prepareFinishViewTest();
+
+        $this->testConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with('Test\Entity')
+            ->will($this->returnValue(false));
+        $this->testConfigProvider->expects($this->never())
+            ->method('getConfig');
+
+        $view    = new FormView();
+        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $options = [
+            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+            'association_class' => 'test'
+        ];
+
+        $view->vars['disabled'] = true;
+
+        $view->children[0] = new FormView($view);
+        $view->children[1] = new FormView($view);
+
+        $view->children[0]->vars['value'] = 'Test\Entity1';
+        $view->children[1]->vars['value'] = 'Test\Entity2';
+
+        $this->type->finishView($view, $form, $options);
+
+        $this->assertEquals(
+            [
+                'attr'     => [],
+                'disabled' => true,
+                'value'    => 'Test\Entity1'
+            ],
+            $view->children[0]->vars
+        );
+        $this->assertEquals(
+            [
+                'attr'  => [],
+                'disabled' => true,
+                'value' => 'Test\Entity2'
+            ],
+            $view->children[1]->vars
+        );
+    }
+
     public function testGetName()
     {
         $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->type->getName());
@@ -422,13 +468,16 @@ class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
      */
     protected function getDisabledFormView($cssClass = null)
     {
-        return [
+        $result = [
             'disabled' => true,
-            'attr'     => [
-                'class' => empty($cssClass) ? 'disabled-choice' : $cssClass . ' disabled-choice'
-            ],
+            'attr'     => [],
             'value'    => null
         ];
+        if (!empty($cssClass)) {
+            $result['attr']['class'] = $cssClass;
+        }
+
+        return $result;
     }
 
     protected function prepareFinishViewTest()

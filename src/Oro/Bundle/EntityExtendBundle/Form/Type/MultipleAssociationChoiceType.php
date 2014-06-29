@@ -41,12 +41,12 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $disabledValues = $this->getReadOnlyValues($options);
-        if (!empty($disabledValues)) {
-            /** @var FormView $choiceView */
-            foreach ($view->children as $choiceView) {
-                if (in_array($choiceView->vars['value'], $disabledValues)) {
-                    $choiceView->vars['disabled'] = true;
-                }
+        /** @var FormView $choiceView */
+        foreach ($view->children as $choiceView) {
+            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+                || (!empty($disabledValues) && in_array($choiceView->vars['value'], $disabledValues))
+            ) {
+                $choiceView->vars['disabled'] = true;
             }
         }
     }

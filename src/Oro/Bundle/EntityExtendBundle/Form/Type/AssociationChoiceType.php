@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -62,6 +63,15 @@ class AssociationChoiceType extends AbstractAssociationChoiceType
         }
 
         return parent::isReadOnly($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function disableView(FormView $view)
+    {
+        parent::disableView($view);
+        $this->appendClassAttr($view->vars, 'disabled-choice');
     }
 
     /**
