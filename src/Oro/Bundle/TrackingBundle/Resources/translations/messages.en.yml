@@ -1,6 +1,6 @@
 oro:
     tracking:
-        tracking_website:
+        trackingwebsite:
             entity_label:        Website
             entity_plural_label: Websites
 

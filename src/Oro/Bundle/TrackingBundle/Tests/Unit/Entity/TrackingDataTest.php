@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TrackingBundle\Tests\Unit\Entity;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\TrackingBundle\Entity\TrackingData;
 use Oro\Bundle\TrackingBundle\Entity\TrackingEvent;
 
@@ -38,15 +40,16 @@ class TrackingDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testProperties($property, $value, $expected)
     {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->assertNull(
-            $this->data->{'get' . $property}()
+            $propertyAccessor->getValue($this->data, $property)
         );
 
-        $this->data->{'set' . $property}($value);
+        $propertyAccessor->setValue($this->data, $property, $value);
 
         $this->assertEquals(
             $expected,
-            $this->data->{'get' . $property}()
+            $propertyAccessor->getValue($this->data, $property)
         );
     }
 

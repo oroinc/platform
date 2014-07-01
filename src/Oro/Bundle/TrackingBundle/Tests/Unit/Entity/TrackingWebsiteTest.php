@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TrackingBundle\Tests\Unit\Entity;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -45,15 +47,16 @@ class TrackingWebsiteTest extends \PHPUnit_Framework_TestCase
      */
     public function testProperties($property, $value, $expected)
     {
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->assertNull(
-            $this->website->{'get' . $property}()
+            $propertyAccessor->getValue($this->website, $property)
         );
 
-        $this->website->{'set' . $property}($value);
+        $propertyAccessor->setValue($this->website, $property, $value);
 
         $this->assertEquals(
             $expected,
-            $this->website->{'get' . $property}()
+            $propertyAccessor->getValue($this->website, $property)
         );
     }
 

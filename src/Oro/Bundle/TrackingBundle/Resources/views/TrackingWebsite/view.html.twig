@@ -9,7 +9,7 @@
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' : path('oro_tracking_website_update', { id: entity.id }),
-            'entity_label': 'oro.tracking.tracking_website.entity_label'|trans
+            'entity_label': 'oro.tracking.trackingwebsite.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
@@ -18,7 +18,7 @@
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_tracking_website_index'),
-        'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
+        'indexLabel': 'oro.tracking.trackingwebsite.entity_plural_label'|trans,
         'entityTitle': entity.name
     } %}
     {{ parent() }}
@@ -28,15 +28,15 @@
     {%- set generalInformation -%}
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {{ UI.renderProperty('oro.tracking.tracking_website.name.label'|trans, entity.name) }}
-            {{ UI.renderProperty('oro.tracking.tracking_website.identifier.label'|trans, entity.identifier) }}
+            {{ UI.renderProperty('oro.tracking.trackingwebsite.name.label'|trans, entity.name) }}
+            {{ UI.renderProperty('oro.tracking.trackingwebsite.identifier.label'|trans, entity.identifier) }}
 
             {%- set url -%}
             <a target="_blank" href="{{ entity.url }}">
                 {{ entity.url }}
             </a>
             {%- endset -%}
-            {{ UI.renderHtmlProperty('oro.tracking.tracking_website.url.label'|trans, url) }}
+            {{ UI.renderHtmlProperty('oro.tracking.trackingwebsite.url.label'|trans, url) }}
 
             {%- set ownerData -%}
             {%- if entity.owner -%}
@@ -49,7 +49,7 @@
                 {% endif %}
             {%- endif -%}
             {%- endset -%}
-            {{ UI.renderHtmlProperty('oro.tracking.tracking_website.owner.label'|trans, ownerData) }}
+            {{ UI.renderHtmlProperty('oro.tracking.trackingwebsite.owner.label'|trans, ownerData) }}
 
             {{ entityConfig.renderDynamicFields(entity) }}
         </div>
