@@ -1,33 +1,25 @@
 <?php
 
-namespace Oro\Bundle\TrackingBundle\Controller\Api\Rest;
+namespace Oro\Bundle\TrackingBundle\Controller;
 
-use FOS\Rest\Util\Codes;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
- * @RouteResource("tracking_data")
- * @NamePrefix("oro_api_")
+ * @Route("/tracking/data")
  */
-class TrackingDataController extends FOSRestController implements ClassResourceInterface
+class TrackingDataController extends Controller
 {
     /**
-     * @ApiDoc(
-     *      description="Create TrackingData entity. Decouple TrackingEvent if possible",
-     *      resource=true
-     * )
+     * @Route("/create", name="oro_tracking_data_create")
      * @Acl(
      *      id="oro_tracking_data_create",
      *      type="entity",
@@ -56,17 +48,11 @@ class TrackingDataController extends FOSRestController implements ClassResourceI
             'success' => $isSuccessful
         ];
 
-        $code = Codes::HTTP_OK;
-
         if (!$isSuccessful) {
             $response['errors'] = $jobResult->getFailureExceptions();
-
-            $code = Codes::HTTP_BAD_REQUEST;
         }
 
-        return $this->handleView(
-            $this->view($response, $code)
-        );
+        return new JsonResponse($response, 201);
     }
 
     /**

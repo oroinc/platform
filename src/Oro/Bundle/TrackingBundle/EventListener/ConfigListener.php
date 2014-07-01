@@ -11,7 +11,7 @@ class ConfigListener
     /**
      * @var string
      */
-    protected $dynamicTrackingRouteName = 'oro_api_create_tracking_data';
+    protected $dynamicTrackingRouteName = 'oro_tracking_data_create';
 
     /**
      * @var string
