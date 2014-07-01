@@ -3,6 +3,7 @@ parameters:
     oro_tracking.tracking_event.class:                Oro\Bundle\TrackingBundle\Entity\TrackingEvent
     oro_tracking.tracking_data.class:                 Oro\Bundle\TrackingBundle\Entity\TrackingData
     oro_tracking.form.type.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
+    oro_tracking.form.handler.tracking_website.class: Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
     oro_tracking.tracking_website.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tracking.importexport.reader.log.class:       Oro\Bundle\TrackingBundle\ImportExport\LogReader
     oro_tracking.importexport.reader.context.class:   Oro\Bundle\TrackingBundle\ImportExport\ContextReader
@@ -15,6 +16,14 @@ services:
             - %oro_tracking.tracking_website.class%
         tags:
             - { name: form.type, alias: oro_tracking_website }
+
+    oro_tracking.form.handler.tracking_website:
+        class: %oro_tracking.form.handler.tracking_website.class%
+        scope: request
+        arguments:
+            - @oro_tracking.form.tracking_website
+            - @request
+            - @doctrine.orm.entity_manager
 
     oro_tracking.form.tracking_website:
         class: Symfony\Component\Form\Form
