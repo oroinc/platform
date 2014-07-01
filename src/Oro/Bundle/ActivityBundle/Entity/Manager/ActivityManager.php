@@ -144,20 +144,19 @@ class ActivityManager
     /**
      * Adds filter by $entity DQL to the given query builder
      *
-     * @param QueryBuilder  $qb                  The query builder that is used to get the list of activities
-     * @param object|string $entity              The target entity
-     * @param string|null   $activityEntityClass This parameter should be specified
-     *                                           if the query has more than one root entity
+     * @param QueryBuilder $qb                  The query builder that is used to get the list of activities
+     * @param string       $entityClass         The target entity class
+     * @param mixed        $entityId            The target entity id
+     * @param string|null  $activityEntityClass This parameter should be specified
+     *                                          if the query has more than one root entity
      * @throws \RuntimeException
      */
     public function addFilterByTargetEntity(
         QueryBuilder $qb,
-        $entity,
+        $entityClass,
+        $entityId,
         $activityEntityClass = null
     ) {
-        $entityClass = ClassUtils::getClass($entity);
-        $entityId    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
         $activityEntityAlias = null;
         $rootEntities        = $qb->getRootEntities();
         if (empty($rootEntities)) {

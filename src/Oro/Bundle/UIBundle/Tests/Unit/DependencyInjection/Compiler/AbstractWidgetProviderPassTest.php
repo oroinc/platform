@@ -60,10 +60,10 @@ class AbstractWidgetProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
+                ['addProvider', [new Reference('provider2')]],
+                ['addProvider', [new Reference('provider3')]],
                 ['addProvider', [new Reference('provider1')]],
                 ['addProvider', [new Reference('provider4')]],
-                ['addProvider', [new Reference('provider3')]],
-                ['addProvider', [new Reference('provider2')]],
             ],
             $chainProvider->getMethodCalls()
         );

@@ -255,6 +255,7 @@ services:
         class: %oro_email.listener.datagrid.activity.class%
         arguments:
             - @oro_activity.manager
+            - @oro_entity.routing_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 

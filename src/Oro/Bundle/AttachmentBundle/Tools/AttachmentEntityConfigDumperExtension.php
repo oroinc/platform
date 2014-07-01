@@ -4,16 +4,13 @@ namespace Oro\Bundle\AttachmentBundle\Tools;
 
 use Doctrine\Common\Inflector\Inflector;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
-
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 
 class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
@@ -86,8 +83,7 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
                             $relationKey,
                             ['assign' => true]
                         );
-
-                        $this->relationBuilder->updateFieldConfig(
+                        $this->relationBuilder->updateFieldConfigs(
                             $entityClassName,
                             $relationName,
                             [
@@ -124,7 +120,6 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
 
         $configManager        = $this->relationBuilder->getConfigManager();
         $extendConfigProvider = $configManager->getProvider('extend');
-
         $extendConfigProvider->persist($entityExtendConfig);
         $configManager->calculateConfigChangeSet($entityExtendConfig);
     }

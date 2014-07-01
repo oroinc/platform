@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
@@ -27,9 +29,26 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
                 'empty_value'       => false,
                 'choices'           => $choices,
                 'multiple'          => true,
-                'association_class' => null // the group name for owning side entities
+                'expanded'          => true,
+                'association_class' => null, // the group name for owning side entities
             ]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $disabledValues = $this->getReadOnlyValues($options);
+        /** @var FormView $choiceView */
+        foreach ($view->children as $choiceView) {
+            if ((isset($view->vars['disabled']) && $view->vars['disabled'])
+                || (!empty($disabledValues) && in_array($choiceView->vars['value'], $disabledValues))
+            ) {
+                $choiceView->vars['disabled'] = true;
+            }
+        }
     }
 
     /**
@@ -40,14 +59,13 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     {
         $this->ensureOwningSideEntitiesLoaded($groupName);
 
-        $result = [];
-
+        $choices              = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
         foreach ($this->owningSideEntities as $className) {
-            $result[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
+            $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
         }
 
-        return $result;
+        return $choices;
     }
 
     /**
@@ -75,6 +93,31 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
         };
 
         return parent::isReadOnly($options);
+    }
+
+    /**
+     * Gets the list of values which state cannot be changed
+     *
+     * @param array $options
+     *
+     * @return string[]
+     */
+    protected function getReadOnlyValues(array $options)
+    {
+        $result = [];
+
+        /** @var EntityConfigId $configId */
+        $configId       = $options['config_id'];
+        $className      = $configId->getClassName();
+        $configProvider = $this->configManager->getProvider($configId->getScope());
+        if ($configProvider->hasConfig($className)) {
+            $immutable = $configProvider->getConfig($className)->get('immutable');
+            if (is_array($immutable) && !empty($immutable)) {
+                $result = $immutable;
+            }
+        }
+
+        return $result;
     }
 
     /**

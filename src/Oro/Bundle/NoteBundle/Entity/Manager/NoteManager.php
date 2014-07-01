@@ -30,10 +30,10 @@ class NoteManager
     protected $attachmentManager;
 
     /**
-     * @param EntityManager  $em
-     * @param SecurityFacade $securityFacade
-     * @param AclHelper      $aclHelper
-     * @param NameFormatter  $nameFormatter
+     * @param EntityManager     $em
+     * @param SecurityFacade    $securityFacade
+     * @param AclHelper         $aclHelper
+     * @param NameFormatter     $nameFormatter
      * @param AttachmentManager $attachmentManager
      */
     public function __construct(
@@ -113,8 +113,9 @@ class NoteManager
             $result[$attrName]               = $this->nameFormatter->format($user);
             $result[$attrName . '_id']       = $user->getId();
             $result[$attrName . '_viewable'] = $this->securityFacade->isGranted('VIEW', $user);
-            $result[$attrName . '_avatar']   = $user->getAvatar()
-                ? $this->attachmentManager->getFilteredImageUrl($user->getAvatar(), 'avatar_xsmall')
+            $avatar                          = $user->getAvatar();
+            $result[$attrName . '_avatar']   = $avatar
+                ? $this->attachmentManager->getFilteredImageUrl($avatar, 'avatar_xsmall')
                 : null;
         }
     }

@@ -131,7 +131,6 @@ abstract class AbstractAssociationChoiceType extends AbstractType
     protected function disableView(FormView $view)
     {
         $view->vars['disabled'] = true;
-        $this->appendClassAttr($view->vars, 'disabled-choice');
     }
 
     /**
