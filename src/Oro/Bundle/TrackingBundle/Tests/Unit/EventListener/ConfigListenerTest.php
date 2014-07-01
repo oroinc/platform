@@ -181,7 +181,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('oro_api_create_tracking_data')
+            ->with('oro_tracking_data_create')
             ->will($this->returnValue('/test/url'));
 
         $this->listener->onUpdateAfter($event);

@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
-use Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler;
 use Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
