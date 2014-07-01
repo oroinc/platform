@@ -165,14 +165,23 @@
 
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
-        'data': function (query, page) {
-            return {
-                '{{ configs.grid.name }}[_pager][_page]': page,
-                '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
-                '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
-                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
-                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
-            };
+        'data': function (query, page, searchById) {
+            if (searchById) {
+                return {
+                    '{{ configs.grid.name }}[_pager][_page]': 1,
+                    '{{ configs.grid.name }}[_pager][_per_page]': 1,
+                    '{{ configs.grid.name }}[_filter][id][type]': 3,
+                    '{{ configs.grid.name }}[_filter][id][value]': query
+                };
+            } else {
+                return {
+                    '{{ configs.grid.name }}[_pager][_page]': page,
+                    '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
+                    '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
+                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
+                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
+                };
+            }
         },
         'results': function (data, page) {
             return {
