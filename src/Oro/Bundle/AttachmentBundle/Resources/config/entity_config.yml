@@ -4,17 +4,23 @@ oro_entity_config:
             items:
                 enabled:
                     options:
-                        priority:           250
+                        priority:           100
                         default_value:      false
                         auditable:          false
                     form:
                         type:               oro_entity_extend_association_choice
                         options:
-                            block:          other
+                            block:          associations
                             required:       true
                             label:          oro.attachment.enabled
-                            entity_class:   'OroAttachmentBundle:Attachment'
-                            entity_config_scope: attachment
+                            association_class: 'OroAttachmentBundle:Attachment'
+#                            entity_class:   'OroAttachmentBundle:Attachment'
+#                            entity_config_scope: attachment
+                # this attribute can be used to prohibit changing the note association state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than the current state cannot be changed
+                immutable: # boolean
+                    options: []
         field:
             items:
                 attachment:
