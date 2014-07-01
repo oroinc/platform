@@ -31,6 +31,7 @@ class OroTrackerBundle implements Migration
         $table->addColumn('value', 'string', ['length' => 255]);
         $table->addColumn('user', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('logged_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'IDX_AAD45A1E18F45C82', []);
         /** End of generate table oro_tracking_event **/

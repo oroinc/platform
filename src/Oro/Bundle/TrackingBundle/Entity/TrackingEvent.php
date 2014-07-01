@@ -30,6 +30,14 @@ class TrackingEvent
     protected $id;
 
     /**
+     * @var TrackingWebsite
+     *
+     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
+     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $website;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
@@ -58,25 +66,24 @@ class TrackingEvent
     protected $createdAt;
 
     /**
-     * @var TrackingWebsite
+     * @var \DateTime
      *
-     * @ORM\ManyToOne(targetEntity="TrackingWebsite")
-     * @ORM\JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     * @ORM\Column(name="logged_at", type="datetime", nullable=false)
      */
-    protected $website;
+    protected $loggedAt;
 
     /**
      * @ORM\PrePersist
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -99,7 +106,7 @@ class TrackingEvent
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -122,7 +129,7 @@ class TrackingEvent
     /**
      * Get value
      *
-     * @return string 
+     * @return string
      */
     public function getValue()
     {
@@ -145,7 +152,7 @@ class TrackingEvent
     /**
      * Get user
      *
-     * @return string 
+     * @return string
      */
     public function getUser()
     {
@@ -168,11 +175,34 @@ class TrackingEvent
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Set loggedAt
+     *
+     * @param \DateTime $loggedAt
+     * @return TrackingEvent
+     */
+    public function setLoggedAt($loggedAt)
+    {
+        $this->loggedAt = $loggedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get loggedAt
+     *
+     * @return \DateTime
+     */
+    public function getLoggedAt()
+    {
+        return $this->loggedAt;
     }
 
     /**

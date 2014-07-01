@@ -64,7 +64,7 @@ class TrackingData
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -93,7 +93,7 @@ class TrackingData
     /**
      * Get data
      *
-     * @return string 
+     * @return string
      */
     public function getData()
     {
@@ -116,7 +116,7 @@ class TrackingData
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {

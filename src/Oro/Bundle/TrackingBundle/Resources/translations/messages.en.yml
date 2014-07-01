@@ -13,11 +13,12 @@ oro:
 
             saved_message: Website updated
 
-        tracking_event:
-            name.label: Name
-            value.label: Value
-            user.label: User
-            created_at.label: Create At
+        trackingevent:
+            name.label:       Name
+            value.label:      Value
+            user.label:       User
+            created_at.label: Created At
+            logged_at.label:  Logged At
 
         block:
             general: General

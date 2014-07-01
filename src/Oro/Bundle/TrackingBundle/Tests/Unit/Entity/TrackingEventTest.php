@@ -67,6 +67,7 @@ class TrackingEventTest extends \PHPUnit_Framework_TestCase
             ['user', 'user', 'user'],
             ['website', $website, $website],
             ['createdAt', $date, $date],
+            ['loggedAt', $date, $date],
         ];
     }
 }
