@@ -9,10 +9,9 @@ use Symfony\Component\Routing\Router;
 class ConfigListener
 {
     /**
-     * @todo Change to real route in scope CRM-1480
      * @var string
      */
-    protected $dynamicTrackingRouteName = 'oro_tracking_website_view';
+    protected $dynamicTrackingRouteName = 'oro_api_create_tracking_data';
 
     /**
      * @var string

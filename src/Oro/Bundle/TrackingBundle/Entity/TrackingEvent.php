@@ -33,20 +33,6 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="category", type="string", length=255, nullable=true)
-     */
-    protected $category;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="action", type="string", length=255, nullable=true)
-     */
-    protected $action;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
     protected $name;
@@ -59,18 +45,18 @@ class TrackingEvent
     protected $value;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="user", type="string", length=255, nullable=true)
+     */
+    protected $user;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
     protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    protected $updatedAt;
 
     /**
      * @var TrackingWebsite
@@ -89,67 +75,13 @@ class TrackingEvent
     }
 
     /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime();
-    }
-
-    /**
      * Get id
      *
-     * @return integer
+     * @return integer 
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set category
-     *
-     * @param string $category
-     * @return TrackingEvent
-     */
-    public function setCategory($category)
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * Get category
-     *
-     * @return string
-     */
-    public function getCategory()
-    {
-        return $this->category;
-    }
-
-    /**
-     * Set action
-     *
-     * @param string $action
-     * @return TrackingEvent
-     */
-    public function setAction($action)
-    {
-        $this->action = $action;
-
-        return $this;
-    }
-
-    /**
-     * Get action
-     *
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
     }
 
     /**
@@ -168,7 +100,7 @@ class TrackingEvent
     /**
      * Get name
      *
-     * @return string
+     * @return string 
      */
     public function getName()
     {
@@ -191,11 +123,34 @@ class TrackingEvent
     /**
      * Get value
      *
-     * @return string
+     * @return string 
      */
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Set user
+     *
+     * @param string $user
+     * @return TrackingEvent
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return string 
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**
@@ -214,34 +169,11 @@ class TrackingEvent
     /**
      * Get createdAt
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getCreatedAt()
     {
         return $this->createdAt;
-    }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     * @return TrackingEvent
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**
@@ -250,7 +182,7 @@ class TrackingEvent
      * @param TrackingWebsite $website
      * @return TrackingEvent
      */
-    public function setWebsite($website)
+    public function setWebsite(TrackingWebsite $website = null)
     {
         $this->website = $website;
 

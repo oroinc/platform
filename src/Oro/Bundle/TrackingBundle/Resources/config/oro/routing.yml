@@ -3,8 +3,18 @@ oro_tracking:
     type:         annotation
     prefix:       /
 
-oro_tracking_api:
+oro_tracking_website_api:
     resource:     "@OroTrackingBundle/Controller/Api/Rest/TrackingWebsiteController.php"
+    type:         rest
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
+
+oro_tracking_data_api:
+    resource:     "@OroTrackingBundle/Controller/Api/Rest/TrackingDataController.php"
     type:         rest
     prefix:       api/rest/{version}/
     requirements:

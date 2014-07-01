@@ -50,5 +50,7 @@ class LoadTrackingWebsiteData extends AbstractFixture implements ContainerAwareI
 
         $manager->persist($website);
         $manager->flush();
+
+        $this->setReference('website', $website);
     }
 }

@@ -14,3 +14,16 @@ connector:
                         writer:    oro_integration.writer.persistent_batch_writer
                     parameters:
                         batch_size: 50
+        import_request_to_database:
+            title: "Import tracking request to database"
+            type: import
+            steps:
+                import:
+                    title:     import
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_tracking.importexport.reader.request
+                        processor: oro_importexport.processor.import_delegate
+                        writer:    oro_integration.writer.persistent_batch_writer
+                    parameters:
+                        batch_size: 1

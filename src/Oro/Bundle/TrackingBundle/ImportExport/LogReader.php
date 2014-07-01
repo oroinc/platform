@@ -2,46 +2,51 @@
 
 namespace Oro\Bundle\TrackingBundle\ImportExport;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 
 class LogReader extends AbstractReader
 {
-    /**
-     * @var string
-     */
-    protected $directory;
-
     /**
      * @var array
      */
     protected $data;
 
     /**
-     * @param string $directory
+     * @var \SplFileObject
      */
-    public function setDirectory($directory)
-    {
-        $this->directory = $directory;
-    }
+    protected $file;
 
     /**
      * {@inheritdoc}
      */
     public function read()
     {
-        $context = $this->getContext();
+        if ($this->file->valid()) {
+            $this->file->seek($this->getContext()->getReadCount());
+            $line = rtrim($this->file->current(), PHP_EOL);
+            $this->getContext()->incrementReadCount();
 
-        if (empty($this->data)) {
-            $context = $this->getContext();
-            $file    = $context->getOption('file');
-
-            $content    = file_get_contents($file);
-            $this->data = explode(PHP_EOL, $content);
+            return json_decode($line, true);
         }
 
-        $item = $this->data[$context->getReadCount()];
-        $context->incrementReadCount();
+        return null;
+    }
 
-        return json_decode($item, true);
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeFromContext(ContextInterface $context)
+    {
+        if (!$context->hasOption('file')) {
+            throw new InvalidConfigurationException(
+                'Configuration reader must contain "file".'
+            );
+        } else {
+            $this->file = new \SplFileObject(
+                $context->getOption('file')
+            );
+        }
     }
 }

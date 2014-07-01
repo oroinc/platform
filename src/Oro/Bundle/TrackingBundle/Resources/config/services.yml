@@ -5,6 +5,7 @@ parameters:
     oro_tracking.form.type.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
     oro_tracking.tracking_website.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tracking.importexport.reader.log.class:       Oro\Bundle\TrackingBundle\ImportExport\LogReader
+    oro_tracking.importexport.reader.request.class:   Oro\Bundle\TrackingBundle\ImportExport\RequestReader
     oro_tracking.importexport.normalizer.data.class:  Oro\Bundle\TrackingBundle\ImportExport\DataNormalizer
     oro_tracking.config.listener:                     Oro\Bundle\TrackingBundle\EventListener\ConfigListener
 services:
@@ -33,8 +34,11 @@ services:
         class: %oro_tracking.importexport.reader.log.class%
         arguments:
             - @oro_importexport.context_registry
-        calls:
-             - [setDirectory, ['%kernel.logs_dir%/tracking/']]
+
+    oro_tracking.importexport.reader.request:
+        class: %oro_tracking.importexport.reader.request.class%
+        arguments:
+            - @oro_importexport.context_registry
 
     oro_tracking.importexport.data_converter.data:
         parent: oro_importexport.data_converter.configurable
@@ -46,7 +50,7 @@ services:
         class: %oro_tracking.importexport.normalizer.data.class%
         parent: oro_importexport.serializer.configurable_entity_normalizer
         calls:
-             - [setEntityName, [%oro_tracking.tracking_data.class%]]
+            - [setEntityName, [%oro_tracking.tracking_data.class%]]
         tags:
             - { name: oro_importexport.normalizer, priority: 10 }
 
