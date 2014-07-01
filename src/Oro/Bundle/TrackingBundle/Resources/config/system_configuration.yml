@@ -40,8 +40,6 @@ oro_system_configuration:
                 label: 'Piwik Host'
                 tooltip: oro.tracking.form.tooltip.piwik_host
                 required: false
-                constraints:
-                    - Url: ~
 
         oro_tracking.piwik_token_auth:
             type: text
