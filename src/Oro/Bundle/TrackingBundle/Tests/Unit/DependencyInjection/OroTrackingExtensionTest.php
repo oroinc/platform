@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TrackingBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\TrackingBundle\DependencyInjection\OroTrackingExtension;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroBundleTrackingExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,18 +12,23 @@ class OroBundleTrackingExtensionTest extends \PHPUnit_Framework_TestCase
     protected $extension;
 
     /**
-     * @var ContainerBuilder
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $container;
 
     protected function setUp()
     {
-        $this->container = new ContainerBuilder();
+        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->extension = new OroTrackingExtension();
     }
 
     public function testLoad()
     {
+        $this->container->expects($this->once())
+            ->method('prependExtensionConfig')
+            ->with('oro_tracking', $this->isType('array'));
         $this->extension->load([], $this->container);
     }
 }
