@@ -63,9 +63,12 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
      */
     protected function updateData(array $data)
     {
-        $result = [];
+        $result          = [];
         $result['data']  = json_encode($data);
-        $result['event'] = $data;
+
+        if (isset($data['name'], $data['value'], $data['user'])) {
+            $result['event'] = $data;
+        }
 
         if (!empty($result['event']['website'])) {
             $result['event']['website'] = [

@@ -5,7 +5,7 @@ namespace Oro\Bundle\TrackingBundle\Tests\Functional\Controller\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @dbIsolation
+ * @1dbIsolation
  */
 class TrackingDataControllerTest extends WebTestCase
 {
@@ -14,14 +14,12 @@ class TrackingDataControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
     }
 
-    public function testCreate()
+    /**
+     * @param array $options
+     * @dataProvider optionsProvider
+     */
+    public function testCreate(array $options)
     {
-        $options = [
-            'param1' => 'value1',
-            'param2' => 'value2',
-            'param3' => 'value3',
-        ];
-
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_create_tracking_data', $options),
@@ -30,7 +28,33 @@ class TrackingDataControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
         $response = $this->client->getResponse();
-        $result = $this->getJsonResponseContent($response, 200);
+        $result   = $this->getJsonResponseContent($response, 200);
         $this->assertArrayHasKey('success', $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function optionsProvider()
+    {
+        return [
+            'simple' => [
+                [
+                    'param1' => 'value1',
+                    'param2' => 'value2',
+                    'param3' => 'value3',
+                ]
+            ],
+            'event'  => [
+                [
+                    'param1' => 'value1',
+                    'param2' => 'value2',
+                    'param3' => 'value3',
+                    'name'   => 'name',
+                    'value'  => 'value',
+                    'user'   => 'user',
+                ]
+            ],
+        ];
     }
 }

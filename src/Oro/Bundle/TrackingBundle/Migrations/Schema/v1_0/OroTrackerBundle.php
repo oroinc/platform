@@ -27,10 +27,10 @@ class OroTrackerBundle implements Migration
         $table = $schema->createTable('oro_tracking_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('value', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('value', 'string', ['length' => 255]);
+        $table->addColumn('user', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('user', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'IDX_AAD45A1E18F45C82', []);
         /** End of generate table oro_tracking_event **/

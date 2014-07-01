@@ -5,7 +5,6 @@ namespace Oro\Bundle\TrackingBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(name="oro_tracking_event")
@@ -33,21 +32,21 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=true)
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     * @ORM\Column(name="value", type="string", length=255, nullable=false)
      */
     protected $value;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="user", type="string", length=255, nullable=true)
+     * @ORM\Column(name="user", type="string", length=255, nullable=false)
      */
     protected $user;
 
