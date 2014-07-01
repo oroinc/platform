@@ -55,7 +55,7 @@ class OroTrackerBundle implements Migration
             $schema->getTable('oro_tracking_event'),
             ['event_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null,]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_tracking_data **/
 
@@ -65,7 +65,7 @@ class OroTrackerBundle implements Migration
             $schema->getTable('oro_tracking_website'),
             ['website_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null,]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_tracking_event **/
 
@@ -75,7 +75,7 @@ class OroTrackerBundle implements Migration
             $schema->getTable('oro_user'),
             ['user_owner_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null,]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_tracking_website **/
     }
