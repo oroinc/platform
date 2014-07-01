@@ -3,19 +3,34 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_1\UserEmailOrigins;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UpdateAvatars;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 
-class OroUserBundleInstaller implements Installation
+class OroUserBundleInstaller implements Installation, AttachmentExtensionAwareInterface
 {
+    /** @var AttachmentExtension */
+    protected $attachmentExtension;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
+    {
+        $this->attachmentExtension = $attachmentExtension;
     }
 
     /**
@@ -26,7 +41,8 @@ class OroUserBundleInstaller implements Installation
         OroUserBundle::oroAccessGroupTable($schema);
         OroUserBundle::oroAccessRoleTable($schema);
         OroUserBundle::oroSessionTable($schema);
-        OroUserBundle::oroUserTable($schema, false);
+        OroUserBundle::oroUserTable($schema, false, false);
+        UpdateAvatars::addAvatarToUser($schema, $this->attachmentExtension);
         OroUserBundle::oroUserAccessGroupTable($schema);
         OroUserBundle::oroUserAccessGroupRoleTable($schema);
         OroUserBundle::oroUserAccessRoleTable($schema);
