@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% oro_title_set({params : {"%entity.name%": entity.name|default('N/A') }}) %}
 
@@ -68,21 +69,31 @@
     </div>
     {%- endset -%}
 
+    {% set trackingEventsGrid %}
+        {{ dataGrid.renderGrid('website-tracking-events-grid', {websiteIdentifier: entity.identifier}) }}
+    {% endset %}
+
     {% set dataBlocks = [
-    {
-        'title': 'oro.tracking.block.general'|trans,
-        'class': 'active',
-        'subblocks': [
-            {'data' : [generalInformation]}
-        ]
-    },
-    {
-        'title': 'oro.tracking.block.tracking'|trans,
-        'class': 'active',
-        'subblocks': [
-            {'data' : [trackingCode]}
-        ]
-    }] %}
+        {
+            'title': 'oro.tracking.block.general'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [generalInformation]}
+            ]
+        },
+        {
+            'title': 'oro.tracking.block.tracking'|trans,
+            'subblocks': [
+                {'data' : [trackingCode]}
+            ]
+        },
+        {
+            'title': 'oro.tracking.block.events'|trans,
+            'subblocks': [
+                {'data' : [trackingEventsGrid]}
+            ]
+        }
+    ] %}
 
     {% set id = 'websiteView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}

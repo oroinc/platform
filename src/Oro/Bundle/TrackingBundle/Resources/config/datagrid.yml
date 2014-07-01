@@ -109,3 +109,66 @@ datagrid:
                 label:         Delete
                 icon:          trash
                 link:          delete_link
+
+    tracking-events-grid:
+        source:
+            type: orm
+            acl_resource: oro_tracking_website_view
+            query:
+                select:
+                    - e.id
+                    - e.name
+                    - e.value
+                    - e.user
+                    - e.createdAt
+                from:
+                    - { table: %oro_tracking.tracking_event.class%, alias: e }
+        columns:
+            name:
+                label: oro.tracking.tracking_event.name.label
+            value:
+                label: oro.tracking.tracking_event.value.label
+            user:
+                label: oro.tracking.tracking_event.user.label
+            createdAt:
+                label:   oro.tracking.tracking_event.created_at.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                name:
+                    data_name: e.name
+                value:
+                    data_name: e.value
+                user:
+                    data_name: e.user
+                createdAt:
+                    data_name: e.createdAt
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                name:
+                    type:      string
+                    data_name: e.name
+                value:
+                    type:      string
+                    data_name: e.value
+                user:
+                    type:      string
+                    data_name: e.user
+                createdAt:
+                    type:      datetime
+                    data_name: website.createdAt
+        properties:
+            id: ~
+
+    website-tracking-events-grid:
+        extends: tracking-events-grid
+        source:
+            query:
+                join:
+                    inner:
+                        - { join: e.website, alias: w }
+                where:
+                    and:
+                        - w.identifier = :websiteIdentifier
