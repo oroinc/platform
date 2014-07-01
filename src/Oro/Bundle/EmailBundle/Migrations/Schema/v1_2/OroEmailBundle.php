@@ -71,19 +71,17 @@ class OroEmailBundle implements
     {
         $fromAndRecipients = '
             SELECT DISTINCT email_id, owner_id FROM (
-                SELECT
-                    e.id as email_id,
-                    ea.{owner} as owner_id
+                SELECT e.id as email_id, ea.{owner} as owner_id
                 FROM oro_email_address ea
-                INNER JOIN oro_email e ON e.from_email_address_id = ea.id
+                    INNER JOIN oro_email e ON e.from_email_address_id = ea.id
                 WHERE ea.{owner} IS NOT NULL
                 UNION
                 SELECT er.email_id as email_id, ea.{owner} as owner_id
                 FROM oro_email_address ea
-                INNER JOIN oro_email_recipient er ON er.email_address_id=ea.id
+                    INNER JOIN oro_email_recipient er ON er.email_address_id = ea.id
                 WHERE ea.{owner} IS NOT NULL
             ) as subq';
-        $sourceClassName = $this->extendExtension->getEntityClassByTableName('oro_email');
+        $sourceClassName   = $this->extendExtension->getEntityClassByTableName('oro_email');
 
         $ownerProviders = $this->ownerProviderStorage->getProviders();
         foreach ($ownerProviders as $ownerProvider) {
