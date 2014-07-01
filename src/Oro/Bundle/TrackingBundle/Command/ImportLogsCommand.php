@@ -52,11 +52,8 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
         $ignoredFilename = $this->getIgnoredFilename();
         $finder
             ->files()
-            ->filter(
-                function (\SplFileInfo $file) use ($ignoredFilename) {
-                    return $ignoredFilename != $file->getFilename();
-                }
-            )
+            ->notName($ignoredFilename)
+            ->notName('settings.ser')
             ->in($directory);
 
         /** @var SplFileInfo $file */
