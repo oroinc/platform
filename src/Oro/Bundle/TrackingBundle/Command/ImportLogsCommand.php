@@ -46,13 +46,12 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
         $finder = new Finder();
 
         $directory = $this
-                ->getContainer()
-                ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
+            ->getContainer()
+            ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
 
-        $ignoredFilename = $this->getIgnoredFilename();
         $finder
             ->files()
-            ->notName($ignoredFilename)
+            ->notName($this->getIgnoredFilename())
             ->notName('settings.ser')
             ->in($directory);
 
