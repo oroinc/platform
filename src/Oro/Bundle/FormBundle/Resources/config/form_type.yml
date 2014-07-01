@@ -12,6 +12,7 @@ parameters:
     oro_form.type.entity_create_or_select.class:                 Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
+    oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -149,3 +150,10 @@ services:
         class: %oro_form.type.textlist.class%
         tags:
             - { name: form.type, alias: oro_textlist }
+
+    oro_form.type.oro_entity_create_or_select_inline:
+        class: %oro_form.type.oro_entity_create_or_select_inline.class%
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: form.type, alias: oro_entity_create_or_select_inline }

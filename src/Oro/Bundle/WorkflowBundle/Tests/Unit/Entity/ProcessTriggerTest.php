@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
@@ -153,23 +155,29 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
         $importedEntity
             ->setEvent(ProcessTrigger::EVENT_UPDATE)
             ->setField('testField')
+            ->setPriority(Job::PRIORITY_HIGH)
             ->setQueued(true)
             ->setTimeShift(123)
             ->setDefinition($importedDefinition);
 
-        $this->assertNotEquals($importedEntity->getEvent(), $this->entity->getEvent());
-        $this->assertNotEquals($importedEntity->getField(), $this->entity->getField());
-        $this->assertNotEquals($importedEntity->isQueued(), $this->entity->isQueued());
-        $this->assertNotEquals($importedEntity->getTimeShift(), $this->entity->getTimeShift());
-        $this->assertNotEquals($importedEntity->getDefinition(), $this->entity->getDefinition());
-
+        $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity, false);
         $this->entity->import($importedEntity);
+        $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity);
+    }
 
-        $this->assertEquals($importedEntity->getEvent(), $this->entity->getEvent());
-        $this->assertEquals($importedEntity->getField(), $this->entity->getField());
-        $this->assertEquals($importedEntity->isQueued(), $this->entity->isQueued());
-        $this->assertEquals($importedEntity->getTimeShift(), $this->entity->getTimeShift());
-        $this->assertEquals($importedEntity->getDefinition(), $this->entity->getDefinition());
-
+    /**
+     * @param ProcessTrigger $expectedEntity
+     * @param ProcessTrigger $actualEntity
+     * @param bool $isEquals
+     */
+    protected function assertProcessTriggerEntitiesEquals($expectedEntity, $actualEntity, $isEquals = true)
+    {
+        $method = $isEquals ? 'assertEquals' : 'assertNotEquals';
+        $this->$method($expectedEntity->getEvent(), $actualEntity->getEvent());
+        $this->$method($expectedEntity->getField(), $actualEntity->getField());
+        $this->$method($expectedEntity->getPriority(), $actualEntity->getPriority());
+        $this->$method($expectedEntity->isQueued(), $actualEntity->isQueued());
+        $this->$method($expectedEntity->getTimeShift(), $actualEntity->getTimeShift());
+        $this->$method($expectedEntity->getDefinition(), $actualEntity->getDefinition());
     }
 }

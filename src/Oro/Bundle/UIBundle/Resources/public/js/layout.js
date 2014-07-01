@@ -7,6 +7,7 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var bootstrap = require('bootstrap');
+    var __ = require('orotranslation/js/translator');
 
     var scrollspy = require('oroui/js/scrollspy');
     var widgetControlInitializer = require('oroui/js/widget-control-initializer');
@@ -88,9 +89,14 @@ define(function (require) {
 
     layout.styleForm = function (container) {
         if ($.isPlainObject($.uniform)) {
-            var elements = $(container).find('input:file, select:not(.select2)');
-            elements.uniform();
-            elements.trigger('uniformInit');
+            var selectElements = $(container).find('select:not(.select2)');
+            selectElements.uniform();
+
+            var fileElements = $(container).find('input:file');
+            fileElements.uniform({fileDefaultHtml: __('Please select a file...')});
+
+            selectElements.trigger('uniformInit');
+            fileElements.trigger('uniformInit');
         }
     };
 

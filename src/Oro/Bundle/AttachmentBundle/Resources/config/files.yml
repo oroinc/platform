@@ -1,0 +1,6 @@
+file-icons:
+    default: icon-file
+    doc: icon-file
+    docx: icon-file
+    xls: icon-file
+    xlsx: icon-file

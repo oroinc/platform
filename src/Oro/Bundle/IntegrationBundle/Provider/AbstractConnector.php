@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
@@ -18,7 +18,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Channel */
+    /** @var Integration */
     protected $channel;
 
     /** @var ParameterBag */

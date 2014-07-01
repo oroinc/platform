@@ -13,7 +13,7 @@ use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
-class ExportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
+class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {
     /**
      * @var ContextInterface

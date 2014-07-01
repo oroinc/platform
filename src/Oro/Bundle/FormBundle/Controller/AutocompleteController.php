@@ -30,6 +30,7 @@ class AutocompleteController extends Controller
         $query   = $request->get('query');
         $page    = intval($request->get('page', 1));
         $perPage = intval($request->get('per_page', 50));
+        $searchById = (bool) $request->get('search_by_id', false);
 
         if (!$name) {
             throw new HttpException(400, 'Parameter "name" is required');
@@ -50,6 +51,6 @@ class AutocompleteController extends Controller
         /** @var SearchHandlerInterface $searchHandler */
         $searchHandler = $this->get('oro_form.autocomplete.search_registry')->getSearchHandler($name);
 
-        return new JsonResponse($searchHandler->search($query, $page, $perPage));
+        return new JsonResponse($searchHandler->search($query, $page, $perPage, $searchById));
     }
 }
