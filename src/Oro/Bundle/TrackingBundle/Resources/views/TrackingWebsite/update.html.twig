@@ -2,7 +2,7 @@
 
 {% oro_title_set({params : {
     '%entity.name%': entity.name,
-    '%entityName%': 'oro.tracking.tracking_website.entity_label'|trans }
+    '%entityName%': 'oro.tracking.trackingwebsite.entity_label'|trans }
 }) %}
 {% set entityId = entity.id %}
 
@@ -24,12 +24,12 @@
         {% set breadcrumbs = {
             'entity': entity,
             'indexPath': path('oro_tracking_website_index'),
-            'indexLabel': 'oro.tracking.tracking_website.entity_plural_label'|trans,
+            'indexLabel': 'oro.tracking.trackingwebsite.entity_plural_label'|trans,
             'entityTitle': entity.name
         } %}
         {{ parent() }}
     {% else %}
-        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.tracking.tracking_website.entity_label'|trans}) %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.tracking.trackingwebsite.entity_label'|trans}) %}
         {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}

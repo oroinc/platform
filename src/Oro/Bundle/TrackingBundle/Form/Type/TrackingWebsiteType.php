@@ -31,21 +31,21 @@ class TrackingWebsiteType extends AbstractType
                 'name',
                 'text',
                 [
-                    'label' => 'oro.tracking.tracking_website.name.label'
+                    'label' => 'oro.tracking.trackingwebsite.name.label'
                 ]
             )
             ->add(
                 'identifier',
                 'text',
                 [
-                    'label' => 'oro.tracking.tracking_website.identifier.label'
+                    'label' => 'oro.tracking.trackingwebsite.identifier.label'
                 ]
             )
             ->add(
                 'url',
                 'text',
                 [
-                    'label' => 'oro.tracking.tracking_website.url.label'
+                    'label' => 'oro.tracking.trackingwebsite.url.label'
                 ]
             );
     }

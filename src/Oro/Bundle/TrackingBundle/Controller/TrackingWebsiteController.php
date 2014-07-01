@@ -108,7 +108,7 @@ class TrackingWebsiteController extends Controller
                     'parameters' => array('id' => $entity->getId())
                 );
             },
-            $this->getTranslator()->trans('oro.tracking.tracking_website.saved_message')
+            $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
         );
     }
 
