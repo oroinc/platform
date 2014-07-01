@@ -4,6 +4,9 @@ namespace Oro\Bundle\TrackingBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolation
+ */
 class TrackingDataControllerTest extends WebTestCase
 {
     protected function setUp()
@@ -16,6 +19,7 @@ class TrackingDataControllerTest extends WebTestCase
         $options = [
             'param1' => 'value1',
             'param2' => 'value2',
+            'param3' => 'value3',
         ];
 
         $this->client->request(
@@ -25,7 +29,8 @@ class TrackingDataControllerTest extends WebTestCase
             [],
             $this->generateWsseAuthHeader()
         );
-        $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $response = $this->client->getResponse();
+        $result = $this->getJsonResponseContent($response, 200);
+        $this->assertArrayHasKey('success', $result);
     }
 }

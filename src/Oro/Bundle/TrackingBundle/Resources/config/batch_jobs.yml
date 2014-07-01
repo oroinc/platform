@@ -22,7 +22,7 @@ connector:
                     title:     import
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
-                        reader:    oro_tracking.importexport.reader.request
+                        reader:    oro_tracking.importexport.reader.context
                         processor: oro_importexport.processor.import_delegate
                         writer:    oro_integration.writer.persistent_batch_writer
                     parameters:

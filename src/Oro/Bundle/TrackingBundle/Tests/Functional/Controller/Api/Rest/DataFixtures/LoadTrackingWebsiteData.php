@@ -44,6 +44,7 @@ class LoadTrackingWebsiteData extends AbstractFixture implements ContainerAwareI
 
         $website = new TrackingWebsite();
         $website
+            ->setName('delete')
             ->setIdentifier('delete')
             ->setUrl('http://domain.com')
             ->setOwner($owner);

@@ -5,9 +5,8 @@ namespace Oro\Bundle\TrackingBundle\ImportExport;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
-use Symfony\Component\HttpFoundation\Request;
 
-class RequestReader extends AbstractReader
+class ContextReader extends AbstractReader
 {
     /**
      * @var array
@@ -19,7 +18,11 @@ class RequestReader extends AbstractReader
      */
     public function read()
     {
-        return $this->data;
+        $data = $this->data;
+
+        $this->data = null;
+
+        return $data;
     }
 
     /**

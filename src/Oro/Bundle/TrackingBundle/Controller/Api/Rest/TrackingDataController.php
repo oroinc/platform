@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\TrackingBundle\Controller\Api\Rest;
 
+use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
  * @RouteResource("tracking_data")
  * @NamePrefix("oro_api_")
  */
-class TrackingDataController extends ContainerAware
+class TrackingDataController extends RestController implements ClassResourceInterface
 {
     /**
      * @ApiDoc(
@@ -54,11 +56,17 @@ class TrackingDataController extends ContainerAware
             'success' => $isSuccessful
         ];
 
+        $code = Codes::HTTP_OK;
+
         if (!$isSuccessful) {
             $response['errors'] = $jobResult->getFailureExceptions();
+
+            $code = Codes::HTTP_BAD_REQUEST;
         }
 
-        return new Response();
+        return $this->handleView(
+            $this->view($response, $code)
+        );
     }
 
     /**
@@ -75,5 +83,29 @@ class TrackingDataController extends ContainerAware
     protected function getClassName()
     {
         return $this->container->getParameter('oro_tracking.tracking_data.class');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormHandler()
+    {
+        throw new \Exception('Not implemented');
     }
 }
