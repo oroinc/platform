@@ -15,5 +15,3 @@ Oro\Bundle\TrackingBundle\Entity\TrackingWebsite:
             - Url: ~
             - Length:
                 max: 255
-        owner:
-            - NotBlank: ~
