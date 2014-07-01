@@ -31,7 +31,27 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         return [
             'empty' => [
                 'configs'  => [[]],
-                'expected' => []
+                'expected' => [
+                    'settings' => [
+                        'resolved'                 => 1,
+                        'dynamic_tracking_enabled' => [
+                            'value' => false,
+                            'scope' => 'app'
+                        ],
+                        'log_rotate_interval'      => [
+                            'value' => 60,
+                            'scope' => 'app'
+                        ],
+                        'piwik_host'               => [
+                            'value' => null,
+                            'scope' => 'app'
+                        ],
+                        'piwik_token_auth'         => [
+                            'value' => null,
+                            'scope' => 'app'
+                        ]
+                    ]
+                ]
             ]
         ];
     }

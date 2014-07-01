@@ -3,9 +3,15 @@
 namespace Oro\Bundle\TrackingBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\TrackingBundle\EventListener\ConfigListener;
+use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Filesystem
+     */
+    protected $fs;
+
     /**
      * @var string
      */
@@ -38,11 +44,15 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logsDir = realpath(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures';
-        $this->trackingDir = $this->logsDir . DIRECTORY_SEPARATOR . 'tracking';
-        $this->settingsFile = $this->trackingDir . DIRECTORY_SEPARATOR . 'settings.ser';
+        $this->fs = new Filesystem();
 
-        $this->removeSettings();
+        $this->logsDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . time();
+        $this->fs->mkdir($this->logsDir);
+
+        $this->trackingDir = $this->logsDir . DIRECTORY_SEPARATOR . 'tracking';
+        $this->fs->mkdir($this->logsDir);
+
+        $this->settingsFile = $this->trackingDir . DIRECTORY_SEPARATOR . 'settings.ser';
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -60,17 +70,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $this->removeSettings();
-    }
-
-    protected function removeSettings()
-    {
-        if (is_file($this->settingsFile)) {
-            unlink($this->settingsFile);
-        }
-        if (is_dir($this->trackingDir)) {
-            rmdir($this->trackingDir);
-        }
+        $this->fs->remove($this->logsDir);
     }
 
     public function testOnUpdateAfterNoChanges()
@@ -181,7 +181,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('oro_tracking_website_view')
+            ->with('oro_api_create_tracking_data')
             ->will($this->returnValue('/test/url'));
 
         $this->listener->onUpdateAfter($event);
