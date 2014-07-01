@@ -5,11 +5,11 @@ namespace Oro\Bundle\TrackingBundle\Controller\Api\Rest;
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-
+use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,7 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
  * @RouteResource("tracking_data")
  * @NamePrefix("oro_api_")
  */
-class TrackingDataController extends RestController implements ClassResourceInterface
+class TrackingDataController extends FOSRestController implements ClassResourceInterface
 {
     /**
      * @ApiDoc(
@@ -44,7 +44,7 @@ class TrackingDataController extends RestController implements ClassResourceInte
             'import_request_to_database',
             [
                 'import' => [
-                    'entityName'     => $this->getClassName(),
+                    'entityName'     => $this->container->getParameter('oro_tracking.tracking_data.class'),
                     'processorAlias' => 'oro_tracking.processor.data',
                     'data'           => $request->query->all(),
                 ]
@@ -75,37 +75,5 @@ class TrackingDataController extends RestController implements ClassResourceInte
     protected function getJobExecutor()
     {
         return $this->container->get('oro_importexport.job_executor');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getClassName()
-    {
-        return $this->container->getParameter('oro_tracking.tracking_data.class');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getManager()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getForm()
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormHandler()
-    {
-        throw new \Exception('Not implemented');
     }
 }

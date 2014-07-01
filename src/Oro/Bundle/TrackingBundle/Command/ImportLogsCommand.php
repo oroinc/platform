@@ -24,7 +24,7 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
      */
     public function getDefaultDefinition()
     {
-        return '*/5 * * * *';
+        return '1 * * * *';
     }
 
     /**
@@ -42,30 +42,22 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $fs        = new Filesystem();
-        $finder    = new Finder();
-        $className = $this->getContainer()->getParameter('oro_tracking.tracking_data.class');
+        $fs     = new Filesystem();
+        $finder = new Finder();
 
         $directory = $this
                 ->getContainer()
                 ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
 
-        if (!$fs->exists($directory)) {
-            throw new \InvalidArgumentException(
-                sprintf('Directory "%s" does not exists', $directory)
-            );
-        }
-
+        $ignoredFilename = $this->getIgnoredFilename();
         $finder
             ->files()
-            ->notName(
-                sprintf('%s*.log', date('Ymd-H'))
+            ->filter(
+                function (\SplFileInfo $file) use ($ignoredFilename) {
+                    return $ignoredFilename != $file->getFilename();
+                }
             )
             ->in($directory);
-
-        if (!$finder->count()) {
-            throw new \InvalidArgumentException('All files were imported');
-        }
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
@@ -73,7 +65,7 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
             $fileName = $file->getFilename();
 
             $options = [
-                'entityName'     => $className,
+                'entityName'     => $this->getContainer()->getParameter('oro_tracking.tracking_data.class'),
                 'processorAlias' => 'oro_tracking.processor.data',
                 'file'           => $pathName
             ];
@@ -144,5 +136,24 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
             ->getOneOrNullResult();
 
         return $result['jobs'];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getIgnoredFilename()
+    {
+        $config            = $this->getContainer()->get('oro_config.user');
+        $logRotateInterval = $config->get('oro_tracking.log_rotate_interval');
+
+        $rotateInterval = 60;
+        $currentPart    = 1;
+        if ($logRotateInterval > 0 && $logRotateInterval < 60) {
+            $rotateInterval = (int)$logRotateInterval;
+            $passingMinute  = intval(date('i')) + 1;
+            $currentPart    = ceil($passingMinute / $rotateInterval);
+        }
+
+        return date('Ymd-H') . '-' . $rotateInterval . '-' . $currentPart . '.log';
     }
 }
