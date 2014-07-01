@@ -45,13 +45,25 @@ define([
             }
 
             $form.data('sent', true);
-            options = formToAjaxOptions($form, {
-                complete: function () {
-                    $form.removeData('sent');
-                }
-            });
 
-            mediator.execute('submitPage', options);
+            url = $form.attr('action');
+            method = $form.attr('method') || 'GET';
+
+            if (url && method.toUpperCase() === 'GET') {
+                data = $form.serialize();
+                if (data) {
+                    url += (url.indexOf('?') === -1 ? '?' : '&') + data;
+                }
+                mediator.execute('redirectTo', {url: url});
+                $form.removeData('sent');
+            } else {
+                options = formToAjaxOptions($form, {
+                    complete: function () {
+                        $form.removeData('sent');
+                    }
+                });
+                mediator.execute('submitPage', options);
+            }
         }
     });
 
