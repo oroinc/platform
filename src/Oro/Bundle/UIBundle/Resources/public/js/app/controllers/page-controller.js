@@ -23,8 +23,16 @@ define([
          * @override
          */
         initialize: function () {
+            var page;
             PageController.__super__.initialize.apply(this, arguments);
-            this.model = new PageModel();
+
+            page = new PageModel();
+            this.listenTo(page, 'request', this.onPageRequest);
+            this.listenTo(page, 'change', this.onPageLoaded);
+            this.listenTo(page, 'sync', this.onPageUpdated);
+            this.listenTo(page, 'invalid', this.onPageInvalid);
+            this.listenTo(page, 'error', this.onPageError);
+            this.model = page;
         },
 
         /**
@@ -59,9 +67,9 @@ define([
 
             if (cacheItem && options.force !== true) {
                 options.fromCache = true;
-                this.onPageRequest(this.model, null, {actionArgs: args});
+                this.publishEvent('page:request', args);
                 this.model.set(cacheItem.page, {actionArgs: args});
-                this.onPageUpdated(this.model, null, {actionArgs: args});
+                this.publishEvent('page:afterChange');
             } else {
                 this.model.fetch({
                     url: url,
@@ -82,18 +90,9 @@ define([
          * @private
          */
         _beforePageLoad: function (route, params, options) {
-            var oldRoute, newRoute, page;
-
-            page = this.model;
+            var oldRoute, newRoute;
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
-
-            this.listenTo(page, 'request', this.onPageRequest);
-            this.listenTo(page, 'change', this.onPageLoaded);
-            this.listenTo(page, 'sync', this.onPageUpdated);
-            this.listenTo(page, 'invalid', this.onPageInvalid);
-            this.listenTo(page, 'error', this.onPageError);
-
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
         },
 
@@ -210,7 +209,9 @@ define([
                 parser.href = url;
                 url = parser.pathname + (parser.search || '');
                 this.publishEvent('page:redirect');
-                utils.redirectTo({url: url}, _.extend(options, {forceStartup: true, force: true}));
+                options = options || {};
+                _.extend(options, {forceStartup: true, force: true});
+                utils.redirectTo({url: url}, options);
             } else {
                 utils.redirectTo({url: url}, options);
             }
@@ -228,11 +229,11 @@ define([
                 utils.redirectTo({url: url}, {forceStartup: true, force: true});
                 mediator.trigger('page:refreshed');
             });
+            mediator.setHandler('submitPage', this._submitPage, this);
             mediator.setHandler('afterPageChange', function () {
-                mediator.publishEvent('page:afterChange');
+                mediator.trigger('page:afterChange');
             });
         },
-
 
         /**
          * Make data more bulletproof.
@@ -276,6 +277,20 @@ define([
 
             return dataObj;
         },
+
+        /**
+         * Performs save call for a model
+         * (is used for saving forms, all data should be already packet into options)
+         *
+         * @param options
+         * @private
+         */
+        _submitPage: function (options) {
+            this.publishEvent('page:beforeChange');
+            options.actionArgs = options.actionArgs || {};
+            _.defaults(options.actionArgs, {params: {}, route: {}, options: {}});
+            this.model.save(null, options);
+        }
     });
 
     return PageController;

@@ -1,4 +1,4 @@
-/*jslint nomen:true*/
+/*jslint nomen:true, eqeq:true*/
 /*global define*/
 define([
     'underscore',
@@ -36,22 +36,25 @@ define([
          * @override
          */
         fetch: function (options) {
-            var headers, headerId;
-            headers = {};
-            headerId = mediator.execute('retrieveOption', 'headerId');
-            if (headerId) {
-                // @TODO discuss if 'x-oro-hash-navigation' header is still necessary
-                headers[headerId] = true;
-            }
-
-            options = _.defaults(options || {}, {
-                accepts: {
-                    // @TODO refactor server side action point to accept 'application/json'
-                    "json": "*/*"
-                },
-                headers: headers
-            });
+            options = this._extendOptions(options);
             PageModel.__super__.fetch.call(this, options);
+        },
+
+        /**
+         * Saves model
+         *  - extends options with required parameters
+         *
+         * @param key
+         * @param value
+         * @param options
+         * @returns {XMLHttpRequest}
+         */
+        save: function (key, value, options) {
+            if (key == null || typeof key === 'object') {
+                options = value;
+            }
+            options = this._extendOptions(options);
+            return PageModel.__super__.save.call(this, key, value, options);
         },
 
         /**
@@ -69,6 +72,33 @@ define([
                 result = _.pick(attrs, ['redirect', 'fullRedirect', 'location']);
             }
             return result;
+        },
+
+        /**
+         * Adds extra options
+         *
+         * @param {Object} options
+         * @returns {Object}
+         * @private
+         */
+        _extendOptions: function (options) {
+            var headerId;
+            options = options || {};
+            _.extend(options, {
+                accepts: {
+                    // @TODO refactor server side action point to accept 'application/json'
+                    "json": "*/*"
+                }
+            });
+
+            // @TODO discuss if 'x-oro-hash-navigation' header is still necessary
+            headerId = mediator.execute('retrieveOption', 'headerId');
+            if (headerId) {
+                options.headers = options.headers || {};
+                options.headers[headerId] = true;
+            }
+
+            return options;
         }
     });
 

@@ -56,7 +56,7 @@ define([
                 updateProxy = $.proxy(this.updatePos, this);
                 $(window).resize(updateProxy).scroll(updateProxy);
             }
-            BaseView.__super__.initialize.apply(this, arguments);
+            LoadingMaskView.__super__.initialize.apply(this, arguments);
         },
 
         /**
