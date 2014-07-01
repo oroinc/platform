@@ -117,7 +117,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             false,
             'SET NULL'
         );
-        if (in_array($fieldId->getFieldType(), AttachmentScope::$attachmentTypes)) {
+        /** @var FieldConfigId $realFieldId */
+        $realFieldId = $this->extendConfigProvider->getId($fieldId->getClassName(), $fieldId->getFieldName());
+        if (in_array($realFieldId->getFieldType(), AttachmentScope::$attachmentTypes)) {
             $builder->cascadePersist();
         }
         $builder->cascadeDetach();
