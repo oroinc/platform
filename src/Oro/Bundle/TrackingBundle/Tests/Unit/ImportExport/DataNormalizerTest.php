@@ -121,22 +121,31 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function dataProvider()
     {
+        $data = [
+            'website' => 'id1',
+            'name'    => 'name',
+            'value'   => 'value',
+            'user'    => 'user',
+        ];
+
         return [
             [
                 [],
                 [
-                    'data'  => json_encode([]),
-                    'event' => []
+                    'data' => json_encode([]),
                 ]
             ],
             [
-                ['website' => 'id1'],
+                $data,
                 [
-                    'data'  => '{"website":"id1"}',
+                    'data'  => json_encode($data),
                     'event' => [
                         'website' => [
-                            'identifier' => 'id1'
-                        ]
+                            'identifier' => 'id1',
+                        ],
+                        'name'    => 'name',
+                        'value'   => 'value',
+                        'user'    => 'user',
                     ]
                 ]
             ]
