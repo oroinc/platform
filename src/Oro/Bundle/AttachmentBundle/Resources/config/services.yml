@@ -33,7 +33,7 @@ services:
         arguments:
             - @oro_entity_extend.relation_builder
         tags:
-            - { name: oro_entity_extend.dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.migration.extension.attachment:
         class: %oro_attachment.migration.extension.attachment.class%
