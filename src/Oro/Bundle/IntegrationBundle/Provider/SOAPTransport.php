@@ -5,8 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Guzzle\Http\Url;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 /**
