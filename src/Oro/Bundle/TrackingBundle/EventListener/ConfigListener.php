@@ -83,7 +83,7 @@ class ConfigListener
     {
         foreach ($this->keys as $key) {
             if (!array_key_exists($key, $configuration)) {
-                $value = $this->configManager->get($this->getKeyName($key), true);
+                $value = $this->configManager->get($this->getKeyName($key));
                 $value = is_array($value) ? $value['value'] : $value;
                 $configuration[$key] = $value;
             }
