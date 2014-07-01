@@ -8,7 +8,7 @@ require([
      * Init PageHistoryView
      */
     BaseController.loadBeforeAction([
-        'oronavigation/js/app/views/page/history-view'
+        'oronavigation/js/app/views/history-view'
     ], function (PageHistoryView) {
         BaseController.addToReuse('history', PageHistoryView, {
             el: '#history-content'
@@ -19,7 +19,7 @@ require([
      * Init PageMostViewedView
      */
     BaseController.loadBeforeAction([
-        'oronavigation/js/app/views/page/most-viewed-view'
+        'oronavigation/js/app/views/most-viewed-view'
     ], function (PageMostViewedView) {
         BaseController.addToReuse('mostViewed', PageMostViewedView, {
             el: '#mostviewed-content'
@@ -31,7 +31,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/page/favorite/main-view',
+        'oronavigation/js/app/views/favorite/main-view',
         'oronavigation/js/app/models/base/model',
         'oroui/js/app/models/base/collection'
     ], function ($, FavoriteView, Model, Collection) {
@@ -63,7 +63,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/page/pin/main-view',
+        'oronavigation/js/app/views/pin/main-view',
         'oronavigation/js/app/models/base/model',
         'oroui/js/app/models/base/collection'
     ], function ($, PinView, Model, Collection) {

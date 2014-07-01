@@ -5,7 +5,7 @@ define([
     '../base/main-view',
     '../base/button-view',
     'oroui/js/app/views/base/collection-view',
-    './../base/item-view'
+    '../base/item-view'
 ], function (_, MainView, ButtonView, CollectionView, ItemView) {
     'use strict';
 

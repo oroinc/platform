@@ -5,7 +5,9 @@ define([
 ], function (Chaplin, BaseModel) {
     'use strict';
 
-    var BaseCollection = Chaplin.Collection.extend({
+    var BaseCollection;
+
+    BaseCollection = Chaplin.Collection.extend({
         model: BaseModel
     });
 

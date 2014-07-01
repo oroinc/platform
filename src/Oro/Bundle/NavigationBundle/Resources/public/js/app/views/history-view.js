@@ -5,9 +5,9 @@ define([
 ], function (PageRegionView) {
     'use strict';
 
-    var PageHistoryView;
+    var HistoryView;
 
-    PageHistoryView = PageRegionView.extend({
+    HistoryView = PageRegionView.extend({
         template: function (data) {
             return data.history;
         },
@@ -19,9 +19,9 @@ define([
                 return;
             }
 
-            PageHistoryView.__super__.render.call(this);
+            HistoryView.__super__.render.call(this);
         }
     });
 
-    return PageHistoryView;
+    return HistoryView;
 });

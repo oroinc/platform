@@ -4,7 +4,9 @@ define([
 ], function (Chaplin) {
     'use strict';
 
-    var BaseModel = Chaplin.Model.extend({
+    var BaseModel;
+
+    BaseModel = Chaplin.Model.extend({
 
     });
 

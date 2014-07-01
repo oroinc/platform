@@ -5,9 +5,9 @@ define([
 ], function (PageRegionView) {
     'use strict';
 
-    var PageMostViewedView;
+    var MostViewedView;
 
-    PageMostViewedView = PageRegionView.extend({
+    MostViewedView = PageRegionView.extend({
         template: function (data) {
             return data.mostviewed;
         },
@@ -19,9 +19,9 @@ define([
                 return;
             }
 
-            PageMostViewedView.__super__.render.call(this);
+            MostViewedView.__super__.render.call(this);
         }
     });
 
-    return PageMostViewedView;
+    return MostViewedView;
 });
