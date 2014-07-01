@@ -177,6 +177,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             $(openDropdownsSelector).removeClass('open');
         });
 
+        mediator.on('page:beforeChange', function () {
+            $('.pin-menus.dropdown.open, .nav .dropdown.open').removeClass('open');
+        });
+
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function (e) {
             var $elem = $(e.target),

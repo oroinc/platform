@@ -12,11 +12,11 @@ function($, _, routing, mediator) {
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
-          mediator.bind(
-              'page:afterChange',
-              searchByTagClose,
-              this
-          );
+          mediator.bind('page:beforeChange', function () {
+              searchBarContainer.removeClass('header-search-focused');
+          });
+
+          mediator.bind('page:afterChange', searchByTagClose);
 
           $(document).on('click', '.search-view-more-link', function(evt) {
               $('#top-search-form').submit();
