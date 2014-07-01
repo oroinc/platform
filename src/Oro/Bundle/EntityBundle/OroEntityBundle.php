@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
 
 class OroEntityBundle extends Bundle
@@ -16,5 +17,6 @@ class OroEntityBundle extends Bundle
     {
         parent::build($container);
         $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
+        $container->addCompilerPass(new ExclusionProviderPass());
     }
 }
