@@ -54,7 +54,7 @@ Before the new activity entity can be used in ORO platform you need to configure
  - [The activity list section](#how-to-configure-ui-for-activity-list-section)
  - [The add activity button](#how-to-configure-ui-for-activity-button)
 
-Also please take a look at [all configuration options](/Resources/config/entity_config.yml) for the activity scope before you continue reading.
+Also please take a look at [all configuration options](./Resources/config/entity_config.yml) for the activity scope before you continue reading.
 
 ### How to configure UI for activity list section
 
