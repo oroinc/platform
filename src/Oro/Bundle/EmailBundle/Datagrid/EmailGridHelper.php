@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -93,8 +92,8 @@ class EmailGridHelper
         if (null === $this->emailOrigins) {
             if ($userId) {
                 $user = $this->doctrineHelper
-                    ->getEntityManager('OroUserBundle:User')
-                    ->getRepository('OroUserBundle:User')
+                    ->getEntityManager($this->userClass)
+                    ->getRepository($this->userClass)
                     ->find($userId);
 
                 $this->emailOrigins = $user->getEmailOrigins();
