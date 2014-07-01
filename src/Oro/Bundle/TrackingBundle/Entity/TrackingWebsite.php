@@ -46,7 +46,7 @@ class TrackingWebsite
     /**
      * @var string
      *
-     * @ORM\Column(name="identifier", type="string", length=255, nullable=false, unique=true)
+     * @ORM\Column(name="identifier", type="string", length=255, unique=true)
      * @ConfigField(
      *  defaultValues={
      *      "importexport"={
@@ -60,14 +60,14 @@ class TrackingWebsite
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     * @ORM\Column(name="name", type="string", length=255)
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="url", type="string", length=255, nullable=false)
+     * @ORM\Column(name="url", type="string", length=255)
      */
     protected $url;
 
@@ -82,7 +82,7 @@ class TrackingWebsite
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 

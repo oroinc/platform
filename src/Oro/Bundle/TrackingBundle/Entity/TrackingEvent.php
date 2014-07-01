@@ -40,35 +40,35 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
+     * @ORM\Column(name="name", type="string", length=255)
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255, nullable=false)
+     * @ORM\Column(name="value", type="string", length=255)
      */
     protected $value;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="user", type="string", length=255, nullable=false)
+     * @ORM\Column(name="user", type="string", length=255)
      */
     protected $user;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="logged_at", type="datetime", nullable=false)
+     * @ORM\Column(name="logged_at", type="datetime")
      */
     protected $loggedAt;
 

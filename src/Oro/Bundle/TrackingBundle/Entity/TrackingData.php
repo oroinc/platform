@@ -33,7 +33,7 @@ class TrackingData
     /**
      * @var string
      *
-     * @ORM\Column(name="data", type="text", nullable=false)
+     * @ORM\Column(name="data", type="text")
      */
     protected $data;
 
@@ -55,7 +55,7 @@ class TrackingData
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 
