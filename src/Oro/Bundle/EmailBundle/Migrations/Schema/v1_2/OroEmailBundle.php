@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -13,8 +16,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
-class OroEmailBundle implements Migration, NameGeneratorAwareInterface, ExtendExtensionAwareInterface
+class OroEmailBundle implements
+    Migration,
+    NameGeneratorAwareInterface,
+    ExtendExtensionAwareInterface,
+    ContainerAwareInterface
 {
     /**
      * @var ExtendDbIdentifierNameGenerator
@@ -25,6 +34,11 @@ class OroEmailBundle implements Migration, NameGeneratorAwareInterface, ExtendEx
      * @var ExtendExtension
      */
     protected $extendExtension;
+
+    /**
+     * @var EmailOwnerProviderStorage
+     */
+    protected $ownerProviderStorage;
 
     /**
      * @inheritdoc
@@ -43,58 +57,63 @@ class OroEmailBundle implements Migration, NameGeneratorAwareInterface, ExtendEx
     }
 
     /**
+     * @inheritdoc
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->ownerProviderStorage = $container->get(EmailOwnerConfigurationPass::SERVICE_KEY);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $fromAndRecipientsUser = '
-            SELECT DISTINCT email_id, user_id FROM (
-            SELECT e.id as email_id,
-                ed.owner_user_id as user_id
-            FROM oro_email_address ed
-            INNER JOIN oro_email e ON e.from_email_address_id = ed.id
-            WHERE ed.owner_user_id IS NOT NULL
-            UNION
-            SELECT DISTINCT er.email_id as email_id, ed.owner_user_id as user_id
-            FROM oro_email_address ed
-            INNER JOIN oro_email_recipient er ON er.email_address_id=ed.id
-            WHERE ed.owner_user_id IS NOT NULL) as subq';
+        $fromAndRecipients = '
+            SELECT DISTINCT email_id, owner_id FROM (
+                SELECT
+                    e.id as email_id,
+                    ed.[owner] as owner_id
+                FROM oro_email_address ed
+                INNER JOIN oro_email e ON e.from_email_address_id = ed.id
+                WHERE ed.[owner] IS NOT NULL
+                UNION
+                SELECT DISTINCT er.email_id as email_id, ed.[owner] as owner_id
+                FROM oro_email_address ed
+                INNER JOIN oro_email_recipient er ON er.email_address_id=ed.id
+                WHERE ed.[owner] IS NOT NULL
+            ) as subq';
+        $sourceClassName = $this->extendExtension->getEntityClassByTableName('oro_email');
 
-        $fromAndRecipientsContact = '
-            SELECT DISTINCT email_id, contact_id FROM (
-            SELECT
-                e.id as email_id,
-                ed.owner_contact_id as contact_id
-            FROM oro_email_address ed
-            INNER JOIN oro_email e ON e.from_email_address_id = ed.id
-            WHERE ed.owner_contact_id IS NOT NULL
-            UNION
-            SELECT DISTINCT er.email_id as email_id, ed.owner_contact_id as contact_id
-            FROM oro_email_address ed
-            INNER JOIN oro_email_recipient er ON er.email_address_id=ed.id
-            WHERE ed.owner_contact_id IS NOT NULL) as subq';
+        $ownerProviders = $this->ownerProviderStorage->getProviders();
+        foreach ($ownerProviders as $ownerProvider) {
+            $ownerFieldName = $this->ownerProviderStorage->getEmailOwnerColumnName($ownerProvider);
 
-        $this->migrateEmails('oro_email', 'oro_user', $fromAndRecipientsUser, $queries);
-        $this->migrateEmails('oro_email', 'orocrm_contact', $fromAndRecipientsContact, $queries);
+            $select = str_replace(
+                '[owner]',
+                $ownerFieldName,
+                $fromAndRecipients
+            );
+
+            $this->migrateEmails($sourceClassName, $ownerProvider->getEmailOwnerClass(), $select, $queries);
+        }
     }
 
     /**
-     * @param string   $sourceTableName
-     * @param string   $targetTableName
+     * @param string   $sourceClassName
+     * @param string   $targetClassName
      * @param string   $selectQuery
      * @param QueryBag $queries
      */
-    public function migrateEmails($sourceTableName, $targetTableName, $selectQuery, QueryBag $queries)
+    public function migrateEmails($sourceClassName, $targetClassName, $selectQuery, QueryBag $queries)
     {
-        $targetClassName = $this->extendExtension->getEntityClassByTableName($targetTableName);
-        $selfClassName   = $this->extendExtension->getEntityClassByTableName($sourceTableName);
         $associationName = ExtendHelper::buildAssociationName(
             $targetClassName,
             ActivityScope::ASSOCIATION_KIND
         );
 
         $tableName = $this->nameGenerator->generateManyToManyJoinTableName(
-            $selfClassName,
+            $sourceClassName,
             $associationName,
             $targetClassName
         );
