@@ -7,9 +7,7 @@ use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -74,44 +72,23 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
                     );
 
                     if (!isset($entityExtendConfig->get('relation')[$relationKey])) {
-                        $relationName = Inflector::tableize($attachmentFieldName);
-                        $label        = ConfigHelper::getTranslationKey(
-                            'entity',
-                            'label',
-                            $entityClassName,
-                            $attachmentFieldName
-                        );
-
-                        // create field
-                        $this->createField(
-                            $entityClassName,
-                            $relationName,
-                            'manyToOne',
-                            [
-                                'extend' => [
-                                    'owner'         => ExtendScope::OWNER_CUSTOM,
-                                    'state'         => ExtendScope::STATE_ACTIVE,
-                                    'is_extend'     => true,
-                                    'target_entity' => AttachmentScope::ATTACHMENT_ENTITY,
-                                    'target_field'  => 'id',
-                                    'relation_key'  => $relationKey,
-                                ],
-                                'entity' => [
-                                    'label'       => $label,
-                                    'description' => '',
-                                ],
-                                'importexport' => [
-                                    'process_as_scalar' => true
-                                ]
-                            ]
-                        );
-
                         // add relation to owning entity
+                        $relationName = Inflector::tableize($attachmentFieldName);
                         $this->addManyToOneRelation(
                             AttachmentScope::ATTACHMENT_ENTITY,
                             $entityClassName,
                             $relationName,
                             $relationKey
+                        );
+
+                        $this->updateFieldConfigs(
+                            $entityClassName,
+                            $relationName,
+                            [
+                                'importexport' => [
+                                    'process_as_scalar' => true
+                                ]
+                            ]
                         );
                     }
                 }
@@ -146,27 +123,11 @@ class AttachmentExtendConfigDumperExtension extends ExtendConfigDumperExtension
 
     /**
      *  TODO:
-     *      Next methods (createField, updateFieldConfigs, addManyToOneRelation)
+     *      Next methods (updateFieldConfigs, addManyToOneRelation)
      *      is copy-past from AssociationExtendConfigDumperExtension
      *      and as discussed with Bravo team will be refactored.
      *
      */
-
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array  $values
-     */
-    protected function createField($className, $fieldName, $fieldType, $values)
-    {
-        $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, 'hidden');
-        $this->updateFieldConfigs(
-            $className,
-            $fieldName,
-            $values
-        );
-    }
 
     /**
      * @param string $className

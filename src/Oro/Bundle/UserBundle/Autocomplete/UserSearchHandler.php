@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
 class UserSearchHandler extends FullNameSearchHandler
@@ -11,18 +10,18 @@ class UserSearchHandler extends FullNameSearchHandler
     const IMAGINE_AVATAR_FILTER = 'avatar_med';
 
     /**
-     * @var CacheManager
+     * @var AttachmentManager
      */
-    protected $cacheManager;
+    protected $attachmentManager;
 
     /**
-     * @param CacheManager $cacheManager
+     * @param AttachmentManager $attachmentManager
      * @param string $userEntityName
      * @param array $properties
      */
-    public function __construct(CacheManager $cacheManager, $userEntityName, array $properties)
+    public function __construct(AttachmentManager $attachmentManager, $userEntityName, array $properties)
     {
-        $this->cacheManager = $cacheManager;
+        $this->attachmentManager = $attachmentManager;
         parent::__construct($userEntityName, $properties);
     }
 
@@ -34,9 +33,12 @@ class UserSearchHandler extends FullNameSearchHandler
         $result = parent::convertItem($user);
         $result['avatar'] = null;
 
-        $imagePath = $this->getPropertyValue('imagePath', $user);
-        if ($imagePath) {
-            $result['avatar'] = $this->cacheManager->getBrowserPath($imagePath, self::IMAGINE_AVATAR_FILTER);
+        $avatar = $this->getPropertyValue('avatar', $user);
+        if ($avatar) {
+            $result['avatar'] = $this->attachmentManager->getFilteredImageUrl(
+                $avatar,
+                self::IMAGINE_AVATAR_FILTER
+            );
         }
 
         return $result;
