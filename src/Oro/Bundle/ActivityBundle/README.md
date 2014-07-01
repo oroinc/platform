@@ -51,12 +51,11 @@ How to configure UI for the activity entity
 -------------------------------------------
 Before the new activity entity can be used in ORO platform you need to configure two things for entities this activity can be assigned:
 
- - [The activity list section](#activity_list)
- - [The add activity button](#activity_button)
+ - [The activity list section](#how-to-configure-ui-for-activity-list-section)
+ - [The add activity button](#how-to-configure-ui-for-activity-button)
 
 Also please take a look at [all configuration options](/Resources/config/entity_config.yml) for the activity scope before you continue reading.
 
-<a href="#activity_list"></a>
 ### How to configure UI for activity list section
 
 Let's start with the activity list. At the first you need to create the new action in your controller and TWIG template responsible to render the list of your activities.
@@ -119,7 +118,6 @@ class Email extends ExtendEmail
 
 Please note that in the above example we use `route` attribute to specify controller path and `acl` attribute to set ACL restrictions.
 
-<a href="#activity_button"></a>
 ### How to configure UI for activity button
 
 To add activity button on the view page of the entity your activity can be assigned, you need to do the following:
