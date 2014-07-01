@@ -1,4 +1,12 @@
 oro:
+    dashboard:
+        recent_emails:
+            title:       Recent Emails
+            inbox:       Inbox
+            sent:        Sent
+            view_all:    View All
+            description: This widget allows you to see most recent additions to your inbox and outbox
+
     email:
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template:                   "Choose a template..."
@@ -22,6 +30,7 @@ oro:
 
         menu:
             emailtemplate_list.description: List of email templates
+            user_emails: My Emails
 
         datagrid:
             emailtemplate:
@@ -37,6 +46,10 @@ oro:
                     all: "All"
                 view:
                     system_templates: "System only"
+            emails:
+                action:
+                    view: "View"
+
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 class EntitySelectType extends AbstractType
 {
@@ -42,7 +42,7 @@ class EntitySelectType extends AbstractType
             $fieldName = $fieldConfig->get('target_field');
             $vars['attr'] = array(
                 'data-selected-data' => json_encode(
-                    array(array($fieldName => $form->getData()->{'get' . ucfirst(Inflector::camelize($fieldName))}()))
+                    array(array($fieldName => FieldAccessor::getValue($form->getData(), $fieldName)))
                 )
             );
         }

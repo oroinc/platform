@@ -1,0 +1,31 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    protected $default_rel_2;
+    protected $default_rel1;
+
+    public function setDefaultRel2($value)
+    {
+        $this->default_rel_2 = $value; return $this;
+    }
+
+    public function setDefaultRel1($value)
+    {
+        $this->default_rel1 = $value; return $this;
+    }
+
+    public function getDefaultRel2()
+    {
+        return $this->default_rel_2;
+    }
+
+    public function getDefaultRel1()
+    {
+        return $this->default_rel1;
+    }
+
+    public function __construct()
+    {
+    }
+}

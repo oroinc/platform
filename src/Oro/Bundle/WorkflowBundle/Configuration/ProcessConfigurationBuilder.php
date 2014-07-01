@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
@@ -83,8 +85,9 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
         }
 
-        $field = $this->getConfigurationOption($configuration, 'field', null);
-        $queued = $this->getConfigurationOption($configuration, 'queued', false);
+        $field     = $this->getConfigurationOption($configuration, 'field', null);
+        $priority  = $this->getConfigurationOption($configuration, 'priority', Job::PRIORITY_DEFAULT);
+        $queued    = $this->getConfigurationOption($configuration, 'queued', false);
         $timeShift = $this->getConfigurationOption($configuration, 'time_shift', null);
 
         if ($timeShift && !is_int($timeShift) && !$timeShift instanceof \DateInterval) {
@@ -99,6 +102,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         $trigger
             ->setEvent($event)
             ->setField($field)
+            ->setPriority($priority)
             ->setQueued($queued)
             ->setDefinition($definition);
 

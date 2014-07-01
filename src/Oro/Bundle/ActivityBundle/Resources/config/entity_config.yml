@@ -1,0 +1,46 @@
+oro_entity_config:
+    activity:
+        entity:
+            items:
+                # the list of activities that can be assigned to the entity
+                activities: # array of class names
+                    options:
+                        priority:           250
+                        auditable:          false
+                    form:
+                        type:               oro_entity_extend_multiple_association_choice
+                        options:
+                            block:          associations
+                            required:       false
+                            label:          oro.activity.activities
+                            association_class: activity
+                # this attribute can be used to prohibit changing activity state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than no one activity state can be changed
+                # also it can be an array with the list of activities which state cannot be changed
+                immutable: # boolean or array
+                    options: []
+
+                # the route name for the controller that can be used to render the list of this type of activities
+                # this controller must have $entityClass and $entityId parameters are used to pass the target entity
+                # this attribute must be defined for each activity entity (an entity included in 'activity' group,
+                # see 'grouping' scope)
+                route: # string
+                    options: []
+                # the ACL ancestor that is used to check whether this type of activity is available
+                # in the current security context
+                acl: # string
+                    options: []
+                # this attribute can be used to change the order of this type of activity on UI
+                priority: # integer
+                    options: []
+                # the widget name of the activity action. This widget must be defined in placeholders.yml
+                # this attribute can be defined for activity entity
+                action_widget: # string
+                    options: []
+                # the name of a group in which the activity action is included.
+                # this attribute can be defined for activity entity
+                # if this attribute is not specified the activity action is rendered standalone;
+                # otherwise, it is grouped with other activity actions included in the same group
+                action_group: # string
+                    options: []

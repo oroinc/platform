@@ -1,0 +1,4 @@
+items:
+    oro_send_email_button:
+        template: OroEmailBundle:Email:activityButton.html.twig
+        acl: oro_email_create

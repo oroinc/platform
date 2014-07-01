@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use Doctrine\Common\Inflector\Inflector;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -99,7 +98,7 @@ class EntitiesController extends Controller
             foreach ($fields as $field) {
                 $fieldName          = $field->getId()->getFieldName();
                 $label              = $entityProvider->getConfigById($field->getId())->get('label') ? : $fieldName;
-                $dynamicRow[$label] = $entity->{Inflector::camelize('get_' . $fieldName)}();
+                $dynamicRow[$label] = FieldAccessor::getValue($entity, $fieldName);
             }
 
             return array(

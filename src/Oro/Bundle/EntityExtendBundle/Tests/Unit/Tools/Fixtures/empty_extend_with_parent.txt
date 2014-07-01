@@ -1,0 +1,8 @@
+namespace Test;
+
+class Entity extends \Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClass implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    public function __construct()
+    {
+    }
+}

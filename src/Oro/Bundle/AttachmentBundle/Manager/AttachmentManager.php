@@ -124,19 +124,29 @@ class AttachmentManager
     {
         if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
             $file = $entity->getFile();
-
-            $src = new LocalStream($file->getPathname());
-            $dst = $this->filesystem->createStream($entity->getFilename());
-
-            $src->open(new StreamMode('rb+'));
-            $dst->open(new StreamMode('wb+'));
-
-            while (!$src->eof()) {
-                $dst->write($src->read(100000));
-            }
-            $dst->close();
-            $src->close();
+            $this->copyLocalFileToStorage($file->getPathname(), $entity->getFilename());
         }
+    }
+
+    /**
+     * Copy file from local filesystem to attachment storage with new name
+     *
+     * @param string $localFilePath
+     * @param string $destinationFileName
+     */
+    public function copyLocalFileToStorage($localFilePath, $destinationFileName)
+    {
+        $src = new LocalStream($localFilePath);
+        $dst = $this->filesystem->createStream($destinationFileName);
+
+        $src->open(new StreamMode('rb+'));
+        $dst->open(new StreamMode('wb+'));
+
+        while (!$src->eof()) {
+            $dst->write($src->read(100000));
+        }
+        $dst->close();
+        $src->close();
     }
 
     /**
@@ -269,5 +279,24 @@ class AttachmentManager
         }
 
         return $this->fileIcons['default'];
+    }
+
+    /**
+     * Get image attachment link with liip imagine filter applied to image
+     *
+     * @param Attachment $entity
+     * @param string     $filerName
+     * @return string
+     */
+    public function getFilteredImageUrl(Attachment $entity, $filerName)
+    {
+        return $this->router->generate(
+            'oro_filtered_attachment',
+            [
+                'id' => $entity->getId(),
+                'filename' => $entity->getOriginalFilename(),
+                'filter' => $filerName
+            ]
+        );
     }
 }

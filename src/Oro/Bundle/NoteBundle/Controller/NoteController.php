@@ -7,8 +7,6 @@ use FOS\Rest\Util\Codes;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,10 +14,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Entity\Manager\EntityManager;
+use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 
 /**
  * @Route("/notes")
@@ -37,10 +34,10 @@ class NoteController extends Controller
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $entityClass = str_replace('_', '\\', $entityClass);
+        $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
 
         return [
-            'entity' => $this->getTargetEntity($entityClass, $entityId)
+            'entity' => $entity
         ];
     }
 
@@ -54,12 +51,11 @@ class NoteController extends Controller
      */
     public function getAction($entityClass, $entityId)
     {
-        $entityClass = str_replace('_', '\\', $entityClass);
+        $entityClass = $this->getEntityRoutingHelper()->decodeClassName($entityClass);
 
         $sorting = strtoupper($this->getRequest()->get('sorting', 'DESC'));
 
-        /** @var EntityManager $securityFacade */
-        $manager = $this->get('oro_note.manager');
+        $manager = $this->getNoteManager();
 
         $result = $manager->getEntityViewModels(
             $manager->getList($entityClass, $entityId, $sorting)
@@ -76,19 +72,17 @@ class NoteController extends Controller
      */
     public function createAction($entityClass, $entityId)
     {
-        $entityClass = str_replace('_', '\\', $entityClass);
+        $entityRoutingHelper = $this->getEntityRoutingHelper();
 
-        $targetEntity = $this->getTargetEntity($entityClass, $entityId);
+        $entity      = $entityRoutingHelper->getEntity($entityClass, $entityId);
+        $entityClass = get_class($entity);
 
-        $entity = new Note();
-        $entity->setTarget($targetEntity);
+        $noteEntity = new Note();
+        $noteEntity->setTarget($entity);
 
-        $formAction = $this->get('router')->generate(
-            'oro_note_create',
-            ['entityClass' => str_replace('\\', '_', $entityClass), 'entityId' => $entityId]
-        );
+        $formAction = $entityRoutingHelper->generateUrl('oro_note_create', $entityClass, $entityId);
 
-        return $this->update($entity, $formAction);
+        return $this->update($noteEntity, $formAction);
     }
 
     /**
@@ -113,9 +107,7 @@ class NoteController extends Controller
 
         if ($this->get('oro_note.form.handler.note')->process($entity)) {
             $responseData['saved'] = true;
-            /** @var EntityManager $securityFacade */
-            $manager               = $this->get('oro_note.manager');
-            $responseData['model'] = $manager->getEntityViewModel($entity);
+            $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
         $responseData['form']       = $this->get('oro_note.form.note')->createView();
         $responseData['formAction'] = $formAction;
@@ -124,29 +116,18 @@ class NoteController extends Controller
     }
 
     /**
-     * @param string $entityClass
-     * @param string $entityId
-     *
-     * @return object
-     *
-     * @throws BadRequestHttpException
-     * @throws NotFoundHttpException
+     * @return NoteManager
      */
-    protected function getTargetEntity($entityClass, $entityId)
+    protected function getNoteManager()
     {
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+        return $this->get('oro_note.manager');
+    }
 
-        $entity = null;
-        try {
-            $entity = $doctrineHelper->getEntity($entityClass, $entityId);
-        } catch (NotManageableEntityException $e) {
-            throw new BadRequestHttpException($e->getMessage(), $e);
-        }
-        if (!$entity) {
-            throw $this->createNotFoundException();
-        }
-
-        return $entity;
+    /**
+     * @return EntityRoutingHelper
+     */
+    protected function getEntityRoutingHelper()
+    {
+        return $this->get('oro_entity.routing_helper');
     }
 }

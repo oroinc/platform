@@ -17,6 +17,7 @@ triggers:
         -
             event: update
             field: some_field
+            priority: 10
             queued: true
             time_shift: 123456
         -

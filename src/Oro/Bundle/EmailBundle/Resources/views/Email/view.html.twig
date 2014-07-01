@@ -5,19 +5,29 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
-{% oro_title_set({params : {"%subject%": entity.subject} }) %}
+{% set name = app.user|oro_format_name|default('N/A') %}
+{% oro_title_set({params : {"%subject%": entity.subject, "%username%": name} }) %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-        'entity': entity,
-        'indexLabel': 'oro.email.entity_plural_label'|trans,
-        'entityTitle': entity.subject
+        'entity':      entity,
+        'indexPath':   path('oro_email_user_emails'),
+        'indexLabel':  'oro.email.entity_plural_label'|trans,
+        'entityTitle': entity.subject,
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        {'label': name },
+        {'label': 'oro.email.menu.user_emails'|trans }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
+
 {% block stats %}
-    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}
@@ -39,7 +49,7 @@
     {% set data = {
         'dataBlocks': [
             {
-                'title': 'General',
+                'title': 'General'|trans,
                 'class': 'active',
                 'subblocks': [
                     {

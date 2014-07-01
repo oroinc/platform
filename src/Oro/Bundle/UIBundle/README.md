@@ -5,6 +5,7 @@ User interface layouts and controls.
 
 ## Table of Contents
 
+- [TWIG Filters](./Resources/doc/reference/twig_filters.md)
 - [Form Components](./Resources/doc/reference/form_components.md)
 - [JavaScript Tools and Libraries](./Resources/doc/reference/js_tools_and_libraries.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
@@ -46,14 +47,14 @@ placeholders:
         order: 100                 # sort order in placeholder
       <another_item_name>:
         order: 200
-      <one_more_item_name>: ~      # sort order will be set to 1
+      <one_more_item_name>: ~      # sort order will be set to 0
 ```
 
 Any configuration defined in bundle `placeholders.yml` file can be overridden in `app/config/config.yml` file.
 
 ```yaml
 oro_ui:
-    placeholder_items:
+    placeholders:
         <placeholder_name>:
             items:
                 <item_name>:
