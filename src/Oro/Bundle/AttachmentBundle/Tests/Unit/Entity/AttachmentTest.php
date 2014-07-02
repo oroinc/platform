@@ -50,6 +50,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $extension = 'txt';
         $type = 'text/doc';
         $fileSize = 10000;
+        $comment = 'test comment';
 
         return [
             'filename' => ['filename', $filename, $filename],
@@ -59,7 +60,8 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             'file' => ['file', $file, $file],
             'extension' => ['extension', $extension, $extension],
             'mimeType' => ['mimeType', $type, $type],
-            'fileSize' => ['fileSize', $fileSize, $fileSize]
+            'fileSize' => ['fileSize', $fileSize, $fileSize],
+            'comment' => ['comment', $comment, $comment]
         ];
     }
 
