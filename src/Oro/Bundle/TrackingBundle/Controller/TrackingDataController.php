@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * @Route("/tracking/data")
@@ -20,12 +19,6 @@ class TrackingDataController extends Controller
 {
     /**
      * @Route("/create", name="oro_tracking_data_create")
-     * @Acl(
-     *      id="oro_tracking_data_create",
-     *      type="entity",
-     *      class="OroTrackingBundle:TrackingData",
-     *      permission="CREATE"
-     * )
      * @param Request $request
      * @return Response
      */
