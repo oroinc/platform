@@ -120,7 +120,8 @@ datagrid:
                     - e.name
                     - e.value
                     - e.user
-                    - e.createdAt
+                    - e.url
+                    - e.title
                     - e.loggedAt
                 from:
                     - { table: %oro_tracking.tracking_event.class%, alias: e }
@@ -131,9 +132,11 @@ datagrid:
                 label: oro.tracking.trackingevent.value.label
             user:
                 label: oro.tracking.trackingevent.user.label
-            createdAt:
-                label: oro.tracking.trackingevent.created_at.label
-                frontend_type: datetime
+            url:
+                type: twig
+                label: oro.tracking.trackingevent.url.label
+                frontend_type: html
+                template: OroTrackingBundle:TrackingEvent:Property/url.html.twig
             loggedAt:
                 label: oro.tracking.trackingevent.logged_at.label
                 frontend_type: datetime
@@ -145,8 +148,6 @@ datagrid:
                     data_name: e.value
                 user:
                     data_name: e.user
-                createdAt:
-                    data_name: e.createdAt
                 loggedAt:
                     data_name: e.loggedAt
             default:
@@ -162,9 +163,6 @@ datagrid:
                 user:
                     type:      string
                     data_name: e.user
-                createdAt:
-                    type:      datetime
-                    data_name: e.createdAt
                 loggedAt:
                     type:      datetime
                     data_name: e.loggedAt
