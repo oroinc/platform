@@ -45,12 +45,17 @@ define([
 
         /**
          *
-         * @param {string} path
-         * @param {string} query
+         * @param {(string|Object)} path
+         * @param {string=} query
          * @returns {string}
          */
         combineRouteUrl: function (path, query) {
             var routeUrl;
+            // if first argument is a route object (or a current record from content-manager)
+            if (typeof path === 'object') {
+                query = path.query;
+                path = path.path;
+            }
             routeUrl = path + (query ? '?' + query : '');
             return routeUrl;
         },

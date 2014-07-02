@@ -371,7 +371,7 @@ define([
          */
         currentUrl: function () {
             var url;
-            url = mediator.execute('combineRouteUrl', current.path, current.query);
+            url = mediator.execute('combineRouteUrl', current);
             return url;
         },
 
