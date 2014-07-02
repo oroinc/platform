@@ -20,6 +20,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
  *      "entity"={
  *          "icon"="icon-file"
  *      },
+ *      "note"={
+ *          "immutable"=true
+ *      }
  *  }
  * )
  */

@@ -1,5 +1,7 @@
 oro:
     attachment:
+        enabled:              Enable attachments
+
         entity_label:         Attachment
         entity_plural_label:  Attachments
         entity_description:   Entity attachments
@@ -9,7 +11,7 @@ oro:
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings
             mime_types.label:    Mime types
-            upload_mime_types.label: File mime types
+            upload_mime_types.label:       File mime types
             upload_image_mime_types.label: Image mime types
 
         id.label:                Id

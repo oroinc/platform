@@ -3,8 +3,10 @@ parameters:
     oro_attachment.listener.attachment_listener.class:   Oro\Bundle\AttachmentBundle\EventListener\AttachmentListener
     oro_attachment.twig.attachment_extension.class:      Oro\Bundle\AttachmentBundle\Twig\AttachmentExtension
 
-    oro_attachment.entity_config_dumper.extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
-    oro_attachment.migration.extension.attachment.class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
+    oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
+    oro_attachment.config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentsConfigDumperExtension
+    oro_attachment.attachments.generator.extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentsGeneratorExtension
+    oro_attachment.migration.extension.attachment.class:  Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
     oro_attachment.serializer.attachment_normalizer:     Oro\Bundle\AttachmentBundle\ImportExport\AttachmentNormalizer
 
@@ -34,6 +36,20 @@ services:
             - @oro_entity_extend.relation_builder
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_attachment.attachments.config_dumper.extension:
+        class: %oro_attachment.config_dumper.extension.class%
+        arguments:
+            - @oro_entity_extend.relation_builder
+            - @oro_entity_extend.association_builder
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+#    oro_attachment.attachments.generator.extension:
+#        class: %oro_attachment.attachments.generator.extension.class%
+#        tags:
+#            - { name: oro_entity_extend.entity_generator_extension }
+
 
     oro_attachment.migration.extension.attachment:
         class: %oro_attachment.migration.extension.attachment.class%
