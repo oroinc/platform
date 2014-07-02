@@ -1,13 +1,16 @@
-oro.tracking.form.tooltip:
-    dynamic_tracking_enabled: |
-        Enable realtime tracking information processing.
-        Note, this may have performance impact.
-    log_rotate_interval: |
-        How often log files will be rotated.
-        This option is required only for non dynamic tracking.
-    piwik_host: |
-        Piwik analytics URL.
-        In case when this option is set all tracking information will be passed to piwik instance.
-    piwik_token_auth: |
-        Piwik API Token auth. It used to make API calls and pass real client IP to piwik.
-        This token_auth is as secret as your login and password, <strong>do not share it!</strong>
+oro.tracking:
+    form.tooltip:
+        dynamic_tracking_enabled: |
+            Enable realtime tracking information processing.
+            Note, this may have performance impact.
+        log_rotate_interval: |
+            How often log files will be rotated.
+            This option is required only for non dynamic tracking.
+        piwik_host: |
+            Piwik analytics URL.
+            In case when this option is set all tracking information will be passed to piwik instance.
+        piwik_token_auth: |
+            Piwik API Token auth. It used to make API calls and pass real client IP to piwik.
+            This token_auth is as secret as your login and password, <strong>do not share it!</strong>
+        identifier: |
+            In case when Piwik synchronization enabled should be same as Piwik website id.

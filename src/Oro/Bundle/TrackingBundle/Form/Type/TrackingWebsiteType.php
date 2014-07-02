@@ -38,7 +38,8 @@ class TrackingWebsiteType extends AbstractType
                 'identifier',
                 'text',
                 [
-                    'label' => 'oro.tracking.trackingwebsite.identifier.label'
+                    'label'   => 'oro.tracking.trackingwebsite.identifier.label',
+                    'tooltip' => 'oro.tracking.form.tooltip.identifier',
                 ]
             )
             ->add(
