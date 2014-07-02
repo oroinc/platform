@@ -6,7 +6,7 @@ parameters:
     oro_entity.event_listener.custom_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.relation_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\RelationEntityGridListener
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
-    oro_entity.exclusion_provider.class:                           Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+    oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
@@ -102,10 +102,15 @@ services:
             - [setExclusionProvider, [@oro_entity.exclusion_provider]]
 
     oro_entity.exclusion_provider:
-        class: %oro_entity.exclusion_provider.class%
+        class: %oro_entity.exclusion_provider.chain.class%
+
+    oro_entity.exclusion_provider.config:
+        class: %oro_entity.exclusion_provider.config.class%
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.exclusions%
+        tags:
+            - { name: oro_entity.exclusion_provider.default }
 
     oro_entity.exclusion_provider.dictionary:
         class: %oro_entity.exclusion_provider.dictionary.class%
