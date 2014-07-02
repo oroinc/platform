@@ -34,19 +34,28 @@ class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExte
      */
     public function preUpdate(array &$extendConfigs)
     {
-        $a                   = 1;
         $targetEntityConfigs = $this->getTargetEntityConfigs();
         $entityClass         = $this->getAssociationEntityClass();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
-            $targenClassName    = $targetEntityConfig->getId()->getClassName();
-            $targetRelationName = ExtendHelper::buildAssociationName($targenClassName, null);
-            $this->createAssociation($entityClass, $targenClassName);
+            $targetClassName    = $targetEntityConfig->getId()->getClassName();
 
-            /**
-             * todo: check this, may be we do not need any additional options
-             */
+            //$targetRelationName = ExtendHelper::buildAssociationName($targetClassName, null);
+
+            $this->createAssociation($entityClass, $targetClassName);
+        }
+    }
+
+    public function postUpdate(array &$extendConfigs)
+    {
+        $targetEntityConfigs = $this->getTargetEntityConfigs();
+        $entityClass         = $this->getAssociationEntityClass();
+        foreach ($targetEntityConfigs as $targetEntityConfig) {
+            $targetClassName    = $targetEntityConfig->getId()->getClassName();
+            $targetRelationName = ExtendHelper::buildAssociationName($targetClassName, null);
+
+            /*
             $this->relationBuilder->updateFieldConfigs(
-                $targenClassName,
+                $targetClassName,
                 $targetRelationName,
                 [
                     'attachment'   => [
@@ -60,8 +69,10 @@ class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExte
                     ]
                 ]
             );
+            */
         }
     }
+
 
     /**
      * {@inheritdoc}
