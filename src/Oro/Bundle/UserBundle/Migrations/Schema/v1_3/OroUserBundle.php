@@ -4,9 +4,6 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
@@ -20,14 +17,11 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class OroUserBundle implements
     Migration,
     NameGeneratorAwareInterface,
     ExtendExtensionAwareInterface,
-    ContainerAwareInterface,
     ActivityExtensionAwareInterface
 {
     /** @var ActivityExtension */
@@ -44,11 +38,6 @@ class OroUserBundle implements
     protected $extendExtension;
 
     /**
-     * @var EmailOwnerProviderStorage
-     */
-    protected $ownerProviderStorage;
-
-    /**
      * @inheritdoc
      */
     public function setExtendExtension(ExtendExtension $extendExtension)
@@ -62,14 +51,6 @@ class OroUserBundle implements
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->ownerProviderStorage = $container->get(EmailOwnerConfigurationPass::SERVICE_KEY);
     }
 
     /**
