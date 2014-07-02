@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -24,14 +25,17 @@ class AttachmentExtension extends \Twig_Extension
     /** @var ConfigProvider */
     protected $attachmentConfigProvider;
 
+    protected $em;
+
     /**
      * @param AttachmentManager $manager
      * @param ConfigManager     $configManager
      */
-    public function __construct(AttachmentManager $manager, ConfigManager $configManager)
+    public function __construct(AttachmentManager $manager, ConfigManager $configManager, EntityManager $em)
     {
         $this->manager = $manager;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
+        $this->em = $em;
     }
 
     /**
@@ -117,13 +121,21 @@ class AttachmentExtension extends \Twig_Extension
      * Get file view html block
      *
      * @param \Twig_Environment $environment
-     * @param object            $parentEntity
+     * @param object|string     $parentEntity
      * @param string            $fieldName
      * @param Attachment        $attachment
      * @return string
      */
-    public function getFileView(\Twig_Environment $environment, $parentEntity, $fieldName, $attachment = null)
-    {
+    public function getFileView(
+        \Twig_Environment $environment,
+        $parentEntity,
+        $fieldName,
+        $attachment = null,
+        $parentId = null
+    ) {
+        if (is_string($parentEntity) && $parentId) {
+            $parentEntity = $this->em->getRepository($parentEntity)->find($parentId);
+        }
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [

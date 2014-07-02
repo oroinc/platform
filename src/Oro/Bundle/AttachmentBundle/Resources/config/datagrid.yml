@@ -9,17 +9,18 @@ datagrid:
                     - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
                 where:
                     and:
-                      - e.id = :entityId
+                      - e.id = :entityId # entity with aliae 'e' sets in event listener
         columns:
             originalFilename:
                 type: twig
-                label: orocrm.contact.datagrid.contact_name
+                label: oro.attachment.filename.label
                 frontend_type: html
                 template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
+                context: ~ # set from buildBefore in event listener
             fileSize:
-                label: fileSize
+                label: oro.attachment.file_size.label
             createdAt:
-                label: oro.user.created_at.label
+                label: oro.attachment.created_at.label
                 frontend_type: datetime
             comment:
-                label: comment
+                label: comment.label

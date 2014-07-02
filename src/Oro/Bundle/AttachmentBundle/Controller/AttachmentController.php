@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,12 +27,11 @@ class AttachmentController extends Controller
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $routHelper = $this->get('oro_entity.routing_helper');
-        //$entity = $routHelper->getEntity($entityClass, $entityId);
-
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
         return [
             'entityId' => $entityId,
-            'entityField' => ExtendHelper::buildAssociationName($routHelper->decodeClassName($entityClass))
+            'entityField' => ExtendHelper::buildAssociationName($entityClass),
+            'entityClass' => $entityClass
         ];
     }
 
@@ -51,7 +51,15 @@ class AttachmentController extends Controller
         }
         $accessor = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($parentEntity, $fieldName);
-        if ($attachment->getOriginalFilename() !== $filename) {
+        if ($attachment instanceof Collection) {
+            foreach ($attachment as $attachmentEntity) {
+                if ($attachmentEntity->getOriginalFilename() === $filename) {
+                    $attachment = $attachmentEntity;
+                    break;
+                }
+            }
+        }
+        if ($attachment instanceof Collection || $attachment->getOriginalFilename() !== $filename) {
             throw new NotFoundHttpException();
         }
         $response = new Response();
