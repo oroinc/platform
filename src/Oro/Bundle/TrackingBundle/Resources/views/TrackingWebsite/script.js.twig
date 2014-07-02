@@ -6,7 +6,9 @@
     var _paq = _paq || [];
     _paq.push(['setUserId', [user_identifier] ]);
     _paq.push(['setConversionAttributionFirstReferrer', false]);
-    _paq.push(['trackGoal', [name], [value] ]);
+    _paq.push(['trackPageView']);
+    // Uncomment following line to track custom events
+    // _paq.push(['trackEvent', 'OroCRM', 'Tracking', [name], [value] ]);
     (function() {
         var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ host|raw }}/";
         _paq.push(['setTrackerUrl', u+'tracking.php']);
