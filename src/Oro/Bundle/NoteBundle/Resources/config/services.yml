@@ -1,11 +1,11 @@
 parameters:
     oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
     oro_note.note_lifecycle_listener.class:             Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
-    oro_note.placeholder.filter.class:                  Oro\Bundle\NoteBundle\Placeholder\Filter
+    oro_note.placeholder.filter.class:                  Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter
     oro_note.migration.extension.note.class:            Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
-    oro_note.entity_extend.dumper_extension.class:      Oro\Bundle\NoteBundle\Tools\NoteExtendConfigDumperExtension
-    oro_note.entity_extend.generator_extension.class:   Oro\Bundle\NoteBundle\Tools\NoteExtendEntityGeneratorExtension
-    oro_note.manager.class:                             Oro\Bundle\NoteBundle\Entity\Manager\EntityManager
+    oro_note.entity_config_dumper.extension.class:      Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension
+    oro_note.entity_generator.extension.class:          Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension
+    oro_note.manager.class:                             Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
     oro_note.manager.api.class:                         Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
 
 services:
@@ -36,20 +36,17 @@ services:
         class: %oro_note.placeholder.filter.class%
         arguments:
             - @oro_entity_config.provider.note
-            - @oro_entity.orm.entity_class_accessor
 
-    oro_note.entity_extend.dumper_extension:
-        class: %oro_note.entity_extend.dumper_extension.class%
-        arguments:
-            - @oro_entity_config.config_manager
+    oro_note.entity_config_dumper.extension:
+        class: %oro_note.entity_config_dumper.extension.class%
+        parent: oro_entity_extend.config_dumper_extension
         tags:
-            - { name: oro_entity_extend.dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_note.entity_extend.generator_extension:
-        class: %oro_note.entity_extend.generator_extension.class%
-        arguments:
+    oro_note.entity_generator.extension:
+        class: %oro_note.entity_generator.extension.class%
         tags:
-            - { name: oro_entity_extend.generator_extension }
+            - { name: oro_entity_extend.entity_generator_extension }
 
     oro_note.migration.extension.note:
         class: %oro_note.migration.extension.note.class%

@@ -3,7 +3,7 @@
 
     {% set emailId = record.getValue('id') %}
     {{ UI.clientLink({
-        'dataUrl': path('oro_email_widget_info', {id:emailId}),
+        'dataUrl': path('oro_email_view', {id: emailId}),
         'aCss': 'no-hash',
         'label' : value,
         'widget' : {

@@ -9,13 +9,22 @@ oro:
             field_search:        Return varchar type field(s) in given entity
 
         block_titles:
-            general.label: General Information
-            fields.label:  Fields
+            general.label:       General Information
+            fields.label:        Fields
+            other.label:         Other
+            associations.label:  Communication & Collaboration
 
         config_log:
             user.label:      Author
             diffs.label:     Diffs
             logged_at.label: Logged at
+
+        menu:
+            entities_list.label:           Entities
+            entities_list.description:     List of entities
+            entity_management.label:       Entity Management
+            entity_management.description: List of entities
+
 
         controller:
             config_entity:
@@ -44,9 +53,3 @@ oro:
             new_field.label:     New Field
             records_count.label: Number of records
             updated.label:       Updated
-
-        menu:
-            entities_list.label:       Entities
-            entities_list.description: List of entities
-            entity_management.label: Entity Management
-            entity_management.description: List of entities

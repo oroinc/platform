@@ -13,13 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_embedded_form")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_embedded_form_list",
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_embedded_form_list",
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class EmbeddedForm

@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -67,7 +68,7 @@ class ConfigType extends AbstractType
                 'fieldName',
                 'text',
                 array(
-                    'block'     => 'entity',
+                    'block'     => 'general',
                     'disabled'  => true,
                     'data'      => $fieldName,
                 )
@@ -77,7 +78,7 @@ class ConfigType extends AbstractType
                 'choice',
                 array(
                     'choices'     => [],
-                    'block'       => 'entity',
+                    'block'       => 'general',
                     'disabled'    => true,
                     'empty_value' => 'oro.entity_extend.form.data_type.' . $fieldType
                 )
@@ -102,7 +103,7 @@ class ConfigType extends AbstractType
                         $configModel
                     ),
                     array(
-                        'block_config' => (array)$provider->getPropertyConfig()->getFormBlockConfig($configType)
+                        'block_config' => $this->getFormBlockConfig($provider, $configType)
                     )
                 );
                 $data[$provider->getScope()] = $config->all();
@@ -146,5 +147,30 @@ class ConfigType extends AbstractType
     public function getName()
     {
         return 'oro_entity_config_type';
+    }
+
+    /**
+     * @param ConfigProvider $configProvider
+     * @param string         $configType
+     * @return array
+     */
+    protected function getFormBlockConfig(ConfigProvider $configProvider, $configType)
+    {
+        $result = (array)$configProvider->getPropertyConfig()->getFormBlockConfig($configType);
+
+        $this->applyFormBlockConfigTranslations($result);
+
+        return $result;
+    }
+
+    protected function applyFormBlockConfigTranslations(array &$config)
+    {
+        foreach ($config as $key => &$val) {
+            if (is_array($val)) {
+                $this->applyFormBlockConfigTranslations($val);
+            } elseif (is_string($val) && $key === 'title' && !empty($val)) {
+                $val = $this->translator->trans($val);
+            }
+        }
     }
 }

@@ -7,8 +7,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const UNSPECIFIED_POSITION = 9999;
-
     /**
      * {@inheritDoc}
      *
@@ -83,7 +81,7 @@ class Configuration implements ConfigurationInterface
                                         ->integerNode('position')
                                             ->info('The position in which an item is rendered')
                                             ->cannotBeEmpty()
-                                            ->defaultValue(self::UNSPECIFIED_POSITION)
+                                            ->defaultValue(0)
                                         ->end()
                                     ->end()
                                 ->end()

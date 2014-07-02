@@ -9,7 +9,7 @@ oro_entity_config:
                     form:
                         type:               oro_attachment_config
                         options:
-                            block:          entity
+                            block:          general
                             subblock:       properties
 
                 maxsize:
@@ -26,7 +26,7 @@ oro_entity_config:
                         options:
                             required:   true
                             label:      oro.attachment.config.file_size.label
-                            block:      entity
+                            block:      general
                             subblock:   properties
                             empty_data: 1
                             tooltip:    oro.attachment.max_size
@@ -43,7 +43,7 @@ oro_entity_config:
                         options:
                             required:   true
                             label:      oro.attachment.config.thumb_width.label
-                            block:      entity
+                            block:      general
                             subblock:   properties
                             empty_data: 32
                             tooltip:    oro.attachment.thumb_width
@@ -60,7 +60,7 @@ oro_entity_config:
                         options:
                             required:   true
                             label:      oro.attachment.config.thumb_height.label
-                            block:      entity
+                            block:      general
                             subblock:   properties
                             empty_data: 32
                             tooltip:    oro.attachment.thumb_height
