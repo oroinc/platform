@@ -7,6 +7,8 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormal
 
 class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameAwareInterface
 {
+    const DEFAULT_NAME = 'visit';
+
     /**
      * @var string
      */
@@ -66,9 +68,14 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
         $result          = [];
         $result['data']  = json_encode($data);
 
-        if (isset($data['name'], $data['value'], $data['user'])) {
-            $result['event'] = $data;
+        if (empty($data['name'])) {
+            $data['name'] = self::DEFAULT_NAME;
         }
+        if (!isset($data['value'])) {
+            $data['value'] = 1;
+        }
+
+        $result['event'] = $data;
 
         if (!empty($result['event']['website'])) {
             $result['event']['website'] = [

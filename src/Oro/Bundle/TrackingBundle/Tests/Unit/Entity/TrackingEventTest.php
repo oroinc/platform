@@ -63,8 +63,10 @@ class TrackingEventTest extends \PHPUnit_Framework_TestCase
 
         return [
             ['name', 'name', 'name'],
-            ['value', 'value', 'value'],
+            ['value', 1, 1],
             ['user', 'user', 'user'],
+            ['url', 'url', 'url'],
+            ['title', 'title', 'title'],
             ['code', 'code', 'code'],
             ['website', $website, $website],
             ['createdAt', $date, $date],

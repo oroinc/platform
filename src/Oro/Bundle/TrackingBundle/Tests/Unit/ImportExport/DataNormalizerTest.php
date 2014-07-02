@@ -124,7 +124,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
         $data = [
             'website' => 'id1',
             'name'    => 'name',
-            'value'   => 'value',
+            'value'   => 100,
             'user'    => 'user',
         ];
 
@@ -132,7 +132,11 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 [],
                 [
-                    'data' => json_encode([]),
+                    'data'  => json_encode([]),
+                    'event' => [
+                        'name' => DataNormalizer::DEFAULT_NAME,
+                        'value' => 1
+                    ]
                 ]
             ],
             [
@@ -144,7 +148,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                             'identifier' => 'id1',
                         ],
                         'name'    => 'name',
-                        'value'   => 'value',
+                        'value'   => 100,
                         'user'    => 'user',
                     ]
                 ]

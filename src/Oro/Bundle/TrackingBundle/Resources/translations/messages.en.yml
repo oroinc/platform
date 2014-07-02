@@ -17,6 +17,7 @@ oro:
             name.label:       Name
             value.label:      Value
             user.label:       User
+            url.label:        Url
             code.label:       Code
             created_at.label: Created At
             logged_at.label:  Logged At
@@ -28,5 +29,7 @@ oro:
 
         help:
             event_tooltip: |
-                Replace [name], [value] and [user_identifier] with your values.
-                It will log an event with an an event [name] and optional [value].
+                Make sure this code is on every page of your website before the </body> tag.
+                To track custom events, please uncomment the trackEvent string and replace
+                [name], [value], and [user_identifier] parameters with your values.
+                The script will log an event with the [name] name and optional [value].

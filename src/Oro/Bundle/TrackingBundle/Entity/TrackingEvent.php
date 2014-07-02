@@ -7,7 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(name="oro_tracking_event")
+ * @ORM\Table(name="oro_tracking_event", indexes={
+ *     @ORM\Index(name="event_name_idx", columns={"name"}),
+ *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"})
+ * })
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -47,7 +50,7 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255)
+     * @ORM\Column(name="value", type="float", nullable=true)
      */
     protected $value;
 
@@ -57,6 +60,20 @@ class TrackingEvent
      * @ORM\Column(name="user", type="string", length=255)
      */
     protected $user;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=255)
+     */
+    protected $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=255, nullable=true)
+     */
+    protected $title;
 
     /**
      * @var string
@@ -167,26 +184,49 @@ class TrackingEvent
     }
 
     /**
-     * Set code
+     * Set url
      *
-     * @param string $code
+     * @param string $url
      * @return TrackingEvent
      */
-    public function setCode($code)
+    public function setUrl($url)
     {
-        $this->code = $code;
+        $this->url = $url;
 
         return $this;
     }
 
     /**
-     * Get code
+     * Get url
      *
      * @return string
      */
-    public function getCode()
+    public function getUrl()
     {
-        return $this->code;
+        return $this->url;
+    }
+
+    /**
+     * Set title
+     *
+     * @param string $title
+     * @return TrackingEvent
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Get title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
@@ -256,5 +296,28 @@ class TrackingEvent
     public function getWebsite()
     {
         return $this->website;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return TrackingEvent
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 }

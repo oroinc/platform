@@ -28,12 +28,16 @@ class OroTrackerBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('value', 'string', ['length' => 255]);
+        $table->addColumn('value', 'float', ['notnull' => false]);
         $table->addColumn('user', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);
+        $table->addColumn('url', 'string', ['length' => 255]);
+        $table->addColumn('title', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['website_id'], 'IDX_AAD45A1E18F45C82', []);
+        $table->addIndex(['name'], 'event_name_idx', []);
+        $table->addIndex(['logged_at'], 'event_loggedAt_idx', []);
         /** End of generate table oro_tracking_event **/
 
         /** Generate table oro_tracking_website **/
