@@ -16,7 +16,7 @@ parameters:
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
-    oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
 
 services:
     oro_entity.listener.navigation_listener:
@@ -28,11 +28,6 @@ services:
             - @translator
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-
-    oro_entity.doctrine_helper:
-        class: %oro_entity.doctrine_helper.class%
-        arguments:
-            - @doctrine
 
     oro_entity.owner.entity_config_subscriber:
         class: %oro_entity.owner.entity_config_subscriber.class%
@@ -145,7 +140,13 @@ services:
             - @oro_entity.entity_field_provider
             - @oro_entity.entity_provider
 
-    oro_entiy.twig.extension.class_name:
+    oro_entity.twig.extension.class_name:
         class: %oro_entity.twig.extension.class_name.class%
         tags:
             - { name: twig.extension }
+
+    oro_entity.routing_helper:
+        class: %oro_entity.routing_helper.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @router

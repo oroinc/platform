@@ -28,34 +28,38 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $container  = new ContainerBuilder();
+        $container = new ContainerBuilder();
 
-        $extensionConfig = array(
-            array(
-                'placeholders_items' => array(
-                    'test_block'       => array(
-                        'items' => array(
-                            'item1'          => array(
+        $extensionConfig = [
+            [
+                'placeholders'       => [
+                    'test_block' => [
+                        'items' => [
+                            'item1'          => [
                                 'remove' => true
-                            ),
-                            'item4'          => array(
+                            ],
+                            'item4'          => [
                                 'order' => 15
-                            ),
-                            'item7'          => array(
+                            ],
+                            'item7'          => [
                                 'order' => -5
-                            ),
-                            'new_empty_item' => array(
+                            ],
+                            'new_empty_item' => [
                                 'order' => 100
-                            ),
-                            'new_item'       => array(
-                                'template' => 'test_template',
-                                'order'    => 5
-                            ),
-                        )
-                    ),
-                )
-            )
-        );
+                            ],
+                            'new_item'       => [
+                                'order' => 5
+                            ],
+                        ]
+                    ],
+                ],
+                'placeholder_items' => [
+                    'new_item' => [
+                        'template' => 'test_template',
+                    ],
+                ]
+            ]
+        ];
 
         $extension = new OroUIExtension();
         $extension->load($extensionConfig, $container);
@@ -63,57 +67,43 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
         $palaceholders = $container->getParameter('oro_ui.placeholders');
         $this->assertEquals(
             [
-                'test_block'       => array(
-                    'items' => array(
-                        array(
-                            'name'   => 'item6',
-                            'action' => 'TestBundle:Test:test6',
-                            'order'  => -10
-                        ),
-                        array(
-                            'name'   => 'item7',
-                            'action' => 'TestBundle:Test:test7',
-                            'order'  => -5
-                        ),
-                        array(
-                            'name'   => 'item2',
-                            'action' => 'TestBundle:Test:test2',
-                            'order'  => 0
-                        ),
-                        array(
-                            'name'                  => 'item3',
-                            'action'                => 'TestBundle:Test:test3',
-                            'order'                 => 0
-                        ),
-                        array(
-                            'name'     => 'new_item',
-                            'template' => 'test_template',
-                            'order'    => 5
-                        ),
-                        array(
-                            'name'   => 'item4',
-                            'action' => 'TestBundle:Test:test4',
-                            'order'  => 15
-                        ),
-                        array(
-                            'name'   => 'item5',
-                            'action' => 'TestBundle:Test:test5',
-                            'order'  => 20
-                        ),
-                    )
-                ),
-                'test_merge_block' => array(
-                    'items' => array(
-                        array(
-                            'name'     => 'item1',
-                            'template' => 'TestBundle::test.html.twig',
-                            'order'    => 10
-                        )
-                    ),
-                ),
-                'empty_block'      => array(
-                    'items' => array()
-                ),
+                'placeholders' => [
+                    'test_block'       => [
+                        'items' => ['item6', 'item7', 'item2', 'item3', 'new_item', 'item4', 'item5', 'new_empty_item']
+                    ],
+                    'test_merge_block' => [
+                        'items' => ['item1']
+                    ],
+                    'empty_block'      => [
+                        'items' => []
+                    ],
+                ],
+                'items'        => [
+                    'item1'    => [
+                        'template' => 'TestBundle::test.html.twig',
+                    ],
+                    'item2'    => [
+                        'action' => 'TestBundle:Test:test2',
+                    ],
+                    'item3'    => [
+                        'action' => 'TestBundle:Test:test3',
+                    ],
+                    'item4'    => [
+                        'action' => 'TestBundle:Test:test4',
+                    ],
+                    'item5'    => [
+                        'action' => 'TestBundle:Test:test5',
+                    ],
+                    'item6'    => [
+                        'action' => 'TestBundle:Test:test6',
+                    ],
+                    'item7'    => [
+                        'action' => 'TestBundle:Test:test7',
+                    ],
+                    'new_item' => [
+                        'template' => 'test_template',
+                    ],
+                ]
             ],
             $palaceholders
         );

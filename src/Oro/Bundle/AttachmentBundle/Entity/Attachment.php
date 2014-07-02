@@ -16,11 +16,17 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "entity"={
- *          "icon"="icon-file"
- *      },
- *  }
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-file"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
+ *      }
  * )
  */
 class Attachment extends ExtendAttachment
