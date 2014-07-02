@@ -2000,7 +2000,7 @@ if (typeof Piwik !== 'object') {
                 }
                 var request = getRequest(
                         'action_name=' + encodeWrapper(titleFixup(configTitle))
-                            + 'e_c=' + encodeWrapper(category)
+                            + '&e_c=' + encodeWrapper(category)
                             + '&e_a=' + encodeWrapper(action)
                             + (isDefined(name) ? '&e_n=' + encodeWrapper(name) : '')
                             + (isDefined(value) ? '&e_v=' + encodeWrapper(value) : ''),
