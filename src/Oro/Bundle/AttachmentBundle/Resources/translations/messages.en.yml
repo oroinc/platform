@@ -1,6 +1,11 @@
 oro:
     attachment:
+        block_titles:
+            attachments.label:  Attachments management
+
         enabled:              Enable attachments
+        maxsize:              Max allowed file size
+        mimetypes:            Allowed mime types
 
         entity_label:         Attachment
         entity_plural_label:  Attachments
