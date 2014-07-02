@@ -133,6 +133,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                 [],
                 [
                     'data' => json_encode([]),
+                    'name' => DataNormalizer::DEFAULT_NAME
                 ]
             ],
             [
