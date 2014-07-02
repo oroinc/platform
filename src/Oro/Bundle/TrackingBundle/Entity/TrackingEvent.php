@@ -47,7 +47,7 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255)
+     * @ORM\Column(name="value", type="float", length=255, nullable=true)
      */
     protected $value;
 
@@ -57,6 +57,20 @@ class TrackingEvent
      * @ORM\Column(name="user", type="string", length=255)
      */
     protected $user;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=255)
+     */
+    protected $url;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=255)
+     */
+    protected $title;
 
     /**
      * @var \DateTime
@@ -157,6 +171,52 @@ class TrackingEvent
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     * @return TrackingEvent
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set title
+     *
+     * @param string $title
+     * @return TrackingEvent
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Get title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
