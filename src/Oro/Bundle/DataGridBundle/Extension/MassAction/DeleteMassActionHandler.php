@@ -54,6 +54,8 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $this->entityManager->beginTransaction();
         try {
             foreach ($results as $result) {
+                // to prevent excess of php time limit when huge data must be deleted
+                set_time_limit(30);
                 /** @var $result ResultRecordInterface */
                 $entity = $result->getRootEntity();
                 if (!$entity) {
