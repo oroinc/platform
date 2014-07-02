@@ -120,6 +120,7 @@ datagrid:
                     - e.name
                     - e.value
                     - e.user
+                    - e.code
                     - e.createdAt
                     - e.loggedAt
                 from:
@@ -131,6 +132,8 @@ datagrid:
                 label: oro.tracking.trackingevent.value.label
             user:
                 label: oro.tracking.trackingevent.user.label
+            code:
+                label: oro.tracking.trackingevent.code.label
             createdAt:
                 label: oro.tracking.trackingevent.created_at.label
                 frontend_type: datetime
@@ -145,6 +148,8 @@ datagrid:
                     data_name: e.value
                 user:
                     data_name: e.user
+                code:
+                    data_name: e.code
                 createdAt:
                     data_name: e.createdAt
                 loggedAt:
@@ -162,6 +167,9 @@ datagrid:
                 user:
                     type:      string
                     data_name: e.user
+                code:
+                    type:      string
+                    data_name: e.code
                 createdAt:
                     type:      datetime
                     data_name: e.createdAt

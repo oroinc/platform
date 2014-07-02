@@ -16,6 +16,7 @@ class DataConverter extends AbstractTableDataConverter
             'revenue' => 'value',
             'idsite'  => 'website',
             '_uid'    => 'user',
+            '_rcn'    => 'code',
         ];
     }
 

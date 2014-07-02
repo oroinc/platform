@@ -59,6 +59,13 @@ class TrackingEvent
     protected $user;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=255)
+     */
+    protected $code;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -157,6 +164,29 @@ class TrackingEvent
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return TrackingEvent
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 
     /**

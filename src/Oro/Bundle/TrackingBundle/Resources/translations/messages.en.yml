@@ -17,6 +17,7 @@ oro:
             name.label:       Name
             value.label:      Value
             user.label:       User
+            code.label:       Code
             created_at.label: Created At
             logged_at.label:  Logged At
 
