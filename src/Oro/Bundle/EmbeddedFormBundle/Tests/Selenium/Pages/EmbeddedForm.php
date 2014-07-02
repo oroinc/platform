@@ -125,7 +125,8 @@ class EmbeddedForm extends AbstractPageEntity
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@id='page']/p[normalize-space(.)='Form has been submitted successfully']",
-            'Form has not been submitted');
+            'Form has not been submitted'
+        );
 
         return $this;
     }
