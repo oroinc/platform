@@ -7,7 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(name="oro_tracking_event")
+ * @ORM\Table(name="oro_tracking_event", indexes={
+ *     @ORM\Index(name="event_name_idx", columns={"name"}),
+ *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"})
+ * })
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
