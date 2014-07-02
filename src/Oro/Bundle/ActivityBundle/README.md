@@ -1,7 +1,58 @@
 OroActivityBundle
 ===================
 
-The `OroActivityBundle` provide ability to assign activities (calls, emails, tasks) to other entities.
+The `OroActivityBundle` provide ability to assign activities (calls, emails, tasks) to other entities. The system administrator can manage this functionality on *System / Entities / Entity Management* page.
+
+How to enable activity association using migrations
+---------------------------------------------------
+
+Usually you do not need to provide predefined set of associations between the activity entity and other entities, rather it is the administrator chose to do this. But it is possible to create this type of association using migrations if you need. The following example shows how it can be done:
+``` php
+<?php
+
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
+
+use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+
+class OroUserBundle implements Migration, ActivityExtensionAwareInterface
+{
+    /** @var ActivityExtension */
+    protected $activityExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension)
+    {
+        $this->activityExtension = $activityExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        self::addActivityAssociations($schema, $this->activityExtension);
+    }
+
+    /**
+     * Enables Email activity for User entity
+     *
+     * @param Schema            $schema
+     * @param ActivityExtension $activityExtension
+     */
+    public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
+    {
+        $activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
+    }
+}
+```
 
 How to make an entity as activity
 ---------------------------------
@@ -182,55 +233,4 @@ Bind the item declared in *placeholders.yml* to the activity entity using `actio
  * )
  */
 class Email extends ExtendEmail
-```
-
-How to enable activity association using migrations
----------------------------------------------------
-
-Usually you do not need to provide predefined set of associations between the activity entity and other entities, rather it is the administrator chose to do this. But it is possible to create this type of association using migrations if you need. The following example shows how it can be done:
-``` php
-<?php
-
-namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_3;
-
-use Doctrine\DBAL\Schema\Schema;
-
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
-
-class OroUserBundle implements Migration, ActivityExtensionAwareInterface
-{
-    /** @var ActivityExtension */
-    protected $activityExtension;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(Schema $schema, QueryBag $queries)
-    {
-        self::addActivityAssociations($schema, $this->activityExtension);
-    }
-
-    /**
-     * Enables Email activity for User entity
-     *
-     * @param Schema            $schema
-     * @param ActivityExtension $activityExtension
-     */
-    public static function addActivityAssociations(Schema $schema, ActivityExtension $activityExtension)
-    {
-        $activityExtension->addActivityAssociation($schema, 'oro_email', 'oro_user', true);
-    }
-}
 ```
