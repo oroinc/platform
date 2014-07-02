@@ -35,7 +35,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'settings' => [
                         'resolved'                 => 1,
                         'dynamic_tracking_enabled' => [
-                            'value' => false,
+                            'value' => true,
                             'scope' => 'app'
                         ],
                         'log_rotate_interval'      => [
