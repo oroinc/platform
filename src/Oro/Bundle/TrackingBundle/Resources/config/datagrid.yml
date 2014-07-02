@@ -151,7 +151,7 @@ datagrid:
                 loggedAt:
                     data_name: e.loggedAt
             default:
-                createdAt: DESC
+                loggedAt: DESC
         filters:
             columns:
                 name:
