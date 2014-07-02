@@ -69,10 +69,10 @@ class DataNormalizer extends ConfigurableEntityNormalizer implements EntityNameA
         $result['data']  = json_encode($data);
 
         if (empty($data['name'])) {
-            $result['name'] = self::DEFAULT_NAME;
+            $data['name'] = self::DEFAULT_NAME;
         }
         if (!isset($data['value'])) {
-            $result['value'] = 1;
+            $data['value'] = 1;
         }
 
         $result['event'] = $data;
