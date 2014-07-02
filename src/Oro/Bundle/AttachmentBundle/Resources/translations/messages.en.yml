@@ -31,7 +31,9 @@ oro:
         delete_file.label:       Delete
         file_size.label:         File size
         mime_type.label:         Mime type
-
+        comment.label:           Comment
+        action:
+            add:                 Add Attachment
     entity_extend:
         form:
             data_type:

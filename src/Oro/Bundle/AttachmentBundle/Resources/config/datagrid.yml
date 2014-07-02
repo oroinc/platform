@@ -1,0 +1,25 @@
+datagrid:
+    attachment-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - attachment
+                from:
+                    - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
+                where:
+                    and:
+                      - e.id = :entityId
+        columns:
+            originalFilename:
+                type: twig
+                label: orocrm.contact.datagrid.contact_name
+                frontend_type: html
+                template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
+            fileSize:
+                label: fileSize
+            createdAt:
+                label: oro.user.created_at.label
+                frontend_type: datetime
+            comment:
+                label: comment

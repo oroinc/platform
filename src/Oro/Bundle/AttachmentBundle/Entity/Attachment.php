@@ -73,6 +73,13 @@ class Attachment extends ExtendAttachment
     protected $fileSize;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="comment", type="string", length=255, nullable=true)
+     */
+    protected $comment;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -316,5 +323,23 @@ class Attachment extends ExtendAttachment
         return (string) $this->getFilename()
             ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
             : '';
+    }
+
+    /**
+     * @param string $comment
+     * @return $this
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
     }
 }
