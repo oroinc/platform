@@ -12,11 +12,12 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ConfigSubscriber */
     protected $configSubscriber;
 
+    /** @var PersistConfigEvent */
     protected $event;
 
     public function testGetSubscribedEvents()
@@ -34,11 +35,37 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new field (entity state is 'NEW')
-     *  Nothing should be persisted
-     *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
+     * Test that persistConfig called with event
+     * that has config id something other than FieldConfigId
      */
-    public function testPersistConfigScopeExtendNewFieldNewEntity()
+    public function testWrongConfigId()
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->never())
+            ->method($this->anything());
+
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->never())
+            ->method($this->anything());
+
+        $entityConfigId = new EntityConfigId('extend', 'TestClass');
+        $eventConfig    = new Config($entityConfigId);
+
+        $event = new PersistConfigEvent($eventConfig, $configManager);
+        $configSubscriber = new ConfigSubscriber($configProvider);
+
+        $this->assertNull($configSubscriber->persistConfig($event), 'nothing should happen due to wrong config id');
+    }
+
+    /**
+     *  Test create new field (entity state is 'NEW', owner - Custom)
+     *  Nothing should be persisted
+     */
+    public function testScopeExtendNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -56,7 +83,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfigScopeExtendNewFieldActiveEntity()
+    public function testScopeExtendNewFieldActiveEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -77,15 +104,18 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test update active field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfigScopeExtendActiveFieldActiveEntity()
+    public function testScopeExtendActiveFieldActiveEntity()
     {
+        $eventConfig = $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]);
         $this->runPersistConfig(
-            $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]),
+            $eventConfig,
             $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
             [
                 'length' => [0 => 255, 1 => 200]
             ]
         );
+
+        $this->assertEquals(ExtendScope::STATE_UPDATED, $eventConfig->get('state'));
 
         /** @var ConfigManager $cm */
         $cm = $this->event->getConfigManager();
@@ -112,7 +142,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [1:*])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationOneToMany()
+    public function testScopeExtendRelationTypeCreateSelfRelationOneToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -334,6 +364,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      * @param array $values
      * @param string $type
      * @param string $scope
+     *
      * @return Config
      */
     protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend')
