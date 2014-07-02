@@ -12,8 +12,8 @@ class DataConverter extends AbstractTableDataConverter
     protected function getHeaderConversionRules()
     {
         return [
-            'idgoal'  => 'name',
-            'revenue' => 'value',
+            'e_n'     => 'name',
+            'e_v'     => 'value',
             'idsite'  => 'website',
             '_uid'    => 'user',
         ];
