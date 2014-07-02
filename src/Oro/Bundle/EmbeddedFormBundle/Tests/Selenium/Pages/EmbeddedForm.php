@@ -69,7 +69,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setFirstName($name)
     {
-        $this->test->frame($frameId);
+        $this->test->frame('frameId');
         $field = $this->test->byXpath("//input[@id='orocrm_magento_contactus_contact_request_firstName']");
         $field->clear();
         $field->value($name);
