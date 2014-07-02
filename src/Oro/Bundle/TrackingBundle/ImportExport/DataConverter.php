@@ -12,10 +12,11 @@ class DataConverter extends AbstractTableDataConverter
     protected function getHeaderConversionRules()
     {
         return [
-            'e_n'     => 'name',
-            'e_v'     => 'value',
-            'idsite'  => 'website',
-            '_uid'    => 'user',
+            'e_n'         => 'name',
+            'e_v'         => 'value',
+            'action_name' => 'title',
+            'idsite'      => 'website',
+            '_uid'        => 'user',
         ];
     }
 
