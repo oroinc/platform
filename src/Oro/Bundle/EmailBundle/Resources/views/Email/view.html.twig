@@ -44,7 +44,11 @@
     {% if entity.emailBody.hasAttachments %}
         {% set attributes = attributes | merge([UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments))]) %}
     {% endif %}
-    {% set attributes = attributes | merge([EA.body(entity.emailBody)]) %}
+    {% if entity.emailBody.bodyContent is empty %}
+        {% set attributes = attributes | merge([UI.attibuteRow('', 'oro.email.empty_body'|trans)]) %}
+    {% else %}
+        {% set attributes = attributes | merge([EA.body(entity.emailBody)]) %}
+    {% endif %}
 
     {% set data = {
         'dataBlocks': [
