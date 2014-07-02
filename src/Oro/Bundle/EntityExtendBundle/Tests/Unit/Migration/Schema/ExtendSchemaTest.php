@@ -41,8 +41,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+        $fieldTypeHelper = $this->getMock('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper');
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper);
+        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper, $fieldTypeHelper);
         $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
@@ -20,7 +20,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
  */
 class SyncCommand extends AbstractSyncCronCommand
 {
-    const COMMAND_NAME = 'oro:cron:channels:sync';
+    const COMMAND_NAME = 'oro:cron:integration:sync';
 
     /**
      * {@inheritdoc}
@@ -38,10 +38,10 @@ class SyncCommand extends AbstractSyncCronCommand
         $this
             ->setName(static::COMMAND_NAME)
             ->addOption(
-                'channel-id',
-                'c',
+                'integration-id',
+                'i',
                 InputOption::VALUE_OPTIONAL,
-                'If option exists sync will be performed for given channel id'
+                'If option exists sync will be performed for given integration id'
             )
             ->addOption(
                 'connector',
@@ -53,7 +53,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 'force',
                 'f',
                 InputOption::VALUE_NONE,
-                'Run sync in force mode, might not be supported by some channel/connector types'
+                'Run sync in force mode, might not be supported by some integration/connector types'
             )
             ->addOption(
                 'transport-batch-size',
@@ -68,7 +68,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 'Additional connector parameters array. Format - parameterKey=parameterValue',
                 []
             )
-            ->setDescription('Runs synchronization for channel');
+            ->setDescription('Runs synchronization for integration');
     }
 
     /**
@@ -79,7 +79,7 @@ class SyncCommand extends AbstractSyncCronCommand
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector           = $input->getOption('connector');
-        $channelId           = $input->getOption('channel-id');
+        $integrationId       = $input->getOption('integration-id');
         $batchSize           = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
         $repository          = $this->getService('doctrine.orm.entity_manager')
@@ -91,34 +91,34 @@ class SyncCommand extends AbstractSyncCronCommand
         $this->getContainer()->get('doctrine.orm.entity_manager')
             ->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        if ($this->isJobRunning($channelId)) {
+        if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
 
             return 0;
         }
 
-        if ($channelId) {
-            $channel = $repository->getOrLoadById($channelId);
-            if (!$channel) {
-                throw new \InvalidArgumentException('Channel with given ID not found');
+        if ($integrationId) {
+            $integration = $repository->getOrLoadById($integrationId);
+            if (!$integration) {
+                throw new \InvalidArgumentException('Integration with given ID not found');
             }
-            $channels = [$channel];
+            $integrations = [$integration];
         } else {
-            $channels = $repository->getConfiguredChannelsForSync();
+            $integrations = $repository->getConfiguredChannelsForSync();
         }
 
-        /** @var Channel $channel */
-        foreach ($channels as $channel) {
+        /** @var Integration $integration */
+        foreach ($integrations as $integration) {
             try {
-                $logger->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
+                $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
 
                 if ($batchSize) {
-                    $channel->getTransport()->getSettingsBag()->set('page_size', $batchSize);
+                    $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
-                $processor->process($channel, $connector, $connectorParameters);
+                $processor->process($integration, $connector, $connectorParameters);
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-                //process another channel even in case if exception thrown
+                //process another integration even in case if exception thrown
                 continue;
             }
         }

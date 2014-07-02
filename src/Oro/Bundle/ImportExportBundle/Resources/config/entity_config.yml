@@ -1,0 +1,84 @@
+oro_entity_config:
+    importexport:
+        field:
+            items:
+                # custom field header, by default field label is used
+                header:
+                    options: []
+                    form:
+                        type:               text
+                        options:
+                            label:          oro.importexport.entity_config.header.label
+                            required:       false
+                            block:          import and export
+                            tooltip:        oro.importexport.entity_config.header.tooltip
+                # field order in result file
+                order:
+                    options: []
+                    form:
+                        type:               integer
+                        options:
+                            label:          oro.importexport.entity_config.order.label
+                            precision:      0
+                            empty_data:     ''
+                            required:       false
+                            block:          import and export
+                # is filed will be used to find existing entity
+                identity:
+                    options:
+                        allowed_type: 
+                            - string
+                            - integer
+                            - smallint
+                            - bigint
+                            - boolean
+                            - decimal
+                            - date
+                            - text
+                            - float
+                            - money
+                            - percent
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.identity.label
+                            choices:
+                                false:      'No'
+                                true:       'Yes'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                # is field must be excluded from import/export
+                excluded:
+                    options: []
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.excluded.label
+                            choices:
+                                false:      'No'
+                                true:       'Yes'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                # is relation must be represented by all it's fields
+                full:
+                    options:
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, attachment, attachmentImage]
+                    form:
+                        type:               choice
+                        options:
+                            label:          oro.importexport.entity_config.full.label
+                            choices:
+                                false:      'Identity only'
+                                true:       'All'
+                            empty_value:    false
+                            required:       false
+                            block:          import and export
+                            tooltip:        'oro.importexport.entity_config.full.tooltip'
+
+                # is relation field should be processed as scalar value when exporting data
+                process_as_scalar:
+                    options:
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, attachment, attachmentImage]
+                        default_value:      false

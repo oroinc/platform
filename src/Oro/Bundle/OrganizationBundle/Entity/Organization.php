@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 /**
@@ -18,6 +19,9 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
+ *      },
+ *      "form"={
+ *          "form_type"="oro_organization_select"
  *      }
  *  }
  * )
@@ -37,6 +41,13 @@ class Organization implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $name;
 

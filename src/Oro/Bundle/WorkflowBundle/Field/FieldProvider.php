@@ -34,12 +34,12 @@ class FieldProvider extends EntityFieldProvider
         $className,
         EntityManager $em,
         $withVirtualFields,
-        $withExclusions,
+        $applyExclusions,
         $translate
     ) {
         // in workflow exclusions not used
-        $withExclusions = false;
-        parent::addFields($result, $className, $em, $withVirtualFields, $withExclusions, $translate);
+        $applyExclusions = false;
+        parent::addFields($result, $className, $em, $withVirtualFields, $applyExclusions, $translate);
 
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {

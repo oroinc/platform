@@ -59,7 +59,7 @@ class Item
     /**
      * @var bool $changed
      *
-     * @ORM\Column(name="changed", type="boolean", options={"unsigned"=true})
+     * @ORM\Column(name="changed", type="boolean")
      */
     protected $changed = false;
 

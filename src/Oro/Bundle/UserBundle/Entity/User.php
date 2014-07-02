@@ -67,7 +67,6 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
 class User extends ExtendUser implements
     AdvancedUserInterface,
     \Serializable,
-    EntityUploadedImageInterface,
     Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
@@ -95,7 +94,16 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          },
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $username;
 
@@ -106,7 +114,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $email;
 
@@ -119,7 +133,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $namePrefix;
 
@@ -132,7 +152,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $firstName;
 
@@ -145,7 +171,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $middleName;
 
@@ -158,7 +190,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastName;
 
@@ -171,7 +209,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $nameSuffix;
 
@@ -182,25 +226,15 @@ class User extends ExtendUser implements
      * @JMS\Type("DateTime")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $birthday;
-
-    /**
-     * Image filename
-     *
-     * @var string
-     *
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     */
-    protected $image;
-
-    /**
-     * Image filename
-     *
-     * @var UploadedFile
-     */
-    protected $imageFile;
 
     /**
      * @var boolean
@@ -209,7 +243,13 @@ class User extends ExtendUser implements
      * @JMS\Type("boolean")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $enabled = true;
 
@@ -219,6 +259,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $salt;
 
@@ -228,6 +275,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $password;
 
@@ -244,6 +298,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="confirmation_token", type="string", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $confirmationToken;
 
@@ -251,6 +312,13 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="password_requested", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $passwordRequestedAt;
 
@@ -260,6 +328,13 @@ class User extends ExtendUser implements
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastLogin;
 
@@ -274,6 +349,13 @@ class User extends ExtendUser implements
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", cascade={"persist"})
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $owner;
 
@@ -286,7 +368,14 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getLabel")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={"auditable"=true},
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $roles;
 
@@ -299,13 +388,26 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $groups;
 
     /**
      * @ORM\OneToOne(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
      * )
      */
     protected $api;
@@ -348,7 +450,13 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $businessUnits;
 
@@ -540,26 +648,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Return image filename
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Return image file
-     *
-     * @return UploadedFile
-     */
-    public function getImageFile()
-    {
-        return $this->imageFile;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getSalt()
@@ -742,30 +830,39 @@ class User extends ExtendUser implements
      * Set middle name
      *
      * @param string $middleName
+     * @return User
      */
     public function setMiddleName($middleName)
     {
         $this->middleName = $middleName;
+
+        return $this;
     }
 
     /**
      * Set name prefix
      *
      * @param string $namePrefix
+     * @return User
      */
     public function setNamePrefix($namePrefix)
     {
         $this->namePrefix = $namePrefix;
+
+        return $this;
     }
 
     /**
      * Set name suffix
      *
      * @param string $nameSuffix
+     * @return User
      */
     public function setNameSuffix($nameSuffix)
     {
         $this->nameSuffix = $nameSuffix;
+
+        return $this;
     }
 
     /**
@@ -776,42 +873,6 @@ class User extends ExtendUser implements
     public function setBirthday(\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
-
-        return $this;
-    }
-
-    /**
-     * @param  string $image [optional] New image file name. Null by default.
-     * @return User
-     */
-    public function setImage($image = null)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    /**
-     * @param  UploadedFile $imageFile
-     * @return User
-     */
-    public function setImageFile(UploadedFile $imageFile)
-    {
-        $this->imageFile = $imageFile;
-        // this will trigger PreUpdate callback even if only image has been changed
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        return $this;
-    }
-
-    /**
-     * Unset image file.
-     *
-     * @return User
-     */
-    public function unsetImageFile()
-    {
-        $this->imageFile = null;
 
         return $this;
     }
@@ -1152,18 +1213,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return string|null
-     */
-    public function getImagePath()
-    {
-        if ($this->image) {
-            return $this->getUploadDir(true) . '/' . $this->image;
-        }
-
-        return null;
-    }
-
-    /**
      * Generate unique confirmation token
      *
      * @return string Token value
@@ -1290,25 +1339,6 @@ class User extends ExtendUser implements
         $this->emails->removeElement($email);
 
         return $this;
-    }
-
-    /**
-     * Get the relative directory path to user avatar
-     *
-     * @param  bool   $forWeb
-     * @return string
-     */
-    public function getUploadDir($forWeb = false)
-    {
-        $ds = DIRECTORY_SEPARATOR;
-
-        if ($forWeb) {
-            $ds = '/';
-        }
-
-        $suffix = $this->getCreatedAt() ? $this->getCreatedAt()->format('Y-m') : date('Y-m');
-
-        return 'uploads' . $ds . 'users' . $ds . $suffix;
     }
 
     /**

@@ -1,6 +1,7 @@
 parameters:
     oro_importexport.reader.csv.class: Oro\Bundle\ImportExportBundle\Reader\CsvFileReader
     oro_importexport.reader.entity.class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
+    oro_importexport.reader.template_fixture.class: Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
 
 services:
     oro_importexport.reader.csv:
@@ -13,3 +14,9 @@ services:
         arguments:
             - @oro_importexport.context_registry
             - @doctrine
+
+    oro_importexport.reader.template_fixture:
+        class: %oro_importexport.reader.template_fixture.class%
+        arguments:
+            - @oro_importexport.context_registry
+            - @oro_importexport.template_fixture.registry

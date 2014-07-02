@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 
 class UnsetValue implements ActionInterface

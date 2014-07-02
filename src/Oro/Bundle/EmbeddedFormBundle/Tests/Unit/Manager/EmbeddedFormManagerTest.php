@@ -29,7 +29,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
 
         $formFactory->expects($this->once())
             ->method('create')
-            ->with($type, null, ['channel_form_type' => 'oro_entity_identifier'])
+            ->with($type, null, [])
             ->will($this->returnValue($formInstance))
         ;
 
