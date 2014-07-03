@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -25,17 +24,14 @@ class FileExtension extends \Twig_Extension
     /** @var ConfigProvider */
     protected $attachmentConfigProvider;
 
-    protected $em;
-
     /**
      * @param AttachmentManager $manager
      * @param ConfigManager     $configManager
      */
-    public function __construct(AttachmentManager $manager, ConfigManager $configManager, EntityManager $em)
+    public function __construct(AttachmentManager $manager, ConfigManager $configManager)
     {
         $this->manager = $manager;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->em = $em;
     }
 
     /**
@@ -44,9 +40,9 @@ class FileExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_attachment.file_url', [$this, 'getFIleUrl']),
-            new \Twig_SimpleFunction('oro_attachment.resized_image_url', [$this, 'getResizedImageUrl']),
-            new \Twig_SimpleFunction('oro_attachment.filtered_image_url', [$this, 'getFilteredImageUrl']),
+            new \Twig_SimpleFunction('file_url', [$this, 'getFIleUrl']),
+            new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
+            new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction(

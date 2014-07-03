@@ -30,7 +30,7 @@ services:
 
     oro_attachment.twig.file_extension:
         class: %oro_attachment.twig.file_extension.class%
-        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager, @doctrine.orm.entity_manager]
+        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager]
         tags:
             - { name: twig.extension }
 

@@ -29,11 +29,11 @@ class AttachmentGridListener
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-        $datagridParameters =  $event->getDatagrid()->getParameters();
+        $datagridParameters = $event->getDatagrid()->getParameters();
         $fieldName = $datagridParameters->get(self::GRID_PARAM_FIELD_NAME);
 
         $leftJoins = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
-        $leftJoins[] =['join'  => 'attachment.' . $fieldName, 'alias' => 'entity'];
+        $leftJoins[] = ['join' => 'attachment.' . $fieldName, 'alias' => 'entity'];
         $config->offsetSetByPath(self::GRID_LEFT_JOIN_PATH, $leftJoins);
     }
 

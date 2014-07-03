@@ -58,7 +58,7 @@ class AttachmentController extends Controller
 
     /**
      * @param Attachment $entity
-     * @param $formAction
+     * @param            $formAction
      * @return array
      */
     protected function update(Attachment $entity, $formAction)
