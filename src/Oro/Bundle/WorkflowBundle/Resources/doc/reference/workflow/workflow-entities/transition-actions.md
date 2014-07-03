@@ -20,6 +20,7 @@ Table of Contents
  - [Start Workflow](#start-workflow)
  - [Redirect](#redirect)
  - [Tree Executor](#tree-executor)
+ - [Foreach](#foreach)
  - [Configurable](#configurable)
 
 Add Custom Action
@@ -197,6 +198,8 @@ Create Entity
 **Parameters:**
  - class - fully qualified class name of created entity;
  - attribute - attribute that will contain entity instance;
+ - flush - when flush in DB should be performed.
+           Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
  - data - array of data that should be set to entity.
 
 **Configuration Example**
@@ -218,6 +221,7 @@ OR
 - @create_entity:
     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
     attribute: $conversation
+    flush: true # entity will be flushed to DB immediately after creation
     data:
         result: $conversation_result
         comment: $conversation_comment
@@ -539,6 +543,34 @@ OR
     - @tree:
         # action configuration here
     # other action
+
+```
+
+Foreach
+-------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\Traverse
+
+**Alias:** traverse|foreach
+
+**Description:** Provides support of iteration over traversable entities (arrays, collections etc).
+
+**Configuration Example**
+```
+- @foreach:
+    array: $order.relatedCalls
+    value: $.result.value
+    actions:
+        - @assign_value: [$.result.value.subject, 'Test Subject']
+
+OR
+
+- @foreach:
+    array: $order.relatedCalls
+    key: $.result.key
+    value: $.result.value
+    actions:
+        - @assign_value: [$.result.value.subject, $.result.key]
 
 ```
 

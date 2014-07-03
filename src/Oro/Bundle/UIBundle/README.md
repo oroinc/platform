@@ -65,6 +65,15 @@ oro_ui:
                     order: 200     # change item order in placeholder
 ```
 
+Each placeholder item can have the following properties:
+
+ - **template** or **action** - The path to TWIG template or controller action is used to rendering the item
+ - **applicable** - The condition indicates whether the item can be rendered or not
+ - **acl** - The ACL resource. Can be used to restrict access to the item
+ - **data** - An additional data to be passed to TWIG template or controller.
+
+Each property can be a constant or some expression supported by [System Aware Resolver Component](../../Component/Resources/doc/system_aware_resolver.md). Examples can be found in existing *placeholders.yml* files.
+
 ### Rendering placeholders
 
 To render placeholder content in twig template we need to put
