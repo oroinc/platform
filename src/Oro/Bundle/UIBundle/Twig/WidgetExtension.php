@@ -53,14 +53,17 @@ class WidgetExtension extends \Twig_Extension
     public function render(Twig_Environment $environment, array $options = array())
     {
         $optionsHash = md5(json_encode($options));
+
         if (!empty($this->rendered[$optionsHash])) {
             return '';
         }
+
         $this->rendered[$optionsHash] = true;
 
         if (!array_key_exists('url', $options)) {
             throw new \InvalidArgumentException('Option url is required');
         }
+
         if (!array_key_exists('widgetType', $options)) {
             throw new \InvalidArgumentException('Option widgetType is required');
         } else {
@@ -71,26 +74,31 @@ class WidgetExtension extends \Twig_Extension
         if (!isset($options['wid'])) {
             $options['wid'] = $this->getUniqueIdentifier();
         }
+
         $elementId = 'widget-container-' . $options['wid'];
+
         if (!array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;
         }
+
         if ($options['elementFirst']) {
             $options['el'] = '#' . $elementId . ' .widget-content:first';
         } else {
             $options['container'] = '#' . $elementId;
         }
+
         $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid']);
+
         if ($this->request) {
             $options['url'] = $this->addRequestParameters($options['url']);
         }
 
         return $environment->render(
-            "OroUIBundle::widget_loader.html.twig",
+            'OroUIBundle::widget_loader.html.twig',
             array(
-                "widgetType" => $widgetType,
-                "elementId" => $elementId,
-                "options" => $options
+                'elementId'  => $elementId,
+                'options'    => $options,
+                'widgetType' => $widgetType,
             )
         );
     }

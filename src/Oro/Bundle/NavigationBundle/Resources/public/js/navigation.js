@@ -13,8 +13,8 @@ define(function (require) {
     var messenger = require('oroui/js/messenger');
     var Modal = require('oroui/js/modal');
     var LoadingMask = require('oroui/js/loading-mask');
-    var PagestateView = require('./app/views/page-state-view');
-    var PagestateModel = require('./app/models/page-state-model');
+    var PageStateView = require('./app/views/page-state-view');
+    var PageStateModel = require('./app/models/page-state-model');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
@@ -273,8 +273,8 @@ define(function (require) {
             /**
              * Add "pinned" page to cache
              */
-            mediator.bind("pagestate_collected", function (pagestateModel) {
-                this.updateCachedContent('form', {formData: pagestateModel.get('pagestate').data});
+            mediator.bind("pagestate_collected", function (pageStateModel) {
+                this.updateCachedContent('form', {formData: pageStateModel.get('pagestate').data});
                 if (this.useCache) {
                     contentManager.addPage(this.getHashUrl(), this.tempCache);
                 }
@@ -410,9 +410,9 @@ define(function (require) {
         },
 
         beforeDefaultAction: function() {
-            //reset pagestate restore flag in case we left the page
+            //reset page state restore flag in case we left the page
             if (this.url !== this.getHashUrl(false, true)) {
-                this.getPagestate().needServerRestore = true;
+                this.getPageState().needServerRestore = true;
             }
         },
 
@@ -434,10 +434,10 @@ define(function (require) {
             }
         },
 
-        getPagestate: function() {
+        getPageState: function() {
             if (!this.pagestate) {
-                this.pagestate = new PagestateView({
-                    model: new PagestateModel()
+                this.pagestate = new PageStateView({
+                    model: new PageStateModel()
                 });
             }
             return this.pagestate;
@@ -515,16 +515,16 @@ define(function (require) {
          */
         restoreFormState: function(cacheData) {
             var formState = {},
-                pagestate = this.getPagestate();
+                pageState = this.getPageState();
             if (this.formState) {
                 formState = this.formState;
             } else if (cacheData.states) {
                 formState = cacheData.states.getObjectCache('form');
             }
             if (formState.formData && formState.formData.length) {
-                pagestate.updateState(formState.formData);
-                pagestate.restore();
-                pagestate.needServerRestore = false;
+                pageState.updateState(formState.formData);
+                pageState.restore();
+                pageState.needServerRestore = false;
             }
         },
 
@@ -966,15 +966,15 @@ define(function (require) {
             $('body').on('submit', _.bind(function (e) {
                 var $form = $(e.target);
                 if (e.isDefaultPrevented()) {
-                    return;
+                    return true;
                 }
                 if ($form.data('nohash')) {
                     $form.data('sent', true);
-                    return;
+                    return true;
                 }
                 e.preventDefault();
                 if ($form.data('sent')) {
-                    return;
+                    return true;
                 }
 
                 var url = $form.attr('action');

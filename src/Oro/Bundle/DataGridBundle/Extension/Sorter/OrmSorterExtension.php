@@ -56,8 +56,7 @@ class OrmSorterExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $sorters   = $this->getSortersToApply($config);
-        $multisort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
+        $sorters = $this->getSortersToApply($config);
         foreach ($sorters as $definition) {
             list($direction, $sorter) = $definition;
 
@@ -97,7 +96,7 @@ class OrmSorterExtension extends AbstractExtension
 
         $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
 
-        $sortersState = $this->getSortersState($config, $data);
+        $sortersState        = $this->getSortersState($config, $data);
         $initialSortersState = $this->getSortersState($config, $data, false);
 
         $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);

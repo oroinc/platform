@@ -29,8 +29,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateParameters()
     {
-        $gridName = 'test_grid';
-
+        $gridName       = 'test_grid';
         $gridParameters = array('foo' => 'bar');
 
         $this->request->expects($this->at(0))
@@ -50,10 +49,12 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateParametersWithMinifiedData()
     {
-        $gridName = 'test_grid';
+        $gridName    = 'test_grid';
+        $minifiedKey = 'f';
+        $minifiedVal = 'value';
 
-        $gridParameters = array('foo' => 'bar');
-        $minifiedParameters = array($gridName => 'f=qwe');
+        $gridParameters     = array('foo' => 'bar');
+        $minifiedParameters = array($gridName => $minifiedKey . '=' . $minifiedVal);
 
         $this->request->expects($this->at(0))
             ->method('get')
@@ -67,7 +68,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
         $parameters = $this->factory->createParameters($gridName);
 
         $expectedParameters = $gridParameters;
-        $expectedParameters[ParameterBag::MINIFIED_PARAMETERS] = array('f' => 'qwe');
+        $expectedParameters[ParameterBag::MINIFIED_PARAMETERS] = array($minifiedKey => $minifiedVal);
 
         $this->assertInstanceOf(self::PARAMETERS_CLASS, $parameters);
         $this->assertEquals($expectedParameters, $parameters->all());
@@ -82,11 +83,14 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with($gridName, [], false)
             ->will($this->returnValue('foo'));
+        $this->request->expects($this->at(1))
+            ->method('get')
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->will($this->returnValue(null));
 
         $parameters = $this->factory->createParameters($gridName);
 
         $this->assertInstanceOf(self::PARAMETERS_CLASS, $parameters);
-
         $this->assertEquals(array(), $parameters->all());
     }
 }

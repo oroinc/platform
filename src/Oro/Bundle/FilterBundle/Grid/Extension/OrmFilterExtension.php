@@ -106,10 +106,10 @@ class OrmFilterExtension extends AbstractExtension
         $initialValues = $this->getValuesToApply($config, false);
 
         foreach ($filters as $filter) {
-            $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
+            $value        = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
             $initialValue = isset($initialValues[$filter->getName()]) ? $initialValues[$filter->getName()] : false;
 
-            $filtersState = $this->updateFiltersState($filter, $value, $filtersState);
+            $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
             $metadata          = $filter->getMetadata();
@@ -222,11 +222,10 @@ class OrmFilterExtension extends AbstractExtension
      */
     protected function getValuesToApply(DatagridConfiguration $config, $readParameters = true)
     {
-        $result = [];
-
-        $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-
+        $result         = array();
+        $filters        = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
+
         if ($readParameters) {
             $filterBy = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
         } else {
