@@ -10,9 +10,7 @@ class AttachmentGridListener
 {
     const GRID_PARAM_FIELD_NAME = 'entityField';
 
-
     const GRID_LEFT_JOIN_PATH = '[source][query][join][left]';
-    const GRID_FILE_CONTEXT_PATH = '[columns][originalFilename][context]';
 
     /** @var array */
     protected $paramsToBind = [];
@@ -35,19 +33,8 @@ class AttachmentGridListener
         $fieldName = $datagridParameters->get(self::GRID_PARAM_FIELD_NAME);
 
         $leftJoins = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
-        $leftJoins[] =['join'  => 'attachment.' . $fieldName, 'alias' => 'e'];
+        $leftJoins[] =['join'  => 'attachment.' . $fieldName, 'alias' => 'entity'];
         $config->offsetSetByPath(self::GRID_LEFT_JOIN_PATH, $leftJoins);
-
-        $context = $config->offsetGetByPath(self::GRID_FILE_CONTEXT_PATH, []);
-        $context = array_merge(
-            $context,
-            [
-                'entityClass' => $datagridParameters->get('entityClass'),
-                'entityField' => $datagridParameters->get('entityField'),
-                'entityId'    => $datagridParameters->get('entityId')
-            ]
-        );
-        $config->offsetSetByPath(self::GRID_FILE_CONTEXT_PATH, $context);
     }
 
     /**

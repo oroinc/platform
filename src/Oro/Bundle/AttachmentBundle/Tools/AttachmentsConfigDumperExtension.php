@@ -22,12 +22,4 @@ class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExte
     {
         return 'attachment';
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationType()
-    {
-        return 'manyToMany';
-    }
 }

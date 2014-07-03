@@ -29,7 +29,6 @@ class AttachmentController extends Controller
         return [
             'entityId' => $entityId,
             'entityField' => ExtendHelper::buildAssociationName($entityClass),
-            'entityClass' => $entityClass
         ];
     }
 

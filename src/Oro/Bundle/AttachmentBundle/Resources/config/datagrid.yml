@@ -4,23 +4,32 @@ datagrid:
             type: orm
             query:
                 select:
-                    - attachment
+                    - attachment as att
+                    - attachment.comment as comment
+                    - file.originalFilename as originalFilename
+                    - file.fileSize as fileSize
+                    - file.createdAt as createdAt
                 from:
                     - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
+                join:
+                    left:
+                        - { join: attachment.file, alias: file }
                 where:
                     and:
-                      - e.id = :entityId # entity with aliae 'e' sets in event listener
+                      - entity.id = :entityId # entity with alias 'entity' sets in event listener
         columns:
             originalFilename:
                 type: twig
-                label: oro.attachment.filename.label
+                label: oro.attachment.file.filename.label
                 frontend_type: html
                 template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
-                context: ~ # set from buildBefore in event listener
             fileSize:
-                label: oro.attachment.file_size.label
+                label: oro.attachment.file.file_size.label
+                type: twig
+                frontend_type: html
+                template: OroAttachmentBundle:Attachment:Datagrid/Property/fileSize.html.twig
             createdAt:
-                label: oro.attachment.created_at.label
+                label: oro.attachment.file.created_at.label
                 frontend_type: datetime
             comment:
-                label: comment.label
+                label: oro.attachment.comment.label

@@ -1,17 +1,18 @@
 parameters:
-    oro_attachment.manager.attachment_manager.class:     Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
-    oro_attachment.listener.file_listener.class:   Oro\Bundle\AttachmentBundle\EventListener\FileListener
-    oro_attachment.twig.file_extension.class:      Oro\Bundle\AttachmentBundle\Twig\FileExtension
+    oro_attachment.manager.attachment_manager.class:      Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
+    oro_attachment.listener.file_listener.class:          Oro\Bundle\AttachmentBundle\EventListener\FileListener
+
+    oro_attachment.twig.file_extension.class:             Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
     oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
     oro_attachment.config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentsConfigDumperExtension
     oro_attachment.attachments.generator.extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentsGeneratorExtension
     oro_attachment.migration.extension.attachment.class:  Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
-    oro_attachment.serializer.file_normalizer.class:     Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
+    oro_attachment.serializer.file_normalizer.class:      Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
 
-    oro_attachment.placeholder.filter.class:             Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
-    oro_attachment.attachment_grid_listener:             Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
+    oro_attachment.placeholder.filter.class:              Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
+    oro_attachment.attachment_grid_listener:              Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
 
 services:
     oro_attachment.manager:

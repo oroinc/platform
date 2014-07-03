@@ -1,1 +1,2 @@
-{{ oro_file_view(entityClass, entityField, record.rootEntity, entityId) }}
+{% set attachment = record.getValue('att') %}
+{{ oro_file_view(attachment, 'file', attachment.file) }}

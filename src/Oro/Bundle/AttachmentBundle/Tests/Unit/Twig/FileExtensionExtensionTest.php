@@ -48,9 +48,9 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $result = $this->extension->getFunctions();
         $functions = [
-            'oro_attachment_url',
-            'oro_resized_attachment_url',
-            'oro_filtered_attachment_url',
+            'oro_attachment.file_url',
+            'oro_attachment.resized_image_url',
+            'oro_attachment.filtered_image_url',
             'oro_configured_image_url',
             'oro_attachment_icon',
             'oro_file_view',
@@ -68,15 +68,15 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_attachment', $this->extension->getName());
     }
 
-    public function testGetAttachmentUrl()
+    public function testGetFileUrl()
     {
         $parentEntity = new TestClass();
         $parentField = 'test_field';
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl')
+            ->method('getFileUrl')
             ->with($parentEntity, $parentField, $this->attachment, 'download', true);
 
-        $this->extension->getAttachmentUrl($parentEntity, $parentField, $this->attachment, 'download', true);
+        $this->extension->getFIleUrl($parentEntity, $parentField, $this->attachment, 'download', true);
     }
 
     public function testGetResizedImageUrl()
@@ -122,7 +122,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getAttachmentIconClass')
             ->with($this->attachment);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
         $this->extension->getFileView($environment, $parentEntity, $parentField, $this->attachment);
     }
 
@@ -149,7 +149,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 16, 16);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $this->attachment);
     }
@@ -178,7 +178,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 120, 120);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $this->attachment, new TestClass(), 'testField');
     }
