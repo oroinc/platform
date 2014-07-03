@@ -1,0 +1,2 @@
+bundles:
+    - OroTrackingBundle:Form:fields.html.twig
