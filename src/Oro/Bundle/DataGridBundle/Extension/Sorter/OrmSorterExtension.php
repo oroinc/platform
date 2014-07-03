@@ -97,13 +97,8 @@ class OrmSorterExtension extends AbstractExtension
 
         $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
 
-        $initialSortersState = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
-        $sortersState = $data->offsetGetByPath('[state][sorters]', []);
-        $sorters      = $this->getSortersToApply($config);
-        foreach ($sorters as $column => $definition) {
-            list($direction) = $definition;
-            $sortersState[$column] = $this->normalizeDirection($direction);
-        }
+        $sortersState = $this->getSortersState($config, $data);
+        $initialSortersState = $this->getSortersState($config, $data, false);
 
         $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);
         $data->offsetAddToArray('state', ['sorters' => $sortersState]);
@@ -167,17 +162,22 @@ class OrmSorterExtension extends AbstractExtension
      * Prepare sorters array
      *
      * @param DatagridConfiguration $config
+     * @param bool $readParameters
      *
      * @return array
      */
-    protected function getSortersToApply(DatagridConfiguration $config)
+    protected function getSortersToApply(DatagridConfiguration $config, $readParameters = true)
     {
         $result = [];
 
         $sorters = $this->getSorters($config);
 
         $defaultSorters = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
-        $sortBy         = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
+        if ($readParameters) {
+            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
+        } else {
+            $sortBy = $defaultSorters;
+        }
 
         // if default sorter was not specified, just take first sortable column
         if (!$sortBy && $sorters) {
@@ -218,5 +218,24 @@ class OrmSorterExtension extends AbstractExtension
         }
 
         return $direction;
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $data
+     * @param bool $readParameters
+     * @return array
+     */
+    protected function getSortersState(DatagridConfiguration $config, MetadataObject $data, $readParameters = true)
+    {
+        $sortersState = $data->offsetGetByPath('[state][sorters]', []);
+        $sorters = $this->getSortersToApply($config, $readParameters);
+
+        foreach ($sorters as $column => $definition) {
+            list($direction) = $definition;
+            $sortersState[$column] = $this->normalizeDirection($direction);
+        }
+
+        return $sortersState;
     }
 }
