@@ -42,20 +42,6 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/widget/info/{id}", name="oro_email_widget_info", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_view")
-     * @Template
-     */
-    public function infoAction(Email $entity)
-    {
-        $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
-
-        return array(
-            'entity' => $entity
-        );
-    }
-
-    /**
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
      *
