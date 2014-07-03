@@ -162,7 +162,7 @@
                                         tickFormatter: function (y) {
                                             return getYLabel(y);
                                         },
-                                        title: {{ options.data_schema.value.label|json_encode|raw }}
+                                        title: {{ options.data_schema.value.label|trans|json_encode|raw }}
                                     },
                                     xaxis: {
                                         max: xMax,
@@ -170,7 +170,7 @@
                                         tickFormatter: function (x) {
                                             return getXLabel(x);
                                         },
-                                        title: {{ options.data_schema.label.label|json_encode|raw }}
+                                        title: {{ options.data_schema.label.label|trans|json_encode|raw }}
                                     },
                                     HtmlText : false,
                                     grid: {
