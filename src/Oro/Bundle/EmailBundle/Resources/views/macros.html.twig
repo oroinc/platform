@@ -193,6 +193,8 @@
     {% for address in addresses -%}
         {{ address }}
         {%- if not loop.last %}; {% endif %}
+    {% else %}
+        {{ 'N/A'|trans }}
     {%- endfor %}
 {%- endmacro %}
 

@@ -62,6 +62,7 @@ class OroUserBundleInstaller implements
         OroUserBundle::oroSessionTable($schema);
         OroUserBundle::oroUserTable($schema, false, false);
         UserAvatars::addAvatarToUser($schema, $this->attachmentExtension);
+        UserAvatars::addOwnerToOroFile($schema);
         OroUserBundle::oroUserAccessGroupTable($schema);
         OroUserBundle::oroUserAccessGroupRoleTable($schema);
         OroUserBundle::oroUserAccessRoleTable($schema);

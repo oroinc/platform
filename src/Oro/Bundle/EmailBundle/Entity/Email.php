@@ -23,21 +23,25 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  *
- *  @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-envelope"},
- *      "security"={
- *          "type"="ACL",
- *          "permissions"="VIEW;CREATE",
- *          "group_name"=""
- *      },
- *      "grouping"={"groups"={"activity"}},
- *      "activity"={
- *          "route"="oro_email_activity_view",
- *          "acl"="oro_email_view",
- *          "action_widget"="oro_send_email_button"
+ * @Config(
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-envelope"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE",
+ *              "group_name"=""
+ *          },
+ *          "grouping"={
+ *              "groups"={"activity"}
+ *          },
+ *          "activity"={
+ *              "route"="oro_email_activity_view",
+ *              "acl"="oro_email_view",
+ *              "action_widget"="oro_send_email_button"
+ *          }
  *      }
- *  }
  * )
  */
 class Email extends ExtendEmail

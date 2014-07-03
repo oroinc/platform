@@ -109,11 +109,13 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
         /** @var EntityConfigId $configId */
         $configId       = $options['config_id'];
         $className      = $configId->getClassName();
-        $configProvider = $this->configManager->getProvider($configId->getScope());
-        if ($configProvider->hasConfig($className)) {
-            $immutable = $configProvider->getConfig($className)->get('immutable');
-            if (is_array($immutable) && !empty($immutable)) {
-                $result = $immutable;
+        if (!empty($className)) {
+            $configProvider = $this->configManager->getProvider($configId->getScope());
+            if ($configProvider->hasConfig($className)) {
+                $immutable = $configProvider->getConfig($className)->get('immutable');
+                if (is_array($immutable) && !empty($immutable)) {
+                    $result = $immutable;
+                }
             }
         }
 

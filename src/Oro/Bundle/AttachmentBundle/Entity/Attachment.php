@@ -4,10 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\HttpFoundation\File\File;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Attachment
@@ -21,6 +19,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
  *          "icon"="icon-file"
  *      },
  *      "note"={
+ *          "immutable"=true
+ *      },
+ *      "activity"={
  *          "immutable"=true
  *      }
  *  }
@@ -40,73 +41,22 @@ class Attachment extends ExtendAttachment
     /**
      * @var string
      *
-     * @ORM\Column(name="filename", type="string", length=255, nullable=true)
-     */
-    protected $filename;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="extension", type="string", length=10, nullable=true)
-     */
-    protected $extension;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="mime_type", type="string", length=100, nullable=true)
-     */
-    protected $mimeType;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="original_filename", type="string", length=255, nullable=true)
-     */
-    protected $originalFilename;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="file_size", type="integer", nullable=true)
-     */
-    protected $fileSize;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="comment", type="string", length=255, nullable=true)
+     * @ORM\Column(name="comment", type="text", nullable=true)
      */
     protected $comment;
 
     /**
-     * @var \DateTime
+     * @var File
      *
-     * @ORM\Column(name="created_at", type="datetime")
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    protected $updatedAt;
-
-    /**
-     * @var File $file
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
+     * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
      */
     protected $file;
 
     /**
-     * @var bool
-     */
-    protected $emptyFile;
-
-    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -114,101 +64,25 @@ class Attachment extends ExtendAttachment
     }
 
     /**
-     * Set filename
-     *
-     * @param string $filename
-     * @return Attachment
+     * @param string $comment
      */
-    public function setFilename($filename)
+    public function setComment($comment)
     {
-        $this->filename = $filename;
-
-        return $this;
+        $this->comment = $comment;
     }
 
     /**
-     * Get filename
-     *
-     * @return string 
+     * @return string
      */
-    public function getFilename()
+    public function getComment()
     {
-        return $this->filename;
-    }
-
-    /**
-     * Set originalFilename
-     *
-     * @param string $originalFilename
-     * @return Attachment
-     */
-    public function setOriginalFilename($originalFilename)
-    {
-        $this->originalFilename = $originalFilename;
-
-        return $this;
-    }
-
-    /**
-     * Get originalFilename
-     *
-     * @return string 
-     */
-    public function getOriginalFilename()
-    {
-        return $this->originalFilename;
-    }
-
-    /**
-     * Set createdAt
-     *
-     * @param \DateTime $createdAt
-     * @return Attachment
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get createdAt
-     *
-     * @return \DateTime 
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     * @return Attachment
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime 
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
+        return $this->comment;
     }
 
     /**
      * @param File $file
      */
-    public function setFile(File $file)
+    public function setFile($file)
     {
         $this->file = $file;
     }
@@ -219,127 +93,5 @@ class Attachment extends ExtendAttachment
     public function getFile()
     {
         return $this->file;
-    }
-
-    /**
-     * @param $extension
-     * @return $this
-     */
-    public function setExtension($extension)
-    {
-        $this->extension = $extension;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getExtension()
-    {
-        return $this->extension;
-    }
-
-    /**
-     * @param $emptyFile
-     * @return $this
-     */
-    public function setEmptyFile($emptyFile)
-    {
-        $this->emptyFile = $emptyFile;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isEmptyFile()
-    {
-        return $this->emptyFile;
-    }
-
-    /**
-     * @param $mimeType
-     * @return $this
-     */
-    public function setMimeType($mimeType)
-    {
-        $this->mimeType = $mimeType;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMimeType()
-    {
-        return $this->mimeType;
-    }
-
-    /**
-     * @param $fileSize
-     * @return $this
-     */
-    public function setFileSize($fileSize)
-    {
-        $this->fileSize = $fileSize;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFileSize()
-    {
-        return $this->fileSize;
-    }
-
-    /**
-     * Pre persist event handler
-     *
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = clone $this->createdAt;
-    }
-
-    /**
-     * Pre update event handler
-     *
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    public function __toString()
-    {
-        return (string) $this->getFilename()
-            ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
-            : '';
-    }
-
-    /**
-     * @param string $comment
-     * @return $this
-     */
-    public function setComment($comment)
-    {
-        $this->comment = $comment;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getComment()
-    {
-        return $this->comment;
     }
 }

@@ -19,11 +19,17 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "entity"={
- *          "icon"="icon-bell"
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-bell"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Reminder
