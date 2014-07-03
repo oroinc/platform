@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Knp\Menu\MenuItem;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -11,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;

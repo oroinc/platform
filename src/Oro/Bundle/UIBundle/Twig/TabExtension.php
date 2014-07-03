@@ -105,7 +105,6 @@ class TabExtension extends \Twig_Extension
 
         $tabs = [];
         foreach ($menu->getChildren() as $child) {
-
             if (!$child->isDisplayed()) {
                 continue;
             }
