@@ -14,8 +14,8 @@
             <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
                 <fieldset class="form-horizontal">
                     {{ form_widget(form.file) }}
-                    {{ form_widget(form.comment) }}
-                    {{ form_errors(form.comment) }}
+                    {#{{ form_widget(form.comment) }}#}
+                    {#{{ form_errors(form.comment) }}#}
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

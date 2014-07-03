@@ -90,7 +90,9 @@ class FileSubscriber implements EventSubscriberInterface
     {
         $fieldName = $form->getName();
 
-        $dataClass = $form->getParent()->getConfig()->getDataClass();
+        $dataClass = $form->getParent()
+            ? $form->getParent()->getConfig()->getDataClass()
+            : $form->getConfig()->getDataClass();
         if (!$dataClass) {
             $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
         }

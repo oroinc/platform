@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraints\File;
 
@@ -44,12 +45,18 @@ class ConfigFileValidator
      */
     public function validate($dataClass, $fieldName, Attachment $entity)
     {
-        /** @var Config $entityExtendConfig */
-        $entityExtendConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
+        /**
+         * TODO: !!!!!
+         */
 
-        $fileSize = $entityExtendConfig->get('maxsize') * 1024 * 1024;
+        /** @var Config $entityAttachmentConfig */
+        $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
 
-        if ($entityExtendConfig->getId()->getFieldType() === 'attachment') {
+        $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
+
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $entityAttachmentConfig->getId();
+        if ($fieldConfigId->getFieldType() === 'attachment') {
             $configValue = 'upload_mime_types';
         } else {
             $configValue = 'upload_image_mime_types';
