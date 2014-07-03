@@ -46,10 +46,7 @@ class AttachmentController extends Controller
         $entityClass = get_class($entity);
 
         $attachmentEntity = new Attachment();
-        $attachmentEntity->addTarget($entity);
-
-        //$this->getAttachmentManager()->
-        //$attachmentEntity->setFile();
+        $attachmentEntity->setTarget($entity);
 
         $formAction = $entityRoutingHelper->generateUrl('oro_attachment_create', $entityClass, $entityId);
 
@@ -69,12 +66,11 @@ class AttachmentController extends Controller
         ];
 
         if ($this->get('oro_attachment.form.handler.attachment')->process($entity)) {
-// $responseData['saved'] = true;
-// //$responseData['model'] = $this->getAttachmentManager()->getEntityViewModel($entity);
+            $responseData['saved'] = true;
+        } else {
+            $responseData['form']       = $this->get('oro_attachment.form.attachment')->createView();
+            $responseData['formAction'] = $formAction;
         }
-
-        $responseData['form'] = $this->get('oro_attachment.form.attachment')->createView();
-        $responseData['formAction'] = $formAction;
 
         return $responseData;
     }

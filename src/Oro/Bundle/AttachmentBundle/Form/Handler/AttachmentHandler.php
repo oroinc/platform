@@ -44,10 +44,8 @@ class AttachmentHandler
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
-
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);
-
                 return true;
             }
         }

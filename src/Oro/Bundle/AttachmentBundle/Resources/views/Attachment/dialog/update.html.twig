@@ -1,22 +1,26 @@
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 <div class="widget-content">
     {% if saved %}
-        <script type="text/javascript">
-            require(['oroui/js/widget-manager'],
-                    function(widgetManager) {
-                        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                            widget.trigger('formSave', {{ model|json_encode|raw }});
-                        });
-                    });
-        </script>
+        SAVED...
+        {#<script type="text/javascript">#}
+            {#require(['oroui/js/widget-manager'],#}
+            {#function(widgetManager) {#}
+                {#widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {#}
+                    {#widget.trigger('formSave', {{ model|json_encode|raw }});#}
+                {#});#}
+            {#});#}
+        {#</script>#}
     {% else %}
+        {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
         <div class="form-container">
-            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
-                <fieldset class="form-horizontal">
-                    {{ form_widget(form.file) }}
-                    {#{{ form_widget(form.comment) }}#}
-                    {#{{ form_errors(form.comment) }}#}
-                    {{ form_rest(form) }}
+            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post">
+                <fieldset class="form form-horizontal">
+                    <div class="span6">
+                        {{ form_row(form.file) }}
+                        {{ form_row(form.comment) }}
+
+                        {{ form_errors(form) }}
+                        {{ form_rest(form) }}
+                    </div>
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
                         <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>

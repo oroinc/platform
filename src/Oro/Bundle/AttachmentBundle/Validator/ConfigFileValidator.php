@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraints\File as FileConstrain;
 
@@ -32,33 +34,45 @@ class ConfigFileValidator
      */
     public function __construct(Validator $validator, ConfigManager $configManager, UserConfigManager $config)
     {
-        $this->validator = $validator;
+        $this->validator                = $validator;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->config = $config;
+        $this->config                   = $config;
     }
 
     /**
-     * @param string     $dataClass Parent entity class name
-     * @param string     $fieldName Field name where new file/image field was added
-     * @param File       $entity    File entity
+     * @param string          $dataClass Parent entity class name
+     * @param string          $fieldName Field name where new file/image field was added
+     * @param File|Attachment $entity    File entity
      *
      * @return \Symfony\Component\Validator\ConstraintViolationListInterface
      */
-    public function validate($dataClass, $fieldName, File $entity)
+    public function validate($dataClass, $fieldName, $entity)
     {
         /**
          * TODO: !!!!!
          */
 
-        /** @var Config $entityAttachmentConfig */
-        $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
+        if ($dataClass == AttachmentScope::ATTACHMENT) {
+            //$targetClassName = get_class($entity->getTarget());
 
-        /** @var FieldConfigId $fieldConfigId */
-        $fieldConfigId = $entityAttachmentConfig->getId();
-        if ($fieldConfigId->getFieldType() === 'file') {
-            $configValue = 'upload_mime_types';
-        } else {
+            /** @var Config $entityAttachmentConfig */
+            //$entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
+            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig(
+                'OroCRM\Bundle\ContactBundle\Entity\Contact'
+            );
+
             $configValue = 'upload_image_mime_types';
+        } else {
+            /** @var Config $entityAttachmentConfig */
+            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
+
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $entityAttachmentConfig->getId();
+            if ($fieldConfigId->getFieldType() === 'file') {
+                $configValue = 'upload_mime_types';
+            } else {
+                $configValue = 'upload_image_mime_types';
+            }
         }
 
         $fileSize  = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
@@ -72,7 +86,7 @@ class ConfigFileValidator
             [
                 new FileConstrain(
                     [
-                        'maxSize' => $fileSize,
+                        'maxSize'   => $fileSize,
                         'mimeTypes' => $mimeTypes
                     ]
                 )

@@ -48,7 +48,7 @@ class Attachment extends ExtendAttachment
     /**
      * @var File
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File", cascade={"persist"})
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
      */
     protected $file;

@@ -36,7 +36,7 @@ class ExtendAttachment
      *
      * @return object This object
      */
-    public function addTarget($target)
+    public function setTarget($target)
     {
         return $this;
     }
