@@ -41,7 +41,7 @@ class Attachment extends ExtendAttachment
     /**
      * @var string
      *
-     * @ORM\Column(name="comment", type="string", length=255, nullable=true)
+     * @ORM\Column(name="comment", type="text", nullable=true)
      */
     protected $comment;
 
