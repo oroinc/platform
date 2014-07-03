@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,14 +12,14 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $activityManager;
+    private $emailGridHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityRoutingHelper;
 
     protected function setUp()
     {
-        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+        $this->emailGridHelper     = $this->getMockBuilder('Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
@@ -28,7 +27,7 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->listener = new ActivityGridListener(
-            $this->activityManager,
+            $this->emailGridHelper,
             $this->entityRoutingHelper
         );
     }
@@ -39,39 +38,76 @@ class ActivityGridListenerTest extends \PHPUnit_Framework_TestCase
         $entityClass        = 'Test\Entity';
         $entityId           = 123;
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $parameters = new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId]);
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
-        $datasource->expects($this->once())
-            ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($datasource));
         $datagrid->expects($this->once())
             ->method('getParameters')
-            ->will(
-                $this->returnValue(
-                    new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId])
-                )
-            );
+            ->will($this->returnValue($parameters));
         $this->entityRoutingHelper->expects($this->once())
             ->method('decodeClassName')
             ->with($encodedEntityClass)
             ->will($this->returnValue($entityClass));
 
-        $this->activityManager->expects($this->once())
-            ->method('addFilterByTargetEntity')
+        $this->emailGridHelper->expects($this->once())
+            ->method('updateDatasource')
             ->with(
-                $this->identicalTo($qb),
-                $entityClass,
-                $entityId
+                $this->identicalTo($datasource),
+                $entityId,
+                $entityClass
             );
+        $this->emailGridHelper->expects($this->once())
+            ->method('isUserEntity')
+            ->with($entityClass)
+            ->will($this->returnValue(false));
+        $this->emailGridHelper->expects($this->never())
+            ->method('handleRefresh');
+
+        $event = new BuildAfter($datagrid);
+        $this->listener->onBuildAfter($event);
+    }
+
+    public function testOnBuildAfterForUser()
+    {
+        $encodedEntityClass = 'Test_Entity';
+        $entityClass        = 'Test\Entity';
+        $entityId           = 123;
+
+        $parameters = new ParameterBag(['entityClass' => $encodedEntityClass, 'entityId' => $entityId]);
+        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->will($this->returnValue($datasource));
+        $datagrid->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue($parameters));
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('decodeClassName')
+            ->with($encodedEntityClass)
+            ->will($this->returnValue($entityClass));
+
+        $this->emailGridHelper->expects($this->once())
+            ->method('updateDatasource')
+            ->with(
+                $this->identicalTo($datasource),
+                $entityId,
+                $entityClass
+            );
+        $this->emailGridHelper->expects($this->once())
+            ->method('isUserEntity')
+            ->with($entityClass)
+            ->will($this->returnValue(true));
+        $this->emailGridHelper->expects($this->once())
+            ->method('handleRefresh')
+            ->with($this->identicalTo($parameters), $entityId);
 
         $event = new BuildAfter($datagrid);
         $this->listener->onBuildAfter($event);

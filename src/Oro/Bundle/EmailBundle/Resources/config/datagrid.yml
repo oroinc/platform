@@ -64,19 +64,6 @@ datagrid:
 
     user-email-grid:
         extends: email-grid
-        source:
-            query:
-                join:
-                    inner:
-                        folder:
-                            join: e.folders
-                            alias: f
-                        origin:
-                            join: f.origin
-                            alias: o
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
         properties:
             view_link:
                 type: url

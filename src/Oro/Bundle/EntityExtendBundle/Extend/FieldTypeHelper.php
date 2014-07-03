@@ -11,8 +11,8 @@ class FieldTypeHelper
 {
     protected $typeMap = [
         'manyToOne' => [
-            'attachment',
-            'attachmentImage'
+            'file',
+            'image'
         ]
     ];
 
