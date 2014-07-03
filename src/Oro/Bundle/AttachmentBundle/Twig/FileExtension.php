@@ -40,9 +40,9 @@ class FileExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_attachment_url', [$this, 'getAttachmentUrl']),
-            new \Twig_SimpleFunction('oro_resized_attachment_url', [$this, 'getResizedImageUrl']),
-            new \Twig_SimpleFunction('oro_filtered_attachment_url', [$this, 'getFilteredImageUrl']),
+            new \Twig_SimpleFunction('file_url', [$this, 'getFIleUrl']),
+            new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
+            new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction(
@@ -63,11 +63,11 @@ class FileExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'oro_attachment';
+        return 'oro_attachment_file';
     }
 
     /**
-     * Get attachment file url
+     * Get file url
      *
      * @param object     $parentEntity
      * @param string     $fieldName
@@ -76,14 +76,14 @@ class FileExtension extends \Twig_Extension
      * @param bool       $absolute
      * @return string
      */
-    public function getAttachmentUrl(
+    public function getFileUrl(
         $parentEntity,
         $fieldName,
         File $attachment,
         $type = 'get',
         $absolute = false
     ) {
-        return $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
+        return $this->manager->getFiletUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
     }
 
     /**
@@ -122,13 +122,17 @@ class FileExtension extends \Twig_Extension
      * @param File              $attachment
      * @return string
      */
-    public function getFileView(\Twig_Environment $environment, $parentEntity, $fieldName, $attachment = null)
-    {
+    public function getFileView(
+        \Twig_Environment $environment,
+        $parentEntity,
+        $fieldName,
+        $attachment = null
+    ) {
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url' => $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'url' => $this->manager->getFiletUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );
@@ -169,7 +173,7 @@ class FileExtension extends \Twig_Extension
             return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
                 [
                     'imagePath' => $this->manager->getResizedImageUrl($attachment, $width, $height),
-                    'url' => $this->manager->getAttachmentUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'url' => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );

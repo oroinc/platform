@@ -48,8 +48,8 @@
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
                 <div id="{{ divId }}" class="oro_attachment_file">
-                    <a href="{{ oro_attachment_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
-                        <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                        <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                         {{ value.originalFilename }}
                     </a>
                     {{ form_row(form.emptyFile) }}

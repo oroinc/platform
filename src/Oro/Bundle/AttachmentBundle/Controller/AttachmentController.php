@@ -3,16 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -30,11 +25,10 @@ class AttachmentController extends Controller
      */
     public function widgetAction($entityClass, $entityId)
     {
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
         return [
-            'entityId'    => $entityId,
-            'entityField' => ExtendHelper::buildAssociationName(
-                $this->getEntityRoutingHelper()->decodeClassName($entityClass)
-            )
+            'entityId' => $entityId,
+            'entityField' => ExtendHelper::buildAssociationName($entityClass),
         ];
     }
 
@@ -48,7 +42,7 @@ class AttachmentController extends Controller
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
-        $entity      = $entityRoutingHelper->getEntity($entityClass, $entityId);
+        $entity = $entityRoutingHelper->getEntity($entityClass, $entityId);
         $entityClass = get_class($entity);
 
         $attachmentEntity = new Attachment();
@@ -71,15 +65,15 @@ class AttachmentController extends Controller
     {
         $responseData = [
             'entity' => $entity,
-            'saved'  => false
+            'saved' => false
         ];
 
         if ($this->get('oro_attachment.form.handler.attachment')->process($entity)) {
-//            $responseData['saved'] = true;
-//            //$responseData['model'] = $this->getAttachmentManager()->getEntityViewModel($entity);
+// $responseData['saved'] = true;
+// //$responseData['model'] = $this->getAttachmentManager()->getEntityViewModel($entity);
         }
 
-        $responseData['form']       = $this->get('oro_attachment.form.attachment')->createView();
+        $responseData['form'] = $this->get('oro_attachment.form.attachment')->createView();
         $responseData['formAction'] = $formAction;
 
         return $responseData;

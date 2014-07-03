@@ -9,10 +9,10 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+use Doctrine\Common\Collections\Collection;
 
 class FileController extends Controller
 {
@@ -32,7 +32,15 @@ class FileController extends Controller
         }
         $accessor = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($parentEntity, $fieldName);
-        if ($attachment->getOriginalFilename() !== $filename) {
+        if ($attachment instanceof Collection) {
+            foreach ($attachment as $attachmentEntity) {
+                if ($attachmentEntity->getOriginalFilename() === $filename) {
+                    $attachment = $attachmentEntity;
+                    break;
+                }
+            }
+        }
+        if ($attachment instanceof Collection || $attachment->getOriginalFilename() !== $filename) {
             throw new NotFoundHttpException();
         }
         $response = new Response();
@@ -54,13 +62,13 @@ class FileController extends Controller
 
     /**
      * @Route("media/cache/attachment/resize/{id}/{width}/{height}/{filename}",
-     *  name="oro_resize_attachment",
-     *  requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
+     *   name="oro_resize_attachment",
+     *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
-        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
+        $attachment = $this->getFileByIdAndFileName($id, $filename);
         $path = substr($this->getRequest()->getPathInfo(), 1);
         $filterName = 'attachment_' . $width . '_' . $height;
 
@@ -83,8 +91,8 @@ class FileController extends Controller
 
     /**
      * @Route("media/cache/attachment/resize/{id}/{filter}/{filename}",
-     *  name="oro_filtered_attachment",
-     *  requirements={"id"="\d+"}
+     *   name="oro_filtered_attachment",
+     *   requirements={"id"="\d+"}
      * )
      */
     public function getFilteredImageAction($id, $filter, $filename)
@@ -106,7 +114,7 @@ class FileController extends Controller
      * @return File
      * @throws NotFoundHttpException
      */
-    protected function getAttachmentByIdAndFileName($id, $fileName)
+    protected function getFileByIdAndFileName($id, $fileName)
     {
         $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->findOneBy(
             [

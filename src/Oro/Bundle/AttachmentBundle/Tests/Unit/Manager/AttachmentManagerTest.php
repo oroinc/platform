@@ -89,7 +89,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fileContent, $this->attachmentManager->getContent($this->attachment));
     }
 
-    public function testGetAttachmentUrl()
+    public function testGetFileUrl()
     {
         $this->attachment->setId(1);
         $this->attachment->setExtension('txt');
@@ -107,7 +107,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 true
             );
-        $this->attachmentManager->getAttachmentUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+        $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
     }
 
     public function testDecodeAttachmentUrl()

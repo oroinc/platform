@@ -16,12 +16,4 @@ class AttachmentsGeneratorExtension extends AbstractAssociationEntityGeneratorEx
             $schema['class'] === AttachmentScope::ATTACHMENT
             && parent::supports($schema);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationType()
-    {
-        return 'manyToMany';
-    }
 }
