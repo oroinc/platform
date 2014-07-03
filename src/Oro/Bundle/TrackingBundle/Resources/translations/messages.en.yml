@@ -33,3 +33,5 @@ oro:
                 To track custom events, please uncomment the trackEvent string and replace
                 [name], [value], and [user_identifier] parameters with your values.
                 The script will log an event with the [name] name and optional [value].
+
+        website_configuration: Tracking websites

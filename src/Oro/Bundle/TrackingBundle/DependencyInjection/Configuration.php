@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             array(
-                'dynamic_tracking_enabled' => ['value' => false],
+                'dynamic_tracking_enabled' => ['value' => true],
                 'log_rotate_interval'      => ['value' => 60],
                 'piwik_host'               => ['value' => null],
                 'piwik_token_auth'         => ['value' => null]

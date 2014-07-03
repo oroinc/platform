@@ -49,6 +49,14 @@ oro_system_configuration:
                 tooltip: oro.tracking.form.tooltip.piwik_token_auth
                 required: false
 
+        oro_tracking.wesite_configuration:
+            type: oro_tracking_link_type
+            priority: 0
+            options:
+                label: false
+                required: false
+                resettable: false
+
     tree:
         system_configuration:
             platform:
@@ -65,3 +73,4 @@ oro_system_configuration:
                                             - oro_tracking.log_rotate_interval
                                             - oro_tracking.piwik_host
                                             - oro_tracking.piwik_token_auth
+                                            - oro_tracking.wesite_configuration
