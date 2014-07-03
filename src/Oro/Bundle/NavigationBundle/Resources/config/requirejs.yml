@@ -13,8 +13,6 @@ config:
         'url': 'bundles/oronavigation/lib/url.min.js'
         'oronavigation/js/app/module': 'bundles/oronavigation/js/app/module.js'
         'oronavigation/js/content/grid-builder': 'bundles/oronavigation/js/content/grid-builder.js'
-        'oronavigation/js/pagestate/model': 'bundles/oronavigation/js/pagestate/model.js'
-        'oronavigation/js/pagestate/view': 'bundles/oronavigation/js/pagestate/view.js'
         'oronavigation/js/shortcuts/view': 'bundles/oronavigation/js/shortcuts/view.js'
     appmodules:
         - oronavigation/js/app/module

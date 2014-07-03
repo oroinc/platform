@@ -65,7 +65,7 @@ define([
             };
             cacheItem = this.cache.get(route.path);
 
-            if (cacheItem && options.force !== true) {
+            if (cacheItem && cacheItem.page && options.force !== true) {
                 options.fromCache = true;
                 this.publishEvent('page:request', args);
                 this.model.set(cacheItem.page, {actionArgs: args});

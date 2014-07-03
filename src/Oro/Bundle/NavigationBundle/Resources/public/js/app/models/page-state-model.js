@@ -1,19 +1,20 @@
 /*global define*/
-define(['backbone', 'routing'
-    ], function (Backbone, routing) {
+define([
+    'oroui/js/app/models/base/model',
+    'routing'
+], function (BaseModel, routing) {
     'use strict';
 
-    /**
-     * @export  oronavigation/js/pagestate/model
-     * @class   oronavigationpagestate.Model
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var PageStateModel;
+
+    PageStateModel = BaseModel.extend({
         defaults: {
             restore   : false,
+            pageId : '',
+            data   : {},
             pagestate : {
                 pageId : '',
-                data   : {}
+                data   : ''
             }
         },
 
@@ -25,4 +26,6 @@ define(['backbone', 'routing'
             return routing.generate.apply(routing, args);
         }
     });
+
+    return PageStateModel;
 });

@@ -56,6 +56,10 @@ define([
         gridName = collection.inputName;
         key = gridNameKey(gridName);
         hash = encodeStateData(collection.state);
+        if (hash === encodeStateData(collection.initialState)) {
+            // if the state is the same as initial, remove URL param for grid state
+            hash = null;
+        }
         mediator.execute('pageCache:state:save', key, collection, hash);
     }
 

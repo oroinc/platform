@@ -132,7 +132,8 @@ define(function (require) {
                     state: _.extend({
                         filters: {},
                         sorters: {}
-                    }, this.metadata.state)
+                    }, this.metadata.state),
+                    initialState: this.metadata.initialState || {}
                 }, this.metadata.options);
             },
 
