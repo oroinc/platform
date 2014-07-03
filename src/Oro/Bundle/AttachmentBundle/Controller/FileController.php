@@ -10,9 +10,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
-class AttachmentController extends Controller
+class FileController extends Controller
 {
     /**
      * @Route("attachment/{codedString}.{extension}",
@@ -97,16 +97,16 @@ class AttachmentController extends Controller
     }
 
     /**
-     * Get attachment
+     * Get file
      *
      * @param $id
      * @param $fileName
-     * @return Attachment
+     * @return File
      * @throws NotFoundHttpException
      */
     protected function getAttachmentByIdAndFileName($id, $fileName)
     {
-        $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
+        $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->findOneBy(
             [
                 'id' => $id,
                 'originalFilename' => $fileName

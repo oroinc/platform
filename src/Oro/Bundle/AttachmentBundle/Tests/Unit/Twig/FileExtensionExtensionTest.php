@@ -6,12 +6,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
-use Oro\Bundle\AttachmentBundle\Twig\AttachmentExtension;
+use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
 
-class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
+class FileExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var AttachmentExtension
+     * @var FileExtension
      */
     protected $extension;
 
@@ -40,7 +40,7 @@ class AttachmentExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('attachment')
             ->will($this->returnValue($this->attachmentConfigProvider));
 
-        $this->extension = new AttachmentExtension($this->manager, $configManager);
+        $this->extension = new FileExtension($this->manager, $configManager);
         $this->attachment = new TestAttachment();
     }
 

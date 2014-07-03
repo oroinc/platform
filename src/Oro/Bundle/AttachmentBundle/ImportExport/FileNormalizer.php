@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\AttachmentBundle\ImportExport;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
-class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
+class FileNormalizer implements DenormalizerInterface, NormalizerInterface
 {
     /** @var  AttachmentManager */
     protected $attachmentManager;
@@ -38,7 +38,7 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        return $type == 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
+        return $type == 'Oro\Bundle\AttachmentBundle\Entity\File';
     }
 
     /**
@@ -46,7 +46,7 @@ class AttachmentNormalizer implements DenormalizerInterface, NormalizerInterface
      */
     public function supportsNormalization($data, $format = null, array $context = [])
     {
-        return is_object($data) && $data instanceof Attachment;
+        return is_object($data) && $data instanceof File;
     }
 
     /**

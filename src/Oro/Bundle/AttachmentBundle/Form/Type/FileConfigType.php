@@ -15,10 +15,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class AttachmentConfigType extends AbstractType
+class FileConfigType extends AbstractType
 {
-    const NAME              = 'oro_attachment_config';
-    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
+    const NAME              = 'oro_attachment_file_config';
+    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\File';
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;

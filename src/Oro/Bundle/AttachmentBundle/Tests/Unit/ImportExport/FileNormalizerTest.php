@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\AttachmentBundle\ImportExport\AttachmentNormalizer;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
+class FileNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AttachmentNormalizer */
+    /** @var FileNormalizer */
     protected $normalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -21,7 +21,7 @@ class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->normalizer = new AttachmentNormalizer();
+        $this->normalizer = new FileNormalizer();
 
         $filesystemMap = $this->getMockBuilder('Knp\Bundle\GaufretteBundle\FilesystemMap')
             ->disableOriginalConstructor()
@@ -41,8 +41,22 @@ class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $serviceLink->expects($this->any())->method('getService')
+            ->will($this->returnValue($securityFacade));
+
+        $securityFacade->expects($this->any())->method('getLoggedUser')
+            ->will($this->returnValue(null));
+
         $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
-            ->setConstructorArgs([$filesystemMap, $router, []])
+            ->setConstructorArgs([$filesystemMap, $router, $serviceLink, []])
             ->setMethods(['upload', 'getAttachment'])
             ->getMock();
 
@@ -65,7 +79,7 @@ class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
     public function supportsDenormalizationData()
     {
         return [
-            'supports' => ['Oro\Bundle\AttachmentBundle\Entity\Attachment', true],
+            'supports' => ['Oro\Bundle\AttachmentBundle\Entity\File', true],
             'notSupports' => ['testClass', false],
         ];
     }
@@ -81,7 +95,7 @@ class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
     public function supportsNormalizationData()
     {
         return [
-            'supports' => [new Attachment(), true],
+            'supports' => [new File(), true],
             'wrongObject' => [new \stdClass(), false],
             'notObject' => ['test', false]
         ];
@@ -150,7 +164,7 @@ class AttachmentNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalize()
     {
-        $object = new Attachment();
+        $object = new File();
         $this->attachmentManager->expects($this->once())->method('getAttachment')
             ->with('testEntity', 1, 'testField', $object, 'download', true);
         $this->normalizer->normalize(
