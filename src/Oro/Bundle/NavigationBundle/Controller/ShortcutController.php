@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Knp\Menu\MenuItem;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -69,11 +70,11 @@ class ShortcutController extends Controller
     }
 
     /**
-     * @param $item
+     * @param MenuItem $item
      *
      * @return bool
      */
-    protected function isItemAllowed($item)
+    protected function isItemAllowed(MenuItem $item)
     {
         return (
             $item->getExtra('isAllowed')
