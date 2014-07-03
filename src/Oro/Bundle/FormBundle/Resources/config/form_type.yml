@@ -13,6 +13,7 @@ parameters:
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
+    oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -157,3 +158,8 @@ services:
             - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
+
+    oro_form.type.link:
+        class: %oro_form.type.link.class%
+        tags:
+            - { name: form.type, alias: oro_link_type }

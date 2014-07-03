@@ -52,7 +52,21 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->attachment->setFilename('testFile.txt');
         $this->attachment->setOriginalFilename('testFile.txt');
 
-        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $ileIcons);
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $serviceLink->expects($this->any())->method('getService')
+            ->will($this->returnValue($securityFacade));
+
+        $securityFacade->expects($this->any())->method('getLoggedUser')
+            ->will($this->returnValue(null));
+
+        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $serviceLink, $ileIcons);
     }
 
     public function testGetContent()

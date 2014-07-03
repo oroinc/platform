@@ -14,7 +14,12 @@ class OroAttachmentBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->createTable('oro_attachment');
+        self::createFileTable($schema);
+    }
+
+    public static function createFileTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_attachment_file');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('filename', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('extension', 'string', ['length' => 10, 'notnull' => false]);
