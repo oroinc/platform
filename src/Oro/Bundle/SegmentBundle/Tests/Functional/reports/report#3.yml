@@ -11,12 +11,12 @@ request:
         oro_segment_form[entity]: Oro\Bundle\UserBundle\Entity\User
         oro_segment_form[filter][columnName]: ""
         oro_segment_form[filter][criterion]: ""
-        oro_segment_form[name]: Users Static
+        oro_segment_form[name]: Users Filterd Dynamic
         oro_segment_form[owner]: 1
-        oro_segment_form[type]: static
+        oro_segment_form[type]: dynamic
 response:
         - [admin,1,/user/view/1]
-export:
-        - [admin]
+export: []
 export_filter:
-        - []
+        oro_segment_grid_$id[_filter][c1][value]: 321admin123
+        oro_segment_grid_$id[_filter][c1][type]: 1

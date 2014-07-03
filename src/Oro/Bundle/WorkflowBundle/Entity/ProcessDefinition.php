@@ -13,19 +13,22 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_process_definition_index",
- *  routeView="oro_process_definition_view",
- *  defaultValues={
- *      "entity"={
- *          "label"="Process",
- *          "plural_label"="Processes",
- *          "icon"="icon-inbox"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_process_definition_index",
+ *      routeView="oro_process_definition_view",
+ *      defaultValues={
+ *          "entity"={
+ *              "label"="Process",
+ *              "plural_label"="Processes",
+ *              "icon"="icon-inbox"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class ProcessDefinition implements DomainObjectInterface

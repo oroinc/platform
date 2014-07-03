@@ -132,7 +132,7 @@ define(['jquery', 'underscore'
             var setSelect2ValueById = function(id) {
                 var select2Obj = element.data('select2');
                 var select2AjaxOptions = select2Obj.opts.ajax;
-                var searchData = select2AjaxOptions.data(id, 1);
+                var searchData = select2AjaxOptions.data(id, 1, true);
                 var url = (typeof select2AjaxOptions.url === 'function')
                     ? select2AjaxOptions.url.call(select2Obj, id, 1)
                     : select2AjaxOptions.url;
@@ -142,6 +142,9 @@ define(['jquery', 'underscore'
                     url: url,
                     data: searchData,
                     success: function(response) {
+                        if (typeof select2AjaxOptions.results == 'function') {
+                            response = select2AjaxOptions.results.call(select2Obj, response, 1);
+                        }
                         if (typeof response.results != 'undefined' && response.results.length > 0) {
                             handleResults(response.results);
                         }

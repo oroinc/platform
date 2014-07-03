@@ -16,21 +16,27 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  * @ORM\Table(name="oro_calendar_event",
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
  * @Config(
- *  routeName="oro_calendar_view_default",
- *  defaultValues={
- *      "entity"={
- *          "icon"="icon-time"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "permissions"="VIEW;CREATE;EDIT;DELETE",
- *          "group_name"=""
- *      },
- *      "reminder"={
- *          "reminder_template_name"="calendar_reminder",
- *          "reminder_flash_template_identifier"="calendar_event_template"
- *      },
- *  }
+ *      routeName="oro_calendar_view_default",
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-time"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT;DELETE",
+ *              "group_name"=""
+ *          },
+ *          "reminder"={
+ *              "reminder_template_name"="calendar_reminder",
+ *              "reminder_flash_template_identifier"="calendar_event_template"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
+ *      }
  * )
  */
 class CalendarEvent implements RemindableInterface

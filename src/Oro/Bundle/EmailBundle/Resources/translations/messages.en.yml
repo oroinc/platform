@@ -75,6 +75,8 @@ oro:
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
 
+        empty_body:               Empty body
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"
