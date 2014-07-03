@@ -3,7 +3,6 @@ parameters:
     oro_tracking.tracking_event.class:                   Oro\Bundle\TrackingBundle\Entity\TrackingEvent
     oro_tracking.tracking_data.class:                    Oro\Bundle\TrackingBundle\Entity\TrackingData
     oro_tracking.form.type.tracking_website.class:       Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
-    oro_tracking.form.type.configuration_link.class:     Oro\Bundle\TrackingBundle\Form\Type\TrackingLinkType
     oro_tracking.form.handler.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
     oro_tracking.tracking_website.manager.api.class:     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tracking.importexport.reader.log.class:          Oro\Bundle\TrackingBundle\ImportExport\LogReader
@@ -90,8 +89,3 @@ services:
             - false
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.website-tracking-events-grid, method: onBuildAfter }
-
-    oro_tracking.form.type.configuration_link:
-        class: %oro_tracking.form.type.configuration_link.class%
-        tags:
-            - { name: form.type, alias: oro_tracking_link_type }
