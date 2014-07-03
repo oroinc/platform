@@ -132,7 +132,9 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            this.publishEvent('page:afterChange');
+            //@todo develop approach to postpone 'page:afterChange' event
+            // until all inline scripts on a page have not finished changes
+            _.delay(_.bind(this.publishEvent, this), 50, 'page:afterChange');
         },
 
         /**
@@ -225,8 +227,10 @@ define([
          */
         _setNavigationHandlers: function (url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
-            mediator.setHandler('refreshPage', function () {
-                utils.redirectTo({url: url}, {forceStartup: true, force: true});
+            mediator.setHandler('refreshPage', function (options) {
+                options = options || {};
+                _.defaults(options, {forceStartup: true, force: true});
+                utils.redirectTo({url: url}, options);
                 mediator.trigger('page:refreshed');
             });
             mediator.setHandler('submitPage', this._submitPage, this);

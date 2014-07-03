@@ -74,6 +74,8 @@ define([
         }
     };
 
+    Chaplin.Layout.prototype.el = 'document';
+
     /**
      * Fixes issues
      *  - empty hashes (like '#')
@@ -83,6 +85,10 @@ define([
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
         var el, href;
         el = event.currentTarget;
+
+        if (event.isDefaultPrevented()) {
+            return;
+        }
 
         if (el.nodeName === 'A') {
             href = el.getAttribute('href');

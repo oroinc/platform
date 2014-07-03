@@ -319,7 +319,11 @@ define([
          */
         saveState: function (key, value, hash) {
             var url, query;
-            current.state[key] = value;
+            if (value !== null) {
+                current.state[key] = value;
+            } else {
+                delete current.state[key];
+            }
 
             if (!_.isUndefined(hash)) {
                 query = Chaplin.utils.queryParams.parse(current.query);
