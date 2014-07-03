@@ -194,7 +194,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:1])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToOne()
+    public function testScopeExtendRelationTypeCreateSelfRelationManyToOne()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -241,7 +241,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:*])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToMany()
+    public function testScopeExtendRelationTypeCreateSelfRelationManyToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -291,10 +291,10 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new relation field to own entity
+     *  Test create new 1:* relation field to same entity
      *  Should NOT be persisted
      */
-    public function testPersistConfigScopeExtendRelationTypeOwnEntity()
+    public function testScopeExtendRelationTypeOwnEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'oneToMany'),
@@ -325,7 +325,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field should be added to index
      */
-    public function testPersistConfigScopeDataGridNewFieldNewEntity()
+    public function testScopeDataGridNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'integer', 'datagrid'),
@@ -345,7 +345,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field type 'text' should NOT be added to index
      */
-    public function testPersistConfigScopeDataGridNewFieldNewEntityNot()
+    public function testScopeDataGridNewFieldNewEntityNot()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'text', 'datagrid'),
