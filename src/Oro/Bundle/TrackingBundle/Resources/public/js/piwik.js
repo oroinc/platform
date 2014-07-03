@@ -3377,5 +3377,3 @@ if (typeof piwik_log !== 'function') {
         }
     };
 }
-
-/*! @license-end */
