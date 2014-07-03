@@ -118,7 +118,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             'SET NULL'
         );
 
-        if ($targetEntity && $targetEntity === AttachmentScope::ATTACHMENT_ENTITY) {
+        if ($targetEntity === AttachmentScope::ATTACHMENT_ENTITY) {
             $builder->cascadePersist();
         }
 
