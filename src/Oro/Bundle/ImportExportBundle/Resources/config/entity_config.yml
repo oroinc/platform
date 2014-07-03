@@ -69,7 +69,7 @@ oro_entity_config:
                 # is relation must be represented by all it's fields
                 full:
                     options:
-                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, attachment, attachmentImage]
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, file, image]
                     form:
                         type:               choice
                         options:
@@ -85,5 +85,5 @@ oro_entity_config:
                 # is relation field should be processed as scalar value when exporting data
                 process_as_scalar:
                     options:
-                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, attachment, attachmentImage]
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, file, image]
                         default_value:      false

@@ -4,20 +4,20 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\AttachmentBundle\EventListener\AttachmentListener;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 
-class AttachmentListenerTest extends \PHPUnit_Framework_TestCase
+class FileListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AttachmentListener  */
+    /** @var FileListener  */
     protected $listener;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject  */
     protected $manager;
 
     /**
-     * @var Attachment
+     * @var File
      */
     protected $attachment;
 
@@ -26,7 +26,7 @@ class AttachmentListenerTest extends \PHPUnit_Framework_TestCase
         $this->manager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->listener = new AttachmentListener($this->manager);
+        $this->listener = new FileListener($this->manager);
     }
 
     /**
@@ -86,7 +86,7 @@ class AttachmentListenerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $correctArguments = new LifecycleEventArgs(new Attachment(), $em);
+        $correctArguments = new LifecycleEventArgs(new File(), $em);
         $incorrectArguments = new LifecycleEventArgs(new TestClass(), $em);
 
         return [

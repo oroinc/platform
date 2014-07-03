@@ -4,10 +4,10 @@ namespace Oro\Bundle\AttachmentBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
-class AttachmentListener
+class FileListener
 {
     /**
      * @var AttachmentManager
@@ -27,9 +27,9 @@ class AttachmentListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
-        /** @var $entity Attachment */
+        /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof Attachment) {
+        if ($entity instanceof File) {
             $this->manager->preUpload($entity);
         }
     }
@@ -47,9 +47,9 @@ class AttachmentListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
-        /** @var $entity Attachment */
+        /** @var $entity File */
         $entity = $args->getEntity();
-        if ($entity instanceof Attachment) {
+        if ($entity instanceof File) {
             $this->manager->upload($entity);
         }
     }

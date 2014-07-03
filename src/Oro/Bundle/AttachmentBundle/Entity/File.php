@@ -4,15 +4,16 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
+use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 
 /**
- * Attachment
+ * File
  *
- * @ORM\Table(name="oro_attachment")
+ * @ORM\Table(name="oro_attachment_file")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -29,7 +30,7 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
  *      }
  * )
  */
-class Attachment extends ExtendAttachment
+class File extends ExtendFile
 {
     /**
      * @var integer
@@ -39,6 +40,14 @@ class Attachment extends ExtendAttachment
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var UserInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
+     * @ORM\JoinColumn(name="owner_user_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @var string
@@ -90,7 +99,7 @@ class Attachment extends ExtendAttachment
     protected $updatedAt;
 
     /**
-     * @var File $file
+     * @var ComponentFile $file
      */
     protected $file;
 
@@ -113,7 +122,7 @@ class Attachment extends ExtendAttachment
      * Set filename
      *
      * @param string $filename
-     * @return Attachment
+     * @return File
      */
     public function setFilename($filename)
     {
@@ -136,7 +145,7 @@ class Attachment extends ExtendAttachment
      * Set originalFilename
      *
      * @param string $originalFilename
-     * @return Attachment
+     * @return File
      */
     public function setOriginalFilename($originalFilename)
     {
@@ -159,7 +168,7 @@ class Attachment extends ExtendAttachment
      * Set createdAt
      *
      * @param \DateTime $createdAt
-     * @return Attachment
+     * @return File
      */
     public function setCreatedAt($createdAt)
     {
@@ -182,7 +191,7 @@ class Attachment extends ExtendAttachment
      * Set updatedAt
      *
      * @param \DateTime $updatedAt
-     * @return Attachment
+     * @return File
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -202,15 +211,15 @@ class Attachment extends ExtendAttachment
     }
 
     /**
-     * @param File $file
+     * @param ComponentFile $file
      */
-    public function setFile(File $file)
+    public function setFile(ComponentFile $file)
     {
         $this->file = $file;
     }
 
     /**
-     * @return File
+     * @return ComponentFile
      */
     public function getFile()
     {
@@ -319,5 +328,25 @@ class Attachment extends ExtendAttachment
         return (string) $this->getFilename()
             ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
             : '';
+    }
+
+    /**
+     * @param UserInterface|null $owningUser
+     *
+     * @return File
+     */
+    public function setOwner($owningUser)
+    {
+        $this->owner = $owningUser;
+
+        return $this;
+    }
+
+    /**
+     * @return UserInterface
+     */
+    public function getOwner()
+    {
+        return $this->owner;
     }
 }

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 
-use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentConfigType;
+use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
 
-class AttachmentConfigTypeTest extends \PHPUnit_Framework_TestCase
+class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AttachmentConfigType */
+    /** @var FileConfigType */
     protected $type;
 
     public function setUp()
@@ -15,12 +15,12 @@ class AttachmentConfigTypeTest extends \PHPUnit_Framework_TestCase
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->type = new AttachmentConfigType($configManager);
+        $this->type = new FileConfigType($configManager);
     }
 
     public function testInterface()
     {
-        $this->assertSame('oro_attachment_config', $this->type->getName());
+        $this->assertSame('oro_attachment_file_config', $this->type->getName());
         $this->assertSame('form', $this->type->getParent());
     }
 

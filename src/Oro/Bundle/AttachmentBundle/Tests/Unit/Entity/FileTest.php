@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\File as FileType;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Attachment */
+    /** @var File */
     protected $entity;
 
     protected function setUp()
     {
-        $this->entity = new Attachment();
+        $this->entity = new File();
     }
 
     public function tearDown()
@@ -46,7 +45,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $filename = 'testFile.doc';
         $originalFileName = 'original.doc';
         $date = new \DateTime('now');
-        $file = new File('testPath', false);
+        $file = new FileType('testPath', false);
         $extension = 'txt';
         $type = 'text/doc';
         $fileSize = 10000;

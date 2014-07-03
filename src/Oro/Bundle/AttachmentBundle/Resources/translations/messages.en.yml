@@ -28,5 +28,5 @@ oro:
     entity_extend:
         form:
             data_type:
-                attachment:      File
-                attachmentImage: Image
+                file:  File
+                image: Image

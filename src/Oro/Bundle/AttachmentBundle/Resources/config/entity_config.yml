@@ -4,17 +4,17 @@ oro_entity_config:
             items:
                 attachment:
                     options:
-                        allowed_type:       [attachment, attachmentImage]
+                        allowed_type:       [file, image]
                         auditable:          false
                     form:
-                        type:               oro_attachment_config
+                        type:               oro_attachment_file_config
                         options:
                             block:          general
                             subblock:       properties
 
                 maxsize:
                     options:
-                        allowed_type:   [attachment, attachmentImage]
+                        allowed_type:   [file, image]
                         auditable:      false
                     constraints:
                         - NotBlank:  ~
@@ -33,7 +33,7 @@ oro_entity_config:
 
                 width:
                     options:
-                        allowed_type:   [attachmentImage]
+                        allowed_type:   [image]
                         auditable:      false
                     constraints:
                         - Type:
@@ -50,7 +50,7 @@ oro_entity_config:
 
                 height:
                     options:
-                        allowed_type:   [attachmentImage]
+                        allowed_type:   [image]
                         auditable:      false
                     constraints:
                         - Type:
