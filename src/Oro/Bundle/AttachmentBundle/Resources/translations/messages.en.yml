@@ -6,7 +6,7 @@ oro:
 
         id.label:            Id
         comment.label:       Comment
-        ile.label:          File
+        file.label:          File
 
         block_titles:
             attachments.label:  Attachments management
