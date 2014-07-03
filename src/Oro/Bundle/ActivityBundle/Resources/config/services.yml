@@ -1,0 +1,58 @@
+parameters:
+    oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager
+    oro_activity.entity_config_dumper.extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityEntityConfigDumperExtension
+    oro_activity.entity_generator.extension.class:      Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
+    oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
+    oro_activity.widget_provider.activities.class:      Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
+    oro_activity.widget_provider.activities.main.class: Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider
+    oro_activity.widget_provider.activities.menu.class: Oro\Bundle\UIBundle\Provider\TabMenuWidgetProvider
+    oro_activity.widget_provider.actions.class:         Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider
+
+services:
+    oro_activity.manager:
+        class: %oro_activity.manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_entity_config.provider.activity
+            - @oro_entity_config.provider.entity
+
+    oro_activity.entity_config_dumper.extension:
+        class: %oro_activity.entity_config_dumper.extension.class%
+        parent: oro_entity_extend.config_dumper_extension
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_activity.entity_generator.extension:
+        class: %oro_activity.entity_generator.extension.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
+
+    oro_activity.migration.extension.activity:
+        class: %oro_activity.migration.extension.activity.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: activity }
+
+    oro_activity.widget_provider.activities:
+        class: %oro_activity.widget_provider.activities.class%
+
+    oro_activity.widget_provider.activities.main:
+        class: %oro_activity.widget_provider.activities.main.class%
+        arguments:
+            - @oro_activity.manager
+            - @oro_security.security_facade
+            - @translator
+            - @oro_entity.entity_identifier_accessor
+            - @oro_entity.routing_helper
+        tags:
+            - { name: oro_activity.activity_widget_provider }
+
+    oro_activity.widget_provider.actions:
+        class: %oro_activity.widget_provider.actions.class%
+        arguments:
+            - @oro_activity.manager
+            - @oro_ui.placeholder.provider
+        tags:
+            - { name: oro_ui.view_action_provider }

@@ -74,6 +74,7 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 
                                 widget.render();
 
                                 event.preventDefault();
+                                event.stopPropagation();
                             }
                         );
                     }
