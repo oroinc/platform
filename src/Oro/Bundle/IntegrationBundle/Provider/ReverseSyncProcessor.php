@@ -77,11 +77,17 @@ class ReverseSyncProcessor
             return $this->logger->error($e->getMessage());
         }
 
+        $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
+            ProcessorRegistry::TYPE_EXPORT,
+            $realConnector->getImportEntityFQCN()
+        );
+
         $configuration = [
             ProcessorRegistry::TYPE_EXPORT =>
                 array_merge(
                     [
                         'entityName' => $realConnector->getImportEntityFQCN(),
+                        'processorAlias' => reset($processorAliases),
                         'channel'    => $integration->getId()
                     ],
                     $parameters
