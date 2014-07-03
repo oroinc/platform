@@ -13,8 +13,8 @@ define(function (require) {
     var messenger = require('oroui/js/messenger');
     var Modal = require('oroui/js/modal');
     var LoadingMask = require('oroui/js/loading-mask');
-    var PagestateView = require('./pagestate/view');
-    var PagestateModel = require('./pagestate/model');
+    var PagestateView = require('./app/views/page-state-view');
+    var PagestateModel = require('./app/models/page-state-model');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
