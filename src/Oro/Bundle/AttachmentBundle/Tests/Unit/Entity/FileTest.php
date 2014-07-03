@@ -2,39 +2,16 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 use Symfony\Component\HttpFoundation\File\File as FileType;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
-class AttachmentTest extends \PHPUnit_Framework_TestCase
+class FileTest extends EntityTestAbstract
 {
-    /** @var File */
-    protected $entity;
-
     protected function setUp()
     {
         $this->entity = new File();
-    }
-
-    public function tearDown()
-    {
-        unset($this->entity);
-    }
-
-    /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed $value
-     * @param mixed $expected
-     */
-    public function testSetGet($property, $value = null, $expected = null)
-    {
-        if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), [$value]);
-        }
-
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), []));
     }
 
     /**
@@ -49,6 +26,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $extension = 'txt';
         $type = 'text/doc';
         $fileSize = 10000;
+        $owner = new TestUser();
 
         return [
             'filename' => ['filename', $filename, $filename],
@@ -59,6 +37,7 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
             'extension' => ['extension', $extension, $extension],
             'mimeType' => ['mimeType', $type, $type],
             'fileSize' => ['fileSize', $fileSize, $fileSize],
+            'owner'    => ['owner', $owner, $owner]
         ];
     }
 
