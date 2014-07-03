@@ -14,6 +14,6 @@ class OroAttachmentBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $schema->getTable('oro_attachment')->addColumn('comment', 'string', ['length' => 255, 'notnull' => false]);
+        //$schema->getTable('oro_attachment')->addColumn('comment', 'string', ['length' => 255, 'notnull' => false]);
     }
 }
