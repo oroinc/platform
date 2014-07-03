@@ -49,7 +49,7 @@ class ConfigFileValidator
 
         $fileSize = $entityExtendConfig->get('maxsize') * 1024 * 1024;
 
-        if ($entityExtendConfig->getId()->getFieldType() === 'attachment') {
+        if ($entityExtendConfig->getId()->getFieldType() === 'file') {
             $configValue = 'upload_mime_types';
         } else {
             $configValue = 'upload_image_mime_types';

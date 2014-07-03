@@ -1,8 +1,23 @@
 oro:
     attachment:
-        entity_label:         Attachment
-        entity_plural_label:  Attachments
-        entity_description:   Entity attachments
+        file:
+            entity_label:            File
+            entity_plural_label:     Files
+            entity_description:      File storage
+
+            id.label:                Id
+            filename.label:          File name
+            original_filename.label: Original file name
+            filepath.label:          File path
+            created_at.label:        Created
+            updated_at.label:        Updated
+            owner.label:             Owner
+            extension.label:         Extension
+            file.label:              File
+            delete_file.label:       Delete
+            file_size.label:         File size
+            mime_type.label:         Mime type
+
         config:
             file_size.label:     File size
             thumb_width.label:   Thumbnail width
@@ -11,19 +26,6 @@ oro:
             mime_types.label:    Mime types
             upload_mime_types.label: File mime types
             upload_image_mime_types.label: Image mime types
-
-        id.label:                Id
-        filename.label:          File name
-        original_filename.label: Original file name
-        filepath.label:          File path
-        created_at.label:        Created
-        updated_at.label:        Updated
-        owner.label:             Owner
-        extension.label:         Extension
-        file.label:              File
-        delete_file.label:       Delete
-        file_size.label:         File size
-        mime_type.label:         Mime type
 
     entity_extend:
         form:
