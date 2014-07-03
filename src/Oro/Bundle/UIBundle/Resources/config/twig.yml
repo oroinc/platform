@@ -39,6 +39,8 @@ services:
 
     oro_ui.twig.widget_extension:
         class: %oro_ui.twig.widget.class%
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: twig.extension }
 

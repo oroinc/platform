@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -14,7 +15,8 @@ class OrmSorterExtension extends AbstractExtension
     /**
      * Query param
      */
-    const SORTERS_ROOT_PARAM = '_sort_by';
+    const SORTERS_ROOT_PARAM     = '_sort_by';
+    const MINIFIED_SORTERS_PARAM = 's';
 
     /**
      * Ascending sorting direction
@@ -112,6 +114,32 @@ class OrmSorterExtension extends AbstractExtension
     {
         // should visit after all extensions
         return -250;
+    }
+
+    /**
+     * @param ParameterBag $parameters
+     */
+    public function setParameters(ParameterBag $parameters)
+    {
+        if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
+            $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
+            $sorters = [];
+
+            if (array_key_exists(self::MINIFIED_SORTERS_PARAM, $minifiedParameters)) {
+                $sorters = $minifiedParameters[self::MINIFIED_SORTERS_PARAM];
+                if (is_array($sorters)) {
+                    foreach ($sorters as $field => $direction) {
+                        $sorters[$field] = $direction > 0
+                            ? self::DIRECTION_DESC
+                            : self::DIRECTION_ASC;
+                    }
+                }
+            }
+
+            $parameters->set(self::SORTERS_ROOT_PARAM, $sorters);
+        }
+
+        parent::setParameters($parameters);
     }
 
     /**

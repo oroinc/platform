@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Twig_Environment;
 
 class WidgetExtension extends \Twig_Extension
@@ -14,6 +16,11 @@ class WidgetExtension extends \Twig_Extension
      * @var bool
      */
     protected $rendered = array();
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * Returns a list of functions to add to the existing list.
@@ -74,6 +81,9 @@ class WidgetExtension extends \Twig_Extension
             $options['container'] = '#' . $elementId;
         }
         $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid']);
+        if ($this->request) {
+            $options['url'] = $this->addRequestParameters($options['url']);
+        }
 
         return $environment->render(
             "OroUIBundle::widget_loader.html.twig",
@@ -108,11 +118,43 @@ class WidgetExtension extends \Twig_Extension
     }
 
     /**
+     * @param string $url
+     * @return string
+     */
+    protected function addRequestParameters($url)
+    {
+        $urlParts = parse_url($url);
+
+        $urlPath = !empty($urlParts['path']) ? $urlParts['path'] : '';
+        $urlParams = array();
+        if (!empty($urlParts['query'])) {
+            parse_str($urlParts['query'], $urlParams);
+        }
+
+        $requestParams = $this->request->query->all();
+
+        $mergedParams = array_merge($requestParams, $urlParams);
+        if (empty($mergedParams)) {
+            return $urlPath;
+        }
+
+        return $urlPath . '?' . http_build_query($mergedParams);
+    }
+
+    /**
      * @return string
      */
     protected function getUniqueIdentifier()
     {
         return str_replace('.', '-', uniqid('', true));
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**

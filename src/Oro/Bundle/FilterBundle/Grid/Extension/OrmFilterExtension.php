@@ -14,13 +14,15 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConf
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
 class OrmFilterExtension extends AbstractExtension
 {
     /**
      * Query param
      */
-    const FILTER_ROOT_PARAM = '_filter';
+    const FILTER_ROOT_PARAM     = '_filter';
+    const MINIFIED_FILTER_PARAM = 'f';
 
     /** @var FilterInterface[] */
     protected $filters = [];
@@ -145,6 +147,25 @@ class OrmFilterExtension extends AbstractExtension
         $this->filters[$name] = $filter;
 
         return $this;
+    }
+
+    /**
+     * @param ParameterBag $parameters
+     */
+    public function setParameters(ParameterBag $parameters)
+    {
+        if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
+            $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
+            $filters = [];
+
+            if (array_key_exists(self::MINIFIED_FILTER_PARAM, $minifiedParameters)) {
+                $filters = $minifiedParameters[self::MINIFIED_FILTER_PARAM];
+            }
+
+            $parameters->set(self::FILTER_ROOT_PARAM, $filters);
+        }
+
+        parent::setParameters($parameters);
     }
 
     /**
