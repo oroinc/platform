@@ -338,8 +338,6 @@ class File extends ExtendFile
     public function setOwner($owningUser)
     {
         $this->owner = $owningUser;
-
-        return $this;
     }
 
     /**

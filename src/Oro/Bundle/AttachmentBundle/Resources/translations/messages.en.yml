@@ -34,6 +34,9 @@ oro:
             upload_mime_types.label:       File mime types
             upload_image_mime_types.label: Image mime types
 
+        action:
+            add:                 Add Attachment
+
     entity_extend:
         form:
             data_type:

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -9,11 +10,31 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 class FileController extends Controller
 {
+    /**
+     * @Route(
+     *      "attachment/view/widget/{entityClass}/{entityId}",
+     *      name="oro_attachment_widget_attachments"
+     * )
+     *
+     * @Template("OroAttachmentBundle:Attachment:attachments.html.twig")
+     */
+    public function widgetAction($entityClass, $entityId)
+    {
+        $routHelper = $this->get('oro_entity.routing_helper');
+        //$entity = $routHelper->getEntity($entityClass, $entityId);
+
+        return [
+            'entityId' => $entityId,
+            'entityField' => ExtendHelper::buildAssociationName($routHelper->decodeClassName($entityClass))
+        ];
+    }
+
     /**
      * @Route("attachment/{codedString}.{extension}",
      *   name="oro_attachment_file",

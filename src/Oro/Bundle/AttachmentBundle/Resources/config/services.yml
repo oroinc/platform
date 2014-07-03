@@ -10,6 +10,9 @@ parameters:
 
     oro_attachment.serializer.file_normalizer.class:     Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
 
+    oro_attachment.placeholder.filter.class:             Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
+    oro_attachment.attachment_grid_listener:             Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -39,9 +42,7 @@ services:
 
     oro_attachment.attachments.config_dumper.extension:
         class: %oro_attachment.config_dumper.extension.class%
-        arguments:
-            - @oro_entity_extend.relation_builder
-            - @oro_entity_extend.association_builder
+        parent: oro_entity_extend.config_dumper_extension
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -65,3 +66,16 @@ services:
             - [setValidator, [@oro_attachment.validator.file_config_validator]]
         tags:
             - { name: oro_importexport.normalizer}
+
+    oro_attachment.placeholder.filter:
+        class: %oro_attachment.placeholder.filter.class%
+        arguments:
+            - @oro_entity_config.provider.attachment
+
+    oro_attachment.event_listener.attachment_grid_listener:
+        class: %oro_attachment.attachment_grid_listener%
+        arguments:
+            - [entityId]
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
