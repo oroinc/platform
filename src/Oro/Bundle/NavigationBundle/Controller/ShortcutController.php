@@ -55,7 +55,7 @@ class ShortcutController extends Controller
         $result = array();
         /** @var $item ItemInterface */
         foreach ($iterator as $key => $item) {
-            if ($item->getExtra('isAllowed') && !in_array($item->getUri(), $this->uris) && $item->getUri() !== '#') {
+            if ($this->isItemAllowed($item)) {
                 $result[$key] = array(
                     'url' => $item->getUri(),
                     'label' => $item->getLabel(),
@@ -66,5 +66,20 @@ class ShortcutController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * @param $item
+     *
+     * @return bool
+     */
+    protected function isItemAllowed($item)
+    {
+        return (
+            $item->getExtra('isAllowed')
+            && !in_array($item->getUri(), $this->uris)
+            && $item->getUri() !== '#'
+            && $item->isDisplayed()
+        );
     }
 }
