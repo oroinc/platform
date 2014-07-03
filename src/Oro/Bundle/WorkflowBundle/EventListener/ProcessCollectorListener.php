@@ -243,7 +243,7 @@ class ProcessCollectorListener
                 if ($trigger->isQueued() || $this->forceQueued) {
                     $processJob = $this->queueProcess($trigger, $data);
                     $entityManager->persist($processJob);
-                    $this->queuedJobs[] = $processJob;
+                    $this->queuedJobs[(int)$trigger->getTimeShift()][$trigger->getPriority()][] = $processJob;
                 } else {
                     $this->logger->debug('Process handled', $trigger, $data);
                     $this->handler->handleTrigger($trigger, $data);
@@ -264,32 +264,43 @@ class ProcessCollectorListener
             $this->removedEntityHashes = array();
         }
 
-        // create JMS jobs for queued process jobs
+        $this->createJobs($entityManager);
+    }
+
+    /**
+     * Create JMS jobs for queued process jobs
+     *
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     */
+    protected function createJobs($entityManager)
+    {
         $hasQueuedJobs = false;
-        /** @var ProcessJob $processJob */
-        while ($processJob = array_shift($this->queuedJobs)) {
-            $jmsJob = new Job(
-                ExecuteProcessJobCommand::NAME,
-                array('--id=' . $processJob->getId()),
-                true,
-                Job::DEFAULT_QUEUE,
-                $processJob->getProcessTrigger()->getPriority()
-            );
+        foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
+            foreach ($processJobBatch as $priority => $processJobs) {
+                $args = array();
 
-            $timeShiftInterval = $processJob->getProcessTrigger()->getTimeShiftInterval();
-            if ($timeShiftInterval) {
-                $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
-                $executeAfter->add($timeShiftInterval);
-                $jmsJob->setExecuteAfter($executeAfter);
+                /** @var ProcessJob $processJob */
+                foreach ($processJobs as $processJob) {
+                    $args[] = '--id=' . $processJob->getId();
+                    $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
+                }
+
+                $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, true, Job::DEFAULT_QUEUE, $priority);
+                $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
+
+                if ($timeShiftInterval) {
+                    $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
+                    $executeAfter->add($timeShiftInterval);
+                    $jmsJob->setExecuteAfter($executeAfter);
+                }
+
+                $entityManager->persist($jmsJob);
+                $hasQueuedJobs = true;
             }
-
-            $entityManager->persist($jmsJob);
-            $hasQueuedJobs = true;
-
-            $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
         }
 
-        // save JMS job instances
+        $this->queuedJobs = array();
+
         if ($hasQueuedJobs) {
             $entityManager->flush();
         }
