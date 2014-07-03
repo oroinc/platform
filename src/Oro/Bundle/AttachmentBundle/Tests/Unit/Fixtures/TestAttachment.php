@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
-class TestAttachment extends Attachment
+class TestAttachment extends File
 {
     /**
      * @param int $id
