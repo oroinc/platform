@@ -148,9 +148,11 @@ services:
     oro_entity_extend.association_builder:
         class: %oro_entity_extend.association_builder.class%
         arguments:
+            - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
 
     oro_entity_extend.config_dumper_extension:
         abstract: true
         arguments:
+            - @oro_entity_config.config_manager
             - @oro_entity_extend.association_builder

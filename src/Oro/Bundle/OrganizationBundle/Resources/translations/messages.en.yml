@@ -1,4 +1,8 @@
 oro:
+    custom_entity:
+        owner.label:          Owner
+        owner.description:    ""
+
     business_unit:
         menu:
             list.description: List of business units

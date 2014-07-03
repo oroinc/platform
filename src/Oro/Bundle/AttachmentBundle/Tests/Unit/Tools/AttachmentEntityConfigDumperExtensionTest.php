@@ -28,6 +28,7 @@ class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
             ->getMock();
 
         $this->extension = new AttachmentEntityConfigDumperExtension(
+            $this->configManager,
             new RelationBuilder($this->configManager)
         );
     }
