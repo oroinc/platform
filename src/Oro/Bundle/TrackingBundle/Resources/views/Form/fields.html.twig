@@ -1,7 +1,0 @@
-{% block oro_tracking_link_type_widget %}
-    {% if resource_granted('oro_tracking_website_view') %}
-        <a href="{{ path('oro_tracking_website_index') }}">
-            {{ 'oro.tracking.website_configuration'|trans }}
-        </a>
-    {% endif %}
-{% endblock %}

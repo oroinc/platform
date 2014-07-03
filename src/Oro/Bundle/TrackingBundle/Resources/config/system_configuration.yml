@@ -50,12 +50,15 @@ oro_system_configuration:
                 required: false
 
         oro_tracking.wesite_configuration:
-            type: oro_tracking_link_type
+            type: oro_link_type # @todo BAP-4696 use template
             priority: 0
             options:
                 label: false
                 required: false
                 resettable: false
+                route: oro_tracking_website_index
+                acl: oro_tracking_website_view
+                title: oro.tracking.website_configuration
 
     tree:
         system_configuration:
