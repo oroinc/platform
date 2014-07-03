@@ -97,6 +97,7 @@ class OrmSorterExtension extends AbstractExtension
 
         $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
 
+        $initialSortersState = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
         $sortersState = $data->offsetGetByPath('[state][sorters]', []);
         $sorters      = $this->getSortersToApply($config);
         foreach ($sorters as $column => $definition) {
@@ -104,6 +105,7 @@ class OrmSorterExtension extends AbstractExtension
             $sortersState[$column] = $this->normalizeDirection($direction);
         }
 
+        $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);
         $data->offsetAddToArray('state', ['sorters' => $sortersState]);
     }
 

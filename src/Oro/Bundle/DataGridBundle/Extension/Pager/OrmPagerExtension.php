@@ -77,13 +77,19 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
+        $defaultPage = 1;
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
+        $initialState = [
+            'currentPage' => $defaultPage,
+            'pageSize'    => $defaultPerPage
+        ];
         $state = [
-            'currentPage' => $this->getOr(PagerInterface::PAGE_PARAM, 1),
+            'currentPage' => $this->getOr(PagerInterface::PAGE_PARAM, $defaultPage),
             'pageSize'    => $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage)
         ];
 
+        $data->offsetAddToArray('initialState', $initialState);
         $data->offsetAddToArray('state', $state);
     }
 

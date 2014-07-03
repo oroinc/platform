@@ -97,25 +97,20 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $filtersState    = $data->offsetGetByPath('[state][filters]', []);
-        $filtersMetaData = [];
+        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $initialFiltersState = $filtersState;
+        $filtersMetaData     = [];
 
-        $filters = $this->getFiltersToApply($config);
-        $values  = $this->getValuesToApply($config);
+        $filters       = $this->getFiltersToApply($config);
+        $values        = $this->getValuesToApply($config);
+        $initialValues = $this->getValuesToApply($config, false);
 
         foreach ($filters as $filter) {
             $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
+            $initialValue = isset($initialValues[$filter->getName()]) ? $initialValues[$filter->getName()] : false;
 
-            if ($value !== false) {
-                $form = $filter->getForm();
-                if (!$form->isSubmitted()) {
-                    $form->submit($value);
-                }
-
-                if ($form->isValid()) {
-                    $filtersState[$filter->getName()] = $value;
-                }
-            }
+            $filtersState = $this->updateFiltersState($filter, $value, $filtersState);
+            $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
             $metadata          = $filter->getMetadata();
             $filtersMetaData[] = array_merge(
@@ -129,9 +124,33 @@ class OrmFilterExtension extends AbstractExtension
 
         }
 
-        $data->offsetAddToArray('state', ['filters' => $filtersState])
+        $data
+            ->offsetAddToArray('initialState', ['filters' => $initialFiltersState])
+            ->offsetAddToArray('state', ['filters' => $filtersState])
             ->offsetAddToArray('filters', $filtersMetaData)
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
+    }
+
+    /**
+     * @param FilterInterface $filter
+     * @param mixed $value
+     * @param array $state
+     * @return array
+     */
+    protected function updateFiltersState(FilterInterface $filter, $value, array $state)
+    {
+        if ($value !== false) {
+            $form = $filter->getForm();
+            if (!$form->isSubmitted()) {
+                $form->submit($value);
+            }
+
+            if ($form->isValid()) {
+                $state[$filter->getName()] = $value;
+            }
+        }
+
+        return $state;
     }
 
     /**
@@ -197,17 +216,22 @@ class OrmFilterExtension extends AbstractExtension
      * Takes param from request and merge with default filters
      *
      * @param DatagridConfiguration $config
+     * @param bool $readParameters
      *
      * @return array
      */
-    protected function getValuesToApply(DatagridConfiguration $config)
+    protected function getValuesToApply(DatagridConfiguration $config, $readParameters = true)
     {
         $result = [];
 
         $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
         $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
-        $filterBy       = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
+        if ($readParameters) {
+            $filterBy = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
+        } else {
+            $filterBy = $defaultFilters;
+        }
 
         foreach ($filterBy as $column => $value) {
             if (isset($filters[$column])) {
