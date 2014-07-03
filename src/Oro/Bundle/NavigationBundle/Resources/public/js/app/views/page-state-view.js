@@ -6,10 +6,12 @@ define([
     'underscore',
     'url',
     'routing',
-    'oroui/js/app/views/base/view',
+    'orotranslation/js/translator',
     'oroui/js/mediator',
+    'oroui/js/modal',
+    'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, Url, routing, BaseView, mediator) {
+], function ($, _, Url, routing, __, mediator, Modal, BaseView) {
     'use strict';
 
     var setInterval, clearInterval, PageStateView;
@@ -19,6 +21,10 @@ define([
 
     PageStateView = BaseView.extend({
         pageStateTimer: null,
+
+        events: {
+            'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
+        },
 
         listen: {
             'change:data model': '_saveModel',
@@ -30,15 +36,46 @@ define([
         },
 
         initialize: function () {
-            this._init();
+            var confirmModal;
+
+            this._initialData = null;
+            this._loadState();
+
+            confirmModal = new Modal({
+                title: __('Refresh Confirmation'),
+                content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
+                okText: __('Ok, got it.'),
+                className: 'modal modal-primary',
+                okButtonClass: 'btn-primary btn-large',
+                cancelText: __('Cancel')
+            });
+            this.listenTo(confirmModal, 'ok', function () {
+                mediator.execute('refreshPage', {restore: true});
+            });
+
+            this.subview('confirmModal', confirmModal);
+        },
+
+        /**
+         * Handles click on page refresh element
+         * @param {jQuery.Event} e
+         */
+        onRefreshClick: function (e) {
+            e.preventDefault();
+            if (this._initialData !== null && this.model.get('data') !== this._initialData) {
+                this.subview('confirmModal').open();
+            } else {
+                mediator.execute('refreshPage', {restore: true});
+            }
         },
 
         /**
          * Initializes form changes trace
          *  - if attributes is not in a cache, loads data from server
+         * @param {boolean=} discardChanges
          * @private
          */
-        _init: function () {
+        _loadState: function (discardChanges) {
             var url, attributes, self;
             if (!this._hasForm()) {
                 return;
@@ -51,15 +88,16 @@ define([
                 return;
             }
 
+            // makes request even if stored changes has been discarded, in order to fetch model id
             url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
             $.get(url).done(function (data) {
                 var attributes;
                 attributes = {
                     id: data.id,
                     pageId: data.pagestate.pageId,
-                    data: data.pagestate.data
+                    data: discardChanges ? '' : data.pagestate.data
                 };
-                self._resetPageState(attributes);
+                self._initFormTracer(attributes);
                 self._updateCache();
             });
         },
@@ -71,14 +109,21 @@ define([
             if (this.pageStateTimer) {
                 clearInterval(this.pageStateTimer);
             }
+            this._initialData = null;
             this.model.clear({silent: true});
         },
 
         /**
          * Init page state on page updated
          */
-        onPageUpdate: function () {
-            this._init();
+        onPageUpdate: function (attributes, args) {
+            var options;
+            options = (args || {}).options;
+            if (options && options.restore) {
+                // delete cache if changes are discarded
+                mediator.execute('pageCache:state:save', 'form', null);
+            }
+            this._loadState(options.restore || false);
         },
 
         /**
@@ -92,7 +137,7 @@ define([
 
             attributes = mediator.execute('pageCache:state:fetch', 'form');
             if (attributes) {
-                this._resetPageState(attributes);
+                this._initFormTracer(attributes);
             }
         },
 
@@ -101,10 +146,18 @@ define([
          * @param attributes
          * @private
          */
-        _resetPageState: function (attributes) {
-            this.model.set(attributes, {silent: true});
-            this._restore();
-            this.pageStateTimer = setInterval(_.bind(this._collect, this), 2000);
+        _initFormTracer: function (attributes) {
+            var options;
+            this._initialData = this._collectFormsData();
+            if (attributes.data) {
+                options = {silent: true};
+            } else {
+                attributes.data = this._initialData;
+            }
+
+            this.model.set(attributes, options);
+            this._restoreState();
+            this.pageStateTimer = setInterval(_.bind(this._collectState, this), 2000);
         },
 
         /**
@@ -146,9 +199,11 @@ define([
 
         /**
          * Collects data of page forms and update model if state is changed
+         *  - collects data
+         *  - updates model
          * @private
          */
-        _collect: function () {
+        _collectState: function () {
             var pageId, data;
 
             pageId = this._combinePageId();
@@ -156,8 +211,26 @@ define([
                 return;
             }
 
-            data = [];
+            data = this._collectFormsData();
 
+            if (data === this.model.get('data')) {
+                return;
+            }
+
+            this.model.set({
+                pageId: pageId,
+                data: data
+            });
+        },
+
+        /**
+         * Goes through the form and collects data
+         * @returns {string}
+         * @private
+         */
+        _collectFormsData: function () {
+            var data;
+            data = [];
             $('form[data-collect=true]').each(function (index, el) {
                 var items = $(el)
                     .find('input, textarea, select')
@@ -172,7 +245,7 @@ define([
                 _.each(items, function (item) {
                     var $item = $(item),
                         itemData = {name: item.name, value: $item.val()},
-                        selectedData = $(item).select2('data');
+                        selectedData = $item.select2('data');
 
                     if (!_.isEmpty(selectedData)) {
                         itemData.selectedData = [selectedData];
@@ -181,30 +254,30 @@ define([
                     data[index].push(itemData);
                 });
             });
-
             data = JSON.stringify(data);
-
-            if (data === this.model.get('data')) {
-                return;
-            }
-            this.model.set({
-                pageId: pageId,
-                data: data
-            });
+            return data;
         },
 
         /**
          * Reads data from model and restores page forms
          * @private
          */
-        _restore: function () {
+        _restoreState: function () {
             var data;
             data = this.model.get('data');
 
-            if (!data) {
-                return;
+            if (data) {
+                this._restoreForms(data);
+                mediator.trigger("pagestate_restored");
             }
+        },
 
+        /**
+         * Updates form from data
+         * @param {string} data JSON
+         * @private
+         */
+        _restoreForms: function (data) {
             data = JSON.parse(data);
 
             $.each(data, function (index, el) {
@@ -228,7 +301,6 @@ define([
                     }
                 });
             });
-            mediator.trigger("pagestate_restored");
         },
 
         /**
