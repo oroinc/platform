@@ -111,7 +111,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($parent));
 
         $this->environment
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('render');
 
         $this->extension->menuTabPanel($this->environment, []);
