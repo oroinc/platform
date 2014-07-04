@@ -43,7 +43,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment']);
+            ->with(['data_class' => 'Oro\Bundle\AttachmentBundle\Entity\File']);
 
         $this->type->setDefaultOptions($resolver);
     }

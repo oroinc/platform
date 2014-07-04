@@ -29,6 +29,9 @@ placeholders:
         items:
             navbar:
                 order: 150
+    view_navButtons_before:
+        items:
+            view_buttons: ~
 
 items:
     logo:
@@ -41,3 +44,7 @@ items:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
     navbar:
         template: OroUIBundle:Default/navbar:sided.html.twig
+    view_buttons:
+        template: OroUIBundle::buttons.html.twig
+        applicable: @oro_ui.widget_provider.view_actions->supports($entity$)
+        data: @oro_ui.widget_provider.view_actions->getWidgets($entity$)

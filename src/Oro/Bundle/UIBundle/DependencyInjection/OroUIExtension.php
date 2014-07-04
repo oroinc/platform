@@ -26,7 +26,7 @@ class OroUIExtension extends Extension
 
         array_unshift(
             $configs,
-            array('placeholders_items' => $this->loadPlaceholdersConfigs($container))
+            $this->loadPlaceholdersConfigs($container)
         );
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -36,7 +36,13 @@ class OroUIExtension extends Extension
         $loader->load('twig.yml');
 
         $container->setParameter('oro_ui.show_pin_button_on_start_page', $config['show_pin_button_on_start_page']);
-        $container->setParameter('oro_ui.placeholders', $config['placeholders_items']);
+        $container->setParameter(
+            'oro_ui.placeholders',
+            [
+                'placeholders' => $config['placeholders'],
+                'items'        => $config['placeholder_items']
+            ]
+        );
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
@@ -49,8 +55,8 @@ class OroUIExtension extends Extension
      */
     protected function loadPlaceholdersConfigs(ContainerBuilder $container)
     {
-        $placeholders = array();
-        $items        = array();
+        $placeholders = [];
+        $items        = [];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_placeholders',
@@ -67,38 +73,10 @@ class OroUIExtension extends Extension
             }
         }
 
-        $this->addItemsToPlaceholders($placeholders, $items);
-
-        return $placeholders;
-    }
-
-    /**
-     * Insert items data (templates, actions, etc) into placeholders item data
-     *
-     * @param array $placeholders
-     * @param array $items
-     */
-    protected function addItemsToPlaceholders(array &$placeholders, array $items)
-    {
-        foreach ($placeholders as $placeholderName => $placeholder) {
-            if (isset($placeholder['items']) && !empty($placeholder['items'])) {
-                foreach ($placeholder['items'] as $itemName => $itemData) {
-                    if (!isset($items[$itemName])) {
-                        // remove a link to undefined item
-                        unset($placeholders[$placeholderName]['items'][$itemName]);
-                    } elseif (empty($itemData)) {
-                        // copy item attributes defined inside 'items' section to 'placeholders' section
-                        $placeholders[$placeholderName]['items'][$itemName] = $items[$itemName];
-                    } else {
-                        // merge item attributes defined inside 'placeholders' and 'items' sections
-                        $placeholders[$placeholderName]['items'][$itemName] = array_merge(
-                            $items[$itemName],
-                            $itemData
-                        );
-                    }
-                }
-            }
-        }
+        return [
+            'placeholders'      => $placeholders,
+            'placeholder_items' => $items
+        ];
     }
 
     /**
@@ -118,7 +96,7 @@ class OroUIExtension extends Extension
         $names = array_keys($placeholders);
         foreach ($names as $name) {
             if (!isset($placeholders[$name]['items'])) {
-                $placeholders[$name]['items'] = array();
+                $placeholders[$name]['items'] = [];
             }
         }
     }

@@ -7,10 +7,10 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 class CreateObject extends AbstractAction
 {
-    const OPTION_KEY_DATA = 'data';
-    const OPTION_KEY_CLASS = 'class';
     const OPTION_KEY_ATTRIBUTE = 'attribute';
     const OPTION_KEY_ARGUMENTS = 'arguments';
+    const OPTION_KEY_CLASS     = 'class';
+    const OPTION_KEY_DATA      = 'data';
 
     /**
      * @var array

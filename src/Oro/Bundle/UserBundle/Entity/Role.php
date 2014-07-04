@@ -20,17 +20,23 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_access_role")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */

@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 
 /**
  * This class allows to get the real class name of an entity by its name
@@ -58,9 +59,12 @@ class EntityClassResolver
     public function isKnownEntityClassNamespace($namespace)
     {
         foreach (array_keys($this->doctrine->getManagers()) as $name) {
-            $namespaces = $this->doctrine->getManager($name)->getConfiguration()->getEntityNamespaces();
-            if (in_array($namespace, $namespaces, true)) {
-                return true;
+            $manager = $this->doctrine->getManager($name);
+            if ($manager instanceof EntityManager) {
+                $namespaces = $manager->getConfiguration()->getEntityNamespaces();
+                if (in_array($namespace, $namespaces, true)) {
+                    return true;
+                }
             }
         }
 

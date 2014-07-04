@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 /**
@@ -16,7 +17,7 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
  *
  * @ORM\MappedSuperclass
  */
-class BasePerson implements FullNameInterface
+class BasePerson implements FullNameInterface, EmailHolderInterface
 {
     /**
      * @var int
