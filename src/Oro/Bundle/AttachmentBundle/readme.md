@@ -80,11 +80,11 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
             $schema,
             'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
             'new_field_name', // field name
-            'attachmentImage', // type of attachment field, e.g. "attachment' OR "attachmentImage"
+            'image', // type of attachment field, e.g. "file' OR "image"
             [], //additional options for relation
             7, // max allowed file size for upload, can be omitted, by default 1
-            100, // thumbnail width in PX, applicable only for "attachmentImage", can be omitted, by default 32
-            100 // thumbnail height in PX, applicable only for "attachmentImage", can be omitted, by default 32
+            100, // thumbnail width in PX, applicable only for "image", can be omitted, by default 32
+            100 // thumbnail height in PX, applicable only for "image", can be omitted, by default 32
         );
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
 /**
@@ -23,11 +23,6 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * @var OwnerTreeProvider
      */
     protected $treeProvider;
-
-    /**
-     * @var EntityClassAccessor
-     */
-    protected $entityClassAccessor;
 
     /**
      * @var ObjectIdAccessor
@@ -48,20 +43,17 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * Constructor
      *
      * @param OwnerTreeProvider         $treeProvider
-     * @param EntityClassAccessor       $entityClassAccessor
      * @param ObjectIdAccessor          $objectIdAccessor
      * @param EntityOwnerAccessor       $entityOwnerAccessor
      * @param OwnershipMetadataProvider $metadataProvider
      */
     public function __construct(
         OwnerTreeProvider $treeProvider,
-        EntityClassAccessor $entityClassAccessor,
         ObjectIdAccessor $objectIdAccessor,
         EntityOwnerAccessor $entityOwnerAccessor,
         OwnershipMetadataProvider $metadataProvider
     ) {
         $this->treeProvider = $treeProvider;
-        $this->entityClassAccessor = $entityClassAccessor;
         $this->objectIdAccessor = $objectIdAccessor;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->metadataProvider = $metadataProvider;
@@ -318,7 +310,11 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      */
     protected function getObjectClass($domainObjectOrClassName)
     {
-        return $this->entityClassAccessor->getClass($domainObjectOrClassName);
+        if (is_object($domainObjectOrClassName)) {
+            return ClassUtils::getClass($domainObjectOrClassName);
+        } else {
+            return ClassUtils::getRealClass($domainObjectOrClassName);
+        }
     }
 
     /**

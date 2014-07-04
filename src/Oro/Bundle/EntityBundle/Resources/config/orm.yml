@@ -1,18 +1,26 @@
 parameters:
     doctrine.orm.entity_manager.class:                         Oro\Bundle\EntityBundle\ORM\OroEntityManager
 
+    oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor
     oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
-    oro_entity.orm.entity_class_accessor.class:                Oro\Bundle\EntityBundle\ORM\EntityClassAccessor
     oro_entity.orm.query.filter_collection.class:              Oro\Bundle\EntityBundle\ORM\Query\FilterCollection
 
 services:
+    oro_entity.doctrine_helper:
+        class: %oro_entity.doctrine_helper.class%
+        arguments:
+            - @doctrine
+
+    oro_entity.entity_identifier_accessor:
+        class: %oro_entity.entity_identifier_accessor.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+
     oro_entity.orm.entity_class_resolver:
         class: %oro_entity.orm.entity_class_resolver.class%
         arguments:
             - @doctrine
-
-    oro_entity.orm.entity_class_accessor:
-        class: %oro_entity.orm.entity_class_accessor.class%
 
     oro_entity.orm.sql_filter_collection:
         class:             %oro_entity.orm.query.filter_collection.class%

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -11,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 /**
  * Class OptionSetListener
@@ -92,10 +92,9 @@ class OptionSetListener
      */
     protected function getEntityFieldData(ConfigInterface $fieldConfig, $fieldName, $entity)
     {
-        $getterName = Inflector::camelize('get_' . $fieldName);
         if ($fieldConfig->getId()->getFieldType() != 'optionSet'
-            || !method_exists($entity, $getterName)
-            || !$options = $entity->$getterName()
+            || !FieldAccessor::hasGetter($entity, $fieldName)
+            || !$options = FieldAccessor::getValue($entity, $fieldName)
         ) {
             return null;
         }
