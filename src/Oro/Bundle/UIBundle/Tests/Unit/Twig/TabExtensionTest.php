@@ -86,6 +86,10 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testMenuTabPanelWithoutAnyParameters()
     {
         $child = $this->createMenuItem();
+        $child->expects($this->once())
+            ->method('isDisplayed')
+            ->will($this->returnValue(true));
+
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension
@@ -103,6 +107,11 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testMenuTabPanel()
     {
         $child  = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
+        $child
+            ->expects($this->once())
+            ->method('isDisplayed')
+            ->will($this->returnValue(true));
+
         $acl    =  ['testAcl' => true];
         $parent = $this->createMenuItem($child);
 
