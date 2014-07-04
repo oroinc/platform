@@ -9,7 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Table(name="oro_tracking_event", indexes={
  *     @ORM\Index(name="event_name_idx", columns={"name"}),
- *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"})
+ *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"}),
+ *     @ORM\Index(name="code_idx", columns={"code"})
  * })
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
@@ -78,7 +79,7 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=255)
+     * @ORM\Column(name="code", type="string", length=255, nullable=true)
      */
     protected $code;
 
