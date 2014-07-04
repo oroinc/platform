@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -48,6 +50,7 @@ class Attachment extends ExtendAttachment
     /**
      * @var File
      *
+     * @Assert\Valid()
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AttachmentBundle\Entity\File", cascade={"persist"})
      * @ORM\JoinColumn(name="file_id", referencedColumnName="id")
      */

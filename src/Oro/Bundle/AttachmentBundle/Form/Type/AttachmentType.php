@@ -22,7 +22,8 @@ class AttachmentType extends AbstractType
             'oro_file',
             [
                 'label' => 'oro.attachment.file.label',
-                'required'  => false,
+                'required'  => true,
+                'checkEmptyFIle' => $options['checkEmptyFIle']
             ]
         );
 
@@ -53,7 +54,8 @@ class AttachmentType extends AbstractType
             [
                 'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                 'cascade_validation' => true,
-                'parentEntityClass' => ''
+                'parentEntityClass' => '',
+                'checkEmptyFIle' => false
             ]
         );
     }
