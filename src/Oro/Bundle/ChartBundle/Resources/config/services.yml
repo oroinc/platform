@@ -4,6 +4,7 @@ parameters:
     oro_chart.options_builder.class:               Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
     oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
     oro_chart.data_transformer.pie_chart.class:    Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
+    oro_chart.data_transformer.multi_line.class:   Oro\Bundle\ChartBundle\Model\Data\Transformer\MultiLineDataTransformer
     oro_chart.form.type.settings.class:            Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
     oro_chart.form.type.class:                     Oro\Bundle\ChartBundle\Form\Type\ChartType
     oro_chart.form.type.settings.collection.class: Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType
@@ -54,6 +55,9 @@ services:
 
     oro_chart.data_transformer.pie_chart:
         class: %oro_chart.data_transformer.pie_chart.class%
+
+    oro_chart.data_transformer.multi_line:
+        class: %oro_chart.data_transformer.multi_line.class%
 
     oro_chart.options_builder:
         class: %oro_chart.options_builder.class%

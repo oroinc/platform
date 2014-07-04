@@ -17,17 +17,17 @@
     ]
 
 #}
-{% if data|length > 0  %}
-{% set containerId = "chart-container-" ~ random() %}
-<div class="chart-container">
-    <div class="clearfix">
-        <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
+{% if data|length > 0 %}
+    {% set containerId = "chart-container-" ~ random() %}
+    <div class="chart-container">
+        <div class="clearfix">
+            <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
+        </div>
     </div>
-</div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
     require(['jquery', 'oroui/js/layout', 'flotr2', 'orochart/js/data_formatter'],
-            function($, layout, Flotr, dataFormatter){
+            function ($, layout, Flotr, dataFormatter) {
                 $(function () {
                     var $chart = $('#{{ containerId }}-chart');
                     var $widgetContent = $chart.parents('.chart-container').parent();
@@ -52,40 +52,43 @@
 
                         var rawData = {{ data|json_encode|raw }};
 
-                        if (dataFormatter.isValueNumerical(xFormat)) {
-                            rawData.sort(function(first, second){
-                                if(first.label == null){
-                                    return -1;
-                                }
-                                if(second.label == null){
-                                    return 1;
-                                }
-                                var firstLabel = dataFormatter.parseValue(first.label, xFormat);
-                                var secondLabel = dataFormatter.parseValue(second.label, xFormat);
-                                return firstLabel - secondLabel;
-                            });
+                        // single-multi bc
+                        if (_.isArray(rawData)) {
+                            rawData = {data: rawData};
                         }
 
-                        var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
-                        var colors = {{ config.default_settings.chartColors|json_encode|raw }};
-                        var chartData = [];
-                        var yMax = null;
-                        var yMin = null;
-                        var xMax = null;
-                        var xMin = null;
-                        var getXLabel = function(data) {
+                        if (dataFormatter.isValueNumerical(xFormat)) {
+                            var sort = function (rawData) {
+                                rawData.sort(function (first, second) {
+                                    if (first.label == null) {
+                                        return -1;
+                                    }
+                                    if (second.label == null) {
+                                        return 1;
+                                    }
+                                    var firstLabel = dataFormatter.parseValue(first.label, xFormat);
+                                    var secondLabel = dataFormatter.parseValue(second.label, xFormat);
+                                    return firstLabel - secondLabel;
+                                });
+                            };
+
+                            _.each(rawData, sort);
+                        }
+
+                        var getXLabel = function (data) {
                             var label = dataFormatter.formatValue(data, xFormat);
                             if (label === null) {
                                 var number = parseInt(data);
                                 if (rawData.length > number) {
-                                    label = rawData[number]['label'] === null ? '{{ 'N/A'|trans }}'  : rawData[number]['label'];
+                                    label = rawData[number]['label'] === null ? '{{ 'N/A'|trans }}' : rawData[number]['label'];
                                 } else {
                                     label = '';
                                 }
                             }
                             return label;
                         };
-                        var getYLabel = function(data) {
+
+                        var getYLabel = function (data) {
                             var label = dataFormatter.formatValue(data, yFormat);
                             if (label === null) {
                                 var number = parseInt(data);
@@ -97,84 +100,130 @@
                             }
                             return label;
                         };
-                        for (var i in rawData) {
-                            var yValue = dataFormatter.parseValue(rawData[i]['value'], yFormat);
-                            yValue = yValue === null ? parseInt(i) : yValue;
-                            var xValue = dataFormatter.parseValue(rawData[i]['label'], xFormat);
-                            xValue = xValue === null ? parseInt(i) : xValue;
-                            if (xMax === null) {
-                                xMax = xValue;
-                                yMax = yValue;
-                                yMin = yValue;
-                                xMin = xValue;
-                            }
-                            xMax = xMax < xValue ? xValue : xMax;
-                            xMin = xMin > xValue ? xValue : xMin;
-                            yMax = yMax < yValue ? yValue : yMax;
-                            yMin = yMin > yValue ? yValue : yMin;
 
-                            var item = [xValue, yValue];
-                            chartData.push(item);
-                        }
-                        var deltaX = xMax - xMin;
-                        var deltaY = yMax - yMin;
-                        var xStep = (deltaX > 0 ? deltaX / rawData.length : 1);
-                        var yStep = (deltaY > 0 ? deltaY / rawData.length : 1);
-                        xMax += xStep;
-                        yMax += yStep;
-                        xMin -= xStep;
-                        yMin -= yStep;
+                        var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
+                        var colors = {{ config.default_settings.chartColors|json_encode|raw }};
 
-                        var chart = {
-                            data: chartData,
-                            color: colors[0],
-                            markers: {
-                                show: true,
-                                position: 'ct',
-                                labelFormatter: function (pointData) {
-                                     return getYLabel(pointData.y);
+                        var makeChart = function (rawData) {
+                            var chartData = [];
+                            var yMax = null, yMin = null, xMax = null, xMin = null;
+                            var prevYValue = 0;
+
+                            for (var i in rawData) {
+                                var yValue = dataFormatter.parseValue(rawData[i]['value'], yFormat);
+                                yValue = yValue === null ? parseInt(i) : yValue;
+                                yValue = yValue + prevYValue;
+                                var xValue = dataFormatter.parseValue(rawData[i]['label'], xFormat);
+                                xValue = xValue === null ? parseInt(i) : xValue;
+                                if (xMax === null) {
+                                    xMax = xValue;
+                                    yMax = yValue;
+                                    yMin = yValue;
+                                    xMin = xValue;
                                 }
-                            },
-                            points: {
-                                show: !connectDots
+                                xMax = xMax < xValue ? xValue : xMax;
+                                xMin = xMin > xValue ? xValue : xMin;
+                                yMax = yMax < yValue ? yValue : yMax;
+                                yMin = yMin > yValue ? yValue : yMin;
+
+                                var item = [xValue, yValue];
+                                chartData.push(item);
+                                prevYValue = yValue;
+                            }
+                            var deltaX = xMax - xMin;
+                            var deltaY = yMax - yMin;
+                            var xStep = (deltaX > 0 ? deltaX / rawData.length : 1);
+                            var yStep = (deltaY > 0 ? deltaY / rawData.length : 1);
+                            xMax += xStep;
+                            yMax += yStep;
+                            xMin -= xStep;
+                            yMin -= yStep;
+
+                            var chart = {
+                                data: chartData,
+                                color: colors[_.random(0, rawData.length - 1)],
+                                markers: {
+                                    show: true,
+                                    position: 'ct',
+                                    labelFormatter: function (pointData) {
+                                        return getYLabel(pointData.y);
+                                    }
+                                },
+                                points: {
+                                    show: !connectDots
+                                }
+                            };
+
+                            return {
+                                chart: chart,
+                                axis: {
+                                    xMax: xMax,
+                                    yMax: yMax,
+                                    xMin: xMin,
+                                    yMin: yMin
+                                }
                             }
                         };
+
+                        var xMax = [], yMax = [], xMin = [], yMin = [], charts = [];
+
+                        _.each(rawData, function (rawData) {
+                            var result = makeChart(rawData);
+
+                            charts.push(result.chart);
+                            xMax.push(result.axis.xMax);
+                            yMax.push(result.axis.yMax);
+                            xMin.push(result.axis.xMin);
+                            yMin.push(result.axis.yMin);
+                        });
+
                         Flotr.draw(
                                 $chart.get(0),
-                                [chart],
+                                charts,
                                 {
-                                    colors: {{ options.settings.chartColors|json_encode|raw }},
+                                    colors: colors,
                                     fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
                                     fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                                    lines : {
-                                        show : connectDots
+                                    lines: {
+                                        show: connectDots
                                     },
-                                    mouse : {
-                                        track : true,
-                                        relative : true,
+                                    mouse: {
+                                        track: true,
+                                        relative: true,
                                         trackFormatter: function (pointData) {
-                                            return   getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
+                                            return getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
                                         }
                                     },
                                     yaxis: {
-                                        max: yMax,
-                                        min: yMin,
+                                        max: _.max(yMax),
+                                        min: _.min(yMin),
                                         tickFormatter: function (y) {
                                             return getYLabel(y);
                                         },
                                         title: {{ options.data_schema.value.label|trans|json_encode|raw }}
                                     },
                                     xaxis: {
-                                        max: xMax,
-                                        min: xMin,
+                                        max: _.max(xMax),
+                                        min: _.min(xMin),
                                         tickFormatter: function (x) {
                                             return getXLabel(x);
                                         },
                                         title: {{ options.data_schema.label.label|trans|json_encode|raw }}
                                     },
-                                    HtmlText : false,
+                                    HtmlText: false,
                                     grid: {
-                                        verticalLines : false
+                                        verticalLines: false
+                                    },
+                                    legend: {
+                                        show: true,
+                                        noColumns: 1,
+                                        labelFormatter: null,
+                                        labelBoxBorderColor: '#ccc',
+                                        container: null,
+                                        position: 'ne',
+                                        margin: 50,
+                                        backgroundColor: null,
+                                        backgroundOpacity: 0.85
                                     }
                                 }
                         );
@@ -194,7 +243,7 @@
                     });
                 });
             });
-</script>
+    </script>
 {% else %}
     <div class="clearfix no-data">
         <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
