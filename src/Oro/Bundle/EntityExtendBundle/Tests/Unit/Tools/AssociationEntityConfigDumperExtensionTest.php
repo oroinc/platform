@@ -13,10 +13,16 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     const ATTR_NAME         = 'enabled';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationBuilder;
 
     public function setUp()
     {
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->associationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -26,8 +32,8 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     {
         $extension = $this->getExtensionMock();
 
-        $this->associationBuilder->expects($this->never())
-            ->method('getConfigManager');
+        $this->configManager->expects($this->never())
+            ->method('getProvider');
 
         $this->assertFalse(
             $extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
@@ -142,7 +148,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     {
         return $this->getMockForAbstractClass(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationEntityConfigDumperExtension',
-            [$this->associationBuilder],
+            [$this->configManager, $this->associationBuilder],
             '',
             true,
             true,
@@ -159,15 +165,9 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         $configProvider->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue($configs));
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with(self::ASSOCIATION_SCOPE)
             ->will($this->returnValue($configProvider));
-        $this->associationBuilder->expects($this->once())
-            ->method('getConfigManager')
-            ->will($this->returnValue($configManager));
     }
 }
