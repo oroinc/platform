@@ -31,9 +31,9 @@
                 {% set itemValue = itemValue ? itemValue | oro_format_percent : null %}
             {% elseif item.type == 'date' %}
                 {% set itemValue = itemValue ? itemValue | oro_format_date : null %}
-            {% elseif item.type == 'attachment' %}
+            {% elseif item.type == 'file' %}
                 {% set itemValue = oro_file_view(entity, fieldName, itemValue) %}
-            {% elseif item.type == 'attachmentImage' %}
+            {% elseif item.type == 'image' %}
                 {% if entity_class is null %}
                     {% set entityInfo = entity %}
                 {% else  %}

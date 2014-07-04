@@ -3,7 +3,7 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
@@ -99,7 +99,7 @@ class NoteManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityViewModels()
     {
-        $createdByAvatar = new Attachment();
+        $createdByAvatar = new File();
         $createdBy       = $this->getMockBuilder('Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser')
             ->disableOriginalConstructor()
             ->getMock();

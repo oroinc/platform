@@ -57,7 +57,7 @@ class FileType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
+                'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\File'
             ]
         );
     }
