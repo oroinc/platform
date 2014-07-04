@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AttachmentHandler
 {
-    /** @var FormInterface */
-    protected $form;
-
     /** @var Request */
     protected $request;
 
@@ -20,13 +17,11 @@ class AttachmentHandler
     protected $manager;
 
     /**
-     * @param FormInterface $form
      * @param Request       $request
      * @param ObjectManager $manager
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
+    public function __construct(Request $request, ObjectManager $manager)
     {
-        $this->form    = $form;
         $this->request = $request;
         $this->manager = $manager;
     }
@@ -34,18 +29,15 @@ class AttachmentHandler
     /**
      * Process form
      *
-     * @param  Attachment $entity
-     *
+     * @param FormInterface $form
      * @return bool
      */
-    public function process(Attachment $entity)
+    public function process(FormInterface $form)
     {
-        $this->form->setData($entity);
-
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
-            if ($this->form->isValid()) {
-                $this->onSuccess($entity);
+            $form->submit($this->request);
+            if ($form->isValid()) {
+                $this->onSuccess($form->getData());
                 return true;
             }
         }

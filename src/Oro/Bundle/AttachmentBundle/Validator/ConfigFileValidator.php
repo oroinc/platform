@@ -41,31 +41,19 @@ class ConfigFileValidator
 
     /**
      * @param string          $dataClass Parent entity class name
-     * @param string          $fieldName Field name where new file/image field was added
      * @param File|Attachment $entity    File entity
+     * @param string          $fieldName Field name where new file/image field was added
      *
      * @return \Symfony\Component\Validator\ConstraintViolationListInterface
      */
-    public function validate($dataClass, $fieldName, $entity)
+    public function validate($dataClass, $entity, $fieldName = '')
     {
-        /**
-         * TODO: !!!!!
-         */
-
-        if ($dataClass == AttachmentScope::ATTACHMENT) {
-            //$targetClassName = get_class($entity->getTarget());
-
-            /** @var Config $entityAttachmentConfig */
-            //$entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig(
-                'OroCRM\Bundle\ContactBundle\Entity\Contact'
-            );
-
+        /** @var Config $entityAttachmentConfig */
+        if ($fieldName === '') {
+            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
             $configValue = 'upload_image_mime_types';
         } else {
-            /** @var Config $entityAttachmentConfig */
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
-
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $entityAttachmentConfig->getId();
             if ($fieldConfigId->getFieldType() === 'file') {

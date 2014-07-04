@@ -18,19 +18,19 @@ class AttachmentType extends AbstractType
         parent::buildForm($builder, $options);
 
         $builder->add(
-            'comment',
-            'textarea',
+            'file',
+            'oro_file',
             [
-                'label' => 'oro.attachment.comment.label',
+                'label' => 'oro.attachment.file.label',
                 'required'  => false,
             ]
         );
 
         $builder->add(
-            'file',
-            'oro_file',
+            'comment',
+            'textarea',
             [
-                'label' => 'oro.attachment.file.label',
+                'label' => 'oro.attachment.comment.label',
                 'required'  => false,
             ]
         );
@@ -52,7 +52,8 @@ class AttachmentType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
-                'cascade_validation' => true
+                'cascade_validation' => true,
+                'parentEntityClass' => ''
             ]
         );
     }

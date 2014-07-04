@@ -83,7 +83,7 @@ class FileSubscriber implements EventSubscriberInterface
              * -- do not call for attachment entity
              * -- OR add created/updated into attachment entity
              */
-            //$entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }
     }
 
@@ -97,14 +97,19 @@ class FileSubscriber implements EventSubscriberInterface
     {
         $fieldName = $form->getName();
 
-        $dataClass = $form->getParent()
-            ? $form->getParent()->getConfig()->getDataClass()
-            : $form->getConfig()->getDataClass();
-        if (!$dataClass) {
-            $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+        if ($form->getParent()->getConfig()->getOption('parentEntityClass', null)) {
+            $dataClass = $form->getParent()->getConfig()->getOption('parentEntityClass', null);
+            $fieldName = '';
+        } else {
+            $dataClass = $form->getParent()
+                ? $form->getParent()->getConfig()->getDataClass()
+                : $form->getConfig()->getDataClass();
+            if (!$dataClass) {
+                $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+            }
         }
 
-        $violations = $this->validator->validate($dataClass, $fieldName, $entity);
+        $violations = $this->validator->validate($dataClass, $entity, $fieldName);
 
         if (!empty($violations)) {
             $fileField = $form->get('file');
