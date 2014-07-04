@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
-use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
@@ -50,28 +51,31 @@ class AttachmentController extends Controller
         $attachmentEntity->setTarget($entity);
 
         $formAction = $entityRoutingHelper->generateUrl('oro_attachment_create', $entityClass, $entityId);
-
-        return $this->update($attachmentEntity, $formAction, $entityClass);
+        $form = $this->createForm(
+            new AttachmentType(),
+            $attachmentEntity,
+            ['parentEntityClass' => $entityClass, 'checkEmptyFIle' => true]
+        );
+        return $this->update($form, $formAction);
     }
 
     /**
-     * @param Attachment $entity
-     * @param string     $formAction
-     * @param string     $entityClass
+     * @param FormInterface $form
+     * @param string $formAction
+     *
      * @return array
      */
-    protected function update(Attachment $entity, $formAction, $entityClass)
+    protected function update(FormInterface $form, $formAction)
     {
         $responseData = [
-            'entity' => $entity,
+            'entity' => $form->getData(),
             'saved' => false
         ];
-        $form = $this->createForm(new AttachmentType(), $entity, ['parentEntityClass' => $entityClass]);
 
         if ($this->get('oro_attachment.form.handler.attachment')->process($form)) {
             $responseData['saved'] = true;
         } else {
-            $responseData['form']       = $form->createView();
+            $responseData['form'] = $form->createView();
             $responseData['formAction'] = $formAction;
         }
 
