@@ -1,14 +1,14 @@
 <div class="widget-content">
     {% if saved %}
         SAVED...
-        {#<script type="text/javascript">#}
+        <script type="text/javascript">
             {#require(['oroui/js/widget-manager'],#}
             {#function(widgetManager) {#}
                 {#widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {#}
                     {#widget.trigger('formSave', {{ model|json_encode|raw }});#}
                 {#});#}
             {#});#}
-        {#</script>#}
+        </script>
     {% else %}
         {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
         <div class="form-container">

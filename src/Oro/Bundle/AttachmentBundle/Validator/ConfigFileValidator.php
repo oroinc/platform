@@ -48,19 +48,12 @@ class ConfigFileValidator
      */
     public function validate($dataClass, $fieldName, $entity)
     {
-        /**
-         * TODO: !!!!!
-         */
-
         if ($dataClass == AttachmentScope::ATTACHMENT) {
-            //$targetClassName = get_class($entity->getTarget());
-
-            /** @var Config $entityAttachmentConfig */
-            //$entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig(
-                'OroCRM\Bundle\ContactBundle\Entity\Contact'
-            );
-
+            /**
+             * TODO:
+             *    may be we should store maxsize & mime types in global config ???
+             */
+            $fileSize    = 10 * 1024 * 1024;
             $configValue = 'upload_image_mime_types';
         } else {
             /** @var Config $entityAttachmentConfig */
@@ -73,9 +66,10 @@ class ConfigFileValidator
             } else {
                 $configValue = 'upload_image_mime_types';
             }
+
+            $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
         }
 
-        $fileSize  = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
         $mimeTypes = explode("\n", $this->config->get('oro_attachment.' . $configValue));
         foreach ($mimeTypes as $id => $value) {
             $mimeTypes[$id] = trim($value);
