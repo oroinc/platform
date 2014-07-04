@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraints\File as FileConstrain;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 
@@ -56,18 +56,18 @@ class ConfigFileValidator
             $fileSize    = 10 * 1024 * 1024;
             $configValue = 'upload_image_mime_types';
         } else {
-            /** @var Config $entityAttachmentConfig */
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
+            /** @var Config $attachmentFileConfig */
+            $attachmentFileConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
 
             /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $entityAttachmentConfig->getId();
+            $fieldConfigId = $attachmentFileConfig->getId();
             if ($fieldConfigId->getFieldType() === 'file') {
                 $configValue = 'upload_mime_types';
             } else {
                 $configValue = 'upload_image_mime_types';
             }
 
-            $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
+            $fileSize = $attachmentFileConfig->get('maxsize') * 1024 * 1024;
         }
 
         $mimeTypes = explode("\n", $this->config->get('oro_attachment.' . $configValue));
