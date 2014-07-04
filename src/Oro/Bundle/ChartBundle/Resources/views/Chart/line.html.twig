@@ -104,7 +104,7 @@
                         var connectDots = {{ options.settings.connect_dots_with_line|json_encode|raw }};
                         var colors = {{ config.default_settings.chartColors|json_encode|raw }};
 
-                        var makeChart = function (rawData) {
+                        var makeChart = function (rawData, count) {
                             var chartData = [];
                             var yMax = null, yMin = null, xMax = null, xMin = null;
                             var prevYValue = 0;
@@ -141,7 +141,7 @@
 
                             var chart = {
                                 data: chartData,
-                                color: colors[_.random(0, rawData.length - 1)],
+                                color: colors[Math.ceil(colors.length/count)],
                                 markers: {
                                     show: true,
                                     position: 'ct',
@@ -166,9 +166,11 @@
                         };
 
                         var xMax = [], yMax = [], xMin = [], yMin = [], charts = [];
+                        var count = 0;
 
-                        _.each(rawData, function (rawData) {
-                            var result = makeChart(rawData);
+                        _.each(rawData, function (rawData, key) {
+                            var result = makeChart(rawData, count);
+                            count++;
 
                             charts.push(result.chart);
                             xMax.push(result.axis.xMax);
