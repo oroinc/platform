@@ -23,6 +23,8 @@ class OroAttachmentBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('file_id', 'integer', ['notnull' => false]);
         $table->addColumn('comment', 'text', ['notnull' => false]);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['file_id'], 'IDX_FA0FE08193CB796C', []);
         $table->addForeignKeyConstraint(

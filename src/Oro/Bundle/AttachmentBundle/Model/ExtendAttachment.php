@@ -6,7 +6,6 @@ class ExtendAttachment
 {
     /**
      * Constructor
-     *
      * The real implementation of this method is auto generated.
      *
      * IMPORTANT: If the derived class has own constructor it must call parent constructor.
@@ -17,7 +16,6 @@ class ExtendAttachment
 
     /**
      * Gets the entity this attachment is associated with
-     *
      * The real implementation of this method is auto generated.
      *
      * @return object|null Any configurable entity
@@ -29,7 +27,6 @@ class ExtendAttachment
 
     /**
      * Sets the entity this attachment is associated with
-     *
      * The real implementation of this method is auto generated.
      *
      * @param object $target Any configurable entity that can have notes

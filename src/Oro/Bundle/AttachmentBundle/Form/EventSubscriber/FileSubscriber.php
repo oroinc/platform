@@ -77,12 +77,6 @@ class FileSubscriber implements EventSubscriberInterface
             || (is_object($entity) && $entity->getFile() !== null)
         ) {
             // trigger update in entity
-
-            /**
-             * TODO:
-             * -- do not call for attachment entity
-             * -- OR add created/updated into attachment entity
-             */
             $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         }
     }
