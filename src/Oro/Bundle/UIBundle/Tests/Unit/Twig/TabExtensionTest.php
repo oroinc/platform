@@ -112,7 +112,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isDisplayed')
             ->will($this->returnValue(true));
 
-        $acl    =  ['testAcl' => true];
+        $acl    = [['testAcl', null, true]];
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension
@@ -127,11 +127,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade->expects($this->any())
             ->method('isGranted')
             ->will(
-                $this->returnCallback(
-                    function ($aclResource) use ($acl) {
-                        return $acl[$aclResource];
-                    }
-                )
+                $this->returnValueMap($acl)
             );
 
         $this->extension->menuTabPanel($this->environment, []);
