@@ -10,6 +10,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+
 class OroDashboardExtension extends Extension
 {
     /**
@@ -65,26 +67,7 @@ class OroDashboardExtension extends Extension
      */
     protected function sortItemsByPosition(array &$items)
     {
-        // Update "position" attribute if it was not specified to keep order of such items as it was declared in config
-        $lastUnspecifiedPosition = Configuration::UNSPECIFIED_POSITION;
-        foreach ($items as &$item) {
-            if ($item['position'] === Configuration::UNSPECIFIED_POSITION) {
-                $lastUnspecifiedPosition++;
-                $item['position'] = $lastUnspecifiedPosition;
-            }
-        }
-
-        // Sort items
-        uasort(
-            $items,
-            function (&$first, &$second) {
-                if ($first['position'] == $second['position']) {
-                    return 0;
-                } else {
-                    return ($first['position'] < $second['position']) ? -1 : 1;
-                }
-            }
-        );
+        ArrayUtils::sortBy($items, false, 'position');
 
         foreach ($items as &$item) {
             unset($item['position']);

@@ -609,6 +609,75 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddOneToManyRelationWithoutDefaultForeignKey()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['id']);
+
+        $extension->addOneToManyRelation(
+            $schema,
+            $selfTable,
+            'relation_column1',
+            'table2',
+            ['name'],
+            ['name'],
+            ['name'],
+            [
+                'extend' => ['without_default' => true]
+            ]
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE table1 ('
+                . 'id INT NOT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE table2 ('
+                . 'id SMALLINT NOT NULL, '
+                . 'entity1_relation_column1_id INT DEFAULT NULL, '
+                . 'name VARCHAR(255) NOT NULL, '
+                . 'INDEX IDX_859C7327B0E6CF0B (entity1_relation_column1_id), '
+                . 'PRIMARY KEY(id))',
+                'ALTER TABLE table2 ADD CONSTRAINT FK_859C7327B0E6CF0B '
+                . 'FOREIGN KEY (entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'fields' => [
+                        'relation_column1' => [
+                            'type'    => 'oneToMany',
+                            'configs' => [
+                                'extend' => [
+                                    'extend'          => true,
+                                    'without_default' => true,
+                                    'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
+                                    'target_title'    => ['name'],
+                                    'target_detailed' => ['name'],
+                                    'target_grid'     => ['name'],
+                                    'relation_key'    =>
+                                        'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
+                                        . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
+                                ]
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        );
+    }
 
     /**
      * @expectedException \Doctrine\DBAL\Schema\SchemaException
@@ -926,6 +995,82 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'extend' => [
                                     'extend'          => true,
                                     'is_extend'       => true,
+                                    'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
+                                    'target_title'    => ['name'],
+                                    'target_detailed' => ['name'],
+                                    'target_grid'     => ['name'],
+                                    'relation_key'    =>
+                                        'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
+                                        . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
+                                ]
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testAddManyToManyRelationWithoutDefaultForeignKey()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $table1 = $schema->createTable('table1');
+        $table1->addColumn('id', 'integer');
+        $table1->setPrimaryKey(['id']);
+
+        $table2 = $schema->createTable('table2');
+        $table2->addColumn('id', 'smallint');
+        $table2->addColumn('name', 'string');
+        $table2->setPrimaryKey(['id']);
+
+        $extension->addManyToManyRelation(
+            $schema,
+            $table1,
+            'relation_column1',
+            $table2,
+            ['name'],
+            ['name'],
+            ['name'],
+            [
+                'extend' => ['without_default' => true]
+            ]
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE table1 ('
+                . 'id INT NOT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE table2 ('
+                . 'id SMALLINT NOT NULL, '
+                . 'name VARCHAR(255) NOT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE oro_rel_f061705960f46bf2d67f27 ('
+                . 'entity1_id INT NOT NULL, '
+                . 'entity2_id SMALLINT NOT NULL, '
+                . 'INDEX IDX_8CE090DAC33725A7 (entity1_id), '
+                . 'INDEX IDX_8CE090DAD1828A49 (entity2_id), '
+                . 'PRIMARY KEY(entity1_id, entity2_id))',
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAC33725A7 '
+                . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAD1828A49 '
+                . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'fields' => [
+                        'relation_column1' => [
+                            'type'    => 'manyToMany',
+                            'configs' => [
+                                'extend' => [
+                                    'extend'          => true,
+                                    'without_default' => true,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],

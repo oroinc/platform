@@ -12,13 +12,19 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *                              columns={"calendar_id", "connected_calendar_id"})})
  * @ORM\HasLifecycleCallbacks
  * @Config(
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "permissions"="VIEW",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class CalendarConnection

@@ -338,20 +338,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($api, $user->getApi());
     }
 
-    public function testImage()
-    {
-        $user = new User;
-
-        $this->assertNull($user->getImagePath());
-
-        $user->setImage('test');
-
-        $this->assertEquals('test', $user->getImage());
-        $this->assertNotEmpty($user->getUploadDir());
-        $path = $user->getUploadDir(true) . '/' . $user->getImage();
-        $this->assertEquals($path, $user->getImagePath());
-    }
-
     public function testUnserialize()
     {
         $user = new User();
@@ -371,20 +357,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($serialized[3], $user->isEnabled());
         $this->assertEquals($serialized[4], $user->getConfirmationToken());
         $this->assertEquals($serialized[5], $user->getId());
-    }
-
-    public function testImageFile()
-    {
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $user = new User();
-        $this->assertSame($user, $user->setImageFile($file));
-        $this->assertInstanceOf('\DateTime', $user->getUpdatedAt());
-        $this->assertEquals($user->getUpdatedAt(), $user->getUpdatedAt());
-        $this->assertEquals($file, $user->getImageFile());
-        $this->assertSame($user, $user->unsetImageFile());
-        $this->assertNull($user->getImageFile());
     }
 
     public function testIsCredentialsNonExpired()
@@ -422,7 +394,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
             array('lastname', 'test'),
             array('namesuffix', 'test'),
             array('birthday', new \DateTime()),
-            array('image', 'test'),
             array('password', 'test'),
             array('plainPassword', 'test'),
             array('confirmationToken', 'test'),

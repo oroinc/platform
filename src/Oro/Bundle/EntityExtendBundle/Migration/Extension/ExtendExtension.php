@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
@@ -76,30 +76,28 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table     = $schema->createTable($tableName);
 
+        $options = new OroOptions($options);
         // set options
-        if (!isset($options['extend'])) {
-            $options['extend'] = [];
-        }
-        $options[ExtendOptionsManager::ENTITY_CLASS_OPTION] = $className;
-        if (isset($options['extend']['owner'])) {
-            if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
+        $options->setAuxiliary(ExtendOptionsManager::ENTITY_CLASS_OPTION, $className);
+        if ($options->has('extend', 'owner')) {
+            if ($options->get('extend', 'owner') !== ExtendScope::OWNER_CUSTOM) {
                 throw new \InvalidArgumentException(
                     sprintf('The "extend.owner" option for a custom entity must be "%s".', ExtendScope::OWNER_CUSTOM)
                 );
             }
         } else {
-            $options['extend']['owner'] = ExtendScope::OWNER_CUSTOM;
+            $options->set('extend', 'owner', ExtendScope::OWNER_CUSTOM);
         }
-        if (isset($options['extend']['is_extend'])) {
-            if ($options['extend']['is_extend'] !== true) {
+        if ($options->has('extend', 'is_extend')) {
+            if ($options->get('extend', 'is_extend') !== true) {
                 throw new \InvalidArgumentException(
                     'The "extend.is_extend" option for a custom entity must be TRUE.'
                 );
             }
         } else {
-            $options['extend']['is_extend'] = true;
+            $options->set('extend', 'is_extend', true);
         }
-        $table->addOption(ExtendColumn::ORO_OPTIONS_NAME, $options);
+        $table->addOption(OroOptions::KEY, $options);
 
         // add a primary key
         $table->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
@@ -159,7 +157,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
@@ -168,19 +165,22 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetColumnName           = $this->nameGenerator
             ->generateOneToManyRelationColumnName($selfClassName, $associationName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
-        $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
         $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
-        $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName]);
-        $selfTable->addForeignKeyConstraint(
-            $targetTable,
-            [$selfColumnName],
-            [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
-        );
+        if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
+            $selfColumnName         = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
+            $targetPrimaryKeyColumn = $targetTable->getColumn($targetPrimaryKeyColumnName);
+            $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
+            $selfTable->addUniqueIndex([$selfColumnName]);
+            $selfTable->addForeignKeyConstraint(
+                $targetTable,
+                [$selfColumnName],
+                [$targetPrimaryKeyColumnName],
+                ['onDelete' => 'SET NULL']
+            );
+        }
 
         $this->addRelationColumn($targetTable, $targetColumnName, $selfPrimaryKeyColumn, ['notnull' => false]);
         $targetTable->addIndex([$targetColumnName]);
@@ -235,7 +235,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $selfRelationName         = $this->nameGenerator->generateManyToManyRelationColumnName($selfClassName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
@@ -251,14 +250,17 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
-        $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName]);
-        $selfTable->addForeignKeyConstraint(
-            $targetTable,
-            [$selfColumnName],
-            [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
-        );
+        if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
+            $selfColumnName = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
+            $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
+            $selfTable->addUniqueIndex([$selfColumnName]);
+            $selfTable->addForeignKeyConstraint(
+                $targetTable,
+                [$selfColumnName],
+                [$targetPrimaryKeyColumnName],
+                ['onDelete' => 'SET NULL']
+            );
+        }
 
         $relationsTableName = $this->nameGenerator->generateManyToManyJoinTableName(
             $selfClassName,

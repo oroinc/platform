@@ -20,6 +20,7 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 
 oro:
     ui:
+        actions:        %entityName% Actions
         create:         Create
         create_entity:  Create %entityName%
         created:        Created

@@ -8,6 +8,6 @@ class AttachmentScopeTest extends \PHPUnit_Framework_TestCase
 {
     public function testScope()
     {
-        $this->assertEquals(['attachment', 'attachmentImage'], AttachmentScope::$attachmentTypes);
+        $this->assertEquals(['file', 'image'], AttachmentScope::$attachmentTypes);
     }
 }
