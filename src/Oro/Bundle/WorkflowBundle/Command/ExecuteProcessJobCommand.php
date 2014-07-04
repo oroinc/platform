@@ -64,10 +64,10 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
         }
 
         $entityManager = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
-
+        $jobHandler    = $this->getContainer()->get('oro_workflow.process.process_handler');
         /** @var ProcessJob $processJob */
         foreach ($processJobs as $processJob) {
-            $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
+            $jobHandler->handleJob($processJob);
             $output->writeln(sprintf(
                 '  <comment>></comment> <info>Successfully done process: %s</info>',
                 $processJob->getId()

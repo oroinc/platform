@@ -48,15 +48,19 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getName());
     }
 
-    public function testExecute()
+    /**
+     * @param array $ids
+     * @dataProvider executeProvider
+     */
+    public function testExecute($ids)
     {
-        $processJobId = 1;
+        $callCount = count($ids);
         $this->input->expects($this->once())
             ->method('getOption')
             ->with('id')
-            ->will($this->returnValue($processJobId));
+            ->will($this->returnValue($ids));
 
-        $this->output->expects($this->never())
+        $this->output->expects($this->exactly($callCount))
             ->method('writeln');
 
         $processHandler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessHandler')
@@ -67,7 +71,7 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processHandler->expects($this->once())
+        $processHandler->expects($this->exactly($callCount))
             ->method('handleJob')
             ->with($processJob)
             ->will($this->returnSelf());
@@ -77,38 +81,46 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->with('oro_workflow.process.process_handler')
             ->will($this->returnValue($processHandler));
 
-        $this->assetProcessJobRepository($processJobId, $processJob);
+        $this->assetProcessJobRepository($ids, array_fill(0, $callCount, $processJob));
 
         $this->command->execute($this->input, $this->output);
+    }
+
+    public function executeProvider()
+    {
+        return array(
+            'single id'   => array('ids' => array(1)),
+            'several ids' => array('ids' => array(1, 2, 3, 4, 5))
+        );
     }
 
     public function testExecuteEmptyIdError()
     {
-        $id = 1;
+        $ids = array(1);
         $this->input->expects($this->once())
             ->method('getOption')
             ->with('id')
-            ->will($this->returnValue($id));
+            ->will($this->returnValue($ids));
 
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with(sprintf('<error>Process job with passed identity "%s" does not exist.</error>', $id))
+            ->with(sprintf('<error>Process jobs with passed identities does not exist.</error>'))
             ->will($this->returnSelf());
 
-        $this->assetProcessJobRepository($id, null);
+        $this->assetProcessJobRepository($ids, null);
 
         $this->command->execute($this->input, $this->output);
     }
 
-    protected function assetProcessJobRepository($processJobId, $processJob, $callOrder = 0)
+    protected function assetProcessJobRepository($processJobIds, $processJobs, $callOrder = 0)
     {
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->once())
-            ->method('find')
-            ->with($processJobId)
-            ->will($this->returnValue($processJob));
+            ->method('findByIds')
+            ->with($processJobIds)
+            ->will($this->returnValue($processJobs));
 
         $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
@@ -118,13 +130,12 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->with('OroWorkflowBundle:ProcessJob')
             ->will($this->returnValue($repository));
 
-        if ($processJob) {
+        if ($processJobs) {
             $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
                 ->disableOriginalConstructor()
                 ->getMock();
-            $entityManager->expects($this->once())
+            $entityManager->expects($this->exactly(count($processJobs)))
                 ->method('remove')
-                ->with($processJob)
                 ->will($this->returnSelf());
             $entityManager->expects($this->once())
                 ->method('flush')
