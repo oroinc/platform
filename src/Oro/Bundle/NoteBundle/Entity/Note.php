@@ -14,18 +14,23 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
  * @ORM\Table(name="oro_note")
  * @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-comment"},
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-comment"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Note extends ExtendNote
