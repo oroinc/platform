@@ -617,3 +617,11 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_link_type_widget %}
+    {% if resource_granted(acl) %}
+        <a href="{{ path(route, routeParameters) }}">
+            {{ title|trans }}
+        </a>
+    {% endif %}
+{% endblock %}

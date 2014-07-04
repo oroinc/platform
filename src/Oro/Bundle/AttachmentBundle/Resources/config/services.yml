@@ -1,20 +1,20 @@
 parameters:
     oro_attachment.manager.attachment_manager.class:     Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
-    oro_attachment.listener.attachment_listener.class:   Oro\Bundle\AttachmentBundle\EventListener\AttachmentListener
-    oro_attachment.twig.attachment_extension.class:      Oro\Bundle\AttachmentBundle\Twig\AttachmentExtension
+    oro_attachment.listener.file_listener.class:   Oro\Bundle\AttachmentBundle\EventListener\FileListener
+    oro_attachment.twig.file_extension.class:      Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
     oro_attachment.entity_config_dumper.extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
     oro_attachment.migration.extension.attachment.class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
-    oro_attachment.serializer.attachment_normalizer:     Oro\Bundle\AttachmentBundle\ImportExport\AttachmentNormalizer
+    oro_attachment.serializer.file_normalizer.class:     Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
 
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
-        arguments: [@knp_gaufrette.filesystem_map, @router, %oro_attachment.files%]
+        arguments: [@knp_gaufrette.filesystem_map, @router, @oro_security.security_facade.link, %oro_attachment.files%]
 
-    oro_attachment.listener.attachment_listener:
-        class: %oro_attachment.listener.attachment_listener.class%
+    oro_attachment.listener.file_listener:
+        class: %oro_attachment.listener.file_listener.class%
         arguments: [@oro_attachment.manager]
         tags:
             - { name: doctrine.event_listener, event: prePersist }
@@ -22,8 +22,8 @@ services:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postUpdate }
 
-    oro_attachment.twig.attachment_extension:
-        class: %oro_attachment.twig.attachment_extension.class%
+    oro_attachment.twig.file_extension:
+        class: %oro_attachment.twig.file_extension.class%
         arguments: [@oro_attachment.manager, @oro_entity_config.config_manager]
         tags:
             - { name: twig.extension }
@@ -31,6 +31,7 @@ services:
     oro_attachment.entity_config_dumper.extension:
         class: %oro_attachment.entity_config_dumper.extension.class%
         arguments:
+            - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
@@ -42,8 +43,8 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
 
-    oro_attachment.serializer.attachment_normalizer:
-        class: %oro_attachment.serializer.attachment_normalizer%
+    oro_attachment.serializer.file_normalizer:
+        class: %oro_attachment.serializer.file_normalizer.class%
         calls:
             - [setAttachmentManager, [@oro_attachment.manager]]
             - [setValidator, [@oro_attachment.validator.file_config_validator]]
