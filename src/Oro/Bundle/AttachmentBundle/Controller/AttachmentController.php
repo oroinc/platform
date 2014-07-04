@@ -14,6 +14,7 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class AttachmentController extends Controller
 {
@@ -66,9 +67,15 @@ class AttachmentController extends Controller
      * @Template("OroAttachmentBundle:Attachment:update.html.twig")
      * @ AclAncestor("oro_attachment_update")
      */
-    public function updateAction($attachmentId)
+    public function updateAction(Attachment $attachment)
     {
-
+        $formAction = $this->getRequest()->getUri();
+        $form = $this->createForm(
+            new AttachmentType(),
+            $attachment,
+            ['parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()), 'checkEmptyFIle' => false]
+        );
+        return $this->update($form, $formAction);
     }
 
     /**

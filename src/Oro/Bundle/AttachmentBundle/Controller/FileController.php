@@ -97,7 +97,7 @@ class FileController extends Controller
      */
     public function getFilteredImageAction($id, $filter, $filename)
     {
-        $attachment = $this->getAttachmentByIdAndFileName($id, $filename);
+        $attachment = $this->getFileByIdAndFileName($id, $filename);
         $path = substr($this->getRequest()->getPathInfo(), 1);
         $binary = $this->get('liip_imagine')->load($this->get('oro_attachment.manager')->getContent($attachment));
         $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
