@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Constraints\File as FileConstrain;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 
@@ -51,7 +50,7 @@ class ConfigFileValidator
         /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $configValue = 'upload_image_mime_types';
+            $configValue            = 'upload_image_mime_types';
         } else {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
             /** @var FieldConfigId $fieldConfigId */
@@ -75,7 +74,8 @@ class ConfigFileValidator
                 new FileConstrain(
                     [
                         'maxSize'   => $fileSize,
-                        'mimeTypes' => $mimeTypes
+                        'mimeTypes' => $mimeTypes,
+                        'mimeTypesMessage' => 'This file type is not allowed.'
                     ]
                 )
             ]

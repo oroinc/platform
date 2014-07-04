@@ -2,7 +2,11 @@
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
             {{ form_widget(form.file) }}
-            {{ form_errors(form.file) }}
+            {% if form_errors(form.file) %}
+                <div style="clear:both; float:left">
+                    {{ form_errors(form.file) }}
+                </div>
+            {% endif %}
         </div>
         {% if value is not empty %}
             {% if value.originalFilename is not empty %}
@@ -38,7 +42,11 @@
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
             {{ form_widget(form.file) }}
-            {{ form_errors(form.file) }}
+            {% if form_errors(form.file) %}
+                <div style="clear:both; float:left">
+                    {{ form_errors(form.file) }}
+                </div>
+            {% endif %}
         </div>
         {% if value is not empty %}
             {% if value.originalFilename is not empty %}

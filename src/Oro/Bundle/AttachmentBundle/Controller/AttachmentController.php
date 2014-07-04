@@ -3,10 +3,13 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -14,7 +17,6 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class AttachmentController extends Controller
 {
@@ -23,7 +25,12 @@ class AttachmentController extends Controller
      *      "attachment/view/widget/{entityClass}/{entityId}",
      *      name="oro_attachment_widget_attachments"
      * )
-     *
+     * @Acl(
+     *      id="oro_attachment_view",
+     *      type="entity",
+     *      class="OroAttachmentBundle:Attachment",
+     *      permission="VIEW"
+     * )
      * @Template("OroAttachmentBundle:Attachment:attachments.html.twig")
      */
     public function widgetAction($entityClass, $entityId)
@@ -39,7 +46,12 @@ class AttachmentController extends Controller
      * @Route("attachment/create/{entityClass}/{entityId}", name="oro_attachment_create")
      *
      * @Template("OroAttachmentBundle:Attachment:update.html.twig")
-     * @ AclAncestor("oro_attachment_create")
+     * @Acl(
+     *      id="oro_attachment_create",
+     *      type="entity",
+     *      class="OroAttachmentBundle:Attachment",
+     *      permission="CREATE"
+     * )
      */
     public function createAction($entityClass, $entityId)
     {
@@ -65,7 +77,12 @@ class AttachmentController extends Controller
      * @Route("attachment/update/{id}", name="oro_attachment_update")
      *
      * @Template("OroAttachmentBundle:Attachment:update.html.twig")
-     * @ AclAncestor("oro_attachment_update")
+     * @Acl(
+     *      id="oro_attachment_update",
+     *      type="entity",
+     *      class="OroAttachmentBundle:Attachment",
+     *      permission="EDIT"
+     * )
      */
     public function updateAction(Attachment $attachment)
     {

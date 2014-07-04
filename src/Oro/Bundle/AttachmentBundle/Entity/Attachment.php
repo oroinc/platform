@@ -4,10 +4,12 @@ namespace Oro\Bundle\AttachmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
 /**
  * Attachment
@@ -19,6 +21,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  defaultValues={
  *      "entity"={
  *          "icon"="icon-file"
+ *      },
+ *      "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="owner_id"
+ *      },
+ *      "security"={
+ *          "type"="ACL"
  *      },
  *      "note"={
  *          "immutable"=true
@@ -39,6 +49,14 @@ class Attachment extends ExtendAttachment
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var UserInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
+     * @ORM\JoinColumn(name="owner_user_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @var string
@@ -78,6 +96,30 @@ class Attachment extends ExtendAttachment
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getOwnerId()
+    {
+        return $this->getOwner() ? $this->getOwner()->getId() : null;
+    }
+
+    /**
+     * @param User $owner
+     */
+    public function setOwner($owner = null)
+    {
+        $this->owner = $owner;
     }
 
     /**

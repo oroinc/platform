@@ -47,14 +47,13 @@ datagrid:
         actions:
             update:
                 type:          navigate
-#                acl_resource:  oro_attachment_view
+                acl_resource:  oro_attachment_update
                 label:         Update
                 icon:          edit
                 link:          update_link
-                rowAction:     true
             delete:
                 type:          delete
-#                acl_resource:  oro_attachment_delete
+                acl_resource:  oro_attachment_delete
                 label:         Delete
                 icon:          trash
                 link:          delete_link
