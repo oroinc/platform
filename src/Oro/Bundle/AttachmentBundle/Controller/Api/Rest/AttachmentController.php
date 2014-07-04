@@ -56,18 +56,18 @@ class AttachmentController extends RestController implements ClassResourceInterf
     }
 
     /**
-     * @return FormInterface
+     * {@inheritdoc}
      */
     public function getForm()
     {
-        //return $this->get('oro_attachment.f');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
-     * @return ApiFormHandler
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {
-        //return $this->get('orocrm_task.form.handler.task_api');
+        throw new \BadMethodCallException('FormHandler is not available.');
     }
 }
