@@ -286,7 +286,9 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEmpty('queuedJobs', $this->listener);
     }
 
-    /** @SuppressWarnings(PHPMD.ExcessiveMethodLength) */
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function postFlushQueuedProcessJobProvider()
     {
         return array(
@@ -547,10 +549,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $config
+     * @param array $config
      * @return ProcessTrigger
      */
-    protected function getCustomQueuedTrigger($config)
+    protected function getCustomQueuedTrigger(array $config)
     {
         $definition = new ProcessDefinition();
         $definition->setName('test-' . uniqid())->setRelatedEntity(self::ENTITY);
@@ -603,9 +605,9 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $event
-     * @param $entity
-     * @param $entityManager
+     * @param string $event
+     * @param object $entity
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
      * @param array $changeSet
      */
     protected function callPreFunctionByEventName($event, $entity, $entityManager, $changeSet = array())
@@ -627,11 +629,11 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $entityManager
-     * @param $entityParams
-     * @param $callOrder
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param array $entityParams
+     * @param int $callOrder
      */
-    protected function assertProcessJobPersist($entityManager, $entityParams, $callOrder)
+    protected function assertProcessJobPersist($entityManager, array $entityParams, $callOrder)
     {
         $entityManager->expects($this->at($callOrder))->method('persist')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
@@ -648,7 +650,12 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    protected function assertJMSJobPersist($entityManager, $expected, $callOrder)
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param array $expected
+     * @param int $callOrder
+     */
+    protected function assertJMSJobPersist($entityManager, array $expected, $callOrder)
     {
         $entityManager->expects($this->at($callOrder))->method('persist')
             ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))

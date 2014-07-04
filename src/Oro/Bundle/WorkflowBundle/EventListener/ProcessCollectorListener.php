@@ -264,6 +264,7 @@ class ProcessCollectorListener
             $this->removedEntityHashes = array();
         }
 
+        // create queued JMS jobs
         $this->createJobs($entityManager);
     }
 
@@ -274,7 +275,10 @@ class ProcessCollectorListener
      */
     protected function createJobs($entityManager)
     {
-        $hasQueuedJobs = false;
+        if (empty($this->queuedJobs)) {
+            return;
+        }
+
         foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
                 $args = array();
@@ -286,24 +290,21 @@ class ProcessCollectorListener
                 }
 
                 $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, true, Job::DEFAULT_QUEUE, $priority);
-                $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
 
-                if ($timeShiftInterval) {
+                if ($timeShift) {
+                    $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
                     $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
                     $executeAfter->add($timeShiftInterval);
                     $jmsJob->setExecuteAfter($executeAfter);
                 }
 
                 $entityManager->persist($jmsJob);
-                $hasQueuedJobs = true;
             }
         }
 
         $this->queuedJobs = array();
 
-        if ($hasQueuedJobs) {
-            $entityManager->flush();
-        }
+        $entityManager->flush();
     }
 
     /**

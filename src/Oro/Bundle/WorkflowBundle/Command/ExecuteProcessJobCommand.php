@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -57,25 +58,30 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
         $processJobs   = $registry->getRepository('OroWorkflowBundle:ProcessJob')->findByIds($processJobIds);
 
         if (!$processJobs) {
-            $output->writeln(
-                sprintf('<error>Process jobs with passed identities does not exist.</error>')
-            );
+            $output->writeln('<error>Process jobs with passed identifiers do not exist</error>');
             return;
         }
 
+        /** @var EntityManager $entityManager */
         $entityManager = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
-        $jobHandler    = $this->getContainer()->get('oro_workflow.process.process_handler');
+        $processHandler    = $this->getContainer()->get('oro_workflow.process.process_handler');
+
         /** @var ProcessJob $processJob */
         foreach ($processJobs as $processJob) {
-            $jobHandler->handleJob($processJob);
-            $output->writeln(sprintf(
-                '  <comment>></comment> <info>Successfully done process: %s</info>',
-                $processJob->getId()
-            ));
-            $entityManager->remove($processJob);
-        }
+            $processId = $processJob->getId();
+            $entityManager->beginTransaction();
+            try {
+                $processHandler->handleJob($processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+                $entityManager->commit();
 
-        // remove process job and flush handled data
-        $entityManager->flush();
+                $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+
+                $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
+            }
+        }
     }
 }
