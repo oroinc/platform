@@ -115,6 +115,10 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
         // process triggers
         $triggersConfiguration = $processConfiguration[ProcessConfigurationProvider::NODE_TRIGGERS];
         $this->loadTriggers($output, $triggersConfiguration);
+
+        // update triggers cache
+        $processTriggerCache = $this->getContainer()->get('oro_workflow.cache.process_trigger');
+        $processTriggerCache->build();
     }
 
     /**
