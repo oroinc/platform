@@ -86,6 +86,10 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testMenuTabPanelWithoutAnyParameters()
     {
         $child = $this->createMenuItem();
+        $child->expects($this->once())
+            ->method('isDisplayed')
+            ->will($this->returnValue(true));
+
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension
@@ -102,7 +106,13 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testMenuTabPanel()
     {
-        $child = $this->createMenuItem(null, ['uri' => 'test']);
+        $child  = $this->createMenuItem(null, ['uri' => 'test', 'widgetAcl' => 'testAcl']);
+        $child
+            ->expects($this->once())
+            ->method('isDisplayed')
+            ->will($this->returnValue(true));
+
+        $acl    = [['testAcl', null, true]];
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension
@@ -114,15 +124,26 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('render');
 
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->will(
+                $this->returnValueMap($acl)
+            );
+
         $this->extension->menuTabPanel($this->environment, []);
     }
 
     /**
      * @dataProvider menuProvider
      */
-    public function testGetTabs($options, $tab, $tabOptions, $acl)
+    public function testGetTabs($options, $tab, $tabOptions, $acl, $isDisplayed = true)
     {
         $child = $this->createMenuItem(null, $options);
+        $child
+            ->expects($this->once())
+            ->method('isDisplayed')
+            ->will($this->returnValue($isDisplayed));
+
         $parent = $this->createMenuItem($child);
 
         $this->menuExtension
@@ -161,78 +182,94 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $result = $this->extension->getTabs('menu', $tabOptions);
+
         $this->assertEquals($tab ? [$tab] : [], $result);
     }
 
     public function menuProvider()
     {
         return [
-            'uri and label' => [
-                'options' => [
-                    'name' => 'item',
-                    'uri' => 'test',
-                    'label' => 'testLabel',
+            'uri and label'             => [
+                'options'    => [
+                    'name'      => 'item',
+                    'uri'       => 'test',
+                    'label'     => 'testLabel',
                     'widgetAcl' => 'testAcl',
                 ],
-                'tab' => [
-                    'alias' => 'item',
-                    'label' => 'testLabel',
+                'tab'        => [
+                    'alias'      => 'item',
+                    'label'      => 'testLabel',
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
-                    'url' => 'test'
+                    'url'        => 'test'
                 ],
                 'tabOptions' => [],
-                'acl' => [
+                'acl'        => [
                     'testAcl' => true
                 ]
             ],
-            'route' => [
-                'options' => [
-                    'name' => 'item',
-                    'widgetRoute' => 'route',
-                    'widgetAcl' => 'testAcl',
+            'route'                     => [
+                'options'    => [
+                    'name'                  => 'item',
+                    'widgetRoute'           => 'route',
+                    'widgetAcl'             => 'testAcl',
                     'widgetRouteParameters' => ['type' => 'code'],
                 ],
-                'tab' => [
-                    'alias' => 'item',
-                    'label' => null,
+                'tab'        => [
+                    'alias'      => 'item',
+                    'label'      => null,
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
-                    'url' => 'route?' . http_build_query(['type' => 'code'])
+                    'url'        => 'route?' . http_build_query(['type' => 'code'])
                 ],
                 'tabOptions' => [],
-                'acl' => [
+                'acl'        => [
                     'testAcl' => true
                 ]
             ],
-            'routeMap' => [
-                'options' => [
-                    'name' => 'item',
-                    'widgetRoute' => 'route',
-                    'widgetAcl' => 'testAcl',
-                    'widgetRouteParameters' => ['type' => 'code'],
+            'routeMap'                  => [
+                'options'    => [
+                    'name'                     => 'item',
+                    'widgetRoute'              => 'route',
+                    'widgetAcl'                => 'testAcl',
+                    'widgetRouteParameters'    => ['type' => 'code'],
                     'widgetRouteParametersMap' => ['type' => 'type2'],
                 ],
-                'tab' => [
-                    'alias' => 'item',
-                    'label' => null,
+                'tab'        => [
+                    'alias'      => 'item',
+                    'label'      => null,
                     'widgetType' => TabExtension::DEFAULT_WIDGET_TYPE,
-                    'url' => 'route?' . http_build_query(['type' => 'test']),
+                    'url'        => 'route?' . http_build_query(['type' => 'test']),
                 ],
                 'tabOptions' => ['type2' => 'test'],
-                'acl' => [
+                'acl'        => [
                     'testAcl' => true
                 ]
             ],
-            'accessDenide' => [
-                'options' => [
-                    'name' => 'item',
-                    'uri' => 'test',
+            'accessDenide'              => [
+                'options'    => [
+                    'name'      => 'item',
+                    'uri'       => 'test',
                     'widgetAcl' => 'testAcl',
                 ],
-                'tab' => null,
+                'tab'        => null,
                 'tabOptions' => [],
-                'acl' => [
+                'acl'        => [
                     'testAcl' => false
                 ]
+            ],
+            'routeMap does not display' => [
+                'options'    => [
+                    'name'                     => 'item',
+                    'widgetRoute'              => 'route',
+                    'widgetAcl'                => 'testAcl',
+                    'widgetRouteParameters'    => ['type' => 'code'],
+                    'widgetRouteParametersMap' => ['type' => 'type2'],
+                ],
+                'tab'        => [],
+                'tabOptions' => ['type2' => 'test'],
+                'acl'        => [
+                    'testAcl' => true
+                ],
+                false
             ],
         ];
     }
@@ -253,7 +290,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
         $menuItem = $this
             ->getMockBuilder('Knp\Menu\MenuItem')
             ->disableOriginalConstructor()
-            ->setMethods(['getChildren', 'getUri', 'getName', 'getLabel', 'getExtra'])
+            ->setMethods(['getChildren', 'getUri', 'getName', 'getLabel', 'getExtra', 'isDisplayed'])
             ->getMock();
 
         if ($child) {
