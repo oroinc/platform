@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityBundle\Event\OroEventManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -74,15 +75,27 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $this->serializedTitle = json_encode(array('titleTemplate' => 'Test title template'));
     }
 
-    public function testOnResponse()
+    /**
+     * @dataProvider onResponseProvider
+     * @param $eventManager
+     */
+    public function testOnResponse($eventManager)
     {
         $response = $this->getResponse();
 
         $repository = $this->getDefaultRepositoryMock($this->item);
-        $em = $this->getEntityManager($repository);
+        $em = $this->getEntityManager($repository, $eventManager);
 
         $listener = $this->getListener($this->factory, $this->securityContext, $em);
         $listener->onResponse($this->getEventMock($this->getRequest(), $response));
+    }
+
+    public function onResponseProvider()
+    {
+        return array(
+            'with enabling/disabling listeners'    => array('Oro\Bundle\EntityBundle\Event\OroEventManager'),
+            'without enabling/disabling listeners' => array('Doctrine\Common\EventManager')
+        );
     }
 
     public function testTitle()
@@ -239,11 +252,12 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
      * Returns EntityManager
      *
      * @param  \Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository $repositoryMock
+     * @param  string                                                               $eventManager
      * @return \Doctrine\ORM\EntityManager                                          $entityManager
      */
-    private function getEntityManager($repositoryMock)
+    private function getEntityManager($repositoryMock, $eventManager = 'Oro\Bundle\EntityBundle\Event\OroEventManager')
     {
-        $eventManager = $this->getMockBuilder('Oro\Bundle\EntityBundle\Event\OroEventManager')
+        $eventManager = $this->getMockBuilder($eventManager)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -258,7 +272,9 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
             ->will($this->returnValue($repositoryMock));
 
-        $eventManager->expects($this->once())
+        $shouldBeDisable = $eventManager instanceof OroEventManager;
+
+        $eventManager->expects($shouldBeDisable ? $this->once() : $this->never())
             ->method('enable');
         $this->em->expects($this->once())
             ->method('persist')
@@ -266,7 +282,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())
             ->method('flush')
             ->with($this->item);
-        $eventManager->expects($this->once())
+        $eventManager->expects($shouldBeDisable ? $this->once() : $this->never())
             ->method('disable');
 
         return $this->em;

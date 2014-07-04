@@ -31,7 +31,7 @@ class ResponseHistoryListener
     /**
      * @var \Doctrine\ORM\EntityManager|null
      */
-    protected $em = null;
+    protected $entityManager = null;
 
     /**
      * @var TitleServiceInterface
@@ -47,7 +47,7 @@ class ResponseHistoryListener
         $this->navItemFactory = $navigationItemFactory;
         $this->user = !$securityContext->getToken() ||  is_string($securityContext->getToken()->getUser())
                       ? null : $securityContext->getToken()->getUser();
-        $this->em = $entityManager;
+        $this->entityManager = $entityManager;
         $this->titleService = $titleService;
     }
 
@@ -78,8 +78,10 @@ class ResponseHistoryListener
         );
 
         /** @var $historyItem  NavigationHistoryItem */
-        $historyItem = $this->em->getRepository('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
-                                ->findOneBy($postArray);
+        $historyItem = $this->entityManager
+            ->getRepository('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
+            ->findOneBy($postArray);
+
         if (!$historyItem) {
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
@@ -94,13 +96,13 @@ class ResponseHistoryListener
         $historyItem->doUpdate();
 
         // disable Doctrine events for history item processing
-        $eventManager = $this->em->getEventManager();
+        $eventManager = $this->entityManager->getEventManager();
         if ($eventManager instanceof OroEventManager) {
             $eventManager->disable();
         }
 
-        $this->em->persist($historyItem);
-        $this->em->flush($historyItem);
+        $this->entityManager->persist($historyItem);
+        $this->entityManager->flush($historyItem);
 
         if ($eventManager instanceof OroEventManager) {
             $eventManager->enable();
