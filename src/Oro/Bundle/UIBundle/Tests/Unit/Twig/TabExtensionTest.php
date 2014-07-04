@@ -134,7 +134,6 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetTabs($options, $tab, $tabOptions, $acl, $isDisplayed = true)
     {
         $child = $this->createMenuItem(null, $options);
-        $child->setDisplay($isDisplayed);
         $child
             ->expects($this->once())
             ->method('isDisplayed')
