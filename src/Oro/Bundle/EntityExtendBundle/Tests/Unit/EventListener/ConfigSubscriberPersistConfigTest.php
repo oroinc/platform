@@ -58,7 +58,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
         $event = new PersistConfigEvent($eventConfig, $configManager);
         $configSubscriber = new ConfigSubscriber($configProvider);
 
-        $this->assertNull($configSubscriber->persistConfig($event), 'nothing should happen due to wrong config id');
+        $configSubscriber->persistConfig($event);
     }
 
     /**
@@ -246,7 +246,6 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 [
-                    'state' => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'manyToMany'
@@ -280,6 +279,73 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
                                     'testFieldName',
                                     'manyToMany'
                                 ),
+                            ]
+                        ]
+                    ]
+                )
+            ],
+            'persistConfigs',
+            $cm
+        );
+    }
+
+    /**
+     * Test create new field (relation type [*:*])
+     */
+    public function testScopeExtendRelationTypeCreateTargetRelationManyToMany()
+    {
+        $relationKey   = 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName';
+        $this->runPersistConfig(
+            $this->getEventConfigNewField(
+                [
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_title'    => ['username'],
+                    'target_grid'     => ['username'],
+                    'target_detailed' => ['username'],
+                    'relation_key'    => $relationKey,
+                ],
+                'manyToMany'
+            ),
+            $this->getEntityConfig(
+                [
+                    'state' => ExtendScope::STATE_ACTIVE,
+                    'relation'    => [
+                        'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                            'assign'          => true,
+                            'owner'           => true,
+                            'target_entity'   => 'TestClass',
+                            'field_id'        => new FieldConfigId(
+                                'extend',
+                                'TestClass',
+                                'testFieldName',
+                                'manyToMany'
+                            )
+                        ]
+                    ],
+                ]
+            ),
+            ['state' => [0 => ExtendScope::STATE_ACTIVE, 1 => ExtendScope::STATE_UPDATED ]]
+        );
+
+        /** @var ConfigManager $cm */
+        $cm = $this->event->getConfigManager();
+
+        $this->assertAttributeEquals(
+            [
+                'extend_TestClass' => $this->getEntityConfig(
+                    [
+                        'state'    => ExtendScope::STATE_UPDATED,
+                        'relation' => [
+                            'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                                'assign'          => true,
+                                'field_id'        => new FieldConfigId(
+                                    'extend',
+                                    'TestClass',
+                                    'testFieldName',
+                                    'manyToMany'
+                                ),
+                                'owner'           => true,
+                                'target_entity'   => 'TestClass',
                             ]
                         ]
                     ]
