@@ -2122,7 +2122,7 @@ div.uploader span.filename {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: default;
-  width: 109px;
+  width: 202px;
 }
 
 div.uploader input {
@@ -2900,7 +2900,8 @@ label.radio.error {
   }
 }
 #orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow {
+#oro_entity_config_type .removeRow,
+.oro_attachment_file .removeFile{
   text-indent:-999;
   font-size:0;
   line-height:0;
@@ -2916,7 +2917,9 @@ label.radio.error {
     color:#888;
   }
 }
-
+.oro_attachment_file .removeFile{
+  margin: 0;
+}
 pre.email-body {
   width: 99%;
   min-height: 5em;
@@ -3333,4 +3336,15 @@ label .popover-content {
       }
     }
   }
+}
+
+.entity-create-or-select-container .entity-create-btn {
+  padding: 0 6px;
+  margin-left: 3px;
+  height: 30px;
+}
+
+.entity-create-enabled .input-prepend .select2-container,
+.entity-create-enabled .input-append .select2-container {
+  width: 228px;
 }

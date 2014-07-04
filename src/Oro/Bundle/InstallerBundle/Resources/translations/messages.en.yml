@@ -59,6 +59,7 @@ process:
             schema-update: Schema update
             fixtures:      Load fixtures
             workflows:     Load workflow definitions
+            processes:     Load processes configuration
         setup:
             header:        Administration setup
         installation:

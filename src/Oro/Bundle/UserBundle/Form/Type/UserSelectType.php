@@ -6,6 +6,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class UserSelectType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -15,14 +18,18 @@ class UserSelectType extends AbstractType
                     'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                     'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig'
                 ),
-                'autocomplete_alias' => 'users'
+                'autocomplete_alias' => 'users',
+                'grid_name' => 'users-select-grid'
             )
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return 'oro_entity_create_or_select_inline';
     }
 
     /**

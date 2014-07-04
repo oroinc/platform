@@ -2,31 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
 
-    /**
-     * @var array
-     */
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
+    /** @var array */
     protected $tableToEntityMap = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $result = [];
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -95,7 +97,12 @@ class ExtendOptionsBuilder
         $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
         $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
-        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])
+            || in_array(
+                $this->fieldTypeHelper->getUnderlyingType($columnType),
+                ['oneToMany', 'manyToOne', 'manyToMany']
+            )
+        ) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
@@ -143,6 +150,69 @@ class ExtendOptionsBuilder
         }
         if ($columnMode) {
             $this->result[$entityClassName]['fields'][$fieldName]['mode'] = $columnMode;
+        }
+    }
+
+    /**
+     * @param string $configType
+     * @param string $tableName
+     * @param array  $options
+     */
+    public function addTableAuxiliaryOptions($configType, $tableName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        if (!isset($this->result[$configType])) {
+            $this->result[$configType] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName])) {
+            $this->result[$configType][$entityClassName] = [];
+        }
+        $this->result[$configType][$entityClassName]['configs'] = $options;
+    }
+
+    /**
+     * @param string $configType
+     * @param string $tableName
+     * @param string $columnName
+     * @param array  $options
+     */
+    public function addColumnAuxiliaryOptions($configType, $tableName, $columnName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        $fieldName = $this->getFieldName($tableName, $columnName);
+
+        if (!isset($this->result[$configType])) {
+            $this->result[$configType] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName])) {
+            $this->result[$configType][$entityClassName] = [];
+        }
+        if (!isset($this->result[$configType][$entityClassName]['fields'])) {
+            $this->result[$configType][$entityClassName]['fields'] = [];
+        }
+        $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
+    }
+
+    /**
+     * @param string $sectionName
+     * @return string
+     * @throws \RuntimeException if unknown section name specified
+     */
+    public function getAuxiliaryConfigType($sectionName)
+    {
+        switch ($sectionName) {
+            case ExtendOptionsManager::APPEND_SECTION:
+                return ExtendConfigProcessor::APPEND_CONFIGS;
+            default:
+                throw new \RuntimeException(sprintf('Unknown auxiliary section: %s.', $sectionName));
         }
     }
 

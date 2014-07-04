@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Doctrine\Common\Util\Inflector;
 
+use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
+
 class ConfigHelper
 {
     private static $configModelClasses = [
@@ -67,36 +69,22 @@ class ConfigHelper
             throw new \InvalidArgumentException('$className must not be empty');
         }
 
-        //example: className - OroCRM\Bundle\ContactBundle\Entity\ContactAddress
-        $class = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
-
-        //example: className - OroCRM\Contact\ContactAddress
-        $classArray = explode('\\', strtolower($class));
-        $classArray = array_filter($classArray);
-
-        $keyArray = [];
-        foreach ($classArray as $item) {
-            $item = Inflector::camelize($item);
-            if (!in_array($item, $keyArray)) {
-                $keyArray[] = $item;
-            }
+        // handle 'entity' scope separately
+        if ($scope === 'entity') {
+            return EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         }
 
+        $parts = EntityLabelBuilder::explodeClassName($className);
+
+        $propertyName = Inflector::tableize($scope) . '_' . $propertyName;
         if ($fieldName) {
-            $keyArray[] = Inflector::tableize($fieldName);
-        }
-
-        $propertyName = Inflector::tableize($propertyName);
-        if ($scope !== 'entity') {
-            $propertyName = Inflector::tableize($scope) . '_' . $propertyName;
-        }
-        if ($fieldName) {
-            $keyArray[] = $propertyName;
+            $parts[] = Inflector::tableize($fieldName);
+            $parts[] = $propertyName;
         } else {
-            $keyArray[] = 'entity_' . $propertyName;
+            $parts[] = 'entity_' . $propertyName;
         }
 
-        return implode('.', $keyArray);
+        return implode('.', $parts);
     }
 
     /**

@@ -17,7 +17,6 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
@@ -63,7 +62,6 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->ownerTree = new OwnerTree();
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
-        $classAccessor = new EntityClassAccessor();
         $objectIdAccessor = new ObjectIdAccessor();
 
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
@@ -76,9 +74,8 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
-            $classAccessor,
             $objectIdAccessor,
-            new EntityOwnerAccessor($classAccessor, $this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
         $this->strategy = new PermissionGrantingStrategy(

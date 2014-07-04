@@ -29,38 +29,38 @@ class ExtendConfigDumper
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /** @var ExtendEntityGenerator */
-    protected $extendEntityGenerator;
+    /** @var EntityGenerator */
+    protected $entityGenerator;
 
-    /** @var array|ExtendConfigDumperExtension[] */
+    /** @var array */
     protected $extensions = [];
 
-    /** @var array|ExtendConfigDumperExtension[]|null */
+    /** @var AbstractEntityConfigDumperExtension[]|null */
     protected $sortedExtensions = null;
 
     /**
      * @param OroEntityManager                $em
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param string                          $cacheDir
-     * @param ExtendEntityGenerator           $extendEntityGenerator
+     * @param EntityGenerator                 $entityGenerator
      */
     public function __construct(
         OroEntityManager $em,
         ExtendDbIdentifierNameGenerator $nameGenerator,
-        ExtendEntityGenerator $extendEntityGenerator,
+        EntityGenerator $entityGenerator,
         $cacheDir
     ) {
-        $this->nameGenerator         = $nameGenerator;
-        $this->em                    = $em;
-        $this->extendEntityGenerator = $extendEntityGenerator;
-        $this->cacheDir              = $cacheDir;
+        $this->nameGenerator   = $nameGenerator;
+        $this->em              = $em;
+        $this->entityGenerator = $entityGenerator;
+        $this->cacheDir        = $cacheDir;
     }
 
     /**
-     * @param ExtendConfigDumperExtension $extension
-     * @param int                   $priority
+     * @param AbstractEntityConfigDumperExtension $extension
+     * @param int                                 $priority
      */
-    public function addExtension(ExtendConfigDumperExtension $extension, $priority = 0)
+    public function addExtension(AbstractEntityConfigDumperExtension $extension, $priority = 0)
     {
         if (!isset($this->extensions[$priority])) {
             $this->extensions[$priority] = [];
@@ -70,27 +70,12 @@ class ExtendConfigDumper
     }
 
     /**
-     * Return sorted extensions
-     *
-     * @return array|ExtendConfigDumperExtension[]
-     */
-    protected function getExtensions()
-    {
-        if (empty($this->sortedExtensions)) {
-            krsort($this->extensions);
-            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
-        }
-
-        return $this->sortedExtensions;
-    }
-
-    /**
      * @param null $className
      */
     public function updateConfig($className = null)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
-        $this->clear();
+        $this->clear(true);
 
         $extendProvider = $this->em->getExtendConfigProvider();
 
@@ -127,27 +112,54 @@ class ExtendConfigDumper
             $className = $extendConfig->getId()->getClassName();
 
             if ($schema) {
-                $schemas[$className] = $schema;
+                $schemas[$className]                 = $schema;
                 $schemas[$className]['relationData'] = $extendConfig->get('relation');
             }
         }
 
-        $this->extendEntityGenerator->generate($schemas);
+        $this->entityGenerator->generate($schemas);
     }
 
-    public function clear()
+    /**
+     * Removes the entity proxies and metadata from the cache
+     *
+     * @param bool $keepEntityProxies Set TRUE if proxies for custom and extend entities should not be deleted
+     */
+    public function clear($keepEntityProxies = false)
     {
         $filesystem   = new Filesystem();
-        $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
-        if ($filesystem->exists($baseCacheDir)) {
-            $filesystem->remove([$baseCacheDir]);
-        }
 
-        $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+        if ($keepEntityProxies) {
+            $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
+            if ($filesystem->exists($aliasesPath)) {
+                $filesystem->remove($aliasesPath);
+            }
+        } else {
+            $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
+            if ($filesystem->exists($baseCacheDir)) {
+                $filesystem->remove([$baseCacheDir]);
+            }
+            $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
+        }
 
         /** @var ExtendClassMetadataFactory $metadataFactory */
         $metadataFactory = $this->em->getMetadataFactory();
         $metadataFactory->clearCache();
+    }
+
+    /**
+     * Return sorted extensions
+     *
+     * @return AbstractEntityConfigDumperExtension[]
+     */
+    protected function getExtensions()
+    {
+        if (empty($this->sortedExtensions)) {
+            krsort($this->extensions);
+            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
+        }
+
+        return $this->sortedExtensions;
     }
 
     /**
@@ -183,7 +195,7 @@ class ExtendConfigDumper
 
             if (in_array($fieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
                 $relationProperties[$fieldName] = $fieldConfig->getId()->getFieldName();
-                if ($fieldType != 'manyToOne') {
+                if ($fieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldConfig->getId()->getFieldName();
 
                     $defaultProperties[$defaultName] = $defaultName;
@@ -296,13 +308,16 @@ class ExtendConfigDumper
             }
 
             $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() != 'manyToOne' && $relation['target_field_id']) {
+            if ($relation['field_id']->getFieldType() != 'manyToOne') {
                 $fieldName = $relation['field_id']->getFieldName();
 
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
-                $addRemoveMethods[$fieldName]['target'] = $relation['target_field_id']->getFieldName();
-                $addRemoveMethods[$fieldName]['is_target_addremove']
-                    = $relation['field_id']->getFieldType() == 'manyToMany';
+                if ($relation['target_field_id']) {
+                    $addRemoveMethods[$fieldName]['target']              =
+                        $relation['target_field_id']->getFieldName();
+                    $addRemoveMethods[$fieldName]['is_target_addremove'] =
+                        $relation['field_id']->getFieldType() == 'manyToMany';
+                }
             }
 
             $this->checkRelation($relation['target_entity'], $relation['field_id']);

@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -51,21 +51,21 @@ class SyncProcessor
     }
 
     /**
-     * Process channel synchronization
-     * By default, if $connector is empty, will process all connectors of given channel
+     * Process integration synchronization
+     * By default, if $connector is empty, will process all connectors of given integration
      *
-     * @param Channel $channel    Channel object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
+     * @param Integration $integration Integration object
+     * @param string      $connector   Connector name
+     * @param array       $parameters  Connector additional parameters
      */
-    public function process(Channel $channel, $connector = '', array $parameters = [])
+    public function process(Integration $integration, $connector = '', array $parameters = [])
     {
         if ($connector) {
-            $this->processChannelConnector($channel, $connector, $parameters, false);
+            $this->processIntegrationConnector($integration, $connector, $parameters, false);
         } else {
-            $connectors = $channel->getConnectors();
+            $connectors = $integration->getConnectors();
             foreach ((array)$connectors as $connector) {
-                $this->processChannelConnector($channel, $connector, $parameters);
+                $this->processIntegrationConnector($integration, $connector, $parameters);
             }
         }
     }
@@ -81,21 +81,26 @@ class SyncProcessor
     }
 
     /**
-     * Process channel connector
+     * Process integration connector
      *
-     * @param Channel $channel    Channel object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
-     * @param boolean $saveStatus Do we need to save new status to bd
+     * @param Integration $integration Integration object
+     * @param string      $connector   Connector name
+     * @param array       $parameters  Connector additional parameters
+     * @param boolean     $saveStatus  Do we need to save new status to bd
      */
-    protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
-    {
+    protected function processIntegrationConnector(
+        Integration $integration,
+        $connector,
+        array $parameters = [],
+        $saveStatus = true
+    ) {
+        if (!$integration->getEnabled()) {
+            return;
+        }
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-            /**
-             * Clone object here because it will be modified and changes should not be shared between
-             */
-            $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
+            // Clone object here because it will be modified and changes should not be shared between
+            $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
         } catch (\Exception $e) {
             // log and continue
             $this->logger->error($e->getMessage());
@@ -105,7 +110,7 @@ class SyncProcessor
                 ->setConnector($connector);
 
             $this->em->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($channel, $status);
+                ->addStatus($integration, $status);
             return;
         }
         $jobName = $realConnector->getImportJobName();
@@ -120,22 +125,22 @@ class SyncProcessor
                     [
                         'processorAlias' => reset($processorAliases),
                         'entityName'     => $realConnector->getImportEntityFQCN(),
-                        'channel'        => $channel->getId()
+                        'channel'        => $integration->getId()
                     ],
                     $parameters
                 ),
         ];
-        $this->processImport($connector, $jobName, $configuration, $channel, $saveStatus);
+        $this->processImport($connector, $jobName, $configuration, $integration, $saveStatus);
     }
 
     /**
-     * @param string  $connector
-     * @param string  $jobName
-     * @param array   $configuration
-     * @param Channel $channel
-     * @param boolean $saveStatus
+     * @param string      $connector
+     * @param string      $jobName
+     * @param array       $configuration
+     * @param Integration $integration
+     * @param boolean     $saveStatus
      */
-    protected function processImport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
+    protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
     {
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
 
@@ -187,7 +192,7 @@ class SyncProcessor
         }
         if ($saveStatus) {
             $this->em->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($channel, $status);
+                ->addStatus($integration, $status);
         }
     }
 }

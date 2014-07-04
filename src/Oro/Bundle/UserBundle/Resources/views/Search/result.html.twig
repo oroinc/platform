@@ -9,7 +9,7 @@
 {% set showImage = true %}
 
 {% set recordUrl = indexer_item.recordUrl %}
-{% set imagePath = entity ? entity.imagePath : null %}
+{% set image = entity ? entity.avatar : null %}
 
 {% if entity %}
     {% block additional_info %}

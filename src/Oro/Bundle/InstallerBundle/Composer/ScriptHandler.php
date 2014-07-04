@@ -49,26 +49,8 @@ class ScriptHandler extends SensioScriptHandler
         ];
 
         $permissionHandler = new PermissionsHandler();
-
-        $withoutPermissionsList = [];
         foreach ($directories as $directory) {
-            $isPermissionSet = $permissionHandler->setPermissions($directory);
-
-            if (!$isPermissionSet) {
-                $withoutPermissionsList[] = $directory;
-            }
-        }
-
-        if ($withoutPermissionsList) {
-            $withoutPermissions = implode(',', $withoutPermissionsList);
-
-            $event->getIO()->write(
-                sprintf(
-                    'Note: check permissions for %s, see %s for more',
-                    $withoutPermissions,
-                    'http://symfony.com/doc/current/book/installation.html#configuration-and-setup'
-                )
-            );
+            $permissionHandler->setPermissions($directory);
         }
     }
 }

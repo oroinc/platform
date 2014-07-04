@@ -30,23 +30,29 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider buildAssociationNameProvider
      */
-    public function testBuildAssociationName($targetEntityClassName, $expected)
+    public function testBuildAssociationName($targetEntityClassName, $associationKind, $expected)
     {
         $this->assertEquals(
             $expected,
-            ExtendHelper::buildAssociationName($targetEntityClassName)
+            ExtendHelper::buildAssociationName($targetEntityClassName, $associationKind)
         );
     }
 
     public static function buildAssociationNameProvider()
     {
         return [
-            ['Oro\Bundle\TestBundle\Entity\Test', 'test_d2f667e'],
-            ['Oro\Bundle\TestBundle\Entity\OtherTest', 'other_test_f1fe376e'],
-            ['Acme\Bundle\TestBundle\Entity\Test', 'test_77981b51'],
-            ['Acme\Bundle\TestBundle\Entity\OtherTest', 'other_test_3efb8e13'],
-            ['Test', 'test_784dd132'],
-            ['OtherTest', 'other_test_f54366f8'],
+            ['Oro\Bundle\TestBundle\Entity\Test', null, 'test_d2f667e'],
+            ['Oro\Bundle\TestBundle\Entity\Test', 'test', 'test_9a6fc24b'],
+            ['Oro\Bundle\TestBundle\Entity\OtherTest', null, 'other_test_f1fe376e'],
+            ['Oro\Bundle\TestBundle\Entity\OtherTest', 'test', 'other_test_14ac1fd7'],
+            ['Acme\Bundle\TestBundle\Entity\Test', null, 'test_77981b51'],
+            ['Acme\Bundle\TestBundle\Entity\Test', 'test', 'test_21bc9fd6'],
+            ['Acme\Bundle\TestBundle\Entity\OtherTest', null, 'other_test_3efb8e13'],
+            ['Acme\Bundle\TestBundle\Entity\OtherTest', 'test', 'other_test_8ca3d713'],
+            ['Test', null, 'test_784dd132'],
+            ['Test', 'test', 'test_4c5b140f'],
+            ['OtherTest', null, 'other_test_f54366f8'],
+            ['OtherTest', 'test', 'other_test_4ee028ce'],
         ];
     }
 
