@@ -359,6 +359,22 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     *  Field type 'text' should NOT be added to index, it's not extend
+     */
+    public function testScopeDataGridNewFieldNewEntityNotExtend()
+    {
+        $this->runPersistConfig(
+            $this->getEventConfigNewField(['is_extend' => false, 'extend' => false], 'string', 'datagrid'),
+            $this->getEntityConfig(),
+            ['is_visible' => [0 => null, 1 => true]]
+        );
+
+        /** @var ConfigManager $cm */
+        $cm = $this->event->getConfigManager();
+        $this->assertAttributeEquals(null, 'persistConfigs', $cm);
+    }
+
+    /**
      * FieldConfig
      *
      * @param array $values

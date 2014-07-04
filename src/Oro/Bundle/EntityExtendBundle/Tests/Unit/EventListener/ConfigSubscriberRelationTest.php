@@ -19,10 +19,8 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test create new field (relation type [*:*])
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateTargetRelationManyToMany()
+    public function testScopeExtendRelationTypeCreateTargetRelationManyToMany()
     {
         $fieldConfigId = new FieldConfigId('extend', 'TestClass', 'rel', 'manyToMany');
         $relationKey   = 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|rel';
@@ -51,7 +49,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                 'upgradeable' => false,
                 'relation'    => [
                     'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|rel' => [
-                        'assign'          => false,
+                        'assign'          => true,
                         'owner'           => true,
                         'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                         'field_id'        => new FieldConfigId(

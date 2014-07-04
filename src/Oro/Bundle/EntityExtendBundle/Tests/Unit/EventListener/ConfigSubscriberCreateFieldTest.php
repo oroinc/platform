@@ -13,7 +13,7 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
-    public function testCreateNew()
+    public function testCreateNewField()
     {
         $entityConfig = new Config(
             new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
@@ -60,9 +60,8 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testUpdateNew()
+    public function testUpdateNewField()
     {
-        $configModel = new FieldConfigModel('testField', 'string');
         $entityConfig = new Config(
             new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
         );
@@ -105,7 +104,6 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
 
         /** @var ConfigManager $cm */
         $cm = $event->getConfigManager();
-
 
         $this->assertEquals(
             ['upgradeable' => true],
