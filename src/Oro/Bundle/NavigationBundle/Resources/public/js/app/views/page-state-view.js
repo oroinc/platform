@@ -97,6 +97,7 @@ define([
         onPageRequest: function () {
             this._initialData = null;
             this._restore = false;
+            this.$el.off('change.page-state');
             this.model.clear({silent: true});
         },
 
