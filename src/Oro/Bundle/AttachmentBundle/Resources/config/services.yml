@@ -2,6 +2,9 @@ parameters:
     oro_attachment.manager.attachment_manager.class:      Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
     oro_attachment.listener.file_listener.class:          Oro\Bundle\AttachmentBundle\EventListener\FileListener
 
+    oro_attachment.entity.class:                          Oro\Bundle\AttachmentBundle\Entity\Attachment
+    oro_attachment.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+
     oro_attachment.twig.file_extension.class:             Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
     oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
@@ -18,6 +21,12 @@ services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
         arguments: [@knp_gaufrette.filesystem_map, @router, @oro_security.security_facade.link, %oro_attachment.files%]
+
+    oro_attachment.manager.api:
+        class: %oro_attachment.manager.api.class%
+        arguments:
+            - %oro_attachment.entity.class%
+            - @doctrine.orm.entity_manager
 
     oro_attachment.listener.file_listener:
         class: %oro_attachment.listener.file_listener.class%

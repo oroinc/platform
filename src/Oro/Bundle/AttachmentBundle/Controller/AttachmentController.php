@@ -60,6 +60,18 @@ class AttachmentController extends Controller
     }
 
     /**
+     *
+     * @Route("attachment/update/{id}", name="oro_attachment_update")
+     *
+     * @Template("OroAttachmentBundle:Attachment:update.html.twig")
+     * @ AclAncestor("oro_attachment_update")
+     */
+    public function updateAction($attachmentId)
+    {
+
+    }
+
+    /**
      * @param FormInterface $form
      * @param string $formAction
      *
