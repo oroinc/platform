@@ -18,6 +18,9 @@ parameters:
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
 
+    # override default Doctrine event manager class
+    doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
+
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
