@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Types\Type;
 use Psr\Log\LoggerInterface;
 
+use Doctrine\DBAL\Types\Type;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-class UpdateCustomEntityOwnerLabelQuery extends ParametrizedMigrationQuery
+class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 {
     const NEW_OWNER_LABEL       = 'oro.custom_entity.owner.label';
     const NEW_OWNER_DESCRIPTION = 'oro.custom_entity.owner.description';
@@ -63,9 +65,9 @@ class UpdateCustomEntityOwnerLabelQuery extends ParametrizedMigrationQuery
                 $id = $row['id'];
 
                 $updateQueries[] = [
-                    'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
-                    ['id' => $id, 'data' => $data],
-                    ['id' => Type::INTEGER, 'data' => Type::TARRAY]
+                    'UPDATE oro_entity_config_field SET data = :data, mode = :mode WHERE id = :id',
+                    ['id' => $id, 'mode' => ConfigModelManager::MODE_DEFAULT, 'data' => $data],
+                    ['id' => Type::INTEGER, 'mode' => Type::STRING, 'data' => Type::TARRAY]
                 ];
                 $updateQueries[] = [
                     'UPDATE oro_entity_config_index_value SET value = :value'

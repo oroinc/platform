@@ -13,6 +13,6 @@ class OroOrganizationBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new UpdateCustomEntityOwnerLabelQuery());
+        $queries->addQuery(new UpdateCustomEntityOwnerQuery());
     }
 }
