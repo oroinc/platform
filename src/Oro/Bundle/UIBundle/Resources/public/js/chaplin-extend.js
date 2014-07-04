@@ -74,8 +74,6 @@ define([
         }
     };
 
-    Chaplin.Layout.prototype.el = 'document';
-
     /**
      * Fixes issues
      *  - empty hashes (like '#')

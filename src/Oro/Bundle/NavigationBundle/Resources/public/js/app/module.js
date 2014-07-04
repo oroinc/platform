@@ -106,7 +106,7 @@ require([
         var model;
         model = new PageStateModel();
         BaseController.addToReuse('pageState', PageStateView, {
-            el: 'body',
+            el: '#container',
             keepElement: true,
             model: model
         });
