@@ -174,14 +174,21 @@ EOF
             if (!$this->checkFiles($languagePackPath, $output)) {
                 /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
                 $dialog = $this->getHelperSet()->get('dialog');
-                if (!$dialog->askConfirmation($output,
+                if (!$input->isInteractive()) {
+                    $output->writeln('Some files require correction. Sending canceled.');
+                    return;
+                }
+                $ask = $dialog->askConfirmation(
+                    $output,
                     '<question>Some files require correction, send anyway? (y/n)</question>',
                     false
-                )
-                ) {
+                );
+                if (!$ask) {
                     return;
                 }
             }
+        } else {
+            $output->writeln('Force sending, without check files.');
         }
 
         if ($mode == 'update') {
