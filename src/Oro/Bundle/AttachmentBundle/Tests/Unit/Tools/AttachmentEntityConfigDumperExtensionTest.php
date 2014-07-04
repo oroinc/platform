@@ -67,7 +67,7 @@ class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
             'extend',
             'OroCRM\Bundle\ContactBundle\Entity\Contact',
             'test_field',
-            'attachmentImage'
+            'image'
         );
 
         $configProvider
@@ -114,7 +114,7 @@ class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
             'relation',
             [
                 'manyToOne|OroCRM\Bundle\ContactBundle\Entity\Contact|' .
-                'Oro\Bundle\AttachmentBundle\Entity\Attachment|test_field' => [
+                'Oro\Bundle\AttachmentBundle\Entity\File|test_field' => [
                     'assign'          => true,
                     'field_id'        => new FieldConfigId(
                         'extend',
@@ -123,7 +123,7 @@ class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestC
                         'manyToOne'
                     ),
                     'owner'           => true,
-                    'target_entity'   => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
+                    'target_entity'   => 'Oro\Bundle\AttachmentBundle\Entity\File',
                     'target_field_id' => false
                 ]
             ]

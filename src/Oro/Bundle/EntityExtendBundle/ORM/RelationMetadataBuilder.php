@@ -117,11 +117,11 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             false,
             'SET NULL'
         );
-        /** @var FieldConfigId $realFieldId */
-        $realFieldId = $this->extendConfigProvider->getId($fieldId->getClassName(), $fieldId->getFieldName());
-        if (in_array($realFieldId->getFieldType(), AttachmentScope::$attachmentTypes)) {
+
+        if ($targetEntity === AttachmentScope::ATTACHMENT_ENTITY) {
             $builder->cascadePersist();
         }
+
         $builder->cascadeDetach();
         $builder->build();
     }
