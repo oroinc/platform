@@ -23,7 +23,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
         });
 
         /**
-         * Process role checkboxes after hash navigation request is completed
+         * Process role checkboxes after navigation request is completed
          */
         mediator.on("page:afterChange", checkRoleInputs);
 

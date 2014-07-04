@@ -236,9 +236,6 @@ define([
         return mediator.execute('retrievePath', _ref[0]);
     }
 
-    /**
-     * Router for hash navigation
-     */
     contentManager = {
         /**
          * Setups content management component, sets initial URL

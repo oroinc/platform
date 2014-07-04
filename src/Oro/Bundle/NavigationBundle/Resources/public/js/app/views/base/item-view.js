@@ -24,7 +24,7 @@ define([
         },
 
         /**
-         * Change active item after hash navigation request is completed
+         * Change active item after navigation request is completed
          */
         onPageUpdated: function () {
             this.setActiveItem();

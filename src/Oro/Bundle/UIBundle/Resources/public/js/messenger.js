@@ -147,13 +147,15 @@ function ($, _, tools) {
                 var args = [type, message, _.extend({flash: true}, options)];
                 var actions = {close: $.noop};
 
-                if (options.hashNavEnabled) {
+                queue.push([args, actions]);
+                // since navigation is always enabled, this condition does not make sense
+                /*if (options.hashNavEnabled) {
                     queue.push([args, actions]);
                 } else { // add message to localStorage or cookie
                     var flashMessages = getStoredMessages();
                     flashMessages.push([args, actions]);
                     setStoredMessages(flashMessages);
-                }
+                }*/
             }
         };
 });
