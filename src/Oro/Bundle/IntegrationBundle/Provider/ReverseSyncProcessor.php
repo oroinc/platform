@@ -117,7 +117,48 @@ class ReverseSyncProcessor
      */
     protected function processExport($jobName, $configuration)
     {
-        $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
+        $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
+
+        $context = $jobResult->getContext();
+
+        $counts = [];
+        if ($context) {
+            $counts['process'] = $counts['warnings'] = 0;
+            $counts['read']    = $context->getReadCount();
+            $counts['process'] += $counts['add'] = $context->getAddCount();
+            $counts['process'] += $counts['update'] = $context->getUpdateCount();
+            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
+        }
+
+        $exceptions = $jobResult->getFailureExceptions();
+        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
+
+        if (!$isSuccess) {
+            $this->logger->error('Errors were occurred:');
+            $exceptions = implode(PHP_EOL, $exceptions);
+            $this->logger->error(
+                $exceptions,
+                ['exceptions' => $jobResult->getFailureExceptions()]
+            );
+        } else {
+            if ($context->getErrors()) {
+                $this->logger->warning('Some entities were skipped due to warnings:');
+                foreach ($context->getErrors() as $error) {
+                    $this->logger->warning($error);
+                }
+            }
+
+            $message = sprintf(
+                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
+                $counts['read'],
+                $counts['process'],
+                $counts['update'],
+                $counts['add'],
+                $counts['delete'],
+                $context->getErrorEntriesCount()
+            );
+            $this->logger->info($message);
+        }
 
         return $this;
     }
