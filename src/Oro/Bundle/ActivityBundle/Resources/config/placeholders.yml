@@ -1,0 +1,8 @@
+placeholders:
+    view_content_data_activities:
+        items:
+            oro_activities: ~
+
+items:
+    oro_activities:
+        action: OroActivityBundle:Activity:activities

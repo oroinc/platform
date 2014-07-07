@@ -9,6 +9,7 @@ oro:
             label: Export
 
         entity_config:
+            block_title:    "Import & Export"
             excluded.label: "Exclude Column"
             full.label:     "Export Fields"
             header.label:   "Column Name"

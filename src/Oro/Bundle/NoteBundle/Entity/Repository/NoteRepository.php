@@ -10,10 +10,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class NoteRepository extends EntityRepository
 {
     /**
-     * @param int $entityClassName
-     * @param int $entityId
+     * @param string   $entityClassName
+     * @param mixed    $entityId
      * @param int|null $page
      * @param int|null $limit
+     *
      * @return QueryBuilder
      */
     public function getAssociatedNotesQueryBuilder($entityClassName, $entityId, $page = null, $limit = null)

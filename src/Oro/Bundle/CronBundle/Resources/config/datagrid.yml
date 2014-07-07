@@ -5,7 +5,7 @@ datagrid:
             acl_resource: oro_jobs
             query:
                 select:
-                    - partial j.{id, command, args, state, runtime, memoryUsageReal, createdAt}
+                    - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt}
                 from:
                     - { table: JMSJobQueueBundle:Job , alias: j }
                 where:
@@ -27,21 +27,26 @@ datagrid:
                 frontend_type: html
             runtime:
                 label: oro.cron.header.runtime
+                frontend_type: integer
             memoryUsageReal:
                 label: oro.cron.header.memory
                 type: twig
                 template: OroCronBundle:Job:Datagrid/memory.html.twig
                 frontend_type: html
+            priority:
+                label: oro.cron.header.priority
+                frontend_type: integer
             createdAt:
                 label: oro.cron.header.created
                 frontend_type: datetime
         sorters:
             columns:
-                command:             { data_name: j.command }
-                state:               { data_name: j.state }
-                runtime:             { data_name: j.runtime }
-                memoryUsageReal:     { data_name: j.memoryUsageReal }
-                createdAt:           { data_name: j.createdAt }
+                command:         { data_name: j.command }
+                state:           { data_name: j.state }
+                runtime:         { data_name: j.runtime }
+                memoryUsageReal: { data_name: j.memoryUsageReal }
+                priority:        { data_name: j.priority }
+                createdAt:       { data_name: j.createdAt }
             default:
                 createdAt: DESC
         filters:
@@ -52,6 +57,9 @@ datagrid:
                 runtime:
                     type: number
                     data_name: j.runtime
+                priority:
+                    type: number
+                    data_name: j.priority * -1
                 createdAt:
                     type:      datetime
                     data_name: j.createdAt

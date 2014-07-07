@@ -26,12 +26,18 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */

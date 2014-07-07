@@ -23,8 +23,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
  * @Config(
  *      defaultValues={
- *          "grouping"={"groups"={"dictionary"}},
- *          "dictionary"={"virtual_fields"={"iso2Code", "iso3Code", "name"}}
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"iso2Code", "iso3Code", "name"}
+ *          }
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")

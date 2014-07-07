@@ -13,7 +13,7 @@ use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 
 class AttachmentExtension implements ExtendExtensionAwareInterface
 {
-    const ATTACHMENT_TABLE_NAME = 'oro_attachment';
+    const ATTACHMENT_TABLE_NAME = 'oro_attachment_file';
 
     /** @var ExtendExtension */
     protected $extendExtension;
@@ -41,16 +41,18 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
      * @param Schema $schema
      * @param string $sourceTable           Target entity table name
      * @param string $sourceColumnName      A column name is used to show related entity
-     * @param string $type                  attachment OR attachmentImage
+     * @param string $type                  file OR image
+     * @param array  $options               Additional options for relation
      * @param int    $attachmentMaxSize     Max allowed file size in MB
      * @param int    $attachmentThumbWidth  Thumbnail width in PX (used in viewAction)
      * @param int    $attachmentThumbHeight Thumbnail height in PX (used in viewAction)
      */
-    public function addAttachmentRelation(
+    public function addFileRelation(
         Schema $schema,
         $sourceTable,
         $sourceColumnName,
         $type,
+        $options = [],
         $attachmentMaxSize = 1,
         $attachmentThumbWidth = 32,
         $attachmentThumbHeight = 32
@@ -66,19 +68,25 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
             $attachmentScopeOptions['height'] = $attachmentThumbHeight;
         }
 
+        $relationOptions = [
+            'extend' => [
+                'owner'     => ExtendScope::OWNER_SYSTEM,
+                'is_extend' => true
+            ],
+            'attachment' => $attachmentScopeOptions
+        ];
+
+        if (!empty($options)) {
+            $relationOptions = array_merge($relationOptions, $options);
+        }
+
         $this->extendExtension->addManyToOneRelation(
             $schema,
             $entityTable,
             $sourceColumnName,
             self::ATTACHMENT_TABLE_NAME,
             'id',
-            [
-                'extend'     => [
-                    'owner'     => ExtendScope::OWNER_SYSTEM,
-                    'is_extend' => true
-                ],
-                'attachment' => $attachmentScopeOptions
-            ]
+            $relationOptions
         );
 
         $this->extendOptionsManager->setColumnType($sourceTable, $sourceColumnName, $type);
