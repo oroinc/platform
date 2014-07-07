@@ -48,6 +48,7 @@ class UpdateSchemaListenerTest extends WebTestCase
             'oro:cron:import-tracking',
             ['--directory' => $this->directory]
         );
+        $this->assertTrue($this->fs->exists($this->directory));
         $this->assertContains('Logs not found', $result);
     }
 
@@ -65,6 +66,7 @@ class UpdateSchemaListenerTest extends WebTestCase
             'oro:cron:import-tracking',
             ['--directory' => $this->directory]
         );
+        $this->assertFileNotExists($this->directory . DIRECTORY_SEPARATOR . $file);
         $this->assertContains(sprintf('Successful: "%s"', $file), $result);
     }
 
@@ -82,6 +84,7 @@ class UpdateSchemaListenerTest extends WebTestCase
             'oro:cron:import-tracking',
             ['--directory' => $this->directory]
         );
+        $this->assertFileExists($this->directory . DIRECTORY_SEPARATOR . $file);
         $this->assertNotContains(sprintf('Successful: "%s"', $file), $result);
     }
 }
