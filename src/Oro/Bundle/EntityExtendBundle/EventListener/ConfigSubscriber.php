@@ -50,12 +50,17 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Update configs depending on their data and persist
+     * - create relations config data
+     * - update entity and field states
+     * - create index config data
+     *
      * @param PersistConfigEvent $event
      */
     public function persistConfig(PersistConfigEvent $event)
     {
         $eventConfig   = $event->getConfig();
-        $eventConfigId = $event->getConfig()->getId();
+        $eventConfigId = $eventConfig->getId();
         $scope         = $eventConfigId->getScope();
 
         if (!$eventConfigId instanceof FieldConfigId) {
