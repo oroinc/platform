@@ -160,13 +160,16 @@ class ControllersTest extends WebTestCase
 
     public function testAutoCompleteTwoPart()
     {
-        $this->client->request('GET', $this->getUrl('oro_form_autocomplete_search'),
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_form_autocomplete_search'),
             array(
                 'page' => 1,
                 'per_page' => 10,
                 'name' => 'acl_users',
                 'query' => 'John Doe;Oro_Bundle_UserBundle_Entity_User;CREATE;0',
-            ));
+            )
+        );
 
         $result = $this->client->getResponse();
         $arr = $this->getJsonResponseContent($result, 200);

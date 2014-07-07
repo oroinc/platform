@@ -216,26 +216,38 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected function getSearchQueryBuilder($search)
     {
-        $words = explode(' ', $search);
-        if (count($words) == 2) {
-            $searchPart1 = $words[0];
-            $searchPart2 = $words[1];
-            $queryBuilder = $this->em->createQueryBuilder()
-                ->select(['users'])
-                ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
-                ->where('users.firstName like :searchStringPart1 AND users.lastName like :searchStringPart2')
-                ->orWhere('users.firstName like :searchStringPart2 AND users.lastName like :searchStringPart1')
-                ->setParameter('searchStringPart1', $searchPart1 . '%')
-                ->setParameter('searchStringPart2', $searchPart2 . '%');
-        } else {
-            $queryBuilder = $this->em->createQueryBuilder()
-                ->select(['users'])
-                ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
-                ->where('users.firstName like :searchString')
-                ->orWhere('users.lastName like :searchString')
-                ->orWhere('users.username like :searchString')
-                ->setParameter('searchString', $search . '%');
-        }
+        /** @var \Doctrine\ORM\QueryBuilder $queryBuilder */
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder
+            ->select(['users'])
+            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
+            ->add(
+                'where',
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like(
+                        $queryBuilder->expr()->concat(
+                            'users.firstName',
+                            $queryBuilder->expr()->concat(
+                                $queryBuilder->expr()->literal(' '),
+                                'users.lastName'
+                            )
+                        ),
+                        '?1'
+                    ),
+                    $queryBuilder->expr()->like(
+                        $queryBuilder->expr()->concat(
+                            'users.lastName',
+                            $queryBuilder->expr()->concat(
+                                $queryBuilder->expr()->literal(' '),
+                                'users.firstName'
+                            )
+                        ),
+                        '?1'
+                    ),
+                    $queryBuilder->expr()->like('users.username', '?1')
+                )
+            )
+            ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
         return $queryBuilder;
     }
 
