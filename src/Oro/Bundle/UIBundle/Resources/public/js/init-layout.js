@@ -353,7 +353,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                             el.trigger('removesuccess');
                             messenger.addMessage('success', el.data('success-message'));
                             if (el.data('redirect')) {
-                                $.isActive(true);
                                 mediator.execute('redirectTo', {url: el.data('redirect')});
                             } else {
                                 mediator.execute('hideLoading');
