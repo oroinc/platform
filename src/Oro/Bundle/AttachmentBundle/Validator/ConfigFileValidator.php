@@ -50,7 +50,13 @@ class ConfigFileValidator
         /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $configValue            = 'upload_image_mime_types';
+            $mimeTypes = $this->getMimeArray($entityAttachmentConfig->get('mimetypes')) ;
+            if (!$mimeTypes) {
+                $mimeTypes = array_merge(
+                    $this->getMimeArray($this->config->get('oro_attachment.upload_mime_types')),
+                    $this->getMimeArray($this->config->get('oro_attachment.upload_image_mime_types'))
+                );
+            }
         } else {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
             /** @var FieldConfigId $fieldConfigId */
@@ -60,10 +66,11 @@ class ConfigFileValidator
             } else {
                 $configValue = 'upload_image_mime_types';
             }
+            $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
         }
 
         $fileSize  = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
-        $mimeTypes = explode("\n", $this->config->get('oro_attachment.' . $configValue));
+
         foreach ($mimeTypes as $id => $value) {
             $mimeTypes[$id] = trim($value);
         }
@@ -80,5 +87,19 @@ class ConfigFileValidator
                 )
             ]
         );
+    }
+
+    /**
+     * @param string $mimeString
+     * @return array
+     */
+    protected function getMimeArray($mimeString)
+    {
+        $mimeTypes = explode("\n", $mimeString);
+        if (count($mimeTypes) === 1 && $mimeTypes[0] === '') {
+            return '';
+        }
+
+        return $mimeTypes;
     }
 }

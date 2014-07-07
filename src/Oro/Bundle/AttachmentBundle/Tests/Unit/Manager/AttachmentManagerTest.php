@@ -259,4 +259,22 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/css', $this->attachment->getMimeType());
         $this->assertEquals(1024, $this->attachment->getFileSize());
     }
+
+    public function testGetFilteredImageUrl()
+    {
+        $this->attachment->setId(1);
+        $filerName = 'testFilter';
+        $this->attachment->setOriginalFilename('test.doc');
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'oro_filtered_attachment',
+                [
+                    'id' => 1,
+                    'filename' => 'test.doc',
+                    'filter' => $filerName
+                ]
+            );
+        $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
+    }
 }

@@ -29,8 +29,7 @@ class AttachmentGridListener
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-        $datagridParameters = $event->getDatagrid()->getParameters();
-        $fieldName = $datagridParameters->get(self::GRID_PARAM_FIELD_NAME);
+        $fieldName = $event->getDatagrid()->getParameters()->get(self::GRID_PARAM_FIELD_NAME);
 
         $leftJoins = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
         $leftJoins[] = ['join' => 'attachment.' . $fieldName, 'alias' => 'entity'];
@@ -48,7 +47,7 @@ class AttachmentGridListener
         if ($dataSource instanceof OrmDatasource) {
             $parameters = $datagrid->getParameters();
             $queryBuilder = $dataSource->getQueryBuilder();
-            $params = array();
+            $params = [];
 
             foreach ($this->paramsToBind as $fieldName) {
                 $param = $parameters->get($fieldName, null);

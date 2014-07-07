@@ -229,7 +229,7 @@ class Attachment extends ExtendAttachment
 
     public function __toString()
     {
-        return (string) $this->getFile()->getFilename()
+        return $this->getFile() && (string) $this->getFile()->getFilename()
             ? $this->getFile()->getFilename() . ' (' . $this->getFile()->getOriginalFilename() . ')'
             : '';
     }
