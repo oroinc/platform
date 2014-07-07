@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -16,11 +17,6 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 class WorkflowDataSerializeListener
 {
     /**
-     * @var WorkflowAwareSerializer
-     */
-    protected $serializer;
-
-    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
@@ -29,6 +25,21 @@ class WorkflowDataSerializeListener
      * @var string
      */
     protected $format = 'json';
+
+    /**
+     * @var bool
+     */
+    protected $needFlush = false;
+
+    /**
+     * @var WorkflowItem[]
+     */
+    protected $scheduledEntities;
+
+    /**
+     * @var WorkflowAwareSerializer
+     */
+    protected $serializer;
 
     /**
      * Constructor
@@ -50,15 +61,36 @@ class WorkflowDataSerializeListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $unitOfWork = $args->getEntityManager()->getUnitOfWork();
+
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
             if ($this->isSupported($entity)) {
-                $this->serialize($entity, $unitOfWork);
+                $this->scheduledEntities[] = $entity;
             }
         }
 
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
             if ($this->isSupported($entity)) {
-                $this->serialize($entity, $unitOfWork);
+                $this->scheduledEntities[] = $entity;
+            }
+        }
+    }
+
+    /**
+     * @param PostFlushEventArgs $args
+     */
+    public function postFlush(PostFlushEventArgs $args)
+    {
+        if ($this->scheduledEntities) {
+            $this->needFlush = false;
+            $entityManager   = $args->getEntityManager();
+            $unitOfWork      = $entityManager->getUnitOfWork();
+
+            while ($workflowItem = array_shift($this->scheduledEntities)) {
+                $this->serialize($workflowItem, $unitOfWork);
+            }
+
+            if ($this->needFlush) {
+                $entityManager->flush();
             }
         }
     }
@@ -81,13 +113,14 @@ class WorkflowDataSerializeListener
      * Serialize data of WorkflowItem
      *
      * @param WorkflowItem $workflowItem
-     * @param UnitOfWork $uow
+     * @param UnitOfWork   $unitOfWork
      */
-    protected function serialize(WorkflowItem $workflowItem, UnitOfWork $uow)
+    protected function serialize(WorkflowItem $workflowItem, UnitOfWork $unitOfWork)
     {
         $workflowData = $workflowItem->getData();
+
         if ($workflowData->isModified()) {
-            $oldValue = $workflowItem->getSerializedData();
+            $oldSerializedData = $workflowItem->getSerializedData();
 
             $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
 
@@ -95,10 +128,15 @@ class WorkflowDataSerializeListener
             $workflowData = clone $workflowData;
             // entity attribute must not be serialized
             $workflowData->remove($workflowItem->getDefinition()->getEntityAttributeName());
-            $serializedData = $this->serializer->serialize($workflowData, $this->format);
-            $workflowItem->setSerializedData($serializedData);
 
-            $uow->propertyChanged($workflowItem, 'serializedData', $oldValue, $serializedData);
+            $newSerializedData = $this->serializer->serialize($workflowData, $this->format);
+
+            $workflowItem->setSerializedData($newSerializedData);
+
+            if ($newSerializedData != $oldSerializedData) {
+                $unitOfWork->propertyChanged($workflowItem, 'serializedData', $oldSerializedData, $newSerializedData);
+                $this->needFlush = true;
+            }
         }
     }
 

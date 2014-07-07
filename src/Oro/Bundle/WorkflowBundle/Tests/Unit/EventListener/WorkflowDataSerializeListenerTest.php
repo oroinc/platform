@@ -5,11 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener;
 
-class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var WorkflowDataSerializeListener
@@ -73,7 +74,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->listener->postLoad($args);
     }
 
-    public function testOnFlush()
+    public function testOnFlushAndPostFlush()
     {
         $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
@@ -134,36 +135,35 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->serializer->expects($this->at(5))->method('serialize')
             ->with($data4, 'json')->will($this->returnValue($expectedSerializedData4));
 
-        $this->listener->onFlush(
-            new OnFlushEventArgs(
-                $this->getOnFlushEntityManagerMock(
-                    array(
-                        array(
-                            'getScheduledEntityInsertions',
-                            array(),
-                            $this->returnValue(array($entity1, $entity2, $entity3))
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity1, 'serializedData', $entity1->getSerializedData(), $expectedSerializedData1)
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity2, 'serializedData', $entity2->getSerializedData(), $expectedSerializedData2)
-                        ),
-                        array(
-                            'getScheduledEntityUpdates',
-                            array(),
-                            $this->returnValue(array($entity4, $entity5, $entity6))
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity4, 'serializedData', $entity4->getSerializedData(), $expectedSerializedData4)
-                        ),
-                    )
-                )
+        $entityManager = $this->getPostFlushEntityManagerMock(
+            array(
+                array(
+                    'getScheduledEntityInsertions',
+                    array(),
+                    $this->returnValue(array($entity1, $entity2, $entity3))
+                ),
+                array(
+                    'getScheduledEntityUpdates',
+                    array(),
+                    $this->returnValue(array($entity4, $entity5, $entity6))
+                ),
+                array(
+                    'propertyChanged',
+                    array($entity1, 'serializedData', $entity1->getSerializedData(), $expectedSerializedData1)
+                ),
+                array(
+                    'propertyChanged',
+                    array($entity2, 'serializedData', $entity2->getSerializedData(), $expectedSerializedData2)
+                ),
+                array(
+                    'propertyChanged',
+                    array($entity4, 'serializedData', $entity4->getSerializedData(), $expectedSerializedData4)
+                ),
             )
         );
+
+        $this->listener->onFlush(new OnFlushEventArgs($entityManager));
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
 
         $this->assertAttributeEquals($expectedSerializedData1, 'serializedData', $entity1);
         $this->assertAttributeEquals($expectedSerializedData2, 'serializedData', $entity2);
@@ -173,21 +173,19 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $uowExpectedCalls
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\EntityManager
      */
-    protected function getOnFlushEntityManagerMock(array $uowExpectedCalls)
+    protected function getPostFlushEntityManagerMock(array $uowExpectedCalls)
     {
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getUnitOfWork'))
             ->disableOriginalConstructor()
             ->getMock();
 
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->setMethods(array('getScheduledEntityInsertions', 'getScheduledEntityUpdates', 'propertyChanged'))
             ->disableOriginalConstructor()
             ->getMock();
 
-        $em->expects($this->once())->method('getUnitOfWork')->will($this->returnValue($uow));
+        $em->expects($this->exactly(2))->method('getUnitOfWork')->will($this->returnValue($uow));
 
         $index = 0;
         foreach ($uowExpectedCalls as $expectedCall) {
