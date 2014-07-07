@@ -73,7 +73,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'website-grid',
-            ['website-grid[_filter][identifier][value]' => 'unique']
+            ['website-grid[_filter][identifier][value]' => 'unique2']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
