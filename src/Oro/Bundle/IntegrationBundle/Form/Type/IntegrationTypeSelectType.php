@@ -40,12 +40,6 @@ class IntegrationTypeSelectType extends AbstractType
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
         }
 
-        if ($form->getData()) {
-            $vars['attr'] = [
-                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData()]])
-            ];
-        }
-
         $view->vars = array_replace_recursive($view->vars, ['configs' => $options['configs']]);
     }
 

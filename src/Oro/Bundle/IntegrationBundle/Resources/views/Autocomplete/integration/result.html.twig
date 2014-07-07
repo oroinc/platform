@@ -8,15 +8,7 @@
     }
 %>
 <span class="aware-icon-block aware-icon-block-text" <%= background %> ></span>
-<span class="aware-icon-block-text"><%= highlight(text) %></span>
-<% if (data.status) { %>
-    <span class="badge badge-enabled status-enabled">
-        <i class="icon-status-enabled icon-circle"></i>
-        {{ 'oro.integration.integration.enabled.active.label'|trans }}
-    </span>
-<% } else { %>
-    <span class="badge badge-disabled status-disabled">
-        <i class="icon-status-disabled icon-circle"></i>
-        {{ 'oro.integration.integration.enabled.inactive.label'|trans }}
-    </span>
-<% } %>
+<span class="aware-icon-block-text">
+    <%= highlight(text) %>
+    (<% if (data.status) { %>{{ 'oro.integration.integration.enabled.active.label'|trans }}<% } else { %>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}<% } %>)
+</span>
