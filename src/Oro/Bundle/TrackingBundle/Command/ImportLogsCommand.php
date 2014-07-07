@@ -49,6 +49,16 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
             ->getContainer()
             ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
 
+        if (!$fs->exists($directory)) {
+            $fs->mkdir($directory);
+
+            $output->writeln(
+                sprintf('<info>Logs not found</info>', $directory)
+            );
+
+            return;
+        }
+
         $finder
             ->files()
             ->notName($this->getIgnoredFilename())
