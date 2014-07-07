@@ -123,7 +123,7 @@ class SearchHandler implements SearchHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function search($query, $page, $perPage)
+    public function search($query, $page, $perPage, $searchById = false)
     {
         $this->checkAllDependenciesInjected();
 
@@ -134,6 +134,10 @@ class SearchHandler implements SearchHandlerInterface
 
         if ($query == '') {
             $items = $this->manager->getRepository($this->entityName)->findBy(array(), null, $perPage, $firstResult);
+        } elseif ($searchById) {
+            $items = array(
+                $this->manager->getRepository($this->entityName)->find($query, null, $perPage, $firstResult)
+            );
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }

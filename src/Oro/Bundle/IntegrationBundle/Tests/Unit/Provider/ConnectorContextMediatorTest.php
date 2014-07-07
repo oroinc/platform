@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\DependencyInjection\Container;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -70,11 +70,11 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
      */
     public function transportSourceProvider()
     {
-        $channel = new Channel();
-        $channel->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $integration = new Integration();
+        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
         return [
             'bad source exception expected' => [false, '\LogicException'],
-            'channel given'                 => [$channel]
+            'channel given'                 => [$integration]
         ];
     }
 
@@ -82,15 +82,15 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
     {
         $testID        = 1;
         $testTransport = new \stdClass();
-        $channel       = new Channel();
-        $channel->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $integration   = new Integration();
+        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
 
         $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())->method('getOption')->with('channel')
             ->will($this->returnValue($testID));
 
         $this->repo->expects($this->once())->method('getOrLoadById')->with($testID)
-            ->will($this->returnValue($channel));
+            ->will($this->returnValue($integration));
 
         $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
             ->will($this->returnValue($testTransport));
@@ -101,18 +101,18 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChannelFromContext()
     {
-        $testID  = 1;
-        $channel = new Channel();
-        $channel->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
+        $testID      = 1;
+        $integration = new Integration();
+        $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
 
         $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())->method('getOption')->with('channel')
             ->will($this->returnValue($testID));
 
         $this->repo->expects($this->once())->method('getOrLoadById')->with($testID)
-            ->will($this->returnValue($channel));
+            ->will($this->returnValue($integration));
 
         $result = $this->contextMediator->getChannel($context);
-        $this->assertEquals($channel, $result);
+        $this->assertEquals($integration, $result);
     }
 }

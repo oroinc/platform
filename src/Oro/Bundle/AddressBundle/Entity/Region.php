@@ -10,6 +10,7 @@ use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Region
@@ -21,7 +22,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
  * @Config(
  *      defaultValues={
- *          "grouping"={"groups"={"dictionary"}}
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          }
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")
@@ -38,6 +41,13 @@ class Region implements Translatable
      * @JMS\Type("string")
      * @JMS\SerializedName("combinedCode")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $combinedCode;
 

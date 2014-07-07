@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,6 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -69,14 +69,14 @@ class MultipleEntityType extends AbstractType
                     foreach (explode(',', $data['added']) as $id) {
                         $entity = $repository->find($id);
                         if ($entity) {
-                            $targetData->{Inflector::camelize('add_' . $fieldName)}($entity);
+                            FieldAccessor::addValue($targetData, $fieldName, $entity);
                         }
                     }
 
                     foreach (explode(',', $data['removed']) as $id) {
                         $entity = $repository->find($id);
                         if ($entity) {
-                            $targetData->{Inflector::camelize('remove_' . $fieldName)}($entity);
+                            FieldAccessor::removeValue($targetData, $fieldName, $entity);
                         }
                     }
                 }

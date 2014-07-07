@@ -2,6 +2,9 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% set buttonsPlaceholderData = {} %}
+{% if entity_class is defined %}
+    {% set buttonsPlaceholderData = {'entity_class': entity_class} %}
+{% endif %}
 {% block content %}
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">

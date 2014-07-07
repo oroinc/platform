@@ -10,11 +10,10 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\QueryBuilderAwareInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 
-class ExportProcessor implements ProcessorInterface, ContextAwareInterface
+class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
 {
     /**
      * @var ContextInterface
@@ -27,9 +26,14 @@ class ExportProcessor implements ProcessorInterface, ContextAwareInterface
     protected $serializer;
 
     /**
-     * @var DataConverterInterface
+     * @var DataConverterInterface|EntityNameAwareInterface|ContextAwareInterface|QueryBuilderAwareInterface
      */
     protected $dataConverter;
+
+    /**
+     * @var string
+     */
+    protected $entityName;
 
     /**
      * Processes entity to export format
@@ -95,5 +99,17 @@ class ExportProcessor implements ProcessorInterface, ContextAwareInterface
     public function setDataConverter(DataConverterInterface $dataConverter)
     {
         $this->dataConverter = $dataConverter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEntityName($entityName)
+    {
+        $this->entityName = $entityName;
+
+        if ($this->dataConverter && $this->dataConverter instanceof EntityNameAwareInterface) {
+            $this->dataConverter->setEntityName($this->entityName);
+        }
     }
 }

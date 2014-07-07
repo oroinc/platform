@@ -17,6 +17,7 @@ parameters:
     oro_workflow.action.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
     oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
+    oro_workflow.action.traverse.class: Oro\Bundle\WorkflowBundle\Model\Action\Traverse
 
 services:
     oro_workflow.action_factory:
@@ -145,3 +146,11 @@ services:
             - @oro_locale.formatter.name
         tags:
             - { name: oro_workflow.action, alias: format_name }
+
+    oro_workflow.action.traverse:
+        class: %oro_workflow.action.traverse.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_workflow.action.configurable
+        tags:
+            - { name: oro_workflow.action, alias: traverse|foreach }

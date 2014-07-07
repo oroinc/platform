@@ -22,6 +22,10 @@ that will contains `type` key, it's should be unique.
             - { name: oro_integration.channel, type: presta_shop }
 ```
 
+Integration type might also bring icon that will be shown in type selector. For this purposes type class should implements
+`Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface` and method `getIcon()` should return valid path to image
+for symfony assets helper.
+
 ##Transport definition
 
 Responsibility of **transport** is communicate connector and channel, it should perform read/write operations to third

@@ -47,6 +47,8 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
         'float',
         'money',
         'percent',
+        'file',
+        'image',
         'oneToMany',
         'manyToOne',
         'manyToMany',

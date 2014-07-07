@@ -127,7 +127,9 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_user.entity.class')
+        );
     }
 
     /**
@@ -203,16 +205,6 @@ class UserController extends Controller
     protected function getBusinessUnitManager()
     {
         return $this->get('oro_organization.business_unit_manager');
-    }
-
-    /**
-     * @Route("/widget/emails/{id}", name="oro_user_widget_emails", requirements={"id"="\d+"})
-     * @Template
-     * @AclAncestor("oro_email_view")
-     */
-    public function emailsAction(User $user)
-    {
-        return array('entity' => $user);
     }
 
     /**

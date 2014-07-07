@@ -11,6 +11,7 @@ use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Country
@@ -22,8 +23,12 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
  * @Config(
  *      defaultValues={
- *          "grouping"={"groups"={"dictionary"}},
- *          "dictionary"={"virtual_fields"={"iso2Code", "iso3Code", "name"}}
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"iso2Code", "iso3Code", "name"}
+ *          }
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")
@@ -38,6 +43,13 @@ class Country implements Translatable
      * @JMS\Type("string")
      * @JMS\SerializedName("iso2code")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $iso2Code;
 

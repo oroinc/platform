@@ -11,7 +11,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class AttributeGuesser
