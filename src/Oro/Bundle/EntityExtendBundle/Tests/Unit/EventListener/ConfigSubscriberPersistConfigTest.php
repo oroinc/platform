@@ -12,11 +12,12 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ConfigSubscriber */
     protected $configSubscriber;
 
+    /** @var PersistConfigEvent */
     protected $event;
 
     public function testGetSubscribedEvents()
@@ -34,11 +35,37 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new field (entity state is 'NEW')
-     *  Nothing should be persisted
-     *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
+     * Test that persistConfig called with event
+     * that has config id something other than FieldConfigId
      */
-    public function testPersistConfigScopeExtendNewFieldNewEntity()
+    public function testWrongConfigId()
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->never())
+            ->method($this->anything());
+
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->never())
+            ->method($this->anything());
+
+        $entityConfigId = new EntityConfigId('extend', 'TestClass');
+        $eventConfig    = new Config($entityConfigId);
+
+        $event = new PersistConfigEvent($eventConfig, $configManager);
+        $configSubscriber = new ConfigSubscriber($configProvider);
+
+        $configSubscriber->persistConfig($event);
+    }
+
+    /**
+     *  Test create new field (entity state is 'NEW', owner - Custom)
+     *  Nothing should be persisted
+     */
+    public function testScopeExtendNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -56,7 +83,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfigScopeExtendNewFieldActiveEntity()
+    public function testScopeExtendNewFieldActiveEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -77,15 +104,18 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test update active field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfigScopeExtendActiveFieldActiveEntity()
+    public function testScopeExtendActiveFieldActiveEntity()
     {
+        $eventConfig = $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]);
         $this->runPersistConfig(
-            $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]),
+            $eventConfig,
             $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
             [
                 'length' => [0 => 255, 1 => 200]
             ]
         );
+
+        $this->assertEquals(ExtendScope::STATE_UPDATED, $eventConfig->get('state'));
 
         /** @var ConfigManager $cm */
         $cm = $this->event->getConfigManager();
@@ -112,7 +142,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [1:*])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationOneToMany()
+    public function testScopeExtendRelationTypeCreateSelfRelationOneToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -164,7 +194,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:1])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToOne()
+    public function testScopeExtendRelationTypeCreateSelfRelationManyToOne()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -211,12 +241,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:*])
      */
-    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToMany()
+    public function testScopeExtendRelationTypeCreateSelfRelationManyToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 [
-                    'state' => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'manyToMany'
@@ -261,10 +290,77 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new relation field to own entity
+     * Test create new field (relation type [*:*])
+     */
+    public function testScopeExtendRelationTypeCreateTargetRelationManyToMany()
+    {
+        $relationKey   = 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName';
+        $this->runPersistConfig(
+            $this->getEventConfigNewField(
+                [
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_title'    => ['username'],
+                    'target_grid'     => ['username'],
+                    'target_detailed' => ['username'],
+                    'relation_key'    => $relationKey,
+                ],
+                'manyToMany'
+            ),
+            $this->getEntityConfig(
+                [
+                    'state' => ExtendScope::STATE_ACTIVE,
+                    'relation'    => [
+                        'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                            'assign'          => true,
+                            'owner'           => true,
+                            'target_entity'   => 'TestClass',
+                            'field_id'        => new FieldConfigId(
+                                'extend',
+                                'TestClass',
+                                'testFieldName',
+                                'manyToMany'
+                            )
+                        ]
+                    ],
+                ]
+            ),
+            ['state' => [0 => ExtendScope::STATE_ACTIVE, 1 => ExtendScope::STATE_UPDATED ]]
+        );
+
+        /** @var ConfigManager $cm */
+        $cm = $this->event->getConfigManager();
+
+        $this->assertAttributeEquals(
+            [
+                'extend_TestClass' => $this->getEntityConfig(
+                    [
+                        'state'    => ExtendScope::STATE_UPDATED,
+                        'relation' => [
+                            'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                                'assign'          => true,
+                                'field_id'        => new FieldConfigId(
+                                    'extend',
+                                    'TestClass',
+                                    'testFieldName',
+                                    'manyToMany'
+                                ),
+                                'owner'           => true,
+                                'target_entity'   => 'TestClass',
+                            ]
+                        ]
+                    ]
+                )
+            ],
+            'persistConfigs',
+            $cm
+        );
+    }
+
+    /**
+     *  Test create new 1:* relation field to same entity
      *  Should NOT be persisted
      */
-    public function testPersistConfigScopeExtendRelationTypeOwnEntity()
+    public function testScopeExtendRelationTypeOwnEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'oneToMany'),
@@ -295,7 +391,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field should be added to index
      */
-    public function testPersistConfigScopeDataGridNewFieldNewEntity()
+    public function testScopeDataGridNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'integer', 'datagrid'),
@@ -315,10 +411,26 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field type 'text' should NOT be added to index
      */
-    public function testPersistConfigScopeDataGridNewFieldNewEntityNot()
+    public function testScopeDataGridNewFieldNewEntityNot()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'text', 'datagrid'),
+            $this->getEntityConfig(),
+            ['is_visible' => [0 => null, 1 => true]]
+        );
+
+        /** @var ConfigManager $cm */
+        $cm = $this->event->getConfigManager();
+        $this->assertAttributeEquals(null, 'persistConfigs', $cm);
+    }
+
+    /**
+     *  Field type 'text' should NOT be added to index, it's not extend
+     */
+    public function testScopeDataGridNewFieldNewEntityNotExtend()
+    {
+        $this->runPersistConfig(
+            $this->getEventConfigNewField(['is_extend' => false, 'extend' => false], 'string', 'datagrid'),
             $this->getEntityConfig(),
             ['is_visible' => [0 => null, 1 => true]]
         );
@@ -334,6 +446,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      * @param array $values
      * @param string $type
      * @param string $scope
+     *
      * @return Config
      */
     protected function getEventConfigNewField($values = [], $type = 'string', $scope = 'extend')
