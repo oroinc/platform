@@ -118,7 +118,7 @@ class UserAclHandler implements SearchHandlerInterface
             $user = $this->getSecurityContext()->getToken()->getUser();
             $queryBuilder = $this->getSearchQueryBuilder($search);
             $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
-            if((boolean) $excludeCurrentUser){
+            if ((boolean) $excludeCurrentUser) {
                 $this->excludeUser($queryBuilder, $user);
             }
             $results = $queryBuilder->getQuery()->getResult();
@@ -260,6 +260,13 @@ class UserAclHandler implements SearchHandlerInterface
         return $this->securityContextLink->getService();
     }
 
+
+    /**
+     * Adds a condition excluding user from the list
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param UserInterface $user
+     */
     protected function excludeUser(QueryBuilder $queryBuilder, UserInterface $user)
     {
         $queryBuilder->andWhere('users.id != :userId');
