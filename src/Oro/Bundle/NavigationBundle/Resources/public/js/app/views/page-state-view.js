@@ -80,7 +80,7 @@ define([
             $.get(url).done(function (data) {
                 var attributes;
                 attributes = {
-                    pageId: data.pagestate.pageId ? data.pagestate.pageId : self._combinePageId(),
+                    pageId: data.pagestate.pageId || self._combinePageId(),
                     data: self._restore ? '' : data.pagestate.data
                 };
                 if (data.id) {
@@ -147,7 +147,10 @@ define([
             }
 
             this.model.set(attributes, options);
-            this._restoreState();
+            if (this.model.get('restore')) {
+                this._restoreState();
+                this.model.set('restore', false);
+            }
             this.$el.on('change.page-state', _.bind(this._collectState, this));
         },
 
