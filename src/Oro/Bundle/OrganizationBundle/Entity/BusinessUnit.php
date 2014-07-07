@@ -20,18 +20,20 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-building"},
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-building"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          }
  *      }
- *  }
  * )
  */
 class BusinessUnit implements NotificationEmailInterface

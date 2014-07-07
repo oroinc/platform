@@ -1,0 +1,38 @@
+parameters:
+    oro_entity_extend.entity_metadata_builder.class:            Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder
+    oro_entity_extend.entity_metadata_builder.relations.class:  Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder
+    oro_entity_extend.entity_metadata_builder.indices.class:    Oro\Bundle\EntityExtendBundle\ORM\IndexMetadataBuilder
+    oro_entity_extend.listener.entity_listener.class:           Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
+
+services:
+    oro_entity_extend.entity_metadata_builder:
+        class: %oro_entity_extend.entity_metadata_builder.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+
+    oro_entity_extend.link.entity_metadata_builder:
+        tags:
+            - { name: oro_service_link, service: oro_entity_extend.entity_metadata_builder }
+
+    oro_entity_extend.entity_metadata_builder.relations:
+        class: %oro_entity_extend.entity_metadata_builder.relations.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_extend.db_id_name_generator
+        tags:
+            - { name: oro_entity_extend.entity_metadata_builder, priority: 10 }
+
+    oro_entity_extend.entity_metadata_builder.indices:
+        class: %oro_entity_extend.entity_metadata_builder.indices.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_extend.db_id_name_generator
+        tags:
+            - { name: oro_entity_extend.entity_metadata_builder, priority: 20 }
+
+    oro_entity_extend.listener.entity_listener:
+        class: %oro_entity_extend.listener.entity_listener.class%
+        arguments:
+            - @oro_entity_extend.link.entity_metadata_builder
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }

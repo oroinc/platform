@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -28,43 +29,44 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('show_pin_button_on_start_page')
                 ->defaultValue(true)
             ->end()
-            ->arrayNode('placeholders_items')
+            ->arrayNode('placeholders')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
-                        ->append($this->getPlaceholderItemsConfigTree())
+                        ->append($this->getPlaceholdersConfigTree())
                     ->end()
                 ->end()
             ->end()
+            ->append($this->getPlaceholderItemsConfigTree())
         ->end();
 
         SettingsBuilder::append(
             $rootNode,
-            array(
-                'application_name' => array(
+            [
+                'application_name' => [
                     'value' => 'ORO',
-                    'type' => 'scalar'
-                ),
-                'application_title' => array(
+                    'type'  => 'scalar'
+                ],
+                'application_title' => [
                     'value' => 'ORO Business Application Platform',
-                    'type' => 'scalar'
-                ),
-                'navbar_position' => array(
+                    'type'  => 'scalar'
+                ],
+                'navbar_position' => [
                     'value' => 'top',
-                    'type' => 'scalar'
-                ),
-            )
+                    'type'  => 'scalar'
+                ],
+            ]
         );
 
         return $treeBuilder;
     }
 
     /**
-     * Builds the configuration tree for placeholder items
+     * Builds the configuration tree for placeholders
      *
      * @return NodeDefinition
      */
-    protected function getPlaceholderItemsConfigTree()
+    protected function getPlaceholdersConfigTree()
     {
         $builder = new TreeBuilder();
         $node    = $builder->root('items');
@@ -75,16 +77,47 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->append($this->getRemoveAttributeConfigTree())
                 ->integerNode('order')->defaultValue(0)->end()
-                ->scalarNode('applicable')->end()
-                ->scalarNode('action')->end()
-                ->scalarNode('template')->end()
             ->end()
             ->validate()
-                // remove all items with remove=TRUE or if neither 'action' nor 'template' attribute is not specified
+                // remove all items with remove=TRUE
                 ->ifTrue(
                     function ($v) {
-                        return (isset($v['remove']) && $v['remove'])
-                            || (empty($v['action']) && empty($v['template']));
+                        return (isset($v['remove']) && $v['remove']);
+                    }
+                )
+                ->thenUnset()
+            ->end();
+
+        $this->addItemsSorting($node);
+
+        return $node;
+    }
+
+    /**
+     * Builds the configuration tree for placeholder items
+     *
+     * @return NodeDefinition
+     */
+    protected function getPlaceholderItemsConfigTree()
+    {
+        $builder = new TreeBuilder();
+        $node    = $builder->root('placeholder_items');
+
+        $node
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+            ->children()
+                ->scalarNode('applicable')->end()
+                ->scalarNode('acl')->end()
+                ->scalarNode('action')->end()
+                ->scalarNode('template')->end()
+                ->variableNode('data')->end()
+            ->end()
+            ->validate()
+                // remove all items if neither 'action' nor 'template' attribute is not specified
+                ->ifTrue(
+                    function ($v) {
+                        return (empty($v['action']) && empty($v['template']));
                     }
                 )
                 ->thenUnset()
@@ -98,8 +131,6 @@ class Configuration implements ConfigurationInterface
                 )
                 ->thenInvalid('Only one either "action" or "template" attribute can be defined. %s')
             ->end();
-
-        $this->addItemsSorting($node);
 
         return $node;
     }
@@ -153,23 +184,8 @@ class Configuration implements ConfigurationInterface
      */
     protected function sortItems($items)
     {
-        uasort(
-            $items,
-            function ($a, $b) {
-                if ($a['order'] === $b['order']) {
-                    return 0;
-                }
+        ArrayUtils::sortBy($items, false, 'order');
 
-                return ($a['order'] < $b['order']) ? -1 : 1;
-            }
-        );
-
-        $result = array();
-        foreach ($items as $name => $item) {
-            $item['name'] = $name;
-            $result[] = $item;
-        }
-
-        return $result;
+        return array_keys($items);
     }
 }

@@ -13,19 +13,27 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository")
  * @ORM\Table(name="oro_calendar")
  * @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-calendar"},
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "permissions"="VIEW",
- *          "group_name"=""
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-calendar"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Calendar
