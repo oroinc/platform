@@ -86,8 +86,6 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-
-        $this->assertContains('nameUP - Websites - Marketing', $result->getContent());
     }
 
     /**
@@ -99,6 +97,5 @@ class TrackingWebsiteControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('unique2', $result->getContent());
-        $this->assertContains('Websites - Marketing', $result->getContent());
     }
 }
