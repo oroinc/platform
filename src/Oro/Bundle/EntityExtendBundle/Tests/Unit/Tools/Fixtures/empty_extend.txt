@@ -1,0 +1,8 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    public function __construct()
+    {
+    }
+}

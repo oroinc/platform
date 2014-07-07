@@ -89,14 +89,6 @@ Login: Login
 "Remove role": "Remove role"
 "Template controller": "Template controller"
 oro:
-    dashboard:
-        recent_emails:
-            title:       Recent Emails
-            inbox:       Inbox
-            sent:        Sent
-            view_all:    View All
-            description: This widget allows you to see most recent additions to your inbox and outbox
-
     user:
         menu:
             system_tab.label: System
@@ -139,7 +131,7 @@ oro:
         entity_plural_label:         Users
         first_name.label:            First name
         id.label:                    Id
-        image.label:                 Avatar
+        avatar.label:                Avatar
         imap_configuration.label:    Email synchronization settings
         last_login.label:            Last logged in
         last_name.label:             Last name

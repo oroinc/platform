@@ -14,12 +14,18 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  * @ORM\Table("oro_notification_email_notif")
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository")
  * @Config(
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class EmailNotification

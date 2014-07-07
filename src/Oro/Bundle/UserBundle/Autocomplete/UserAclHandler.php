@@ -6,8 +6,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -18,7 +18,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 /**
- * Autocomplite search handler for users with ACL access level protection
+ * Autocomplete search handler for users with ACL access level protection
  *
  * Class UserAclHandler
  * @package Oro\Bundle\UserBundle\Autocomplete
@@ -32,9 +32,9 @@ class UserAclHandler implements SearchHandlerInterface
     protected $em;
 
     /**
-     * @var CacheManager
+     * @var AttachmentManager
      */
-    protected $cache;
+    protected $attachmentManager;
 
     protected $className;
 
@@ -70,7 +70,7 @@ class UserAclHandler implements SearchHandlerInterface
 
     /**
      * @param ObjectManager $em
-     * @param CacheManager $cache
+     * @param AttachmentManager $attachmentManager
      * @param $className
      * @param $fields
      * @param ServiceLink $securityContextLink
@@ -79,7 +79,7 @@ class UserAclHandler implements SearchHandlerInterface
      */
     public function __construct(
         ObjectManager $em,
-        CacheManager $cache,
+        AttachmentManager $attachmentManager,
         $className,
         $fields,
         ServiceLink $securityContextLink,
@@ -87,7 +87,7 @@ class UserAclHandler implements SearchHandlerInterface
         AclVoter $aclVoter = null
     ) {
         $this->em = $em;
-        $this->cache = $cache;
+        $this->attachmentManager = $attachmentManager;
         $this->className = $className;
         $this->fields = $fields;
         $this->aclVoter = $aclVoter;
@@ -96,9 +96,9 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function search($query, $page, $perPage)
+    public function search($query, $page, $perPage, $searchById = false)
     {
 
         list ($search, $entityClass, $permission, $entityId) = explode(';', $query);
@@ -135,7 +135,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getProperties()
     {
@@ -143,7 +143,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getEntityName()
     {
@@ -159,7 +159,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function convertItem($user)
     {
@@ -169,9 +169,12 @@ class UserAclHandler implements SearchHandlerInterface
         }
         $result['avatar'] = null;
 
-        $imagePath = $this->getPropertyValue('imagePath', $user);
-        if ($imagePath) {
-            $result['avatar'] = $this->cache->getBrowserPath($imagePath, UserSearchHandler::IMAGINE_AVATAR_FILTER);
+        $avatar = $this->getPropertyValue('avatar', $user);
+        if ($avatar) {
+            $result['avatar'] = $this->attachmentManager->getFilteredImageUrl(
+                $avatar,
+                UserSearchHandler::IMAGINE_AVATAR_FILTER
+            );
         }
 
         if (!$this->nameFormatter) {

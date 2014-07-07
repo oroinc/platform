@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
 
@@ -37,7 +38,8 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->fieldProvider = $this->prepareFieldProvider();
         $this->configProvider = $this->prepareConfigProvider();
-        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider);
+
+        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider, new FieldTypeHelper());
     }
 
     /**

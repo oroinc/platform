@@ -9,6 +9,7 @@ oro:
             label: Export
 
         entity_config:
+            block_title:    "Import & Export"
             excluded.label: "Exclude Column"
             full.label:     "Export Fields"
             header.label:   "Column Name"
@@ -21,7 +22,7 @@ oro:
             label:          Import
             success:        "File was successful imported."
             entity:         Import %entityName%
-            tempate:        Import Data Template
+            tempate:        Download Data Template
 
 "Identity only": "Identity only"
 "All": "All"

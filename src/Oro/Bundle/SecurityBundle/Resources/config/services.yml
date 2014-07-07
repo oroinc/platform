@@ -113,7 +113,6 @@ services:
         public: false
         class: %oro_security.acl.extension.entity.class%
         arguments:
-            - @oro_entity.orm.entity_class_accessor
             - @oro_security.acl.object_id_accessor
             - @oro_entity.orm.entity_class_resolver
             - @oro_security.entity_security_metadata_provider
@@ -176,7 +175,6 @@ services:
         class: %oro_security.owner.decision_maker.class%
         arguments:
             - @oro_security.ownership_tree_provider
-            - @oro_entity.orm.entity_class_accessor
             - @oro_security.acl.object_id_accessor
             - @oro_security.owner.entity_owner_accessor
             - @oro_security.owner.ownership_metadata_provider

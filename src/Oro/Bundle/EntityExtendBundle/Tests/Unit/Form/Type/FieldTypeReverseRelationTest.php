@@ -49,6 +49,8 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
         'float',
         'money',
         'percent',
+        'file',
+        'image',
         'oneToMany',
         'manyToOne',
         'manyToMany',

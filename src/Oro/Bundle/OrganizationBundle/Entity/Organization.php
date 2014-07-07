@@ -15,12 +15,15 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  * @ORM\Table(name="oro_organization")
  * @ORM\Entity
  * @Config(
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "form"={
+ *              "form_type"="oro_organization_select"
+ *          }
  *      }
- *  }
  * )
  */
 class Organization implements NotificationEmailInterface
