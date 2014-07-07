@@ -52,9 +52,7 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
         if (!$fs->exists($directory)) {
             $fs->mkdir($directory);
 
-            $output->writeln(
-                sprintf('<info>Logs not found</info>', $directory)
-            );
+            $output->writeln('<info>Logs not found</info>');
 
             return;
         }
