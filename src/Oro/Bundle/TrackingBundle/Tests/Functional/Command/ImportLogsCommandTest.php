@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\TrackingBundle\Tests\Functional\Command;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+/**
+ * @dbIsolation
+ */
 class UpdateSchemaListenerTest extends WebTestCase
 {
     /**
@@ -17,32 +21,33 @@ class UpdateSchemaListenerTest extends WebTestCase
      */
     protected $directory;
 
+    /**
+     * @var string
+     */
+    protected $logsDir;
+
     protected function setUp()
     {
         $this->initClient();
 
         $this->fs = new Filesystem();
 
-        $this->directory = $this
-                ->getContainer()
-                ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
-
+        $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . time();
     }
 
     protected function tearDown()
     {
-        if (!$this->fs->exists($this->directory)) {
-            $this->fs->mkdir($this->directory);
-        }
+        $this->fs->remove($this->directory);
     }
 
     public function testDirectoryEmpty()
     {
-        if ($this->fs->exists($this->directory)) {
-            $this->fs->remove($this->directory);
-        }
+        $this->assertFalse($this->fs->exists($this->directory));
 
-        $result = $this->runCommand('oro:cron:import-tracking');
+        $result = $this->runCommand(
+            'oro:cron:import-tracking',
+            ['--directory' => $this->directory]
+        );
         $this->assertContains('Logs not found', $result);
     }
 
@@ -56,7 +61,10 @@ class UpdateSchemaListenerTest extends WebTestCase
             json_encode(['prop' => 'value'])
         );
 
-        $result = $this->runCommand('oro:cron:import-tracking');
+        $result = $this->runCommand(
+            'oro:cron:import-tracking',
+            ['--directory' => $this->directory]
+        );
         $this->assertContains(sprintf('Successful: "%s"', $file), $result);
     }
 
@@ -70,7 +78,10 @@ class UpdateSchemaListenerTest extends WebTestCase
             json_encode(['prop' => 'value'])
         );
 
-        $result = $this->runCommand('oro:cron:import-tracking');
+        $result = $this->runCommand(
+            'oro:cron:import-tracking',
+            ['--directory' => $this->directory]
+        );
         $this->assertNotContains(sprintf('Successful: "%s"', $file), $result);
     }
 }
