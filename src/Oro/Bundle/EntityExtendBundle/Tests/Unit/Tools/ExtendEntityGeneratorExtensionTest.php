@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension;
 
 class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {

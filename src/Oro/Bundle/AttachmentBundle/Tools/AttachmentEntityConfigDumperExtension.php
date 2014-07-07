@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;

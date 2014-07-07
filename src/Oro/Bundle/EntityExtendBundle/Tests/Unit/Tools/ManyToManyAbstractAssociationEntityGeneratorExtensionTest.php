@@ -6,7 +6,7 @@ use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +19,7 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
     public function setUp()
     {
         $this->extension = $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension',
+            'Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension',
             [],
             '',
             true,

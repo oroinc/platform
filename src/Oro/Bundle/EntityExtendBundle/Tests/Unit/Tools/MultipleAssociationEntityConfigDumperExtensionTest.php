@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
@@ -157,7 +157,7 @@ class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framew
     protected function getExtensionMock(array $methods = [])
     {
         return $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationEntityConfigDumperExtension',
+            'Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension',
             [$this->configManager, $this->associationBuilder],
             '',
             true,

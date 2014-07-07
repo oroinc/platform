@@ -17,7 +17,7 @@ parameters:
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
-    oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension
+    oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
 
