@@ -23,15 +23,15 @@
                 </div>
                 <script type="text/javascript">
                     require(['jquery'],
-                        function($){
-                            $(function() {
-                                $(document).on('click', '#{{ buttonId }}', function() {
-                                    $('#{{ divId }}').hide();
-                                    $('#{{ inputId }}').val('true');
-                                    return false;
-                                });
+                    function($){
+                        $(function() {
+                            $(document).on('click', '#{{ buttonId }}', function() {
+                                $('#{{ divId }}').hide();
+                                $('#{{ inputId }}').val('true');
+                                return false;
                             });
                         });
+                    });
                 </script>
             {% endif %}
         {% endif %}
