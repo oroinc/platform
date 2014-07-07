@@ -4,9 +4,15 @@
             require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
             function(_, __, widgetManager, messenger, mediator) {
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    {% if update is defined and update %}
+                    messenger.notificationFlashMessage('success', __('Attachment updated successfully'));
+                    mediator.trigger('datagrid:doRefresh:' + 'attachment-grid');
+                    {% else %}
                     messenger.notificationFlashMessage('success', __('Attachment created successfully'));
-                    mediator.trigger('widget_success:' + widget.getAlias());
+                    {% endif %}
+
                     mediator.trigger('widget_success:' + widget.getWid());
+
                     widget.remove();
                 });
             });

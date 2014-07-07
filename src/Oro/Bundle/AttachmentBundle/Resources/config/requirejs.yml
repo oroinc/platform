@@ -1,0 +1,4 @@
+config:
+    paths:
+        'orodatagrid/js/datagrid/action/dialog-action': 'bundles/oroattachment/js/datagrid/action/dialog-action.js'
+

@@ -17,6 +17,8 @@ parameters:
     oro_attachment.placeholder.filter.class:              Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
     oro_attachment.attachment_grid_listener:              Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
 
+    oro_attachment.datagrid.action.dialog.class:        Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
@@ -89,3 +91,12 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
+
+    #
+    #Datagrid
+    #
+    oro_attachment.datagrid.action.dialog:
+        class: %oro_attachment.datagrid.action.dialog.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: dialog }

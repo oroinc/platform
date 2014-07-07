@@ -43,7 +43,9 @@ oro:
             upload_image_mime_types.label: Image mime types
 
         action:
-            add:                 Add Attachment
+            add:                 Add attachment
+            update:              Update attachment
+            saved:               Attachment saved successfully
 
     entity_extend:
         form:
