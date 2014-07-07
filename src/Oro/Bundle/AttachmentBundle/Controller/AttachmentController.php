@@ -90,23 +90,32 @@ class AttachmentController extends Controller
         $form = $this->createForm(
             new AttachmentType(),
             $attachment,
-            ['parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()), 'checkEmptyFIle' => false]
+            [
+                'parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()),
+                'checkEmptyFIle' => false
+            ]
         );
-        return $this->update($form, $formAction);
+        return $this->update($form, $formAction, true);
     }
 
     /**
      * @param FormInterface $form
      * @param string $formAction
+     * @param bool $update
      *
      * @return array
      */
-    protected function update(FormInterface $form, $formAction)
+    protected function update(FormInterface $form, $formAction, $update = false)
     {
+        $entity = $form->getData();
         $responseData = [
-            'entity' => $form->getData(),
+            'entity' => $entity,
             'saved' => false
         ];
+
+        if ($update) {
+            $responseData['update'] = true;
+        }
 
         if ($this->get('oro_attachment.form.handler.attachment')->process($form)) {
             $responseData['saved'] = true;
