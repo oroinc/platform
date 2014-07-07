@@ -91,7 +91,7 @@ class EntityToIdTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        if (null === $value) {
+        if ('' === $value || null === $value) {
             return null;
         }
 

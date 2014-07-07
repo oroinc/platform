@@ -48,7 +48,6 @@ services:
     oro_integration.form.type.channel:
         class: %oro_integration.form.type.channel.class%
         arguments:
-            - @oro_integration.manager.types_registry
             - @oro_integration.form.subscriber.default_user_owner_subscriber
             - @oro_integration.form.subscriber.channel_subscriber
             - @oro_integration.form.subscriber.organization_subscriber
@@ -59,7 +58,6 @@ services:
         class: %oro_integration.form.type.oro_integration_type_select.class%
         arguments:
             - @oro_integration.manager.types_registry
-            - @translator
             - @templating.helper.assets
         scope: request
         tags:
@@ -69,6 +67,9 @@ services:
         class: %oro_integration.form.type.oro_integration_select.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_integration.manager.types_registry
+            - @templating.helper.assets
+        scope: request
         tags:
             - { name: form.type, alias: oro_integration_select }
 
