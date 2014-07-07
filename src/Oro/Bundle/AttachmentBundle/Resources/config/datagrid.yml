@@ -46,11 +46,22 @@ datagrid:
                 params:     [ id ]
         actions:
             update:
-                type:          navigate
+                type:          dialog
                 acl_resource:  oro_attachment_update
                 label:         Update
                 icon:          edit
                 link:          update_link
+                widget:
+                    reload-grid-name: attachment-grid
+                    options:
+                        dialogOptions:
+                            title: Update attachment
+                            width: 550
+                            allowMaximize: false
+                            allowMinimize: false
+                            maximizedHeightDecreaseBy: minimize-bar
+                messages:
+                    saved: oro.attachment.action.saved
             delete:
                 type:          delete
                 acl_resource:  oro_attachment_delete
