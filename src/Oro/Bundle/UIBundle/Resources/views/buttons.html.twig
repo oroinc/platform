@@ -1,0 +1,18 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% for groupName, group in data -%}
+    {% if groupName is empty -%}
+        {% for widget in group.widgets -%}
+            {% include widget.template %}
+        {%- endfor -%}
+    {% else -%}
+        {% set items = [] -%}
+        {% for widget in group.widgets -%}
+            {% set items = items|merge(['<li>' ~ include(widget.template) ~ '</li>']) -%}
+        {% endfor -%}
+        {{ UI.dropdownButton({
+            'label': group.label,
+            'aCss': 'pull-left',
+            'html': items|join
+        }) }}
+    {%- endif -%}
+{% endfor %}

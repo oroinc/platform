@@ -1,0 +1,22 @@
+#simple report by user
+request:
+        input_action: ~
+        oro_segment_form[column][func]: ""
+        oro_segment_form[column][label]: ""
+        oro_segment_form[column][name]: ""
+        oro_segment_form[column][sorting]: ""
+        oro_segment_form[definition]: >
+                {"filters":[],"columns":[{"name":"username","label":"Username","sorting":"","func":null}]}
+        oro_segment_form[description]: ""
+        oro_segment_form[entity]: Oro\Bundle\UserBundle\Entity\User
+        oro_segment_form[filter][columnName]: ""
+        oro_segment_form[filter][criterion]: ""
+        oro_segment_form[name]: Users Filterd Dynamic
+        oro_segment_form[owner]: 1
+        oro_segment_form[type]: dynamic
+response:
+        - [admin,1,/user/view/1]
+export: []
+export_filter:
+        oro_segment_grid_$id[_filter][c1][value]: 321admin123
+        oro_segment_grid_$id[_filter][c1][type]: 1

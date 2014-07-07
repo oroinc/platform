@@ -15,19 +15,22 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity
  * @Config(
- *  routeName="oro_workflow_definition_index",
- *  routeView="oro_workflow_definition_view",
- *  defaultValues={
- *      "entity"={
- *          "label"="Workflow",
- *          "plural_label"="Workflows",
- *          "icon"="icon-exchange"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_workflow_definition_index",
+ *      routeView="oro_workflow_definition_view",
+ *      defaultValues={
+ *          "entity"={
+ *              "label"="Workflow",
+ *              "plural_label"="Workflows",
+ *              "icon"="icon-exchange"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @ORM\HasLifecycleCallbacks()
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

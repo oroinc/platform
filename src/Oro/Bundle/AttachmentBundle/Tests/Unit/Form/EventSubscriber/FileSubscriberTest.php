@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\EventSubscriber;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Symfony\Component\Form\FormEvents;
@@ -14,6 +14,9 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $form;
 
     public function setUp()
     {
@@ -66,7 +69,7 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
         $correctEntity->setId(1);
         $correctEntity->setFilename('test.doc');
 
-        $incorrectEntity = new Attachment();
+        $incorrectEntity = new File();
 
         return [
             'correctEntity' => [$correctEntity, true],
