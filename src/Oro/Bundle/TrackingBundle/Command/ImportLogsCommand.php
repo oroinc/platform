@@ -75,6 +75,8 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
 
         if (!$finder->count()) {
             $output->writeln('<info>Logs not found</info>');
+
+            return;
         }
 
         /** @var SplFileInfo $file */
