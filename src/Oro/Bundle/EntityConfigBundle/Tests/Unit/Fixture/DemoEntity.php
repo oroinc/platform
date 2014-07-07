@@ -46,6 +46,14 @@ class DemoEntity
     private $description;
 
     /**
+     * @param int|null $id
+     */
+    public function __construct($id = null)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * Get id
      * @return integer
      */

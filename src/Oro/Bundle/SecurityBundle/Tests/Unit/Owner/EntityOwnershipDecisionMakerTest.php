@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
@@ -94,12 +93,10 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
-        $classAccessor = new EntityClassAccessor();
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
-            $classAccessor,
             new ObjectIdAccessor(),
-            new EntityOwnerAccessor($classAccessor, $this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
     }

@@ -14,7 +14,6 @@ services:
     oro_security.owner.entity_owner_accessor:
         class: %oro_security.owner.entity_owner_accessor.class%
         arguments:
-            - @oro_entity.orm.entity_class_accessor
             - @oro_security.owner.ownership_metadata_provider
 
     oro_security.owner.ownership_metadata_provider:
