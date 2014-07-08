@@ -104,7 +104,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
             $schema->getTable('oro_user'),
             ['owner_user_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 
