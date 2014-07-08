@@ -39,7 +39,7 @@ class CountQueryBuilderOptimizer
     {
         $this->originalQb = $originalQb;
 
-        $this->qbTools->prepareFieldAliases($originalQb->getDQLPart('select'));
+        $this->qbTools->prepareFieldAliases($originalQb->getDQLParts());
         $this->rootAlias = current($this->originalQb->getRootAliases());
         $this->initIdFieldName();
     }
@@ -64,7 +64,7 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
-        $this->qbTools->prepareFieldAliases($parts['select']);
+        $this->qbTools->prepareFieldAliases($parts);
         $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
         $usedAliases = array();
         if ($parts['groupBy']) {

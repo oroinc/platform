@@ -14,12 +14,16 @@ class QueryBuilderTools
 
     /**
      * @param array $selects
+     * @param array  $joins
      */
-    public function __construct(array $selects = null)
+    public function __construct(array $selects = null, $joins = null)
     {
-        if ($selects) {
-            $this->prepareFieldAliases($selects);
-        }
+        $parts = [
+            'select' => $selects ? : [],
+            'joins'  => $joins ? : [],
+        ];
+
+        $this->prepareFieldAliases($parts);
     }
 
     /**
@@ -58,20 +62,35 @@ class QueryBuilderTools
     /**
      * Get mapping of filed aliases to real field expressions.
      *
-     * @param array $selects
+     * @param array $parts DQL parts
      * @return array
      */
-    public function prepareFieldAliases($selects)
+    public function prepareFieldAliases($parts)
     {
         $this->resetFieldAliases();
 
         /** @var Expr\Select $select */
-        foreach ($selects as $select) {
+        foreach ($parts['select'] as $select) {
             foreach ($select->getParts() as $part) {
                 $part = preg_replace('/ as /i', ' as ', $part);
                 if (strpos($part, ' as ') !== false) {
                     list($field, $alias) = explode(' as ', $part, 2);
                     $this->fieldAliases[trim($alias)] = trim($field);
+                }
+            }
+        }
+
+        if (!empty($parts['join'])) {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveArrayIterator($parts['join']),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            foreach ($iterator as $join) {
+                if ($join instanceof Expr\Join) {
+                    $joinTable = $join->getJoin();
+                    if (!empty($joinTable)) {
+                        $a = 1;
+                    }
                 }
             }
         }
@@ -117,18 +136,20 @@ class QueryBuilderTools
      *
      * @param array $joins
      * @param array $aliases
-     * @param $rootAlias
+     * @param       $rootAlias
+     *
      * @return array
      */
     public function getUsedJoinAliases($joins, $aliases, $rootAlias)
     {
+        $incomeAliasesCount = count($aliases);
         /** @var Expr\Join $join */
         foreach ($joins[$rootAlias] as $join) {
             $joinTable = $join->getJoin();
             $joinCondition = $join->getCondition();
             $alias = $join->getAlias();
             if (in_array($alias, $aliases)) {
-                if (!empty($joinTable)) {
+                if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
                     $data = explode('.', $joinTable);
                     if (!in_array($data[0], $aliases)) {
                         $aliases[] = $data[0];
@@ -138,13 +159,20 @@ class QueryBuilderTools
             }
         }
 
-        return array_unique($aliases);
+        $aliases = array_unique($aliases);
+        if ($incomeAliasesCount !== count($aliases)) {
+            // resolve joins recursively in order to fetch dependencies between joins
+            return $this->getUsedJoinAliases($joins, $aliases, $rootAlias);
+        }
+
+        return $aliases;
     }
 
     /**
      * Get list of table aliases mentioned in condition.
      *
      * @param string|object|array $where
+     *
      * @return array
      */
     public function getUsedTableAliases($where)
@@ -159,7 +187,7 @@ class QueryBuilderTools
             $where = (string) $where;
 
             if ($where) {
-                $where = $this->replaceAliasesWithFields($where);
+                $where  = $this->replaceAliasesWithFields($where);
                 $fields = $this->getFields($where);
                 foreach ($fields as $field) {
                     if (strpos($field, '.') !== false) {
@@ -174,7 +202,8 @@ class QueryBuilderTools
     }
 
     /**
-     * Replace field aliases with real fields.
+     * Replaces field aliases with real fields.
+     * Replaces entity aliases with StateFieldPathExpression in WITH|ON conditional statements
      *
      * @param string $condition
      * @return string

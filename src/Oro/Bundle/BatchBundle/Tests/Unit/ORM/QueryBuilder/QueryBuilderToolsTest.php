@@ -15,8 +15,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
             $this->getSelectMock(array('someTable.field2 AS alias2')),
         );
 
-        $tools = new QueryBuilderTools();
-        $tools->prepareFieldAliases($selects);
+        $tools = new QueryBuilderTools($selects);
         $expected = array(
             'eData' => 'e.data',
             'alias' => 'someTable.field',

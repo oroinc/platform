@@ -203,10 +203,36 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             'having_instead_where' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
-                    ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
-                    ->having('login LIKE :test'),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
+                        ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
+                        ->having('login LIKE :test'),
+                'expectedDQL'  => 'SELECT u.id FROM OroUserBundle:User u WHERE u.username LIKE :test'
             ),
+            'join_on_table_that_has_with_join_condition' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                        ->from('OroUserBundle:User', 'u')
+                        ->select(array('u.id'))
+                        ->leftJoin('OroUserBundle:Email', 'e', Join::WITH, 'e.user = u')
+                        ->leftJoin('e.user', 'eu')
+                        ->leftJoin('eu.owner', 'euo')
+                        ->where('euo.name = :name'),
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
+                    . 'LEFT JOIN e.user eu '
+                    . 'LEFT JOIN eu.owner euo WHERE euo.name = :name'
+            ),
+            'join_on_table_that_has_with_join_and_join_on_alias_condition' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                        ->from('OroUserBundle:User', 'u')
+                        ->select(array('u.id'))
+                        ->leftJoin('OroUserBundle:Email', 'e', Join::WITH, 'e.user = u')
+                        ->leftJoin('e.user', 'eu')
+                        ->leftJoin('OroUserBundle:Status', 's', Join::WITH, 's.user = eu')
+                        ->where('s.status = :statusName'),
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
+                    . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
+                    . 'WHERE s.status = :statusName'
+            )
         );
     }
 
