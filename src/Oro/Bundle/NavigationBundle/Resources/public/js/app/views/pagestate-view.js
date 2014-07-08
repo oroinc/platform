@@ -1,106 +1,232 @@
-/* jshint browser:true */
-/*global define, require, base64_encode*/
-define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation', 'oroui/js/mediator', 'base64', 'json'
-    ], function (_, Backbone, Url, routing, Navigation, mediator) {
+/*jslint nomen:true*/
+/*global define, base64_encode*/
+define([
+    'jquery',
+    'underscore',
+    'url',
+    'routing',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/modal',
+    'oroui/js/app/views/base/view',
+    'base64'
+], function ($, _, Url, routing, __, mediator, Modal, BaseView) {
     'use strict';
 
-    var pageStateTimer;
+    var PageStateView;
 
-    /**
-     * @export  oronavigation/js/pagestate/view
-     * @class   oronavigation.pagestate.View
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
-        /**
-         * A flag whether we need to restore data from server
-         */
-        needServerRestore: true,
+    PageStateView = BaseView.extend({
+        events: {
+            'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
+        },
 
-        stopCollecting: false,
+        listen: {
+            'change:data model': '_saveModel',
+            'change model': '_updateCache',
+
+            'page:request mediator': 'onPageRequest',
+            'page:update mediator': 'onPageUpdate',
+            'page:afterChange mediator': 'afterPageChange'
+        },
 
         initialize: function () {
-            this.init();
-            this.listenTo(this.model, 'change:pagestate', this.handleStateChange);
+            var confirmModal;
 
-            /**
-             * Init page state after hash navigation request is completed
-             */
-            mediator.bind(
-                "page:update",
-                function() {
-                    this.stopCollecting = false;
-                    this.init();
-                },
-                this
-            );
-            /**
-             * Clear page state timer after hash navigation request is started
-             */
-            mediator.bind(
-                "page:request",
-                function() {
-                    this.stopCollecting = true;
-                    this.clearTimer();
-                },
-                this
-            );
+            this._initialData = null;
+            this._restore = false;
+
+            confirmModal = new Modal({
+                title: __('Refresh Confirmation'),
+                content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
+                okText: __('Ok, got it.'),
+                className: 'modal modal-primary',
+                okButtonClass: 'btn-primary btn-large',
+                cancelText: __('Cancel')
+            });
+            this.listenTo(confirmModal, 'ok', function () {
+                mediator.execute('refreshPage', {restore: true});
+            });
+
+            this.subview('confirmModal', confirmModal);
+
+            if (this._hasForm()) {
+                this._loadState();
+            }
         },
 
-        hasForm: function() {
-            return Backbone.$('form[data-collect=true]').length;
+        /**
+         * Handles click on page refresh element
+         * @param {jQuery.Event} e
+         */
+        onRefreshClick: function (e) {
+            e.preventDefault();
+            if (this._initialData !== null && this.model.get('data') !== this._initialData) {
+                this.subview('confirmModal').open();
+            } else {
+                mediator.execute('refreshPage', {restore: true});
+            }
         },
 
-        init: function() {
-            this.clearTimer();
-            if (!this.hasForm()) {
+        /**
+         * Initializes form changes trace
+         *  - if attributes is not in a cache, loads data from server
+         * @private
+         */
+        _loadState: function () {
+            var url, self;
+            self = this;
+
+            url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
+            $.get(url).done(function (data) {
+                var attributes;
+                attributes = {
+                    pageId: data.pagestate.pageId || self._combinePageId(),
+                    data: self._restore ? '' : data.pagestate.data
+                };
+                if (data.id) {
+                    attributes.id = data.id;
+                }
+                self._initFormTracer(attributes);
+                self._updateCache();
+            });
+        },
+
+        /**
+         * Clear page state timer and model on page request is started
+         */
+        onPageRequest: function () {
+            this._initialData = null;
+            this._restore = false;
+            this.$el.off('change.page-state');
+            this.model.clear({silent: true});
+        },
+
+        /**
+         * Init page state on page updated
+         */
+        onPageUpdate: function (attributes, args) {
+            var options;
+            options = (args || {}).options;
+            this._restore = Boolean(options && options.restore);
+        },
+
+        /**
+         * Fetches model's attributes from cache on page changes is done
+         */
+        afterPageChange: function () {
+            var attributes;
+            if (!this._hasForm()) {
                 return;
             }
 
-            Backbone.$.get(
-                routing.generate('oro_api_get_pagestate_checkid') + '?pageId=' + this.filterUrl(),
-                _.bind(function (data) {
-                    this.clearTimer();
-                    this.model.set({
-                        id        : data.id,
-                        pagestate : data.pagestate
-                    });
-
-                    if (parseInt(data.id) > 0  && this.model.get('restore') && this.needServerRestore) {
-                        this.restore();
-                    }
-
-                    pageStateTimer = setInterval(_.bind(this.collect, this), 2000);
-                }, this)
-            )
-        },
-
-        clearTimer: function() {
-            if (pageStateTimer) {
-                clearInterval(pageStateTimer);
+            if (this._restore) {
+                // delete cache if changes are discarded
+                mediator.execute('pageCache:state:save', 'form', null);
             }
-            this.model.set('restore', false);
-        },
 
-        handleStateChange: function() {
-            if (this.model.get('pagestate').pageId) {
-                this.model.save(this.model.get('pagestate'));
+            attributes = mediator.execute('pageCache:state:fetch', 'form');
+            if (attributes && attributes.id) {
+                this._initFormTracer(attributes);
+            } else {
+                this._loadState();
             }
         },
 
-        collect: function() {
-            if (!this.hasForm() || this.stopCollecting) {
-                this.clearTimer();
+        /**
+         * Rests page state model, restores page forms and start tracing changes
+         * @param attributes
+         * @private
+         */
+        _initFormTracer: function (attributes) {
+            var options;
+            this._initialData = this._collectFormsData();
+            if (attributes.data) {
+                options = {silent: true};
+            } else {
+                attributes.data = this._initialData;
+            }
+
+            this.model.set(attributes, options);
+            if (this.model.get('restore')) {
+                this._restoreState();
+                this.model.set('restore', false);
+            }
+            this.$el.on('change.page-state', _.bind(this._collectState, this));
+        },
+
+        /**
+         * Updates state in cache on model sync
+         * @private
+         */
+        _updateCache: function () {
+            var attributes;
+            attributes = {};
+            _.extend(attributes, this.model.getAttributes());
+            mediator.execute('pageCache:state:save', 'form', attributes);
+        },
+
+        /**
+         * Defines if page has forms and state tracing is required
+         * @returns {boolean}
+         * @private
+         */
+        _hasForm: function () {
+            return Boolean($('form[data-collect=true]').length);
+        },
+
+        /**
+         * Handles model save
+         * @private
+         */
+        _saveModel: function () {
+            if (!this.model.get('pageId')) {
                 return;
             }
-            var filterUrl = this.filterUrl();
-            if (!filterUrl) {
+            // @TODO why data duplication is required?
+            this.model.save({
+                pagestate: {
+                    pageId: this.model.get('pageId'),
+                    data: this.model.get('data')
+                }
+            });
+        },
+
+        /**
+         * Collects data of page forms and update model if state is changed
+         *  - collects data
+         *  - updates model
+         * @private
+         */
+        _collectState: function () {
+            var pageId, data;
+
+            pageId = this._combinePageId();
+            if (!pageId) {
                 return;
             }
-            var data = {};
 
-            Backbone.$('form[data-collect=true]').each(function(index, el){
-                var items = Backbone.$(el)
+            data = this._collectFormsData();
+
+            if (data === this.model.get('data')) {
+                return;
+            }
+
+            this.model.set({
+                pageId: pageId,
+                data: data
+            });
+        },
+
+        /**
+         * Goes through the form and collects data
+         * @returns {string}
+         * @private
+         */
+        _collectFormsData: function () {
+            var data;
+            data = [];
+            $('form[data-collect=true]').each(function (index, el) {
+                var items = $(el)
                     .find('input, textarea, select')
                     .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
                          ':input[type=password], :input[type=file],   :input[name$="[_token]"], ' +
@@ -109,11 +235,11 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
                 data[index] = items.serializeArray();
 
                 // collect select2 selected data
-                items = Backbone.$(el).find('.select2[type=hidden], .select2[type=select]')
+                items = $(el).find('.select2[type=hidden], .select2[type=select]');
                 _.each(items, function (item) {
                     var $item = $(item),
                         itemData = {name: item.name, value: $item.val()},
-                        selectedData = $(item).select2('data');
+                        selectedData = $item.select2('data');
 
                     if (!_.isEmpty(selectedData)) {
                         itemData.selectedData = [selectedData];
@@ -122,78 +248,86 @@ define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation
                     data[index].push(itemData);
                 });
             });
-
-            this.model.set({
-                pagestate: {
-                    pageId : filterUrl,
-                    data   : JSON.stringify(data)
-                }
-            });
-            mediator.trigger("pagestate_collected", this.model);
+            data = JSON.stringify(data);
+            return data;
         },
 
-        updateState: function(data) {
-            this.model.set({
-                pagestate: {
-                    pageId : '',
-                    data   : data
-                }
-            });
+        /**
+         * Reads data from model and restores page forms
+         * @private
+         */
+        _restoreState: function () {
+            var data;
+            data = this.model.get('data');
+
+            if (data) {
+                this._restoreForms(data);
+                mediator.trigger("pagestate_restored");
+            }
         },
 
-        restore: function() {
-            Backbone.$.each(JSON.parse(this.model.get('pagestate').data), function(index, el) {
-                var form = Backbone.$('form[data-collect=true]').eq(index);
+        /**
+         * Updates form from data
+         * @param {string} data JSON
+         * @private
+         */
+        _restoreForms: function (data) {
+            data = JSON.parse(data);
+
+            $.each(data, function (index, el) {
+                var form = $('form[data-collect=true]').eq(index);
                 form.find('option').prop('selected', false);
 
-                Backbone.$.each(el, function(i, input){
-                    var element = form.find('[name="'+ input.name+'"]');
+                $.each(el, function (i, input) {
+                    var element = form.find('[name="' + input.name + '"]');
                     switch (element.prop('type')) {
-                        case 'checkbox':
-                            element.filter('[value="'+ input.value +'"]').prop('checked', true);
-                            break;
-                        case 'select-multiple':
-                            element.find('option[value="'+ input.value +'"]').prop('selected', true);
-                            break;
-                        default:
-                            if (input.selectedData) {
-                                element.data('selected-data', input.selectedData);
-                            }
-                            element.val(input.value);
+                    case 'checkbox':
+                        element.filter('[value="' +  input.value + '"]').prop('checked', true);
+                        break;
+                    case 'select-multiple':
+                        element.find('option[value="' + input.value + '"]').prop('selected', true);
+                        break;
+                    default:
+                        if (input.selectedData) {
+                            element.data('selected-data', input.selectedData);
+                        }
+                        element.val(input.value);
                     }
                 });
             });
-            mediator.trigger("pagestate_restored");
         },
 
-        filterUrl: function() {
-            var self = this,
-                url = window.location,
-                // cause that's circular dependency
-                navigation = require('oronavigation/js/navigation').getInstance();
-            if (navigation) {
-                url = new Url(navigation.getHashUrl());
-                url.search = url.query.toString();
-                url.pathname = url.path;
-            }
+        /**
+         * Combines pageId
+         * @returns {string}
+         * @private
+         */
+        _combinePageId: function () {
+            var model, url, params, _ref;
+            model = this.model;
+            url = mediator.execute('currentUrl');
 
-            var params = url.search.replace('?', '').split('&');
+            _ref = url.split('?');
+            url = {
+                pathname: _ref[0],
+                search: _ref[1] || ''
+            };
 
-            if (params.length == 1 && params[0].indexOf('restore') !== -1) {
-                params = '';
-                self.model.set('restore', true);
-            } else {
-                params = Backbone.$.grep(params, function(el) {
-                    if (el.indexOf('restore') == -1) {
-                        return true;
-                    } else {
-                        self.model.set('restore', true);
-                        return false;
-                    }
-                });
-            }
+            params = url.search.split('&');
 
-            return base64_encode(url.pathname + (params != '' ? '?' + params.join('&') : ''));
+            params = _.filter(params, function (part) {
+                var toRestore;
+                toRestore = part.indexOf('restore') !== -1;
+                if (toRestore) {
+                    model.set('restore', true);
+                }
+                return !toRestore && part.length;
+            });
+
+            url = url.pathname + (params.length ? '?' + params.join('&') : '');
+            return base64_encode(url);
         }
     });
+
+    return PageStateView;
 });
