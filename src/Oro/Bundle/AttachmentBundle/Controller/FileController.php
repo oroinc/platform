@@ -24,13 +24,15 @@ class FileController extends Controller
      */
     public function getAttachmentAction($codedString, $extension)
     {
-        list($parentClass, $fieldName, $parentId, $type, $filename) =
-            $this->get('oro_attachment.manager')->decodeAttachmentUrl($codedString);
+        list($parentClass, $fieldName, $parentId, $type, $filename) = $this->get(
+            'oro_attachment.manager'
+        )->decodeAttachmentUrl($codedString);
         $parentEntity = $this->getDoctrine()->getRepository($parentClass)->find($parentId);
         if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $parentEntity)) {
             throw new AccessDeniedException();
         }
-        $accessor = PropertyAccess::createPropertyAccessor();
+
+        $accessor   = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($parentEntity, $fieldName);
         if ($attachment instanceof Collection) {
             foreach ($attachment as $attachmentEntity) {
@@ -40,11 +42,14 @@ class FileController extends Controller
                 }
             }
         }
+
         if ($attachment instanceof Collection || $attachment->getOriginalFilename() !== $filename) {
             throw new NotFoundHttpException();
         }
+
         $response = new Response();
         $response->headers->set('Cache-Control', 'public');
+
         if ($type == 'get') {
             $response->headers->set('Content-Type', $attachment->getMimeType() ? : 'application/force-download');
         } else {
@@ -54,6 +59,7 @@ class FileController extends Controller
                 sprintf('attachment;filename="%s"', $attachment->getOriginalFilename())
             );
         }
+
         $response->headers->set('Content-Length', $attachment->getFileSize());
         $response->setContent($this->get('oro_attachment.manager')->getContent($attachment));
 
@@ -69,7 +75,7 @@ class FileController extends Controller
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
         $attachment = $this->getFileByIdAndFileName($id, $filename);
-        $path = substr($this->getRequest()->getPathInfo(), 1);
+        $path       = substr($this->getRequest()->getPathInfo(), 1);
         $filterName = 'attachment_' . $width . '_' . $height;
 
         $this->get('liip_imagine.filter.configuration')->set(
@@ -82,9 +88,11 @@ class FileController extends Controller
                 ]
             ]
         );
-        $binary = $this->get('liip_imagine')->load($this->get('oro_attachment.manager')->getContent($attachment));
+        $binary         = $this->get('liip_imagine')->load(
+            $this->get('oro_attachment.manager')->getContent($attachment)
+        );
         $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
-        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
+        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
         return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
     }
@@ -97,11 +105,13 @@ class FileController extends Controller
      */
     public function getFilteredImageAction($id, $filter, $filename)
     {
-        $attachment = $this->getFileByIdAndFileName($id, $filename);
-        $path = substr($this->getRequest()->getPathInfo(), 1);
-        $binary = $this->get('liip_imagine')->load($this->get('oro_attachment.manager')->getContent($attachment));
+        $attachment     = $this->getFileByIdAndFileName($id, $filename);
+        $path           = substr($this->getRequest()->getPathInfo(), 1);
+        $binary         = $this->get('liip_imagine')->load(
+            $this->get('oro_attachment.manager')->getContent($attachment)
+        );
         $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filter);
-        $response = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
+        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getMimeType()));
 
         return $this->get('liip_imagine.cache.manager')->store($response, $path, $filter);
     }
@@ -118,7 +128,7 @@ class FileController extends Controller
     {
         $attachment = $this->get('doctrine')->getRepository('OroAttachmentBundle:File')->findOneBy(
             [
-                'id' => $id,
+                'id'               => $id,
                 'originalFilename' => $fileName
             ]
         );

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\EventSubscriber;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,6 +10,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileSubscriber implements EventSubscriberInterface
@@ -33,7 +33,7 @@ class FileSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::POST_SUBMIT => 'postSubmit'
+            FormEvents::POST_SUBMIT  => 'postSubmit'
         ];
     }
 
@@ -45,7 +45,7 @@ class FileSubscriber implements EventSubscriberInterface
     public function preSetData(FormEvent $event)
     {
         $entity = $event->getData();
-        $form = $event->getForm();
+        $form   = $event->getForm();
 
         if (
             is_object($entity)
@@ -75,7 +75,7 @@ class FileSubscriber implements EventSubscriberInterface
     {
         /** @var File $entity */
         $entity = $event->getData();
-        $form = $event->getForm();
+        $form   = $event->getForm();
 
         if (is_object($entity) && $entity->getFile() !== null) {
             $this->validate($form, $entity);
@@ -92,7 +92,7 @@ class FileSubscriber implements EventSubscriberInterface
     /**
      * Validate attachment field
      *
-     * @param FormInterface $form
+     * @param FormInterface   $form
      * @param File|Attachment $entity
      */
     protected function validate(FormInterface $form, $entity)

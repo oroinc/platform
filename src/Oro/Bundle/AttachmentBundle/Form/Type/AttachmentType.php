@@ -23,8 +23,8 @@ class AttachmentType extends AbstractType
             'file',
             'oro_file',
             [
-                'label' => 'oro.attachment.file.label',
-                'required' => true,
+                'label'          => 'oro.attachment.file.label',
+                'required'       => true,
                 'checkEmptyFile' => $options['checkEmptyFile']
             ]
         );
@@ -33,7 +33,7 @@ class AttachmentType extends AbstractType
             'comment',
             'textarea',
             [
-                'label' => 'oro.attachment.comment.label',
+                'label'    => 'oro.attachment.comment.label',
                 'required' => false,
             ]
         );
@@ -54,10 +54,10 @@ class AttachmentType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
+                'data_class'         => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                 'cascade_validation' => true,
-                'parentEntityClass' => '',
-                'checkEmptyFile' => false
+                'parentEntityClass'  => '',
+                'checkEmptyFile'     => false
             ]
         );
     }
