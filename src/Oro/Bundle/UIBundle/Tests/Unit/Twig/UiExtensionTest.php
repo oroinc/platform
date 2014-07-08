@@ -26,4 +26,38 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
         $parsers = $this->extension->getTokenParsers();
         $this->assertTrue($parsers[0] instanceof \Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser);
     }
+
+    public function testGetFilters()
+    {
+        $this->assertArrayHasKey('trimString', $this->extension->getFilters());
+    }
+
+    /**
+     * @dataProvider testStrings
+     */
+    public function testTrimString($inputString, $symbolCount ,$expectedString)
+    {
+        $this->assertEquals($expectedString, $this->extension->trimString($inputString, $symbolCount));
+    }
+
+    public function testStrings()
+    {
+        return [
+            [
+                'Lorem ipsum dolor sit amet',
+                2,
+                'Lo...'
+            ],
+            [
+                'Lorem ipsum dolor sit amet',
+                10,
+                'Lorem ipsu...'
+            ],
+            [
+                'Lorem ipsum dolor sit amet',
+                50,
+                'Lorem ipsum dolor sit amet'
+            ],
+        ];
+    }
 }

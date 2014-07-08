@@ -1,0 +1,26 @@
+.oro_attachment_file{
+  border: none;
+  padding: 5px;
+  width: 295px;
+  line-height: 20px;
+  margin-top: 5px;
+  margin-bottom: 0;
+  .removeFile{
+    margin: 0;
+  }
+  .delete{
+    float: right;
+    line-height: 20px;
+    margin-top: -4px;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f014";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+}
