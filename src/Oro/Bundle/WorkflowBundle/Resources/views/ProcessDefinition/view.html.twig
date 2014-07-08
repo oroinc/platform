@@ -25,8 +25,8 @@
             }) }}
         {% endif %}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/messenger', 'oroui/js/mediator', 'oroui/js/error'],
-            function($, Messenger, mediator, Error) {
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
+            function($, mediator, Error) {
                 $('#{{ idButton }}').on('click', function(e) {
                     e.preventDefault();
                     var el = $(this);
@@ -36,7 +36,7 @@
                         success: function(response) {
                             if (response.message) {
                                 mediator.once('page:afterChange', function() {
-                                    Messenger.notificationFlashMessage('success', response.message);
+                                    mediator.execute('showFlashMessage', 'success', response.message);
                                 });
                             }
                             mediator.execute('refreshPage');

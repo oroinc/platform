@@ -17,9 +17,9 @@ require(['oroui/js/mediator'], function (mediator) {
 
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout',
-        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+        'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, messenger, scrollspy) {
+    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
     /* ============================================================
@@ -351,7 +351,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         type: 'DELETE',
                         success: function (data) {
                             el.trigger('removesuccess');
-                            messenger.addMessage('success', el.data('success-message'));
+                            mediator.execute('addMessage', 'success', el.data('success-message'));
                             if (el.data('redirect')) {
                                 mediator.execute('redirectTo', {url: el.data('redirect')});
                             } else {
@@ -359,11 +359,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                             }
                         },
                         error: function () {
+                            var message;
+                            message = el.data('error-message') ||
+                                __('Unexpected error occured. Please contact system administrator.');
                             mediator.execute('hideLoading');
-                            messenger.notificationMessage(
-                                'error',
-                                el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
-                            );
+                            mediator.execute('showMessage', 'error', message);
                         }
                     });
                 });
