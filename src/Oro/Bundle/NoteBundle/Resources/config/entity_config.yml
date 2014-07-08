@@ -5,6 +5,7 @@ oro_entity_config:
                 # indicates whether the entity can have notes or not
                 enabled:
                     options:
+                        require_schema_update: true
                         priority:           250
                         default_value:      false
                         auditable:          false

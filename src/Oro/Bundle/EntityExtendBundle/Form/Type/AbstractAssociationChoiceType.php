@@ -3,23 +3,20 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * The goal of this form type is to check if an association is set
  * and mark entity as as "Required Update".
  * Also the association cannot be applied to the owning side entities.
  */
-abstract class AbstractAssociationChoiceType extends AbstractType
+abstract class AbstractAssociationChoiceType extends ChoiceType
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -49,42 +46,6 @@ abstract class AbstractAssociationChoiceType extends AbstractType
             $this->disableView($view);
         }
     }
-
-    /**
-     * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
-     */
-    public function postSubmit(FormEvent $event)
-    {
-        $form    = $event->getForm();
-        $options = $form->getConfig()->getOptions();
-        /** @var EntityConfigId $configId */
-        $configId = $options['config_id'];
-
-        $newVal = $form->getData();
-        $oldVal = $this->configManager->getConfig($configId)->get($form->getName());
-        if ($this->isSchemaUpdateRequired($newVal, $oldVal)) {
-            $extendConfigProvider = $this->configManager->getProvider('extend');
-            $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
-            if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
-
-                $extendConfigProvider->persist($extendConfig);
-                $extendConfigProvider->flush();
-            }
-        }
-    }
-
-    /**
-     * Checks if the changes require the schema update
-     *
-     * @param mixed $newVal
-     * @param mixed $oldVal
-     *
-     * @return bool
-     */
-    abstract protected function isSchemaUpdateRequired($newVal, $oldVal);
 
     /**
      * Check if the association choice element should be disabled or not

@@ -37,44 +37,81 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     {
         $targetEntityConfigs = $this->configManager->getProvider('extend')->getConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
-            if (!$this->isExtendEntity($targetEntityConfig)) {
-                continue;
-            }
-            $index = $targetEntityConfig->has('index')
-                ? $targetEntityConfig->get('index')
-                : [];
-            $hasChanges = false;
-            $fieldConfigs = $this->configManager->getProvider('datagrid')
-                ->getConfigs($targetEntityConfig->getId()->getClassName());
-            foreach ($fieldConfigs as $fieldConfig) {
-                $fieldName = $fieldConfig->getId()->getFieldName();
-                $isVisible = $fieldConfig->get('is_visible');
-                if (isset($index[$fieldName])) {
-                    if ($index[$fieldName] != $isVisible) {
-                        if ($isVisible) {
-                            $index[$fieldName] = true;
-                        } else {
-                            unset($index[$fieldName]);
-                        }
-                        $hasChanges = true;
+            if ($this->isExtend($targetEntityConfig)) {
+                $indices = $targetEntityConfig->has('index')
+                    ? $targetEntityConfig->get('index')
+                    : [];
+                if ($this->updateIndices($indices, $targetEntityConfig->getId()->getClassName())) {
+                    if (empty($indices)) {
+                        $targetEntityConfig->remove('index');
+                    } else {
+                        $targetEntityConfig->set('index', $indices);
                     }
-                } elseif ($isVisible) {
-                    $index[$fieldName] = true;
-                    $hasChanges = true;
+                    $this->configManager->persist($targetEntityConfig);
                 }
-            }
-            if ($hasChanges) {
-                $targetEntityConfig->set('index', $index);
-                $this->configManager->persist($targetEntityConfig);
             }
         }
     }
+
     /**
-     * @param ConfigInterface $extendEntityConfig
+     * @param array  $indices
+     * @param string $targetEntityClass
+     *
      * @return bool
      */
-    protected function isExtendEntity($extendEntityConfig)
+    protected function updateIndices(array &$indices, $targetEntityClass)
     {
-        return $extendEntityConfig->is('is_extend') || $extendEntityConfig->is('extend');
+        $hasChanges   = false;
+        $fieldConfigs = $this->configManager->getProvider('extend')->getConfigs($targetEntityClass);
+        foreach ($fieldConfigs as $fieldConfig) {
+            if ($this->isExtend($fieldConfig)) {
+                $className = $fieldConfig->getId()->getClassName();
+                $fieldName = $fieldConfig->getId()->getFieldName();
+                if ($this->isIndexRequired($className, $fieldName)) {
+                    if (!isset($indices[$fieldName]) || !$indices[$fieldName]) {
+                        $indices[$fieldName] = true;
+                        $hasChanges          = true;
+                    }
+                } elseif (isset($indices[$fieldName]) || array_key_exists($fieldName, $indices)) {
+                    unset($indices[$fieldName]);
+                    $hasChanges = true;
+                }
+            }
+        }
+
+        return $hasChanges;
+    }
+
+    /**
+     * @param ConfigInterface $extendConfig
+     *
+     * @return bool
+     */
+    protected function isExtend($extendConfig)
+    {
+        return $extendConfig->is('is_extend') || $extendConfig->is('extend');
+    }
+
+    /**
+     * Determines whether the index for the given field is needed or not
+     *
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isIndexRequired($className, $fieldName)
+    {
+        $result = false;
+
+        $datagridConfigProvider = $this->configManager->getProvider('datagrid');
+        if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
+            $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
+            if ($datagridConfig->get('is_visible')) {
+                $result = true;
+            }
+        }
+
+        return $result;
     }
 }
