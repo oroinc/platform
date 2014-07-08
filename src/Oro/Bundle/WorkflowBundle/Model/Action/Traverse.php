@@ -40,21 +40,23 @@ class Traverse extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $array = $this->getArray($context);
+        $array  = $this->getArray($context);
         $hasKey = $this->hasKey();
 
         foreach ($array as $key => $value) {
             if ($hasKey) {
                 $this->setKey($context, $key);
             }
+
             $this->setValue($context, $value);
             $this->configurableAction->execute($context);
-        }
 
-        if ($hasKey) {
-            $this->setKey($context, null);
+            if ($hasKey) {
+                $this->setKey($context, null);
+            }
+
+            $this->setValue($context, null);
         }
-        $this->setValue($context, null);
     }
 
     /**

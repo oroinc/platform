@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -38,8 +39,13 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Execute process job with specified identifier')
-            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Identifier of the process job');
+            ->setDescription('Execute process job with specified identifiers')
+            ->addOption(
+                'id',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Identifiers of the process jobs'
+            );
     }
 
     /**
@@ -47,22 +53,35 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $processJobId         = $input->getOption('id');
-        $processJobRepository = $this->getRegistry()->getRepository('OroWorkflowBundle:ProcessJob');
-        $processJob           = $processJobRepository->find($processJobId);
+        $registry      = $this->getRegistry();
+        $processJobIds = $input->getOption('id');
+        $processJobs   = $registry->getRepository('OroWorkflowBundle:ProcessJob')->findByIds($processJobIds);
 
-        if (!$processJob) {
-            $output->writeln(
-                sprintf('<error>Process job with passed identity "%s" does not exist.</error>', $processJobId)
-            );
+        if (!$processJobs) {
+            $output->writeln('<error>Process jobs with passed identifiers do not exist</error>');
             return;
         }
 
-        $this->getContainer()->get('oro_workflow.process.process_handler')->handleJob($processJob);
+        /** @var EntityManager $entityManager */
+        $entityManager = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
+        $processHandler    = $this->getContainer()->get('oro_workflow.process.process_handler');
 
-        // remove process job and flush handled data
-        $entityManager = $this->getRegistry()->getManagerForClass('OroWorkflowBundle:ProcessJob');
-        $entityManager->remove($processJob);
-        $entityManager->flush();
+        /** @var ProcessJob $processJob */
+        foreach ($processJobs as $processJob) {
+            $processId = $processJob->getId();
+            $entityManager->beginTransaction();
+            try {
+                $processHandler->handleJob($processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+                $entityManager->commit();
+
+                $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
+            } catch (\Exception $e) {
+                $entityManager->rollback();
+
+                $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
+            }
+        }
     }
 }
