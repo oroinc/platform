@@ -83,6 +83,18 @@ config:
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/chaplin-extend': 'bundles/oroui/js/chaplin-extend.js'
+        'oroui/js/app/modules/views': 'bundles/oroui/js/app/modules/views.js'
+        'oroui/js/app/modules/messenger': 'bundles/oroui/js/app/modules/messenger.js'
+        'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
+        'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
+        'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/views/page/breadcrumb-view': 'bundles/oroui/js/app/views/page/breadcrumb-view.js'
+        'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
+        'oroui/js/app/views/page/main-menu-view': 'bundles/oroui/js/app/views/page/main-menu-view.js'
+        'oroui/js/app/views/page/user-menu-view': 'bundles/oroui/js/app/views/page/user-menu-view.js'
+        'oroui/js/app/views/page/loading-mask-view': 'bundles/oroui/js/app/views/page/loading-mask-view.js'
+        'oroui/js/app/views/page/messages-view': 'bundles/oroui/js/app/views/page/messages-view.js'
+        'oroui/js/app/views/page/debug-toolbar-view': 'bundles/oroui/js/app/views/page/debug-toolbar-view.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
@@ -115,7 +127,8 @@ config:
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
-        - oroui/js/app/module
+        - oroui/js/app/modules/views
+        - oroui/js/app/modules/messenger
 
 build:
     paths:

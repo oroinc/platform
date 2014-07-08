@@ -119,18 +119,3 @@ require([
         });
     });
 });
-
-
-/**
- * Init messenger's handlers
- */
-require([
-    'oroui/js/mediator',
-    'oroui/js/messenger'
-], function (mediator, messenger) {
-    'use strict';
-
-    mediator.setHandler('showMessage', messenger.notificationMessage, messenger);
-    mediator.setHandler('showFlashMessage', messenger.notificationFlashMessage, messenger);
-});
-
