@@ -73,7 +73,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'website-grid',
-            ['website-grid[_filter][identifier][value]' => 'unique']
+            ['website-grid[_filter][identifier][value]' => 'unique2']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -86,9 +86,6 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-
-        // @todo: add to application menu
-        //$this->assertContains('Website updated - Websites - Marketing', $result->getContent());
     }
 
     /**

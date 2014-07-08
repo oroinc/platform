@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Oro\Bundle\EntityBundle\Event\OroEventManager;
 
 class ResponseHistoryListener
 {
@@ -25,12 +26,12 @@ class ResponseHistoryListener
     /**
      * @var \Symfony\Component\Security\Core\User\User|String
      */
-    protected $user  = null;
+    protected $user = null;
 
     /**
      * @var \Doctrine\ORM\EntityManager|null
      */
-    protected $em = null;
+    protected $entityManager = null;
 
     /**
      * @var TitleServiceInterface
@@ -46,7 +47,7 @@ class ResponseHistoryListener
         $this->navItemFactory = $navigationItemFactory;
         $this->user = !$securityContext->getToken() ||  is_string($securityContext->getToken()->getUser())
                       ? null : $securityContext->getToken()->getUser();
-        $this->em = $entityManager;
+        $this->entityManager = $entityManager;
         $this->titleService = $titleService;
     }
 
@@ -54,13 +55,13 @@ class ResponseHistoryListener
      * Process onResponse event, updates user history information
      *
      * @param  FilterResponseEvent $event
-     * @return bool|void
+     * @return bool|null
      */
     public function onResponse(FilterResponseEvent $event)
     {
         if (HttpKernel::MASTER_REQUEST != $event->getRequestType()) {
             // Do not do anything
-            return;
+            return null;
         }
 
         $request = $event->getRequest();
@@ -72,13 +73,15 @@ class ResponseHistoryListener
         }
 
         $postArray = array(
-            'url'      => $request->getRequestUri(),
-            'user'     => $this->user,
+            'url'  => $request->getRequestUri(),
+            'user' => $this->user,
         );
 
         /** @var $historyItem  NavigationHistoryItem */
-        $historyItem = $this->em->getRepository('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
-                                ->findOneBy($postArray);
+        $historyItem = $this->entityManager
+            ->getRepository('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
+            ->findOneBy($postArray);
+
         if (!$historyItem) {
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
@@ -92,8 +95,18 @@ class ResponseHistoryListener
         // force update
         $historyItem->doUpdate();
 
-        $this->em->persist($historyItem);
-        $this->em->flush($historyItem);
+        // disable Doctrine events for history item processing
+        $eventManager = $this->entityManager->getEventManager();
+        if ($eventManager instanceof OroEventManager) {
+            $eventManager->disable();
+        }
+
+        $this->entityManager->persist($historyItem);
+        $this->entityManager->flush($historyItem);
+
+        if ($eventManager instanceof OroEventManager) {
+            $eventManager->enable();
+        }
 
         return true;
     }
