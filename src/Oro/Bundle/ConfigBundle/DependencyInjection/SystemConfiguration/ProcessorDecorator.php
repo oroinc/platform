@@ -122,6 +122,9 @@ class ProcessorDecorator
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
                     ->scalarNode('configurator')->end()
+                    ->booleanNode('page_reload')
+                        ->defaultValue(false)
+                    ->end()
                     ->integerNode('priority')->end()
                 ->end()
             ->end();

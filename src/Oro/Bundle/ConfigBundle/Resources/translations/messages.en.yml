@@ -1,6 +1,6 @@
 oro:
     config:
-        module_label:             "System configuration"
+        module_label: "System configuration"
 
         actions:
             collapse_all: Collapse All
