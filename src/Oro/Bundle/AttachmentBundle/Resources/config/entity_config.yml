@@ -20,9 +20,6 @@ oro_entity_config:
                             required:       true
                             label:          oro.attachment.enabled
                             association_class: 'OroAttachmentBundle:Attachment'
-                            #entity_class:   'OroAttachmentBundle:Attachment'
-                            #entity_config_scope: attachment
-
                 maxsize:
                     options:
                         priority:           90
