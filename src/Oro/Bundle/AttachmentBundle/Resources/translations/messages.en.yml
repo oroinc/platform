@@ -46,6 +46,9 @@ oro:
             add:                 Add attachment
             update:              Update attachment
             saved:               Attachment saved successfully
+            button:
+                update:          Update
+                delete:          Delete
 
     entity_extend:
         form:
