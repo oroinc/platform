@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -34,7 +35,14 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
     {
         $this
             ->setName('oro:cron:import-tracking')
-            ->setDescription('Import tracking logs');
+            ->setDescription('Import tracking logs')
+            ->addOption(
+                'directory',
+                'd',
+                InputOption::VALUE_OPTIONAL,
+                'Logs directory'
+            );
+
     }
 
     /**
@@ -45,15 +53,31 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
         $fs     = new Filesystem();
         $finder = new Finder();
 
-        $directory = $this
-            ->getContainer()
-            ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
+        if (!$directory = $input->getOption('directory')) {
+            $directory = $this
+                    ->getContainer()
+                    ->getParameter('kernel.logs_dir') . DIRECTORY_SEPARATOR . 'tracking';
+        }
+
+        if (!$fs->exists($directory)) {
+            $fs->mkdir($directory);
+
+            $output->writeln('<info>Logs not found</info>');
+
+            return;
+        }
 
         $finder
             ->files()
             ->notName($this->getIgnoredFilename())
             ->notName('settings.ser')
             ->in($directory);
+
+        if (!$finder->count()) {
+            $output->writeln('<info>Logs not found</info>');
+
+            return;
+        }
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {

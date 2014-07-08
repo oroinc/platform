@@ -16,9 +16,11 @@
       - name: label                                 # Name of field in data array
         label: oro.chart.line_chart.params.label    # Label of field to use in chart form
         required: true                              # Is this field required
+        field_name: field_name                      # Predefined field name for non-abstract charts, optional
       - name: value
         label: oro.chart.line_chart.params.value
         required: true
+        field_name: field_name
 
     settings_schema:                                # Describe field of chart settings form
       - name: connect_dots_with_line                # Field name
@@ -31,6 +33,8 @@
       chartFontSize: 9
       chartFontColor: "#454545"
       chartHighlightColor: "#FF5E5E"
+
+    data_transformer: oro_chart.data_transformer.example # Custom data transformer
 
     template: OroChartBundle:Chart:line.html.twig
 ```

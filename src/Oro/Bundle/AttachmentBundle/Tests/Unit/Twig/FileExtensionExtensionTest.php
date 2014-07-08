@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
-
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
@@ -48,9 +47,9 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $result = $this->extension->getFunctions();
         $functions = [
-            'oro_attachment_url',
-            'oro_resized_attachment_url',
-            'oro_filtered_attachment_url',
+            'file_url',
+            'resized_image_url',
+            'filtered_image_url',
             'oro_configured_image_url',
             'oro_attachment_icon',
             'oro_file_view',
@@ -65,18 +64,18 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_attachment', $this->extension->getName());
+        $this->assertEquals('oro_attachment_file', $this->extension->getName());
     }
 
-    public function testGetAttachmentUrl()
+    public function testGetFileUrl()
     {
         $parentEntity = new TestClass();
         $parentField = 'test_field';
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl')
+            ->method('getFileUrl')
             ->with($parentEntity, $parentField, $this->attachment, 'download', true);
 
-        $this->extension->getAttachmentUrl($parentEntity, $parentField, $this->attachment, 'download', true);
+        $this->extension->getFIleUrl($parentEntity, $parentField, $this->attachment, 'download', true);
     }
 
     public function testGetResizedImageUrl()
@@ -122,7 +121,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getAttachmentIconClass')
             ->with($this->attachment);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
         $this->extension->getFileView($environment, $parentEntity, $parentField, $this->attachment);
     }
 
@@ -149,7 +148,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 16, 16);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $this->attachment);
     }
@@ -178,8 +177,38 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 120, 120);
         $this->manager->expects($this->once())
-            ->method('getAttachmentUrl');
+            ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $this->attachment, new TestClass(), 'testField');
+    }
+
+    public function testGetFilteredImageUrl()
+    {
+        $this->manager->expects($this->once())
+            ->method('getFilteredImageUrl')
+            ->with($this->attachment, 'testFilter');
+
+        $this->extension->getFilteredImageUrl($this->attachment, 'testFilter');
+    }
+
+    public function testGetConfiguredImageUrl()
+    {
+        $parent = new TestAttachment();
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->attachmentConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment', 'testField')
+            ->will($this->returnValue($config));
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->will($this->returnValue(45));
+        $this->attachment->setFilename('test.doc');
+        $this->manager->expects($this->once())
+            ->method('getResizedImageUrl')
+            ->with($this->attachment, 45, 45);
+
+        $this->extension->getConfiguredImageUrl($parent, 'testField', $this->attachment);
     }
 }
