@@ -9,7 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Table(name="oro_tracking_event", indexes={
  *     @ORM\Index(name="event_name_idx", columns={"name"}),
- *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"})
+ *     @ORM\Index(name="event_loggedAt_idx", columns={"logged_at"}),
+ *     @ORM\Index(name="code_idx", columns={"code"})
  * })
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
@@ -74,6 +75,13 @@ class TrackingEvent
      * @ORM\Column(name="title", type="string", length=255, nullable=true)
      */
     protected $title;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=255, nullable=true)
+     */
+    protected $code;
 
     /**
      * @var \DateTime
@@ -289,5 +297,28 @@ class TrackingEvent
     public function getWebsite()
     {
         return $this->website;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return TrackingEvent
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 }
