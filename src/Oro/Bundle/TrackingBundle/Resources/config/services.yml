@@ -84,8 +84,6 @@ services:
 
     oro_tracking.event_listener.website_tracking_events_grid_listener:
         class: %oro_datagrid.event_listener.base_orm_relation.class%
-        arguments:
-            - 'websiteIdentifier'
-            - false
+        arguments: ['websiteIdentifier', false]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.website-tracking-events-grid, method: onBuildAfter }
