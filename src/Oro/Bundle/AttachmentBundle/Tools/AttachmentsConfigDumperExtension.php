@@ -12,7 +12,7 @@ class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExte
      */
     protected function getAssociationEntityClass()
     {
-        return AttachmentScope::ATTACHMENT_ENTITY;
+        return AttachmentScope::ATTACHMENT;
     }
 
     /**
@@ -21,13 +21,5 @@ class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExte
     protected function getAssociationScope()
     {
         return 'attachment';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationType()
-    {
-        return 'manyToMany';
     }
 }

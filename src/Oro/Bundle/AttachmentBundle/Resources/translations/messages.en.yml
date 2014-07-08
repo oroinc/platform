@@ -6,13 +6,13 @@ oro:
 
         id.label:            Id
         comment.label:       Comment
-        ile.label:          File
+        file.label:          File
 
         block_titles:
             attachments.label:  Attachments management
 
         enabled:              Enable attachments
-        maxsize:              Max allowed file size
+        maxsize:              Max allowed file size, Mb
         mimetypes:            Allowed mime types
 
         file:
@@ -43,7 +43,9 @@ oro:
             upload_image_mime_types.label: Image mime types
 
         action:
-            add:                 Add Attachment
+            add:                 Add attachment
+            update:              Update attachment
+            saved:               Attachment saved successfully
 
     entity_extend:
         form:

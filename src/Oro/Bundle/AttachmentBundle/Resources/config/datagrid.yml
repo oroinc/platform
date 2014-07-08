@@ -4,22 +4,67 @@ datagrid:
             type: orm
             query:
                 select:
-                    - attachment
+                    - attachment as att
+                    - attachment.id as id
+                    - attachment.comment as comment
+                    - file.originalFilename as originalFilename
+                    - file.fileSize as fileSize
+                    - file.createdAt as createdAt
                 from:
                     - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
+                join:
+                    left:
+                        - { join: attachment.file, alias: file }
                 where:
                     and:
-                      - e.id = :entityId
+                      - entity.id = :entityId # entity with alias 'entity' sets in event listener
         columns:
             originalFilename:
                 type: twig
-                label: orocrm.contact.datagrid.contact_name
+                label: oro.attachment.file.filename.label
                 frontend_type: html
                 template: OroAttachmentBundle:Attachment:Datagrid/Property/allachmentLink.html.twig
             fileSize:
-                label: fileSize
+                label: oro.attachment.file.file_size.label
+                type: twig
+                frontend_type: html
+                template: OroAttachmentBundle:Attachment:Datagrid/Property/fileSize.html.twig
             createdAt:
-                label: oro.user.created_at.label
+                label: oro.attachment.file.created_at.label
                 frontend_type: datetime
             comment:
-                label: comment
+                label: oro.attachment.comment.label
+        properties:
+            id: ~
+            update_link:
+                type:       url
+                route:      oro_attachment_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_api_delete_attachment
+                params:     [ id ]
+        actions:
+            update:
+                type:          dialog
+                acl_resource:  oro_attachment_update
+                label:         Update
+                icon:          edit
+                link:          update_link
+                widget:
+                    reload-grid-name: attachment-grid
+                    options:
+                        dialogOptions:
+                            title: Update attachment
+                            width: 550
+                            allowMaximize: false
+                            allowMinimize: false
+                            maximizedHeightDecreaseBy: minimize-bar
+                messages:
+                    saved: oro.attachment.action.saved
+            delete:
+                type:          delete
+                acl_resource:  oro_attachment_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link

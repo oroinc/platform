@@ -1,19 +1,23 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-
-
+{% if resource_granted('oro_attachment_create') %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{ UI.clientButton({
-    'id': 'add-entity-attachment-button',
-    'aCss': 'no-hash',
-    'iCss': 'icon-paper-clip hide-text',
-    'label' : 'oro.attachment.action.add'|trans
+        'dataUrl': path('oro_attachment_create', { 'entityClass': oro_class_name(entity), 'entityId': entity.id}) ,
+        'aCss': 'no-hash',
+        'iCss': 'icon-paper-clip hide-text',
+        'label' : 'oro.attachment.action.add'|trans,
+        'widget' : {
+            'type' : 'dialog',
+            'multiple' : false,
+            'reload-grid-name' : 'attachment-grid',
+            'options' : {
+                'dialogOptions' : {
+                    'title' : 'oro.attachment.action.add'|trans,
+                    'allowMaximize': false,
+                    'allowMinimize': false,
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 550
+                }
+            }
+        },
     }) }}
-    <script type="text/javascript">
-        require(['jquery', 'oroui/js/mediator'],
-                function($, mediator){
-                    $('#add-entity-attachment-button').on('click', function(e) {
-                        e.preventDefault();
-                        mediator.trigger('attachment:add');
-                    });
-                });
-    </script>
-
+{% endif %}

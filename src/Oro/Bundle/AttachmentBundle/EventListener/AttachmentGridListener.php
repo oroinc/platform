@@ -10,6 +10,8 @@ class AttachmentGridListener
 {
     const GRID_PARAM_FIELD_NAME = 'entityField';
 
+    const GRID_LEFT_JOIN_PATH = '[source][query][join][left]';
+
     /** @var array */
     protected $paramsToBind = [];
 
@@ -26,13 +28,12 @@ class AttachmentGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $config = $event->getConfig();
-        $datagrid =  $event->getDatagrid();
-        $fieldName = $datagrid->getParameters()->get(self::GRID_PARAM_FIELD_NAME);
+        $config    = $event->getConfig();
+        $fieldName = $event->getDatagrid()->getParameters()->get(self::GRID_PARAM_FIELD_NAME);
 
-        $leftJoins = $config->offsetGetByPath('[source][query][join][left]', []);
-        $leftJoins[] =['join'  => 'attachment.' . $fieldName, 'alias' => 'e'];
-        $config->offsetSetByPath('[source][query][join][left]', $leftJoins);
+        $leftJoins   = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
+        $leftJoins[] = ['join' => 'attachment.' . $fieldName, 'alias' => 'entity'];
+        $config->offsetSetByPath(self::GRID_LEFT_JOIN_PATH, $leftJoins);
     }
 
     /**
@@ -40,16 +41,16 @@ class AttachmentGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datagrid = $event->getDatagrid();
+        $datagrid   = $event->getDatagrid();
         $dataSource = $event->getDatagrid()->getDatasource();
 
         if ($dataSource instanceof OrmDatasource) {
-            $parameters = $datagrid->getParameters();
+            $parameters   = $datagrid->getParameters();
             $queryBuilder = $dataSource->getQueryBuilder();
-            $params = array();
+            $params       = [];
 
             foreach ($this->paramsToBind as $fieldName) {
-                $param = $parameters->get($fieldName, null);
+                $param              = $parameters->get($fieldName, null);
                 $params[$fieldName] = $param;
             }
 

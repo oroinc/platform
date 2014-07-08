@@ -2,13 +2,18 @@
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
             {{ form_widget(form.file) }}
-            {{ form_errors(form.file) }}
+            {% if form_errors(form.file) %}
+                <div style="clear:both; float:left">
+                    {{ form_errors(form.file) }}
+                </div>
+            {% endif %}
         </div>
         {% if value is not empty %}
             {% if value.originalFilename is not empty %}
                 {% set parentEntity = form.parent.vars.value %}
                 {% set fieldName = form.vars.name %}
 
+                {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
@@ -19,16 +24,21 @@
                 </div>
                 <script type="text/javascript">
                     require(['jquery'],
-                        function($){
-                            $(function() {
-                                $(document).on('click', '#{{ buttonId }}', function() {
-                                    $('#{{ divId }}').hide();
-                                    $('#{{ inputId }}').val('true');
-                                    return false;
-                                });
+                    function($){
+                        $(function() {
+                            $(document).on('click', '#{{ buttonId }}', function() {
+                                $('#{{ divId }}').hide();
+                                $('#{{ inputId }}').val('true');
+                                return false;
                             });
                         });
+                    });
                 </script>
+                {% else %}
+                    <div class="oro_attachment_file">
+                        {{ oro_file_view(parentEntity, fieldName, value) }}
+                    </div>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endspaceless %}
@@ -38,18 +48,24 @@
     {% spaceless %}
         <div class="control-group" style="margin-bottom: 0">
             {{ form_widget(form.file) }}
-            {{ form_errors(form.file) }}
+            {% if form_errors(form.file) %}
+                <div style="clear:both; float:left">
+                    {{ form_errors(form.file) }}
+                </div>
+            {% endif %}
         </div>
         {% if value is not empty %}
             {% if value.originalFilename is not empty %}
                 {% set parentEntity = form.parent.vars.value %}
                 {% set fieldName = form.vars.name %}
+
+                {% if form.emptyFile is defined%}
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
                 <div id="{{ divId }}" class="oro_attachment_file">
-                    <a href="{{ oro_attachment_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
-                        <img src="{{ oro_resized_attachment_url(value) }}" alt="{{ value.originalFilename }}" />
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                        <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                         {{ value.originalFilename }}
                     </a>
                     {{ form_row(form.emptyFile) }}
@@ -67,6 +83,14 @@
                             });
                     </script>
                 </div>
+                {% else %}
+                    <div class="oro_attachment_file">
+                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                            <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
+                            {{ value.originalFilename }}
+                        </a>
+                    </div>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endspaceless %}

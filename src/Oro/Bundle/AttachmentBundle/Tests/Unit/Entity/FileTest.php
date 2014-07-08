@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 use Symfony\Component\HttpFoundation\File\File as FileType;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 
 class FileTest extends EntityTestAbstract
 {
