@@ -48,15 +48,20 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getName());
     }
 
-    public function testExecute()
+    /**
+     * @param array $ids
+     * @param bool $successful
+     * @dataProvider executeProvider
+     */
+    public function testExecute(array $ids, $successful = true)
     {
-        $processJobId = 1;
+        $callCount = count($ids);
         $this->input->expects($this->once())
             ->method('getOption')
             ->with('id')
-            ->will($this->returnValue($processJobId));
+            ->will($this->returnValue($ids));
 
-        $this->output->expects($this->never())
+        $this->output->expects($this->exactly($callCount))
             ->method('writeln');
 
         $processHandler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessHandler')
@@ -67,48 +72,74 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processHandler->expects($this->once())
-            ->method('handleJob')
-            ->with($processJob)
-            ->will($this->returnSelf());
+        if ($successful) {
+            $processHandler->expects($this->exactly($callCount))
+                ->method('handleJob')
+                ->with($processJob)
+                ->will($this->returnSelf());
+        } else {
+            $processHandler->expects($this->exactly($callCount))
+                ->method('handleJob')
+                ->with($processJob)
+                ->will($this->throwException(new \Exception()));
+        }
 
         $this->container->expects($this->at(1))
             ->method('get')
             ->with('oro_workflow.process.process_handler')
             ->will($this->returnValue($processHandler));
 
-        $this->assetProcessJobRepository($processJobId, $processJob);
+        $this->assertProcessJobRepository($ids, $successful, array_fill(0, $callCount, $processJob));
 
         $this->command->execute($this->input, $this->output);
+    }
+
+    public function executeProvider()
+    {
+        return array(
+            'single id' => array('ids' => array(1)),
+            'several ids successful' => array('ids' => array(1, 2, 3, 4, 5)),
+            'several ids failed' => array('ids' => array(1, 2, 3, 4, 5), 'successful' => false),
+        );
     }
 
     public function testExecuteEmptyIdError()
     {
-        $id = 1;
+        $ids = array(1);
         $this->input->expects($this->once())
             ->method('getOption')
             ->with('id')
-            ->will($this->returnValue($id));
+            ->will($this->returnValue($ids));
 
         $this->output->expects($this->once())
             ->method('writeln')
-            ->with(sprintf('<error>Process job with passed identity "%s" does not exist.</error>', $id))
+            ->with(sprintf('<error>Process jobs with passed identifiers do not exist</error>'))
             ->will($this->returnSelf());
 
-        $this->assetProcessJobRepository($id, null);
+        $processJob = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessJob')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->assertProcessJobRepository($ids, true, array());
 
         $this->command->execute($this->input, $this->output);
     }
 
-    protected function assetProcessJobRepository($processJobId, $processJob, $callOrder = 0)
+    /**
+     * @param array $processJobIds
+     * @param bool $successful
+     * @param array $processJobs
+     * @param int $callOrder
+     */
+    protected function assertProcessJobRepository(array $processJobIds, $successful, array $processJobs, $callOrder = 0)
     {
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->once())
-            ->method('find')
-            ->with($processJobId)
-            ->will($this->returnValue($processJob));
+            ->method('findByIds')
+            ->with($processJobIds)
+            ->will($this->returnValue($processJobs));
 
         $registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()
@@ -118,17 +149,21 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             ->with('OroWorkflowBundle:ProcessJob')
             ->will($this->returnValue($repository));
 
-        if ($processJob) {
+        if ($processJobs) {
             $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
                 ->disableOriginalConstructor()
                 ->getMock();
-            $entityManager->expects($this->once())
-                ->method('remove')
-                ->with($processJob)
-                ->will($this->returnSelf());
-            $entityManager->expects($this->once())
-                ->method('flush')
-                ->will($this->returnSelf());
+
+            $entityManager->expects($this->exactly(count($processJobs)))->method('beginTransaction');
+
+            if ($successful) {
+                $entityManager->expects($this->exactly(count($processJobs)))->method('remove');
+                $entityManager->expects($this->exactly(count($processJobs)))->method('flush');
+                $entityManager->expects($this->exactly(count($processJobs)))->method('commit');
+            } else {
+                $entityManager->expects($this->exactly(count($processJobs)))->method('rollback');
+            }
+
             $registry->expects($this->once())
                 ->method('getManagerForClass')
                 ->with('OroWorkflowBundle:ProcessJob')

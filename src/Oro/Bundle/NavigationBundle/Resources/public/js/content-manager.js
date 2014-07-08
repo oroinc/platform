@@ -236,9 +236,6 @@ define([
         return mediator.execute('retrievePath', _ref[0]);
     }
 
-    /**
-     * Router for hash navigation
-     */
     contentManager = {
         /**
          * Setups content management component, sets initial URL
@@ -319,7 +316,11 @@ define([
          */
         saveState: function (key, value, hash) {
             var url, query;
-            current.state[key] = value;
+            if (value !== null) {
+                current.state[key] = value;
+            } else {
+                delete current.state[key];
+            }
 
             if (!_.isUndefined(hash)) {
                 query = Chaplin.utils.queryParams.parse(current.query);
@@ -371,7 +372,7 @@ define([
          */
         currentUrl: function () {
             var url;
-            url = mediator.execute('combineRouteUrl', current.path, current.query);
+            url = mediator.execute('combineRouteUrl', current);
             return url;
         },
 

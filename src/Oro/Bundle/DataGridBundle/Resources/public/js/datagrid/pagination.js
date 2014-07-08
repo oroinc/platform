@@ -186,10 +186,14 @@ define(['jquery', 'underscore', 'backbone'
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-
             var state = this.collection.state;
 
+            // prevent render if data is not loaded yet
+            if (state.totalRecords == null) {
+                return this;
+            }
+
+            this.$el.empty();
             this.$el.append($(this.template({
                 disabled: !this.enabled || !state.totalRecords,
                 handles: this.makeHandles(),

@@ -134,11 +134,12 @@ class ControllersTest extends WebTestCase
      * @param array $report
      * @param array $reportResult
      * @param array $segmentExport
+     * @param array|null $segmentExportFilter
      *
      * @depends testView
      * @dataProvider segmentsDataProvider
      */
-    public function testExport(array $report, array $reportResult, array $segmentExport)
+    public function testExport(array $report, array $reportResult, array $segmentExport, $segmentExportFilter)
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
@@ -149,15 +150,26 @@ class ControllersTest extends WebTestCase
         $result = reset($result['data']);
         $id = $result['id'];
 
+
+
+        $keys = array_keys($segmentExportFilter);
+        $filter = array_values($segmentExportFilter);
+        $keys = str_replace('$id', $id, $keys);
+        $filter = array_combine($keys, $filter);
+
         //capture output content
         ob_start();
         $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_datagrid_export_action',
-                array('gridName' =>"oro_segment_grid_{$id}", "format" => 'csv')
+                array_merge(
+                    array('gridName' =>"oro_segment_grid_{$id}", "format" => 'csv'),
+                    $filter
+                )
             )
         );
+
         $content = ob_get_contents();
         // Clean the output buffer and end it
         ob_end_clean();

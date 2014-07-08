@@ -5,24 +5,9 @@
 {# grid params #}
 {% set params = {class_name: entity_class} %}
 
-{% set pageTitle = plural_label %}
+{% set pageTitle = plural_label|trans %}
 
 {% oro_title_set({params : {"%entityName%": label|default('N/A')|trans }}) %}
-
-{% block pageHeader %}
-    {% set breadcrumbs = {
-        'entity':      entity,
-        'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': 'Item #'~entity.id|default('N/A'),
-        'additional': [{
-            'indexPath'  : path('oro_entity_index', {id: parent}),
-            'indexLabel' : entity_config.get('label')|default('N/A')
-        }]
-    } %}
-
-    {{ parent() }}
-{% endblock pageHeader %}
 
 {% block navButtons %}
     {% if resource_granted('CREATE', 'entity:' ~ entity_class) %}

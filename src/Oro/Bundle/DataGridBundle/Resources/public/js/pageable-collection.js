@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tools'
     ], function (_, Backbone, BackbonePageableCollection, tools) {
@@ -28,7 +29,13 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
          *
          * @property
          */
-        initialState: {},
+        initialState: {
+            currentPage: 1,
+            pageSize: 25,
+            totals: null,
+            filters: {},
+            sorters: {}
+        },
 
         /**
          * Declaration of URL parameters
@@ -64,18 +71,31 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
          * @param models
          * @param options
          */
-        initialize: function(models, options) {
+        initialize: function (models, options) {
             options = options || {};
+
+            // copy initialState from the prototype to own property
+            this.initialState = tools.deepClone(this.initialState);
+            _.defaults(this.initialState, this.state);
+            if (options.initialState) {
+                if (options.initialState.sorters) {
+                    _.each(options.initialState.sorters, function (direction, field) {
+                        options.initialState.sorters[field] = this.getSortDirectionKey(direction);
+                    }, this);
+                }
+                _.extend(this.initialState, options.initialState);
+            }
+
+            // copy state from the prototype to own property
+            this.state = tools.deepClone(this.state);
             if (options.state) {
                 if (options.state.sorters) {
-                    _.each(options.state.sorters, function(direction, field) {
+                    _.each(options.state.sorters, function (direction, field) {
                         options.state.sorters[field] = this.getSortDirectionKey(direction);
                     }, this);
                 }
                 _.extend(this.state, options.state);
             }
-
-            this.initialState = tools.deepClone(this.state);
 
             if (options.url) {
                 this.url = options.url;
@@ -96,7 +116,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
 
             this.on('remove', this.onRemove, this);
 
-            BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+            PageableCollection.__super__.initialize.call(this, models, options);
 
             if (models.options) {
                 this.state.totals = models.options.totals;

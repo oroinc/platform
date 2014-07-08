@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
+use Oro\Bundle\NoteBundle\Tests\Selenium\Pages\Notes;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class NotesTest extends Selenium2TestCase
 {
-    protected $username = 'admin';
+    const USERNAME  = 'admin';
 
     /**
      * Test that user entity do not have Notes functionality On by default
@@ -16,8 +19,9 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $this->username)
-            ->open(array($this->username));
+            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+        /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();
     }
@@ -29,7 +33,7 @@ class NotesTest extends Selenium2TestCase
      */
     public function testAddNoteOn()
     {
-        $note = 'Some note_'.mt_rand();
+        $note = 'Some note_' . mt_rand();
         $entityName = 'User';
 
         $login = $this->login();
@@ -44,8 +48,9 @@ class NotesTest extends Selenium2TestCase
             ->assertMessage('Schema updated');
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $this->username)
-            ->open(array($this->username));
+            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+        /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNote()
             ->setNoteMessage($note)
@@ -69,8 +74,9 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $this->username)
-            ->open(array($this->username));
+            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+        /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->editNote($note)
             ->setNoteMessage($newNote)
@@ -91,8 +97,9 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $this->username)
-            ->open(array($this->username));
+            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+        /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->deleteNote($note)
             ->assertMessage('Note deleted');
@@ -114,11 +121,12 @@ class NotesTest extends Selenium2TestCase
             ->edit()
             ->enableNotes('No')
             ->save()
-            ->assertMessage('Schema updated');
+            ->assertMessage('Entity saved');
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $this->username)
-            ->open(array($this->username));
+            ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+        /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();
     }

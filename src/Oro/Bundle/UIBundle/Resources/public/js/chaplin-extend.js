@@ -84,6 +84,10 @@ define([
         var el, href;
         el = event.currentTarget;
 
+        if (event.isDefaultPrevented()) {
+            return;
+        }
+
         if (el.nodeName === 'A') {
             href = el.getAttribute('href');
             // prevent click by empty hashes

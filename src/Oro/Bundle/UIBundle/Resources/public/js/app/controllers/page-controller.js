@@ -23,7 +23,7 @@ define([
          * @override
          */
         initialize: function () {
-            var page;
+            var page, isInAction;
             PageController.__super__.initialize.apply(this, arguments);
 
             page = new PageModel();
@@ -33,6 +33,17 @@ define([
             this.listenTo(page, 'invalid', this.onPageInvalid);
             this.listenTo(page, 'error', this.onPageError);
             this.model = page;
+
+            isInAction = false;
+            this.subscribeEvent('page:beforeChange', function () {
+                isInAction = true;
+            });
+            this.subscribeEvent('page:afterChange', function () {
+                isInAction = false;
+            });
+            mediator.setHandler('isInAction', function () {
+                return isInAction;
+            });
         },
 
         /**
@@ -49,27 +60,32 @@ define([
 
             url = this._combineRouteUrl(route);
             this._setNavigationHandlers(url);
-
-            if (!route.previous || options.silent) {
-                // - page just loaded from server, does not require update
-                // - page was updated locally and url is changed, no request required
-                return;
-            }
-
-            this._beforePageLoad(route, params, options);
-
             args = {// collect arguments to reuse in events of page_fetch state change
                 params: params,
                 route: route,
                 options: options
             };
+
+            if (!route.previous || options.silent) {
+                // - page just loaded from server, does not require update
+                // - page was updated locally and url is changed, no request required
+
+                if (!route.previous) {
+                    // if this first time dispatch, trigger event 'page:afterChange'
+                    this.onPageUpdated(this.model, null, {actionArgs: args});
+                }
+                return;
+            }
+
+            this._beforePageLoad(route, params, options);
+
             cacheItem = this.cache.get(route.path);
 
-            if (cacheItem && options.force !== true) {
+            if (cacheItem && cacheItem.page && options.force !== true) {
                 options.fromCache = true;
-                this.publishEvent('page:request', args);
+                this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
-                this.publishEvent('page:afterChange');
+                this.onPageUpdated(this.model, null, {actionArgs: args});
             } else {
                 this.model.fetch({
                     url: url,
@@ -132,7 +148,9 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            this.publishEvent('page:afterChange');
+            //@todo develop approach to postpone 'page:afterChange' event
+            // until all inline scripts on a page have not finished changes
+            _.delay(_.bind(this.publishEvent, this), 50, 'page:afterChange');
         },
 
         /**
@@ -187,7 +205,7 @@ define([
             }
 
             this.publishEvent('page:error', model.getAttributes(), options.actionArgs, xhr);
-            this.publishEvent('page:afterChange');
+            this.onPageUpdated(model, null, options.actionArgs);
         },
 
         /**
@@ -200,7 +218,6 @@ define([
         _processRedirect: function (data, options) {
             var url, delimiter, parser;
             url = data.url || data.location;
-//            $.isActive(true);
             if (data.fullRedirect) {
                 delimiter = url.indexOf('?') === -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
@@ -225,12 +242,16 @@ define([
          */
         _setNavigationHandlers: function (url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
-            mediator.setHandler('refreshPage', function () {
-                utils.redirectTo({url: url}, {forceStartup: true, force: true});
+            mediator.setHandler('refreshPage', function (options) {
+                options = options || {};
+                _.defaults(options, {forceStartup: true, force: true});
+                utils.redirectTo({url: url}, options);
                 mediator.trigger('page:refreshed');
             });
             mediator.setHandler('submitPage', this._submitPage, this);
+            //@TODO discuss why is this handler needed
             mediator.setHandler('afterPageChange', function () {
+                // fake page:afterChange event trigger
                 mediator.trigger('page:afterChange');
             });
         },

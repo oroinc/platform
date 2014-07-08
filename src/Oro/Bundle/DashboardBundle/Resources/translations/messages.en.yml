@@ -1,7 +1,5 @@
 oro:
     dashboard:
-        block:
-            general: General Information
         title:
             main:            Dashboard
             quick_launchpad: Quick Launchpad

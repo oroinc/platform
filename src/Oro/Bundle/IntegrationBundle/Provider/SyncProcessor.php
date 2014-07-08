@@ -99,9 +99,7 @@ class SyncProcessor
         }
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-            /**
-             * Clone object here because it will be modified and changes should not be shared between
-             */
+            // Clone object here because it will be modified and changes should not be shared between
             $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
         } catch (\Exception $e) {
             // log and continue

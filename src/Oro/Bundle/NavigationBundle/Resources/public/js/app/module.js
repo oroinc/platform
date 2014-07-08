@@ -95,6 +95,22 @@ require([
             collection: collection
         });
     });
+
+    /**
+     * Init PageState view
+     */
+    BaseController.loadBeforeAction([
+        'oronavigation/js/app/views/page-state-view',
+        'oronavigation/js/app/models/page-state-model'
+    ], function (PageStateView, PageStateModel) {
+        var model;
+        model = new PageStateModel();
+        BaseController.addToReuse('pageState', PageStateView, {
+            el: '#container',
+            keepElement: true,
+            model: model
+        });
+    });
 });
 
 

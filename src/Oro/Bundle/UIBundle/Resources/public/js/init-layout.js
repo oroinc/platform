@@ -4,8 +4,9 @@
 
 require(['oroui/js/mediator'], function (mediator) {
     'use strict';
-    // @TODO utilize other event to mark page as rendered
-    mediator.once('tab:changed', function () {
+    mediator.once('page:afterChange', function () {
+        //@TODO remove delay, when afterChange event will
+        // take in account rendering from inline scripts
         setTimeout(function () {
             // emulates 'document ready state' for selenium tests
             document['page-rendered'] = true;
@@ -15,10 +16,10 @@ require(['oroui/js/mediator'], function (mediator) {
 });
 
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
-        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
+        'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, tools, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
+    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
     /* ============================================================
@@ -27,13 +28,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     $(function () {
         layout.init();
 
-        /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
-            if ($('#page-title').size()) {
-                document.title = _.unescape($('#page-title').text());
-            }
-            layout.hideProgressBar();
+        if ($('#page-title').size()) {
+            document.title = _.unescape($('#page-title').text());
         }
+        layout.hideProgressBar();
 
         /* side bar functionality */
         $('div.side-nav').each(function () {
@@ -202,11 +200,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     });
 
     /**
-     * Init page layout js and hide progress bar after hash navigation request is completed
+     * Init page layout js after navigation request is completed
      */
     mediator.bind("page:afterChange", function () {
         layout.init();
-        layout.hideProgressBar();
         layout.pageRendered();
     });
 
@@ -354,9 +351,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         type: 'DELETE',
                         success: function (data) {
                             el.trigger('removesuccess');
-                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                            messenger.addMessage('success', el.data('success-message'));
                             if (el.data('redirect')) {
-                                $.isActive(true);
                                 mediator.execute('redirectTo', {url: el.data('redirect')});
                             } else {
                                 mediator.execute('hideLoading');

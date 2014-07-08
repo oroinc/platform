@@ -98,7 +98,7 @@
                             form.attr('action', formAction);
                         });
 
-                        // prevent hash navigation form processing
+                        // prevent navigation form processing
                         e.stopImmediatePropagation();
                     });
 
@@ -193,6 +193,8 @@
     {% for address in addresses -%}
         {{ address }}
         {%- if not loop.last %}; {% endif %}
+    {% else %}
+        {{ 'N/A'|trans }}
     {%- endfor %}
 {%- endmacro %}
 
