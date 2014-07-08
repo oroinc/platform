@@ -47,8 +47,7 @@ class FileSubscriber implements EventSubscriberInterface
         $entity = $event->getData();
         $form   = $event->getForm();
 
-        if (
-            is_object($entity)
+        if (is_object($entity)
             && $entity->getId()
             && $entity->getFilename() !== null
             && $form->getConfig()->getOption(

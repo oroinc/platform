@@ -17,7 +17,7 @@ class AttachmentOwner implements Migration
         self::addOwnerToAttachment($schema);
     }
 
-    static public function addOwnerToAttachment(Schema $schema)
+    public static function addOwnerToAttachment(Schema $schema)
     {
         $table = $schema->getTable('oro_attachment');
         $table->addColumn('owner_user_id', 'integer', ['notnull' => false]);
