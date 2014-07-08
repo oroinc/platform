@@ -64,9 +64,9 @@
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
                 <div id="{{ divId }}" class="well well-small oro_attachment_file">
-                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename">
                         <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
-                        {{ value.originalFilename|trimString }}
+                        {{  value.originalFilename }}
                     </a>
                     {{ form_row(form.emptyFile) }}
                     <button id = "{{ buttonId }}" class="btn btn-action btn-link delete" type="button" data-related="{{ form.emptyFile.vars.name }}"></button>
@@ -85,9 +85,9 @@
                 </div>
                 {% else %}
                     <div class="well well-small oro_attachment_file">
-                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename">
                             <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
-                            {{ value.originalFilename|trimString }}
+                            {{ value.originalFilename }}
                         </a>
                     </div>
                 {% endif %}

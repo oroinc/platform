@@ -1,12 +1,21 @@
 .oro_attachment_file{
   border: none;
-  padding: 5px;
+  padding: 5px 5px 0 5px;
   width: 295px;
   line-height: 20px;
   margin-top: 5px;
   margin-bottom: 0;
   .removeFile{
     margin: 0;
+  }
+  .filename{
+    display:inline-block;
+    width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
   }
   .delete{
     float: right;
