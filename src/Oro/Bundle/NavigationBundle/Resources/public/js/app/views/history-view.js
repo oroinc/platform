@@ -14,7 +14,7 @@ define([
         pageItems: ['history'],
 
         render: function () {
-            // does not update view is data is from cache
+            // does not update view if data is from cache
             if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
                 return;
             }

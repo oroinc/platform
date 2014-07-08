@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action',
-    'chaplin'
-    ], function (_, __, messenger, mediator, ModelAction, Chaplin) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'oroui/js/mediator',
+    './model-action'
+], function (_, __, messenger, mediator, ModelAction) {
     'use strict';
 
     /**

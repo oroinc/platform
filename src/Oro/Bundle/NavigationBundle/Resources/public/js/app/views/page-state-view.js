@@ -43,9 +43,7 @@ define([
                 okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel')
             });
-            this.listenTo(confirmModal, 'ok', function () {
-                mediator.execute('refreshPage', {restore: true});
-            });
+            this.listenTo(confirmModal, 'ok', this._refreshPage);
 
             this.subview('confirmModal', confirmModal);
 
@@ -63,8 +61,16 @@ define([
             if (this._initialData !== null && this.model.get('data') !== this._initialData) {
                 this.subview('confirmModal').open();
             } else {
-                mediator.execute('refreshPage', {restore: true});
+                this._refreshPage();
             }
+        },
+
+        /**
+         * Calls global refreshPage handler with proper options
+         * @private
+         */
+        _refreshPage: function () {
+            mediator.execute('refreshPage', {restore: true});
         },
 
         /**
