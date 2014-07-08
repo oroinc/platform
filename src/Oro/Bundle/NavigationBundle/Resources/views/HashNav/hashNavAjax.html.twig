@@ -13,7 +13,7 @@
         'content': content,
         'showPinButton': (
             (app.request.attributes.get('_route') != 'oro_default' or show_pin_button_on_start_page)
-            and app.request.attributes.get('exception').statusCode is empty
+            and app.request.attributes.get('exception') is empty
         )
     } %}
     {{ data|json_encode|raw }}
