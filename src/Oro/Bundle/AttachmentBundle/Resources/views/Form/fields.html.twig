@@ -64,7 +64,7 @@
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
                 <div id="{{ divId }}" class="well well-small oro_attachment_file">
-                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename">
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                         <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                         {{  value.originalFilename }}
                     </a>
@@ -85,7 +85,7 @@
                 </div>
                 {% else %}
                     <div class="well well-small oro_attachment_file">
-                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename">
+                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                             <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                             {{ value.originalFilename }}
                         </a>
