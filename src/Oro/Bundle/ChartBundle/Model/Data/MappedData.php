@@ -50,6 +50,14 @@ class MappedData implements DataInterface
     }
 
     /**
+     * @return DataInterface
+     */
+    public function getSourceData()
+    {
+        return $this->sourceData;
+    }
+
+    /**
      * @param array|object $sourceItem
      * @param string $fieldName
      * @return mixed
