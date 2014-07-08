@@ -11,15 +11,13 @@
 
 {% block breadcrumbs %}
     {{ parent() }}
-    <div class="status-enabled pull-left">
+    <div class="pull-left">
         {% if entity.enabled %}
             <div class="badge badge-enabled status-enabled">
-                <i class="icon-status-enabled icon-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}
-            </div>
+                <i class="icon-status-enabled icon-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}</div>
         {% else %}
-            <div class="badge badge-enabled status-disabled">
-                <i class="icon-status-disabled icon-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}
-            </div>
+            <div class="badge badge-disabled status-disabled">
+                <i class="icon-status-disabled icon-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
