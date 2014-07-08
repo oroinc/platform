@@ -20,6 +20,7 @@ parameters:
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
+    oro_entity_extend.entity_config_dumper.relation_extension.class: Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -156,3 +157,11 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.association_builder
+
+    oro_entity_extend.entity_config_dumper.relation_extension:
+        class: %oro_entity_extend.entity_config_dumper.relation_extension.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.relation_builder
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }

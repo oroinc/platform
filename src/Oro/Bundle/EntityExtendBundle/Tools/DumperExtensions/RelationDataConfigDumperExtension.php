@@ -87,9 +87,7 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
             $this->entityConfigs = [];
 
             foreach ($extendConfigs as $extendConfig) {
-                $ownerType = $extendConfig->get('owner_type');
-
-                if (!empty($ownerType) && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                     $this->entityConfigs[] = $extendConfig;
                 }
             }

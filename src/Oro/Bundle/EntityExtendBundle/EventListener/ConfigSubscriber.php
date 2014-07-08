@@ -4,11 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
@@ -16,8 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -51,10 +46,10 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Update configs depending on their data and persist
-     * - create relations config data
      * - update entity and field states
      * - create index config data
      *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @param PersistConfigEvent $event
      */
     public function persistConfig(PersistConfigEvent $event)
@@ -72,39 +67,25 @@ class ConfigSubscriber implements EventSubscriberInterface
         $isCustom = $eventConfig->is('owner', ExtendScope::OWNER_CUSTOM);
 
         if ('extend' == $scope && $sizeMark && $isCustom) {
-            $this->persistCustomFieldConfig($event);
+            $configManager = $event->getConfigManager();
+            $className     = $eventConfig->getId()->getClassName();
+            $entityConfig  = $configManager->getProvider($scope)->getConfig($className);
+
+            /** @var bool $stateActiveOrUpdated event config state active or updated*/
+            $isStateActiveOrUpdated = $eventConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]);
+            if ($isStateActiveOrUpdated && !isset($change['state'])) {
+                $eventConfig->set('state', ExtendScope::STATE_UPDATED);
+                $configManager->calculateConfigChangeSet($eventConfig);
+            }
+
+            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
+                $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+                $configManager->persist($entityConfig);
+            }
         }
 
         if ('datagrid' == $scope && $eventConfigId->getFieldType() != 'text') {
             $this->persistExtendConfig($event);
-        }
-    }
-
-    /**
-     * @param PersistConfigEvent $event
-     */
-    protected function persistCustomFieldConfig(PersistConfigEvent $event)
-    {
-        $eventConfig   = $event->getConfig();
-        $configManager = $event->getConfigManager();
-        $change        = $configManager->getConfigChangeSet($eventConfig);
-
-        /** @var FieldConfigId $configId */
-        $configId     = $eventConfig->getId();
-        $scope        = $configId->getScope();
-        $className    = $configId->getClassName();
-        $entityConfig = $event->getConfigManager()->getProvider($scope)->getConfig($className);
-
-        if ($eventConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED])
-            && !isset($change['state'])
-        ) {
-            $eventConfig->set('state', ExtendScope::STATE_UPDATED);
-            $event->getConfigManager()->calculateConfigChangeSet($eventConfig);
-        }
-
-        if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
-            $entityConfig->set('state', ExtendScope::STATE_UPDATED);
-            $configManager->persist($entityConfig);
         }
     }
 
