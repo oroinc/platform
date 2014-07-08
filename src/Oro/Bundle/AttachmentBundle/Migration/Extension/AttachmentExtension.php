@@ -99,24 +99,26 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
      * Adds the association between the target table and the attachment table
      *
      * @param Schema $schema
-     * @param string $targetTableName  Target entity table name
-     * @param string $targetColumnName A column name is used to show related entity
+     * @param string $targetTableName Target entity table name
+     * @param array  $allowedMimeTypes
+     * @param int    $maxsize
      */
     public function addAttachmentAssociation(
         Schema $schema,
         $targetTableName,
-        $targetColumnName = null
+        array $allowedMimeTypes = [],
+        $maxsize = 1
     ) {
         $noteTable   = $schema->getTable(self::ATTACHMENT_ASSOCIATION_TABLE_NAME);
         $targetTable = $schema->getTable($targetTableName);
 
-        if (empty($targetColumnName)) {
-            $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
-            $targetColumnName  = array_shift($primaryKeyColumns);
-        }
+        $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
+        $targetColumnName  = array_shift($primaryKeyColumns);
 
         $options = new OroOptions();
         $options->set('attachment', 'enabled', true);
+        $options->set('attachment', 'maxsize', $maxsize);
+        $options->set('attachment', 'mimetypes', implode("\n", $allowedMimeTypes));
         $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(

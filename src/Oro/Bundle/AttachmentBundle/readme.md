@@ -122,7 +122,12 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->attachmentExtension->addAttachmentAssociation($schema, 'entity_table_name');
+        $this->attachmentExtension->addAttachmentAssociation(
+            $schema,
+            'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
+            $allowedMimeTypes = [], // optional, allowed mime types for entity, if empty - global configuration will be used
+            $maxsize = 1 // optional, max allowed file size for upload, in MB, by default 1
+        );
     }
 }
 ```
