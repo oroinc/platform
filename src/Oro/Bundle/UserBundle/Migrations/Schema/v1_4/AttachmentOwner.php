@@ -19,7 +19,7 @@ class AttachmentOwner implements Migration
 
     static public function addOwnerToAttachment(Schema $schema)
     {
-        $table = $schema->getTable('oro_attachment_file');
+        $table = $schema->getTable('oro_attachment');
         $table->addColumn('owner_user_id', 'integer', ['notnull' => false]);
         $table->addIndex(['owner_user_id'], 'IDX_FA0FE0812B18554A', []);
         $table->addForeignKeyConstraint(
