@@ -10,22 +10,24 @@ class Loader extends ORMQueryBuilderLoader
 {
     /**
      * @param EntityManager $em
-     * @param array         $allowedTypes
+     * @param array|null    $allowedTypes - integration types to include, null means that all types are allowed
      */
-    public function __construct(EntityManager $em, array $allowedTypes)
+    public function __construct(EntityManager $em, array $allowedTypes = null)
     {
-        $allowedTypes = is_array($allowedTypes) ? $allowedTypes : [$allowedTypes];
-        $allowedTypes = array_unique($allowedTypes);
-
         $qb = $em->createQueryBuilder();
         $qb->select('i');
         $qb->from('OroIntegrationBundle:Channel', 'i');
         $qb->orderBy('i.name', 'ASC');
 
-        if (!empty($allowedTypes)) {
-            $qb->andWhere($qb->expr()->in('i.type', $allowedTypes));
-        } else {
-            $qb->andWhere('1 = 0');
+        if (null !== $allowedTypes) {
+            $allowedTypes = is_array($allowedTypes) ? $allowedTypes : [$allowedTypes];
+            $allowedTypes = array_unique($allowedTypes);
+
+            if (!empty($allowedTypes)) {
+                $qb->andWhere($qb->expr()->in('i.type', $allowedTypes));
+            } else {
+                $qb->andWhere('1 = 0');
+            }
         }
 
         parent::__construct($qb);

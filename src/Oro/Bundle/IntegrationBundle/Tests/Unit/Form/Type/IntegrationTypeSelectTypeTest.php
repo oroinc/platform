@@ -5,8 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 
 class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,9 +19,6 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
     /** @var  CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
-    /**
-     * Setup test env
-     */
     protected function setUp()
     {
         $this->registry    = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
@@ -29,6 +26,11 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
             ->disableOriginalConstructor()->getMock();
         $this->type        = new IntegrationTypeSelectType($this->registry, $this->assetHelper);
+    }
+
+    public function tearDown()
+    {
+        unset($this->type, $this->registry, $this->assetHelper);
     }
 
     public function testSetDefaultOptions()
