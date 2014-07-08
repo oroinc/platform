@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
-
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;

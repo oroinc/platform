@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
+
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Symfony\Component\Yaml\Parser;
 
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension;
@@ -12,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 class AttachmentEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {

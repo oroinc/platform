@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
-
 abstract class EntityTestAbstract extends \PHPUnit_Framework_TestCase
 {
     protected $entity;
