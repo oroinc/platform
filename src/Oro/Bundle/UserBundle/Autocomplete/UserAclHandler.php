@@ -216,13 +216,39 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected function getSearchQueryBuilder($search)
     {
-        return $this->em->createQueryBuilder()
+        /** @var \Doctrine\ORM\QueryBuilder $queryBuilder */
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder
             ->select(['users'])
             ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
-            ->where('users.firstName like :searchString')
-            ->orWhere('users.lastName like :searchString')
-            ->orWhere('users.username like :searchString')
-            ->setParameter('searchString', $search . '%');
+            ->add(
+                'where',
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like(
+                        $queryBuilder->expr()->concat(
+                            'users.firstName',
+                            $queryBuilder->expr()->concat(
+                                $queryBuilder->expr()->literal(' '),
+                                'users.lastName'
+                            )
+                        ),
+                        '?1'
+                    ),
+                    $queryBuilder->expr()->like(
+                        $queryBuilder->expr()->concat(
+                            'users.lastName',
+                            $queryBuilder->expr()->concat(
+                                $queryBuilder->expr()->literal(' '),
+                                'users.firstName'
+                            )
+                        ),
+                        '?1'
+                    ),
+                    $queryBuilder->expr()->like('users.username', '?1')
+                )
+            )
+            ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
+        return $queryBuilder;
     }
 
     /**
