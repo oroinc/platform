@@ -18,7 +18,7 @@ class PlaceholderFilter
      */
     public function __construct(ConfigProvider $attachmentConfigProvider)
     {
-        $this->attachmentConfigProvider  = $attachmentConfigProvider;
+        $this->attachmentConfigProvider = $attachmentConfigProvider;
     }
 
     /**

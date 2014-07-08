@@ -35,10 +35,10 @@ class AttachmentManager
     protected $securityFacadeLink;
 
     /**
-     * @param FilesystemMap  $filesystemMap
-     * @param Router         $router
-     * @param ServiceLink    $securityFacadeLink
-     * @param array          $fileIcons
+     * @param FilesystemMap $filesystemMap
+     * @param Router        $router
+     * @param ServiceLink   $securityFacadeLink
+     * @param array         $fileIcons
      */
     public function __construct(
         FilesystemMap $filesystemMap,
@@ -46,9 +46,9 @@ class AttachmentManager
         ServiceLink $securityFacadeLink,
         $fileIcons
     ) {
-        $this->filesystem = $filesystemMap->get('attachments');
-        $this->router = $router;
-        $this->fileIcons = $fileIcons;
+        $this->filesystem         = $filesystemMap->get('attachments');
+        $this->router             = $router;
+        $this->fileIcons          = $fileIcons;
         $this->securityFacadeLink = $securityFacadeLink;
     }
 
@@ -61,15 +61,15 @@ class AttachmentManager
     public function prepareRemoteFile($fileUrl)
     {
         try {
-            $fileName = pathinfo($fileUrl)['basename'];
+            $fileName           = pathinfo($fileUrl)['basename'];
             $parametersPosition = strpos($fileName, '?');
             if ($parametersPosition) {
                 $fileName = substr($fileName, 0, $parametersPosition);
             }
             $filesystem = new SymfonyFileSystem();
-            $tmpFile = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
+            $tmpFile    = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
             $filesystem->copy($fileUrl, $tmpFile, true);
-            $file = new FileType($tmpFile);
+            $file       = new FileType($tmpFile);
             $attachment = new File();
             $attachment->setFile($file);
             $this->preUpload($attachment);
@@ -228,7 +228,7 @@ class AttachmentManager
             'oro_attachment_file',
             [
                 'codedString' => $urlString,
-                'extension' => $entity->getExtension()
+                'extension'   => $entity->getExtension()
             ],
             $absolute
         );
@@ -268,9 +268,9 @@ class AttachmentManager
         return $this->router->generate(
             'oro_resize_attachment',
             [
-                'width' => $width,
-                'height' => $height,
-                'id' => $entity->getId(),
+                'width'    => $width,
+                'height'   => $height,
+                'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename()
             ]
         );
@@ -303,9 +303,9 @@ class AttachmentManager
         return $this->router->generate(
             'oro_filtered_attachment',
             [
-                'id' => $entity->getId(),
+                'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename(),
-                'filter' => $filerName
+                'filter'   => $filerName
             ]
         );
     }

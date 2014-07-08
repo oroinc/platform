@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\Handler;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class AttachmentHandler
 {

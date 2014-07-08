@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
 use Symfony\Component\Validator\Validator;
-use Symfony\Component\Validator\Constraints\File as FileConstrain;
+use Symfony\Component\Validator\Constraints\File as FileConstraint;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
@@ -50,7 +50,7 @@ class ConfigFileValidator
         /** @var Config $entityAttachmentConfig */
         if ($fieldName === '') {
             $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $mimeTypes = $this->getMimeArray($entityAttachmentConfig->get('mimetypes')) ;
+            $mimeTypes              = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
             if (!$mimeTypes) {
                 $mimeTypes = array_merge(
                     $this->getMimeArray($this->config->get('oro_attachment.upload_mime_types')),
@@ -69,7 +69,7 @@ class ConfigFileValidator
             $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
         }
 
-        $fileSize  = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
+        $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
 
         foreach ($mimeTypes as $id => $value) {
             $mimeTypes[$id] = trim($value);
@@ -78,10 +78,10 @@ class ConfigFileValidator
         return $this->validator->validateValue(
             $entity->getFile(),
             [
-                new FileConstrain(
+                new FileConstraint(
                     [
-                        'maxSize'   => $fileSize,
-                        'mimeTypes' => $mimeTypes,
+                        'maxSize'          => $fileSize,
+                        'mimeTypes'        => $mimeTypes,
                         'mimeTypesMessage' => 'This file type is not allowed.'
                     ]
                 )

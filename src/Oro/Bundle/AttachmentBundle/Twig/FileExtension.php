@@ -15,7 +15,7 @@ class FileExtension extends \Twig_Extension
 {
     const DEFAULT_THUMB_SIZE = 16;
 
-    const FILES_TEMPLATE = 'OroAttachmentBundle:Twig:file.html.twig';
+    const FILES_TEMPLATE  = 'OroAttachmentBundle:Twig:file.html.twig';
     const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
 
     /** @var AttachmentManager */
@@ -30,7 +30,7 @@ class FileExtension extends \Twig_Extension
      */
     public function __construct(AttachmentManager $manager, ConfigManager $configManager)
     {
-        $this->manager = $manager;
+        $this->manager                  = $manager;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
     }
 
@@ -69,11 +69,11 @@ class FileExtension extends \Twig_Extension
     /**
      * Get file url
      *
-     * @param object     $parentEntity
-     * @param string     $fieldName
-     * @param File       $attachment
-     * @param string     $type
-     * @param bool       $absolute
+     * @param object $parentEntity
+     * @param string $fieldName
+     * @param File   $attachment
+     * @param string $type
+     * @param bool   $absolute
      * @return string
      */
     public function getFileUrl(
@@ -90,8 +90,8 @@ class FileExtension extends \Twig_Extension
      * Get resized attachment image url
      *
      * @param File $attachment
-     * @param int        $width
-     * @param int        $height
+     * @param int  $width
+     * @param int  $height
      * @return string
      */
     public function getResizedImageUrl(
@@ -132,8 +132,8 @@ class FileExtension extends \Twig_Extension
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url' => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName' => $attachment->getOriginalFilename()
+                    'url'       => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'fileName'  => $attachment->getOriginalFilename()
                 ]
             );
         }
@@ -159,7 +159,7 @@ class FileExtension extends \Twig_Extension
         $fieldName = ''
     ) {
         if ($attachment && $attachment->getFilename()) {
-            $width = self::DEFAULT_THUMB_SIZE;
+            $width  = self::DEFAULT_THUMB_SIZE;
             $height = self::DEFAULT_THUMB_SIZE;
 
             if ($entityClass && $fieldName) {
@@ -167,14 +167,14 @@ class FileExtension extends \Twig_Extension
                     $entityClass = ClassUtils::getRealClass($entityClass);
                 }
                 $config = $this->attachmentConfigProvider->getConfig($entityClass, $fieldName);
-                $width = $config->get('width');
+                $width  = $config->get('width');
                 $height = $config->get('height');
             }
             return $environment->loadTemplate(self::IMAGES_TEMPLATE)->render(
                 [
                     'imagePath' => $this->manager->getResizedImageUrl($attachment, $width, $height),
-                    'url' => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName' => $attachment->getOriginalFilename()
+                    'url'       => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'fileName'  => $attachment->getOriginalFilename()
                 ]
             );
         }
@@ -199,7 +199,7 @@ class FileExtension extends \Twig_Extension
 
         if ($attachment && $attachment->getFilename()) {
             $entityClass = ClassUtils::getRealClass($parentEntity);
-            $config = $this->attachmentConfigProvider->getConfig($entityClass, $fieldName);
+            $config      = $this->attachmentConfigProvider->getConfig($entityClass, $fieldName);
 
             return $this->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'));
         }
@@ -208,8 +208,8 @@ class FileExtension extends \Twig_Extension
     }
 
     /**
-     * @param File $attachment
-     * @param string  $filterName
+     * @param File   $attachment
+     * @param string $filterName
      * @return string
      */
     public function getFilteredImageUrl(File $attachment, $filterName)

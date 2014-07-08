@@ -111,7 +111,7 @@ class File extends ExtendFile
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -134,7 +134,7 @@ class File extends ExtendFile
     /**
      * Get filename
      *
-     * @return string 
+     * @return string
      */
     public function getFilename()
     {
@@ -157,7 +157,7 @@ class File extends ExtendFile
     /**
      * Get originalFilename
      *
-     * @return string 
+     * @return string
      */
     public function getOriginalFilename()
     {
@@ -180,7 +180,7 @@ class File extends ExtendFile
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -203,7 +203,7 @@ class File extends ExtendFile
     /**
      * Get updatedAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -325,7 +325,7 @@ class File extends ExtendFile
 
     public function __toString()
     {
-        return (string) $this->getFilename()
+        return (string)$this->getFilename()
             ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
             : '';
     }

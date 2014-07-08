@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
+
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
 {

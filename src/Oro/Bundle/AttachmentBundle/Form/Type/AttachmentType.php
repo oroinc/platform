@@ -4,8 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AttachmentType extends AbstractType
@@ -34,7 +32,7 @@ class AttachmentType extends AbstractType
             'comment',
             'textarea',
             [
-                'label' => 'oro.attachment.comment.label',
+                'label'    => 'oro.attachment.comment.label',
                 'required' => false,
             ]
         );
@@ -55,11 +53,11 @@ class AttachmentType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
+                'data_class'         => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                 'cascade_validation' => true,
-                'parentEntityClass' => '',
-                'checkEmptyFile' => false,
-                'allowDelete' => true,
+                'parentEntityClass'  => '',
+                'checkEmptyFile'     => false,
+                'allowDelete'        => true,
             ]
         );
     }

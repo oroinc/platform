@@ -37,7 +37,7 @@ class AttachmentController extends Controller
     {
         $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
         return [
-            'entityId' => $entityId,
+            'entityId'    => $entityId,
             'entityField' => ExtendHelper::buildAssociationName($entityClass),
         ];
     }
@@ -57,14 +57,14 @@ class AttachmentController extends Controller
     {
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
-        $entity = $entityRoutingHelper->getEntity($entityClass, $entityId);
+        $entity      = $entityRoutingHelper->getEntity($entityClass, $entityId);
         $entityClass = get_class($entity);
 
         $attachmentEntity = new Attachment();
         $attachmentEntity->setTarget($entity);
 
         $formAction = $entityRoutingHelper->generateUrl('oro_attachment_create', $entityClass, $entityId);
-        $form = $this->createForm(
+        $form       = $this->createForm(
             new AttachmentType(),
             $attachmentEntity,
             ['parentEntityClass' => $entityClass, 'checkEmptyFile' => true]
@@ -87,13 +87,13 @@ class AttachmentController extends Controller
     public function updateAction(Attachment $attachment)
     {
         $formAction = $this->getRequest()->getUri();
-        $form = $this->createForm(
+        $form       = $this->createForm(
             new AttachmentType(),
             $attachment,
             [
                 'parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()),
-                'checkEmptyFile' => false,
-                'allowDelete' => false
+                'checkEmptyFile'    => false,
+                'allowDelete'       => false
             ]
         );
         return $this->update($form, $formAction, true);
@@ -101,17 +101,17 @@ class AttachmentController extends Controller
 
     /**
      * @param FormInterface $form
-     * @param string $formAction
-     * @param bool $update
+     * @param string        $formAction
+     * @param bool          $update
      *
      * @return array
      */
     protected function update(FormInterface $form, $formAction, $update = false)
     {
-        $entity = $form->getData();
+        $entity       = $form->getData();
         $responseData = [
             'entity' => $entity,
-            'saved' => false
+            'saved'  => false
         ];
 
         if ($update) {
@@ -121,7 +121,7 @@ class AttachmentController extends Controller
         if ($this->get('oro_attachment.form.handler.attachment')->process($form)) {
             $responseData['saved'] = true;
         } else {
-            $responseData['form'] = $form->createView();
+            $responseData['form']       = $form->createView();
             $responseData['formAction'] = $formAction;
         }
 
