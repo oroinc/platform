@@ -29,7 +29,8 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
                     'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                     'cascade_validation' => true,
                     'parentEntityClass' => '',
-                    'checkEmptyFile' => false
+                    'checkEmptyFile' => false,
+                    'allowDelete' => true
                 ]
             );
 
@@ -47,6 +48,6 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with('comment', 'textarea');
 
-        $this->attachmentType->buildForm($builder, ['checkEmptyFile' => true]);
+        $this->attachmentType->buildForm($builder, ['checkEmptyFile' => true, 'allowDelete' => true]);
     }
 }

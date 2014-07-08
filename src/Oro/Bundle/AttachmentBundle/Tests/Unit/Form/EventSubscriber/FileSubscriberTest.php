@@ -61,8 +61,8 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($formConfig));
             $formConfig->expects($this->once())
                 ->method('getOption')
-                ->with('checkEmptyFile')
-                ->will($this->returnValue(false));
+                ->with('allowDelete')
+                ->will($this->returnValue(true));
         }
         $formEvent = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()

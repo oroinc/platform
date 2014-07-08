@@ -67,6 +67,7 @@ class FileType extends AbstractType
             [
                 'data_class'     => 'Oro\Bundle\AttachmentBundle\Entity\File',
                 'checkEmptyFile' => false,
+                'allowDelete' => true
             ]
         );
     }

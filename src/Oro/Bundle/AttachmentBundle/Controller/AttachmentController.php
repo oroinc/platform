@@ -92,7 +92,8 @@ class AttachmentController extends Controller
             $attachment,
             [
                 'parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()),
-                'checkEmptyFIle'    => false
+                'checkEmptyFile'    => false,
+                'allowDelete'       => false
             ]
         );
         return $this->update($form, $formAction, true);
