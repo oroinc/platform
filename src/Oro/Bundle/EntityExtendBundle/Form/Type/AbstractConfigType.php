@@ -13,6 +13,8 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * The abstract form type for form types are used to work with entity config attributes
+ * The goal of this form type is to check if an association is set
+ * and mark entity as as "Required Update".
  */
 abstract class AbstractConfigType extends AbstractType
 {

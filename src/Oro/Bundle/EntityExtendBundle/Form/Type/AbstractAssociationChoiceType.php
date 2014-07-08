@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
@@ -16,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
  * and mark entity as as "Required Update".
  * Also the association cannot be applied to the owning side entities.
  */
-abstract class AbstractAssociationChoiceType extends ChoiceType
+abstract class AbstractAssociationChoiceType extends AbstractConfigType
 {
     /** @var ConfigManager */
     protected $configManager;
