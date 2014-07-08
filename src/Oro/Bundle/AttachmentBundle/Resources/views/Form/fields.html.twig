@@ -17,10 +17,10 @@
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
-                <div id="{{ divId }}" class="oro_attachment_file">
+                <div id="{{ divId }}" class="well well-small oro_attachment_file">
                     {{ oro_file_view(parentEntity, fieldName, value) }}
                     {{ form_row(form.emptyFile) }}
-                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">x</button>
+                    <button id = "{{ buttonId }}" class="btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}"></button>
                 </div>
                 <script type="text/javascript">
                     require(['jquery'],
@@ -35,7 +35,7 @@
                     });
                 </script>
                 {% else %}
-                    <div class="oro_attachment_file">
+                    <div class="well well-small oro_attachment_file">
                         {{ oro_file_view(parentEntity, fieldName, value) }}
                     </div>
                 {% endif %}
@@ -63,13 +63,13 @@
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set buttonId = inputId ~ 'btn' %}
                 {% set divId = inputId ~ 'div' %}
-                <div id="{{ divId }}" class="oro_attachment_file">
-                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                <div id="{{ divId }}" class="well well-small oro_attachment_file">
+                    <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                         <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
-                        {{ value.originalFilename }}
+                        {{  value.originalFilename }}
                     </a>
                     {{ form_row(form.emptyFile) }}
-                    <button id = "{{ buttonId }}" class="removeFile btn btn-action btn-link" type="button" data-related="{{ form.emptyFile.vars.name }}">x</button>
+                    <button id = "{{ buttonId }}" class="btn btn-action btn-link delete" type="button" data-related="{{ form.emptyFile.vars.name }}"></button>
                     <script type="text/javascript">
                         require(['jquery'],
                             function($){
@@ -84,8 +84,8 @@
                     </script>
                 </div>
                 {% else %}
-                    <div class="oro_attachment_file">
-                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash">
+                    <div class="well well-small oro_attachment_file">
+                        <a href="{{ file_url(parentEntity, fieldName, value, 'download', true) }}" class="no-hash filename" title="{{ value.originalFilename }}">
                             <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
                             {{ value.originalFilename }}
                         </a>
