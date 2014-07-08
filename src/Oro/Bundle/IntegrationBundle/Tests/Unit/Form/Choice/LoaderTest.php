@@ -16,7 +16,6 @@ class LoaderTest extends OrmTestCase
      */
     public function testQueryConfiguration($allowedTypes, $expectedDQL)
     {
-
         $em     = $this->getTestEntityManager();
         $loader = new Loader($em, $allowedTypes);
 
