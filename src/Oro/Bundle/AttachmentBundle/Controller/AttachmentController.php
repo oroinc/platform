@@ -67,7 +67,7 @@ class AttachmentController extends Controller
         $form = $this->createForm(
             new AttachmentType(),
             $attachmentEntity,
-            ['parentEntityClass' => $entityClass, 'checkEmptyFIle' => true]
+            ['parentEntityClass' => $entityClass, 'checkEmptyFile' => true]
         );
         return $this->update($form, $formAction);
     }

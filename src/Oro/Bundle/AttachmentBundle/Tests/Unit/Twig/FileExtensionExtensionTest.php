@@ -65,7 +65,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_attachment', $this->extension->getName());
+        $this->assertEquals('oro_attachment_file', $this->extension->getName());
     }
 
     public function testGetFileUrl()
@@ -181,5 +181,35 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFileUrl');
 
         $this->extension->getImageView($environment, $parentEntity, $this->attachment, new TestClass(), 'testField');
+    }
+
+    public function testGetFilteredImageUrl()
+    {
+        $this->manager->expects($this->once())
+            ->method('getFilteredImageUrl')
+            ->with($this->attachment, 'testFilter');
+
+        $this->extension->getFilteredImageUrl($this->attachment, 'testFilter');
+    }
+
+    public function testGetConfiguredImageUrl()
+    {
+        $parent = new TestAttachment();
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->attachmentConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment', 'testField')
+            ->will($this->returnValue($config));
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->will($this->returnValue(45));
+        $this->attachment->setFilename('test.doc');
+        $this->manager->expects($this->once())
+            ->method('getResizedImageUrl')
+            ->with($this->attachment, 45, 45);
+
+        $this->extension->getConfiguredImageUrl($parent, 'testField', $this->attachment);
     }
 }

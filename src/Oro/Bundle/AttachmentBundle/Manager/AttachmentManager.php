@@ -180,7 +180,7 @@ class AttachmentManager
      * @param bool   $absolute
      * @return string
      */
-    public function getFiletUrl($parentEntity, $fieldName, File $entity, $type = 'get', $absolute = false)
+    public function getFileUrl($parentEntity, $fieldName, File $entity, $type = 'get', $absolute = false)
     {
         return $this->getAttachment(
             ClassUtils::getRealClass($parentEntity),

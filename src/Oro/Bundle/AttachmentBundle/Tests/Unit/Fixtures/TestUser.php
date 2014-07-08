@@ -6,6 +6,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class TestUser implements UserInterface
 {
+    public function getId()
+    {
+        return 1;
+    }
+
     /**
      * {@inheritdoc}
      */

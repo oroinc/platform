@@ -15,7 +15,7 @@ use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileSubscriber implements EventSubscriberInterface
 {
-    /** @var ConfigFileValidator  */
+    /** @var ConfigFileValidator */
     protected $validator;
 
     /**
@@ -46,12 +46,20 @@ class FileSubscriber implements EventSubscriberInterface
     {
         $entity = $event->getData();
         $form = $event->getForm();
-        if (is_object($entity) && $entity->getId() && $entity->getFilename() !== null) {
+
+        if (
+            is_object($entity)
+            && $entity->getId()
+            && $entity->getFilename() !== null
+            && !$form->getConfig()->getOption(
+                'checkEmptyFile'
+            )
+        ) {
             $form->add(
                 'emptyFile',
                 'hidden',
                 [
-                    'required'  => false,
+                    'required' => false,
                 ]
             );
         }
@@ -84,7 +92,7 @@ class FileSubscriber implements EventSubscriberInterface
     /**
      * Validate attachment field
      *
-     * @param FormInterface   $form
+     * @param FormInterface $form
      * @param File|Attachment $entity
      */
     protected function validate(FormInterface $form, $entity)

@@ -32,7 +32,7 @@ class FileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $constraints = [];
-        if ($options['checkEmptyFIle']) {
+        if ($options['checkEmptyFile']) {
             $constraints = [
                 new NotBlank()
             ];
@@ -43,7 +43,7 @@ class FileType extends AbstractType
             'file',
             [
                 'label' => 'oro.attachment.file.label',
-                'required'  => $options['checkEmptyFIle'],
+                'required'  => $options['checkEmptyFile'],
                 'constraints' => $constraints
             ]
         );
@@ -67,7 +67,7 @@ class FileType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\File',
-                'checkEmptyFIle' => false,
+                'checkEmptyFile' => false,
             ]
         );
     }

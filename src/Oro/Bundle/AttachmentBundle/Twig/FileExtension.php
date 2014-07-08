@@ -83,7 +83,7 @@ class FileExtension extends \Twig_Extension
         $type = 'get',
         $absolute = false
     ) {
-        return $this->manager->getFiletUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
+        return $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
     }
 
     /**
@@ -132,7 +132,7 @@ class FileExtension extends \Twig_Extension
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
                     'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url' => $this->manager->getFiletUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'url' => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
                     'fileName' => $attachment->getOriginalFilename()
                 ]
             );
@@ -185,9 +185,9 @@ class FileExtension extends \Twig_Extension
     /**
      * Get attachment image resized with config values
      *
-     * @param object     $parentEntity
-     * @param string     $fieldName
-     * @param File       $attachment
+     * @param object $parentEntity
+     * @param string $fieldName
+     * @param File   $attachment
      *
      * @return string
      */
@@ -207,6 +207,11 @@ class FileExtension extends \Twig_Extension
         return '';
     }
 
+    /**
+     * @param File $attachment
+     * @param string  $filterName
+     * @return string
+     */
     public function getFilteredImageUrl(File $attachment, $filterName)
     {
         return $this->manager->getFilteredImageUrl($attachment, $filterName);

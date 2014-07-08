@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class AttachmentType extends AbstractType
@@ -22,8 +24,8 @@ class AttachmentType extends AbstractType
             'oro_file',
             [
                 'label' => 'oro.attachment.file.label',
-                'required'  => true,
-                'checkEmptyFIle' => $options['checkEmptyFIle']
+                'required' => true,
+                'checkEmptyFile' => $options['checkEmptyFile']
             ]
         );
 
@@ -32,7 +34,7 @@ class AttachmentType extends AbstractType
             'textarea',
             [
                 'label' => 'oro.attachment.comment.label',
-                'required'  => false,
+                'required' => false,
             ]
         );
     }
@@ -55,7 +57,7 @@ class AttachmentType extends AbstractType
                 'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                 'cascade_validation' => true,
                 'parentEntityClass' => '',
-                'checkEmptyFIle' => false
+                'checkEmptyFile' => false
             ]
         );
     }
