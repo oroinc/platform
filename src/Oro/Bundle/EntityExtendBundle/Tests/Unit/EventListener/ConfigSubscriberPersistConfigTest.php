@@ -101,45 +101,6 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test update active field (entity state is 'Active')
-     *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
-     */
-    public function testScopeExtendActiveFieldActiveEntity()
-    {
-        $eventConfig = $this->getEventConfigNewField(['state' => ExtendScope::STATE_ACTIVE]);
-        $this->runPersistConfig(
-            $eventConfig,
-            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
-            [
-                'length' => [0 => 255, 1 => 200]
-            ]
-        );
-
-        $this->assertEquals(ExtendScope::STATE_UPDATED, $eventConfig->get('state'));
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-
-        $this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATED])],
-            'persistConfigs',
-            $cm
-        );
-
-        $this->assertAttributeEquals(
-            [
-                'extend_TestClass_testFieldName' => [
-                    'owner'     => [0 => null, 1 => ExtendScope::OWNER_CUSTOM],
-                    'state'     => [0 => null, 1 => ExtendScope::STATE_UPDATED],
-                    'is_extend' => [0 => null, 1 => true]
-                ]
-            ],
-            'configChangeSets',
-            $cm
-        );
-    }
-
-    /**
      *  Test create new field (relation type [1:*])
      */
     public function testScopeExtendRelationTypeCreateSelfRelationOneToMany()
@@ -381,58 +342,6 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
             [
                 'state' => [0 => null, 1 => ExtendScope::STATE_NEW]
             ]
-        );
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-        $this->assertAttributeEquals(null, 'persistConfigs', $cm);
-    }
-
-    /**
-     *  Field should be added to index
-     */
-    public function testScopeDataGridNewFieldNewEntity()
-    {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField([], 'integer', 'datagrid'),
-            $this->getEntityConfig(),
-            ['is_visible' => [0 => null, 1 => true]]
-        );
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-        $this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['index' => ['testFieldName' => null]])],
-            'persistConfigs',
-            $cm
-        );
-    }
-
-    /**
-     *  Field type 'text' should NOT be added to index
-     */
-    public function testScopeDataGridNewFieldNewEntityNot()
-    {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField([], 'text', 'datagrid'),
-            $this->getEntityConfig(),
-            ['is_visible' => [0 => null, 1 => true]]
-        );
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-        $this->assertAttributeEquals(null, 'persistConfigs', $cm);
-    }
-
-    /**
-     *  Field type 'text' should NOT be added to index, it's not extend
-     */
-    public function testScopeDataGridNewFieldNewEntityNotExtend()
-    {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField(['is_extend' => false, 'extend' => false], 'string', 'datagrid'),
-            $this->getEntityConfig(),
-            ['is_visible' => [0 => null, 1 => true]]
         );
 
         /** @var ConfigManager $cm */

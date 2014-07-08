@@ -68,15 +68,11 @@ class ConfigSubscriber implements EventSubscriberInterface
         }
 
         $change   = $event->getConfigManager()->getConfigChangeSet($eventConfig);
-        $sizeMark = count(array_intersect_key(array_flip(['length', 'precision', 'scale', 'state']), $change)) > 0;
+        $sizeMark = count(array_intersect_key(array_flip(['state']), $change)) > 0;
         $isCustom = $eventConfig->is('owner', ExtendScope::OWNER_CUSTOM);
 
         if ('extend' == $scope && $sizeMark && $isCustom) {
             $this->persistCustomFieldConfig($event);
-        }
-
-        if ('datagrid' == $scope && $eventConfigId->getFieldType() != 'text') {
-            $this->persistExtendConfig($event);
         }
     }
 
@@ -117,48 +113,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param PersistConfigEvent $event
-     */
-    protected function persistExtendConfig(PersistConfigEvent $event)
-    {
-        /** @var FieldConfigId $eventConfigId */
-        $eventConfigId = $event->getConfig()->getId();
-        $className     = $eventConfigId->getClassName();
-
-        /** @var ConfigProvider $extendConfigProvider */
-        $extendConfigProvider = $event->getConfigManager()->getProvider('extend');
-        $extendFieldConfig    = $extendConfigProvider->getConfigById($eventConfigId);
-
-        if (!$extendFieldConfig->is('is_extend') && !$extendFieldConfig->is('extend')) {
-            return;
-        }
-
-        $index        = [];
-        $extendConfig = $extendConfigProvider->getConfig($className);
-        if ($extendConfig->has('index')) {
-            $index = $extendConfig->get('index');
-        }
-
-        if (!isset($index[$eventConfigId->getFieldName()])
-            || $index[$eventConfigId->getFieldName()] != $event->getConfig()->get('is_visible')
-        ) {
-            $index[$eventConfigId->getFieldName()] = $event->getConfig()->get('is_visible');
-
-            $extendConfig->set('index', $index);
-
-            if (!$extendConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
-            }
-
-            if (!$extendFieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
-                $extendFieldConfig->set('state', ExtendScope::STATE_UPDATED);
-                $event->getConfigManager()->persist($extendFieldConfig);
-            }
-
-            $event->getConfigManager()->persist($extendConfig);
-        }
-    }
 
     /**
      * @param EntityConfigEvent $event
