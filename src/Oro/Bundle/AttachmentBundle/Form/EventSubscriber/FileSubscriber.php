@@ -51,8 +51,8 @@ class FileSubscriber implements EventSubscriberInterface
             is_object($entity)
             && $entity->getId()
             && $entity->getFilename() !== null
-            && !$form->getConfig()->getOption(
-                'checkEmptyFile'
+            && $form->getConfig()->getOption(
+                'allowDelete'
             )
         ) {
             $form->add(
