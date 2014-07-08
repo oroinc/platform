@@ -106,9 +106,9 @@
         }) }}
 
         <script type="text/javascript">
-            require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger',
+            require(['jquery', 'orotranslation/js/translator', 'routing',
                      'oroui/js/delete-confirmation', 'oroui/js/mediator'],
-            function ($, __, routing, messenger, DeleteConfirmation, mediator) {
+            function ($, __, routing, DeleteConfirmation, mediator) {
                 $(function () {
                     $('.run-button').click(function (e) {
                         e.preventDefault();
@@ -127,7 +127,7 @@
                             $.post(url,function () {
                                 success = true;
                             }).error(function () {
-                                messenger.notificationFlashMessage('error', __('An unidentified error has occurred. Please contact your Administrator.'));
+                                mediator.execute('showFlashMessage', 'error', __('An unidentified error has occurred. Please contact your Administrator.'));
                             }).always(function () {
                                 mediator.execute('hideLoading');
                                 if (success) {
@@ -135,11 +135,11 @@
 
                                     {% if reloadRequired %}
                                         mediator.once("page:update", function() {
-                                            messenger.notificationFlashMessage('success', successMessage);
+                                            mediator.execute('showFlashMessage', 'success', successMessage);
                                         });
                                         mediator.execute('refreshPage');
                                     {% else %}
-                                        messenger.notificationFlashMessage('success', successMessage);
+                                        mediator.execute('showFlashMessage', 'success', successMessage);
                                     {% endif %}
                                 }
                             });
