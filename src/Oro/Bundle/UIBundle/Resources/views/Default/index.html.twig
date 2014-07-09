@@ -24,9 +24,11 @@
                     compressed: not app.debug,
                     config_extend: requirejs_config_extend
                 } %}
+                {% block application %}
                 <script type="text/javascript">
                     require(['oroui/js/app']);
                 </script>
+                {% endblock %}
                 <script type="text/javascript">
                     require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
