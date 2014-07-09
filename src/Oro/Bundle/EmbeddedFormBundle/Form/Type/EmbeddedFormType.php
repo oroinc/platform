@@ -22,7 +22,13 @@ class EmbeddedFormType extends AbstractType
     {
         $builder
             ->add('title', 'text')
-            ->add('formType', 'oro_available_embedded_forms')
+            ->add(
+                'formType',
+                'oro_available_embedded_forms',
+                [
+                    'empty_value' => 'oro.embeddedform.form.no_types_available'
+                ]
+            )
             ->add('css', 'textarea')
             ->add('successMessage', 'textarea', ['tooltip' => 'oro.embeddedform.success_message.tooltip']);
     }

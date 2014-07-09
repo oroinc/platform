@@ -24,3 +24,5 @@ oro:
 
         controller:
             saved_message: Form has been saved successfully
+        form:
+            no_types_available: No available form types
