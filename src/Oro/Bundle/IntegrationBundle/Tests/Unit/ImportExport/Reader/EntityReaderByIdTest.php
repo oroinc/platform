@@ -87,7 +87,7 @@ class EntityReaderByIdTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
+     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Configuration of entity reader must contain either "entityName".
      */
     public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
