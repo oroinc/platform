@@ -90,3 +90,54 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
 }
 
 ```
+
+Also you can enable attachments for entity, e.g.:
+
+```
+<?php
+
+namespace Acme\Bundle\DemoBundle\Migrations\Schema\v1_0;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+
+class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
+{
+    /** @var AttachmentExtension */
+    protected $attachmentExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
+    {
+        $this->attachmentExtension = $attachmentExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        $this->attachmentExtension->addAttachmentAssociation(
+            $schema,
+            'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
+            $allowedMimeTypes = [], // optional, allowed mime types for entity, if empty - global configuration will be used
+            $maxsize = 1 // optional, max allowed file size for upload, in MB, by default 1
+        );
+    }
+}
+```
+
+#Entity attachments
+
+Configurable entities can use attachments for adding additional files to records.
+
+To turn attachments for entity, administrator should turn attachments in UI for current entity configuration.
+
+Additional, admin can set array with allowed nine types and maximun attached file size. If mime types was not set, for validation will be taken mime types from `Upload settings` block mime types of system configuraton.
+
+After the schema was updated, for current entity will be available button `Add attachment`.

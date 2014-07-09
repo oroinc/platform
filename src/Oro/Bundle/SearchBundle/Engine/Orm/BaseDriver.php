@@ -229,13 +229,11 @@ abstract class BaseDriver
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
         $qb = $this->createQueryBuilder('search')
-            ->select(array('search as item', 'text'))
-            ->leftJoin('search.textFields', 'text', 'WITH', 'text.field = :allTextField')
+            ->select(array('search as item', 'textField'))
             ->leftJoin('search.textFields', 'textField')
             ->leftJoin('search.integerFields', 'integerField')
             ->leftJoin('search.decimalFields', 'decimalField')
-            ->leftJoin('search.datetimeFields', 'datetimeField')
-            ->setParameter('allTextField', Indexer::TEXT_ALL_DATA_FIELD);
+            ->leftJoin('search.datetimeFields', 'datetimeField');
 
         $this->setFrom($query, $qb);
 

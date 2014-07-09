@@ -16,6 +16,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_1\UserEmailOrigins;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UserAvatars;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActivities;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_4\AttachmentOwner;
 
 class OroUserBundleInstaller implements
     Installation,
@@ -33,7 +34,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -63,6 +64,7 @@ class OroUserBundleInstaller implements
         OroUserBundle::oroUserTable($schema, false, false);
         UserAvatars::addAvatarToUser($schema, $this->attachmentExtension);
         UserAvatars::addOwnerToOroFile($schema);
+        AttachmentOwner::addOwnerToAttachment($schema);
         OroUserBundle::oroUserAccessGroupTable($schema);
         OroUserBundle::oroUserAccessGroupRoleTable($schema);
         OroUserBundle::oroUserAccessRoleTable($schema);
