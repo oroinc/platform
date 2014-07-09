@@ -1,9 +1,9 @@
 oro.attachment:
     form.tooltip:
         file_mime_types: |
-            List of file types in MIME format, that are available for upload into ORO system.
+            List of MIME file types that are permitted for upload.
         image_mime_types: |
-            List of image types in MIME format, that are available for upload into ORO system.
+            List of MIME image types that are permitted for upload.
 
     max_size:     Max allowed file size to upload in MB.
     thumb_width:  Thumbnail width in PX.
