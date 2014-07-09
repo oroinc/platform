@@ -246,6 +246,208 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     *  Test create new field (relation type [*:*])
+     */
+    public function testCreateSelfRelationManyToMany()
+    {
+        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
+        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+
+        $configs = [
+            $config1, $config2
+        ];
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                ],
+                'manyToMany'
+            ),
+        ];
+
+        // get field configs
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->with('TestClass')
+            ->will($this->returnValue($fieldsConfigs));
+
+        $selfConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+
+        $this->extendConfigProvider
+            ->expects($this->at(1))
+            ->method('getConfig')
+            ->with('TestClass')
+            ->will($this->returnValue($selfConfig));
+
+        $this->extendConfigProvider
+            ->expects($this->at(2))
+            ->method('getConfig')
+            ->with('TestClass')
+            ->will($this->returnValue($selfConfig));
+
+        $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $this->extendConfigProvider
+            ->expects($this->at(4))
+            ->method('getConfig')
+            ->with('Oro\Bundle\UserBundle\Entity\User')
+            ->will($this->returnValue($targetConfig));
+
+        $this->extension->preUpdate($configs);
+
+        $this->assertEquals(
+            [
+                'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToMany'
+                    ),
+                    'owner'           => false,
+                    'target_entity'   => 'TestClass',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToMany'
+                    ),
+                ],
+            ],
+            $targetConfig->get('relation')
+        );
+
+        $this->assertEquals(
+            [
+                'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToMany'
+                    ),
+                    'owner'           => true,
+                    'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToMany'
+                    ),
+                ],
+            ],
+            $selfConfig->get('relation')
+        );
+    }
+
+    /**
+     *  Test create new field (relation type [*:*])
+     */
+    public function testCreateTargetRelationManyToMany()
+    {
+        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
+        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+
+        $configs = [
+            $config1, $config2
+        ];
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [
+                    'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_title'    => ['username'],
+                    'target_grid'     => ['username'],
+                    'target_detailed' => ['username'],
+                    'relation_key'    => 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName',
+                ],
+                'manyToMany'
+            ),
+        ];
+
+        // get field configs
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->with('TestClass')
+            ->will($this->returnValue($fieldsConfigs));
+
+        $relation = [
+            'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                'assign'          => true,
+                'owner'           => true,
+                'target_entity'   => 'TestClass',
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'TestClass',
+                    'testFieldName',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $selfConfig = $this->getEntityConfig(
+            [
+                'state' => ExtendScope::STATE_ACTIVE,
+                'relation' => $relation,
+            ]
+        );
+
+        $targetConfig = $this->getEntityConfig(
+            [
+                'state'    => ExtendScope::STATE_ACTIVE,
+                'relation' => $relation,
+            ],
+            'extend',
+            'Oro\Bundle\UserBundle\Entity\User'
+        );
+
+        // isInverseSideRelationExist
+        $this->extendConfigProvider
+            ->expects($this->at(1))
+            ->method('getConfig')
+            ->with('TestClass')
+            ->will($this->returnValue($config2));
+
+        $this->extendConfigProvider
+            ->expects($this->at(2))
+            ->method('getConfig')
+            ->with('Oro\Bundle\UserBundle\Entity\User')
+            ->will($this->returnValue($targetConfig));
+
+        $this->extendConfigProvider
+            ->expects($this->at(3))
+            ->method('getConfig')
+            ->with('TestClass')
+            ->will($this->returnValue($selfConfig));
+
+
+        $this->extendConfigProvider
+            ->expects($this->at(4))
+            ->method('getConfig')
+            ->with('Oro\Bundle\UserBundle\Entity\User')
+            ->will($this->returnValue($targetConfig));
+
+        $this->extension->preUpdate($configs);
+
+        // setup expected relation array
+        $relationKey = 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName';
+        $relation[$relationKey]['target_field_id'] = $relation[$relationKey]['field_id'];
+
+        $this->assertEquals(
+            $relation,
+            $targetConfig->get('relation')
+        );
+
+        $this->assertEquals($relation, $targetConfig->get('relation'));
+    }
+
+    /**
      * FieldConfig
      *
      * @param array $values
@@ -277,11 +479,13 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * EntityConfig
      *
-     * @param array $values
+     * @param array  $values
      * @param string $scope
+     * @param string $className
+     *
      * @return Config
      */
-    protected function getEntityConfig($values = [], $scope = 'extend')
+    protected function getEntityConfig($values = [], $scope = 'extend', $className = 'TestClass')
     {
         $resultValues = [
             'owner'       => ExtendScope::OWNER_CUSTOM,
@@ -298,7 +502,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             $resultValues = array_merge($resultValues, $values);
         }
 
-        $entityConfigId = new EntityConfigId($scope, 'TestClass');
+        $entityConfigId = new EntityConfigId($scope, $className);
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($resultValues);
 
