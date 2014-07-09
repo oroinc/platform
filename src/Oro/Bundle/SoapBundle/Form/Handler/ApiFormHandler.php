@@ -22,19 +22,19 @@ class ApiFormHandler
     /**
      * @var ObjectManager
      */
-    protected $manager;
+    protected $entityManager;
 
     /**
      *
      * @param FormInterface $form
      * @param Request       $request
-     * @param ObjectManager $manager
+     * @param ObjectManager $entityManager
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
+    public function __construct(FormInterface $form, Request $request, ObjectManager $entityManager)
     {
         $this->form    = $form;
         $this->request = $request;
-        $this->manager = $manager;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -66,7 +66,7 @@ class ApiFormHandler
      */
     protected function onSuccess($entity)
     {
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
     }
 }

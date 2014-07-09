@@ -7,7 +7,7 @@ interface SoapApiCrudInterface extends SoapApiReadInterface
     /**
      * Create item.
      *
-     * @return bool
+     * @return integer
      */
     public function handleCreateRequest();
 
