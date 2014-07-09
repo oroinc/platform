@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
@@ -19,23 +18,16 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     /** @var ConfigProviderInterface */
     protected $extendConfigProvider;
 
-    /** @var RelationBuilder */
-    protected $relationBuilder;
-
     /** @var ConfigInterface[] */
     private $entityConfigs;
 
     /**
-     * @param ConfigManager             $configManager
-     * @param RelationBuilder           $relationBuilder
+     * @param ConfigManager $configManager
      */
-    public function __construct(
-        ConfigManager $configManager,
-        RelationBuilder $relationBuilder
-    ) {
+    public function __construct(ConfigManager $configManager)
+    {
         $this->configManager             = $configManager;
         $this->extendConfigProvider      = $configManager->getProvider('extend');
-        $this->relationBuilder           = $relationBuilder;
     }
 
     /**
@@ -96,6 +88,9 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
         return $this->entityConfigs;
     }
 
+    /**
+     * @param Config $fieldConfig
+     */
     protected function createRelation(Config $fieldConfig)
     {
         if ($this->isInverseSideRelationExist($fieldConfig)) {
@@ -124,6 +119,9 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
         }
     }
 
+    /**
+     * @param Config $fieldConfig
+     */
     protected function createSelfRelation(Config $fieldConfig)
     {
         /** @var FieldConfigId $fieldConfigId */
@@ -201,6 +199,10 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
         $this->extendConfigProvider->persist($targetConfig);
     }
 
+    /**
+     * @param Config $fieldConfig
+     * @param string $relationKey
+     */
     protected function createTargetRelation(Config $fieldConfig, $relationKey)
     {
         $selfEntityClass   = $fieldConfig->getId()->getClassName();
@@ -224,7 +226,11 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
         $this->extendConfigProvider->persist($targetConfig);
     }
 
-
+    /**
+     * @param Config $fieldConfig
+     *
+     * @return bool
+     */
     protected function isInverseSideRelationExist(Config $fieldConfig)
     {
         $selfConfig = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
