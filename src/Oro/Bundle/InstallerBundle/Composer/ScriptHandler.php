@@ -44,6 +44,7 @@ class ScriptHandler extends SensioScriptHandler
         $directories = [
             'app/cache',
             'app/logs',
+            'app/attachment',
             $webDir,
             $parametersFile
         ];
