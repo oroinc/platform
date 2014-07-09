@@ -6,7 +6,7 @@
         function(mediator, widgetManager) {
             var gridName = {{ gridName|json_encode|raw }};
             mediator.bind('datagrid_create_before', function(options) {
-                if (options.name == gridName && !options.rowClickAction) {
+                if (options.name == gridName) {
                     options.rowClickAction = function(data) {
                         return {
                             run: function() {

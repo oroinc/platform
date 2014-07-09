@@ -34,7 +34,7 @@ class EntityType extends AbstractType
             'text',
             [
                 'label'       => 'Name',
-                'block'       => 'entity',
+                'block'       => 'general',
                 'subblock'    => 'second',
                 'constraints' => [
                     new Assert\Length(['min' => 5, 'max' => $this->nameGenerator->getMaxCustomEntityNameSize()])
@@ -52,8 +52,7 @@ class EntityType extends AbstractType
             [
                 'data_class'   => 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
                 'block_config' => [
-                    'entity' => [
-                        'title'     => 'General',
+                    'general' => [
                         'subblocks' => [
                             'second' => [
                                 'priority' => 10

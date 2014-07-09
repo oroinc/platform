@@ -1,0 +1,57 @@
+oro:
+    attachment:
+        entity_label:        Attachment
+        entity_plural_label: Attachments
+        entity_description:  Attachments management
+
+        id.label:            Id
+        comment.label:       Comment
+        file.label:          File
+
+        block_titles:
+            attachments.label:  Attachments management
+
+        enabled:              Enable attachments
+        maxsize:              Max allowed file size, Mb
+        mimetypes:            Allowed mime types
+
+        file:
+            entity_label:            File
+            entity_plural_label:     Files
+            entity_description:      File storage
+
+            id.label:                Id
+            filename.label:          File name
+            original_filename.label: Original file name
+            filepath.label:          File path
+            created_at.label:        Created
+            updated_at.label:        Updated
+            owner.label:             Owner
+            extension.label:         Extension
+            file.label:              File
+            delete_file.label:       Delete
+            file_size.label:         File size
+            mime_type.label:         Mime type
+
+        config:
+            file_size.label:     File size
+            thumb_width.label:   Thumbnail width
+            thumb_height.label:  Thumbnail height
+            attachment.label:    Upload Settings
+            mime_types.label:    Mime types
+            upload_mime_types.label:       File mime types
+            upload_image_mime_types.label: Image mime types
+
+        action:
+            add:                 Add attachment
+            update:              Update attachment
+            saved:               Attachment saved successfully
+            button:
+                update:          Update
+                delete:          Delete
+
+    entity_extend:
+        form:
+            data_type:
+                file:  File
+                image: Image

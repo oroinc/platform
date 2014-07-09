@@ -27,14 +27,28 @@ abstract class SoapController extends SoapGetController implements
     }
 
     /**
-     * {@inheritDoc}
+     * Create new
+     *
+     * @param mixed $_ [optional] Arguments will be passed to createEntity method
+     * @return integer
      */
     public function handleCreateRequest()
     {
-        $entity = $this->getManager()->createEntity();
+        $entity = call_user_func_array(array($this, 'createEntity'), func_get_args());
         $this->processForm($entity);
 
         return $this->getManager()->getEntityId($entity);
+    }
+
+    /**
+     * Create new entity
+     *
+     * @param mixed $_ [optional] Arguments will be passed to createEntity method of manager (result of getManager)
+     * @return mixed
+     */
+    protected function createEntity()
+    {
+        return call_user_func_array(array($this->getManager(), 'createEntity'), func_get_args());
     }
 
     /**

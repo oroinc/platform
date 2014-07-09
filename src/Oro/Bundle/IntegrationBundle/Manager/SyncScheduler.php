@@ -6,7 +6,8 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 /**
@@ -26,6 +27,10 @@ class SyncScheduler
     /** @var TypesRegistry */
     protected $typesRegistry;
 
+    /**
+     * @param EntityManager $em
+     * @param TypesRegistry $typesRegistry
+     */
     public function __construct(EntityManager $em, TypesRegistry $typesRegistry)
     {
         $this->em            = $em;
@@ -35,23 +40,26 @@ class SyncScheduler
     /**
      * Schedules backward sync job
      *
-     * @param Channel $channel
-     * @param string  $connectorType
-     * @param array   $params
-     * @param bool    $useFlush
+     * @param Integration $integration
+     * @param string      $connectorType
+     * @param array       $params
+     * @param bool        $useFlush
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
-    public function schedule(Channel $channel, $connectorType, $params = [], $useFlush = true)
+    public function schedule(Integration $integration, $connectorType, $params = [], $useFlush = true)
     {
-        $connector = $this->typesRegistry->getConnectorType($channel->getType(), $connectorType);
+        if (!$integration->getEnabled()) {
+            return;
+        }
 
+        $connector = $this->typesRegistry->getConnectorType($integration->getType(), $connectorType);
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
-            throw new \LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
+            throw new LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
         }
 
         $args = [
-            '--channel=' . $channel->getId(),
+            '--integration=' . $integration->getId(),
             '--connector=' . $connectorType,
             '--params=' . serialize($params)
         ];

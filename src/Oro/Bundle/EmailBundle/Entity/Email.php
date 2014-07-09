@@ -11,6 +11,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
+use Oro\Bundle\EmailBundle\Model\ExtendEmail;
+
 /**
  * Email
  *
@@ -21,18 +23,28 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  *
- *  @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-envelope"},
- *      "security"={
- *          "type"="ACL",
- *          "permissions"="VIEW;CREATE",
- *          "group_name"=""
+ * @Config(
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-envelope"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE",
+ *              "group_name"=""
+ *          },
+ *          "grouping"={
+ *              "groups"={"activity"}
+ *          },
+ *          "activity"={
+ *              "route"="oro_email_activity_view",
+ *              "acl"="oro_email_view",
+ *              "action_widget"="oro_send_email_button"
+ *          }
  *      }
- *  }
  * )
  */
-class Email
+class Email extends ExtendEmail
 {
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;
@@ -175,6 +187,8 @@ class Email
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
         $this->emailBody  = new ArrayCollection();

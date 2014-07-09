@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -14,13 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_embedded_form")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_embedded_form_list",
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_embedded_form_list",
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class EmbeddedForm
@@ -41,15 +43,6 @@ class EmbeddedForm
      * @Assert\NotBlank()
      */
     protected $title;
-
-    /**
-     * @var Channel
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id")
-     *
-     */
-    protected $channel;
 
     /**
      * @var string
@@ -95,22 +88,6 @@ class EmbeddedForm
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param Channel $channel
-     */
-    public function setChannel(Channel $channel)
-    {
-        $this->channel = $channel;
-    }
-
-    /**
-     * @return Channel
-     */
-    public function getChannel()
-    {
-        return $this->channel;
     }
 
     /**

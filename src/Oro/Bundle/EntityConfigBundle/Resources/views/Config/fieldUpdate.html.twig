@@ -21,11 +21,15 @@
 {% endblock navButtons %}
 
 {% block pageHeader %}
+    {% set entityTitle = field.id ?
+        (field_config.get('label')|trans) | default(field.fieldName|capitalize) :
+        'oro.entity_config.info.new_field.label'|trans
+    %}
     {% set breadcrumbs = {
         'entity'      : 'entity',
         'indexPath'   : path('oro_entityconfig_index'),
         'indexLabel'  : 'Entities',
-        'entityTitle' : field.id ? (field_config.get('label')|trans)|default(field.fieldName|capitalize) : 'New Field'|trans,
+        'entityTitle' : entityTitle,
         'additional'  : [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: field.entity.id}),

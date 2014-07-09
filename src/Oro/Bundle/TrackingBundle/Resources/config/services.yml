@@ -1,0 +1,89 @@
+parameters:
+    oro_tracking.tracking_website.class:                 Oro\Bundle\TrackingBundle\Entity\TrackingWebsite
+    oro_tracking.tracking_event.class:                   Oro\Bundle\TrackingBundle\Entity\TrackingEvent
+    oro_tracking.tracking_data.class:                    Oro\Bundle\TrackingBundle\Entity\TrackingData
+    oro_tracking.form.type.tracking_website.class:       Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType
+    oro_tracking.form.handler.tracking_website.class:    Oro\Bundle\TrackingBundle\Form\Handler\TrackingWebsiteHandler
+    oro_tracking.tracking_website.manager.api.class:     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_tracking.importexport.reader.log.class:          Oro\Bundle\TrackingBundle\ImportExport\LogReader
+    oro_tracking.importexport.reader.context.class:      Oro\Bundle\TrackingBundle\ImportExport\ContextReader
+    oro_tracking.importexport.normalizer.data.class:     Oro\Bundle\TrackingBundle\ImportExport\DataNormalizer
+    oro_tracking.importexport.data_converter.data.class: Oro\Bundle\TrackingBundle\ImportExport\DataConverter
+    oro_tracking.config.listener:                        Oro\Bundle\TrackingBundle\EventListener\ConfigListener
+services:
+    oro_tracking.form.type.tracking_website:
+        class: %oro_tracking.form.type.tracking_website.class%
+        arguments:
+            - %oro_tracking.tracking_website.class%
+        tags:
+            - { name: form.type, alias: oro_tracking_website }
+
+    oro_tracking.form.handler.tracking_website:
+        class: %oro_tracking.form.handler.tracking_website.class%
+        scope: request
+        arguments:
+            - @oro_tracking.form.tracking_website
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_tracking.form.tracking_website:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - oro_tracking_website
+            - oro_tracking_website
+
+    oro_tracking.tracking_website.manager.api:
+        class: %oro_tracking.tracking_website.manager.api.class%
+        arguments:
+            - %oro_tracking.tracking_website.class%
+            - @doctrine.orm.entity_manager
+
+    oro_tracking.importexport.reader.log:
+        class: %oro_tracking.importexport.reader.log.class%
+        arguments:
+            - @oro_importexport.context_registry
+
+    oro_tracking.importexport.reader.context:
+        class: %oro_tracking.importexport.reader.context.class%
+        arguments:
+            - @oro_importexport.context_registry
+
+    oro_tracking.importexport.data_converter.data:
+        class: %oro_tracking.importexport.data_converter.data.class%
+        parent: oro_importexport.data_converter.configurable
+
+    oro_tracking.importexport.strategy.data:
+        parent: oro_importexport.strategy.configurable_add_or_replace
+
+    oro_tracking.importexport.normalizer.data:
+        class: %oro_tracking.importexport.normalizer.data.class%
+        parent: oro_importexport.serializer.configurable_entity_normalizer
+        calls:
+            - [setEntityName, [%oro_tracking.tracking_data.class%]]
+        tags:
+            - { name: oro_importexport.normalizer, priority: 10 }
+
+    oro_tracking.importexport.processor.import.data:
+        parent: oro_importexport.processor.import_abstract
+        calls:
+            - [setDataConverter, [@oro_tracking.importexport.data_converter.data]]
+            - [setStrategy, [@oro_tracking.importexport.strategy.data]]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: %oro_tracking.tracking_data.class%, alias: oro_tracking.processor.data }
+
+    oro_tracking.config.listener:
+        class: %oro_tracking.config.listener%
+        arguments:
+            - @oro_config.global
+            - @router
+            - %kernel.logs_dir%
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
+
+    oro_tracking.event_listener.website_tracking_events_grid_listener:
+        class: %oro_datagrid.event_listener.base_orm_relation.class%
+        arguments: ['websiteIdentifier', false]
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.website-tracking-events-grid, method: onBuildAfter }

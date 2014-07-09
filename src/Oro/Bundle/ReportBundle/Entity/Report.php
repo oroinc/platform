@@ -3,8 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -14,17 +13,23 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  * @ORM\Table(name="oro_report")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Report extends AbstractQueryDesigner
@@ -251,21 +256,11 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * @param DatagridConfiguration $config
      * @return array
      */
-    public function getChartOptions(DatagridConfiguration $config = null)
+    public function getChartOptions()
     {
-        $result = $this->chartOptions;
-
-        if (isset($result['data_schema']) && isset($config['source']['query_config']['column_aliases'])) {
-            $columnAliases = $config['source']['query_config']['column_aliases'];
-            foreach ($result['data_schema'] as &$value) {
-                $value = isset($columnAliases[$value]) ? $columnAliases[$value] : $value;
-            }
-        }
-
-        return $result;
+        return $this->chartOptions;
     }
 
     /**

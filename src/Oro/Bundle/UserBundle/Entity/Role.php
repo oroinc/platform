@@ -6,6 +6,7 @@ use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -17,23 +18,32 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\RoleRepository")
  * @ORM\Table(name="oro_access_role")
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class Role extends BaseRole
 {
+    const PREFIX_ROLE = 'ROLE_';
+
     /**
      * @var int
      *
@@ -123,8 +133,8 @@ class Role extends BaseRole
         $this->role = (string) strtoupper($role);
 
         // every role should be prefixed with 'ROLE_'
-        if (strpos($this->role, 'ROLE_') !== 0) {
-            $this->role = 'ROLE_' . $this->role;
+        if (strpos($this->role, self::PREFIX_ROLE) !== 0) {
+            $this->role = self::PREFIX_ROLE . $this->role;
         }
 
         return $this;
@@ -170,5 +180,55 @@ class Role extends BaseRole
         $this->owner = $owningBusinessUnit;
 
         return $this;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @throws \LogicException
+     */
+    public function beforeSave(LifecycleEventArgs $args)
+    {
+        /**
+         * @var integer $count
+         * count of attempts to set unique role, maximum 10 else exception
+         */
+        $count = 1;
+
+        while (!$this->updateRole($args) && $count++ < 10) {
+        }
+
+        if ($count > 10) {
+            throw new \LogicException('10 attempts to generate unique role are failed.');
+        }
+    }
+
+    /**
+     * Update role field.
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @return bool
+     */
+    protected function updateRole(LifecycleEventArgs $args)
+    {
+        if ($this->getRole()) {
+            return true;
+        }
+
+        $roleValue  = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
+        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($roleValue);
+
+        if ($sameObject) {
+            return false;
+        }
+
+        $this->setRole($roleValue);
+
+        return true;
     }
 }

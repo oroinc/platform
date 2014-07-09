@@ -1,0 +1,115 @@
+oro_entity_config:
+    attachment:
+        entity:
+            form:
+                block_config:
+                    attachments:
+                        title:              oro.attachment.block_titles.attachments.label
+                        priority:           0
+
+            items:
+                enabled:
+                    options:
+                        priority:           100
+                        default_value:      false
+                        auditable:          false
+                    form:
+                        type:               oro_entity_extend_association_choice
+                        options:
+                            block:          attachments
+                            required:       true
+                            label:          oro.attachment.enabled
+                            association_class: 'OroAttachmentBundle:Attachment'
+                maxsize:
+                    options:
+                        priority:           90
+                        default_value:      1
+                        auditable:          false
+                    form:
+                        type:               integer
+                        options:
+                            block:          attachments
+                            required:       false
+                            label:          oro.attachment.maxsize
+
+                mimetypes:
+                    options:
+                        priority:           80
+                        auditable:          false
+                    form:
+                        type: textarea
+                        options:
+                            block:        attachments
+                            required:     false
+                            label:        oro.attachment.mimetypes
+
+
+                # this attribute can be used to prohibit changing the note association state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than the current state cannot be changed
+                immutable: # boolean
+                    options: []
+        field:
+            items:
+                attachment:
+                    options:
+                        allowed_type:       [file, image]
+                        auditable:          false
+                    form:
+                        type:               oro_attachment_file_config
+                        options:
+                            block:          general
+                            subblock:       properties
+
+                maxsize:
+                    options:
+                        allowed_type:   [file, image]
+                        auditable:      false
+                    constraints:
+                        - NotBlank:  ~
+                        - Type:      integer
+                        - Range:
+                            min:     1
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.file_size.label
+                            block:      general
+                            subblock:   properties
+                            empty_data: 1
+                            tooltip:    oro.attachment.max_size
+
+                width:
+                    options:
+                        allowed_type:   [image]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.thumb_width.label
+                            block:      general
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    oro.attachment.thumb_width
+
+                height:
+                    options:
+                        allowed_type:   [image]
+                        auditable:      false
+                    constraints:
+                        - Type:
+                            type: int
+                    form:
+                        type:           integer
+                        options:
+                            required:   true
+                            label:      oro.attachment.config.thumb_height.label
+                            block:      general
+                            subblock:   properties
+                            empty_data: 32
+                            tooltip:    oro.attachment.thumb_height

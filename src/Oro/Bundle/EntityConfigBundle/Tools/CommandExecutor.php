@@ -70,8 +70,7 @@ class CommandExecutor
     {
         $params = array_merge(
             [
-                'command'    => $command,
-                '--no-debug' => true,
+                'command' => $command
             ],
             $params
         );

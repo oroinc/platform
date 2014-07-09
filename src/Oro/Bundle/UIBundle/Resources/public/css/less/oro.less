@@ -127,7 +127,7 @@ label, input, button, select, textarea { font-size:13px;}
       text-align:right;
     }
   }
-  .user-fiedset{
+  .user-fieldset{
     background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
     margin-bottom: 22px;
     span{
@@ -2122,7 +2122,7 @@ div.uploader span.filename {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: default;
-  width: 109px;
+  width: 202px;
 }
 
 div.uploader input {
@@ -2491,13 +2491,13 @@ div.selector.disabled span {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
   .forScreen(@mediumScreen, background, none);
 }
-h5.user-fiedset {
+h5.user-fieldset {
   font-weight:bold;
   font-size:15px;
   line-height:18px;
   margin: 0 10px 10px 0;
 }
-/*.user-fiedset span {
+/*.user-fieldset span {
   display:block;
   position:relative;
   background: #fff;
@@ -2900,7 +2900,7 @@ label.radio.error {
   }
 }
 #orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow {
+#oro_entity_config_type .removeRow{
   text-indent:-999;
   font-size:0;
   line-height:0;
@@ -2916,7 +2916,6 @@ label.radio.error {
     color:#888;
   }
 }
-
 pre.email-body {
   width: 99%;
   min-height: 5em;
@@ -3333,4 +3332,15 @@ label .popover-content {
       }
     }
   }
+}
+
+.entity-create-or-select-container .entity-create-btn {
+  padding: 0 6px;
+  margin-left: 3px;
+  height: 30px;
+}
+
+.entity-create-enabled .input-prepend .select2-container,
+.entity-create-enabled .input-append .select2-container {
+  width: 228px;
 }

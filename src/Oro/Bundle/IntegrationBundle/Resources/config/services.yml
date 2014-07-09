@@ -1,14 +1,17 @@
 parameters:
-    oro_integration.channel.entity.class:                                 Oro\Bundle\IntegrationBundle\Entity\Channel
+    oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
-    oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+    oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
+    oro_integration.form.handler.integration.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+
+    oro_integration.form.subscriber.channel_subscriber.class:             Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
+    oro_integration.form.subscriber.default_user_owner_subscriber.class:  Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber
+    oro_integration.form.subscriber.organization_subscriber.class:        Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
-    oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
-    oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
 
     # Import/export utils
@@ -19,18 +22,20 @@ parameters:
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
 
-    oro_integration.channel_delete_manager.class:                         Oro\Bundle\IntegrationBundle\Manager\ChannelDeleteManager
+    oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
+    oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
 
-    #Reader
+    oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
+    oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
 services:
-    oro_integration.channel.manager.api:
+    oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
         arguments:
-            - %oro_integration.channel.entity.class%
+            - %oro_integration.entity.class%
             - @doctrine.orm.entity_manager
 
     oro_integration.form.channel:
@@ -43,12 +48,40 @@ services:
         class: %oro_integration.form.type.channel.class%
         arguments:
             - @oro_integration.manager.types_registry
-            - @oro_security.security_facade
+            - @oro_integration.form.subscriber.default_user_owner_subscriber
+            - @oro_integration.form.subscriber.channel_subscriber
+            - @oro_integration.form.subscriber.organization_subscriber
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 
-    oro_integration.form.handler.channel:
-        class:                        %oro_integration.form.handler.channel.class%
+    oro_integration.form.type.oro_integration_type_select:
+        class: %oro_integration.form.type.oro_integration_type_select.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @translator
+            - @templating.helper.assets
+        scope: request
+        tags:
+            - { name: form.type, alias: oro_integration_type_select }
+
+    oro_integration.form.subscriber.channel_subscriber:
+        class: %oro_integration.form.subscriber.channel_subscriber.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @oro_integration.provider.settings_provider
+
+    oro_integration.form.subscriber.default_user_owner_subscriber:
+        class: %oro_integration.form.subscriber.default_user_owner_subscriber.class%
+        arguments:
+            - @oro_security.security_facade
+
+    oro_integration.form.subscriber.organization_subscriber:
+        class: %oro_integration.form.subscriber.organization_subscriber.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+
+    oro_integration.form.handler.integration:
+        class:                        %oro_integration.form.handler.integration.class%
         scope:                        request
         arguments:
             - @request
@@ -103,16 +136,6 @@ services:
           - @oro_integration.logger.strategy
         lazy: true
 
-    oro_integration.provider.channel_type.simple:
-        class: %oro_integration.provider.channel_type.simple.class%
-        tags:
-            - { name: oro_integration.channel, type: simple }
-
-    oro_integration.provider.simple_transport:
-        class: %oro_integration.provider.simple_transport.class%
-        tags:
-            - { name: oro_integration.transport, type: simple, channel_type: simple }
-
     oro_integration.provider.connector_context_mediator:
         class: %oro_integration.provider.connector_context_mediator.class%
         arguments:
@@ -122,8 +145,8 @@ services:
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
 
-    oro_integration.channel_delete_manager:
-        class: %oro_integration.channel_delete_manager.class%
+    oro_integration.delete_manager:
+        class: %oro_integration.delete_manager.class%
         arguments: [ @doctrine.orm.entity_manager ]
 
     oro_integration.sync_scheduler:
@@ -143,3 +166,19 @@ services:
     oro_integration.sync_scheduler.link:
         tags:
             - { name: oro_service_link,  service: oro_integration.sync_scheduler }
+
+    oro_integration.provider.settings_provider:
+        class: %oro_integration.provider.settings_provider.class%
+        arguments:
+            - []
+            - @oro_integration.config_resolver
+
+    oro_integration.config_resolver:
+        class: %oro_integration.config_resolver.class%
+        arguments:
+            - @service_container
+
+    oro_integration.utils.form_utils:
+        class: %oro_integration.utils.form_utils.class%
+        arguments:
+            - @oro_integration.manager.types_registry
