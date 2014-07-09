@@ -7,10 +7,11 @@ use Doctrine\ORM\QueryBuilder;
 
 class QueryBuilderTools
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fieldAliases = array();
+
+    /** @var array */
+    protected $joinTablePaths = array();
 
     /**
      * @param array $selects
@@ -18,12 +19,12 @@ class QueryBuilderTools
      */
     public function __construct(array $selects = null, $joins = null)
     {
-        $parts = [
-            'select' => $selects ? : [],
-            'joins'  => $joins ? : [],
-        ];
-
-        $this->prepareFieldAliases($parts);
+        if (null !== $selects) {
+            $this->prepareFieldAliases($selects);
+        }
+        if (null !== $joins) {
+            $this->prepareJoinTablePaths($selects);
+        }
     }
 
     /**
@@ -62,15 +63,15 @@ class QueryBuilderTools
     /**
      * Get mapping of filed aliases to real field expressions.
      *
-     * @param array $parts DQL parts
+     * @param array $selects DQL parts
      * @return array
      */
-    public function prepareFieldAliases($parts)
+    public function prepareFieldAliases($selects)
     {
         $this->resetFieldAliases();
 
         /** @var Expr\Select $select */
-        foreach ($parts['select'] as $select) {
+        foreach ($selects as $select) {
             foreach ($select->getParts() as $part) {
                 $part = preg_replace('/ as /i', ' as ', $part);
                 if (strpos($part, ' as ') !== false) {
@@ -79,19 +80,44 @@ class QueryBuilderTools
                 }
             }
         }
+    }
 
-        if (!empty($parts['join'])) {
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveArrayIterator($parts['join']),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            );
-            foreach ($iterator as $join) {
-                if ($join instanceof Expr\Join) {
-                    $joinTable = $join->getJoin();
-                    if (!empty($joinTable)) {
-                        $a = 1;
-                    }
-                }
+    /**
+     * Reset join table paths
+     */
+    public function resetJoinTablePaths()
+    {
+        $this->joinTablePaths = array();
+    }
+
+    /**
+     * Get join table paths
+     *
+     * @return array
+     */
+    public function getJoinTablePaths()
+    {
+        return $this->joinTablePaths;
+    }
+
+    /**
+     * Prepares an array of state passes by alias used in join WITH|ON condition
+     *
+     * @param array $joins
+     */
+    public function prepareJoinTablePaths(array $joins)
+    {
+        $this->resetJoinTablePaths();
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveArrayIterator($joins, \RecursiveArrayIterator::CHILD_ARRAYS_ONLY),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        /** @var Expr\Join $join */
+        foreach ($iterator as $join) {
+            $joinTable = $join->getJoin();
+            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
+                $this->joinTablePaths[$join->getAlias()] = $joinTable;
             }
         }
     }
@@ -187,6 +213,7 @@ class QueryBuilderTools
             $where = (string) $where;
 
             if ($where) {
+                $where  = $this->replaceAliasesWithJoinPaths($where);
                 $where  = $this->replaceAliasesWithFields($where);
                 $fields = $this->getFields($where);
                 foreach ($fields as $field) {
@@ -203,7 +230,6 @@ class QueryBuilderTools
 
     /**
      * Replaces field aliases with real fields.
-     * Replaces entity aliases with StateFieldPathExpression in WITH|ON conditional statements
      *
      * @param string $condition
      * @return string
@@ -212,6 +238,23 @@ class QueryBuilderTools
     {
         $condition = (string) $condition;
         foreach ($this->fieldAliases as $alias => $field) {
+            $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
+        }
+
+        return trim($condition);
+    }
+
+    /**
+     * Replaces entity aliases with StateFieldPathExpression in WITH|ON conditional statements
+     *
+     * @param string $condition
+     *
+     * @return string
+     */
+    public function replaceAliasesWithJoinPaths($condition)
+    {
+        $condition = (string) $condition;
+        foreach ($this->joinTablePaths as $alias => $field) {
             $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
         }
 
@@ -253,7 +296,7 @@ class QueryBuilderTools
     {
         // Do not match string if it is part of another string or parameter (starts with :)
         $searchRegExpParts = array(
-            '(?<![\w:.])(' . $alias .')(?=\W)',
+            '(?<![\w:.])(' . $alias .')(?=[^\.\w]+)',
             '(?<![\w:.])(' . $alias .')$'
         );
 

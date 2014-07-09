@@ -232,6 +232,22 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
                     . 'WHERE s.status = :statusName'
+            ),
+            'join_on_table_that_has_with_join_and_join_on_alias_condition_and_group_by' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                        ->from('OroUserBundle:User', 'u')
+                        ->select(array('u.id'))
+                        ->leftJoin('OroUserBundle:Email', 'e', Join::WITH, 'e.user = u')
+                        ->leftJoin('e.user', 'eu')
+                        ->leftJoin('OroUserBundle:Status', 's', Join::WITH, 's.user = eu')
+                        ->groupBy('eu.username')
+                        ->where('s.status = :statusName'),
+                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
+                    . 'LEFT JOIN e.user eu '
+                    . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
+                    . 'WHERE s.status = :statusName '
+                    . 'GROUP BY eu.username'
             )
         );
     }

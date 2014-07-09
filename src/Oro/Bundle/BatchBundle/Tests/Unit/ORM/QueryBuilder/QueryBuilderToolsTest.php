@@ -247,7 +247,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1')
+                array('t2', 't1', 'e')
             ),
             array(
                 array(
@@ -258,7 +258,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
+                array('t2', 't3', 't1', 'e')
             ),
             array(
                 array(
@@ -269,7 +269,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
+                array('t2', 't3', 't1', 'e')
             )
         );
     }

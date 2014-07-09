@@ -39,7 +39,8 @@ class CountQueryBuilderOptimizer
     {
         $this->originalQb = $originalQb;
 
-        $this->qbTools->prepareFieldAliases($originalQb->getDQLParts());
+        $this->qbTools->prepareFieldAliases($originalQb->getDQLPart('select'));
+        $this->qbTools->prepareJoinTablePaths($originalQb->getDQLPart('join'));
         $this->rootAlias = current($this->originalQb->getRootAliases());
         $this->initIdFieldName();
     }
@@ -64,7 +65,6 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
-        $this->qbTools->prepareFieldAliases($parts);
         $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
         $usedAliases = array();
         if ($parts['groupBy']) {
@@ -153,11 +153,13 @@ class CountQueryBuilderOptimizer
         /** @var Expr\Join $join */
         $hasJoins = false;
         foreach ($parts['join'][$this->rootAlias] as $join) {
-            $alias = $join->getAlias();
+            $alias     = $join->getAlias();
             // To count results number join all tables with inner join and required to tables
             if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
                 $hasJoins = true;
                 $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
+                $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
+
                 if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
                     $qb->innerJoin(
                         $join->getJoin(),
