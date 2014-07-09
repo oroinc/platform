@@ -7,7 +7,6 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class ConfigurationController extends Controller
@@ -49,17 +48,6 @@ class ConfigurationController extends Controller
                 $sender       = $this->get('oro_navigation.content.topic_sender');
 
                 $sender->send($sender->getGenerator()->generate($taggableData));
-
-                $activeBlockConfig = $form->getConfig()->getOption('block_config');
-
-                if ($activeBlockConfig[$activeSubGroup]['page_reload']) {
-                    return new RedirectResponse(
-                        $this->get('router')->generate(
-                            'oro_config_configuration_system',
-                            ['activeGroup' => $activeGroup, 'activeSubGroup' => $activeSubGroup]
-                        )
-                    );
-                }
             }
         }
 

@@ -108,6 +108,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
                 'priority'     => 123,
                 'description'  => 'some desc',
                 'icon'         => 'real icon',
+                'page_reload'  => true,
                 'some_another' => ''
             )
         );

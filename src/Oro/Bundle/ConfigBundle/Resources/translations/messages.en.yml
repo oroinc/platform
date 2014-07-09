@@ -12,5 +12,6 @@ oro:
 
         controller:
             config.saved.message: "Configuration saved"
+            page.reload.message:  "Please wait until page will be reloaded..."
 
 "Settings": "Settings"
