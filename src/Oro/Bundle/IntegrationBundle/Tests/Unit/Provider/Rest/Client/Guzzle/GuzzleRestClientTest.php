@@ -269,9 +269,6 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getFormattedResultDataProvider
-     *
-     * @expectedException \Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException
-     * @expectedExceptionMessage Unsuccessful response\\n[status code]
      */
     public function testGetFormattedResultThrowException($format)
     {
@@ -299,7 +296,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->will($this->returnValue($response));
 
-        $request->expects($this->once())
+        $request->expects($this->atLeastOnce())
             ->method('getUrl')
             ->will($this->returnValue($url));
 
@@ -307,11 +304,11 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
             ->method('isSuccessful')
             ->will($this->returnValue(false));
 
-        $response->expects($this->once())
+        $response->expects($this->atLeastOnce())
             ->method('getStatusCode')
             ->will($this->returnValue($statusCode));
 
-        $response->expects($this->once())
+        $response->expects($this->atLeastOnce())
             ->method('getReasonPhrase')
             ->will($this->returnValue($reasonPhrase));
 

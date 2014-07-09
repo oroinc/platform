@@ -54,7 +54,7 @@ class ProcessJob
     /**
      * @var string
      *
-     * @ORM\Column(name="serialized_data", type="text")
+     * @ORM\Column(name="serialized_data", type="text", nullable=true)
      */
     protected $serializedData;
 

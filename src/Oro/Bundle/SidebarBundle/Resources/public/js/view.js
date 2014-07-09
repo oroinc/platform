@@ -284,6 +284,7 @@ define(function (require) {
             var view = this;
 
             var widget = this.getWidgets().get(cid);
+
             if (!widget) {
                 return;
             }
@@ -291,16 +292,18 @@ define(function (require) {
             view.hideAllWidgetHovers();
 
             widget.snapshotState();
-            widget.set({ 'state': constants.WIDGET_MAXIMIZED_HOVER });
+            widget.set({ 'state': constants.WIDGET_MAXIMIZED_HOVER }, {silent: true});
+            widget.save();
 
-            var hoverView = new WidgetContainerView({
-                model: widget
-            });
+            if (!view.hoverViews.hasOwnProperty(cid)) {
+                view.hoverViews[cid] = new WidgetContainerView({
+                    model: widget
+                });
+            }
 
-            view.$el.append(hoverView.render().$el);
+            view.$el.append(view.hoverViews[cid].render().$el);
 
-            hoverView.setOffset({top: cord.top});
-            view.hoverViews[cid] = hoverView;
+            view.hoverViews[cid].setOffset({top: cord.top});
         },
 
         onRefreshWidget: function (cid) {
