@@ -11,7 +11,6 @@ Toolbar options:
             'hide'  => false,
             'items' => [10, 25, 50, 100],
             'default_per_page' => 25,
-            'unlimited' => false
         ],
         'pagination' => [
             'hide' => false,
@@ -24,7 +23,6 @@ Toolbar options:
     - hide - hide or show number of items per page selector
     - items - items per page
     - default_per_page - item per page by default
-    - unlimited - show all rows per page, will work only if 'hide' option is enabled
- - pagination - show or hide pagination block
+ - pagination - show or hide pagination block as well as off the paginator extension
 
 **@TODO complement the doc**
