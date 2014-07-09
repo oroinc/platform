@@ -116,7 +116,7 @@ class QueryBuilderTools
         /** @var Expr\Join $join */
         foreach ($iterator as $join) {
             $joinTable = $join->getJoin();
-            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
+            if (!empty($joinTable)) {
                 $this->joinTablePaths[$join->getAlias()] = $joinTable;
             }
         }
@@ -222,6 +222,7 @@ class QueryBuilderTools
                         $aliases[] = $data[0];
                     }
                 }
+                $aliases = array_merge($aliases, $this->getUsedAliases($where));
             }
         }
 
@@ -255,7 +256,9 @@ class QueryBuilderTools
     {
         $condition = (string) $condition;
         foreach ($this->joinTablePaths as $alias => $field) {
-            $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
+            if (strpos($field, '.') !== false) {
+                $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
+            }
         }
 
         return trim($condition);
@@ -275,8 +278,9 @@ class QueryBuilderTools
                 $aliases = array_merge($aliases, $this->getUsedAliases($conditionPart));
             }
         } else {
-            $condition = (string) $condition;
-            foreach (array_keys($this->fieldAliases) as $alias) {
+            $condition    = (string)$condition;
+            $knownAliases = array_keys(array_merge($this->fieldAliases, $this->joinTablePaths));
+            foreach ($knownAliases as $alias) {
                 if (preg_match($this->getRegExpQueryForAlias($alias), $condition)) {
                     $aliases[] = $alias;
                 }
