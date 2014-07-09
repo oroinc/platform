@@ -108,7 +108,7 @@ class PdoPgsql extends BaseDriver
         $qb->select(
             array(
                  'search as item',
-                 'text',
+                 'textField',
                  'TsRank(textField.value, :value' .$index. ') AS rankField'
             )
         );

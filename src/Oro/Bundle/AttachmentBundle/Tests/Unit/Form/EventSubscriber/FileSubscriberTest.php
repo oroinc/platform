@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\EventSubscriber;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Symfony\Component\Form\FormEvents;
+
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
-use Symfony\Component\Form\FormEvents;
 
 class FileSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,6 +15,9 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $form;
 
     public function setUp()
     {
@@ -48,6 +52,18 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('remove')
             ->with('owner');
+        if ($mustAddedField) {
+            $formConfig = $this->getMockBuilder('Symfony\Component\Form\FormConfigBuilder')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $this->form->expects($this->once())
+                ->method('getConfig')
+                ->will($this->returnValue($formConfig));
+            $formConfig->expects($this->once())
+                ->method('getOption')
+                ->with('allowDelete')
+                ->will($this->returnValue(true));
+        }
         $formEvent = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -66,11 +82,39 @@ class FileSubscriberTest extends \PHPUnit_Framework_TestCase
         $correctEntity->setId(1);
         $correctEntity->setFilename('test.doc');
 
-        $incorrectEntity = new Attachment();
+        $incorrectEntity = new File();
 
         return [
             'correctEntity' => [$correctEntity, true],
             'incorrectEntity' => [$incorrectEntity, false]
         ];
+    }
+
+    public function testPostSubmitEmptyFIle()
+    {
+        $entity = new File();
+        $this->form->expects($this->once())
+            ->method('has')
+            ->with('emptyFile')
+            ->will($this->returnValue(true));
+        $this->form->expects($this->once())
+            ->method('get')
+            ->with('emptyFile')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue(true));
+        $formEvent = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $formEvent->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($entity));
+        $formEvent->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue($this->form));
+        $this->subscriber->postSubmit($formEvent);
+
+        $this->assertNotNull($entity->getUpdatedAt());
     }
 }

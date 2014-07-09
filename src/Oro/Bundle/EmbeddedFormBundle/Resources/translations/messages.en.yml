@@ -24,3 +24,5 @@ oro:
 
         controller:
             saved_message: Form has been saved successfully
+
+        no_types_available: The embedded form cannot be created as no form types are available.

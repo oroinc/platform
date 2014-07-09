@@ -219,6 +219,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 if (this.enableEventLoading) {
                     // load events from a server
                     this.getCollection().fetch({
+                        reset: true,
                         success: onEventsLoad,
                         error: _.bind(function (collection, response) {
                             callback({});

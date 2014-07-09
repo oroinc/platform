@@ -9,6 +9,7 @@ class ExtendOptionsManager
     const MODE_OPTION         = '_mode';
     const TARGET_OPTION       = '_target';
     const NEW_NAME_OPTION     = '_new_name';
+    const APPEND_SECTION      = '_append';
 
     /**
      * @var array key = [table name] or [table name!column name]
@@ -93,6 +94,7 @@ class ExtendOptionsManager
         if (!isset($this->options[$objectKey])) {
             $this->options[$objectKey] = [];
         }
+        $this->handleAppendSection($objectKey, $options);
         foreach ($options as $scope => $values) {
             if (!is_string($scope) || empty($scope)) {
                 throw new \InvalidArgumentException(
@@ -106,12 +108,77 @@ class ExtendOptionsManager
                 );
             }
             if (isset($this->options[$objectKey][$scope]) && is_array($values)) {
-                foreach ($values as $key => $val) {
-                    $this->options[$objectKey][$scope][$key] = $val;
+                foreach ($values as $attrName => $val) {
+                    if ($this->isAppend($objectKey, $scope, $attrName)) {
+                        $this->options[$objectKey][$scope][$attrName] = array_merge(
+                            (array)$this->options[$objectKey][$scope][$attrName],
+                            (array)$val
+                        );
+                    } else {
+                        $this->options[$objectKey][$scope][$attrName] = $val;
+                    }
                 }
             } else {
                 $this->options[$objectKey][$scope] = $values;
             }
         }
+    }
+
+    /**
+     * Gets a value of an option with the given name and then remove the option from $options array
+     *
+     * @param array  $options
+     * @param string $name
+     * @return mixed
+     */
+    protected function getAndRemoveOption(array &$options, $name)
+    {
+        $value = null;
+        if (isset($options[$name])) {
+            $value = $options[$name];
+            unset($options[$name]);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string $objectKey
+     * @param array  $options
+     */
+    protected function handleAppendSection($objectKey, array &$options)
+    {
+        $appendSection = $this->getAndRemoveOption($options, OroOptions::APPEND_SECTION);
+        if (!empty($appendSection)) {
+            foreach ($appendSection as $scope => $attrNames) {
+                foreach ($attrNames as $attrName) {
+                    if (!isset($this->options[self::APPEND_SECTION])) {
+                        $this->options[self::APPEND_SECTION] = [];
+                    }
+                    if (!isset($this->options[self::APPEND_SECTION][$objectKey])) {
+                        $this->options[self::APPEND_SECTION][$objectKey] = [];
+                    }
+                    if (!isset($this->options[self::APPEND_SECTION][$objectKey][$scope])) {
+                        $this->options[self::APPEND_SECTION][$objectKey][$scope] = [];
+                    }
+                    if (!in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope])) {
+                        $this->options[self::APPEND_SECTION][$objectKey][$scope][] = $attrName;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $objectKey
+     * @param string $scope
+     * @param string $attrName
+     * @return bool
+     */
+    protected function isAppend($objectKey, $scope, $attrName)
+    {
+        return
+            isset($this->options[self::APPEND_SECTION][$objectKey][$scope]) &&
+            in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope]);
     }
 }

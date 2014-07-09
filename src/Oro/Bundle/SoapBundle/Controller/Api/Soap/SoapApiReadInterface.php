@@ -17,7 +17,8 @@ interface SoapApiReadInterface
      *
      * @param  int          $page
      * @param  int          $limit
+     * @param  array|null   $orderBy
      * @return \Traversable
      */
-    public function handleGetListRequest($page, $limit);
+    public function handleGetListRequest($page, $limit, $orderBy = null);
 }

@@ -1,0 +1,18 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+
+{% set name = app.user|oro_format_name|default('N/A') %}
+{% oro_title_set({params : {"%username%": name }}) %}
+
+{% set pageTitle = 'oro.email.entity_plural_label'|trans %}
+{% set gridName = 'user-email-grid' %}
+{# grid params #}
+{% set params = {'userId': app.user.id} %}
+{% oro_title_set({params : {"%username%": app.user.username} }) %}
+
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        {'label': name },
+        {'label': 'oro.email.menu.user_emails'|trans }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}

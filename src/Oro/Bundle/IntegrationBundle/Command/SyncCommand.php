@@ -82,14 +82,13 @@ class SyncCommand extends AbstractSyncCronCommand
         $integrationId       = $input->getOption('integration-id');
         $batchSize           = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
-        $repository          = $this->getService('doctrine.orm.entity_manager')
-            ->getRepository('OroIntegrationBundle:Channel');
+        $entityManager       = $this->getService('doctrine.orm.entity_manager');
+        $repository          = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger              = new OutputLogger($output);
         $processor           = $this->getService(self::SYNC_PROCESSOR);
-        $processor->getLoggerStrategy()->setLogger($logger);
 
-        $this->getContainer()->get('doctrine.orm.entity_manager')
-            ->getConnection()->getConfiguration()->setSQLLogger(null);
+        $processor->getLoggerStrategy()->setLogger($logger);
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');

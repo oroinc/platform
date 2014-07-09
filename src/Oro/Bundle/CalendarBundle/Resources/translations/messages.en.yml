@@ -16,7 +16,7 @@ oro:
         my_calendar_widget_descriptions: This widget displays a calendar for today.
 
         menu:
-            view_default.label: My Calendar
+            view_default: My Calendar
 
         control:
             all_day: ""

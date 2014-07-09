@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\File as FileType;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
@@ -15,7 +15,8 @@ use Gaufrette\StreamMode;
 use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class AttachmentManager
 {
@@ -29,39 +30,47 @@ class AttachmentManager
     protected $fileIcons;
 
     /**
+     * @var ServiceLink
+     */
+    protected $securityFacadeLink;
+
+    /**
      * @param FilesystemMap $filesystemMap
      * @param Router        $router
+     * @param ServiceLink   $securityFacadeLink
      * @param array         $fileIcons
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         Router $router,
+        ServiceLink $securityFacadeLink,
         $fileIcons
     ) {
-        $this->filesystem = $filesystemMap->get('attachments');
-        $this->router = $router;
-        $this->fileIcons = $fileIcons;
+        $this->filesystem         = $filesystemMap->get('attachments');
+        $this->router             = $router;
+        $this->fileIcons          = $fileIcons;
+        $this->securityFacadeLink = $securityFacadeLink;
     }
 
     /**
      * Copy file by $fileUrl (local path or remote file), copy it to temp dir and return Attachment entity record
      *
      * @param string $fileUrl
-     * @return Attachment|null
+     * @return File|null
      */
     public function prepareRemoteFile($fileUrl)
     {
         try {
-            $fileName = pathinfo($fileUrl)['basename'];
+            $fileName           = pathinfo($fileUrl)['basename'];
             $parametersPosition = strpos($fileName, '?');
             if ($parametersPosition) {
                 $fileName = substr($fileName, 0, $parametersPosition);
             }
             $filesystem = new SymfonyFileSystem();
-            $tmpFile = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
+            $tmpFile    = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
             $filesystem->copy($fileUrl, $tmpFile, true);
-            $file = new File($tmpFile);
-            $attachment = new Attachment();
+            $file       = new FileType($tmpFile);
+            $attachment = new File();
             $attachment->setFile($file);
             $this->preUpload($attachment);
 
@@ -74,9 +83,9 @@ class AttachmentManager
     /**
      * Update attachment entity before upload
      *
-     * @param Attachment $entity
+     * @param File $entity
      */
-    public function preUpload(Attachment $entity)
+    public function preUpload(File $entity)
     {
         if ($entity->isEmptyFile()) {
             if ($this->filesystem->has($entity->getFilename())) {
@@ -88,6 +97,7 @@ class AttachmentManager
         }
 
         if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
+            $entity->setOwner($this->securityFacadeLink->getService()->getLoggedUser());
             $file = $entity->getFile();
             if ($entity->getFilename() !== null && $this->filesystem->has($entity->getFilename())) {
                 $this->filesystem->delete($entity->getFilename());
@@ -118,9 +128,9 @@ class AttachmentManager
     /**
      * Upload attachment file
      *
-     * @param Attachment $entity
+     * @param File $entity
      */
-    public function upload(Attachment $entity)
+    public function upload(File $entity)
     {
         if ($entity->getFile() !== null && $entity->getFile()->isFile()) {
             $file = $entity->getFile();
@@ -152,10 +162,10 @@ class AttachmentManager
     /**
      * Get file content
      *
-     * @param Attachment $entity
+     * @param File $entity
      * @return string
      */
-    public function getContent(Attachment $entity)
+    public function getContent(File $entity)
     {
         return $this->filesystem->get($entity->getFilename())->getContent();
     }
@@ -163,14 +173,14 @@ class AttachmentManager
     /**
      * Get attachment url
      *
-     * @param object     $parentEntity
-     * @param string     $fieldName
-     * @param Attachment $entity
-     * @param string     $type
-     * @param bool       $absolute
+     * @param object $parentEntity
+     * @param string $fieldName
+     * @param File   $entity
+     * @param string $type
+     * @param bool   $absolute
      * @return string
      */
-    public function getAttachmentUrl($parentEntity, $fieldName, Attachment $entity, $type = 'get', $absolute = false)
+    public function getFileUrl($parentEntity, $fieldName, File $entity, $type = 'get', $absolute = false)
     {
         return $this->getAttachment(
             ClassUtils::getRealClass($parentEntity),
@@ -185,19 +195,19 @@ class AttachmentManager
     /**
      * Get attachment url
      *
-     * @param string     $parentClass
-     * @param int        $parentId
-     * @param string     $fieldName
-     * @param Attachment $entity
-     * @param string     $type
-     * @param bool       $absolute
+     * @param string $parentClass
+     * @param int    $parentId
+     * @param string $fieldName
+     * @param File   $entity
+     * @param string $type
+     * @param bool   $absolute
      * @return string
      */
     public function getAttachment(
         $parentClass,
         $parentId,
         $fieldName,
-        Attachment $entity,
+        File $entity,
         $type = 'get',
         $absolute = false
     ) {
@@ -218,7 +228,7 @@ class AttachmentManager
             'oro_attachment_file',
             [
                 'codedString' => $urlString,
-                'extension' => $entity->getExtension()
+                'extension'   => $entity->getExtension()
             ],
             $absolute
         );
@@ -248,19 +258,19 @@ class AttachmentManager
     /**
      * Get resized image url
      *
-     * @param Attachment $entity
-     * @param int        $width
-     * @param int        $height
+     * @param File $entity
+     * @param int  $width
+     * @param int  $height
      * @return string
      */
-    public function getResizedImageUrl(Attachment $entity, $width = 100, $height = 100)
+    public function getResizedImageUrl(File $entity, $width = 100, $height = 100)
     {
         return $this->router->generate(
             'oro_resize_attachment',
             [
-                'width' => $width,
-                'height' => $height,
-                'id' => $entity->getId(),
+                'width'    => $width,
+                'height'   => $height,
+                'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename()
             ]
         );
@@ -269,10 +279,10 @@ class AttachmentManager
     /**
      * Get filetype icon
      *
-     * @param Attachment $entity
+     * @param File $entity
      * @return string
      */
-    public function getAttachmentIconClass(Attachment $entity)
+    public function getAttachmentIconClass(File $entity)
     {
         if (isset($this->fileIcons[$entity->getExtension()])) {
             return $this->fileIcons[$entity->getExtension()];
@@ -284,18 +294,18 @@ class AttachmentManager
     /**
      * Get image attachment link with liip imagine filter applied to image
      *
-     * @param Attachment $entity
-     * @param string     $filerName
+     * @param File   $entity
+     * @param string $filerName
      * @return string
      */
-    public function getFilteredImageUrl(Attachment $entity, $filerName)
+    public function getFilteredImageUrl(File $entity, $filerName)
     {
         return $this->router->generate(
             'oro_filtered_attachment',
             [
-                'id' => $entity->getId(),
+                'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename(),
-                'filter' => $filerName
+                'filter'   => $filerName
             ]
         );
     }

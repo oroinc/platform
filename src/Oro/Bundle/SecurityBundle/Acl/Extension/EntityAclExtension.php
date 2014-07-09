@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
+
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
@@ -23,11 +23,6 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
  */
 class EntityAclExtension extends AbstractAclExtension
 {
-    /**
-     * @var EntityClassAccessor
-     */
-    protected $entityClassAccessor;
-
     /**
      * @var ObjectIdAccessor
      */
@@ -72,7 +67,6 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * Constructor
      *
-     * @param EntityClassAccessor $entityClassAccessor
      * @param ObjectIdAccessor $objectIdAccessor
      * @param EntityClassResolver $entityClassResolver
      * @param EntitySecurityMetadataProvider $entityMetadataProvider
@@ -80,14 +74,12 @@ class EntityAclExtension extends AbstractAclExtension
      * @param OwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
-        EntityClassAccessor $entityClassAccessor,
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
         OwnershipMetadataProvider $metadataProvider,
         OwnershipDecisionMakerInterface $decisionMaker
     ) {
-        $this->entityClassAccessor = $entityClassAccessor;
         $this->objectIdAccessor = $objectIdAccessor;
         $this->entityClassResolver = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
@@ -187,9 +179,9 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         if ($id === $this->getExtensionKey()) {
-            $type = $this->entityClassResolver->getEntityClass($this->entityClassAccessor->getClass($type));
+            $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
         } else {
-            $type = $this->entityClassAccessor->getClass($type);
+            $type = ClassUtils::getRealClass($type);
         }
 
         return $this->entityClassResolver->isEntity($type);
@@ -495,7 +487,7 @@ class EntityAclExtension extends AbstractAclExtension
         if ($id === $this->getExtensionKey()) {
             return new ObjectIdentity(
                 $id,
-                $this->entityClassResolver->getEntityClass($this->entityClassAccessor->getClass($type))
+                $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type))
             );
         }
 
@@ -520,7 +512,7 @@ class EntityAclExtension extends AbstractAclExtension
         try {
             return new ObjectIdentity(
                 $this->objectIdAccessor->getId($domainObject),
-                $this->entityClassAccessor->getClass($domainObject)
+                ClassUtils::getClass($domainObject)
             );
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
@@ -633,7 +625,7 @@ class EntityAclExtension extends AbstractAclExtension
             $className = $id = null;
             $this->parseDescriptor($object, $className, $id);
         } else {
-            $className = $this->entityClassAccessor->getClass($object);
+            $className = ClassUtils::getClass($object);
         }
 
         return $className;

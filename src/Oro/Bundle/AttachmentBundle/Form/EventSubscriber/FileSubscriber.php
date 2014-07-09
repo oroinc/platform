@@ -9,12 +9,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 
 class FileSubscriber implements EventSubscriberInterface
 {
-    /** @var ConfigFileValidator  */
+    /** @var ConfigFileValidator */
     protected $validator;
 
     /**
@@ -32,7 +33,7 @@ class FileSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::POST_SUBMIT => 'postSubmit'
+            FormEvents::POST_SUBMIT  => 'postSubmit'
         ];
     }
 
@@ -44,13 +45,20 @@ class FileSubscriber implements EventSubscriberInterface
     public function preSetData(FormEvent $event)
     {
         $entity = $event->getData();
-        $form = $event->getForm();
-        if (is_object($entity) && $entity->getId() && $entity->getFilename() !== null) {
+        $form   = $event->getForm();
+
+        if (is_object($entity)
+            && $entity->getId()
+            && $entity->getFilename() !== null
+            && $form->getConfig()->getOption(
+                'allowDelete'
+            )
+        ) {
             $form->add(
                 'emptyFile',
                 'hidden',
                 [
-                    'required'  => false,
+                    'required' => false,
                 ]
             );
         }
@@ -64,9 +72,9 @@ class FileSubscriber implements EventSubscriberInterface
      */
     public function postSubmit(FormEvent $event)
     {
-        /** @var Attachment $entity */
+        /** @var File $entity */
         $entity = $event->getData();
-        $form = $event->getForm();
+        $form   = $event->getForm();
 
         if (is_object($entity) && $entity->getFile() !== null) {
             $this->validate($form, $entity);
@@ -83,19 +91,26 @@ class FileSubscriber implements EventSubscriberInterface
     /**
      * Validate attachment field
      *
-     * @param FormInterface $form
-     * @param Attachment    $entity
+     * @param FormInterface   $form
+     * @param File|Attachment $entity
      */
-    protected function validate(FormInterface $form, Attachment $entity)
+    protected function validate(FormInterface $form, $entity)
     {
         $fieldName = $form->getName();
 
-        $dataClass = $form->getParent()->getConfig()->getDataClass();
-        if (!$dataClass) {
-            $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+        if ($form->getParent()->getConfig()->getOption('parentEntityClass', null)) {
+            $dataClass = $form->getParent()->getConfig()->getOption('parentEntityClass', null);
+            $fieldName = '';
+        } else {
+            $dataClass = $form->getParent()
+                ? $form->getParent()->getConfig()->getDataClass()
+                : $form->getConfig()->getDataClass();
+            if (!$dataClass) {
+                $dataClass = $form->getParent()->getParent()->getConfig()->getDataClass();
+            }
         }
 
-        $violations = $this->validator->validate($dataClass, $fieldName, $entity);
+        $violations = $this->validator->validate($dataClass, $entity, $fieldName);
 
         if (!empty($violations)) {
             $fileField = $form->get('file');

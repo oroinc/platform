@@ -34,7 +34,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with('file', 'file');
 
-        $options = [];
+        $options = ['checkEmptyFile' => true];
         $this->type->buildForm($builder, $options);
     }
 
@@ -43,7 +43,13 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment']);
+            ->with(
+                [
+                    'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\File',
+                    'checkEmptyFile' => false,
+                    'allowDelete' => true
+                ]
+            );
 
         $this->type->setDefaultOptions($resolver);
     }

@@ -1,0 +1,31 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    protected $rel_2;
+    protected $rel1;
+
+    public function setRel2($value)
+    {
+        $this->rel_2 = $value; return $this;
+    }
+
+    public function setRel1($value)
+    {
+        $this->rel1 = $value; return $this;
+    }
+
+    public function getRel2()
+    {
+        return $this->rel_2;
+    }
+
+    public function getRel1()
+    {
+        return $this->rel1;
+    }
+
+    public function __construct()
+    {
+    }
+}

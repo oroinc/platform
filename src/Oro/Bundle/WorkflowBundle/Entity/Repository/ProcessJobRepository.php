@@ -23,4 +23,20 @@ class ProcessJobRepository extends EntityRepository
                 ->execute();
         }
     }
+
+    /**
+     * @param array $ids
+     * @return array
+     */
+    public function findByIds(array $ids)
+    {
+        if (empty($ids)) {
+            return array();
+        } else {
+            $queryBuilder = $this->createQueryBuilder('job');
+            return $queryBuilder->where($queryBuilder->expr()->in('job.id', $ids))
+                ->getQuery()
+                ->getResult();
+        }
+    }
 }

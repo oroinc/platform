@@ -1,6 +1,7 @@
 parameters:
     oro_chart.config_provider.class:               Oro\Bundle\ChartBundle\Model\ConfigProvider
     oro_chart.view_builder.class:                  Oro\Bundle\ChartBundle\Model\ChartViewBuilder
+    oro_chart.options_builder.class:               Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder
     oro_chart.data_transformer.factory.class:      Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory
     oro_chart.data_transformer.pie_chart.class:    Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer
     oro_chart.form.type.settings.class:            Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType
@@ -53,3 +54,6 @@ services:
 
     oro_chart.data_transformer.pie_chart:
         class: %oro_chart.data_transformer.pie_chart.class%
+
+    oro_chart.options_builder:
+        class: %oro_chart.options_builder.class%
