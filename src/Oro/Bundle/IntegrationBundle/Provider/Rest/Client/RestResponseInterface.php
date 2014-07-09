@@ -12,6 +12,13 @@ interface RestResponseInterface
     public function __toString();
 
     /**
+     * Get the request url as string
+     *
+     * @return string
+     */
+    public function getRequestUrl();
+
+    /**
      * Get the response body as string
      *
      * @return string
