@@ -370,7 +370,7 @@
     {% endif %}
 
     {% if parameters.aCss is defined %}
-        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+        {% set aCss = aCss ~ ' ' ~ parameters.aCss %}
     {% endif %}
 
     {% set parameters = parameters|merge({'aCss': aCss}) %}
@@ -399,7 +399,7 @@
         'data': {
             'message': message,
             'success-message': successMessage,
-            'url':url
+            'url': url
         },
         'iCss': 'icon-trash',
         'aCss': parameters.aCss,
@@ -417,7 +417,12 @@
         {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
         {% set linkParams = linkParams|merge({ 'data': data }) %}
     {% endif %}
-
+    {% if parameters.data is defined %}
+        {% for dataItemName,dataItemValue in parameters.data %}
+            {% set data = linkParams.data|merge({(dataItemName): dataItemValue}) %}
+            {% set linkParams = linkParams|merge({ 'data': data }) %}
+        {% endfor %}
+    {% endif %}
     {{ _self.link(linkParams) }}
 {% endmacro %}
 
