@@ -53,7 +53,7 @@ class ConfigFileValidator
             $mimeTypes              = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
             if (!$mimeTypes) {
                 $mimeTypes = array_merge(
-                    $this->getMimeArray($this->config->get('oro_attachment.upload_mime_types')),
+                    $this->getMimeArray($this->config->get('oro_attachment.upload_file_mime_types')),
                     $this->getMimeArray($this->config->get('oro_attachment.upload_image_mime_types'))
                 );
             }
@@ -62,7 +62,7 @@ class ConfigFileValidator
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $entityAttachmentConfig->getId();
             if ($fieldConfigId->getFieldType() === 'file') {
-                $configValue = 'upload_mime_types';
+                $configValue = 'upload_file_mime_types';
             } else {
                 $configValue = 'upload_image_mime_types';
             }
