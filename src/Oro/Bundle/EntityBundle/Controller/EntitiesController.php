@@ -208,8 +208,7 @@ class EntitiesController extends Controller
                 'class_name'   => $extendEntityName,
                 'block_config' => array(
                     'general' => array(
-                        'title'    => 'General',
-                        'priority' => -1
+                        'title' => 'General'
                     )
                 ),
             )
