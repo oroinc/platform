@@ -19,8 +19,9 @@ define([
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove',
+            'toMaximize collection': 'toMaximize',
 
-            'toMaximize collection': 'toMaximize'
+            'page:beforeChange mediator': 'onPageChange'
         },
 
         createSubViews: function (options) {
@@ -109,6 +110,27 @@ define([
             this.collection.each(function (module, position) {
                 module.set({position: position});
             });
+        },
+
+        /**
+         * Handles page change
+         *  - if there's related model in collection, updates route query
+         * @param oldRoute
+         * @param newRoute
+         * @param options
+         */
+        onPageChange: function (oldRoute, newRoute, options) {
+            var model, _ref;
+            if (!newRoute || newRoute.query === '') {
+                return;
+            }
+            model = this.collection.find(function (model) {
+                return mediator.execute('compareUrl', model.get('url'), newRoute.path);
+            });
+            if (model) {
+                _ref = model.get('url').split('?');
+                newRoute.query = _ref[1] || '';
+            }
         }
     });
 

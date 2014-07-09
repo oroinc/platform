@@ -77,7 +77,10 @@ define([
                 return;
             }
 
-            this._beforePageLoad(route, params, options);
+            if (!this._beforePageLoad(route, params, options)) {
+                // prevent page loading, if there's redirect found
+                return;
+            }
 
             cacheItem = this.cache.get(route.path);
 
@@ -99,17 +102,29 @@ define([
          * Does preparation for page loading
          *  - adds event listeners on page model
          *  - triggers 'page:beforeChange' event with two parameters oldRoute and newRoute
+         *  - handle route change, if it has place to be
          *
          * @param {Object} route
          * @param {Object} params
          * @param {Object} options
+         * @returns {boolean}
          * @private
          */
         _beforePageLoad: function (route, params, options) {
-            var oldRoute, newRoute;
+            var oldRoute, newRoute, url;
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
+
+            // if route has been changed, redirect to a new URL and stop processing current
+            if (route.path !== newRoute.path || route.query !== newRoute.query) {
+                url = this._combineRouteUrl(newRoute);
+                _.defer(function () {
+                    mediator.execute('redirectTo', {url: url}, options);
+                });
+                return false;
+            }
+            return true;
         },
 
         /**
