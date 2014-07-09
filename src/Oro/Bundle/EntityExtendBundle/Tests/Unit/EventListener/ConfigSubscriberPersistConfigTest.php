@@ -101,58 +101,6 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new field (relation type [1:*])
-     */
-    public function testScopeExtendRelationTypeCreateSelfRelationOneToMany()
-    {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField(
-                [
-                    'state' => ExtendScope::STATE_NEW,
-                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
-                ],
-                'oneToMany'
-            ),
-            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
-            ['state' => [0 => null, 1 => ExtendScope::STATE_NEW]]
-        );
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-
-        $this->assertAttributeEquals(
-            [
-                'extend_TestClass' => $this->getEntityConfig(
-                    [
-                        'state' => ExtendScope::STATE_UPDATED,
-                        'relation' => [
-                            'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                                'assign' => false,
-                                'field_id' => new FieldConfigId(
-                                    'extend',
-                                    'Oro\Bundle\UserBundle\Entity\User',
-                                    'testclass_testFieldName',
-                                    'manyToOne'
-                                ),
-                                'owner' => true,
-                                'target_entity' => 'TestClass',
-                                'target_field_id' => new FieldConfigId(
-                                    'extend',
-                                    'TestClass',
-                                    'testFieldName',
-                                    'oneToMany'
-                                ),
-                            ]
-                        ]
-                    ]
-                )
-            ],
-            'persistConfigs',
-            $cm
-        );
-    }
-
-    /**
      *  Test create new field (relation type [*:1])
      */
     public function testScopeExtendRelationTypeCreateSelfRelationManyToOne()
@@ -177,20 +125,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
                 'extend_TestClass' => $this->getEntityConfig(
                     [
                         'state' => ExtendScope::STATE_UPDATED,
-                        'relation' => [
-                            'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                                'assign' => false,
-                                'field_id' => false,
-                                'owner' => false,
-                                'target_entity' => 'TestClass',
-                                'target_field_id' => new FieldConfigId(
-                                    'extend',
-                                    'TestClass',
-                                    'testFieldName',
-                                    'manyToOne'
-                                ),
-                            ]
-                        ]
+                        'relation' => []
                     ]
                 )
             ],

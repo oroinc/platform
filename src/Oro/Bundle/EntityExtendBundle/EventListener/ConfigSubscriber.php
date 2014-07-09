@@ -86,43 +86,6 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PersistConfigEvent $event
-     */
-    protected function persistCustomFieldConfig(PersistConfigEvent $event)
-    {
-        $eventConfig   = $event->getConfig();
-        $configManager = $event->getConfigManager();
-        $change        = $configManager->getConfigChangeSet($eventConfig);
-
-        /** @var FieldConfigId $configId */
-        $configId     = $eventConfig->getId();
-        $scope        = $configId->getScope();
-        $className    = $configId->getClassName();
-        $entityConfig = $event->getConfigManager()->getProvider($scope)->getConfig($className);
-
-        if ($eventConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED])
-            && !isset($change['state'])
-        ) {
-            $eventConfig->set('state', ExtendScope::STATE_UPDATED);
-            $event->getConfigManager()->calculateConfigChangeSet($eventConfig);
-        }
-
-        /**
-         * Relations case
-         */
-        if ($eventConfig->is('state', ExtendScope::STATE_NEW)
-            && in_array($configId->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
-        ) {
-            $this->createRelation($eventConfig);
-        }
-
-        if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
-            $entityConfig->set('state', ExtendScope::STATE_UPDATED);
-            $configManager->persist($entityConfig);
-        }
-    }
-
-    /**
      * @param EntityConfigEvent $event
      */
     public function updateEntityConfig(EntityConfigEvent $event)
