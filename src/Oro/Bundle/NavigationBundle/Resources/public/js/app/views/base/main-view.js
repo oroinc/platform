@@ -21,7 +21,8 @@ define([
             'toAdd collection': 'toAdd',
             'toRemove collection': 'toRemove',
 
-            'pagestate:change mediator': 'onPageStateChange'
+            'pagestate:change mediator': 'onPageStateChange',
+            'page:beforeChange mediator': 'onPageChange'
         },
 
         initialize: function (options) {
@@ -96,6 +97,27 @@ define([
                 url = mediator.execute('currentUrl');
                 model.set('url', url);
                 model.save();
+            }
+        },
+
+        /**
+         * Handles page change
+         *  - if there's related model in collection, updates route query
+         * @param oldRoute
+         * @param newRoute
+         * @param options
+         */
+        onPageChange: function (oldRoute, newRoute, options) {
+            var model, _ref;
+            if (!newRoute || newRoute.query !== '') {
+                return;
+            }
+            model = this.collection.find(function (model) {
+                return mediator.execute('compareUrl', model.get('url'), newRoute.path);
+            });
+            if (model) {
+                _ref = model.get('url').split('?');
+                newRoute.query = _ref[1] || '';
             }
         }
     });
