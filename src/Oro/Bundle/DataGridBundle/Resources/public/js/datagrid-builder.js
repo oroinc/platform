@@ -120,10 +120,6 @@ define(function (require) {
                 $(gridGridViewsSelector).append((new GridViewsView(_.extend({collection: collection}, options))).render().$el);
 
                 this.deferred.resolve();
-
-                if (this.$el.closest('.tab-content').length) {
-                    mediator.trigger('widget:contentLoad', this.$el);
-                }
             },
 
             /**
