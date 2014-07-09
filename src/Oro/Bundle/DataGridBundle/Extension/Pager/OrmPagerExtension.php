@@ -20,7 +20,6 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
  */
 class OrmPagerExtension extends AbstractExtension
 {
-
     /** @var Pager */
     protected $pager;
 
@@ -47,7 +46,9 @@ class OrmPagerExtension extends AbstractExtension
     {
         // enabled by default for ORM datasource
         return !(bool)$this->getOr(PagerInterface::DISABLED_PARAM, false)
-            && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+            && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE
+            && !(bool)$this->getOr(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, true)
+            ;
     }
 
     /**
