@@ -69,7 +69,7 @@ class CalendarController extends Controller
             'user_select_form' => $this->get('form.factory')
                 ->createNamed(
                     'new_calendar_owner',
-                    'oro_user_acl_select',
+                    'oro_user_select',
                     null,
                     array(
                         'required' => true,
@@ -82,7 +82,8 @@ class CalendarController extends Controller
                             'excludeCurrent' => true,
                             'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                             'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
-                        )
+                        ),
+                        'autocomplete_alias' => 'acl_users'
                     )
                 )
                 ->createView(),
