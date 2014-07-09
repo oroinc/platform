@@ -26,6 +26,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
 
         initialize: function () {
             var view = this;
+            view.stopListening(view.model, 'change');
             view.listenTo(view.model, 'change', view.render);
         },
 
