@@ -1,7 +1,6 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% set dashboardLabel = dashboard.getLabel() %}
-{% oro_title_set({params : {"%name%": dashboardLabel }}) %}
+{% oro_title_set({params : {"%name%": dashboard.getLabel() }}) %}
 
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
@@ -15,11 +14,7 @@
                     <div class="pull-left">
 
                         <h1 class="oro-subtitle">
-                            {% if dashboardLabel|length > 30 %}
-                                {{ dashboardLabel|slice(0, 30) }} ...
-                            {% else %}
-                                {{ dashboardLabel }}
-                            {% endif %}
+                            {{ dashboard.getLabel()|truncate(30) }}
                         </h1>
                     </div>
                 </div>
@@ -84,11 +79,7 @@
                                     {% for dashboardModel in dashboards %}
                                         {% set dashboardLabel = dashboardModel.getLabel() %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {% if dashboardLabel|length>30 %}
-                                                {{ dashboardLabel|slice(0, 30) }} ...
-                                            {% else %}
-                                                {{ dashboardLabel }}
-                                            {% endif %}
+                                            {{ dashboardLabel|truncate(30) }}
                                         </option>
                                     {% endfor %}
                                 </select>
