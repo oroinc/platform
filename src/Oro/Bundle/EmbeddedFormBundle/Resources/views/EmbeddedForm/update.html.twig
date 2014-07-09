@@ -45,26 +45,34 @@
     {% set id = 'embedded-form' %}
 
     {% if form.formType.vars.choices is empty %}
-        {% set selectType = form_row(form.formType, {'attr': {'disabled':true} }) %}
+        {% set dataBlocks = [{
+            'title': 'General'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': 'oro.embeddedform.no_types_available'|trans,
+                    'data': [
+                    ]
+                }
+            ]
+        }] %}
     {% else %}
-        {% set selectType = form_row(form.formType) %}
+        {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': 'Embedded Form'|trans,
+                'data': [
+                        form_row(form.title),
+                        form_row(form.formType),
+                        form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
+                        form_row(form.successMessage)
+                    ]
+            }
+        ]
+        }] %}
     {% endif %}
-
-    {% set dataBlocks = [{
-    'title': 'General'|trans,
-    'class': 'active',
-    'subblocks': [
-        {
-            'title': 'Embedded Form'|trans,
-            'data': [
-                    form_row(form.title),
-                    selectType,
-                    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
-                    form_row(form.successMessage)
-                ]
-        }
-    ]
-    }] %}
 
     {% set data = {
         'formErrors': form_errors(form) ? form_errors(form) : null,
