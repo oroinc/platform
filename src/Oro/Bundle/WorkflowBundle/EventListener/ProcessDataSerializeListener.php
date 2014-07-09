@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 
@@ -16,6 +16,11 @@ class ProcessDataSerializeListener
      * @var string
      */
     protected $format = 'json';
+
+    /**
+     * @var ProcessJob[]
+     */
+    protected $scheduledEntities = array();
 
     /**
      * @var SerializerInterface
@@ -59,18 +64,32 @@ class ProcessDataSerializeListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
+        /** @var ProcessJob $entity */
         $unitOfWork = $args->getEntityManager()->getUnitOfWork();
 
         foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->serialize($entity, $unitOfWork);
+            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
+                $this->scheduledEntities[] = $entity;
             }
         }
 
         foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->serialize($entity, $unitOfWork);
+            if ($this->isSupported($entity) && $entity->getData()->isModified()) {
+                $this->scheduledEntities[] = $entity;
             }
+        }
+    }
+
+    /**
+     * @param PostFlushEventArgs $args
+     */
+    public function postFlush(PostFlushEventArgs $args)
+    {
+        if ($this->scheduledEntities) {
+            while ($processJob = array_shift($this->scheduledEntities)) {
+                $this->serialize($processJob);
+            }
+            $args->getEntityManager()->flush();
         }
     }
 
@@ -92,37 +111,12 @@ class ProcessDataSerializeListener
      * Serialize data of ProcessJob
      *
      * @param ProcessJob $processJob
-     * @param UnitOfWork $unitOfWork
      */
-    protected function serialize(ProcessJob $processJob, UnitOfWork $unitOfWork)
+    protected function serialize(ProcessJob $processJob)
     {
         $processData = $processJob->getData();
-        if ($processData->isModified()) {
-            $oldSerializedData = $processJob->getSerializedData();
-            $oldEntityId = $processJob->getEntityId();
-            $oldEntityHash = $processJob->getEntityHash();
-
-            $newSerializedData = $this->serializer->serialize(
-                $processData,
-                $this->format,
-                array('processJob' => $processJob)
-            );
-            $newEntityId = $processJob->getEntityId();
-            $newEntityHash = $processJob->getEntityHash();
-
-            $processJob->setSerializedData($newSerializedData);
-
-            if ($newSerializedData != $oldSerializedData) {
-                $unitOfWork->propertyChanged($processJob, 'serializedData', $oldSerializedData, $newSerializedData);
-            }
-            if ($newEntityId != $oldEntityId) {
-                $unitOfWork->propertyChanged($processJob, 'entityId', $oldEntityId, $newEntityId);
-            }
-            if ($newEntityHash != $oldEntityHash) {
-                $unitOfWork->propertyChanged($processJob, 'entityHash', $oldEntityHash, $newEntityHash);
-            }
-
-            $processData->setModified(false);
-        }
+        $serializedData = $this->serializer->serialize($processData, $this->format, array('processJob' => $processJob));
+        $processJob->setSerializedData($serializedData);
+        $processData->setModified(false);
     }
 }

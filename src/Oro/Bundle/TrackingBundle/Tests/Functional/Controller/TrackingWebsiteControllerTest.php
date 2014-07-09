@@ -86,9 +86,6 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-
-        // @todo: add to application menu
-        //$this->assertContains('Website updated - Websites - Marketing', $result->getContent());
     }
 
     /**

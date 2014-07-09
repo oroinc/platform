@@ -308,7 +308,7 @@ create connection and clears temporary attributes in last action.
 
 Following diagram shows this logic in graphical representation.
 
-![Workflow Diagram](../images/getting-started_workflow-diagram.png)
+![Workflow Diagram](../../images/getting-started_workflow-diagram.png)
 
 **Note:** If you want to test this flow in real application, you can put this configuration in file
 Oro/Bundle/UserBundle/Resources/config/workflow.yml, reload definitions using console command
