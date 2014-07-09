@@ -29,7 +29,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
                         return this.CONFIRMATION_MESSAGE;
                     }
                 }, this));
-                mediator.on('hash_navigation_click', this._confirmHashChange, this);
+                mediator.on('openLink:before', this._confirmOpenLink, this);
             },
 
             /**
@@ -71,9 +71,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @param event
              * @private
              */
-            _confirmHashChange: function (event) {
+            _confirmOpenLink: function (event) {
                 if (this.isChanged()) {
-                    event.stoppedProcess = !confirm(this.CONFIRMATION_MESSAGE);
+                    event.prevented = !confirm(this.CONFIRMATION_MESSAGE);
                 }
             },
 
@@ -98,7 +98,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
                 } else {
                     this.data = null;
                 }
-                mediator.off('hash_navigation_click', this._confirmHashChange, this);
+                mediator.off('openLink:before', this._confirmOpenLink, this);
                 $(window).off(this.UNLOAD_EVENT);
                 $(document).off(this.LOAD_EVENT);
             }

@@ -81,7 +81,7 @@ define([
      * @override
      */
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
-        var el, href;
+        var el, href, payload;
         el = event.currentTarget;
 
         if (event.isDefaultPrevented()) {
@@ -99,6 +99,13 @@ define([
             if (href.indexOf(':\/\/') !== -1 && el.host === location.host) {
                 el.setAttribute('href', el.pathname + el.search + el.hash);
             }
+        }
+
+        payload = {prevented: false, target: el};
+        Chaplin.mediator.publish('openLink:before', payload);
+        if (payload.prevented !== false) {
+            event.preventDefault();
+            return;
         }
 
         func.call(this, event);
