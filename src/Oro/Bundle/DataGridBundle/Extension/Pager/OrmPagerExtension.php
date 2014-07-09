@@ -45,10 +45,10 @@ class OrmPagerExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         // enabled by default for ORM datasource
-        return !(bool)$this->getOr(PagerInterface::DISABLED_PARAM, false)
-            && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE
-            && !(bool)$this->getOr(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, true)
-            ;
+        $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
+            || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
+
+        return !$disabled && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
     }
 
     /**
