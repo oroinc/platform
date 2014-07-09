@@ -27,6 +27,7 @@ oro:
             user.label:       User
             url.label:        Url
             website.label:    Website
+            code.label:       Code
             created_at.label: Created At
             logged_at.label:  Logged At
 
