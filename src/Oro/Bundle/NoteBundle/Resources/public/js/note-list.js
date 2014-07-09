@@ -20,26 +20,36 @@ function (
         options: {
             template: null,
             itemTemplate: null,
+            itemAddEvent: 'note:add',
+            itemViewIdPrefix: 'note-',
+            itemView: NoteView,
+            collection: null,
+            model: NoteModel,
             urls: {
                 list: null,
                 createItem: null,
                 updateItem: null,
                 deleteItem: null
             },
-            labels: {
-                noData: '',
-                addDialogTitle: '',
-                editDialogTitle: '',
-                itemSaved: '',
-                itemRemoved: '',
-                deleteConfirmation: ''
-            }
+            messages: {}
         },
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
 
+            _.defaults(this.options.messages, {
+                addDialogTitle: __('oro.note.add_note_title'),
+                editDialogTitle: __('oro.note.edit_note_title'),
+                itemSaved: __('oro.note.note_saved'),
+                itemRemoved: __('oro.note.note_removed'),
+                deleteConfirmation: __('oro.note.note_delete_confirmation'),
+                loadItemsError: __('oro.note.load_notes_error'),
+                deleteItemError: __('oro.note.delete_note_error'),
+                forbiddenError: __('oro.note.forbidden_error')
+            });
+
             this.options.collection = this.options.collection || new NoteCollection();
+            this.options.collection.model = this.options.model;
             this.options.collection.baseUrl = this._getUrl('list');
 
             this.template = _.template($(this.options.template).html());
@@ -50,9 +60,9 @@ function (
 
             var addItem = _.bind(this._addItem, this);
             mediator.once('page:request', function () {
-                mediator.off('note:add', addItem);
-            });
-            mediator.on('note:add', addItem);
+                mediator.off(this.options.itemAddEvent, addItem);
+            }, this);
+            mediator.on(this.options.itemAddEvent, addItem);
         },
 
         render: function () {
@@ -118,16 +128,16 @@ function (
         },
 
         _addItem: function () {
-            this._openItemEditForm(this._getLabel('addDialogTitle'), this._getUrl('createItem'));
+            this._openItemEditForm(this._getMessage('addDialogTitle'), this._getUrl('createItem'));
         },
 
         _editItem: function (itemView, model) {
-            this._openItemEditForm(this._getLabel('editDialogTitle'), this._getUrl('updateItem', model));
+            this._openItemEditForm(this._getMessage('editDialogTitle'), this._getUrl('updateItem', model));
         },
 
         _deleteItem: function (itemView, model) {
             var confirm = new DeleteConfirmation({
-                content: this._getLabel('deleteConfirmation')
+                content: this._getMessage('deleteConfirmation')
             });
             confirm.on('ok', _.bind(function () {
                 this._onItemDelete(model);
@@ -173,7 +183,7 @@ function (
                     url: this._getUrl('deleteItem', model),
                     success: _.bind(function () {
                         this._hideLoading();
-                        messenger.notificationFlashMessage('success', this._getLabel('itemRemoved'));
+                        messenger.notificationFlashMessage('success', this._getMessage('itemRemoved'));
                     }, this),
                     error: _.bind(function (model, response) {
                         if (!_.isUndefined(response.status) && response.status == 403) {
@@ -197,9 +207,9 @@ function (
         },
 
         _createItemView: function (model) {
-            var itemView = new NoteView({
+            var itemView = new this.options.itemView({
                 template: this.options.itemTemplate,
-                id: this._buildItemIdAttribute(model.id),
+                id: this._buildItemViewIdAttribute(model.id),
                 model: model
             });
             itemView.on('edit', _.bind(this._editItem, this));
@@ -212,7 +222,7 @@ function (
         },
 
         _findItemViewElement: function (id) {
-            return this.$itemsContainer.find('#' + this._buildItemIdAttribute(id));
+            return this.$itemsContainer.find('#' + this._buildItemViewIdAttribute(id));
         },
 
         _isItemViewCollapsed: function (viewElement) {
@@ -227,12 +237,12 @@ function (
             return this.options.urls[optionsKey];
         },
 
-        _getLabel: function (labelKey) {
-            return this.options.labels[labelKey];
+        _getMessage: function (labelKey) {
+            return this.options.messages[labelKey];
         },
 
-        _buildItemIdAttribute: function (id) {
-            return 'note-' + id;
+        _buildItemViewIdAttribute: function (id) {
+            return this.options.itemViewIdPrefix + id;
         },
 
         _showEmptyMessage: function () {
@@ -240,7 +250,7 @@ function (
             this.$itemsContainer.hide();
         },
 
-        _hideEmptyMessage: function() {
+        _hideEmptyMessage: function () {
             this.$noDataContainer.hide();
             this.$itemsContainer.show();
         },
@@ -271,12 +281,12 @@ function (
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
                     this.itemEditDialog.remove();
                     delete this.itemEditDialog;
-                    messenger.notificationFlashMessage('success', this._getLabel('itemSaved'));
+                    messenger.notificationFlashMessage('success', this._getMessage('itemSaved'));
                     var $itemView = this._findItemViewElement(response.id);
                     if ($itemView.length) {
                         this.getCollection().get(response.id).set(response);
                     } else {
-                        this.getCollection().add(new NoteModel(response));
+                        this.getCollection().add(response);
                     }
                 }, this));
             }
@@ -300,15 +310,15 @@ function (
         },
 
         _showLoadItemsError: function (err) {
-            this._showError(__('Sorry, notes were not loaded correctly'), err);
+            this._showError(this.options.messages.loadItemsError, err);
         },
 
         _showDeleteItemError: function (err) {
-            this._showError(__('Sorry, the note deleting was failed'), err);
+            this._showError(this.options.messages.deleteItemError, err);
         },
 
         _showForbiddenError: function (err) {
-            this._showError(__('You do not have permission to perform this action.'), err);
+            this._showError(this.options.messages.forbiddenError, err);
         },
 
         _showError: function (message, err) {

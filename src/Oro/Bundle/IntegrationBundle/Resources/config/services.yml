@@ -182,4 +182,3 @@ services:
         class: %oro_integration.utils.form_utils.class%
         arguments:
             - @oro_integration.manager.types_registry
-

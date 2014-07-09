@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector as TestConnector;
@@ -90,6 +91,12 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue('testChannel'));
 
+        $expectedAlias = 'test_alias';
+        $this->processorRegistry->expects($this->once())
+            ->method('getProcessorAliasesByEntity')
+            ->with(ProcessorRegistry::TYPE_EXPORT)
+            ->will($this->returnValue(array($expectedAlias)));
+
         $realConnector = new TestConnector();
 
         $this->registry->expects($this->once())
@@ -116,6 +123,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
                     'export' => [
                         'entityName'    => 'testEntity',
                         'channel'       => 'testChannel',
+                        'processorAlias'=> $expectedAlias,
                         'testParameter' => 'testValue'
                     ]
                 ]
