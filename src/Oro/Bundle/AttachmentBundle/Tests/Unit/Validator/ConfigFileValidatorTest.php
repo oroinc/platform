@@ -71,7 +71,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('file'));
         $this->config->expects($this->once())
             ->method('get')
-            ->with('oro_attachment.upload_mime_types')
+            ->with('oro_attachment.upload_file_mime_types')
             ->will($this->returnValue($mimeTypes));
         $entityAttachmentConfig->expects($this->once())
             ->method('get')
