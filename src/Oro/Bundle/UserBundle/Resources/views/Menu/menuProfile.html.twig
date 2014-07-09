@@ -5,7 +5,7 @@
                 <i class="icon-user"></i>
             {% else %}
                 {#{% if app.user.avatar %}
-                    <img class="avatar" src="{{ oro_filtered_attachment_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
+                    <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
                 {%  endif %}#}
                 {{ app.user|oro_format_name|escape }}
                 <i class="icon-sort-down"></i>
