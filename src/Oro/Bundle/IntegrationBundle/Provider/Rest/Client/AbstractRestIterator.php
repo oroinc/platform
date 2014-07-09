@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
-
 abstract class AbstractRestIterator implements \Iterator
 {
     /**
