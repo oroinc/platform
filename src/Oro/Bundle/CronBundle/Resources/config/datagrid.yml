@@ -54,6 +54,20 @@ datagrid:
                 command:
                     type: string
                     data_name: j.command
+                state:
+                    type: choice
+                    data_name: j.state
+                    options:
+                        field_options:
+                            choices:
+                                new: New
+                                pending:    Pending
+                                canceled:   Canceled
+                                running:    Running
+                                finished:   Rinished
+                                failed:     Failed
+                                terminated: Terminated
+                                incomplete: Incomplete
                 runtime:
                     type: number
                     data_name: j.runtime

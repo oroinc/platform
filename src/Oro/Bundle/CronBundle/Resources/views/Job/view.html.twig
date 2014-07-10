@@ -32,7 +32,7 @@
                 </tr>
                 <tr>
                     <th>{{ 'oro.cron.header.created'|trans }}</th>
-                    <td>{{ macros.ago(entity.createdAt) }}</td>
+                    <td>{{ entity.createdAt|oro_format_datetime }}</td>
                 </tr>
 
                 {% if entity.isRetryJob() %}
