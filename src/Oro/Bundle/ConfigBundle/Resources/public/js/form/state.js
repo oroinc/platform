@@ -38,7 +38,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @returns {boolean}
              */
             isChanged: function () {
-                if (!_.isNull(this.data) && !(this.form.data('nohash') && this.form.data('sent'))) {
+                if (!_.isNull(this.data) && !this.form.data('sent')) {
                     return this.data !== this.getState();
                 }
 

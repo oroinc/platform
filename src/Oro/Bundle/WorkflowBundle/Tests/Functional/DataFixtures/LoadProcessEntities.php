@@ -15,6 +15,7 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
 {
     const FIRST_DEFINITION = 'first';
     const SECOND_DEFINITION = 'second';
+    const DISABLED_DEFINITION = 'disabled';
     const UPDATE_TRIGGER_FIELD = 'name';
 
     /**
@@ -70,6 +71,21 @@ class LoadProcessEntities extends AbstractFixture implements ContainerAwareInter
         $entityManager->persist($secondDefinition);
         $entityManager->persist($createTrigger);
         $entityManager->persist($deleteTrigger);
+
+        // disabled definition
+        $disabledDefinition  = new ProcessDefinition();
+        $disabledDefinition->setName(self::DISABLED_DEFINITION)
+            ->setLabel(self::DISABLED_DEFINITION)
+            ->setRelatedEntity('Test\Entity')
+            ->setExecutionOrder(30)
+            ->setEnabled(false);
+
+        $createTrigger = new ProcessTrigger();
+        $createTrigger->setDefinition($disabledDefinition)
+            ->setEvent(ProcessTrigger::EVENT_CREATE);
+
+        $entityManager->persist($disabledDefinition);
+        $entityManager->persist($createTrigger);
 
         $entityManager->flush();
     }
