@@ -49,7 +49,6 @@ class ConfigSubscriber implements EventSubscriberInterface
      * - update entity and field states
      * - create index config data
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @param PersistConfigEvent $event
      */
     public function persistConfig(PersistConfigEvent $event)
@@ -62,26 +61,17 @@ class ConfigSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $change   = $event->getConfigManager()->getConfigChangeSet($eventConfig);
-        $sizeMark = count(array_intersect_key(array_flip(['state']), $change)) > 0;
-        $isCustom = $eventConfig->is('owner', ExtendScope::OWNER_CUSTOM);
+        $change       = $event->getConfigManager()->getConfigChangeSet($eventConfig);
+        $stateChanged = isset($change['state']);
+        $isCustom     = $eventConfig->is('owner', ExtendScope::OWNER_CUSTOM);
 
-        if ('extend' == $scope && $sizeMark && $isCustom) {
+        // synchronize field state with entity state, when custom field state changed
+        if ($isCustom && 'extend' == $scope && $stateChanged) {
             $configManager = $event->getConfigManager();
             $className     = $eventConfig->getId()->getClassName();
             $entityConfig  = $configManager->getProvider($scope)->getConfig($className);
 
-            /** @var bool $stateActiveOrUpdated event config state active or updated*/
-            $isStateActiveOrUpdated = $eventConfig->in(
-                'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
-            );
-            if ($isStateActiveOrUpdated && !isset($change['state'])) {
-                $eventConfig->set('state', ExtendScope::STATE_UPDATED);
-                $configManager->calculateConfigChangeSet($eventConfig);
-            }
-
-            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
+            if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETED])) {
                 $entityConfig->set('state', ExtendScope::STATE_UPDATED);
                 $configManager->persist($entityConfig);
             }

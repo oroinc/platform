@@ -47,9 +47,12 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
      */
     public function preUpdate(array &$extendConfigs)
     {
-        $entityConfigs = $this->getEntityConfigs($extendConfigs);
+        foreach ($extendConfigs as $entityConfig) {
+            /** @var ConfigInterface $entityConfig */
+            if (!$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                continue;
+            }
 
-        foreach ($entityConfigs as $entityConfig) {
             $className    = $entityConfig->getId()->getClassName();
             $fieldConfigs = $this->extendConfigProvider->getConfigs($className);
 
@@ -64,28 +67,6 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
                 }
             }
         }
-    }
-
-    /**
-     * Gets the list of configs for entities that can have relations
-     *
-     * @param ConfigInterface[] $extendConfigs
-     *
-     * @return ConfigInterface[]
-     */
-    protected function getEntityConfigs($extendConfigs)
-    {
-        if (null === $this->entityConfigs) {
-            $this->entityConfigs = [];
-
-            foreach ($extendConfigs as $extendConfig) {
-                if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                    $this->entityConfigs[] = $extendConfig;
-                }
-            }
-        }
-
-        return $this->entityConfigs;
     }
 
     /**
