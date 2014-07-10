@@ -11,6 +11,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -42,6 +43,11 @@ class ProcessCollectorListener
     protected $logger;
 
     /**
+     * @var ProcessTriggerCache
+     */
+    protected $triggerCache;
+
+    /**
      * @var array
      */
     protected $triggers;
@@ -71,17 +77,20 @@ class ProcessCollectorListener
      * @param DoctrineHelper $doctrineHelper
      * @param ProcessHandler $handler
      * @param ProcessLogger $logger
+     * @param ProcessTriggerCache $triggerCache
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ProcessHandler $handler,
-        ProcessLogger $logger
+        ProcessLogger $logger,
+        ProcessTriggerCache $triggerCache
     ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->handler = $handler;
         $this->logger = $logger;
+        $this->triggerCache = $triggerCache;
     }
 
     /**
@@ -123,6 +132,16 @@ class ProcessCollectorListener
     /**
      * @param string $entityClass
      * @param string $event
+     * @return bool
+     */
+    protected function hasTriggers($entityClass, $event)
+    {
+        return $this->triggerCache->hasTrigger($entityClass, $event);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $event
      * @param string|null $field
      * @return ProcessTrigger[]
      */
@@ -154,8 +173,13 @@ class ProcessCollectorListener
     {
         $entity = $args->getEntity();
         $entityClass = $this->getClass($entity);
+        $event = ProcessTrigger::EVENT_CREATE;
 
-        $triggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_CREATE);
+        if (!$this->hasTriggers($entityClass, $event)) {
+            return;
+        }
+
+        $triggers = $this->getTriggers($entityClass, $event);
         foreach ($triggers as $trigger) {
             $this->scheduleProcess($trigger, $entity);
         }
@@ -168,14 +192,19 @@ class ProcessCollectorListener
     {
         $entity = $args->getEntity();
         $entityClass = $this->getClass($entity);
+        $event = ProcessTrigger::EVENT_UPDATE;
 
-        $entityTriggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_UPDATE);
+        if (!$this->hasTriggers($entityClass, $event)) {
+            return;
+        }
+
+        $entityTriggers = $this->getTriggers($entityClass, $event);
         foreach ($entityTriggers as $trigger) {
             $this->scheduleProcess($trigger, $entity);
         }
 
         foreach (array_keys($args->getEntityChangeSet()) as $field) {
-            $fieldTriggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_UPDATE, $field);
+            $fieldTriggers = $this->getTriggers($entityClass, $event, $field);
             foreach ($fieldTriggers as $trigger) {
                 $oldValue = $args->getOldValue($field);
                 $newValue = $args->getNewValue($field);
@@ -193,14 +222,19 @@ class ProcessCollectorListener
     {
         $entity = $args->getEntity();
         $entityClass = $this->getClass($entity);
-        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
+        $event = ProcessTrigger::EVENT_DELETE;
 
-        $triggers = $this->getTriggers($entityClass, ProcessTrigger::EVENT_DELETE);
+        if (!$this->hasTriggers($entityClass, $event)) {
+            return;
+        }
+
+        $triggers = $this->getTriggers($entityClass, $event);
         foreach ($triggers as $trigger) {
             // cloned to save all data after flush
             $this->scheduleProcess($trigger, clone $entity);
         }
 
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
         if ($entityId) {
             $this->removedEntityHashes[] = ProcessJob::generateEntityHash($entityClass, $entityId);
         }

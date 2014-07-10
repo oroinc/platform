@@ -44,6 +44,8 @@ class ProcessTriggerCache
      */
     public function build()
     {
+        $this->assertProvider();
+
         // get all triggers data
         $triggerClass = 'OroWorkflowBundle:ProcessTrigger';
         /** @var ProcessTriggerRepository $triggerRepository */
@@ -71,11 +73,22 @@ class ProcessTriggerCache
         $this->provider->save(self::BUILT, true);
     }
 
+    /**
+     * @param string $entityClass
+     * @param string $event
+     * @return bool
+     */
     public function hasTrigger($entityClass, $event)
     {
+        $this->assertProvider();
+
         if (!$this->isBuilt()) {
             $this->build();
         }
+
+        $data = $this->provider->fetch(self::DATA);
+
+        return !empty($data[$entityClass]) && in_array($event, $data[$entityClass]);
     }
 
     /**
@@ -84,5 +97,15 @@ class ProcessTriggerCache
     protected function isBuilt()
     {
         return $this->provider->contains(self::BUILT) && $this->provider->fetch(self::BUILT);
+    }
+
+    /**
+     * @throws \LogicException
+     */
+    protected function assertProvider()
+    {
+        if (!$this->provider) {
+            throw new \LogicException('Process trigger cache provider is not defined');
+        }
     }
 }
