@@ -30,7 +30,7 @@ oro:
             label:   Last run
         form:
             choose_segment_type:    Choose segment type
-            designer:               Grid designer
+            designer:               Designer
             columns:                Columns
             filters:                Filters
 
