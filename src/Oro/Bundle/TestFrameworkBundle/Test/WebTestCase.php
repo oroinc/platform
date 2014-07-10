@@ -76,7 +76,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @var ReferenceRepository
      */
-    protected $referenceRepository;
+    private static $referenceRepository;
 
     protected function tearDown()
     {
@@ -316,7 +316,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
-        $this->referenceRepository = $executor->getReferenceRepository();
+        self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
     }
 
@@ -331,11 +331,11 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository
+     * @return ReferenceRepository|null
      */
     protected function getReferenceRepository()
     {
-        return $this->referenceRepository;
+        return self::$referenceRepository;
     }
 
     /**
@@ -631,6 +631,28 @@ abstract class WebTestCase extends BaseWebTestCase
         \PHPUnit_Framework_TestCase::assertTrue(
             $response->headers->contains('Content-Type', $contentType),
             $response->headers
+        );
+    }
+
+    /**
+     * Assert that intersect of $actual with $expected equals $expected
+     *
+     * @param array $expected
+     * @param array $actual
+     * @param string $message
+     */
+    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    {
+        $actualIntersect = array();
+        foreach (array_keys($expected) as $expectedKey) {
+            if (array_key_exists($expectedKey, $actual)) {
+                $actualIntersect[$expectedKey] = $actual[$expectedKey];
+            }
+        }
+        \PHPUnit_Framework_TestCase::assertEquals(
+            $expected,
+            $actualIntersect,
+            $message
         );
     }
 }

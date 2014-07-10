@@ -15,8 +15,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
             $this->getSelectMock(array('someTable.field2 AS alias2')),
         );
 
-        $tools = new QueryBuilderTools();
-        $tools->prepareFieldAliases($selects);
+        $tools = new QueryBuilderTools($selects);
         $expected = array(
             'eData' => 'e.data',
             'alias' => 'someTable.field',
@@ -248,7 +247,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1')
+                array('t2', 't1', 'e')
             ),
             array(
                 array(
@@ -259,7 +258,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
+                array('t2', 't3', 't1', 'e')
             ),
             array(
                 array(
@@ -270,7 +269,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
+                array('t2', 't3', 't1', 'e')
             )
         );
     }
