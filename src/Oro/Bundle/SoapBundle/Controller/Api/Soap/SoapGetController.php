@@ -13,9 +13,9 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     /**
      * {@inheritDoc}
      */
-    public function handleGetListRequest($page = 1, $limit = 10)
+    public function handleGetListRequest($page = 1, $limit = 10, $orderBy = null)
     {
-        return $this->transformToSoapEntities($this->getManager()->getList($limit, $page));
+        return $this->transformToSoapEntities($this->getManager()->getList($limit, $page, $orderBy));
     }
 
     /**

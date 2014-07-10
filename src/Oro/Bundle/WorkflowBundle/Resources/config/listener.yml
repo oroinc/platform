@@ -11,6 +11,7 @@ services:
             - @oro_workflow.serializer.process.serializer
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: postLoad }
 
     oro_workflow.listener.workflow_data_serialize:
@@ -20,6 +21,7 @@ services:
             - @oro_entity.doctrine_helper
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: postLoad }
 
     oro_workflow.listener.workflow_item:

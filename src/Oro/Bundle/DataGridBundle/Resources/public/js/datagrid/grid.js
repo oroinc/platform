@@ -504,6 +504,8 @@ define(function (require) {
                 $el.append(this.footer.render().$el);
             }
             $el.append(this.body.render().$el);
+
+            mediator.trigger("grid_load:complete", this.collection, $el);
         },
 
         /**

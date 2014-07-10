@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
+
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
@@ -89,7 +90,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fileContent, $this->attachmentManager->getContent($this->attachment));
     }
 
-    public function testGetAttachmentUrl()
+    public function testGetFileUrl()
     {
         $this->attachment->setId(1);
         $this->attachment->setExtension('txt');
@@ -107,7 +108,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 true
             );
-        $this->attachmentManager->getAttachmentUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+        $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
     }
 
     public function testDecodeAttachmentUrl()
@@ -258,5 +259,23 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('xls', $this->attachment->getExtension());
         $this->assertEquals('text/css', $this->attachment->getMimeType());
         $this->assertEquals(1024, $this->attachment->getFileSize());
+    }
+
+    public function testGetFilteredImageUrl()
+    {
+        $this->attachment->setId(1);
+        $filerName = 'testFilter';
+        $this->attachment->setOriginalFilename('test.doc');
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'oro_filtered_attachment',
+                [
+                    'id' => 1,
+                    'filename' => 'test.doc',
+                    'filter' => $filerName
+                ]
+            );
+        $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
     }
 }
