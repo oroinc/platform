@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -20,6 +21,9 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var  RelationDataConfigDumperExtension */
     protected $extension;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     public function setUp()
     {
         $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -31,14 +35,14 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getProviderBag', 'getProvider', 'getConfigChangeSet'])
             ->getMock();
 
-
         $this->configManager
             ->expects($this->once())
             ->method('getProvider')
             ->with('extend')
             ->will($this->returnValue($this->extendConfigProvider));
 
-        $this->extension = new RelationDataConfigDumperExtension($this->configManager);
+        $this->fieldTypeHelper = new FieldTypeHelper();
+        $this->extension = new RelationDataConfigDumperExtension($this->configManager, $this->fieldTypeHelper);
     }
 
     public function testSupportsPreUpdate()
