@@ -57,7 +57,7 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expecteedExceptionMessage Process trigger cache provider is not defined
+     * @expectedExceptionMessage Process trigger cache provider is not defined
      */
     public function testBuildNoProvider()
     {
@@ -88,7 +88,7 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expecteedExceptionMessage Process trigger cache provider is not defined
+     * @expectedExceptionMessage Process trigger cache provider is not defined
      */
     public function testHasTriggerNoProvider()
     {
@@ -108,13 +108,15 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
         foreach ($calls as $iteration => $call) {
             $method = $call[0];
-            $with = !empty($call[1]) ? $call[1] : null;
+            $with   = !empty($call[1]) ? $call[1] : null;
             $return = !empty($call[2]) ? $call[2] : null;
 
             $mocker = $cacheProvider->expects($this->at($iteration))->method($method);
+
             if ($with) {
                 call_user_func_array(array($mocker, 'with'), $with);
             }
+
             if ($return) {
                 $mocker->will($this->returnValue($return));
             }
@@ -123,6 +125,9 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
         return $cacheProvider;
     }
 
+    /**
+     * @param array $data
+     */
     protected function prepareRegistryForBuild(array $data)
     {
         // generate triggers
@@ -143,18 +148,17 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
         // set mocks
         $triggerClass = 'OroWorkflowBundle:ProcessTrigger';
 
-        $entityRepository =
-            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $entityRepository->expects($this->any())->method('findAllWithDefinitions')
+        $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->any())->method('findAllWithDefinitions')
             ->will($this->returnValue($triggers));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())->method('getRepository')->with($triggerClass)
-            ->will($this->returnValue($entityRepository));
+            ->will($this->returnValue($repository));
 
         $this->registry->expects($this->any())->method('getManagerForClass')->with($triggerClass)
             ->will($this->returnValue($entityManager));

@@ -6,7 +6,6 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
 class ProcessTriggerCache
 {
@@ -47,16 +46,16 @@ class ProcessTriggerCache
         $this->assertProvider();
 
         // get all triggers data
-        $triggerClass = 'OroWorkflowBundle:ProcessTrigger';
-        /** @var ProcessTriggerRepository $triggerRepository */
-        $triggerRepository = $this->registry->getManagerForClass($triggerClass)->getRepository($triggerClass);
+        $triggerRepository = $this->registry
+            ->getManagerForClass('OroWorkflowBundle:ProcessTrigger')
+            ->getRepository('OroWorkflowBundle:ProcessTrigger');
         /** @var ProcessTrigger[] $triggers */
         $triggers = $triggerRepository->findAllWithDefinitions();
+        $data     = array();
 
-        $data = array();
         foreach ($triggers as $trigger) {
             $entityClass = $trigger->getDefinition()->getRelatedEntity();
-            $event = $trigger->getEvent();
+            $event       = $trigger->getEvent();
 
             if (!isset($data[$entityClass])) {
                 $data[$entityClass] = array();
