@@ -1,7 +1,13 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
-
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        {'label': 'oro.dashboard.menu.dashboards_tab.label'|trans },
+        {'label': dashboard.getLabel()|trans }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
 {% set allowEdit = resource_granted('EDIT', dashboard.entity) %}
@@ -12,7 +18,9 @@
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-                        <h1 class="oro-subtitle">{{ dashboard.getLabel()|trans }}</h1>
+                        <h1 class="oro-subtitle">
+                            {{ dashboard.getLabel()|trans }}
+                        </h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -75,7 +83,7 @@
                                 <select id="dashboard_selector">
                                     {% for dashboardModel in dashboards %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {{ dashboardModel.getLabel()|trans }}
+                                            {{ dashboardModel.getLabel()|trans|truncate(50) }}
                                         </option>
                                     {% endfor %}
                                 </select>
