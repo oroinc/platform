@@ -55,6 +55,22 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     }
 
     /**
+     * Prepare list of entities for serialization
+     *
+     * @param array $entities
+     * @param  array $resultFields If not empty, result item will contain only given fields.
+     * @return array
+     */
+    protected function getPreparedItems($entities, $resultFields = [])
+    {
+        $result = array();
+        foreach ($entities as $entity) {
+            $result[] = $this->getPreparedItem($entity, $resultFields);
+        }
+        return $result;
+    }
+
+    /**
      * Prepare entity for serialization
      *
      * @param  mixed $entity

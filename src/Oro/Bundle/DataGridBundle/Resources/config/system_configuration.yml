@@ -1,10 +1,13 @@
 oro_system_configuration:
     groups:
         look_and_feel:
-            title: 'Display settings'
-            icon:  'icon-eye-open'
+            title:       'Display settings'
+            icon:        'icon-eye-open'
+            page_reload: true
+
         grid_settings:
             title: 'Data Grid settings'
+
     fields:
         oro_data_grid.default_per_page:
             type: choice

@@ -2180,6 +2180,11 @@ div.selector select {
   padding: 0 5px;
 }
 
+/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
+.controls select {width: 282px;}
+.controls .selector select {width: 100%;}
+/* end uniformjs customization */
+
 div.selector:active,
 div.selector.active {
   background-position: -483px -156px;
@@ -2900,8 +2905,7 @@ label.radio.error {
   }
 }
 #orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow,
-.oro_attachment_file .removeFile{
+#oro_entity_config_type .removeRow{
   text-indent:-999;
   font-size:0;
   line-height:0;
@@ -2916,9 +2920,6 @@ label.radio.error {
   &:hover:after {
     color:#888;
   }
-}
-.oro_attachment_file .removeFile{
-  margin: 0;
 }
 pre.email-body {
   width: 99%;
