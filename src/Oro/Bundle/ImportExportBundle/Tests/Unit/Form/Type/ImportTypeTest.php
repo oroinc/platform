@@ -5,8 +5,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Validator\Validation;
 
 class ImportTypeTest extends FormIntegrationTestCase
 {
@@ -85,5 +86,13 @@ class ImportTypeTest extends FormIntegrationTestCase
                 )
             ),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [new ValidatorExtension(Validation::createValidator())];
     }
 }
