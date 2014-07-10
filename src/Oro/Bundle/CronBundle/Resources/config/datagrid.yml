@@ -60,14 +60,14 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                new: New
-                                pending:    Pending
-                                canceled:   Canceled
-                                running:    Running
-                                finished:   Rinished
-                                failed:     Failed
-                                terminated: Terminated
-                                incomplete: Incomplete
+                                new:        oro.cron.job.status.new
+                                pending:    oro.cron.job.status.pending
+                                canceled:   oro.cron.job.status.canceled
+                                running:    oro.cron.job.status.running
+                                finished:   oro.cron.job.status.finished
+                                failed:     oro.cron.job.status.failed
+                                terminated: oro.cron.job.status.terminated
+                                incomplete: oro.cron.job.status.incomplete
                 runtime:
                     type: number
                     data_name: j.runtime
