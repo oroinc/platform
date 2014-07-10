@@ -59,19 +59,25 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test that nothing changed and only custom fields processed
+     */
     public function testCreateRelationTypeOwnEntity()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('owner', ExtendScope::OWNER_CUSTOM);
 
         $configs = [
-            $config1, $config2
+            $config
         ];
 
         $fieldsConfigs = [
             $this->getConfigNewField(
                 [],
+                'oneToMany'
+            ),
+            $this->getConfigNewField(
+                ['owner' => ExtendScope::OWNER_SYSTEM],
                 'oneToMany'
             ),
         ];
@@ -120,12 +126,11 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateSelfRelationOneToMany()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('owner', ExtendScope::OWNER_CUSTOM);
 
         $configs = [
-            $config1, $config2
+            $config
         ];
 
         $fieldsConfigs = [
@@ -220,12 +225,11 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateSelfRelationManyToOne()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('owner', ExtendScope::OWNER_CUSTOM);
 
         $configs = [
-            $config1, $config2
+            $config
         ];
 
         $fieldsConfigs = [
@@ -310,12 +314,11 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateSelfRelationManyToMany()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('owner', ExtendScope::OWNER_CUSTOM);
 
         $configs = [
-            $config1, $config2
+            $config
         ];
 
         $fieldsConfigs = [
@@ -409,12 +412,11 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateTargetRelationManyToMany()
     {
-        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('owner', ExtendScope::OWNER_CUSTOM);
 
         $configs = [
-            $config1, $config2
+            $config
         ];
 
         $fieldsConfigs = [
@@ -472,7 +474,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('getConfig')
             ->with('TestClass')
-            ->will($this->returnValue($config2));
+            ->will($this->returnValue($config));
 
         $this->extendConfigProvider
             ->expects($this->at(2))

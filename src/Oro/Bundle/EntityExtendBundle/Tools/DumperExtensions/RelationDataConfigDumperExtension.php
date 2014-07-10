@@ -51,15 +51,15 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     public function preUpdate(array &$extendConfigs)
     {
         foreach ($extendConfigs as $entityConfig) {
-            /** @var ConfigInterface $entityConfig */
-            if (!$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                continue;
-            }
-
             $className    = $entityConfig->getId()->getClassName();
             $fieldConfigs = $this->extendConfigProvider->getConfigs($className);
 
             foreach ($fieldConfigs as $fieldConfig) {
+                /** @var ConfigInterface $entityConfig */
+                if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                    continue;
+                }
+
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
 
