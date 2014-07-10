@@ -210,7 +210,7 @@ class Channel
     }
 
     /**
-     * @param [] $connectors
+     * @param array $connectors
      *
      * @return $this
      */
@@ -222,7 +222,7 @@ class Channel
     }
 
     /**
-     * @return []
+     * @return array
      */
     public function getConnectors()
     {

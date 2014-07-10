@@ -6,12 +6,15 @@ use Psr\Log\LoggerAwareInterface;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
+
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
 {
@@ -66,12 +69,12 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      * Validates initialization
      * Basically added to be overridden in child classes
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function validateConfiguration()
     {
         if (!$this->transport instanceof TransportInterface) {
-            throw new \LogicException('Could not retrieve transport from context');
+            throw new LogicException('Could not retrieve transport from context');
         }
     }
 

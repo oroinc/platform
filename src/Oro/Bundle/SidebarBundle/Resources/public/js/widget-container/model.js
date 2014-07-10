@@ -41,6 +41,7 @@ define(['backbone', '../constants'], function (Backbone, constants) {
             } else {
                 model.set('state', constants.WIDGET_MINIMIZED);
             }
+            this.save();
         },
 
         /**
@@ -54,7 +55,8 @@ define(['backbone', '../constants'], function (Backbone, constants) {
          * Restores state of widget container
          */
         restoreState: function () {
-            this.set({ state: this.stateSnapshot });
+            this.set({ state: this.stateSnapshot }, {silent: true});
+            this.save();
         },
 
         /**
