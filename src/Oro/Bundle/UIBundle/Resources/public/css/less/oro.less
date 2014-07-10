@@ -2180,6 +2180,11 @@ div.selector select {
   padding: 0 5px;
 }
 
+/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
+.controls select {width: 282px;}
+.controls .selector select {width: 100%;}
+/* end uniformjs customization */
+
 div.selector:active,
 div.selector.active {
   background-position: -483px -156px;
@@ -2829,6 +2834,7 @@ label.radio.error {
 .breadcrumb > li {
   color: #777;
   font: 11px/14px @baseFontFamily;
+  word-break: break-all;
 }
 .breadcrumb > li > .divider {
   color: #777;

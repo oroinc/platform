@@ -74,6 +74,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('title', $result);
         $this->assertArrayHasKey('priority', $result);
         $this->assertArrayHasKey('description', $result);
+        $this->assertArrayHasKey('page_reload', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('icon', $result);
     }
@@ -92,6 +93,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('description', $result);
         $this->assertArrayHasKey('icon', $result);
         $this->assertArrayNotHasKey('some_another', $result);
+        $this->assertArrayNotHasKey('page_reload', $result);
     }
 
     /**
@@ -106,6 +108,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
                 'priority'     => 123,
                 'description'  => 'some desc',
                 'icon'         => 'real icon',
+                'page_reload'  => true,
                 'some_another' => ''
             )
         );

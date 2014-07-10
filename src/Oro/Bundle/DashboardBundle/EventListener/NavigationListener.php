@@ -45,8 +45,11 @@ class NavigationListener
             foreach ($dashboards as $dashboard) {
                 $dashboardId = $dashboard->getId();
 
+                $dashboardLabel = $dashboard->getLabel();
+                $dashboardLabel = strlen($dashboardLabel) > 50 ? substr($dashboardLabel, 0, 50).'...' : $dashboardLabel;
+
                 $options = array(
-                    'label' => $dashboard->getLabel(),
+                    'label' => $dashboardLabel,
                     'route' => 'oro_dashboard_view',
                     'extras' => array(
                         'position' => 1
