@@ -5,6 +5,8 @@ namespace Oro\Bundle\NoteBundle\Placeholder;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\NoteBundle\Entity\Note;
 
 class PlaceholderFilter
 {
@@ -14,11 +16,13 @@ class PlaceholderFilter
     protected $noteConfigProvider;
 
     /**
-     * @param ConfigProvider      $noteConfigProvider
+     * @param ConfigProvider $noteConfigProvider
+     * @param ConfigProvider $entityConfigProvider
      */
-    public function __construct(ConfigProvider $noteConfigProvider)
+    public function __construct(ConfigProvider $noteConfigProvider, ConfigProvider $entityConfigProvider)
     {
-        $this->noteConfigProvider  = $noteConfigProvider;
+        $this->noteConfigProvider   = $noteConfigProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**
@@ -37,6 +41,10 @@ class PlaceholderFilter
 
         return
             $this->noteConfigProvider->hasConfig($className)
-            && $this->noteConfigProvider->getConfig($className)->is('enabled');
+            && $this->noteConfigProvider->getConfig($className)->is('enabled')
+            && $this->entityConfigProvider->hasConfig(
+                Note::ENTITY_NAME,
+                ExtendHelper::buildAssociationName($className)
+            );
     }
 }

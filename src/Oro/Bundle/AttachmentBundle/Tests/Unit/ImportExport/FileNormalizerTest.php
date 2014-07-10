@@ -109,7 +109,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         if ($violations) {
             $this->validator->expects($this->once())->method('validate')
-                ->with($context['entityName'], $context['fieldName'])
+                ->with($context['entityName'])
                 ->will($this->returnValue($violations));
         } else {
             $this->validator->expects($this->never())->method('validate');
