@@ -1,7 +1,6 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% set dashboardLabel = dashboard.getLabel() %}
-{% oro_title_set({params : {"%name%": dashboardLabel }}) %}
+{% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
 
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
@@ -13,14 +12,7 @@
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-
-                        <h1 class="oro-subtitle">
-                            {% if dashboardLabel|length > 30 %}
-                                {{ dashboardLabel|slice(0, 30) }} ...
-                            {% else %}
-                                {{ dashboardLabel }}
-                            {% endif %}
-                        </h1>
+                        <h1 class="oro-subtitle">{{ dashboard.getLabel()|trans }}</h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -82,13 +74,8 @@
                                 <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                                 <select id="dashboard_selector">
                                     {% for dashboardModel in dashboards %}
-                                        {% set dashboardLabel = dashboardModel.getLabel() %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {% if dashboardLabel|length>30 %}
-                                                {{ dashboardLabel|slice(0, 30) }} ...
-                                            {% else %}
-                                                {{ dashboardLabel }}
-                                            {% endif %}
+                                            {{ dashboardModel.getLabel()|trans }}
                                         </option>
                                     {% endfor %}
                                 </select>
