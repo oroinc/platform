@@ -19,7 +19,6 @@ class UserAclSelectType extends AbstractType
                     'permission' => 'CREATE',
                 ),
                 'autocomplete_alias' => 'acl_users',
-                //'autocomplete_alias' => 'users',
                 'grid_name' => 'users-select-grid',
             )
         );
