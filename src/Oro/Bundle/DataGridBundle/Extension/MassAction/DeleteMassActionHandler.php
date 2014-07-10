@@ -53,9 +53,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         // batch remove should be processed in transaction
         $this->entityManager->beginTransaction();
         try {
+            // to prevent excess of php time limit when huge data must be deleted
+            set_time_limit(0);
             foreach ($results as $result) {
-                // to prevent excess of php time limit when huge data must be deleted
-                set_time_limit(30);
                 /** @var $result ResultRecordInterface */
                 $entity = $result->getRootEntity();
                 if (!$entity) {
