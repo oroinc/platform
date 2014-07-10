@@ -113,7 +113,7 @@ class ApiEntityManager
      *
      * @param  int          $limit
      * @param  int          $page
-     * @param  null         $orderBy
+     * @param  array|null   $orderBy
      * @return \Traversable
      */
     public function getList($limit = 10, $page = 1, $orderBy = null)

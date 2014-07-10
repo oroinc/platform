@@ -206,7 +206,7 @@ define(function (require) {
             /**
              * Processing all links in grid after grid load
              */
-            mediator.bind("grid_load:complete", function (collection) {
+            mediator.bind("grid_load:complete", function (collection, element) {
                 this.updateCachedContent(collection.inputName, {'collection': collection});
                 if (pinbarView) {
                     var item = pinbarView.getItemForCurrentPage(true);
@@ -214,7 +214,7 @@ define(function (require) {
                         contentManager.addPage(this.getHashUrl(), this.tempCache);
                     }
                 }
-                this.processGridLinks();
+                this.processGridLinks(element);
             }, this);
 
             /**
@@ -776,9 +776,10 @@ define(function (require) {
             });
         },
 
-        processGridLinks: function()
+        processGridLinks: function(element)
         {
-            this.processClicks($(this.selectors.gridContainer).find(this.selectors.links));
+            element = element || $(this.selectors.gridContainer);
+            this.processClicks(element.find(this.selectors.links));
         },
 
         processRedirect: function (data) {

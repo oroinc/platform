@@ -27,6 +27,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
                 $(window).on(this.UNLOAD_EVENT, _.bind(function () {
                     if (this.isChanged()) {
                         return this.CONFIRMATION_MESSAGE;
+                    } else {
+                        return null;
                     }
                 }, this));
                 mediator.on('hash_navigation_click', this._confirmHashChange, this);
@@ -38,7 +40,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @returns {boolean}
              */
             isChanged: function () {
-                if (!_.isNull(this.data) && !(this.form.data('nohash') && this.form.data('sent'))) {
+                if (!_.isNull(this.data) && !this.form.data('sent')) {
                     return this.data !== this.getState();
                 }
 

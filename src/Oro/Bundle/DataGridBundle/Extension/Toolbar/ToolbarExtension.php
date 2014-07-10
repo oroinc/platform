@@ -20,6 +20,7 @@ class ToolbarExtension extends AbstractExtension
     const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
     const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
     const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
+    const TOOLBAR_PAGINATION_HIDE_OPTION_PATH  = '[options][toolbarOptions][pagination][hide]';
 
     /** @var ConfigManager */
     private $cm;
