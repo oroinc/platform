@@ -64,15 +64,11 @@ class ChannelRepository extends EntityRepository
      */
     public function getOrLoadById($id)
     {
-        $uow = $this->getEntityManager()->getUnitOfWork();
+        $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
+        $integration = $this->getEntityManager()->find('OroIntegrationBundle:Channel', $id);
+        $unitOfWork->markReadOnly($integration);
 
-        if (!isset($this->loadedInstances[$id])) {
-            $this->loadedInstances[$id] = $this->findOneBy(['id' => $id]);
-        } else {
-            $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
-        }
-
-        return $this->loadedInstances[$id];
+        return $integration;
     }
 
     /**
@@ -84,7 +80,7 @@ class ChannelRepository extends EntityRepository
     public function addStatus(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
-            $integration = $this->getEntityManager()->merge($integration);
+            $integration = $this->getOrLoadById($integration->getId());
 
             $this->getEntityManager()->persist($status);
             $integration->addStatus($status);
