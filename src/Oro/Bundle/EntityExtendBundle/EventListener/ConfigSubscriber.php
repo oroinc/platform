@@ -72,7 +72,10 @@ class ConfigSubscriber implements EventSubscriberInterface
             $entityConfig  = $configManager->getProvider($scope)->getConfig($className);
 
             /** @var bool $stateActiveOrUpdated event config state active or updated*/
-            $isStateActiveOrUpdated = $eventConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]);
+            $isStateActiveOrUpdated = $eventConfig->in(
+                'state',
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+            );
             if ($isStateActiveOrUpdated && !isset($change['state'])) {
                 $eventConfig->set('state', ExtendScope::STATE_UPDATED);
                 $configManager->calculateConfigChangeSet($eventConfig);

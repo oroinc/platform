@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -53,6 +53,62 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
         );
+    }
+
+    public function testCreateRelationTypeOwnEntity()
+    {
+        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity'));
+        $config2 = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config2->set('owner', ExtendScope::OWNER_CUSTOM);
+
+        $configs = [
+            $config1, $config2
+        ];
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [],
+                'oneToMany'
+            ),
+        ];
+
+        // get field configs
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('getConfigs')
+            ->with('TestClass')
+            ->will($this->returnValue($fieldsConfigs));
+
+        $relation = [
+            'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                'assign'          => true,
+                'owner'           => true,
+                'target_entity'   => 'TestClass',
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'TestClass',
+                    'testFieldName',
+                    'oneToMany'
+                )
+            ]
+        ];
+        $selfConfig = $this->getEntityConfig(
+            [
+                'state'    => ExtendScope::STATE_ACTIVE,
+                'relation' => $relation,
+            ]
+        );
+
+        $this->extendConfigProvider
+            ->expects($this->at(1))
+            ->method('getConfig')
+            ->with('TestClass')
+            ->will($this->returnValue($selfConfig));
+
+        $this->extension->preUpdate($configs);
+
+        // assert nothing changed
+        $this->assertEquals($relation, $selfConfig->get('relation'));
     }
 
     /**

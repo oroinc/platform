@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
@@ -167,7 +167,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         if ($dump) {
             print_r("\n" . $classBody . "\n");
         }
-        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/' . $expectedFile);
+        $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
 
         $this->assertEquals(trim($expectedBody), $classBody);
     }

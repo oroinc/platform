@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
@@ -181,7 +181,7 @@ class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit_
         $this->extension->generate($schema, $class);
         $strategy     = new DefaultGeneratorStrategy();
         $classBody    = $strategy->generate($class);
-        $expectedBody = file_get_contents(__DIR__ . '/Fixtures/many_to_one_association.txt');
+        $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/many_to_one_association.txt');
 
         $this->assertEquals(trim($expectedBody), $classBody);
     }

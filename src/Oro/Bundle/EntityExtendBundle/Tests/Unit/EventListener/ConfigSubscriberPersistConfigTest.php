@@ -101,38 +101,6 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *  Test create new 1:* relation field to same entity
-     *  Should NOT be persisted
-     */
-    public function testScopeExtendRelationTypeOwnEntity()
-    {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField([], 'oneToMany'),
-            $test = $this->getEntityConfig(
-                [
-                    'state' => ExtendScope::STATE_NEW,
-                    'relation' => [
-                        'oneToMany|TestClass|TestClass|testFieldName' => [
-                            'assign' => false,
-                            'field_id' => new FieldConfigId('extend', 'TestClass', 'testFieldName', 'oneToMany'),
-                            'owner' => true,
-                            'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
-                        ]
-                    ],
-
-                ]
-            ),
-            [
-                'state' => [0 => null, 1 => ExtendScope::STATE_NEW]
-            ]
-        );
-
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-        $this->assertAttributeEquals(null, 'persistConfigs', $cm);
-    }
-
-    /**
      * FieldConfig
      *
      * @param array $values
