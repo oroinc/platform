@@ -53,6 +53,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         // batch remove should be processed in transaction
         $this->entityManager->beginTransaction();
         try {
+            // if huge amount data must be deleted
+            set_time_limit(0);
+
             foreach ($results as $result) {
                 /** @var $result ResultRecordInterface */
                 $entity = $result->getRootEntity();
@@ -86,6 +89,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                     $this->entityManager->clear();
                 }
             }
+
             $this->entityManager->commit();
         } catch (\Exception $e) {
             $this->entityManager->rollback();
