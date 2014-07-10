@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -33,7 +34,7 @@ class ConnectorContextMediator
      *
      * @param ContextInterface|Integration $source
      *
-     * @throws \LogicException
+     * @throws LogicException
      * @return TransportInterface
      */
     public function getTransport($source)
@@ -41,7 +42,7 @@ class ConnectorContextMediator
         if ($source instanceof ContextInterface) {
             $source = $this->getChannel($source);
         } elseif (!$source instanceof Integration) {
-            throw new \LogicException('Expected type ContextInterface or Channel');
+            throw new LogicException('Expected type ContextInterface or Channel');
         }
 
         return clone $this->registryLink->getService()

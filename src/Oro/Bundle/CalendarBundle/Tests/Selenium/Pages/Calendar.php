@@ -93,6 +93,9 @@ class Calendar extends AbstractPage
         $this->test->byXpath(
             "//div[@class='widget-actions-section']//a[@title[normalize-space(.)='Delete event']]"
         )->click();
+        $this->test->byXpath(
+            "//div[@class='modal oro-modal-danger in']//a[normalize-space(.)='Yes, Delete']"
+        )->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']",

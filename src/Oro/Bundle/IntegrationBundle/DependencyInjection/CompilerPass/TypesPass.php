@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+
 class TypesPass implements CompilerPassInterface
 {
     const MANAGER_ID               = 'oro_integration.manager.types_registry';
@@ -32,7 +34,7 @@ class TypesPass implements CompilerPassInterface
      * @param Definition       $managerDefinition
      * @param ContainerBuilder $container
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function processChannelTypes(Definition $managerDefinition, ContainerBuilder $container)
     {
@@ -42,7 +44,7 @@ class TypesPass implements CompilerPassInterface
             $ref = new Reference($serviceId);
             foreach ($tags as $tagAttrs) {
                 if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve type attribute for "%s"', $serviceId));
+                    throw new LogicException(sprintf('Could not retrieve type attribute for "%s"', $serviceId));
                 }
 
                 $managerDefinition->addMethodCall('addChannelType', [$tagAttrs['type'], $ref]);
@@ -56,7 +58,7 @@ class TypesPass implements CompilerPassInterface
      * @param Definition       $managerDefinition
      * @param ContainerBuilder $container
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function processTransportTypes(Definition $managerDefinition, ContainerBuilder $container)
     {
@@ -66,9 +68,9 @@ class TypesPass implements CompilerPassInterface
             $ref = new Reference($serviceId);
             foreach ($tags as $tagAttrs) {
                 if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
+                    throw new LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
                 } elseif (!isset($tagAttrs['channel_type'])) {
-                    throw new \LogicException(
+                    throw new LogicException(
                         sprintf(
                             'Could not retrieve "channel_type" attribute for "%s"',
                             $serviceId
@@ -90,7 +92,7 @@ class TypesPass implements CompilerPassInterface
      * @param Definition       $managerDefinition
      * @param ContainerBuilder $container
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function processConnectorTypes(Definition $managerDefinition, ContainerBuilder $container)
     {
@@ -100,9 +102,9 @@ class TypesPass implements CompilerPassInterface
             $ref = new Reference($serviceId);
             foreach ($tags as $tagAttrs) {
                 if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
+                    throw new LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
                 } elseif (!isset($tagAttrs['channel_type'])) {
-                    throw new \LogicException(
+                    throw new LogicException(
                         sprintf(
                             'Could not retrieve "channel_type" attribute for "%s"',
                             $serviceId

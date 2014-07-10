@@ -2,3 +2,12 @@ oro_attachment_bundle:
     resource:     "@OroAttachmentBundle/Controller"
     type:         annotation
     prefix:       /
+
+oro_attachment_bundle_api:
+    resource: "@OroAttachmentBundle/Controller/Api/Rest/AttachmentController.php"
+    type: rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+    defaults:
+        version:  latest

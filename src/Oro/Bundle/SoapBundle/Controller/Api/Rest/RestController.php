@@ -44,11 +44,12 @@ abstract class RestController extends RestGetController implements
     /**
      * Create new
      *
+     * @param mixed $_ [optional] Arguments will be passed to createEntity method
      * @return Response
      */
     public function handleCreateRequest()
     {
-        $entity = $this->getManager()->createEntity();
+        $entity = call_user_func_array(array($this, 'createEntity'), func_get_args());
         $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
@@ -60,6 +61,17 @@ abstract class RestController extends RestGetController implements
         }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Create new entity
+     *
+     * @param mixed $_ [optional] Arguments will be passed to createEntity method of manager (result of getManager)
+     * @return mixed
+     */
+    protected function createEntity()
+    {
+        return call_user_func_array(array($this->getManager(), 'createEntity'), func_get_args());
     }
 
     /**
