@@ -41,8 +41,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('extend')
             ->will($this->returnValue($this->extendConfigProvider));
 
-        $this->fieldTypeHelper = new FieldTypeHelper();
-        $this->extension = new RelationDataConfigDumperExtension($this->configManager, $this->fieldTypeHelper);
+        $this->extension = new RelationDataConfigDumperExtension($this->configManager);
     }
 
     public function testSupportsPreUpdate()
