@@ -13,7 +13,9 @@
               {{ form_enctype(form) }}>
 
             <fieldset>
-                {{ form_row(form.file, {'label': 'File'}) }}
+                <div class="control-group">
+                    {{ form_row(form.file, {'label': 'File'}) }}
+                </div>
                 <div style="display: none;">
                     {{ form_row(form.processorAlias, {'label': 'Strategy'}) }}
                 </div>
