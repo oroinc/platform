@@ -106,7 +106,7 @@ class WidgetController extends Controller
 
                 $existingAttributes = $workflowItem->getData()->getValues();
                 $formAttributes = $workflowItem->getData()->getValues($attributes);
-                foreach ($formAttributes as $value) {
+                foreach ($existingAttributes + $formAttributes as $value) {
                     // Need to persist all new entities to allow serialization
                     // and correct passing to API start method of all input data.
                     // Form validation already performed, so all these entities are valid

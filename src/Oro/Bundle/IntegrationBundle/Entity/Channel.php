@@ -15,13 +15,19 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_integration_channel")
  * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
  * @Config(
- *  routeName="oro_integration_index",
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_integration_index",
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @Oro\Loggable()
  */
@@ -204,7 +210,7 @@ class Channel
     }
 
     /**
-     * @param [] $connectors
+     * @param array $connectors
      *
      * @return $this
      */
@@ -216,7 +222,7 @@ class Channel
     }
 
     /**
-     * @return []
+     * @return array
      */
     public function getConnectors()
     {

@@ -1,4 +1,5 @@
 parameters:
+    oro_ui.twig.sort_by.class:           Oro\Bundle\UIBundle\Twig\SortByExtension
     oro_ui.twig.ceil.class:              Oro\Bundle\UIBundle\Twig\CeilExtension
     oro_ui.twig.extension.class:         Oro\Bundle\UIBundle\Twig\UiExtension
     oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
@@ -13,6 +14,11 @@ parameters:
     twig.cache_warmer.class:             Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
 
 services:
+    oro_ui.twig.sort_by_extension:
+        class: %oro_ui.twig.sort_by.class%
+        tags:
+            - { name: twig.extension }
+
     oro_ui.twig.ceil_extension:
         class: %oro_ui.twig.ceil.class%
         tags:
@@ -72,3 +78,8 @@ services:
             - @twig.extension.httpkernel
         tags:
             - { name: twig.extension }
+
+    twig.extension.text:
+        class: Twig_Extensions_Extension_Text
+        tags:
+           - { name: twig.extension }

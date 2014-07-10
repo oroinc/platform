@@ -1,0 +1,4 @@
+oro_activity_bundle:
+    resource:     "@OroActivityBundle/Controller"
+    type:         annotation
+    prefix:       /

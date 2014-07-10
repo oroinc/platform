@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
+
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
@@ -52,7 +53,21 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->attachment->setFilename('testFile.txt');
         $this->attachment->setOriginalFilename('testFile.txt');
 
-        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $ileIcons);
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $serviceLink->expects($this->any())->method('getService')
+            ->will($this->returnValue($securityFacade));
+
+        $securityFacade->expects($this->any())->method('getLoggedUser')
+            ->will($this->returnValue(null));
+
+        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $serviceLink, $ileIcons);
     }
 
     public function testGetContent()
@@ -75,7 +90,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fileContent, $this->attachmentManager->getContent($this->attachment));
     }
 
-    public function testGetAttachmentUrl()
+    public function testGetFileUrl()
     {
         $this->attachment->setId(1);
         $this->attachment->setExtension('txt');
@@ -93,7 +108,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 true
             );
-        $this->attachmentManager->getAttachmentUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
+        $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
     }
 
     public function testDecodeAttachmentUrl()
@@ -244,5 +259,23 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('xls', $this->attachment->getExtension());
         $this->assertEquals('text/css', $this->attachment->getMimeType());
         $this->assertEquals(1024, $this->attachment->getFileSize());
+    }
+
+    public function testGetFilteredImageUrl()
+    {
+        $this->attachment->setId(1);
+        $filerName = 'testFilter';
+        $this->attachment->setOriginalFilename('test.doc');
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'oro_filtered_attachment',
+                [
+                    'id' => 1,
+                    'filename' => 'test.doc',
+                    'filter' => $filerName
+                ]
+            );
+        $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
     }
 }

@@ -44,7 +44,8 @@ oro:
             stop:         Stop daemon
 
         view:
-            deps:         Dendencies
+            dependencies: Dendencies
             in_deps:      Incoming Dependencies
             original:     Original Job
+            related:      Related Entities
             related:      Related Entities

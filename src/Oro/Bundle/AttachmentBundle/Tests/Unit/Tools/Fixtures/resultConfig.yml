@@ -20,7 +20,7 @@ extend_config:
                 type: mappedSuperclass
                 fields:
                     code: test_field
-                    type: attachmentImage
+                    type: image
                     nullable: 1
                     length: ~
                     precision: ~

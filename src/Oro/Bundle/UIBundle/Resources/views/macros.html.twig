@@ -201,7 +201,7 @@
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
-                {{ parameters.html }}
+                {{ parameters.html|raw }}
             {% endif %}
         </ul>
     </div>
@@ -370,7 +370,7 @@
     {% endif %}
 
     {% if parameters.aCss is defined %}
-        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+        {% set aCss = aCss ~ ' ' ~ parameters.aCss %}
     {% endif %}
 
     {% set parameters = parameters|merge({'aCss': aCss}) %}
@@ -399,7 +399,7 @@
         'data': {
             'message': message,
             'success-message': successMessage,
-            'url':url
+            'url': url
         },
         'iCss': 'icon-trash',
         'aCss': parameters.aCss,
@@ -417,7 +417,12 @@
         {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
         {% set linkParams = linkParams|merge({ 'data': data }) %}
     {% endif %}
-
+    {% if parameters.data is defined %}
+        {% for dataItemName,dataItemValue in parameters.data %}
+            {% set data = linkParams.data|merge({(dataItemName): dataItemValue}) %}
+            {% set linkParams = linkParams|merge({ 'data': data }) %}
+        {% endfor %}
+    {% endif %}
     {{ _self.link(linkParams) }}
 {% endmacro %}
 
@@ -641,6 +646,7 @@
             'dataBlocks' - array of blocks. each block consist of:
                 [
                     'title' - title of scroll block
+                    'priority' - a number that can be used to change the order of blocks
                     'class' - additional css class for scroll block menu item
                     'useSubBlockDivider' - [optional] indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
                     'subblocks' - array with scroll sub blocks:
@@ -660,7 +666,7 @@
         {% set isForm = false %}
     {% endif %}
 
-    {% set dataBlocks = data.dataBlocks %}
+    {% set dataBlocks = data.dataBlocks|oro_sort_by %}
 
     <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
         <div class="navbar-inner">

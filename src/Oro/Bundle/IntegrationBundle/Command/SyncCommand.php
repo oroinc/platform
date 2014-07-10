@@ -22,6 +22,9 @@ class SyncCommand extends AbstractSyncCronCommand
 {
     const COMMAND_NAME = 'oro:cron:integration:sync';
 
+    const STATUS_SUCCESS = 0;
+    const STATUS_FAILED  = 255;
+
     /**
      * {@inheritdoc}
      */
@@ -82,19 +85,19 @@ class SyncCommand extends AbstractSyncCronCommand
         $integrationId       = $input->getOption('integration-id');
         $batchSize           = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
-        $repository          = $this->getService('doctrine.orm.entity_manager')
-            ->getRepository('OroIntegrationBundle:Channel');
+        $entityManager       = $this->getService('doctrine.orm.entity_manager');
+        $repository          = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger              = new OutputLogger($output);
         $processor           = $this->getService(self::SYNC_PROCESSOR);
-        $processor->getLoggerStrategy()->setLogger($logger);
+        $exitCode            = self::STATUS_SUCCESS;
 
-        $this->getContainer()->get('doctrine.orm.entity_manager')
-            ->getConnection()->getConfiguration()->setSQLLogger(null);
+        $processor->getLoggerStrategy()->setLogger($logger);
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
 
-            return 0;
+            return self::STATUS_SUCCESS;
         }
 
         if ($integrationId) {
@@ -115,17 +118,21 @@ class SyncCommand extends AbstractSyncCronCommand
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
-                $processor->process($integration, $connector, $connectorParameters);
+
+                $result   = $processor->process($integration, $connector, $connectorParameters);
+                $exitCode = $result ?: self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-                //process another integration even in case if exception thrown
+
+                $exitCode = self::STATUS_FAILED;
+
                 continue;
             }
         }
 
         $logger->notice('Completed');
 
-        return 0;
+        return $exitCode;
     }
 
     /**
@@ -138,7 +145,8 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     protected function getConnectorParameters(InputInterface $input)
     {
-        $result              = ['force' => $input->getOption('force')];
+        $result = ['force' => $input->getOption('force')];
+
         $connectorParameters = $input->getArgument('connector-parameters');
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {

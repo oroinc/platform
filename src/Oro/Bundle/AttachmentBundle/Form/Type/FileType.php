@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class FileType extends AbstractType
 {
@@ -30,12 +30,20 @@ class FileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $constraints = [];
+        if ($options['checkEmptyFile']) {
+            $constraints = [
+                new NotBlank()
+            ];
+        }
+
         $builder->add(
             'file',
             'file',
             [
-                'label' => 'oro.attachment.file.label',
-                'required'  => false,
+                'label'       => 'oro.attachment.file.label',
+                'required'    => $options['checkEmptyFile'],
+                'constraints' => $constraints
             ]
         );
 
@@ -57,7 +65,9 @@ class FileType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
+                'data_class'     => 'Oro\Bundle\AttachmentBundle\Entity\File',
+                'checkEmptyFile' => false,
+                'allowDelete' => true
             ]
         );
     }

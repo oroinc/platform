@@ -2,40 +2,15 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Entity;
 
-use Symfony\Component\HttpFoundation\File\File;
-
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 
-class AttachmentTest extends \PHPUnit_Framework_TestCase
+class AttachmentTest extends EntityTestAbstract
 {
-    /** @var Attachment */
-    protected $entity;
-
     protected function setUp()
     {
         $this->entity = new Attachment();
-    }
-
-    public function tearDown()
-    {
-        unset($this->entity);
-    }
-
-    /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed $value
-     * @param mixed $expected
-     */
-    public function testSetGet($property, $value = null, $expected = null)
-    {
-        if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), [$value]);
-        }
-
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), []));
     }
 
     /**
@@ -43,23 +18,17 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
      */
     public function getSetDataProvider()
     {
-        $filename = 'testFile.doc';
-        $originalFileName = 'original.doc';
+        $comment = 'test comment';
+        $file = new File();
         $date = new \DateTime('now');
-        $file = new File('testPath', false);
-        $extension = 'txt';
-        $type = 'text/doc';
-        $fileSize = 10000;
+        $owner = new TestUser();
 
         return [
-            'filename' => ['filename', $filename, $filename],
-            'originalFileName' => ['originalFileName', $originalFileName, $originalFileName],
+            'comment' => ['comment', $comment, $comment],
+            'file' => ['file', $file, $file],
             'createdAt' => ['createdAt', $date, $date],
             'updatedAt' => ['updatedAt', $date, $date],
-            'file' => ['file', $file, $file],
-            'extension' => ['extension', $extension, $extension],
-            'mimeType' => ['mimeType', $type, $type],
-            'fileSize' => ['fileSize', $fileSize, $fileSize]
+            'owner'    => ['owner', $owner, $owner]
         ];
     }
 
@@ -74,18 +43,22 @@ class AttachmentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getUpdatedAt()->format('Y-m-d'));
     }
 
-    public function testEmptyFile()
+    public function testGetOwnerId()
     {
-        $this->assertNull($this->entity->isEmptyFile());
-        $this->entity->setEmptyFile(true);
-        $this->assertTrue($this->entity->isEmptyFile());
+        $this->assertNull($this->entity->getId());
+        $testOwner = new TestUser();
+        $this->entity->setOwner($testOwner);
+
+        $this->assertEquals(1, $this->entity->getOwnerId());
     }
 
     public function testToString()
     {
         $this->assertEquals('', $this->entity->__toString());
-        $this->entity->setFilename('file.doc');
-        $this->entity->setOriginalFilename('original.doc');
-        $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());
+        $file = new File();
+        $file->setFilename('file.txt');
+        $file->setOriginalFilename('original.txt');
+        $this->entity->setFile($file);
+        $this->assertEquals('file.txt (original.txt)', $this->entity->__toString());
     }
 }

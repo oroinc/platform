@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntityWithOwnerFieldButWithoutGetOwnerMethod;
@@ -14,7 +13,7 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetOwner()
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor(new EntityClassAccessor(), $metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider);
 
         $obj1 = new TestEntity('testId1');
         $obj1->setOwner('testOwner1');
@@ -28,7 +27,7 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOwnerNoMetadata()
     {
-        $accessor = new EntityOwnerAccessor(new EntityClassAccessor(), new OwnershipMetadataProviderStub($this));
+        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this));
 
         $obj = new TestEntity('testId');
         $obj->setOwner('testOwner');
@@ -40,7 +39,7 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOwnerNull()
     {
-        $accessor = new EntityOwnerAccessor(new EntityClassAccessor(), new OwnershipMetadataProviderStub($this));
+        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this));
         $accessor->getOwner(null);
     }
 
@@ -50,7 +49,7 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetOwnerNoGetOwnerAndNoOwnerField()
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor(new EntityClassAccessor(), $metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider);
 
         $obj = new \stdClass();
         $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id'));

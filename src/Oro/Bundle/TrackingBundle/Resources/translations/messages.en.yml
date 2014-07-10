@@ -1,0 +1,56 @@
+oro:
+    tracking:
+        trackingwebsite:
+            entity_label:        Tracking Website
+            entity_plural_label: Tracking Websites
+            entity_description:  Websites for tracking
+
+            id.label:            Id
+            name.label:          Name
+            identifier.label:    Identifier
+            url.label:           Url
+            owner.label:         Owner
+            created_at.label:    Created At
+            updated_at.label:    Updated At
+
+            saved_message: Website updated
+
+        trackingevent:
+            entity_label:        Tracking Event
+            entity_plural_label: Tracking Events
+            entity_description:  Tracked events
+
+            id.label:         Id
+            title.label:      Title
+            name.label:       Name
+            value.label:      Value
+            user.label:       User
+            url.label:        Url
+            website.label:    Website
+            code.label:       Code
+            created_at.label: Created At
+            logged_at.label:  Logged At
+
+        trackingdata:
+            entity_label:        Tracking Data
+            entity_plural_label: Tracking Data
+            entity_description:  Tracked raw data
+
+            created_at.label: Created At
+            data.label:       Data
+            event.label:      Event
+            id.label:         Id
+
+        block:
+            general: General
+            tracking: Tracking Code
+            events: Events
+
+        help:
+            event_tooltip: |
+                Make sure this code is on every page of your website before the </body> tag.
+                To track custom events, please uncomment the trackEvent string and replace
+                [name], [value], and [user_identifier] parameters with your values.
+                The script will log an event with the [name] name and optional [value].
+
+        website_configuration: Tracking websites

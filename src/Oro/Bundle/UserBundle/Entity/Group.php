@@ -27,6 +27,12 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
  *          }
  *      }
  * )

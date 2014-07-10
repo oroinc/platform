@@ -57,17 +57,59 @@ class SyncProcessor
      * @param Integration $integration Integration object
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
+     *
+     * @return boolean
      */
-    public function process(Integration $integration, $connector = '', array $parameters = [])
+    public function process(Integration $integration, $connector = null, array $parameters = [])
     {
+        $callback = null;
+
         if ($connector) {
-            $this->processIntegrationConnector($integration, $connector, $parameters, false);
-        } else {
-            $connectors = $integration->getConnectors();
-            foreach ((array)$connectors as $connector) {
-                $this->processIntegrationConnector($integration, $connector, $parameters);
+            $callback = function ($integrationConnector) use ($connector) {
+                return $integrationConnector === $connector;
+            };
+        }
+
+        return $this->processConnectors($integration, $parameters, $callback);
+    }
+
+    /**
+     * Process integration synchronization
+     * By default, if $connector is empty, will process all connectors of given integration
+     *
+     * @param Integration $integration Integration object
+     * @param array       $parameters  Connector additional parameters
+     * @param callable    $callback    Callback to filter connectors
+     *
+     * @return boolean
+     */
+    protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
+    {
+        $isSuccess = true;
+
+        $connectors = $integration->getConnectors();
+
+        if ($callback) {
+            $connectors = array_filter($connectors, $callback);
+        }
+
+        foreach ((array)$connectors as $connector) {
+            try {
+                $result = $this->processIntegrationConnector(
+                    $integration,
+                    $connector,
+                    $parameters
+                );
+
+                $isSuccess = $isSuccess && $result;
+            } catch (\Exception $e) {
+                $isSuccess = false;
+
+                $this->logger->critical($e->getMessage());
             }
         }
+
+        return $isSuccess;
     }
 
     /**
@@ -87,6 +129,8 @@ class SyncProcessor
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
      * @param boolean     $saveStatus  Do we need to save new status to bd
+     *
+     * @return boolean
      */
     protected function processIntegrationConnector(
         Integration $integration,
@@ -95,26 +139,28 @@ class SyncProcessor
         $saveStatus = true
     ) {
         if (!$integration->getEnabled()) {
-            return;
+            return false;
         }
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-            /**
-             * Clone object here because it will be modified and changes should not be shared between
-             */
+            // Clone object here because it will be modified and changes should not be shared between
             $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
         } catch (\Exception $e) {
             // log and continue
             $this->logger->error($e->getMessage());
             $status = new Status();
-            $status->setCode(Status::STATUS_FAILED)
+            $status
+                ->setCode(Status::STATUS_FAILED)
                 ->setMessage($e->getMessage())
                 ->setConnector($connector);
 
-            $this->em->getRepository('OroIntegrationBundle:Channel')
+            $this->em
+                ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
-            return;
+
+            return false;
         }
+
         $jobName = $realConnector->getImportJobName();
 
         $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
@@ -132,7 +178,8 @@ class SyncProcessor
                     $parameters
                 ),
         ];
-        $this->processImport($connector, $jobName, $configuration, $integration, $saveStatus);
+
+        return $this->processImport($connector, $jobName, $configuration, $integration, $saveStatus);
     }
 
     /**
@@ -141,6 +188,8 @@ class SyncProcessor
      * @param array       $configuration
      * @param Integration $integration
      * @param boolean     $saveStatus
+     *
+     * @return boolean
      */
     protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
     {
@@ -193,8 +242,11 @@ class SyncProcessor
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
         if ($saveStatus) {
-            $this->em->getRepository('OroIntegrationBundle:Channel')
+            $this->em
+                ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
         }
+
+        return $isSuccess;
     }
 }

@@ -4,10 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\EntityConfig;
 
 class AttachmentScope
 {
-    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
+    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\File';
+    const ATTACHMENT        = 'Oro\Bundle\AttachmentBundle\Entity\Attachment';
 
-    const ATTACHMENT_FILE   = 'attachment';
-    const ATTACHMENT_IMAGE  = 'attachmentImage';
+    const ATTACHMENT_FILE   = 'file';
+    const ATTACHMENT_IMAGE  = 'image';
 
-    public static $attachmentTypes = ['attachment', 'attachmentImage'];
+    public static $attachmentTypes = ['file', 'image'];
 }
