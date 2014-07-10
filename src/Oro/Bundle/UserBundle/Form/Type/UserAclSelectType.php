@@ -11,7 +11,6 @@ class UserAclSelectType extends AbstractType
         $resolver->setDefaults(
             array(
                 'configs' => array(
-                    'width' => '400px',
                     'placeholder' => 'oro.user.form.choose_user',
                     'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                     'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
@@ -20,14 +19,15 @@ class UserAclSelectType extends AbstractType
                     'permission' => 'CREATE',
                 ),
                 'autocomplete_alias' => 'acl_users',
-
+                //'autocomplete_alias' => 'users',
+                'grid_name' => 'users-select-grid',
             )
         );
     }
 
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return 'oro_entity_create_or_select_inline';
     }
 
     /**

@@ -424,6 +424,8 @@ datagrid:
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
         columns:
+            id:
+                label: ID
             username:
                 label: oro.user.username.label
             email:
