@@ -1,13 +1,13 @@
-/* jshint browser:true */
-/* global require */
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oronavigation/js/navigation', 'oroui/js/mediator'],
-function($, _, __, Modal, Navigation, mediator) {
+/*jshint browser:true*/
+/*jslint nomen:true, browser:true*/
+/*global require*/
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator'
+    ], function ($, _, __, Modal, mediator) {
     'use strict';
-    $(function() {
+    $(function () {
         $(document).on('click', '.entity-extend-apply', function (e) {
             var el = $(this),
                 message = el.data('message'),
-                navigation = Navigation.getInstance(),
                 /** @type oro.Modal */
                 confirmUpdate = new Modal({
                     allowCancel: true,
@@ -18,14 +18,14 @@ function($, _, __, Modal, Navigation, mediator) {
                     okText: __('Yes, Proceed')
                 });
 
-            confirmUpdate.on('ok', function() {
+            confirmUpdate.on('ok', function () {
                 confirmUpdate.preventClose();
 
                 var url = $(el).data('url'),
                     progressbar = $('#progressbar').clone();
                 progressbar
                     .attr('id', 'confirmUpdateLoading')
-                    .css({'display':'block', 'margin': '0 auto'})
+                    .css({'display': 'block', 'margin': '0 auto'})
                     .find('h3').remove();
 
                 confirmUpdate.$content.parent().find('a.cancel').hide();
@@ -33,19 +33,14 @@ function($, _, __, Modal, Navigation, mediator) {
                 confirmUpdate.$content.parent().find('a.btn-primary').replaceWith(progressbar);
 
                 $('#confirmUpdateLoading').show();
+                mediator.once('page:request', function () {
+                    mediator.execute('hideLoading');
+                });
+                mediator.once('page:afterChange', function () {
+                    confirmUpdate.close();
+                });
 
-                if (navigation) {
-                    mediator.once('hash_navigation_request:start', function(){
-                        navigation.hideLoading();
-                    });
-                    mediator.once('hash_navigation_request:complete', function(){
-                        confirmUpdate.close();
-                    });
-                    navigation.setLocation(url);
-
-                } else {
-                    window.location.href = url;
-                }
+                mediator.execute('redirectTo', {url: url});
             });
             confirmUpdate.open();
 

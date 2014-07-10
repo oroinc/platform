@@ -9,10 +9,6 @@ placeholders:
         items:
             navigationItem:
                 order: 100
-    hash_nav:
-        items:
-            hashNavigation:
-                order: 100
     navbar:
         items:
             shortcuts:
@@ -47,8 +43,6 @@ placeholders:
                 order: 100
 
 items:
-   hashNavigation:
-        template: OroNavigationBundle:HashNav:script.js.twig
    dot_menu_js:
         template: OroNavigationBundle:Js:dot.menu.js.twig
    pinbar_js:

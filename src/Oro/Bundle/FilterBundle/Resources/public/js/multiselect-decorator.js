@@ -66,7 +66,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jque
             }
 
             // destroy DOM garbage after change page via hash-navigation
-            mediator.once('hash_navigation_request:start', function() {
+            mediator.once('page:request', function() {
                 if (this.element.closest('body').length) {
                     this.multiselect("destroy");
                     this.element.hide();

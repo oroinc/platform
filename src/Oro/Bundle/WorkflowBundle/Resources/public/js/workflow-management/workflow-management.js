@@ -7,8 +7,7 @@ define([
     'oroworkflow/js/workflow-management/step/view/edit',
     'oroworkflow/js/workflow-management/transition/view/edit',
     'oroworkflow/js/workflow-management/helper',
-    'oronavigation/js/navigation',
-    'oroui/js/app',
+    'oroui/js/tools',
     'oroui/js/mediator',
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
@@ -20,8 +19,7 @@ function(_, Backbone, routing, messenger, __,
      StepEditView,
      TransitionEditForm,
      Helper,
-     Navigation,
-     app,
+     tools,
      mediator,
      Confirmation
 ) {
@@ -230,11 +228,10 @@ function(_, Backbone, routing, messenger, __,
                 return;
             }
 
-            var navigation = Navigation.getInstance();
-            navigation.showLoading();
+            mediator.execute('showLoading');
             this.model.save(null, {
                 'success': _.bind(function() {
-                    navigation.hideLoading();
+                    mediator.execute('hideLoading');
 
                     var redirectUrl = '',
                         modelName = this.model.get('name');
@@ -244,16 +241,16 @@ function(_, Backbone, routing, messenger, __,
                         redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
                     }
 
-                    mediator.once('hash_navigation_request:complete', function() {
+                    mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
-                    navigation.setLocation(redirectUrl);
+                    mediator.execute('redirectTo', {url: redirectUrl});
                 }, this),
                 'error': function(model, response) {
-                    navigation.hideLoading();
+                    mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
 
-                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
+                    if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
                     }
                     messenger.notificationFlashMessage('error', __('Could not save workflow.'));

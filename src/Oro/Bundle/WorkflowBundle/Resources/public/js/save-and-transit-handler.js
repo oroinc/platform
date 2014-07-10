@@ -18,12 +18,11 @@ define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
         var formId = form.prop('id');
 
         // On form submit response check for errors
-        mediator.once('hash_navigation_request:refresh', function (navigation) {
-            var content = $(navigation.getCached$('container'));
-            var hasErrors = content.find('.alert-error, .validation-error').length > 0;
+        mediator.once('page:update', function () {
+            var hasErrors = $('.alert-error, .validation-error').length > 0;
             if (!hasErrors) {
                 var idRegexp = /update\/(\d+).*/;
-                var responseForm = content.find('#' + formId);
+                var responseForm = $('#' + formId);
                 var elementIdMatch = idRegexp.exec(responseForm.prop('action'));
                 if (elementIdMatch.length > 1) {
                     // In case when no errors occurred load transitions for created entity

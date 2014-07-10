@@ -90,23 +90,13 @@
                             </div>
 
                             <script type="text/javascript">
-                                require(['jquery', 'routing', 'oronavigation/js/navigation'],
-                                        function($, routing, Navigation){
-                                            $(function () {
-                                                $('#dashboard_selector').on('change', function (e) {
-                                                    var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true}),
-                                                            navigation = Navigation.getInstance();
-                                                    if (navigation) {
-                                                        navigation.processRedirect({
-                                                            fullRedirect: false,
-                                                            location: url
-                                                        });
-                                                    } else {
-                                                        location.href = url;
-                                                    }
-                                                });
-                                            });
-                                        });
+                                require(['jquery', 'routing', 'oroui/js/mediator'],
+                                function($, routing, mediator){
+                                    $('#dashboard_selector').on('change', function (e) {
+                                        var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true});
+                                        mediator.execute('redirectTo', {url: url, redirect: true});
+                                    });
+                                });
                             </script>
                         {% endif %}
                     {% endblock navButtons %}
