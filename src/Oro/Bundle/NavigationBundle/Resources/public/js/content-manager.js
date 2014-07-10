@@ -73,28 +73,29 @@ define([
      * @param {string} query
      */
     function changeUrl(path, query) {
-        var cached, page, state, tags;
+        var item;
 
-        cached = pagesCache[path];
+        item = pagesCache[path] || {};
 
-        // take page and state from cache, if they exist
-        page = cached ? cached.page : null;
-        state = cached ? cached.state : {};
-        tags = [];
+        _.extend(item, {
+            path: path,
+            query: query,
+            tags: []
+        });
+
+        // define default page and state
+        _.defaults(item, {
+            page: null,
+            state: {}
+        });
 
         // there's no previous page, then collected tags and state belong to current page
         if (current.path == null) {
-            _.extend(state, current.state);
-            tags = current.tags;
+            _.extend(item.state, current.state);
+            item.tags = current.tags;
         }
 
-        current = {
-            path: path,
-            query: query,
-            page: page,
-            state: state,
-            tags: tags
-        };
+        current = item;
     }
 
     /**
@@ -322,20 +323,31 @@ define([
                 delete current.state[key];
             }
 
-            if (!_.isUndefined(hash)) {
-                query = Chaplin.utils.queryParams.parse(current.query);
-                if (hash !== null) {
-                    query[key] = hash;
-                } else {
-                    delete query[key];
-                }
-                query = Chaplin.utils.queryParams.stringify(query);
-                current.query = query;
-
-                url = contentManager.currentUrl();
-                mediator.execute('redirectTo', {url: url}, {silent: true});
-                mediator.trigger('pagestate:change');
+            if (_.isUndefined(hash)) {
+                // hash is not defined, there's nothing else to do
+                return;
             }
+
+            query = Chaplin.utils.queryParams.parse(current.query);
+            if (query[key] === hash || (query[key] == null && hash == null)) {
+                // there's nothing to change in query, skip query update and redirect
+                return;
+            }
+
+            if (hash !== null) {
+                // if there's new hash, update query
+                query[key] = hash;
+            } else {
+                // if there's no new hash, delete query part
+                delete query[key];
+            }
+
+            query = Chaplin.utils.queryParams.stringify(query);
+            current.query = query;
+
+            url = contentManager.currentUrl();
+            mediator.execute('redirectTo', {url: url}, {silent: true, replace: true});
+            mediator.trigger('pagestate:change');
         },
 
         /**
@@ -346,6 +358,18 @@ define([
          */
         fetchState: function (key) {
             return current.state[key];
+        },
+
+        /**
+         * Check if state's GET parameter (pair key and hash) reflects current URL
+         *
+         * @param {string} key
+         * @param {string} hash
+         */
+        checkState: function (key, hash) {
+            var query;
+            query = Chaplin.utils.queryParams.parse(current.query);
+            return query[key] == hash;
         },
 
         /**

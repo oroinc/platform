@@ -51,31 +51,40 @@ define([
         return 'grid[' + gridName + ']';
     }
 
-    function updateState(collection) {
-        var gridName, key, hash, state;
-        gridName = collection.inputName;
-        key = gridNameKey(gridName);
+    function stateHash(collection) {
+        var hash;
         hash = encodeStateData(collection.state);
         if (hash === encodeStateData(collection.initialState)) {
             // if the state is the same as initial, remove URL param for grid state
             hash = null;
         }
+        return hash;
+    }
+
+    function updateState(collection) {
+        var gridName, key, hash;
+        gridName = collection.inputName;
+        key = gridNameKey(gridName);
+        hash = stateHash(collection);
         mediator.execute('pageCache:state:save', key, collection, hash);
     }
 
     contentManager = {
         get: function (gridName) {
-            var key, collection;
+            var key, collection, hash, isActual;
             key = gridNameKey(gridName);
             collection = mediator.execute('pageCache:state:fetch', key);
-            return collection ? collection.clone() : collection;
+            if (collection) {
+                hash = stateHash(collection);
+                // check if collection reflects grid state in url
+                isActual = mediator.execute('pageCache:state:check', key, hash);
+                collection = isActual ? collection.clone() : undefined;
+            }
+            return collection;
         },
 
         trace: function (collection) {
-            var key, gridName;
-            gridName = collection.inputName;
-            key = gridNameKey(gridName);
-            mediator.execute('pageCache:state:save', key, collection);
+            updateState(collection);
             contentManager.listenTo(collection, 'beforeReset', updateState);
             mediator.once('page:beforeChange', function () {
                 contentManager.stopListening(collection);

@@ -84,7 +84,7 @@ define([
 
             cacheItem = this.cache.get(route.path);
 
-            if (cacheItem && cacheItem.page && options.force !== true) {
+            if (cacheItem && cacheItem.page && route.query === cacheItem.query && options.force !== true) {
                 options.fromCache = true;
                 this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
@@ -111,16 +111,19 @@ define([
          * @private
          */
         _beforePageLoad: function (route, params, options) {
-            var oldRoute, newRoute, url;
+            var oldRoute, newRoute, url, opts;
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
 
-            // if route has been changed, redirect to a new URL and stop processing current
+            // if route has been changed during 'page:beforeChange' event,
+            // redirect to a new URL and stop processing current
             if (route.path !== newRoute.path || route.query !== newRoute.query) {
                 url = this._combineRouteUrl(newRoute);
+                opts = _.pick(options, ['forceStartup', 'changeURL', 'force', 'silent']);
+                opts.replace = true;
                 _.defer(function () {
-                    mediator.execute('redirectTo', {url: url}, options);
+                    mediator.execute('redirectTo', {url: url}, opts);
                 });
                 return false;
             }
