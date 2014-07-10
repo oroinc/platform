@@ -81,6 +81,7 @@ define([
                 // prevent page loading, if there's redirect found
                 return;
             }
+            delete options.redirection;
 
             cacheItem = this.cache.get(route.path);
 
@@ -112,6 +113,10 @@ define([
          */
         _beforePageLoad: function (route, params, options) {
             var oldRoute, newRoute, url, opts;
+            // suppress 'page:beforeChange' event, on server redirection
+            if (options.redirection) {
+                return true;
+            }
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
@@ -166,6 +171,10 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
+            // suppress 'page:afterChange' event, on server redirection
+            if (options.redirection) {
+                return true;
+            }
             //@todo develop approach to postpone 'page:afterChange' event
             // until all inline scripts on a page have not finished changes
             _.delay(_.bind(this.publishEvent, this), 50, 'page:afterChange');
@@ -245,7 +254,7 @@ define([
                 url = parser.pathname + (parser.search || '');
                 this.publishEvent('page:redirect');
                 options = options || {};
-                _.extend(options, {forceStartup: true, force: true});
+                _.extend(options, {forceStartup: true, force: true, redirection: true});
                 utils.redirectTo({url: url}, options);
             } else {
                 utils.redirectTo({url: url}, options);

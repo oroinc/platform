@@ -247,7 +247,7 @@ define([
                         itemData = {name: item.name, value: $item.val()},
                         selectedData = $item.select2('data');
 
-                    if (!_.isEmpty(selectedData)) {
+                    if (!_.isEmpty(selectedData) && $.isPlainObject(selectedData)) {
                         itemData.selectedData = [selectedData];
                     }
 
