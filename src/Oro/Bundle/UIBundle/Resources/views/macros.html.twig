@@ -751,15 +751,15 @@
     {%- if entity.owner is defined and entity.owner %}
         {% set ownerType = oro_get_owner_type(entity) %}
         {% if (ownerType == 'USER') %}
-            {% if resource_granted('oro_user_user_view') %}
+            {% if resource_granted('VIEW', entity.owner)  %}
                 {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
-                {% set ownerName = entity.owner|oro_format_name %}
             {% endif %}
+            {% set ownerName = entity.owner|oro_format_name %}
         {% elseif (ownerType == 'BUSINESS_UNIT') %}
-            {% if resource_granted('oro_business_unit_view') %}
+            {% if resource_granted('VIEW', entity.owner)  %}
                 {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
-                {% set ownerName = entity.owner.name %}
             {% endif %}
+            {% set ownerName = entity.owner.name %}
         {% endif %}
         {% if ownerName is defined %}
             {{ 'oro.ui.owner'|trans }}:
