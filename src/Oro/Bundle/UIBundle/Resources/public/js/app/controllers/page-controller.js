@@ -181,7 +181,7 @@ define([
          */
         onPageInvalid: function (model, error, options) {
             if (error.redirect) {
-                this._processRedirect(error);
+                this._processRedirect(error, options.actionArgs.options);
             }
         },
 
@@ -223,7 +223,7 @@ define([
             }
 
             this.publishEvent('page:error', model.getAttributes(), options.actionArgs, xhr);
-            this.onPageUpdated(model, null, options.actionArgs);
+            this.onPageUpdated(model, null, options);
         },
 
         /**

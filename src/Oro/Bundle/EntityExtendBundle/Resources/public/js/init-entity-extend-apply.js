@@ -36,7 +36,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                 mediator.once('page:request', function () {
                     mediator.execute('hideLoading');
                 });
-                mediator.once('page:afterChange', function () {
+                mediator.once('page:update', function () {
                     confirmUpdate.close();
                 });
 
