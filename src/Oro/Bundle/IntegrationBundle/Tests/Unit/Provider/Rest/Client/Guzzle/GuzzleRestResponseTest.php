@@ -16,12 +16,22 @@ class GuzzleRestResponseTest extends \PHPUnit_Framework_TestCase
      */
     protected $response;
 
+    /**
+     * @var string
+     */
+    protected $requestUrl = 'http://test';
+
     protected function setUp()
     {
         $this->sourceResponse = $this->getMockBuilder('Guzzle\Http\Message\Response')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->response = new GuzzleRestResponse($this->sourceResponse);
+        $this->response = new GuzzleRestResponse($this->sourceResponse, $this->requestUrl);
+    }
+
+    public function testGetRequestUrl()
+    {
+        $this->assertEquals($this->requestUrl, $this->response->getRequestUrl());
     }
 
     /**

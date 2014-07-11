@@ -367,7 +367,6 @@ class OwnerFormExtension extends AbstractTypeExtension
                     'autocomplete_alias' => 'acl_users',
                     'data' => $data,
                     'configs' => [
-                        'width' => '400px',
                         'placeholder' => 'oro.user.form.choose_user',
                         'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                         'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',

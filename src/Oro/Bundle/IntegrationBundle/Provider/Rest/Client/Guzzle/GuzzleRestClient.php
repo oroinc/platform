@@ -193,7 +193,7 @@ class GuzzleRestClient implements RestClientInterface
             throw GuzzleRestException::createFromException($exception);
         }
 
-        $this->lastResponse = new GuzzleRestResponse($response);
+        $this->lastResponse = new GuzzleRestResponse($response, (string)$request->getUrl());
         return $this->lastResponse;
     }
 

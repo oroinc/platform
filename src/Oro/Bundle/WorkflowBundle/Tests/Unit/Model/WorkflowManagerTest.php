@@ -121,7 +121,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityClass));
 
         $this->doctrineHelper->expects($this->any())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->will($this->returnValue($entityId));
 
@@ -658,7 +658,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityClass));
 
         $this->doctrineHelper->expects($this->any())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->will($this->returnValue($entityId));
 

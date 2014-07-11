@@ -39,6 +39,14 @@ class RestException extends TransportException
 
         $messageParts[] = '[status code] ' . $response->getStatusCode();
         $messageParts[] = '[reason phrase] ' . $response->getReasonPhrase();
+        $url = $response->getRequestUrl();
+        if ($url) {
+            $messageParts[] = '[url] ' . $response->getRequestUrl();
+        }
+        $body = $response->getBodyAsString();
+        if ($body) {
+            $messageParts[] = '[response body] ' . $response->getBodyAsString();
+        }
         $message = $message . PHP_EOL . implode(PHP_EOL, $messageParts);
 
         /** @var RestException $result */
