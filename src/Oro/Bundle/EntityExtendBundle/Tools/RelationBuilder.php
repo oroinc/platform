@@ -19,14 +19,6 @@ class RelationBuilder
     }
 
     /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
-    {
-        return $this->configManager;
-    }
-
-    /**
      * @param string $className
      * @param string $fieldName
      * @param string $fieldType
