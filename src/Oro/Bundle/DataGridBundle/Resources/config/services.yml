@@ -39,7 +39,6 @@ services:
             - %oro_datagrid.datagrid.base.class%
             - %oro_datagrid.extension.acceptor.class%
             - @oro_datagrid.event.dispatcher
-            - @oro_security.security_facade
         lazy: true
 
     oro_datagrid.datagrid.request_parameters_factory:
