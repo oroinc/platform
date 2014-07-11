@@ -35,16 +35,20 @@ class ProcessTriggerRepository extends EntityRepository
     }
 
     /**
+     * @param bool|null $enabled
      * @return ProcessTrigger[]
      */
-    public function findAllWithEnabledDefinitions()
+    public function findAllWithDefinitions($enabled = null)
     {
-        return $this->createQueryBuilder('trigger')
+        $queryBuilder = $this->createQueryBuilder('trigger')
             ->select('trigger, definition')
             ->innerJoin('trigger.definition', 'definition')
-            ->andWhere('definition.enabled = :enabled')->setParameter('enabled', true)
-            ->orderBy('definition.executionOrder')
-            ->getQuery()
-            ->execute();
+            ->orderBy('definition.executionOrder');
+
+        if (null !== $enabled) {
+            $queryBuilder->andWhere('definition.enabled = :enabled')->setParameter('enabled', $enabled);
+        }
+
+        return $queryBuilder->getQuery()->execute();
     }
 }

@@ -1,6 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/mediator', './model-action'
-    ], function (_, __, messenger, mediator, ModelAction) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'oroui/js/mediator',
+    './model-action'
+], function (_, __, messenger, mediator, ModelAction) {
     'use strict';
 
     /**
@@ -47,7 +53,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oro
          * Execute redirect
          */
         execute: function () {
-            window.location.href = this.getLink();
+            mediator.execute('redirectTo', {url: this.getLink()});
         },
 
         /**
@@ -56,8 +62,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger', 'oro
          * @private
          */
         _preExecuteSubscriber: function (action, options) {
-            mediator.once('navigation:page_load:error', function(xmlHttp, options) {
-                if (403 == xmlHttp.status) {
+            mediator.once('page:beforeError', function (xmlHttp, options) {
+                if (403 === xmlHttp.status) {
                     options.stopPageProcessing = true;
                     messenger.notificationFlashMessage('error', __('You do not have permission to perform this action.'));
                 }

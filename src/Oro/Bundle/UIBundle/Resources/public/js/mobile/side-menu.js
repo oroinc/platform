@@ -14,7 +14,7 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
         _create: function () {
             this._super();
 
-            this.listener.listenTo(mediator, 'hash_navigation_request:start', $.proxy(this._hide, this));
+            this.listener.listenTo(mediator, 'page:request', $.proxy(this._hide, this));
 
             // handler for hiding menu on outside click
             this._onOutsideClick = $.proxy(function (e) {

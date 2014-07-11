@@ -1,6 +1,7 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
-    ], function (_, Backbone, BackbonePageableCollection, app) {
+define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tools'
+    ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     /**
@@ -28,7 +29,13 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          *
          * @property
          */
-        initialState: {},
+        initialState: {
+            currentPage: 1,
+            pageSize: 25,
+            totals: null,
+            filters: {},
+            sorters: {}
+        },
 
         /**
          * Declaration of URL parameters
@@ -43,20 +50,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             totalRecords: undefined,
             totalPages: undefined
         }),
-
-        /**
-         * Object declares state keys that will be involved in URL-state saving with their shorthands
-         *
-         * @property {Object}
-         */
-        stateShortKeys: {
-            currentPage: 'i',
-            pageSize: 'p',
-            sorters: 's',
-            filters: 'f',
-            gridName: 't',
-            gridView: 'v'
-        },
 
         /**
          * @property {Object}
@@ -78,18 +71,31 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          * @param models
          * @param options
          */
-        initialize: function(models, options) {
+        initialize: function (models, options) {
             options = options || {};
+
+            // copy initialState from the prototype to own property
+            this.initialState = tools.deepClone(this.initialState);
+            _.defaults(this.initialState, this.state);
+            if (options.initialState) {
+                if (options.initialState.sorters) {
+                    _.each(options.initialState.sorters, function (direction, field) {
+                        options.initialState.sorters[field] = this.getSortDirectionKey(direction);
+                    }, this);
+                }
+                _.extend(this.initialState, options.initialState);
+            }
+
+            // copy state from the prototype to own property
+            this.state = tools.deepClone(this.state);
             if (options.state) {
                 if (options.state.sorters) {
-                    _.each(options.state.sorters, function(direction, field) {
+                    _.each(options.state.sorters, function (direction, field) {
                         options.state.sorters[field] = this.getSortDirectionKey(direction);
                     }, this);
                 }
                 _.extend(this.state, options.state);
             }
-
-            this.initialState = app.deepClone(this.state);
 
             if (options.url) {
                 this.url = options.url;
@@ -110,7 +116,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
 
             this.on('remove', this.onRemove, this);
 
-            BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+            PageableCollection.__super__.initialize.call(this, models, options);
 
             if (models.options) {
                 this.state.totals = models.options.totals;
@@ -128,31 +134,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             if (this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
-        },
-
-        /**
-         * Encode state object to string
-         *
-         * @param {Object} stateObject
-         * @return {String}
-         */
-        encodeStateData: function(stateObject) {
-            var data = _.pick(stateObject, _.keys(this.stateShortKeys));
-            data.gridName = this.inputName;
-            data = app.invertKeys(data, this.stateShortKeys);
-            return app.packToQueryString(data);
-        },
-
-        /**
-         * Decode state object from string, operation is invert for encodeStateData.
-         *
-         * @param {String} stateString
-         * @return {Object}
-         */
-        decodeStateData: function(stateString) {
-            var data = app.unpackFromQueryString(stateString);
-            data = app.invertKeys(data, _.invert(this.stateShortKeys));
-            return data;
         },
 
         /**
@@ -188,7 +169,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          * @return {Object}
          */
         processAdditionalParams: function (state) {
-            var state = app.deepClone(state);
+            var state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
             _.each(this.additionalParameters, _.bind(function(value, key) {
@@ -361,7 +342,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 var nvp = url.slice(qsi + 1).split('&');
                 for (var i = 0 ; i < nvp.length ; i++) {
                     var pair  = nvp[i].split('=');
-                    data[app.decodeUriComponent(pair[0])] = app.decodeUriComponent(pair[1]);
+                    data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
             }
 
@@ -395,7 +376,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             var url = options.url || _.result(this, "url") || '';
             var qsi = url.indexOf('?');
             if (qsi != -1) {
-                _.extend(data, app.unpackFromQueryString(url.slice(qsi + 1)));
+                _.extend(data, tools.unpackFromQueryString(url.slice(qsi + 1)));
                 url = url.slice(0, qsi);
             }
 
@@ -591,7 +572,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             collectionOptions.url = this.url;
             collectionOptions.inputName = this.inputName;
             var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
-            newCollection.state = app.deepClone(this.state);
+            newCollection.state = tools.deepClone(this.state);
             return newCollection;
         }
     });

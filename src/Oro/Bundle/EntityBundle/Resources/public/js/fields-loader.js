@@ -1,7 +1,7 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/app', 'jquery-ui'
-    ], function ($, routing, __, messenger, app) {
+define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/tools', 'jquery-ui'
+    ], function ($, routing, __, messenger, tools) {
     'use strict';
 
     /**
@@ -86,7 +86,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         _onError: function (jqXHR) {
             var err = jqXHR.responseJSON,
                 msg = __('Sorry, unexpected error was occurred');
-            if (app.debug) {
+            if (tools.debug) {
                 if (err.message) {
                     msg += ': ' + err.message;
                 } else if (err.errors && $.isArray(err.errors)) {

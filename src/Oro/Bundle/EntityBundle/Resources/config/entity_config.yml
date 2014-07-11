@@ -207,6 +207,6 @@ oro_entity_config:
         entity:
             items:
                 # specify the list of fields for which the virtual fields can be created
-                # if non specified the virtual fields are created for all fields, except identiier ones
+                # if not specified the virtual fields are created for all fields, except identifier ones
                 virtual_fields: # array
                     options: []

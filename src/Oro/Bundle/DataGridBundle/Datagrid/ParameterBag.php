@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Datagrid;
 class ParameterBag
 {
     const ADDITIONAL_PARAMETERS = '_parameters';
+    const MINIFIED_PARAMETERS   = '_minified';
 
     /**
      * Parameter storage.
