@@ -56,6 +56,10 @@
       background: lighten(@mainMenuBackgroundColor, 3%);
       border-bottom-color: lighten(@mainMenuBorderColor, 3%);
     }
+    > .dropdown-menu-title,
+    > .dropdown-menu-title + .divider {
+      display: none;
+    }
   }
   .menu_level_2 {
     .title {

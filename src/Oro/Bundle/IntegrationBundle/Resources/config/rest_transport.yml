@@ -1,0 +1,16 @@
+parameters:
+    oro_integration.transport.rest.guzzle.client_factory.class: Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory
+    oro_integration.transport.rest.abstract_transport.class:    Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\AbstractRestTransport
+
+services:
+    oro_integration.transport.rest.guzzle.client_factory:
+        class: %oro_integration.transport.rest.guzzle.client_factory.class%
+
+    oro_integration.transport.rest.client_factory:
+        alias: oro_integration.transport.rest.guzzle.client_factory
+
+    oro_integration.transport.rest.abstract_transport:
+        class: %oro_integration.transport.rest.abstract_transport.class%
+        abstract: true
+        calls:
+            - [setRestClientFactory, [@oro_integration.transport.rest.client_factory]]

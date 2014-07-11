@@ -28,7 +28,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      *
      * @param string $name
      * @param mixed $value
-     * @return WorkflowData
+     * @return AbstractStorage
      */
     public function set($name, $value)
     {
@@ -43,7 +43,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * Add values
      *
      * @param array $data
-     * @return WorkflowData
+     * @return AbstractStorage
      */
     public function add(array $data)
     {
@@ -105,7 +105,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * Remove value by name
      *
      * @param string $name
-     * @return WorkflowData
+     * @return AbstractStorage
      */
     public function remove($name)
     {
@@ -138,10 +138,12 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * This method should be called only by system listeners
      *
      * @param bool $modified
+     * @return AbstractStorage
      */
     public function setModified($modified)
     {
         $this->modified = $modified;
+        return $this;
     }
 
     /**

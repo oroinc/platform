@@ -50,7 +50,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Processor with type "import" and alias "entity_name" already exists
+     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" already exists
      */
     public function testRegisterProcessorFails()
     {

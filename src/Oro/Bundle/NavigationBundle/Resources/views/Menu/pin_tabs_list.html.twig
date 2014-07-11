@@ -1,12 +1,13 @@
 {% if isDesktopVersion() %}
 <div class="list-bar-wrapper">
     <div class="list-bar">
-      <ul>&nbsp;</ul>
+      <ul></ul>
+      <div class="pin-bar-empty" ><a href="{{ path('oro_pinbar_help')|raw }}">{{ 'Learn how to use this space'|trans|raw }}</a></div>
     </div>
 </div>
 <script type="text/javascript">
-    require(['jquery', 'oroui/js/app'], function ($, app) {
-        if (app.isMobile()) {
+    require(['jquery', 'oroui/js/tools'], function ($, tools) {
+        if (tools.isMobile()) {
             return;
         }
 

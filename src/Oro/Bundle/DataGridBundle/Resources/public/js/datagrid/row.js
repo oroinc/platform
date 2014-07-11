@@ -36,7 +36,7 @@ define(['jquery', 'underscore', 'backgrid'
             var targetElement = e.target;
             var targetParentElement = $(e.target).parent().get(0);
 
-            if (!this.el == targetElement && !this.el == targetParentElement) {
+            if (this.el != targetElement && this.el != targetParentElement) {
                 return;
             }
 

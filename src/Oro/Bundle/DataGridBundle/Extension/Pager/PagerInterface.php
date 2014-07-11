@@ -12,6 +12,9 @@ interface PagerInterface
     const PER_PAGE_PARAM   = '_per_page';
     const DISABLED_PARAM   = '_disabled';
 
+    const MINIFIED_PAGE_PARAM     = 'i';
+    const MINIFIED_PER_PAGE_PARAM = 'p';
+
     const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /**

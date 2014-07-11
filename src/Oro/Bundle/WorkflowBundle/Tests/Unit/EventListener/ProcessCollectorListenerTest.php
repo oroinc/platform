@@ -17,6 +17,9 @@ use Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY = 'stdClass';
@@ -43,6 +46,11 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     protected $logger;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $triggerCache;
+
+    /**
      * @var ProcessCollectorListener
      */
     protected $listener;
@@ -63,24 +71,29 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->triggerCache = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->listener = new ProcessCollectorListener(
             $this->registry,
             $this->doctrineHelper,
             $this->handler,
-            $this->logger
+            $this->logger,
+            $this->triggerCache
         );
     }
 
     public function testPrePersist()
     {
-        $triggers = $this->getTriggers();
-        $this->prepareRegistry($triggers);
-
         $entityClass = self::ENTITY;
         $entity = new $entityClass();
-        $args = new LifecycleEventArgs($entity, $this->getEntityManager());
 
-        $this->listener->prePersist($args);
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $this->getEntityManager());
 
         $expectedTriggers = $this->getExpectedTriggers($triggers);
         $expectedScheduledProcessed = array(
@@ -96,19 +109,30 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expectedScheduledProcessed, 'scheduledProcesses', $this->listener);
     }
 
-    public function testPreUpdate()
+    public function testPrePersistNoTriggers()
     {
-        $triggers = $this->getTriggers();
-        $this->prepareRegistry($triggers);
-
         $entityClass = self::ENTITY;
         $entity = new $entityClass();
-        $oldValue = 1;
-        $newValue = 2;
-        $changeSet = array(self::FIELD => array($oldValue, $newValue));
-        $args = new PreUpdateEventArgs($entity, $this->getEntityManager(), $changeSet);
 
-        $this->listener->preUpdate($args);
+        $this->prepareNotUsedRegistry();
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE, false);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $this->getEntityManager());
+    }
+
+    public function testPreUpdate()
+    {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+        $oldValue    = 1;
+        $newValue    = 2;
+        $changeSet   = array(self::FIELD => array($oldValue, $newValue));
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_UPDATE);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_UPDATE, $entity, $this->getEntityManager(), $changeSet);
 
         $expectedTriggers = $this->getExpectedTriggers($triggers);
         $expectedScheduledProcessed = array(
@@ -130,20 +154,34 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expectedScheduledProcessed, 'scheduledProcesses', $this->listener);
     }
 
+    public function testPreUpdateNoTriggers()
+    {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+        $oldValue    = 1;
+        $newValue    = 2;
+        $changeSet   = array(self::FIELD => array($oldValue, $newValue));
+
+        $this->prepareNotUsedRegistry();
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_UPDATE, false);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_UPDATE, $entity, $this->getEntityManager(), $changeSet);
+    }
+
     public function testPreRemove()
     {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+        $entityId    = 1;
+
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
-
-        $entityClass = self::ENTITY;
-        $entityId = 1;
-        $entity = new $entityClass();
-        $args = new LifecycleEventArgs($entity, $this->getEntityManager());
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_DELETE);
 
         $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
             ->will($this->returnValue($entityId));
 
-        $this->listener->preRemove($args);
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, $this->getEntityManager());
 
         $expectedTriggers = $this->getExpectedTriggers($triggers);
         $expectedScheduledProcessed = array(
@@ -161,6 +199,18 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
     }
 
+
+    public function testPreRemoveNoTriggers()
+    {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+
+        $this->prepareNotUsedRegistry();
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_DELETE, false);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, $this->getEntityManager());
+    }
+
     /**
      * @param OnClearEventArgs $args
      * @param bool $hasTriggers
@@ -169,13 +219,15 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnClear(OnClearEventArgs $args, $hasTriggers, $hasScheduledProcesses)
     {
-        $triggers = $this->getTriggers();
-        $this->prepareRegistry($triggers);
-        $expectedTriggers = $this->getExpectedTriggers($triggers);
-
         // prepare environment
         $entityClass = self::ENTITY;
-        $this->listener->prePersist(new LifecycleEventArgs(new $entityClass(), $this->getEntityManager()));
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
+        $expectedTriggers = $this->getExpectedTriggers($triggers);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, new $entityClass(), $this->getEntityManager());
 
         $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
         $this->assertAttributeNotEmpty('scheduledProcesses', $this->listener);
@@ -224,14 +276,15 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostFlushHandledProcess()
     {
-        $triggers = $this->getTriggers();
-        $this->prepareRegistry($triggers);
-        $entityManager = $this->getEntityManager();
-
         $entityClass = self::ENTITY;
         $entity = new $entityClass();
 
-        $this->listener->prePersist(new LifecycleEventArgs($entity, $entityManager));
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
+        $entityManager = $this->getEntityManager();
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $entityManager);
 
         $expectedTrigger = $triggers['create'];
         $expectedData = $this->createProcessData(array('data' => $entity));
@@ -245,77 +298,211 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
     }
 
-    public function testPostFlushQueuedProcessJob()
+    /**
+     * @dataProvider postFlushQueuedProcessJobProvider
+     * @param array $entityParams
+     * @param array $expected
+     */
+    public function testPostFlushQueuedProcessJob($entityParams, $expected)
     {
-        $expectedJobId       = 12;
-        $expectedJobPriority = 10;
-
-        $triggers = $this->getTriggers($expectedJobPriority);
-        $this->prepareRegistry($triggers);
+        $callOrder     = 0;
+        $entityClass   = self::ENTITY;
+        $entity        = new $entityClass();
         $entityManager = $this->getEntityManager();
+        $expectedData  = $this->createProcessData(array('data' => $entity));
+        $triggers      = array();
 
-        $entityClass = self::ENTITY;
-        $entity = new $entityClass();
-        $changeSet = array();
-        $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+        foreach ($entityParams as $entityParam) {
+            $expectedTrigger = $this->getCustomQueuedTrigger($entityParam);
+            $triggers[]      = $expectedTrigger;
+        }
 
-        $this->listener->preUpdate($args);
+        $this->prepareRegistry($triggers);
+        $this->triggerCache->expects($this->any())->method('hasTrigger')->will($this->returnValue(true));
 
-        $expectedTrigger = $triggers['updateEntity'];
-        $expectedData = $this->createProcessData(array('data' => $entity));
+        /** @var ProcessTrigger $trigger */
+        foreach ($triggers as $iteration => $trigger) {
+            $this->logger->expects($this->at($iteration))->method('debug')
+                ->with('Process queued', $trigger, $expectedData);
 
-        $entityManager->expects($this->at(0))->method('persist')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
-            ->will(
-                $this->returnCallback(
-                    function (ProcessJob $processJob) use ($expectedTrigger, $expectedData, $expectedJobId) {
-                        $this->assertEquals($expectedTrigger, $processJob->getProcessTrigger());
-                        $this->assertEquals($expectedData, $processJob->getData());
+            $this->callPreFunctionByEventName($trigger->getEvent(), new $entityClass(), $this->getEntityManager());
 
-                        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
-                        $idReflection->setAccessible(true);
-                        $idReflection->setValue($processJob, $expectedJobId);
-                    }
-                )
-            );
-        $entityManager->expects($this->at(1))->method('flush');
-        $entityManager->expects($this->at(2))->method('persist')
-            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
-            ->will(
-                $this->returnCallback(
-                    function (Job $jmsJob) use ($expectedJobId, $expectedJobPriority) {
-                        $this->assertEquals(ExecuteProcessJobCommand::NAME, $jmsJob->getCommand());
-                        $this->assertEquals(array('--id=' . $expectedJobId), $jmsJob->getArgs());
-                        $this->assertEquals($expectedJobPriority, $jmsJob->getPriority());
-                        $this->assertNotNull($jmsJob->getExecuteAfter());
-                        $this->assertGreaterThan(new \DateTime(), $jmsJob->getExecuteAfter());
-                    }
-                )
-            );
-        $entityManager->expects($this->at(3))->method('flush');
+            $this->assertProcessJobPersist($entityManager, $entityParams, $iteration);
+            $callOrder = $iteration;
+        }
 
-        $this->logger->expects($this->once())->method('debug')
-            ->with('Process queued', $expectedTrigger, $expectedData);
+        $entityManager->expects($this->at(++$callOrder))->method('flush');
+
+        foreach ($expected as $jmsParams) {
+            $this->assertJMSJobPersist($entityManager, $jmsParams, ++$callOrder);
+        }
+
+        $entityManager->expects($this->at(++$callOrder))->method('flush');
 
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
 
         $this->assertAttributeEmpty('queuedJobs', $this->listener);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function postFlushQueuedProcessJobProvider()
+    {
+        return array(
+            'all with same priority and timeShift (1 batch)' => array(
+                'entities' => array(
+                    ProcessTrigger::EVENT_CREATE => array(
+                        'id'        => 1,
+                        'event'     => ProcessTrigger::EVENT_CREATE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    ),
+                    ProcessTrigger::EVENT_UPDATE => array(
+                        'id'        => 2,
+                        'event'     => ProcessTrigger::EVENT_UPDATE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    ),
+                    ProcessTrigger::EVENT_DELETE => array(
+                        'id'        => 3,
+                        'event'     => ProcessTrigger::EVENT_DELETE,
+                        'priority'  => 10,
+                        'timeShift' => 60,
+                    )
+                ),
+                'expected' => array(
+                    array(
+                        'commandArgs' => array('--id=1', '--id=2', '--id=3'),
+                        'priority'    => 10,
+                        'timeShift'   => 60
+                    )
+                )
+            ),
+            'one with different priority (2 batch)' => array(
+                'entities' => array(
+                    ProcessTrigger::EVENT_CREATE => array(
+                        'id'        => 1,
+                        'event'     => ProcessTrigger::EVENT_CREATE,
+                        'priority'  => 90,
+                        'timeShift' => 60
+                    ),
+                    ProcessTrigger::EVENT_UPDATE => array(
+                        'id'        => 2,
+                        'event'     => ProcessTrigger::EVENT_UPDATE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    ),
+                    ProcessTrigger::EVENT_DELETE => array(
+                        'id'        => 3,
+                        'event'     => ProcessTrigger::EVENT_DELETE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    )
+                ),
+                'expected' => array(
+                    array(
+                        'commandArgs' => array('--id=1'),
+                        'priority'    => 90,
+                        'timeShift'   => 60
+                    ),
+                    array(
+                        'commandArgs' => array('--id=2', '--id=3'),
+                        'priority'    => 10,
+                        'timeShift'   => 60
+                    )
+                )
+            ),
+            'all with same priority and different timeShift (3 batch)' => array(
+                'entities' => array(
+                    ProcessTrigger::EVENT_CREATE => array(
+                        'id'        => 1,
+                        'event'     => ProcessTrigger::EVENT_CREATE,
+                        'priority'  => 10,
+                        'timeShift' => 10
+                    ),
+                    ProcessTrigger::EVENT_UPDATE => array(
+                        'id'        => 2,
+                        'event'     => ProcessTrigger::EVENT_UPDATE,
+                        'priority'  => 10,
+                        'timeShift' => 20
+                    ),
+                    ProcessTrigger::EVENT_DELETE => array(
+                        'id'        => 3,
+                        'event'     => ProcessTrigger::EVENT_DELETE,
+                        'priority'  => 10,
+                        'timeShift' => 30
+                    )
+                ),
+                'expected' => array(
+                    array(
+                        'commandArgs' => array('--id=1'),
+                        'priority'    => 10,
+                        'timeShift'   => 10
+                    ),
+                    array(
+                        'commandArgs' => array('--id=2'),
+                        'priority'    => 10,
+                        'timeShift'   => 20
+                    ),
+                    array(
+                        'commandArgs' => array('--id=3'),
+                        'priority'    => 10,
+                        'timeShift'   => 30
+                    )
+                )
+            ),
+            'all with same priority and only one with different timeShift (2 batch)' => array(
+                'entities' => array(
+                    ProcessTrigger::EVENT_CREATE => array(
+                        'id'        => 1,
+                        'event'     => ProcessTrigger::EVENT_CREATE,
+                        'priority'  => 10,
+                        'timeShift' => 10
+                    ),
+                    ProcessTrigger::EVENT_UPDATE => array(
+                        'id'        => 2,
+                        'event'     => ProcessTrigger::EVENT_UPDATE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    ),
+                    ProcessTrigger::EVENT_DELETE => array(
+                        'id'        => 3,
+                        'event'     => ProcessTrigger::EVENT_DELETE,
+                        'priority'  => 10,
+                        'timeShift' => 60
+                    )
+                ),
+                'expected' => array(
+                    array(
+                        'commandArgs' => array('--id=1'),
+                        'priority'    => 10,
+                        'timeShift'   => 10
+                    ),
+                    array(
+                        'commandArgs' => array('--id=2', '--id=3'),
+                        'priority'    => 10,
+                        'timeShift'   => 60
+                    )
+                )
+            )
+        );
+    }
+
     public function testPostFlushForceQueued()
     {
-        $triggers = $this->getTriggers();
-        $this->prepareRegistry($triggers);
-        $entityManager = $this->getEntityManager();
-
         $this->listener->setForceQueued(true);
 
         $entityClass = self::ENTITY;
-        $entity = new $entityClass();
-        $args = new LifecycleEventArgs($entity, $entityManager);
+        $entity      = new $entityClass();
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
+        $entityManager = $this->getEntityManager();
 
         // persist trigger is not queued
-        $this->listener->prePersist($args);
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $entityManager);
 
         // there is no need to check all trace - just ensure that job was queued
         $entityManager->expects($this->exactly(2))->method('persist');
@@ -326,12 +513,13 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPostFlushRemovedEntityHashes()
     {
-        $this->prepareRegistry(array());
-        $entityManager = $this->getEntityManager();
-
         $entityClass = self::ENTITY;
-        $entityId = 1;
-        $entity = new $entityClass();
+        $entity      = new $entityClass();
+        $entityId    = 1;
+
+        $this->prepareRegistry(array());
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_DELETE);
+        $entityManager = $this->getEntityManager();
 
         // expectations
         $expectedEntityHashes = array(ProcessJob::generateEntityHash($entityClass, $entityId));
@@ -349,8 +537,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         // test
-        $this->listener->preRemove(new LifecycleEventArgs($entity, $entityManager));
-
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, $entityManager);
         $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
 
         $this->listener->postFlush(new PostFlushEventArgs($entityManager));
@@ -372,13 +559,18 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     {
         $repository = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository')
             ->disableOriginalConstructor()
-            ->setMethods(array('findAllWithEnabledDefinitions'))
+            ->setMethods(array('findAllWithDefinitions'))
             ->getMock();
-        $repository->expects($this->any())->method('findAllWithEnabledDefinitions')
+        $repository->expects($this->any())->method('findAllWithDefinitions')->with(true)
             ->will($this->returnValue($triggers));
 
         $this->registry->expects($this->at(0))->method('getRepository')->with('OroWorkflowBundle:ProcessTrigger')
             ->will($this->returnValue($repository));
+    }
+
+    protected function prepareNotUsedRegistry()
+    {
+        $this->registry->expects($this->never())->method('getRepository');
     }
 
     /**
@@ -422,6 +614,25 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $config
+     * @return ProcessTrigger
+     */
+    protected function getCustomQueuedTrigger(array $config)
+    {
+        $definition = new ProcessDefinition();
+        $definition->setName('test-' . uniqid())->setRelatedEntity(self::ENTITY);
+
+        $entityTrigger = new ProcessTrigger();
+        $entityTrigger->setDefinition($definition)
+            ->setEvent($config['event'])
+            ->setQueued(true)
+            ->setPriority($config['priority'])
+            ->setTimeShift($config['timeShift']);
+
+        return $entityTrigger;
+    }
+
+    /**
      * @param ProcessTrigger[] $triggers
      * @return array
      */
@@ -459,6 +670,78 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $event
+     * @param object $entity
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param array $changeSet
+     */
+    protected function callPreFunctionByEventName($event, $entity, $entityManager, $changeSet = array())
+    {
+        switch ($event) {
+            case ProcessTrigger::EVENT_CREATE:
+                $args = new LifecycleEventArgs($entity, $entityManager);
+                $this->listener->prePersist($args);
+                break;
+            case ProcessTrigger::EVENT_UPDATE:
+                $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+                $this->listener->preUpdate($args);
+                break;
+            case ProcessTrigger::EVENT_DELETE:
+                $args = new LifecycleEventArgs($entity, $entityManager);
+                $this->listener->preRemove($args);
+                break;
+        }
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param array $entityParams
+     * @param int $callOrder
+     */
+    protected function assertProcessJobPersist($entityManager, array $entityParams, $callOrder)
+    {
+        $entityManager->expects($this->at($callOrder))->method('persist')
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessJob'))
+            ->will(
+                $this->returnCallback(
+                    function (ProcessJob $processJob) use ($entityParams) {
+                        $event = $processJob->getProcessTrigger()->getEvent();
+
+                        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
+                        $idReflection->setAccessible(true);
+                        $idReflection->setValue($processJob, $entityParams[$event]['id']);
+                    }
+                )
+            );
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param array $expected
+     * @param int $callOrder
+     */
+    protected function assertJMSJobPersist($entityManager, array $expected, $callOrder)
+    {
+        $entityManager->expects($this->at($callOrder))->method('persist')
+            ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
+            ->will(
+                $this->returnCallback(
+                    function (Job $jmsJob) use ($expected) {
+                        $this->assertEquals(ExecuteProcessJobCommand::NAME, $jmsJob->getCommand());
+                        $this->assertEquals($expected['commandArgs'], $jmsJob->getArgs());
+                        $this->assertEquals($expected['priority'], $jmsJob->getPriority());
+
+                        $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($expected['timeShift']);
+                        $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
+                        $executeAfter->add($timeShiftInterval);
+
+                        $this->assertEquals($executeAfter, $jmsJob->getExecuteAfter());
+                    }
+                )
+            );
+    }
+
+    /**
      * @param array $data
      * @param bool $modified
      * @return ProcessData
@@ -469,5 +752,18 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $processData->setModified($modified);
 
         return $processData;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $event
+     * @param bool $hasTrigger
+     */
+    protected function prepareTriggerCache($entityClass, $event, $hasTrigger = true)
+    {
+        $this->triggerCache->expects($this->any())
+            ->method('hasTrigger')
+            ->with($entityClass, $event)
+            ->will($this->returnValue($hasTrigger));
     }
 }
