@@ -67,14 +67,6 @@ class Builder
         $acceptor = new $this->acceptorClass();
         $acceptor->setConfig($config);
 
-        /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor, $parameters);
-
-        $event = new BuildBefore($datagrid, $config);
-        $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
-
-        $this->buildDataSource($datagrid, $config);
-
         foreach ($this->extensions as $extension) {
             /**
              * ATTENTION: extension object should be cloned cause it can contain some state
@@ -87,6 +79,13 @@ class Builder
             }
         }
 
+        /** @var DatagridInterface $datagrid */
+        $datagrid = new $class($name, $acceptor, $parameters);
+
+        $event = new BuildBefore($datagrid, $config);
+        $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
+
+        $this->buildDataSource($datagrid, $config);
         $acceptor->processConfiguration();
 
         $event = new BuildAfter($datagrid);

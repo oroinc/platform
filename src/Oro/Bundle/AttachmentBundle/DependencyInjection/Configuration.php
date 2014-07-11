@@ -37,7 +37,7 @@ EOF;
         SettingsBuilder::append(
             $rootNode,
             [
-                'upload_mime_types'       => ['value' => $mimeTypes],
+                'upload_file_mime_types'  => ['value' => $mimeTypes],
                 'upload_image_mime_types' => ['value' => $mimeTypesImage]
             ]
         );

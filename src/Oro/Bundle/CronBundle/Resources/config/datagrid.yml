@@ -54,6 +54,20 @@ datagrid:
                 command:
                     type: string
                     data_name: j.command
+                state:
+                    type: choice
+                    data_name: j.state
+                    options:
+                        field_options:
+                            choices:
+                                new:        oro.cron.job.status.new
+                                pending:    oro.cron.job.status.pending
+                                canceled:   oro.cron.job.status.canceled
+                                running:    oro.cron.job.status.running
+                                finished:   oro.cron.job.status.finished
+                                failed:     oro.cron.job.status.failed
+                                terminated: oro.cron.job.status.terminated
+                                incomplete: oro.cron.job.status.incomplete
                 runtime:
                     type: number
                     data_name: j.runtime

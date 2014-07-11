@@ -141,6 +141,7 @@ oro:
             definition.label:     Process definition
             event.label:          Event
             field.label:          Field
+            priority.label:       Priority
             queued.label:         Queued
             time_shift.label:     Time shift
 
