@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tools;
 
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfigDumperExtension;
 
 class AttachmentsConfigDumperExtension extends AssociationEntityConfigDumperExtension
 {

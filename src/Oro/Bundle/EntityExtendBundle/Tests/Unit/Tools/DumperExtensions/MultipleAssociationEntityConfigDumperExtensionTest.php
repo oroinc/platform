@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class MultipleAssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ASSOCIATION_SCOPE = 'test_scope';
-    const ATTR_NAME         = 'enabled';
+    const ATTR_NAME         = 'items';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -42,14 +42,19 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
 
     public function testSupportsPreUpdate()
     {
-        $extension = $this->getExtensionMock(['getAssociationScope']);
+        $extension = $this->getExtensionMock(
+            ['getAssociationScope', 'getAssociationAttributeName']
+        );
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
             ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->exactly(2))
+            ->method('getAssociationAttributeName')
+            ->will($this->returnValue(self::ATTR_NAME));
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
-        $config1->set(self::ATTR_NAME, true);
+        $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
         $config2 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity2'));
 
         $this->setTargetEntityConfigsExpectations([$config1, $config2]);
@@ -61,11 +66,16 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
 
     public function testSupportsPreUpdateNoApplicableTargetEntities()
     {
-        $extension = $this->getExtensionMock(['getAssociationScope']);
+        $extension = $this->getExtensionMock(
+            ['getAssociationScope', 'getAssociationAttributeName']
+        );
 
         $extension->expects($this->once())
             ->method('getAssociationScope')
             ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->once())
+            ->method('getAssociationAttributeName')
+            ->will($this->returnValue(self::ATTR_NAME));
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
 
@@ -79,54 +89,21 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
     public function testPreUpdate()
     {
         $extension = $this->getExtensionMock(
-            ['getAssociationEntityClass', 'getAssociationScope', 'getAssociationKind']
+            ['getAssociationScope', 'getAssociationAttributeName', 'getAssociationKind']
         );
 
         $extension->expects($this->once())
-            ->method('getAssociationEntityClass')
-            ->will($this->returnValue('Test\SourceEntity'));
-        $extension->expects($this->once())
             ->method('getAssociationScope')
             ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->exactly(3))
+            ->method('getAssociationAttributeName')
+            ->will($this->returnValue(self::ATTR_NAME));
         $extension->expects($this->once())
             ->method('getAssociationKind')
             ->will($this->returnValue('test'));
 
         $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
-        $config1->set(self::ATTR_NAME, true);
-        $config2 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity2'));
-
-        $this->setTargetEntityConfigsExpectations([$config1, $config2]);
-
-        $this->associationBuilder->expects($this->once())
-            ->method('createManyToOneAssociation')
-            ->with('Test\SourceEntity', 'Test\Entity1', 'test');
-
-        $extendConfigs = [];
-        $extension->preUpdate($extendConfigs);
-    }
-
-    public function testPreUpdateForManyToMany()
-    {
-        $extension = $this->getExtensionMock(
-            ['getAssociationEntityClass', 'getAssociationScope', 'getAssociationKind', 'getAssociationType']
-        );
-
-        $extension->expects($this->once())
-            ->method('getAssociationEntityClass')
-            ->will($this->returnValue('Test\SourceEntity'));
-        $extension->expects($this->once())
-            ->method('getAssociationScope')
-            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
-        $extension->expects($this->once())
-            ->method('getAssociationKind')
-            ->will($this->returnValue('test'));
-        $extension->expects($this->once())
-            ->method('getAssociationType')
-            ->will($this->returnValue('manyToMany'));
-
-        $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
-        $config1->set(self::ATTR_NAME, true);
+        $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
         $config2 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity2'));
 
         $this->setTargetEntityConfigsExpectations([$config1, $config2]);
@@ -139,15 +116,48 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
         $extension->preUpdate($extendConfigs);
     }
 
+    public function testPreUpdateForManyToOne()
+    {
+        $extension = $this->getExtensionMock(
+            ['getAssociationScope', 'getAssociationAttributeName', 'getAssociationKind', 'getAssociationType']
+        );
+
+        $extension->expects($this->once())
+            ->method('getAssociationScope')
+            ->will($this->returnValue(self::ASSOCIATION_SCOPE));
+        $extension->expects($this->exactly(3))
+            ->method('getAssociationAttributeName')
+            ->will($this->returnValue(self::ATTR_NAME));
+        $extension->expects($this->once())
+            ->method('getAssociationKind')
+            ->will($this->returnValue('test'));
+        $extension->expects($this->once())
+            ->method('getAssociationType')
+            ->will($this->returnValue('manyToOne'));
+
+        $config1 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity1'));
+        $config1->set(self::ATTR_NAME, ['Test\SourceEntity']);
+        $config2 = new Config(new EntityConfigId(self::ASSOCIATION_SCOPE, 'Test\Entity2'));
+
+        $this->setTargetEntityConfigsExpectations([$config1, $config2]);
+
+        $this->associationBuilder->expects($this->once())
+            ->method('createManyToOneAssociation')
+            ->with('Test\SourceEntity', 'Test\Entity1', 'test');
+
+        $extendConfigs = [];
+        $extension->preUpdate($extendConfigs);
+    }
+
     /**
      * @param string[] $methods
      *
-     * @return AssociationEntityConfigDumperExtension|\PHPUnit_Framework_MockObject_MockObject
+     * @return MultipleAssociationEntityConfigDumperExtension|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getExtensionMock(array $methods = [])
     {
         return $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationEntityConfigDumperExtension',
+            'Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension',
             [$this->configManager, $this->associationBuilder],
             '',
             true,

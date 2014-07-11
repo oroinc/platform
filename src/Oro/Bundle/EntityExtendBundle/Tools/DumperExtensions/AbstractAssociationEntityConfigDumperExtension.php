@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {

@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
@@ -119,7 +119,10 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
         $attachmentFieldName
     ) {
         $schemaConfig = $entityExtendConfig->get('schema');
-        $extendClass  = $entityExtendConfig->get('extend_class');
+        $extendClass = $entityExtendConfig->has('extend_class') ?
+            $entityExtendConfig->get('extend_class') :
+            $schemaConfig['class'];
+
         unset($schemaConfig['doctrine'][$extendClass]['fields'][$attachmentFieldName]);
         unset($schemaConfig['property'][$attachmentFieldName]);
 
