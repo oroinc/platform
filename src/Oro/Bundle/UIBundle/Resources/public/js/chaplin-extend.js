@@ -84,7 +84,7 @@ define([
         var el, href, payload;
         el = event.currentTarget;
 
-        if (event.isDefaultPrevented()) {
+        if (event.isDefaultPrevented() || $(el).parents('.sf-toolbar').length) {
             return;
         }
 
