@@ -3,7 +3,7 @@
 define(['jquery', 'jquery-ui'], function ($) {
     'use strict';
 
-    /* datapicker extend:start */
+    /* datepicker extend:start */
     (function () {
 
         /**
@@ -24,7 +24,8 @@ define(['jquery', 'jquery-ui'], function ($) {
             return events.join(' ');
         }
 
-        var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
+        var _isEventsAdded  = false,
+            _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
             _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
 
         /**
@@ -49,6 +50,8 @@ define(['jquery', 'jquery-ui'], function ($) {
                     input.blur();
                 });
             });
+
+            _isEventsAdded = true;
         };
 
         /**
@@ -59,6 +62,10 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @private
          */
         $.datepicker.constructor.prototype._hideDatepicker = function (elem) {
+            if (!_isEventsAdded) {
+                return;
+            }
+
             var events, input = elem;
 
             if (!elem) {
@@ -71,7 +78,8 @@ define(['jquery', 'jquery-ui'], function ($) {
             });
 
             _hideDatepicker.apply(this, arguments);
+            _isEventsAdded = false;
         };
     }());
-    /* datapicker extend:end */
+    /* datepicker extend:end */
 });
