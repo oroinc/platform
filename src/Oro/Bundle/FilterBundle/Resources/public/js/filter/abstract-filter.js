@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
-    ], function ($, _, Backbone, app) {
+define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
+    ], function ($, _, Backbone, tools) {
     'use strict';
 
     /**
@@ -188,7 +188,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
          * @return {Object}
          */
         getValue: function() {
-            return app.deepClone(this.value);
+            return tools.deepClone(this.value);
         },
 
         /**
@@ -198,9 +198,9 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
          * @return {*}
          */
         setValue: function(value) {
-            if (!app.isEqualsLoosely(this.value, value)) {
+            if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
-                this.value = app.deepClone(value);
+                this.value = tools.deepClone(value);
                 this._updateDOMValue();
                 this._onValueUpdated(this.value, oldValue);
             }
@@ -269,7 +269,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
          * @return {Boolean}
          */
         isEmpty: function() {
-            return app.isEqualsLoosely(this.getValue(), this.emptyValue);
+            return tools.isEqualsLoosely(this.getValue(), this.emptyValue);
         },
 
         /**
@@ -282,7 +282,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
          */
         isEmptyValue: function() {
             if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
-                return app.isEqualsLoosely(this.value.value, this.emptyValue.value);
+                return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
             return true;
         },

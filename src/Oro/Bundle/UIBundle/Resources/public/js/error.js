@@ -1,6 +1,13 @@
+/*jslint browser:true, nomen:true*/
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'oroui/js/app', 'oroui/js/modal', 'oronavigation/js/navigation'
-], function (_, __, $, routing, app, Modal, Navigation) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'jquery',
+    'routing',
+    'oroui/js/tools',
+    'oroui/js/modal'
+], function (_, __, $, routing, tools, Modal) {
     'use strict';
 
     var defaults = {
@@ -24,7 +31,7 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
 
                 if (xhr.status === 401) {
                     this._processRedirect();
-                } else if (xhr.readyState === 4 && app.debug && (typeof xhr.error !== 'function' || force)) {
+                } else if (xhr.readyState === 4 && tools.debug && (typeof xhr.error !== 'function' || force)) {
                     // show error in modal window in following cases:
                     // when custom error handling is not added
                     this.modalHandler(xhr);
@@ -37,14 +44,15 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
              * @param {Object} xhr
              */
             modalHandler: function (xhr) {
-                var modal,
-                    message = defaults.message;
-                if (app.debug) {
+                var modal, message, responseObject, errorType;
+
+                message = defaults.message;
+                if (tools.debug) {
                     message += '<br><b>Debug:</b>' + xhr.responseText;
                 }
 
-                var responseObject = xhr.responseJSON || {},
-                    errorType = responseObject.type;
+                responseObject = xhr.responseJSON || {};
+                errorType = responseObject.type;
 
                 modal = new Modal({
                     title: errorType === ERROR_USER_INPUT ? defaults.headerUserError : defaults.headerServerError,
@@ -60,10 +68,11 @@ define(['underscore', 'orotranslation/js/translator', 'jquery', 'routing', 'orou
              */
             _processRedirect: function () {
                 var hashUrl = '';
-                if (Navigation.isEnabled()) {
+                // @TODO add extra parameter for redirect after login
+                /*if (Navigation.isEnabled()) {
                     var navigation = Navigation.getInstance();
                     hashUrl = '#url=' + navigation.getHashUrl();
-                }
+                }*/
 
                 window.location.href = routing.generate('oro_user_security_login') + hashUrl;
             }

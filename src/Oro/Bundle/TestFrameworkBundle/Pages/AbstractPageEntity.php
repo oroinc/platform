@@ -129,8 +129,8 @@ abstract class AbstractPageEntity extends AbstractPage
     public function getParam($paramName)
     {
         $url = $this->test->url();
-        $fragment = parse_url($url)['fragment'];
-        $str = explode('/', $fragment);
+        $path = parse_url($url)['path'];
+        $str = explode('/', $path);
 
         $found_index = array_search($paramName, $str);
         if ($found_index !== false) {

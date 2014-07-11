@@ -10,10 +10,10 @@ define(function (require) {
     var mediator = require('oroui/js/mediator');
     var PageableCollection = require('./pageable-collection');
     var Grid = require('./datagrid/grid');
-    var GridRouter = require('./datagrid/router');
     var GridViewsView = require('./datagrid/grid-views/view');
     var mapActionModuleName = require('./map-action-module-name');
     var mapCellModuleName = require('./map-cell-module-name');
+    var gridContentManager = require('./content-manager');
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
@@ -85,14 +85,11 @@ define(function (require) {
              * Build grid
              */
             build: function () {
-                var options, collectionOptions, collection, grid, payload;
+                var options, collectionOptions, collection, collectionName, grid;
 
-                // collection can be stored in the page cache
-                payload = {name: this.metadata.options.gridName};
-                mediator.trigger('datagrid_collection_set_before', payload);
-                if (payload.collection) {
-                    collection = payload.collection;
-                } else {
+                collectionName = this.metadata.options.gridName;
+                collection = gridContentManager.get(collectionName);
+                if (!collection) {
                     // otherwise, create collection from metadata
                     collectionOptions = gridBuilder.combineCollectionOptions.call(this);
                     collection = new PageableCollection(this.$el.data('data'), collectionOptions);
@@ -111,8 +108,8 @@ define(function (require) {
                 mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
-                    // register router
-                    new GridRouter({collection: collection});
+                    // trace collection changes
+                    gridContentManager.trace(collection);
                 }
 
                 // create grid view
@@ -135,7 +132,8 @@ define(function (require) {
                     state: _.extend({
                         filters: {},
                         sorters: {}
-                    }, this.metadata.state)
+                    }, this.metadata.state),
+                    initialState: this.metadata.initialState || {}
                 }, this.metadata.options);
             },
 

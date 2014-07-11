@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app'],
-function($, _, __, app) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'],
+function($, _, __, tools) {
     'use strict';
 
     return {
@@ -24,7 +24,7 @@ function($, _, __, app) {
                 errors.push(err);
             } if (!_.isUndefined(err.message)) {
                 // exception object
-                if (app.debug) {
+                if (tools.debug) {
                     errors.push(err.message);
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
