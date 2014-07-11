@@ -6,22 +6,30 @@ use Doctrine\Common\Inflector\Inflector;
 
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var RelationBuilder */
     protected $relationBuilder;
 
     /**
+     * @param ConfigManager   $configManager
      * @param RelationBuilder $relationBuilder
      */
-    public function __construct(RelationBuilder $relationBuilder)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        RelationBuilder $relationBuilder
+    ) {
+        $this->configManager   = $configManager;
         $this->relationBuilder = $relationBuilder;
     }
 
@@ -38,7 +46,6 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
      */
     public function postUpdate(array &$extendConfigs)
     {
-        $configManager = $this->relationBuilder->getConfigManager();
         foreach ($extendConfigs as &$entityExtendConfig) {
             if (!$entityExtendConfig->is('is_extend')) {
                 continue;
@@ -47,7 +54,7 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
             $entityClassName = $entityExtendConfig->getId()->getClassName();
 
             /** @var FieldConfigId[] $entityCustomFields */
-            $entityCustomFields = $configManager->getProvider('extend')->getIds($entityClassName);
+            $entityCustomFields = $this->configManager->getProvider('extend')->getIds($entityClassName);
 
             $attachmentFields = [];
             if (!empty($entityCustomFields)) {
@@ -95,8 +102,8 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
                     }
                 }
 
-                $configManager->persist($entityExtendConfig);
-                $configManager->flush();
+                $this->configManager->persist($entityExtendConfig);
+                $this->configManager->flush();
             }
         }
     }
@@ -112,21 +119,16 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
         $attachmentFieldName
     ) {
         $schemaConfig = $entityExtendConfig->get('schema');
-
-        if ($entityExtendConfig->has('extend_class')) {
-            $extendClass  = $entityExtendConfig->get('extend_class');
-        } else {
-            $extendClass  = $schemaConfig['class'];
-        }
+        $extendClass = $entityExtendConfig->has('extend_class') ?
+            $entityExtendConfig->get('extend_class') :
+            $schemaConfig['class'];
 
         unset($schemaConfig['doctrine'][$extendClass]['fields'][$attachmentFieldName]);
         unset($schemaConfig['property'][$attachmentFieldName]);
 
         $entityExtendConfig->set('schema', $schemaConfig);
 
-        $configManager        = $this->relationBuilder->getConfigManager();
-        $extendConfigProvider = $configManager->getProvider('extend');
-        $extendConfigProvider->persist($entityExtendConfig);
-        $configManager->calculateConfigChangeSet($entityExtendConfig);
+        $this->configManager->persist($entityExtendConfig);
+        $this->configManager->calculateConfigChangeSet($entityExtendConfig);
     }
 }
