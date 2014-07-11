@@ -41,11 +41,10 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'Determines whether sample data need to be loaded or not'
             )
             ->addOption(
-                'full-database',
+                'drop-database',
                 null,
                 InputOption::VALUE_NONE,
-                'Instead of using the Class Metadata to detect the database table schema,
-                    drop ALL assets that the database contains.'
+                'Database will be dropped and all data will be vanished.'
             );
     }
 
@@ -162,8 +161,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             '--process-isolation' => true,
         );
 
-        if ($input->getOption('full-database')) {
-            $schemaDropOptions['--full-database'] = true;
+        if ($input->getOption('drop-database')) {
+            $schemaDropOptions['--drop-database'] = true;
         }
 
         $commandExecutor
