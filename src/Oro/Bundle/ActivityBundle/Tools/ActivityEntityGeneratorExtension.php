@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Tools;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\AbstractAssociationEntityGeneratorExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 
 class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
