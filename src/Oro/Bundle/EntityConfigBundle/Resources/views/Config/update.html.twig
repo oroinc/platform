@@ -39,7 +39,7 @@
             '<a href="', link, '">',
             'oro.entity_config.info.records_count.label'|trans,
             ': ',
-            entity_count|default('N/A') ,
+            entity_count|default(0) ,
             '</a>'
             ]|join|raw }}
         </li>
@@ -49,7 +49,7 @@
             '<span>',
             'oro.entity_config.info.records_count.label'|trans,
             ': ',
-            entity_count|default('N/A') ,
+            entity_count|default(0) ,
             '</span>'
             ]|join|raw }}
         </li>
