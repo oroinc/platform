@@ -8,26 +8,20 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysConstraint;
 
 class UniqueKeyCollectionType extends AbstractType
 {
     /**
      * @var ConfigProvider
      */
-    protected $extendProvider;
-
-    /**
-     * @var ConfigProvider
-     */
     protected $entityProvider;
 
     /**
-     * @param ConfigProvider $extendProvider
      * @param ConfigProvider $entityProvider
      */
-    public function __construct(ConfigProvider $extendProvider, ConfigProvider $entityProvider)
+    public function __construct(ConfigProvider $entityProvider)
     {
-        $this->extendProvider = $extendProvider;
         $this->entityProvider = $entityProvider;
     }
 
@@ -36,16 +30,23 @@ class UniqueKeyCollectionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $className = $options['className'];
+        $fields         = [];
+        $className      = $options['className'];
+        $fieldConfigIds = $this->entityProvider->getIds($className);
 
-        $fieldConfigIds = $this->extendProvider->getIds($className);
-
-        $fields = array_filter(
-            $fieldConfigIds,
-            function (FieldConfigId $fieldConfigId) {
-                return $fieldConfigId->getFieldType() != 'ref-many';
+        /** @var FieldConfigId $fieldConfigId */
+        foreach ($fieldConfigIds as $fieldConfigId) {
+            if ($fieldConfigId->getFieldType() === 'ref-many') {
+                continue;
             }
-        );
+
+            $fieldName = $fieldConfigId->getFieldName();
+
+            $fields[$fieldName] = $this
+                ->entityProvider
+                ->getConfig($className, $fieldName)
+                ->get('label', false, ucfirst($fieldName));
+        }
 
         $builder->add(
             'keys',
@@ -57,7 +58,8 @@ class UniqueKeyCollectionType extends AbstractType
                 'allow_delete'   => true,
                 'prototype'      => true,
                 'prototype_name' => 'tag__name__',
-                'label'          => ' '
+                'label'          => false,
+                'constraints'    => [new UniqueKeysConstraint()]
             )
         );
     }

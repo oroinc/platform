@@ -4,9 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -19,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -48,7 +47,7 @@ class ConfigController extends Controller
      * )
      * @Template()
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         $actions       = [];
         $modules       = [];
@@ -192,7 +191,7 @@ class ConfigController extends Controller
      * @Route("/fields/{id}", name="oro_entityconfig_fields", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template()
      */
-    public function fieldsAction($id, Request $request)
+    public function fieldsAction($id)
     {
         $entity = $this->getDoctrine()->getRepository(EntityConfigModel::ENTITY_NAME)->find($id);
 
@@ -397,18 +396,40 @@ class ConfigController extends Controller
     }
 
     /**
+     * @param EntityConfigModel $entity
+     *
+     * @return array
+     *
      * @Route("/widget/unique_keys/{id}", name="oro_entityconfig_widget_unique_keys")
      * @Template
      */
     public function uniqueKeysAction(EntityConfigModel $entity)
     {
+        $className = $entity->getClassName();
+
         /** @var ConfigProvider $extendConfigProvider */
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
-        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $entityConfig         = $entityConfigProvider->getConfig($className);
+        $translator           = $this->get('translator');
+
+        $uniqueKeys = $entityConfig->get('unique_key', ['keys' => []]);
+
+        foreach ($uniqueKeys['keys'] as $index => $uniqueKey) {
+            $uniqueKeys['keys'][$index]['key'] = array_map(
+                function ($fieldName) use ($entityConfigProvider, $className, $translator) {
+                    $label = $entityConfigProvider
+                        ->getConfig($className, $fieldName)
+                        ->get('label');
+
+                    return $translator->trans($label);
+                },
+                $uniqueKey['key']
+            );
+        }
 
         return [
             'entity'     => $entity,
-            'unique_key' => $extendConfig->get('unique_key')
+            'unique_key' => $uniqueKeys
         ];
     }
 
