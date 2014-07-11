@@ -112,7 +112,13 @@ class AttachmentEntityConfigDumperExtension extends AbstractEntityConfigDumperEx
         $attachmentFieldName
     ) {
         $schemaConfig = $entityExtendConfig->get('schema');
-        $extendClass  = $entityExtendConfig->get('extend_class');
+
+        if ($entityExtendConfig->has('extend_class')) {
+            $extendClass  = $entityExtendConfig->get('extend_class');
+        } else {
+            $extendClass  = $schemaConfig['class'];
+        }
+
         unset($schemaConfig['doctrine'][$extendClass]['fields'][$attachmentFieldName]);
         unset($schemaConfig['property'][$attachmentFieldName]);
 

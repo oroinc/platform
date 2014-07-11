@@ -85,7 +85,8 @@
                                     'entity_class': audit_entity_class,
                                     'id': entity.id,
                                     'title': audit_title|default(entity),
-                                    'audit_path': audit_path|default('oro_dataaudit_history')
+                                    'audit_path': audit_path|default('oro_dataaudit_history'),
+                                    'audit_show_change_history': audit_show_change_history|default(false)
                                 } %}
                             {% endif %}
                         </ul>
