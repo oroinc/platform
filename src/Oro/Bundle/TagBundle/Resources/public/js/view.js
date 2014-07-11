@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oronavigation/js/navigation', 'orotranslation/js/translator', './collection'
-    ], function (_, Backbone, Navigation, __, TagCollection) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
+    ], function (_, Backbone, __, TagCollection) {
     'use strict';
 
     var $ = Backbone.$;
@@ -85,12 +85,6 @@ define(['underscore', 'backbone', 'oronavigation/js/navigation', 'orotranslation
             this.$tagsHolder.html(
                 this.template(this.getCollection().getFilteredCollection(this.options.filter))
             );
-            // process tag click redirect
-            var navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.processClicks(this.$('.tag-list a'));
-            }
-
             return this;
         }
     });

@@ -531,7 +531,7 @@ In this example configuration of Workflow there are two entities:
 * Phone Call
 * Phone Conversation
 
-![Workflow Diagram](../images/configuration-reference_workflow-example-entities.png)
+![Workflow Diagram](../../images/configuration-reference_workflow-example-entities.png)
 
 When Workflow Item is created it's connected to Phone Call. On the first step "Start Call" user can go to
 "Call Phone Conversation Step" if a callee answered or to "End Phone Call" step if callee didn't answer.
@@ -832,4 +832,4 @@ class PhoneConversation
 Flow Diagram
 ------------
 
-![Workflow Diagram](../images/configuration-reference_workflow-example-diagram.png)
+![Workflow Diagram](../../images/configuration-reference_workflow-example-diagram.png)

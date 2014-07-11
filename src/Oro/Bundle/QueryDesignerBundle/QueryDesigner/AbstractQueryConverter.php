@@ -549,10 +549,16 @@ abstract class AbstractQueryConverter
     {
         if (isset($this->definition['grouping_columns'])) {
             foreach ($this->definition['grouping_columns'] as $column) {
-                $this->addGroupByColumn(
-                    $this->getTableAliasForColumn($column['name']),
-                    $this->getFieldName($column['name'])
-                );
+                $columnName = $column['name'];
+
+                if (isset($this->virtualColumnExpressions[$columnName])) {
+                    list($tableAlias, $fieldName) = explode('.', $this->virtualColumnExpressions[$columnName]);
+                } else {
+                    $fieldName  = $this->getFieldName($columnName);
+                    $tableAlias = $this->getTableAliasForColumn($columnName);
+                }
+
+                $this->addGroupByColumn($tableAlias, $fieldName);
             }
         }
     }

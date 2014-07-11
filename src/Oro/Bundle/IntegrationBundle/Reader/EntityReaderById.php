@@ -6,8 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
 

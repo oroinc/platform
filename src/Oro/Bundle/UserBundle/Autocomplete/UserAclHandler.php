@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -25,60 +27,44 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
  */
 class UserAclHandler implements SearchHandlerInterface
 {
-
-    /**
-     * @var ObjectManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var AttachmentManager
-     */
+    /** @var AttachmentManager */
     protected $attachmentManager;
 
+    /** @var string */
     protected $className;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fields;
 
-    /**
-     * @var NameFormatter
-     */
+    /** @var NameFormatter */
     protected $nameFormatter;
 
-    /**
-     * @var AclVoter
-     */
+    /** @var AclVoter */
     protected $aclVoter;
 
-    /**
-     * @var OwnershipConditionDataBuilder
-     */
+    /** @var OwnershipConditionDataBuilder */
     protected $builder;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityContextLink;
 
-    /**
-     * @var OwnerTreeProvider
-     */
+    /** @var OwnerTreeProvider */
     protected $treeProvider;
 
     /**
-     * @param ObjectManager $em
+     * @param EntityManager     $em
      * @param AttachmentManager $attachmentManager
-     * @param $className
-     * @param $fields
-     * @param ServiceLink $securityContextLink
+     * @param string            $className
+     * @param array             $fields
+     * @param ServiceLink       $securityContextLink
      * @param OwnerTreeProvider $treeProvider
-     * @param AclVoter $aclVoter
+     * @param AclVoter          $aclVoter
      */
     public function __construct(
-        ObjectManager $em,
+        EntityManager $em,
         AttachmentManager $attachmentManager,
         $className,
         $fields,
@@ -86,13 +72,13 @@ class UserAclHandler implements SearchHandlerInterface
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter = null
     ) {
-        $this->em = $em;
-        $this->attachmentManager = $attachmentManager;
-        $this->className = $className;
-        $this->fields = $fields;
-        $this->aclVoter = $aclVoter;
+        $this->em                  = $em;
+        $this->attachmentManager   = $attachmentManager;
+        $this->className           = $className;
+        $this->fields              = $fields;
+        $this->aclVoter            = $aclVoter;
         $this->securityContextLink = $securityContextLink;
-        $this->treeProvider = $treeProvider;
+        $this->treeProvider        = $treeProvider;
     }
 
     /**
@@ -100,7 +86,6 @@ class UserAclHandler implements SearchHandlerInterface
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
-
         list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
         $entityClass = str_replace('_', '\\', $entityClass);
 
@@ -115,13 +100,18 @@ class UserAclHandler implements SearchHandlerInterface
         $isGranted = $this->getSecurityContext()->isGranted($permission, $object);
 
         if ($isGranted) {
-            $user = $this->getSecurityContext()->getToken()->getUser();
-            $queryBuilder = $this->getSearchQueryBuilder($search);
-            $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
-            if ((boolean) $excludeCurrentUser) {
-                $this->excludeUser($queryBuilder, $user);
+            $results = [];
+            if ($searchById) {
+                $results[] = $this->em->getRepository('OroUserBundle:User')->find($query);
+            } else {
+                $user         = $this->getSecurityContext()->getToken()->getUser();
+                $queryBuilder = $this->getSearchQueryBuilder($search);
+                $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
+                if ((boolean) $excludeCurrentUser) {
+                    $this->excludeUser($queryBuilder, $user);
+                }
+                $results = $queryBuilder->getQuery()->getResult();
             }
-            $results = $queryBuilder->getQuery()->getResult();
 
             $resultsData = [];
             foreach ($results as $user) {
@@ -133,7 +123,7 @@ class UserAclHandler implements SearchHandlerInterface
 
         return [
             'results' => $resultsData,
-            'more' => false
+            'more'    => false
         ];
     }
 
@@ -189,7 +179,7 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|array $item
      * @return mixed
      */
@@ -257,8 +247,8 @@ class UserAclHandler implements SearchHandlerInterface
     /**
      * Add ACL Check condition to the Query Builder
      *
-     * @param QueryBuilder $queryBuilder
-     * @param $accessLevel
+     * @param QueryBuilder  $queryBuilder
+     * @param               $accessLevel
      * @param UserInterface $user
      */
     protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, UserInterface $user)
@@ -285,7 +275,6 @@ class UserAclHandler implements SearchHandlerInterface
     {
         return $this->securityContextLink->getService();
     }
-
 
     /**
      * Adds a condition excluding user from the list
