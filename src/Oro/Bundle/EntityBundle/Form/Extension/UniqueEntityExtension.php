@@ -72,7 +72,7 @@ class UniqueEntityExtension extends AbstractTypeExtension
             return;
         }
 
-        $uniqueKeys = $config->get('unique_key', ['keys' => []]);
+        $uniqueKeys = $config->get('unique_key', false, ['keys' => []]);
 
         /* @var \Symfony\Component\Validator\Mapping\ClassMetadata $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($className);

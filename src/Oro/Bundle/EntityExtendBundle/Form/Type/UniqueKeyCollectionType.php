@@ -8,19 +8,20 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysConstraint;
 
 class UniqueKeyCollectionType extends AbstractType
 {
     /**
-     * @var ConfigProvider
+     * @var ConfigProviderInterface|ConfigProvider
      */
     protected $entityProvider;
 
     /**
-     * @param ConfigProvider $entityProvider
+     * @param ConfigProviderInterface $entityProvider
      */
-    public function __construct(ConfigProvider $entityProvider)
+    public function __construct(ConfigProviderInterface $entityProvider)
     {
         $this->entityProvider = $entityProvider;
     }

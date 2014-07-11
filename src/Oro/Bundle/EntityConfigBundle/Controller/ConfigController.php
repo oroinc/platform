@@ -412,7 +412,7 @@ class ConfigController extends Controller
         $entityConfig         = $entityConfigProvider->getConfig($className);
         $translator           = $this->get('translator');
 
-        $uniqueKeys = $entityConfig->get('unique_key', ['keys' => []]);
+        $uniqueKeys = $entityConfig->get('unique_key', false, ['keys' => []]);
 
         foreach ($uniqueKeys['keys'] as $index => $uniqueKey) {
             $uniqueKeys['keys'][$index]['key'] = array_map(
