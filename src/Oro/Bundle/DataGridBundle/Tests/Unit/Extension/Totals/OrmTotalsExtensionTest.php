@@ -127,6 +127,8 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $metadata = MetadataObject::create([]);
         $this->extension->visitMetadata($this->config, $metadata);
         $totalsData = $metadata->offsetGet('state');
+        $initialTotalsData = $metadata->offsetGet('initialState');
+        $this->assertEquals($totalsData, $initialTotalsData);
         $this->assertEquals($this->config->offsetGetByPath(Configuration::TOTALS_PATH), $totalsData['totals']);
         $this->assertEquals('orodatagrid/js/totals-builder', $metadata->offsetGet('requireJSModules')[0]);
     }

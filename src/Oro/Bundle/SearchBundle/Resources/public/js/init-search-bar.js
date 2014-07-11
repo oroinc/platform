@@ -12,18 +12,11 @@ function($, _, routing, mediator) {
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
-          mediator.bind(
-              'hash_navigation_request:complete',
-              searchByTagClose,
-              this
-          );
+          mediator.bind('page:beforeChange', function () {
+              searchBarContainer.removeClass('header-search-focused');
+          });
 
-          mediator.bind('hash_navigation_request:form-start', function (form, settings) {
-              if ($(form).hasClass('search-form')) {
-                  var $searchString = $.trim($(form).find('.search').val());
-                  settings.form_validate = $searchString.length > 0;
-              }
-          }, this);
+          mediator.bind('page:afterChange', searchByTagClose);
 
           $(document).on('click', '.search-view-more-link', function(evt) {
               $('#top-search-form').submit();

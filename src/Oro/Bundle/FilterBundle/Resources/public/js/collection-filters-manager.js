@@ -29,6 +29,12 @@ define(['underscore', './filters-manager'
             FiltersManager.prototype.initialize.apply(this, arguments);
         },
 
+        render: function () {
+            FiltersManager.prototype.render.apply(this, arguments);
+            this._onUpdateCollectionState(this.collection);
+            return this;
+        },
+
         /**
          * Triggers when filter is updated
          *

@@ -38,6 +38,11 @@ class RequestParameterBagFactory
             $parameters = array();
         }
 
+        $minifiedParameters = $this->getMinifiedParameters($gridParameterName);
+        if ($minifiedParameters) {
+            $parameters[ParameterBag::MINIFIED_PARAMETERS] = $minifiedParameters;
+        }
+
         return new $this->parametersClass($parameters);
     }
 
@@ -49,5 +54,21 @@ class RequestParameterBagFactory
         if ($request instanceof Request) {
             $this->request = $request;
         }
+    }
+
+    /**
+     * @param string $gridParameterName
+     * @return null
+     */
+    protected function getMinifiedParameters($gridParameterName)
+    {
+        $gridData = $this->request->get(self::DEFAULT_ROOT_PARAM, array());
+        if (empty($gridData[$gridParameterName])) {
+            return null;
+        }
+
+        parse_str($gridData[$gridParameterName], $parameters);
+
+        return $parameters;
     }
 }

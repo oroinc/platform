@@ -64,19 +64,6 @@ datagrid:
 
     user-email-grid:
         extends: email-grid
-        properties:
-            view_link:
-                type: url
-                route: oro_email_view
-                params: [ id ]
-        actions:
-            update:
-                type:         navigate
-                label:        oro.email.datagrid.emails.action.view
-                link:         view_link
-                icon:         eye-open
-                acl_resource: oro_email_view
-                rowAction:    true
 
     dashboard-recent-emails-grid:
         source:
