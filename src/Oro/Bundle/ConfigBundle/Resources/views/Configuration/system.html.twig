@@ -36,7 +36,7 @@
         function ($, __, Mediator, Messenger, FormState, FormDefault, Modal) {
             'use strict';
 
-            $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
+            $('{{'#' ~ form.vars.name ~ ':input[type=reset]'}}').click(function (e) {
                 var $form = $(this).closest('form'),
                     $checkboxes = $form.find('.parent-scope-checkbox input'),
                     confirm = new Modal({
@@ -57,10 +57,10 @@
             });
 
             {% if pageReload %}
-                $('#{{ form.vars.name }}').submit(function() {
-                    Mediator.once('hash_navigation_request:refresh', function() {
+                $('{{ '#' ~ form.vars.name }}').submit(function() {
+                    Mediator.once('page:update', function() {
                         Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
-                        // force reaload without hash navigation
+                        // force reload without hash navigation
                         window.location.reload();
                     });
                 });
