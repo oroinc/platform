@@ -22,24 +22,26 @@
                     {% placeholder scripts_before %}
                 {% endblock %}
                 {% set requirejs_config_extend %}
-                    {% placeholder requirejs_config_extend %}
+                    {%- placeholder requirejs_config_extend -%}
                 {% endset %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {
                     compressed: not app.debug,
                     config_extend: requirejs_config_extend
                 } %}
+                {% block application %}
+                <script type="text/javascript">
+                    require(['oroui/js/app']);
+                </script>
+                {% endblock %}
                 <script type="text/javascript">
                     require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oroui/js/app'], function(app){app.debug = true;});
+                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
                 {% endif %}
                 </script>
-                {% block hash_nav %}
-                    {% placeholder hash_nav %}
-                {% endblock %}
                 {% placeholder scripts_after %}
                 {% block head_script %}
                 {% endblock %}

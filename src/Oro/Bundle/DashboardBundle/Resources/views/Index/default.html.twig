@@ -1,7 +1,13 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
-
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        {'label': 'oro.dashboard.menu.dashboards_tab.label'|trans },
+        {'label': dashboard.getLabel()|trans }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
 {% set allowEdit = resource_granted('EDIT', dashboard.entity) %}
@@ -12,7 +18,9 @@
                 {% block title %}
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
-                        <h1 class="oro-subtitle">{{ dashboard.getLabel()|trans }}</h1>
+                        <h1 class="oro-subtitle">
+                            {{ dashboard.getLabel()|trans }}
+                        </h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -75,30 +83,20 @@
                                 <select id="dashboard_selector">
                                     {% for dashboardModel in dashboards %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {{ dashboardModel.getLabel()|trans }}
+                                            {{ dashboardModel.getLabel()|trans|truncate(50) }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
 
                             <script type="text/javascript">
-                                require(['jquery', 'routing', 'oronavigation/js/navigation'],
-                                        function($, routing, Navigation){
-                                            $(function () {
-                                                $('#dashboard_selector').on('change', function (e) {
-                                                    var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true}),
-                                                            navigation = Navigation.getInstance();
-                                                    if (navigation) {
-                                                        navigation.processRedirect({
-                                                            fullRedirect: false,
-                                                            location: url
-                                                        });
-                                                    } else {
-                                                        location.href = url;
-                                                    }
-                                                });
-                                            });
-                                        });
+                                require(['jquery', 'routing', 'oroui/js/mediator'],
+                                function($, routing, mediator){
+                                    $('#dashboard_selector').on('change', function (e) {
+                                        var url = routing.generate('oro_dashboard_view', {id: $(e.currentTarget).val(), change_dashboard: true});
+                                        mediator.execute('redirectTo', {url: url, redirect: true});
+                                    });
+                                });
                             </script>
                         {% endif %}
                     {% endblock navButtons %}

@@ -1,8 +1,8 @@
 /*jshint devel: true, multistr: true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/app',
+define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools',
         './multiselect-decorator', './datafilter-wrapper'
-    ], function ($, _, Backbone, mediator, app, MultiselectDecorator, filterWrapper) {
+    ], function ($, _, Backbone, mediator, tools, MultiselectDecorator, filterWrapper) {
     'use strict';
 
     /**
@@ -99,14 +99,14 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/app',
             Backbone.View.prototype.initialize.apply(this, arguments);
 
             // destroy events bindings
-            mediator.once('hash_navigation_request:start', function () {
+            mediator.once('page:request', function () {
                 _.each(this.filters, function (filter) {
                     this.stopListening(filter, "update", this._onFilterUpdated);
                     this.stopListening(filter, "disable", this._onFilterDisabled);
                 }, this);
             }, this);
 
-            if (app.isMobile()) {
+            if (tools.isMobile()) {
                 this.collection.on('beforeFetch', this.closeDropdown, this);
             }
         },

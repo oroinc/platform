@@ -1,7 +1,7 @@
 /*global define*/
 /*jslint nomen:true*/
-define(['jquery', 'underscore', 'oroui/js/app', 'bootstrap'],
-function ($, _, app) {
+define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap'],
+function ($, _, tools) {
     'use strict';
 
     var defaults = {
@@ -115,7 +115,7 @@ function ($, _, app) {
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
                     }
-                    if (app.debug) {
+                    if (tools.debug) {
                         if (!_.isUndefined(err.message)) {
                             msg += ': ' + err.message;
                         } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
@@ -147,13 +147,15 @@ function ($, _, app) {
                 var args = [type, message, _.extend({flash: true}, options)];
                 var actions = {close: $.noop};
 
-                if (options.hashNavEnabled) {
+                queue.push([args, actions]);
+                // since navigation is always enabled, this condition does not make sense
+                /*if (options.hashNavEnabled) {
                     queue.push([args, actions]);
                 } else { // add message to localStorage or cookie
                     var flashMessages = getStoredMessages();
                     flashMessages.push([args, actions]);
                     setStoredMessages(flashMessages);
-                }
+                }*/
             }
         };
 });
