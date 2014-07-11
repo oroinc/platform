@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpProperty;
