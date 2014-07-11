@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 

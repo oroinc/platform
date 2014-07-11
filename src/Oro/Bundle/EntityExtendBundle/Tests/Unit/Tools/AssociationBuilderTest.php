@@ -28,9 +28,6 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->relationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->relationBuilder->expects($this->any())
-            ->method('getConfigManager')
-            ->will($this->returnValue($this->configManager));
     }
 
     public function testCreateManyToManyRelation()
@@ -39,7 +36,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->relationBuilder]
+            [$this->configManager, $this->relationBuilder]
         );
 
         $targetEntityConfig = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
@@ -114,7 +111,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->relationBuilder]
+            [$this->configManager, $this->relationBuilder]
         );
 
         $targetEntityConfig = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
@@ -177,15 +174,6 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                 'manyToOne|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
             );
 
-        $this->relationBuilder->expects($this->once())
-            ->method('addManyToOneRelationTargetSide')
-            ->with(
-                self::TARGET_CLASS,
-                self::SOURCE_CLASS,
-                'target_entity_98c95332',
-                'manyToOne|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
-            );
-
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
@@ -213,7 +201,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->will($this->returnValue($em));
 
-        $builder     = new AssociationBuilder($this->relationBuilder);
+        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -230,7 +218,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->will($this->throwException(new \ReflectionException('test')));
 
-        $builder     = new AssociationBuilder($this->relationBuilder);
+        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -247,7 +235,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->will($this->throwException(new MappingException('test')));
 
-        $builder     = new AssociationBuilder($this->relationBuilder);
+        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',

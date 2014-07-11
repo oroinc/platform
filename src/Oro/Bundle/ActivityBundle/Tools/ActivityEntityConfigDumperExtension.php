@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Tools;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\EntityExtendBundle\Tools\MultipleAssociationEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
 
 class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
 {

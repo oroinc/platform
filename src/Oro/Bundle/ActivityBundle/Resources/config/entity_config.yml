@@ -5,6 +5,7 @@ oro_entity_config:
                 # the list of activities that can be assigned to the entity
                 activities: # array of class names
                     options:
+                        require_schema_update: true
                         priority:           250
                         auditable:          false
                     form:
