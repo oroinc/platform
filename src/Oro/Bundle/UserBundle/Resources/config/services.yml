@@ -14,7 +14,6 @@ parameters:
     oro_user.role.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
     oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.entity_with_image.listener.class:    Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageListener
     oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider

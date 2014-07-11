@@ -181,7 +181,7 @@ define([
                 });
                 this.addressEditDialog.render();
                 mediator.on(
-                    "hash_navigation_request:start",
+                    "page:request",
                     _.bind(function () {
                         if (this.addressEditDialog) {
                             this.addressEditDialog.remove();
