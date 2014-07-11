@@ -25,7 +25,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles       = array();
+        $bundles = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -51,7 +51,7 @@ abstract class OroKernel extends Kernel
                     : new $class;
             }
         } else {
-            $file = $this->getCacheDir() . '/bundles.php';
+            $file  = $this->getCacheDir() . '/bundles.php';
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
@@ -124,12 +124,12 @@ abstract class OroKernel extends Kernel
             $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
-                $kernel = false;
+                $kernel   = false;
                 $priority = 0;
 
                 if (is_array($bundle)) {
-                    $class = $bundle['name'];
-                    $kernel = isset($bundle['kernel']) && true == $bundle['kernel'];
+                    $class    = $bundle['name'];
+                    $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
                     $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
                 } else {
                     $class = $bundle;
@@ -137,8 +137,8 @@ abstract class OroKernel extends Kernel
 
                 if (!isset($bundles[$class])) {
                     $bundles[$class] = array(
-                        'name' => $class,
-                        'kernel' => $kernel,
+                        'name'     => $class,
+                        'kernel'   => $kernel,
                         'priority' => $priority,
                     );
                 }
@@ -182,15 +182,20 @@ abstract class OroKernel extends Kernel
         return ($p1 < $p2) ? -1 : 1;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExitExpression)
+     */
     public function boot()
     {
         $phpVersion = phpversion();
 
-        include_once $this->getRootDir().'/OroRequirements.php';
+        include_once $this->getRootDir() . '/OroRequirements.php';
 
         if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
             die(sprintf(
-                'PHP version must be at least %s (%s installed)',
+                'PHP version must be at least %s (%s is installed)',
                 OroRequirements::REQUIRED_PHP_VERSION,
                 $phpVersion
             ));
