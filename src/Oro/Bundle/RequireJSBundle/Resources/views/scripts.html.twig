@@ -9,7 +9,7 @@
     <script type="text/javascript">
         var require = (function(){
             var r=function(c){m(r.c,c)};r.c={};function m(a,b){
-                for (var i in b)b[i].toString()==='[object Object]'?m(a[i]||(a[i]={}),b[i]):a[i]=b[i]}
+                for (var i in b)b[i]!=null&&b[i].toString()==='[object Object]'?m(a[i]||(a[i]={}),b[i]):a[i]=b[i]}
             return r;
         }());
         {{ config_extend|raw }}

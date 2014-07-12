@@ -66,7 +66,6 @@ config:
         'orodatagrid/js/datagrid/grid-views/collection': 'bundles/orodatagrid/js/datagrid/grid-views/collection.js'
         'orodatagrid/js/datagrid/pagination-input': 'bundles/orodatagrid/js/datagrid/pagination-input.js'
         'orodatagrid/js/datagrid/pagination': 'bundles/orodatagrid/js/datagrid/pagination.js'
-        'orodatagrid/js/datagrid/router': 'bundles/orodatagrid/js/datagrid/router.js'
         'orodatagrid/js/datagrid/row': 'bundles/orodatagrid/js/datagrid/row.js'
         'orodatagrid/js/datagrid/toolbar': 'bundles/orodatagrid/js/datagrid/toolbar.js'
         'orodatagrid/js/datagrid-builder': 'bundles/orodatagrid/js/datagrid-builder.js'

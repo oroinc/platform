@@ -30,8 +30,8 @@ class MassActionDispatcher
 
     public function __construct(ContainerInterface $container, Manager $manager)
     {
-        $this->container     = $container;
-        $this->manager       = $manager;
+        $this->container = $container;
+        $this->manager   = $manager;
     }
 
     /**

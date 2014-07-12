@@ -28,7 +28,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator'
             };
             onCollectionSet = _.bind(initHandler, self);
             mediator.once('datagrid_collection_set_after', onCollectionSet);
-            mediator.once('hash_navigation_request:start', function () {
+            mediator.once('page:request', function () {
                 mediator.off('datagrid_collection_set_after', onCollectionSet);
             });
         }

@@ -18,7 +18,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
             form: null,
 
             initialize: function () {
-                mediator.once('hash_navigation_request:start', this._onDestroyHandler, this);
+                mediator.once('page:request', this._onDestroyHandler, this);
 
                 this.form = $('.system-configuration-container').parents('form');
                 $(window).on(this.LOAD_EVENT, _.bind(this._collectHandler, this));
@@ -27,11 +27,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
                 $(window).on(this.UNLOAD_EVENT, _.bind(function () {
                     if (this.isChanged()) {
                         return this.CONFIRMATION_MESSAGE;
-                    } else {
-                        return null;
                     }
                 }, this));
-                mediator.on('hash_navigation_click', this._confirmHashChange, this);
+                mediator.on('openLink:before', this._confirmOpenLink, this);
             },
 
             /**
@@ -73,9 +71,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
              * @param event
              * @private
              */
-            _confirmHashChange: function (event) {
+            _confirmOpenLink: function (event) {
                 if (this.isChanged()) {
-                    event.stoppedProcess = !confirm(this.CONFIRMATION_MESSAGE);
+                    event.prevented = !confirm(this.CONFIRMATION_MESSAGE);
                 }
             },
 
@@ -96,11 +94,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
             _onDestroyHandler: function () {
                 if (_.isNull(this.data)) {
                     // data was not collected disable listener
-                    mediator.off('hash_navigation_request:complete', this._collectHandler, this);
+                    mediator.off('page:afterChange', this._collectHandler, this);
                 } else {
                     this.data = null;
                 }
-                mediator.off('hash_navigation_click', this._confirmHashChange, this);
+                mediator.off('openLink:before', this._confirmOpenLink, this);
                 $(window).off(this.UNLOAD_EVENT);
                 $(document).off(this.LOAD_EVENT);
             }

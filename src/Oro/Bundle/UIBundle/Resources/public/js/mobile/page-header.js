@@ -26,7 +26,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
     return {
         init: function () {
             updatePageHeader();
-            mediator.on('hash_navigation_request:complete', updatePageHeader);
+            mediator.on('page:afterChange', updatePageHeader);
         }
     };
 });
