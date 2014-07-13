@@ -90,7 +90,9 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
             }
 
             $this->logQuery($logger, $updateSql, $params, $types);
-            $this->connection->executeUpdate($updateSql, $params, $types);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($updateSql, $params, $types);
+            }
         }
     }
 }
