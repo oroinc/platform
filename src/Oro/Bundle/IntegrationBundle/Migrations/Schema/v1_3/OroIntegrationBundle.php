@@ -6,10 +6,19 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroIntegrationBundle implements Migration
+class OroIntegrationBundle implements Migration, OrderedMigrationInterface
 {
+    /**
+     * @inheritdoc
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
+
     /**
      * @inheritdoc
      */
@@ -20,8 +29,6 @@ class OroIntegrationBundle implements Migration
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('synchronization_settings', Type::TEXT, ['notnull' => true, 'comment' => '(DC2Type:object)']);
         $table->addColumn('mapping_settings', Type::TEXT, ['notnull' => true, 'comment' => '(DC2Type:object)']);
-        $table->dropColumn('is_two_way_sync_enabled');
-        $table->dropColumn('sync_priority');
 
         $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
         $table->addForeignKeyConstraint(
