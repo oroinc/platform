@@ -9,11 +9,6 @@ datagrid:
                     - @oro_email.datagrid_query_factory->getFromEmailExpression
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
-                join:
-                    inner:
-                        from_email_address:
-                            join: e.fromEmailAddress
-                            alias: a
 
         columns:
             fromEmailAddress:
@@ -21,6 +16,11 @@ datagrid:
                 label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+            recipients:
+                type: twig
+                label: oro.email.recipients.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
@@ -29,11 +29,6 @@ datagrid:
             sentAt:
                 label: oro.email.sent_at.label
                 frontend_type: datetime
-            recipients:
-                type: twig
-                label: oro.email.recipients.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
         properties:
             id: ~
         sorters:
@@ -53,6 +48,11 @@ datagrid:
 
     email-grid:
         extends: base-email-grid
+        source:
+            query:
+                join:
+                    inner:
+                        - { join: e.fromEmailAddress, alias: a }
         filters:
             columns:
                 fromEmailAddress: { type: string,   data_name: a.email }
