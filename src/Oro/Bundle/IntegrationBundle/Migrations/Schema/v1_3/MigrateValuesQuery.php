@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
@@ -15,13 +16,25 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Move integration settings from flat separated fields to serialized single field';
+        $logger = new ArrayLogger();
+        $logger->info('Move integration settings from flat separated fields to serialized single field');
+        $this->doExecute($logger, true);
+
+        return $logger->getMessages();
     }
 
     /**
      * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
+    {
+        $this->doExecute($logger);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $sql = 'SELECT id, is_two_way_sync_enabled, sync_priority FROM oro_integration_channel';
         $this->logQuery($logger, $sql);
@@ -33,11 +46,23 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $params, $types);
         $organizationId = $this->connection->fetchColumn($sql, $params);
 
+        // if default organization not found - assign on first exists
+        if (false === $organizationId) {
+            $sql = 'SELECT id FROM oro_organization';
+            $this->logQuery($logger, $sql);
+            $organizationIds = array_map(
+                function ($row) {
+                    return $row['id'];
+                },
+                $this->connection->fetchAll($sql)
+            );
+            $organizationId  = min($organizationIds);
+        }
+
         $updateSql = 'UPDATE oro_integration_channel SET ' .
             'synchronization_settings = :syncSettings, ' .
             'mapping_settings = :mappingSettings, ' .
-            'enabled = :enabled, ' .
-            'organization_id = :organizationId ' .
+            'enabled = :enabled ' . ($organizationId ? ', organization_id = :organizationId ' : '') .
             'WHERE id = :id';
 
         foreach ($values as $row) {
@@ -45,21 +70,24 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
                 'syncSettings'    => ConfigObject::create(
                     [
                         'isTwoWaySyncEnabled' => (bool)$row['is_two_way_sync_enabled'],
-                        'syncPriority'        => (bool)$row['sync_priority']
+                        'syncPriority'        => $row['sync_priority']
                     ]
                 ),
                 'mappingSettings' => ConfigObject::create([]),
                 'enabled'         => 1,
-                'organizationId'  => $organizationId,
                 'id'              => $row['id']
             ];
             $types  = [
                 'syncSettings'    => 'object',
                 'mappingSettings' => 'object',
                 'enabled'         => 'integer',
-                'organizationId'  => 'integer',
                 'id'              => 'integer'
             ];
+
+            if ($organizationId) {
+                $params['organizationId'] = $organizationId;
+                $types['organizationId']  = 'integer';
+            }
 
             $this->logQuery($logger, $updateSql, $params, $types);
             $this->connection->executeUpdate($updateSql, $params, $types);
