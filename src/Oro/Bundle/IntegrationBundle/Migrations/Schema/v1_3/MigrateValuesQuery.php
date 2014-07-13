@@ -37,15 +37,15 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
             'synchronization_settings = :syncSettings, ' .
             'mapping_settings = :mappingSettings, ' .
             'enabled = :enabled, ' .
-            'organization_id = :organizationId' .
+            'organization_id = :organizationId ' .
             'WHERE id = :id';
 
         foreach ($values as $row) {
             $params = [
                 'syncSettings'    => ConfigObject::create(
                     [
-                        'isTwoWaySyncEnabled' => $row['is_two_way_sync_enabled'],
-                        'syncPriority'        => $row['sync_priority']
+                        'isTwoWaySyncEnabled' => (bool)$row['is_two_way_sync_enabled'],
+                        'syncPriority'        => (bool)$row['sync_priority']
                     ]
                 ),
                 'mappingSettings' => ConfigObject::create([]),
