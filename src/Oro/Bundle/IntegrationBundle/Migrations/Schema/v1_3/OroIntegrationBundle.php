@@ -5,9 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroIntegrationBundle implements Migration, OrderedMigrationInterface
 {
@@ -38,5 +38,7 @@ class OroIntegrationBundle implements Migration, OrderedMigrationInterface
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_55B9B9C532C8A3DE'
         );
+
+        $queries->addPostQuery(new MigrateValuesQuery());
     }
 }
