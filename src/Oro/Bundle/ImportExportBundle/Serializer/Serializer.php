@@ -14,6 +14,8 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class Serializer extends BaseSerializer implements DenormalizerInterface, NormalizerInterface
 {
+    const PROCESSOR_ALIAS_KEY = 'processorAlias';
+
     /**
      * {@inheritdoc}
      */
@@ -31,20 +33,22 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = array())
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        if (isset($this->denormalizerCache[$type][$format])) {
-            return $this->denormalizerCache[$type][$format]->denormalize($data, $type, $format, $context);
+        $cacheKey = md5($type . $format . $this->getProcessorAlias($context));
+
+        if (isset($this->denormalizerCache[$cacheKey])) {
+            return $this->denormalizerCache[$cacheKey]->denormalize($data, $type, $format, $context);
         }
 
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface
                 && $normalizer->supportsDenormalization($data, $type, $format, $context)) {
-                $this->denormalizerCache[$type][$format] = $normalizer;
+                $this->denormalizerCache[$cacheKey] = $normalizer;
 
                 return $normalizer->denormalize($data, $type, $format, $context);
             }
@@ -53,6 +57,18 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         throw new UnexpectedValueException(
             sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type)
         );
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return string
+     */
+    protected function getProcessorAlias(array $context)
+    {
+        return !empty($context[self::PROCESSOR_ALIAS_KEY])
+            ? $context[self::PROCESSOR_ALIAS_KEY]
+            : '';
     }
 
     /**
