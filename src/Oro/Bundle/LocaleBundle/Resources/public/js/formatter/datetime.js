@@ -61,7 +61,7 @@ define(['../locale-settings', 'moment'
          * @returns {*}
          */
         isDateValid: function (value) {
-            return moment(value, [this.getDateFormat(), 'YYYY-MM-DD'], true).isValid();
+            return moment(value, this.getDateFormat(), true).isValid();
         },
 
         /**
