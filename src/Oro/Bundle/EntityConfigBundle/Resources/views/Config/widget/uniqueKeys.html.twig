@@ -3,8 +3,8 @@
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {% if unique_key is not empty %}
-                {% for key in unique_key.keys|default %}
+            {% if unique_key.keys is not empty %}
+                {% for key in unique_key.keys %}
                     {{ ui.renderProperty(key.name, key.key|join(', ')) }}
                 {% endfor %}
             {% else %}

@@ -37,11 +37,13 @@
         {% set name = widget.vars.full_name %}
     {% endif %}
     <div data-content="{{ name }}">
-        <div class="row-oro oro-multiselect-holder">
+        <div class="row-oro oro-multiselect-holder unique-keys">
+            <a class="removeRow pull-right" href="javascript: void(0);" type="button" data-related="{{ name }}">
+                <i class="icon-remove"></i>
+            </a>
             {{ form_errors(form) }}
             {{ form_row(form.name) }}
             {{ form_row(form.key) }}
-            <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
         </div>
     </div>
 {% endmacro %}
@@ -54,7 +56,7 @@
                     {{ _self.unique_collection_prototype(field) }}
                 {% endfor %}
             </div>
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+            <a class="btn add-list-item pull-left" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
         </div>
     {% endspaceless %}
 {% endblock unique_collection_widget %}
@@ -62,7 +64,7 @@
 {% block content_data %}
     {% set id = 'configentity-unique' %}
     {% set dataBlocks = [{
-            'title': 'Unique Keys'|trans,
+            'title': 'oro.entity_extend.unique_keys'|trans,
             'class': 'active',
             'subblocks': [
                 {
