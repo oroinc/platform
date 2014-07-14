@@ -24,6 +24,18 @@ class OroIntegrationBundle implements Migration, OrderedMigrationInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::modifyChannelTable($schema);
+
+        $queries->addPostQuery(new MigrateValuesQuery());
+    }
+
+    /**
+     * Change oro_integration_channel table
+     *
+     * @param Schema $schema
+     */
+    public static function modifyChannelTable(Schema $schema)
+    {
         $table = $schema->getTable('oro_integration_channel');
         $table->addColumn('enabled', 'boolean', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
@@ -38,7 +50,5 @@ class OroIntegrationBundle implements Migration, OrderedMigrationInterface
             ['onDelete' => 'SET NULL', 'onUpdate' => null],
             'FK_55B9B9C532C8A3DE'
         );
-
-        $queries->addPostQuery(new MigrateValuesQuery());
     }
 }

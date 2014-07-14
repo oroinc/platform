@@ -95,7 +95,7 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
      *
      * @param LoggerInterface $logger
      *
-     * @return null|integer
+     * @return false|integer
      */
     protected function getDefaultOrganizationId(LoggerInterface $logger)
     {
@@ -114,7 +114,10 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
                 },
                 $this->connection->fetchAll($sql)
             );
-            $organizationId  = min($organizationIds);
+
+            if (!empty($organizationIds)) {
+                $organizationId = min($organizationIds);
+            }
         }
 
         return $organizationId;
