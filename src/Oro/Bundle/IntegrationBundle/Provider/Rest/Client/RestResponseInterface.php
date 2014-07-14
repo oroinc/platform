@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
-use OroCRM\Bundle\ZendeskBundle\Exception\RestException;
+use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
 interface RestResponseInterface
 {

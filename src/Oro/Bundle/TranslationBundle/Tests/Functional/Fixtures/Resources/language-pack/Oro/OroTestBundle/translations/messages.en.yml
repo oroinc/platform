@@ -1,0 +1,17 @@
+oro.navigation.help.title: 'How To Use Pinbar'
+oro.navigation.help.save: 'Use the Pin Bar to “pin” documents and pages you want to continuously work on by clicking on the minimize button while on a specific page.'
+oro.navigation.help.restore: 'To restore a page simply click on the title of the page you want to work on so that it is maximized back to your working area.'
+oro.navigation.menu.pinbar.label: Pinbar
+oro.navigation.menu.history.label: History
+oro.navigation.menu.favorite.label: Favorites
+oro.navigation.menu.mostviewed.label: 'Most Viewed'
+'Shortcut Actions List': 'Shortcut Actions List'
+'Action Name': 'Action Name'
+'Sorry, you don''t have any action': 'Sorry, you don''t have any action'
+'No items': 'No items'
+'Example: Create user, Users list': 'Example: Create user, Users list'
+'See full list': 'See full list'
+'Most Used Actions': 'Most Used Actions'
+'Learn how to use this space': 'Learn how to use this space'
+'Mark/unmark the page as favorite': 'Mark/unmark the page as favorite'
+'Pin/unpin the page': 'Pin/unpin the page'
