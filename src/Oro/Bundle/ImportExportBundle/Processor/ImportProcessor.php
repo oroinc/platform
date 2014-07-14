@@ -83,7 +83,7 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
     public function process($item)
     {
         if ($this->dataConverter) {
-            $item = $this->dataConverter->convertToImportFormat($item);
+            $item = $this->dataConverter->convertToImportFormat($item, false);
         }
 
         $object = $this->serializer->deserialize(
@@ -94,7 +94,7 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         );
 
         if ($this->strategy) {
-            $object = $this->strategy->process($object);
+            $object = $this->strategy->process($object, $item);
         }
 
         return $object ?: null;

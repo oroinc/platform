@@ -68,13 +68,14 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * {@inheritdoc}
+     * @param array $importedAttributes optional
      */
-    public function process($entity)
+    public function process($entity, $importedAttributes = array())
     {
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = array();
-        $entity = $this->processEntity($entity, true, true);
+        $entity = $this->processEntity($entity, true, true, $importedAttributes);
         $entity = $this->validateAndUpdateContext($entity);
 
         return $entity;
@@ -82,11 +83,12 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * @param object $entity
-     * @param bool $isFullData optional
-     * @param bool $isPersistNew optional
+     * @param bool   $isFullData optional
+     * @param bool   $isPersistNew optional
+     * @param array  $importedAttributes optional
      * @return null|object
      */
-    protected function processEntity($entity, $isFullData = false, $isPersistNew = false)
+    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, $importedAttributes = array())
     {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
@@ -119,13 +121,14 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                 $identifierName = $this->getEntityIdentifierFieldName($entityName);
                 $excludedFields = array($identifierName);
 
-                foreach ($fields as $field) {
+                foreach ($fields as $key => $field) {
                     $fieldName = $field['name'];
                     if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                        || !$isFullData
+                        || (!empty($importedAttributes) && !array_key_exists($fieldName, $importedAttributes))
                         && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
                     ) {
                         $excludedFields[] = $fieldName;
+                        unset($fields[$key]); // In order to fields which excluded, update relations will not performed
                     }
                 }
 
@@ -213,16 +216,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                     $identityValues[$fieldName] = $this->fieldHelper->getObjectValue($entity, $fieldName);
                 }
             }
-            if ($identityValues) {
-                $hasIdentityValues = false;
-                foreach ($identityValues as $value) {
-                    if (null !== $value && '' !== $value) {
-                        $hasIdentityValues = true;
-                        break;
-                    }
-                }
-                if ($hasIdentityValues) {
+
+            foreach ($identityValues as $value) {
+                if (null !== $value && '' !== $value) {
                     $existingEntity = $entityManager->getRepository($entityName)->findOneBy($identityValues);
+                    break;
                 }
             }
         }

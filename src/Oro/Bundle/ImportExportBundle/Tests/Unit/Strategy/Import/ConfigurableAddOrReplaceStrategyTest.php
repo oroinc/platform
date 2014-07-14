@@ -128,13 +128,37 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      * @param array       $identifier
      * @param object|null $existingEntity
      * @param array       $objectValue
+     * @param array       $importedAttributes optional
      *
      * @dataProvider entityProvider
      */
-    public function testProcess($className, array $fields, array $identifier, $existingEntity, array $objectValue)
-    {
+    public function testProcess(
+        $className,
+        array $fields,
+        array $identifier,
+        $existingEntity,
+        array $objectValue,
+        $importedAttributes = array()
+    ) {
         $singleIdentifier = !empty($identifier[0]) ? $identifier[0] : null;
         $object           = new $className;
+
+        if ($existingEntity) {
+            $this->importStrategyHelper
+                ->expects($this->once())
+                ->method('importEntity')
+                ->with(
+                    $existingEntity,
+                    $object,
+                    $this->calcExcludedFields($fields, $singleIdentifier, $importedAttributes)
+                )
+                ->will($this->returnSelf());
+
+        } else {
+            $this->importStrategyHelper
+                ->expects($this->never())
+                ->method('importEntity');
+        }
 
         $this->fieldHelper
             ->expects($this->atLeastOnce())
@@ -152,8 +176,15 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         return isset($field[$type]) ? $field[$type] : $default;
                     }
                 )
-            );
+            );$this->metadata
+            ->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue($singleIdentifier));
 
+        $this->metadata
+            ->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue($singleIdentifier));
         $this->metadata
             ->expects($this->atLeastOnce())
             ->method('getIdentifierValues')
@@ -194,7 +225,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName($className);
 
-        $this->strategy->process($object);
+        $this->strategy->process($object, $importedAttributes);
     }
 
     /**
@@ -204,55 +235,84 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $object = new ImportEntity();
 
-        return [
-            'empty'        => [
+        return array(
+            'empty' => array(
                 'className'      => self::ENTITY,
                 'fields'         => [],
                 'identifier'     => [],
                 'existingEntity' => null,
                 'objectValue'    => []
-            ],
-            'existing'     => [
+            ),
+            'not_existing' => array(
                 'className'      => self::ENTITY,
-                'fields'         => [
-                    'identity' => [
+                'fields'         => array(
+                    'identity' => array(
                         'name'     => 'identity',
                         'excluded' => false,
                         'identity' => true,
-                    ],
-                    'excluded' => [
+                    ),
+                    'excluded' => array(
                         'name'     => 'excluded',
                         'excluded' => true,
                         'identity' => false,
-                    ],
-                ],
-                'identifier'     => ['id'],
-                'existingEntity' => $object,
-                'objectValue'    => [
-                    'identity' => 'value'
-                ]
-            ],
-            'not_existing' => [
-                'className'      => self::ENTITY,
-                'fields'         => [
-                    'identity' => [
-                        'name'     => 'identity',
-                        'excluded' => false,
-                        'identity' => true,
-                    ],
-                    'excluded' => [
-                        'name'     => 'excluded',
-                        'excluded' => true,
-                        'identity' => false,
-                    ],
-                ],
-                'identifier'     => ['id'],
+                    ),
+                ),
+                'identifier'     => array('id'),
                 'existingEntity' => null,
-                'objectValue'    => [
+                'objectValue'    => array(
                     'identity' => 'value'
-                ]
-            ]
-        ];
+                )
+            ),
+            'existing and full fields import' => array(
+                'className' => self::ENTITY,
+                'fields'    => array(
+                    'identity' => array(
+                        'name'     => 'identity',
+                        'excluded' => false,
+                        'identity' => true,
+                    ),
+                    'excluded' => array(
+                        'name'     => 'excluded',
+                        'excluded' => true,
+                        'identity' => false,
+                    ),
+                ),
+                'identifier'     => array('id'),
+                'existingEntity' => $object,
+                'objectValue'    => array(
+                    'identity' => 'value'
+                )
+            ),
+            'existing and several fields import' => array(
+                'className' => self::ENTITY,
+                'fields'    => array(
+                    'identity' => array(
+                        'name'     => 'identity',
+                        'excluded' => false,
+                        'identity' => true,
+                    ),
+                    'imported' => array(
+                        'name'     => 'imported',
+                        'excluded' => false,
+                        'identity' => false,
+                    ),
+                    'not-imported' => array(
+                        'name'     => 'not-imported',
+                        'excluded' => false,
+                        'identity' => false,
+                    ),
+                ),
+                'identifier'     => array('id'),
+                'existingEntity' => $object,
+                'objectValue'    => array(
+                    'identity' => 'value',
+                ),
+                'importedAttributes' => array(
+                    'identity' => 'value',
+                    'imported' => 'value'
+                )
+            ),
+        );
     }
 
     /**
@@ -415,5 +475,28 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setEntityName(self::ENTITY);
 
         $this->strategy->process($object);
+    }
+
+    /**
+     * @param array  $fields
+     * @param string $singleIdentifier
+     * @param array  $importedAttributes optional
+     * @return array
+     */
+    protected function calcExcludedFields($fields, $singleIdentifier, $importedAttributes = array())
+    {
+        $excludedFields = array($singleIdentifier);
+
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if ($field['excluded']
+                || (!empty($importedAttributes) && !array_key_exists($fieldName, $importedAttributes))
+                && !$field['identity']
+            ) {
+                $excludedFields[] = $fieldName;
+            }
+        }
+
+        return $excludedFields;
     }
 }
