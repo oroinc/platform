@@ -19,6 +19,7 @@ class DataGridExtension extends \Twig_Extension
     /** @var RouterInterface */
     protected $router;
 
+    /** @var SecurityFacade $securityFacade */
     protected $securityFacade;
 
     /**
