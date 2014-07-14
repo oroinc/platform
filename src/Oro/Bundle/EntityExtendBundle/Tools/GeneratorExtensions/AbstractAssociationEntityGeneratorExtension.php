@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 
 use Doctrine\Common\Util\Inflector;
 
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * This class provides PHP code generation logic for entities with associations.

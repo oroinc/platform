@@ -12,6 +12,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
+use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
+
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
@@ -115,6 +117,8 @@ class ConfigController extends Controller
             'entity'        => $entity,
             'entity_config' => $entityConfigProvider->getConfig($entity->getClassName()),
             'form'          => $form->createView(),
+            'entity_count'  => $this->getRowCount($entity),
+            'link'          => $this->getRowCountLink($entity),
         ];
     }
 
@@ -131,57 +135,20 @@ class ConfigController extends Controller
      */
     public function viewAction(EntityConfigModel $entity)
     {
-        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
-
-        /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
-        /** @var ConfigProvider $extendConfigProvider */
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
-        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
-
-        /**
-         * TODO
-         * refactor and place into Helper class
-         */
-        // generate link for Entity grid
-        $link = '';
-        /** @var EntityMetadata $metadata */
-        if (class_exists($entity->getClassName())) {
-            $metadata = $configManager->getEntityMetadata($entity->getClassName());
-            if ($metadata && $metadata->routeName) {
-                $link = $this->generateUrl($metadata->routeName);
-            }
-
-            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                $link = $this->generateUrl(
-                    'oro_entity_index',
-                    ['id' => str_replace('\\', '_', $entity->getClassName())]
-                );
-            }
-
-            /** @var QueryBuilder $qb */
-            $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
-            $qb->select('count(entity)');
-            $qb->from($entity->getClassName(), 'entity');
-            $entityCount = $qb->getQuery()->getSingleScalarResult();
-        } else {
-            $entityCount = 0;
-        }
-
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
         list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
 
         return [
-            'entity'           => $entity,
-            'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
-            'entity_count'     => $entityCount,
-            'link'             => $link,
-            'entity_name'      => $entityName,
-            'button_config'    => $layoutActions,
-            'require_js'       => $requireJsModules,
+            'entity'        => $entity,
+            'entity_config' => $entityConfigProvider->getConfig($entity->getClassName()),
+            'entity_count'  => $this->getRowCount($entity),
+            'link'          => $this->getRowCountLink($entity),
+            'entity_name'   => $entityName,
+            'button_config' => $layoutActions,
+            'require_js'    => $requireJsModules,
         ];
     }
 
@@ -316,55 +283,6 @@ class ConfigController extends Controller
     }
 
     /**
-     * Return configured layout actions and requirejs modules
-     *
-     * @param  EntityConfigModel $entity
-     * @return array
-     */
-    protected function getLayoutParams(EntityConfigModel $entity)
-    {
-        $configManager    = $this->get('oro_entity_config.config_manager');
-        $actions          = [];
-        $requireJsModules = [];
-
-        foreach ($configManager->getProviders() as $provider) {
-            $layoutActions = $provider->getPropertyConfig()->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
-            foreach ($layoutActions as $config) {
-                if (isset($config['filter'])) {
-                    foreach ($config['filter'] as $key => $value) {
-                        if (is_array($value)) {
-                            $error = true;
-                            foreach ($value as $v) {
-                                if ($provider->getConfig($entity->getClassName())->get($key) == $v) {
-                                    $error = false;
-                                }
-                            }
-                            if ($error) {
-                                continue 2;
-                            }
-                        } elseif ($provider->getConfig($entity->getClassName())->get($key) != $value) {
-                            continue 2;
-                        }
-                    }
-                }
-
-                if (isset($config['entity_id']) && $config['entity_id'] == true) {
-                    $config['args'] = ['id' => $entity->getId()];
-                }
-
-                $actions[] = $config;
-            }
-
-            $requireJsModules = array_merge(
-                $requireJsModules,
-                $provider->getPropertyConfig(PropertyConfigContainer::TYPE_FIELD)->getRequireJsModules()
-            );
-        }
-
-        return [$actions, $requireJsModules];
-    }
-
-    /**
      * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
      * @Template
      */
@@ -381,9 +299,9 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-        $ownerTypes = $this->get('oro_organization.method.get_ownership_type')->execute();
-        $ownerType = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
-        $ownerType = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
+        $ownerTypes              = $this->get('oro_organization.method.get_ownership_type')->execute();
+        $ownerType               = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
+        $ownerType               = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
         return [
             'entity'            => $entity,
@@ -440,5 +358,103 @@ class ConfigController extends Controller
     public function entityFieldsAction(EntityConfigModel $entity)
     {
         return ['entity' => $entity];
+    }
+
+    /**
+     * @param EntityConfigModel $entity
+     * @return int
+     */
+    protected function getRowCount(EntityConfigModel $entity)
+    {
+        if (class_exists($entity->getClassName())) {
+            /** @var QueryBuilder $qb */
+            $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
+            $qb->select('entity');
+            $qb->from($entity->getClassName(), 'entity');
+
+            return QueryCountCalculator::calculateCount($qb->getQuery());
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param EntityConfigModel $entity
+     * @return string
+     */
+    protected function getRowCountLink(EntityConfigModel $entity)
+    {
+        $link = '';
+        if (class_exists($entity->getClassName())) {
+            /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
+            $configManager = $this->get('oro_entity_config.config_manager');
+
+            /** @var ConfigProvider $extendConfigProvider */
+            $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+            $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+
+            $metadata = $configManager->getEntityMetadata($entity->getClassName());
+            if ($metadata && $metadata->routeName) {
+                $link = $this->generateUrl($metadata->routeName);
+            }
+
+            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                $link = $this->generateUrl(
+                    'oro_entity_index',
+                    ['id' => str_replace('\\', '_', $entity->getClassName())]
+                );
+            }
+        }
+
+        return $link;
+    }
+
+    /**
+     * Return configured layout actions and requirejs modules
+     *
+     * @param  EntityConfigModel $entity
+     * @return array
+     */
+    protected function getLayoutParams(EntityConfigModel $entity)
+    {
+        $configManager    = $this->get('oro_entity_config.config_manager');
+        $actions          = [];
+        $requireJsModules = [];
+
+        foreach ($configManager->getProviders() as $provider) {
+            $layoutActions = $provider->getPropertyConfig()->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
+            foreach ($layoutActions as $config) {
+                if (isset($config['filter'])) {
+                    foreach ($config['filter'] as $key => $value) {
+                        if (is_array($value)) {
+                            $error = true;
+                            foreach ($value as $v) {
+                                if ($provider->getConfig($entity->getClassName())->get($key) == $v) {
+                                    $error = false;
+                                }
+                            }
+                            if ($error) {
+                                continue 2;
+                            }
+                        } elseif ($provider->getConfig($entity->getClassName())->get($key) != $value) {
+                            continue 2;
+                        }
+                    }
+                }
+
+                if (isset($config['entity_id']) && $config['entity_id'] == true) {
+                    $config['args'] = ['id' => $entity->getId()];
+                }
+
+                $actions[] = $config;
+            }
+
+            $requireJsModules = array_merge(
+                $requireJsModules,
+                $provider->getPropertyConfig(PropertyConfigContainer::TYPE_FIELD)->getRequireJsModules()
+            );
+        }
+
+        return [$actions, $requireJsModules];
     }
 }

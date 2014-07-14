@@ -6,6 +6,8 @@ parameters:
     oro_entity_extend.type.option_set.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetType
     oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
 
+    oro_entity_extend.type.text.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\TextType
+    oro_entity_extend.type.choice.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
     oro_entity_extend.type.association_choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
     oro_entity_extend.type.multiple_association_choice.class:   Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType
 
@@ -45,6 +47,20 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_option_set_collection }
+
+    oro_entity_extend.type.text:
+        class: %oro_entity_extend.type.text.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_text }
+
+    oro_entity_extend.type.choice:
+        class: %oro_entity_extend.type.choice.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_choice }
 
     oro_entity_extend.type.association_choice:
         class: %oro_entity_extend.type.association_choice.class%
