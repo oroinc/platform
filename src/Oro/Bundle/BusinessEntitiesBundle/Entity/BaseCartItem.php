@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use OroCRM\Bundle\MagentoBundle\Entity\Cart;
 
 /**
  * Class BasePerson
@@ -131,13 +130,13 @@ class BaseCartItem
     /**
      * @param mixed $cart
      */
-    public function setCart($cart)
+    public function setCart(BaseCart $cart)
     {
         $this->cart = $cart;
     }
 
     /**
-     * @return Cart
+     * @return BaseCart
      */
     public function getCart()
     {
