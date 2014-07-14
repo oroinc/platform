@@ -20,7 +20,7 @@ oro_entity_config:
                         priority:           250
                         default_value:      true
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             label:          oro.workflow.entity_config.show_step_in_grid.label
                             required:       false

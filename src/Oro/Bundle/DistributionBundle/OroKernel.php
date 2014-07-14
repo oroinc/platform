@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
+use OroRequirements;
+
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
@@ -23,7 +25,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles       = [];
+        $bundles = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -49,7 +51,7 @@ abstract class OroKernel extends Kernel
                     : new $class;
             }
         } else {
-            $file = $this->getCacheDir() . '/bundles.php';
+            $file  = $this->getCacheDir() . '/bundles.php';
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
@@ -71,9 +73,9 @@ abstract class OroKernel extends Kernel
      * @param array $roots
      * @return array
      */
-    protected function findBundles($roots = [])
+    protected function findBundles($roots = array())
     {
-        $paths = [];
+        $paths = array();
         foreach ($roots as $root) {
             if (!is_dir($root)) {
                 continue;
@@ -113,21 +115,21 @@ abstract class OroKernel extends Kernel
     protected function collectBundles()
     {
         $files = $this->findBundles(
-            [
+            array(
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
-            ]
+            )
         );
         foreach ($files as $file) {
             $import = Yaml::parse($file);
 
             foreach ($import['bundles'] as $bundle) {
-                $kernel = false;
+                $kernel   = false;
                 $priority = 0;
 
                 if (is_array($bundle)) {
-                    $class = $bundle['name'];
-                    $kernel = isset($bundle['kernel']) && true == $bundle['kernel'];
+                    $class    = $bundle['name'];
+                    $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
                     $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
                 } else {
                     $class = $bundle;
@@ -135,8 +137,8 @@ abstract class OroKernel extends Kernel
 
                 if (!isset($bundles[$class])) {
                     $bundles[$class] = array(
-                        'name' => $class,
-                        'kernel' => $kernel,
+                        'name'     => $class,
+                        'kernel'   => $kernel,
                         'priority' => $priority,
                     );
                 }
@@ -178,6 +180,28 @@ abstract class OroKernel extends Kernel
 
         // sort be priority
         return ($p1 < $p2) ? -1 : 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExitExpression)
+     */
+    public function boot()
+    {
+        $phpVersion = phpversion();
+
+        include_once $this->getRootDir() . '/OroRequirements.php';
+
+        if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
+            die(sprintf(
+                'PHP version must be at least %s (%s is installed)',
+                OroRequirements::REQUIRED_PHP_VERSION,
+                $phpVersion
+            ));
+        }
+
+        parent::boot();
     }
 
     /**
