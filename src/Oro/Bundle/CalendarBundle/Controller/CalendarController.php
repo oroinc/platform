@@ -83,7 +83,8 @@ class CalendarController extends Controller
                             'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                             'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
                         ),
-                        'autocomplete_alias' => 'acl_users'
+                        'autocomplete_alias' => 'acl_users',
+                        'grid_name' => 'users-select-grid-exclude-owner'
                     )
                 )
                 ->createView(),
