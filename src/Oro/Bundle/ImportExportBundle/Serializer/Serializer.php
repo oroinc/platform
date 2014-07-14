@@ -21,11 +21,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
      */
     public function normalize($data, $format = null, array $context = array())
     {
-        if ($data instanceof Collection) {
-            // Clear cache of normalizer for collections,
-            // because of wrong behaviour when selecting normalizer for collections of elements with different types
-            unset($this->normalizerCache[get_class($data)][$format]);
-        }
+        $this->cleanCacheIfDataIsCollection($data, $format, $context);
 
         if (null === $data || is_scalar($data)) {
             return $data;
@@ -135,6 +131,19 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         return !empty($context[self::PROCESSOR_ALIAS_KEY])
             ? $context[self::PROCESSOR_ALIAS_KEY]
             : '';
+    }
+
+
+    protected function cleanCacheIfDataIsCollection($data, $format, $context)
+    {
+        $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
+
+        if ($data instanceof Collection) {
+            // Clear cache of normalizer for collections,
+            // because of wrong behaviour when selecting normalizer for collections of elements with different types
+            unset($this->normalizerCache[$cacheKey]);
+            unset($this->normalizerCache[get_class($data)][$format]);
+        }
     }
 
     /**
