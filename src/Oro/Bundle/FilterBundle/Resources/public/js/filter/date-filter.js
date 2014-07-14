@@ -239,13 +239,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 })
             );
 
+            var displayValue = this._formatDisplayValue(value);
             var $filter = $(
                 this.template({
                     inputClass: this.inputClass,
-                    value: this._formatDisplayValue(value),
+                    value: displayValue,
                     parts: parts
                 })
             );
+
             this._appendFilter($filter);
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
@@ -254,6 +256,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             $filter.find('select:first').bind('change', _.bind(this.onChangeFilterType, this));
 
             _.each(this.criteriaValueSelectors.value, _.bind(this._appendDropdown, this, dropdownTemplate));
+
+            this.dateWidgets.start.datepicker('setDate', displayValue.value.start);
+            this.dateWidgets.end.datepicker('setDate', displayValue.value.end);
 
             this.$('.nav-tabs a').click(function (e) {
                 e.preventDefault();

@@ -14,22 +14,19 @@ class UniqueKeyType extends AbstractType
      */
     protected $fields;
 
-    public function __construct($fields)
+    /**
+     * @param array $fields
+     */
+    public function __construct(array $fields)
     {
         $this->fields = $fields;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $choices = array_map(
-            function (FieldConfigId $field) {
-                return ucfirst($field->getFieldName());
-            },
-            $this->fields
-        );
-
-        $choices = array_combine($choices, $choices);
-
         $builder->add(
             'name',
             'text',
@@ -43,7 +40,7 @@ class UniqueKeyType extends AbstractType
             'choice',
             array(
                 'multiple' => true,
-                'choices'  => $choices,
+                'choices'  => $this->fields,
                 'required' => true,
             )
         );

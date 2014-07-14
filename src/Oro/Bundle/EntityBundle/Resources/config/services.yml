@@ -17,6 +17,7 @@ parameters:
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
     oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
     oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
+    oro_entity.extension.unique_entity_extension.class:            Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
 
     # override default Doctrine event manager class
     doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
@@ -31,6 +32,15 @@ services:
             - @translator
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_entity.extension.unique_entity_extension:
+        class: %oro_entity.extension.unique_entity_extension.class%
+        arguments:
+            - @validator
+            - @translator
+            - @oro_entity_config.provider.entity
+        tags:
+            - { name: form.type_extension, alias: form }
 
     oro_entity.owner.entity_config_subscriber:
         class: %oro_entity.owner.entity_config_subscriber.class%
