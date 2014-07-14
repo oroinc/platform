@@ -68,14 +68,13 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * {@inheritdoc}
-     * @param array $importedAttributes optional
      */
-    public function process($entity, $importedAttributes = array())
+    public function process($entity)
     {
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = array();
-        $entity = $this->processEntity($entity, true, true, $importedAttributes);
+        $entity = $this->processEntity($entity, true, true);
         $entity = $this->validateAndUpdateContext($entity);
 
         return $entity;
@@ -85,10 +84,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param object $entity
      * @param bool   $isFullData optional
      * @param bool   $isPersistNew optional
-     * @param array  $importedAttributes optional
      * @return null|object
      */
-    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, $importedAttributes = array())
+    protected function processEntity($entity, $isFullData = false, $isPersistNew = false)
     {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
@@ -118,11 +116,13 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $identifierName = $this->getEntityIdentifierFieldName($entityName);
-                $excludedFields = array($identifierName);
+                $identifierName     = $this->getEntityIdentifierFieldName($entityName);
+                $excludedFields     = array($identifierName);
+                $importedAttributes = $this->context->getValue('importedAttributes');
 
                 foreach ($fields as $key => $field) {
                     $fieldName = $field['name'];
+
                     if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
                         || (!empty($importedAttributes) && !array_key_exists($fieldName, $importedAttributes))
                         && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
@@ -134,6 +134,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
                 $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
             }
+
             $entity = $existingEntity;
         }
 
@@ -163,22 +164,36 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                 if ($this->fieldHelper->isSingleRelation($field)) {
                     $relationEntity = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationEntity) {
-                        $relationEntity
-                            = $this->processEntity($relationEntity, $isFullRelation, $isPersistRelation);
+                        $importedAttributes = $this->context->getValue('importedAttributes');
+                        $this->context->setValue('importedAttributes', $importedAttributes[$fieldName]);
+                        $relationEntity = $this->processEntity($relationEntity, $isFullRelation, $isPersistRelation);
+                        $this->context->setValue('importedAttributes', $importedAttributes);
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
                     // multiple relation
                     $relationCollection = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationCollection instanceof Collection) {
+                        $importedAttributes = $this->context->getValue('importedAttributes');
+                        $this->context->setValue(
+                            'importedAttributes',
+                            empty($importedAttributes[$fieldName]) ? array() : reset($importedAttributes[$fieldName])
+                        );
+
                         $collectionEntities = array();
                         foreach ($relationCollection as $collectionEntity) {
-                            $collectionEntity
-                                = $this->processEntity($collectionEntity, $isFullRelation, $isPersistRelation);
+                            $collectionEntity = $this->processEntity(
+                                $collectionEntity,
+                                $isFullRelation,
+                                $isPersistRelation
+                            );
+
                             if ($collectionEntity) {
                                 $collectionEntities[] = $collectionEntity;
                             }
                         }
+
+                        $this->context->setValue('importedAttributes', $importedAttributes);
                         $relationCollection->clear();
                         $this->fieldHelper->setObjectValue($entity, $fieldName, $collectionEntities);
                     }
@@ -217,6 +232,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                 }
             }
 
+            // try to find entity by fields, which has been marked as identity
             foreach ($identityValues as $value) {
                 if (null !== $value && '' !== $value) {
                     $existingEntity = $entityManager->getRepository($entityName)->findOneBy($identityValues);

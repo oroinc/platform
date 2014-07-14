@@ -94,7 +94,8 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         );
 
         if ($this->strategy) {
-            $object = $this->strategy->process($object, $item);
+            $this->context->setValue('importedAttributes', $item);
+            $object = $this->strategy->process($object);
         }
 
         return $object ?: null;

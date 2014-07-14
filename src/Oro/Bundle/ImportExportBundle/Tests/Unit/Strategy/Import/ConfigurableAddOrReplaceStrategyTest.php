@@ -154,10 +154,18 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 )
                 ->will($this->returnSelf());
 
+            $this->context->expects($this->once())
+                ->method('getValue')
+                ->with('importedAttributes')
+                ->will($this->returnValue($importedAttributes));
+
         } else {
             $this->importStrategyHelper
                 ->expects($this->never())
                 ->method('importEntity');
+
+            $this->context->expects($this->never())
+                ->method('getValue');
         }
 
         $this->fieldHelper
@@ -225,7 +233,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName($className);
 
-        $this->strategy->process($object, $importedAttributes);
+        $this->strategy->process($object);
     }
 
     /**
