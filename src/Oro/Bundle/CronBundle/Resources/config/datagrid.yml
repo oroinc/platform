@@ -45,7 +45,7 @@ datagrid:
                 state:           { data_name: j.state }
                 runtime:         { data_name: j.runtime }
                 memoryUsageReal: { data_name: j.memoryUsageReal }
-                priority:        { data_name: j.priority }
+                priority:        { data_name: j.priority * -1}
                 createdAt:       { data_name: j.createdAt }
             default:
                 createdAt: DESC
