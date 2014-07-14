@@ -17,8 +17,7 @@ class Builder
     const DATASOURCE_TYPE_PATH     = '[source][type]';
     const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
     const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
-
-    const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skipAclWalkerCheck]';
+    const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
 
     /** @var string */
     protected $baseDatagridClass;

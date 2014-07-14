@@ -482,7 +482,7 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
-            skipAclWalkerCheck: true
+            skip_acl_walker_check: true
         source:
             acl_resource: oro_user_user_view
             type: orm
@@ -508,7 +508,6 @@ datagrid:
                 choices:
                    - Inactive
                    - Active
-
         properties:
             id: ~
         sorters:

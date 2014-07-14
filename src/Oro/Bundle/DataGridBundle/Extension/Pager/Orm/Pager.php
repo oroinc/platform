@@ -182,7 +182,7 @@ class Pager extends AbstractPager implements PagerInterface
     /**
      * @param boolean $skipCheck
      */
-    public function skipAclWalkerCheck($skipCheck)
+    public function setSkipAclWalkerCheck($skipCheck)
     {
         $this->skipAclWalkerCheck = $skipCheck;
     }

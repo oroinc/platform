@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class OwnerUserGridListener
 {
@@ -63,8 +62,8 @@ class OwnerUserGridListener
         $user      = $this->getSecurityContext()->getToken()->getUser();
         $accessLevel = $observer->getAccessLevel();
 
-
         $where = $config->offsetGetByPath('[source][query][where][and]', []);
+        /** todo: refactor this check usages */
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {
             $where = array_merge(
                 $where,
