@@ -8,6 +8,7 @@
 {% set audit_title = entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit' %}
 {% set audit_entity_id = entity.id %}
+{% set audit_show_change_history = true %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
@@ -30,8 +31,30 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    {{ parent() }}
-{% endblock stats %}
+    <li>{{ 'oro.entity_config.info.created.label'|trans }}: {{ entity.created|oro_format_datetime }}</li>
+    <li>{{ 'oro.entity_config.info.updated.label'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
+    {% if link is defined and link %}
+        <li>
+            {{ [
+            '<a href="', link, '">',
+            'oro.entity_config.info.records_count.label'|trans,
+            ': ',
+            entity_count|default(0) ,
+            '</a>'
+            ]|join|raw }}
+        </li>
+    {% else %}
+        <li>
+            {{ [
+            '<span>',
+            'oro.entity_config.info.records_count.label'|trans,
+            ': ',
+            entity_count|default(0) ,
+            '</span>'
+            ]|join|raw }}
+        </li>
+    {% endif %}
+{% endblock stats%}
 
 {% block content_data %}
     {% set id = 'configentity-update' %}
