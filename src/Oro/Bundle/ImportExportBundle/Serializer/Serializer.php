@@ -27,7 +27,33 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
             unset($this->normalizerCache[get_class($data)][$format]);
         }
 
-        return parent::normalize($data, $format, $context);
+        if (null === $data || is_scalar($data)) {
+            return $data;
+        }
+        if (is_object($data) && $this->supportsNormalization($data, $format)) {
+            return $this->normalizeObject($data, $format, $context);
+        }
+        if ($data instanceof \Traversable) {
+            $normalized = array();
+            foreach ($data as $key => $val) {
+                $normalized[$key] = $this->normalize($val, $format, $context);
+            }
+
+            return $normalized;
+        }
+        if (is_object($data)) {
+            return $this->normalizeObject($data, $format, $context);
+        }
+        if (is_array($data)) {
+            foreach ($data as $key => $val) {
+                $data[$key] = $this->normalize($val, $format, $context);
+            }
+
+            return $data;
+        }
+        throw new UnexpectedValueException(
+            sprintf('An unexpected value could not be normalized: %s', var_export($data, true))
+        );
     }
 
     /**
@@ -39,7 +65,7 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
         }
 
-        $cacheKey = md5($type . $format . $this->getProcessorAlias($context));
+        $cacheKey = $this->getCacheKey($type, $format, $context);
 
         if (isset($this->denormalizerCache[$cacheKey])) {
             return $this->denormalizerCache[$cacheKey]->denormalize($data, $type, $format, $context);
@@ -57,18 +83,6 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         throw new UnexpectedValueException(
             sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type)
         );
-    }
-
-    /**
-     * @param array $context
-     *
-     * @return string
-     */
-    protected function getProcessorAlias(array $context)
-    {
-        return !empty($context[self::PROCESSOR_ALIAS_KEY])
-            ? $context[self::PROCESSOR_ALIAS_KEY]
-            : '';
     }
 
     /**
@@ -97,6 +111,61 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
         }
 
         return true;
+    }
+
+    /**
+     * @param string $type
+     * @param string $format
+     * @param array  $context
+     *
+     * @return string
+     */
+    protected function getCacheKey($type, $format, array $context)
+    {
+        return md5($type . $format . $this->getProcessorAlias($context));
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return string
+     */
+    protected function getProcessorAlias(array $context)
+    {
+        return !empty($context[self::PROCESSOR_ALIAS_KEY])
+            ? $context[self::PROCESSOR_ALIAS_KEY]
+            : '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function normalizeObject($object, $format = null, array $context = array())
+    {
+        if (!$this->normalizers) {
+            throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
+        }
+
+        $class = get_class($object);
+
+        $cacheKey = $this->getCacheKey($class, $format, $context);
+
+        if (isset($this->normalizerCache[$cacheKey])) {
+            return $this->normalizerCache[$cacheKey]->normalize($object, $format, $context);
+        }
+
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof NormalizerInterface
+                && $normalizer->supportsNormalization($object, $format)) {
+                $this->normalizerCache[$cacheKey] = $normalizer;
+
+                return $normalizer->normalize($object, $format, $context);
+            }
+        }
+
+        throw new UnexpectedValueException(
+            sprintf('Could not normalize object of type %s, no supporting normalizer found.', $class)
+        );
     }
 
     /**
