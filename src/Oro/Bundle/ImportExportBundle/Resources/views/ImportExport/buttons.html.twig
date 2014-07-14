@@ -1,4 +1,3 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
@@ -19,31 +18,34 @@
 
     {% if importAllowed %}
         <div class="btn-group">
-            {% set buttonsHtml %}
             <a type="button"
                class="btn import-btn icons-holder-text no-hash"
                href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
                 <i class="icon-upload-alt  hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
             </a>
-            {% endset %}
 
         {% if hasExportTemplateProcessor %}
-            {% set buttonsHtml %}
-            {{ buttonsHtml|raw }}
-            <a type="button"
-               class="btn icons-holder-text no-hash"
-               target="_blank"
-               href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
-                <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+            <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
             </a>
-            {% endset %}
+            <ul class="dropdown-menu">
+                <li>
+                    <a type="button"
+                       class="import-btn icons-holder-text no-hash"
+                       href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
+                        <i class="icon-upload-alt hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+                    </a>
+                </li>
+                <li>
+                    <a type="button"
+                       class="no-hash"
+                       target="_blank"
+                       href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
+                        <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+                    </a>
+                </li>
+            </ul>
         {% endif %}
-
-            {% set parameters = {
-                'html': buttonsHtml,
-                'groupKey': 'importButtons'
-            } %}
-            {{ UI.pinnedDropdownButton(parameters) }}
         </div>
     {% endif %}
 
