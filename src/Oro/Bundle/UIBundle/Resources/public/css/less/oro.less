@@ -759,6 +759,9 @@ footer {
   margin: 0;
   padding: 0;
   list-style: none;
+  &:empty {
+    display: none;
+  }
 }
 .a2lix_translations {
   .nav-tabs {
@@ -2180,6 +2183,11 @@ div.selector select {
   padding: 0 5px;
 }
 
+/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
+.controls select {width: 282px;}
+.controls .selector select {width: 100%;}
+/* end uniformjs customization */
+
 div.selector:active,
 div.selector.active {
   background-position: -483px -156px;
@@ -2829,6 +2837,7 @@ label.radio.error {
 .breadcrumb > li {
   color: #777;
   font: 11px/14px @baseFontFamily;
+  word-break: break-all;
 }
 .breadcrumb > li > .divider {
   color: #777;
@@ -2849,9 +2858,8 @@ label.radio.error {
   color:#e7e7e7;
   font-size:19px;
 }
-.btn.favorite-button .icon-gold:before,
-.btn.minimize-button .icon-gold:before,
-.btn.minimize-button .icon-minimize-active:before {
+.btn.favorite-button.gold-icon i:before,
+.btn.minimize-button.gold-icon i:before{
   color:#ffd631;
 }
 #pin-button-div {
@@ -2900,8 +2908,7 @@ label.radio.error {
   }
 }
 #orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow,
-.oro_attachment_file .removeFile{
+#oro_entity_config_type .removeRow{
   text-indent:-999;
   font-size:0;
   line-height:0;
@@ -2916,9 +2923,6 @@ label.radio.error {
   &:hover:after {
     color:#888;
   }
-}
-.oro_attachment_file .removeFile{
-  margin: 0;
 }
 pre.email-body {
   width: 99%;

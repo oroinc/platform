@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
@@ -44,7 +45,7 @@ class SyncScheduler
      * @param array       $params
      * @param bool        $useFlush
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function schedule(Integration $integration, $connectorType, $params = [], $useFlush = true)
     {
@@ -54,7 +55,7 @@ class SyncScheduler
 
         $connector = $this->typesRegistry->getConnectorType($integration->getType(), $connectorType);
         if (!$connector instanceof TwoWaySyncConnectorInterface) {
-            throw new \LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
+            throw new LogicException(sprintf('Unable to schedule job for "%s" connector type', $connectorType));
         }
 
         $args = [

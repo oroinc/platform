@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
-
 use Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType;
 
 class FileConfigTypeTest extends \PHPUnit_Framework_TestCase

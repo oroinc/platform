@@ -1,7 +1,7 @@
 /*global define*/
-define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
+define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
         'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'jquery.dialog.extended'
-    ], function ($, _, app, error, AbstractWidget, StateModel) {
+    ], function ($, _, tools, error, AbstractWidget, StateModel) {
     'use strict';
 
     /**
@@ -103,7 +103,7 @@ define(['jquery', 'underscore', 'oroui/js/app', 'oroui/js/error',
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
                         // Suppress error if it's 404 response and not debug mode
-                        if (xhr.status != 404 || app.debug) {
+                        if (xhr.status != 404 || tools.debug) {
                             error.handle({}, xhr, {enforce: true});
                         }
                     }, this)

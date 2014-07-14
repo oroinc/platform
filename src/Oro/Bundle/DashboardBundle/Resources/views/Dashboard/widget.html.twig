@@ -35,23 +35,12 @@
         </div>
     {% endblock %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroui/js/widget-manager', 'oronavigation/js/navigation'],
-        function($, _, widgetManager, Navigation){
+        require(['jquery', 'underscore', 'oroui/js/widget-manager'],
+        function($, _, widgetManager){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
                 {% if widgetTitle %}
                 widget.setTitle({{ widgetTitle|json_encode|raw }});
                 {% endif %}
-                widget.on('renderStart', function(el) {
-                    var navigation = Navigation.getInstance();
-                    if (navigation) {
-                        var actions = widget.getActions();
-                        if (!_.isUndefined(actions.adopted)) {
-                            _.each(actions.adopted, function (action) {
-                                navigation.processClicks(action);
-                            });
-                        }
-                    }
-                });
             });
         });
     </script>

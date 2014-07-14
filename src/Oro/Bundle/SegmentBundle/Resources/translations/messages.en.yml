@@ -1,41 +1,39 @@
 oro:
     segment:
+        action:
+            refresh: Refresh segment
+
         menu:
             reports_tab.label: Reports & Segments
             manage_segments.label: Manage Segments
+
+        created_at.label:    Created At
+        definition.label:    Definition
+        description.label:   Description
         entity_label:        Segment
         entity_plural_label: Segments
-        id:
-            label:   Id
-        name:
-            label:   Name
-        definition:
-            label:   Definition
-        description:
-            label:   Description
+        id.label:            Id
+        last_run.label:      Last run
+        name.label:          Name
+        owner.label:         Owner
+        updated_at.label:    Updated At
+
         entity:
             label:   Entity
             saved:   Segment saved
+
         type:
-            label:   Type
             dynamic: Dynamic
+            label:   Type
             static:  On demand
-        owner:
-            label:   Owner
-        created_at:
-            label:   Created At
-        updated_at:
-            label:   Updated At
-        last_run:
-            label:   Last run
+
         form:
             choose_segment_type:    Choose segment type
-            designer:               Grid designer
+            designer:               Designer
             columns:                Columns
             filters:                Filters
 
         condition_builder:
-            criteria:
-                segment_condition: Apply segment
-            choose_entity_segment: Choose segment
-            apply_segment: Apply %s segment
+            apply_segment:              Apply %s segment
+            criteria.segment_condition: Apply segment
+            choose_entity_segment:      Choose segment

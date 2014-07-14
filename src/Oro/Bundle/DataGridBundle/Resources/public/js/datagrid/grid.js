@@ -46,12 +46,12 @@ define(function (require) {
         /** @property */
         template: _.template(
             '<div class="toolbar"></div>' +
-                '<div class="container-fluid">' +
+                '<div class="container-fluid grid-container-parent">' +
                 '<div class="grid-container">' +
                 '<table class="grid table-hover table table-bordered table-condensed"></table>' +
                 '<div class="no-data"></div>' +
-                '<div class="loading-mask"></div>' +
                 '</div>' +
+                '<div class="loading-mask"></div>' +
                 '</div>'
         ),
 
@@ -504,6 +504,8 @@ define(function (require) {
                 $el.append(this.footer.render().$el);
             }
             $el.append(this.body.render().$el);
+
+            mediator.trigger("grid_load:complete", this.collection, $el);
         },
 
         /**

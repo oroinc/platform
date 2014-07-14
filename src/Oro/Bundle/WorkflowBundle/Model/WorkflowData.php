@@ -97,6 +97,19 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
+     * This method should be called only by system listeners
+     *
+     * @param bool $modified
+     * @return WorkflowData
+     */
+    public function setModified($modified)
+    {
+        $this->modified = $modified;
+
+        return $this;
+    }
+
+    /**
      * Set value
      *
      * @param string $name

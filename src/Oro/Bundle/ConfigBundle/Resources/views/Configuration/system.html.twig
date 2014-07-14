@@ -9,10 +9,21 @@
 {% set pageTitle = 'oro.config.menu.system_configuration.label'|trans %}
 
 {% block content %}
-    {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
+    {% set pageReload    = attribute(form.vars.block_config, activeSubGroup).page_reload %}
+    {% set saveButton    = UI.saveAndCloseButton('Save Settings') %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Saved Values' }) %}
-    {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
-    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true" data-nohash="true">
+    {% set formAction    = path(
+        'oro_config_configuration_system',
+        {activeGroup: activeGroup, activeSubGroup: activeSubGroup}
+    ) %}
+
+    <form
+        id="{{ form.vars.name }}"
+        {{ form_enctype(form) }}
+        action="{{ formAction }}"
+        method="post"
+        data-collect="true"
+    >
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
     </form>
@@ -21,8 +32,8 @@
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, FormState, FormDefault, Modal) {
+        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
+        function ($, __, Mediator, Messenger, FormState, FormDefault, Modal) {
             'use strict';
 
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
@@ -44,6 +55,16 @@
                 confirm.open();
                 e.preventDefault();
             });
+
+            {% if pageReload %}
+                $('#{{ form.vars.name }}').submit(function() {
+                    Mediator.once('page:update', function() {
+                        Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
+                        // force reload without hash navigation
+                        window.location.reload();
+                    });
+                });
+            {% endif %}
 
             new FormState();
             new FormDefault();

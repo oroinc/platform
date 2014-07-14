@@ -279,7 +279,7 @@ class WorkflowManager
     public function getWorkflowItemByEntity($entity)
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
+        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
         return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }

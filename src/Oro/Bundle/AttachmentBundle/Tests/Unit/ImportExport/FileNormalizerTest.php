@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 
 class FileNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -108,7 +109,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         if ($violations) {
             $this->validator->expects($this->once())->method('validate')
-                ->with($context['entityName'], $context['fieldName'])
+                ->with($context['entityName'])
                 ->will($this->returnValue($violations));
         } else {
             $this->validator->expects($this->never())->method('validate');
