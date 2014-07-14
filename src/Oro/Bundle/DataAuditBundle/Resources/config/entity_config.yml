@@ -16,7 +16,7 @@ oro_entity_config:
                         filterable:         true
                         show_filter:        false
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
@@ -53,7 +53,7 @@ oro_entity_config:
                         filterable:         false
                         show_filter:        false
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false

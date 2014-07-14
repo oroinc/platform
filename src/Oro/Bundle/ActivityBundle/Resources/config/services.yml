@@ -19,7 +19,7 @@ services:
 
     oro_activity.entity_config_dumper.extension:
         class: %oro_activity.entity_config_dumper.extension.class%
-        parent: oro_entity_extend.config_dumper_extension
+        parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 

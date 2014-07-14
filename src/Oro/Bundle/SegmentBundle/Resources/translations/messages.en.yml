@@ -28,10 +28,10 @@ oro:
             static:  On demand
 
         form:
-            choose_segment_type: Choose segment type
-            columns:             Columns
-            designer:            Grid designer
-            filters:             Filters
+            choose_segment_type:    Choose segment type
+            designer:               Designer
+            columns:                Columns
+            filters:                Filters
 
         condition_builder:
             apply_segment:              Apply %s segment
