@@ -12,7 +12,10 @@
                 'page': page,
                 'per_page': {{ configs.per_page|default(10) }},
                 'name': "{{ configs.autocomplete_alias }}",
-                'query': query + ';' + '{{ configs.entity_name }}'+ ';' + '{{ configs.permission }}' + ';' + '{{ configs.entity_id }}'
+                'query': query + ';' + '{{ configs.entity_name }}'+ ';' + '{{ configs.permission }}' + ';' + '{{ configs.entity_id }};'
+                    {% if configs.excludeCurrent is defined and configs.excludeCurrent == true %}
+                        + '1'
+                    {% endif %}
             };
         },
         'results': function (data, page) {

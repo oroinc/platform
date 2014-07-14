@@ -53,7 +53,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        $this->transport = $this->contextMediator->getTransport($context);
+        $this->transport = $this->contextMediator->getTransport($context, true);
         $this->channel   = $this->contextMediator->getChannel($context);
 
         $this->validateConfiguration();
