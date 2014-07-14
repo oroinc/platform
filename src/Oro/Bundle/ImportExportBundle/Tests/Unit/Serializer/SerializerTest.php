@@ -91,63 +91,89 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
     }
 
-    public function testDenormalizeUsingCache()
+
+    /**
+     * @dataProvider denormalizeDataProvider
+     */
+    public function testDenormalize($proc, $procForCompare, $iterations)
     {
         $normalizer = $this
             ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
-        $normalizer
-            ->expects($this->never())
-            ->method('supportsNormalization')
-            ->will($this->returnValue(true));
 
         $supportedDenormalizer = $this
             ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $supportedDenormalizer
-            ->expects($this->exactly(2))
+            ->expects($this->exactly($iterations))
             ->method('supportsDenormalization')
             ->will($this->returnValue(true));
 
         $nonSupportedDenormalizer = $this
             ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
         $nonSupportedDenormalizer
-            ->expects($this->exactly(2))
+            ->expects($this->exactly($iterations))
             ->method('supportsDenormalization')
             ->will($this->returnValue(false));
 
         $this->serializer = new Serializer([$normalizer, $nonSupportedDenormalizer, $supportedDenormalizer]);
 
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
-        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
-        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
+        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY => $proc]);
+        $this->serializer->denormalize(
+            new \stdClass(),
+            'test',
+            null,
+            [Serializer::PROCESSOR_ALIAS_KEY => $procForCompare]
+        );
     }
 
-    public function testDenormalizeWithoutCache()
+    public function denormalizeDataProvider()
     {
-        $normalizer = $this
+        return [
+            'with cache'    => ['proc', 'proc', 2],
+            'without cache' => ['proc', 'proc1', 3],
+
+        ];
+    }
+
+    /**
+     * @dataProvider normalizeDataProvider
+     */
+    public function testNormalize($proc, $procForCompare, $iterations)
+    {
+        $supportedNormalizer = $this
             ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
-        $normalizer
-            ->expects($this->never())
+        $supportedNormalizer
+            ->expects($this->exactly($iterations))
             ->method('supportsNormalization')
             ->will($this->returnValue(true));
 
-        $supportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
-        $supportedDenormalizer
-            ->expects($this->exactly(3))
-            ->method('supportsDenormalization')
-            ->will($this->returnValue(true));
-
-        $nonSupportedDenormalizer = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
-        $nonSupportedDenormalizer
-            ->expects($this->exactly(3))
-            ->method('supportsDenormalization')
+        $nonSupportedNormalizer = $this
+            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface');
+        $nonSupportedNormalizer
+            ->expects($this->exactly($iterations))
+            ->method('supportsNormalization')
             ->will($this->returnValue(false));
 
-        $this->serializer = new Serializer([$normalizer, $nonSupportedDenormalizer, $supportedDenormalizer]);
+        $denormalizer = $this
+            ->getMock('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface');
 
-        $this->serializer->supportsDenormalization(new \stdClass(), 'test');
-        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
-        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'other_proc']);
+        $this->serializer = new Serializer([$denormalizer, $nonSupportedNormalizer, $supportedNormalizer]);
+
+        $this->serializer->supportsNormalization(new \stdClass());
+        $this->serializer->normalize(new \stdClass(), null, [Serializer::PROCESSOR_ALIAS_KEY => $proc]);
+        $this->serializer->normalize(
+            new \stdClass(),
+            null,
+            [Serializer::PROCESSOR_ALIAS_KEY => $procForCompare]
+        );
+    }
+
+    public function normalizeDataProvider()
+    {
+        return [
+            'with cache'    => ['proc', 'proc', 4],
+            'without cache' => ['proc', 'proc1', 5],
+
+        ];
     }
 }
