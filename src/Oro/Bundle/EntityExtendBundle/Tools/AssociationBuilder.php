@@ -10,23 +10,22 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuilder
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var RelationBuilder */
     protected $relationBuilder;
 
     /**
+     * @param ConfigManager   $configManager
      * @param RelationBuilder $relationBuilder
      */
-    public function __construct(RelationBuilder $relationBuilder)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        RelationBuilder $relationBuilder
+    ) {
+        $this->configManager   = $configManager;
         $this->relationBuilder = $relationBuilder;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
-    {
-        return $this->relationBuilder->getConfigManager();
     }
 
     /**
@@ -44,7 +43,7 @@ class AssociationBuilder
             $targetEntityClass
         );
 
-        $entityConfigProvider = $this->getConfigManager()->getProvider('entity');
+        $entityConfigProvider = $this->configManager->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
 
         $label       = $targetEntityConfig->get(
@@ -110,7 +109,7 @@ class AssociationBuilder
             $targetEntityClass
         );
 
-        $entityConfigProvider = $this->getConfigManager()->getProvider('entity');
+        $entityConfigProvider = $this->configManager->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
 
         $label       = $targetEntityConfig->get(
@@ -157,14 +156,6 @@ class AssociationBuilder
             $relationName,
             $relationKey
         );
-
-        // add relation to target entity
-        $this->relationBuilder->addManyToOneRelationTargetSide(
-            $targetEntityClass,
-            $sourceEntityClass,
-            $relationName,
-            $relationKey
-        );
     }
 
     /**
@@ -175,7 +166,7 @@ class AssociationBuilder
     protected function getPrimaryKeyColumnNames($entityClass)
     {
         try {
-            return $this->getConfigManager()
+            return $this->configManager
                 ->getEntityManager()
                 ->getClassMetadata($entityClass)
                 ->getIdentifierColumnNames();
