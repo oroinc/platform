@@ -142,7 +142,6 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
             // Clear cache of normalizer for collections,
             // because of wrong behaviour when selecting normalizer for collections of elements with different types
             unset($this->normalizerCache[$cacheKey]);
-            unset($this->normalizerCache[get_class($data)][$format]);
         }
     }
 
