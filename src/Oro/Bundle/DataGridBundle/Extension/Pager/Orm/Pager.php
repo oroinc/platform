@@ -25,6 +25,7 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var boolean */
     protected $skipAclWalkerCheck;
 
     /** @var CountQueryBuilderOptimizer */
@@ -179,6 +180,14 @@ class Pager extends AbstractPager implements PagerInterface
     }
 
     /**
+     * @param boolean $skipCheck
+     */
+    public function skipAclWalkerCheck($skipCheck)
+    {
+        $this->skipAclWalkerCheck = $skipCheck;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function retrieveObject($offset)
@@ -191,10 +200,5 @@ class Pager extends AbstractPager implements PagerInterface
         $results = $queryForRetrieve->getQuery()->execute();
 
         return $results[0];
-    }
-
-    public function skipAclWalkerCheck($skipCheck)
-    {
-        $this->skipAclWalkerCheck = $skipCheck;
     }
 }

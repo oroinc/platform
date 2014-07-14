@@ -596,7 +596,10 @@
     </div>
 
     {% if configs.extra_config is defined and configs.extra_config %}
-        {{ block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) }}
+        {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
+    {% endif %}
+    {% if _block is not empty %}
+        {{ _block|raw }}
     {% else %}
         <script type="text/javascript">
             require(['jquery', 'oroform/js/select-create-inline-type-handler'],

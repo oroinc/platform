@@ -268,7 +268,7 @@ class OrmTotalsExtension extends AbstractExtension
      * @param ResultsObject $pageData Grid page data
      * @param array $columnsConfig Total row columns config
      * @param bool $perPage Get data only for page data or for all data
-     * @param bool $skipAclWalkerCheck
+     * @param bool $skipAclWalkerCheck Check Acl with acl helper or not
      * @return array
      */
     protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false, $skipAclWalkerCheck = false)

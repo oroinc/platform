@@ -38,8 +38,7 @@
                                 {{ path('oro_datagrid_widget', {'gridName': form.vars.grid_name, 'params': {
                                         'permission': configs.permission,
                                         'entity': configs.entity_name,
-                                        'entity_id': configs.entity_id,
-                                        'no-acl': true
+                                        'entity_id': configs.entity_id
                                     }  })|json_encode|raw }},
                                 {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
                                 {{ form.vars.create_enabled|default(false)|json_encode|raw }},
