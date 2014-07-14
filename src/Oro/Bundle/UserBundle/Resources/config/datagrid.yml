@@ -477,3 +477,11 @@ datagrid:
                             choices:
                                 false: Inactive
                                 true:  Active
+
+    users-select-grid-exclude-owner:
+        extends: users-select-grid
+        source:
+            query:
+                where:
+                    and:
+                        - u.id != @oro_security.security_facade->getLoggedUserId
