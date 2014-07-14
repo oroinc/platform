@@ -201,7 +201,6 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             'Datasource not configured, exceptions should be thrown' => [
                 DatagridConfiguration::create([]),
                 [],
-
                 ['\RuntimeException', 'Datagrid source does not configured']
             ],
             'Configured datasource does not exist'                   => [
