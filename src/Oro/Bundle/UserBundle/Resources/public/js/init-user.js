@@ -1,8 +1,8 @@
 /* jshint browser:true */
 /* global require */
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/messenger',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget', 'jquery.dialog.extended'],
-function($, _, __, app, mediator, messenger, DialogWidget) {
+function($, _, __, mediator, messenger, DialogWidget) {
     'use strict';
 
     /* ============================================================
@@ -23,14 +23,14 @@ function($, _, __, app, mediator, messenger, DialogWidget) {
         });
 
         /**
-         * Process role checkboxes after hash navigation request is completed
+         * Process role checkboxes after navigation request is completed
          */
-        mediator.on("hash_navigation_request:complete", checkRoleInputs);
+        mediator.on("page:afterChange", checkRoleInputs);
 
         /**
          * Process flash messages stored in queue or storage
          */
-        mediator.on("hash_navigation_request:complete", initFlashMessages);
+        mediator.on("page:afterChange", initFlashMessages);
 
         $(document).on('change', '#btn-enable input', function(e) {
             $('.status-enabled').toggleClass('hide');

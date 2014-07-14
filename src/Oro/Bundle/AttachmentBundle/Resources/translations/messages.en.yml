@@ -7,6 +7,9 @@ oro:
         id.label:            Id
         comment.label:       Comment
         file.label:          File
+        created_at.label:    Created At
+        updated_at.label:    Updated At
+        owner.label:         Owner
 
         block_titles:
             attachments.label:  Attachments management

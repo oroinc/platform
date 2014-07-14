@@ -235,6 +235,49 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedValues, $result);
     }
 
+    /**
+     * @dataProvider isSchemaUpdateRequiredProvider
+     */
+    public function testIsSchemaUpdateRequired($code, $type, $expected)
+    {
+        $config = [
+            'entity' => [
+                'items' => [
+                    'testAttr1' => [
+                        'options' => [
+                            'require_schema_update' => true
+                        ]
+                    ],
+                    'testAttr2' => [
+                        'options' => [
+                            'require_schema_update' => false
+                        ]
+                    ],
+                ]
+            ],
+            'field' => [
+                'items' => [
+                    'testAttr1' => [
+                        'options' => [
+                            'require_schema_update' => true
+                        ]
+                    ],
+                    'testAttr2' => [
+                        'options' => [
+                            'require_schema_update' => false
+                        ]
+                    ],
+                ]
+            ],
+        ];
+        $this->configContainer->setConfig($config);
+
+        $this->assertEquals(
+            $expected,
+            $this->configContainer->isSchemaUpdateRequired($code, $type)
+        );
+    }
+
     public function getItemsProvider()
     {
         return [
@@ -1703,6 +1746,18 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ],
                 []
             ],
+        ];
+    }
+
+    public function isSchemaUpdateRequiredProvider()
+    {
+        return [
+            ['testAttr1', PropertyConfigContainer::TYPE_ENTITY, true],
+            ['testAttr2', PropertyConfigContainer::TYPE_ENTITY, false],
+            ['testAttr3', PropertyConfigContainer::TYPE_ENTITY, false],
+            ['testAttr1', PropertyConfigContainer::TYPE_FIELD, true],
+            ['testAttr2', PropertyConfigContainer::TYPE_FIELD, false],
+            ['testAttr3', PropertyConfigContainer::TYPE_FIELD, false],
         ];
     }
 }

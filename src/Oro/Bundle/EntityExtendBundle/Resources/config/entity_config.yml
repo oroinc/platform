@@ -177,6 +177,7 @@ oro_entity_config:
 
                 length:
                     options:
+                        require_schema_update: true
                         default_value:      255
                         allowed_type:       [string]
                         required_property:
@@ -190,7 +191,7 @@ oro_entity_config:
                             min:            1
                             max:            255
                     form:
-                        type:               text
+                        type:               oro_entity_extend_text
                         options:
                             required:       false
                             label:          'Length'
@@ -199,6 +200,7 @@ oro_entity_config:
 
                 precision:
                     options:
+                        require_schema_update: true
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -211,7 +213,7 @@ oro_entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               text
+                        type:               oro_entity_extend_text
                         options:
                             required:       false
                             label:          'Precision'
@@ -220,6 +222,7 @@ oro_entity_config:
 
                 scale:
                     options:
+                        require_schema_update: true
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -232,7 +235,7 @@ oro_entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               text
+                        type:               oro_entity_extend_text
                         options:
                             required:       false
                             label:          'Scale'
@@ -313,7 +316,7 @@ oro_entity_config:
                         allowed_type:       [optionSet]
                         create_only:        true
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             required:       false
                             choices:        ['No', 'Yes']

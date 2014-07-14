@@ -58,9 +58,9 @@
 
             {% if pageReload %}
                 $('#{{ form.vars.name }}').submit(function() {
-                    Mediator.once('hash_navigation_request:refresh', function() {
+                    Mediator.once('page:update', function() {
                         Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
-                        // force reaload without hash navigation
+                        // force reload without hash navigation
                         window.location.reload();
                     });
                 });
