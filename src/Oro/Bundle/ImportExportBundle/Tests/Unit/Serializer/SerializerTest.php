@@ -117,9 +117,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->serializer = new Serializer([$normalizer, $nonSupportedDenormalizer, $supportedDenormalizer]);
 
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
-
         $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
-
         $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
     }
 
@@ -149,9 +147,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->serializer = new Serializer([$normalizer, $nonSupportedDenormalizer, $supportedDenormalizer]);
 
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
-
         $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
-
         $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'other_proc']);
     }
 }
