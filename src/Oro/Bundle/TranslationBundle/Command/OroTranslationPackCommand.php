@@ -163,12 +163,11 @@ EOF
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectName      = $input->getArgument('project');
-        $skipCheckNewKeywords = $input->getOption('skipCheck');
-        $languagePackPath = $this->getLangPackDir($projectName);
-
-        $translationService = $this->getTranslationService($input, $output);
-        $mode = $input->getOption('upload-mode');
+        $projectName            = $input->getArgument('project');
+        $skipCheckNewKeywords   = $input->getOption('skipCheck');
+        $languagePackPath       = $this->getLangPackDir($projectName);
+        $translationService     = $this->getTranslationService($input, $output);
+        $mode                   = $input->getOption('upload-mode');
 
         if (!$skipCheckNewKeywords && is_dir($languagePackPath)) {
             if (!$this->checkFiles($languagePackPath, $output)) {
