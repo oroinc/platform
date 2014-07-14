@@ -14,6 +14,16 @@ class OroIntegrationBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::modifyChannelTable($schema);
+    }
+
+    /**
+     * Change oro_integration_channel table
+     *
+     * @param Schema $schema
+     */
+    public static function modifyChannelTable(Schema $schema)
+    {
         $table = $schema->getTable('oro_integration_channel');
         $table->addIndex(['name'], 'oro_integration_channel_name_idx', []);
     }

@@ -107,7 +107,7 @@ class SyncCommand extends AbstractSyncCronCommand
             }
             $integrations = [$integration];
         } else {
-            $integrations = $repository->getConfiguredChannelsForSync();
+            $integrations = $repository->getConfiguredChannelsForSync(null, true);
         }
 
         /** @var Integration $integration */

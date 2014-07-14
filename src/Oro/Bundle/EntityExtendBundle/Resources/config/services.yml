@@ -9,6 +9,7 @@ parameters:
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
+    oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\UniqueKeysValidator
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
     oro_entity_extend.migration.update_config.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
@@ -94,6 +95,11 @@ services:
             - @doctrine
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.not_sql_keyword }
+
+    oro_entity_extend.validator.unique_keys:
+        class: %oro_entity_extend.validator.unique_keys.class%
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_keys }
 
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%

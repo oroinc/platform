@@ -51,6 +51,8 @@ Command used to dump, upload, download and update translations data on third-par
 
 - `download` - perform download to third party service, downloads all language packs from project at translation service for specified `locale`
 
+- `skipCheck` - Skip checking for the presence of the dump files of keywords without translation before upload/update.
+
 Examples
 ------------------
 
