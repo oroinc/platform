@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_0\OroIntegrationBundle as v10;
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3\OroIntegrationBundle as v12;
+use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_2\OroIntegrationBundle as v12;
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3\OroIntegrationBundle as v13;
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_4\OroIntegrationBundle as v14;
 
@@ -34,6 +34,5 @@ class OroIntegrationBundleInstaller implements Installation
         v14::modifyChannelTable($schema);
 
         v10::createChannelStatusTable($schema);
-
     }
 }
