@@ -7,6 +7,8 @@ use Symfony\Component\Yaml\Yaml;
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
+
 class EntityGenerator
 {
     /** @var string */

@@ -96,27 +96,7 @@
     %}
 
     {% set dataBlocks = dataBlocks|merge( [{
-        'title' : 'oro.segment.form.filters'|trans,
-        'content_attr': {'id': 'segment-filters'},
-        'subblocks': [
-            {
-                'title': 'oro.segment.form.filters'|trans,
-                'spanClass': 'segment-filters responsive-cell',
-                'data': [
-                    segmentQD.query_designer_condition_builder({
-                        'id': 'segment-condition-builder',
-                        'criteria_list_id': 'filter-criteria-list',
-                        'entity_choice_id': 'oro_segment_form_entity',
-                        'currentSegmentId': entity.id|default(null),
-                        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE')
-                    })
-                ]
-            },
-        ]
-    },
-    {
         'title' : 'oro.segment.form.designer'|trans,
-        'content_attr': {'id': 'segment-designer'},
         'subblocks': [
             {
                 'title': 'oro.segment.form.columns'|trans,
@@ -132,6 +112,19 @@
                         {'id': 'segment-column-list', 'rowId': 'segment-column-row'},
                         ['column', 'label', 'sorting', 'action']
                     ),
+                ]
+            },
+            {
+                'title': 'oro.segment.form.filters'|trans,
+                'spanClass': 'segment-filters responsive-cell',
+                'data': [
+                    segmentQD.query_designer_condition_builder({
+                        'id': 'segment-condition-builder',
+                        'criteria_list_id': 'filter-criteria-list',
+                        'entity_choice_id': 'oro_segment_form_entity',
+                        'currentSegmentId': entity.id|default(null),
+                        'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE')
+                    })
                 ]
             },
         ]

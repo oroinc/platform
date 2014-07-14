@@ -3,10 +3,13 @@ parameters:
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
+    oro_entity_extend.entity_config_dumper.extension.index.class:     Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension
+    oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
+    oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\UniqueKeysValidator
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
     oro_entity_extend.migration.update_config.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
@@ -17,7 +20,7 @@ parameters:
     oro_entity_extend.migration.extension.extend.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
-    oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\ExtendEntityGeneratorExtension
+    oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
 
@@ -56,6 +59,26 @@ services:
             - @oro_entity_extend.entity_generator
             - %kernel.cache_dir%
 
+    oro_entity_extend.entity_config_dumper.extension.association:
+        abstract: true
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.association_builder
+
+    oro_entity_extend.entity_config_dumper.extension.index:
+        class: %oro_entity_extend.entity_config_dumper.extension.index.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_entity_extend.entity_config_dumper.extension.relation:
+        class: %oro_entity_extend.entity_config_dumper.extension.relation.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
     oro_entity_extend.listener.config_subscriber:
         class: %oro_entity_extend.listener.config_subscriber.class%
         arguments:
@@ -72,6 +95,11 @@ services:
             - @doctrine
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.not_sql_keyword }
+
+    oro_entity_extend.validator.unique_keys:
+        class: %oro_entity_extend.validator.unique_keys.class%
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_keys }
 
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
@@ -148,9 +176,5 @@ services:
     oro_entity_extend.association_builder:
         class: %oro_entity_extend.association_builder.class%
         arguments:
+            - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
-
-    oro_entity_extend.config_dumper_extension:
-        abstract: true
-        arguments:
-            - @oro_entity_extend.association_builder
