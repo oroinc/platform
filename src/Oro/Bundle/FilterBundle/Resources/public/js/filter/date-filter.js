@@ -291,6 +291,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             $input.on('focus, click', function () {
                 $el.find('.dropdown.open').removeClass('open');
                 $dropdown.addClass('open');
+                $calendar.datepicker('refresh');
             });
 
             $calendar = this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
@@ -301,9 +302,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             $calendar.data('datepicker').inline = false;
             $calendar.datepicker('refresh');
-
             $calendar.on('click', '.ui-datepicker-close', function(e) {
-                $dropdown.removeClass('open')
+                $dropdown.removeClass('open');
             });
 
             widgetOptions = _.extend({
