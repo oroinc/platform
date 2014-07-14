@@ -43,7 +43,7 @@ class ChannelRepository extends EntityRepository
         return $integrations;
     }
 
-     /**
+    /**
      * Load instance once and precache it in property
      *
      * @param int $id
