@@ -36,35 +36,14 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $sql = 'SELECT id, is_two_way_sync_enabled, sync_priority FROM oro_integration_channel';
-        $this->logQuery($logger, $sql);
-        $values = $this->connection->fetchAll($sql);
-
-        $sql    = 'SELECT id FROM oro_organization WHERE name = :name';
-        $params = ['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION];
-        $types  = ['name' => 'string'];
-        $this->logQuery($logger, $sql, $params, $types);
-        $organizationId = $this->connection->fetchColumn($sql, $params);
-
-        // if default organization not found - assign on first exists
-        if (false === $organizationId) {
-            $sql = 'SELECT id FROM oro_organization';
-            $this->logQuery($logger, $sql);
-            $organizationIds = array_map(
-                function ($row) {
-                    return $row['id'];
-                },
-                $this->connection->fetchAll($sql)
-            );
-            $organizationId  = min($organizationIds);
-        }
+        $values         = $this->getOldValues($logger);
+        $organizationId = $this->getDefaultOrganizationId($logger);
 
         $updateSql = 'UPDATE oro_integration_channel SET ' .
             'synchronization_settings = :syncSettings, ' .
             'mapping_settings = :mappingSettings, ' .
             'enabled = :enabled ' . ($organizationId ? ', organization_id = :organizationId ' : '') .
             'WHERE id = :id';
-
         foreach ($values as $row) {
             $params = [
                 'syncSettings'    => ConfigObject::create(
@@ -94,5 +73,50 @@ class MigrateValuesQuery extends ParametrizedMigrationQuery
                 $this->connection->executeUpdate($updateSql, $params, $types);
             }
         }
+    }
+
+    /**
+     * Read values to migrate from old database structure
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return array
+     */
+    protected function getOldValues(LoggerInterface $logger)
+    {
+        $sql = 'SELECT id, is_two_way_sync_enabled, sync_priority FROM oro_integration_channel';
+        $this->logQuery($logger, $sql);
+
+        return $this->connection->fetchAll($sql);
+    }
+
+    /**
+     * Fetch default organization ID or if not found fallback on first existing one
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return null|integer
+     */
+    protected function getDefaultOrganizationId(LoggerInterface $logger)
+    {
+        $sql    = 'SELECT id FROM oro_organization WHERE name = :name';
+        $params = ['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION];
+        $types  = ['name' => 'string'];
+        $this->logQuery($logger, $sql, $params, $types);
+        $organizationId = $this->connection->fetchColumn($sql, $params);
+
+        if (false === $organizationId) {
+            $sql = 'SELECT id FROM oro_organization';
+            $this->logQuery($logger, $sql);
+            $organizationIds = array_map(
+                function ($row) {
+                    return $row['id'];
+                },
+                $this->connection->fetchAll($sql)
+            );
+            $organizationId  = min($organizationIds);
+        }
+
+        return $organizationId;
     }
 }
