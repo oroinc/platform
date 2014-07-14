@@ -46,12 +46,12 @@ define(function (require) {
         /** @property */
         template: _.template(
             '<div class="toolbar"></div>' +
-                '<div class="container-fluid">' +
+                '<div class="container-fluid grid-container-parent">' +
                 '<div class="grid-container">' +
                 '<table class="grid table-hover table table-bordered table-condensed"></table>' +
                 '<div class="no-data"></div>' +
-                '<div class="loading-mask"></div>' +
                 '</div>' +
+                '<div class="loading-mask"></div>' +
                 '</div>'
         ),
 
