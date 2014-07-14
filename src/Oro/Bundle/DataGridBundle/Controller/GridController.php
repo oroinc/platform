@@ -7,12 +7,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
@@ -57,7 +59,15 @@ class GridController extends Controller
      */
     public function getAction($gridName)
     {
-        $grid = $this->get('oro_datagrid.datagrid.manager')->getDatagridByRequestParams($gridName);
+        $gridManager = $this->get('oro_datagrid.datagrid.manager');
+        $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
+        $acl         = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+
+        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+            throw new AccessDeniedException('Access denied.');
+        }
+
+        $grid = $gridManager->getDatagridByRequestParams($gridName);
 
         try {
             $result = $grid->getData();

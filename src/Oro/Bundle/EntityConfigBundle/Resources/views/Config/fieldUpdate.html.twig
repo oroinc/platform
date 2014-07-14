@@ -10,6 +10,7 @@
 {% set audit_title = entity_config.get('label') %}
 {% set audit_path = 'oro_entityconfig_audit_field' %}
 {% set audit_entity_id = field.id %}
+{% set audit_show_change_history = true %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
@@ -25,6 +26,7 @@
         (field_config.get('label')|trans) | default(field.fieldName|capitalize) :
         'oro.entity_config.info.new_field.label'|trans
     %}
+
     {% set breadcrumbs = {
         'entity'      : 'entity',
         'indexPath'   : path('oro_entityconfig_index'),
