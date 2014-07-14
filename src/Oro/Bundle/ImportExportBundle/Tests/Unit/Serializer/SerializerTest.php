@@ -118,9 +118,9 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
 
-        $this->serializer->denormalize(new \DateTime('now'), 'date');
+        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
 
-        $this->serializer->denormalize(new \DateTime('now'), 'date');
+        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
     }
 
     public function testDenormalizeWithoutCache()
@@ -150,8 +150,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer->supportsDenormalization(new \stdClass(), 'test');
 
-        $this->serializer->denormalize(new \DateTime('now'), 'date');
+        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'proc']);
 
-        $this->serializer->denormalize(new \DateTime('now'), 'dateTime');
+        $this->serializer->denormalize(new \stdClass(), 'test', null, [Serializer::PROCESSOR_ALIAS_KEY=>'other_proc']);
     }
 }
