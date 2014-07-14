@@ -69,6 +69,7 @@ services:
         arguments:
             - @oro_datagrid.datagrid.manager
             - @router
+            - @oro_security.security_facade
         tags:
             - { name: twig.extension }
 

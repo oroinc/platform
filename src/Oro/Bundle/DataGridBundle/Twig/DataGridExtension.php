@@ -6,6 +6,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtension extends \Twig_Extension
 {
@@ -17,10 +19,18 @@ class DataGridExtension extends \Twig_Extension
     /** @var RouterInterface */
     protected $router;
 
-    public function __construct(Manager $manager, RouterInterface $router)
+    protected $securityFacade;
+
+    /**
+     * @param Manager         $manager
+     * @param RouterInterface $router
+     * @param SecurityFacade  $securityFacade
+     */
+    public function __construct(Manager $manager, RouterInterface $router, $securityFacade)
     {
-        $this->manager = $manager;
-        $this->router  = $router;
+        $this->manager        = $manager;
+        $this->router         = $router;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -50,7 +60,11 @@ class DataGridExtension extends \Twig_Extension
      */
     public function getGrid($name, array $params = [])
     {
-        return $this->manager->getDatagridByRequestParams($name, $params);
+        if ($this->isAclGrantedForGridName($name)) {
+            return $this->manager->getDatagridByRequestParams($name, $params);
+        }
+
+        return null;
     }
 
     /**
@@ -87,5 +101,26 @@ class DataGridExtension extends \Twig_Extension
     protected function generateUrl($name, $params)
     {
         return $this->router->generate(self::ROUTE, ['gridName' => $name, $name => $params]);
+    }
+
+    /**
+     * @param $gridName
+     *
+     * @return bool
+     */
+    protected function isAclGrantedForGridName($gridName)
+    {
+        $gridConfig = $this->manager->getConfigurationForGrid($gridName);
+
+        if ($gridConfig) {
+            $acl = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+            if ($acl && !$this->securityFacade->isGranted($acl)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
