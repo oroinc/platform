@@ -133,7 +133,11 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
             : '';
     }
 
-
+    /**
+     * @param object $data
+     * @param string $format
+     * @param array $context
+     */
     protected function cleanCacheIfDataIsCollection($data, $format, $context)
     {
         $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
