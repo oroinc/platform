@@ -326,6 +326,23 @@ class PropertyConfigContainer
     }
 
     /**
+     * Indicates whether the schema update is required if an attribute with the given code is modified
+     *
+     * @param string                   $code The attribute name
+     * @param string|ConfigIdInterface $type
+     *
+     * @return bool
+     */
+    public function isSchemaUpdateRequired($code, $type = self::TYPE_ENTITY)
+    {
+        $type = $this->getConfigType($type);
+
+        return
+            isset($this->config[$type]['items'][$code]['options']['require_schema_update'])
+            && $this->config[$type]['items'][$code]['options']['require_schema_update'] === true;
+    }
+
+    /**
      * @param $config
      * @return array|string
      */

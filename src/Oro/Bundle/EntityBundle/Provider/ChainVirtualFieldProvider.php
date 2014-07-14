@@ -81,12 +81,12 @@ class ChainVirtualFieldProvider implements VirtualFieldProviderInterface
 
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {
-                    $result[] = $fieldName;
+                    $result[$fieldName] = true;
                 }
             }
         }
 
-        return $result;
+        return array_keys($result);
     }
 
     /**

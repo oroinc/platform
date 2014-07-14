@@ -74,7 +74,7 @@ define(function (require) {
                     placement: placement
                 });
                 widget.update(widgetData);
-                widget.set('settings', widgetData.settings);
+                widget.set('settings', $.extend(true, {}, widgetData.settings));
 
                 widgets.push(widget);
 

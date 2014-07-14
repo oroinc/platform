@@ -1,11 +1,17 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tools;
+namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var AssociationBuilder */
     protected $associationBuilder;
 
@@ -13,10 +19,14 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
     private $targetEntityConfigs;
 
     /**
+     * @param ConfigManager      $configManager
      * @param AssociationBuilder $associationBuilder
      */
-    public function __construct(AssociationBuilder $associationBuilder)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        AssociationBuilder $associationBuilder
+    ) {
+        $this->configManager      = $configManager;
         $this->associationBuilder = $associationBuilder;
     }
 
@@ -116,8 +126,7 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
         if (null === $this->targetEntityConfigs) {
             $this->targetEntityConfigs = [];
 
-            $configManager = $this->associationBuilder->getConfigManager();
-            $configs       = $configManager->getProvider($this->getAssociationScope())->getConfigs();
+            $configs = $this->configManager->getProvider($this->getAssociationScope())->getConfigs();
             foreach ($configs as $config) {
                 if ($this->isTargetEntityApplicable($config)) {
                     $this->targetEntityConfigs[] = $config;
