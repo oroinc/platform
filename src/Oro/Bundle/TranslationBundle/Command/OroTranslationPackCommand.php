@@ -175,7 +175,7 @@ EOF
                 /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
                 $dialog = $this->getHelperSet()->get('dialog');
                 if (!$input->isInteractive()) {
-                    $output->writeln('Some files require correction. Sending canceled.');
+                    $output->writeln('Some files require correction. Upload canceled.');
                     return;
                 }
                 $ask = $dialog->askConfirmation(
@@ -314,7 +314,7 @@ EOF
         }
         if ($this->hasNewKeywords) {
             $output->writeln(
-                '<question>Found new placeholders. Want to make changes to the files before Upload.</question>'
+                '<question>Found new untranslated labels. In some of the files need to make changes before upload.</question>'
             );
         }
         return true;
@@ -385,7 +385,7 @@ EOF
             if (count($newMessages) > 0) {
                 $output->writeln(sprintf('<comment>New keywords in %s</comment>', $domain));
                 foreach ($newMessages as $newMessage) {
-                    if ($this->checkKeyWord($newMessage)) {
+                    if (preg_match('#\.[^\s]#', $newMessage)) {
                         $this->hasNewKeywords = true;
                         $output->writeln($newMessage);
                     }
@@ -396,19 +396,7 @@ EOF
     }
 
     /**
-     * Checks transmitted text and returns true if this keyword is.
-     *
-     * @param $message
-     * @return int
-     */
-    protected function checkKeyWord($message)
-    {
-        $pattern = '#\.[^\s]#';
-        return preg_match($pattern, $message);
-    }
-
-    /**
-     * Check yaml files in translation pack and display files and keywords which need translate
+     * Check yaml files in translation pack and display files and keywords that need translation.
      *
      * @param string $languagePackPath
      * @param OutputInterface $output
@@ -416,19 +404,21 @@ EOF
      */
     protected function checkFiles($languagePackPath, OutputInterface $output)
     {
-        $needTranslate = array();
-        $result = true;
-        $finder = Finder::create()->files()->name('*.yml')->in($languagePackPath);
-        $yaml = new Parser();
+        $needTranslate  = array();
+        $result         = true;
+        $finder         = Finder::create()->files()->name('*.yml')->in($languagePackPath);
+        $yaml           = new Parser();
 
         foreach ($finder->files() as $file) {
             $value = $yaml->parse(file_get_contents((string)$file));
-            array_walk($value, function (&$value, $key) {
-                if ($value != $key || strpos($key, ' ')) {
-                    $value = false;
+            array_walk(
+                $value,
+                function (&$value, $key) {
+                    if ($value != $key || strpos($key, ' ')) {
+                        $value = false;
+                    }
                 }
-
-            });
+            );
             $tempArr = array_filter($value);
             if (count($tempArr) > 0) {
                 $needTranslate[(string)$file] = $tempArr;
@@ -438,11 +428,8 @@ EOF
 
         foreach ($needTranslate as $key => $value) {
             $output->writeln(sprintf('<comment>Need translate keywords in %s</comment>', $key));
-            foreach ($value as $keyword) {
-                $output->writeln($keyword);
-            }
+            $output->writeln($value);
         }
-
         return $result;
     }
 }
