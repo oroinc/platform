@@ -3,9 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
@@ -35,19 +33,16 @@ class Builder
     /** @var ExtensionVisitorInterface[] */
     protected $extensions = [];
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    public function __construct(
-        $baseDatagridClass,
-        $acceptorClass,
-        EventDispatcherInterface $eventDispatcher,
-        SecurityFacade $securityFacade
-    ) {
+    /**
+     * @param                          $baseDatagridClass
+     * @param                          $acceptorClass
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct($baseDatagridClass, $acceptorClass, EventDispatcherInterface $eventDispatcher)
+    {
         $this->baseDatagridClass = $baseDatagridClass;
         $this->acceptorClass     = $acceptorClass;
         $this->eventDispatcher   = $eventDispatcher;
-        $this->securityFacade    = $securityFacade;
     }
 
     /**
@@ -145,23 +140,6 @@ class Builder
             throw new \RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
         }
 
-        $acl = $config->offsetGetByPath(self::DATASOURCE_ACL_PATH);
-        if ($acl && !$this->isResourceGranted($acl)) {
-            throw new AccessDeniedException('Access denied.');
-        }
-
         $this->dataSources[$sourceType]->process($grid, $config->offsetGetByPath(self::DATASOURCE_PATH, []));
-    }
-
-    /**
-     * Checks if an access to a resource is granted or not
-     *
-     * @param string $aclResource An ACL annotation id or "permission;descriptor"
-     *
-     * @return bool
-     */
-    protected function isResourceGranted($aclResource)
-    {
-        return $this->securityFacade->isGranted($aclResource);
     }
 }
