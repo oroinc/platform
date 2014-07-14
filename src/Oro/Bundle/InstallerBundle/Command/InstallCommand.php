@@ -80,6 +80,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             );
         }
 
+        if ($input->getOption('drop-database')) {
+            $output->writeln(
+                sprintf('<info>WARNING: All data will be lost.</info>', $input->getOption('env'))
+            );
+        }
+
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
@@ -105,6 +111,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
     /**
      * @param OutputInterface $output
+     *
      * @return InstallCommand
      * @throws \RuntimeException
      */
@@ -162,7 +169,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         );
 
         if ($input->getOption('drop-database')) {
-            $schemaDropOptions['--drop-database'] = true;
+            $schemaDropOptions['--full-database'] = true;
         }
 
         $commandExecutor
