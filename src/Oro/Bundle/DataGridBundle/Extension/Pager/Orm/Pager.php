@@ -25,6 +25,8 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var AclHelper */
     protected $aclHelper;
 
+    protected $skipAclWalkerCheck;
+
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
 
@@ -70,7 +72,9 @@ class Pager extends AbstractPager implements PagerInterface
     {
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
         $query = $countQb->getQuery();
-        $query = $this->aclHelper->apply($query);
+        if (!$this->skipAclWalkerCheck) {
+            $query = $this->aclHelper->apply($query);
+        }
 
         return QueryCountCalculator::calculateCount($query);
     }
@@ -187,5 +191,10 @@ class Pager extends AbstractPager implements PagerInterface
         $results = $queryForRetrieve->getQuery()->execute();
 
         return $results[0];
+    }
+
+    public function skipAclWalkerCheck($skipCheck)
+    {
+        $this->skipAclWalkerCheck = $skipCheck;
     }
 }

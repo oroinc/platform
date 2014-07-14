@@ -62,6 +62,7 @@ class OrmPagerExtension extends AbstractExtension
         $this->pager->setQueryBuilder($datasource->getQueryBuilder());
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
         $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+        $this->pager->skipAclWalkerCheck($config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false));
         $this->pager->init();
     }
 
