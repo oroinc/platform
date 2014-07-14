@@ -7,7 +7,7 @@ oro_entity_config:
                         default_value:      false
                         is_bool:            true
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
