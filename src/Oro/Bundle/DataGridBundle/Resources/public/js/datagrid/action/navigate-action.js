@@ -63,9 +63,11 @@ define([
          */
         _preExecuteSubscriber: function (action, options) {
             mediator.once('page:beforeError', function (xmlHttp, options) {
+                var message;
                 if (403 === xmlHttp.status) {
                     options.stopPageProcessing = true;
-                    messenger.notificationFlashMessage('error', __('You do not have permission to perform this action.'));
+                    message = __('You do not have permission to perform this action.');
+                    mediator.execute('addMessage', 'error', message, {flash: true});
                 }
             });
             mediator.trigger('grid_action:navigateAction:preExecute', action, options);
