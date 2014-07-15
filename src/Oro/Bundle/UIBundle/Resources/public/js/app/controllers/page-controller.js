@@ -9,10 +9,11 @@ define([
 ], function (_, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, utils, mediator, PageController;
+    var document, location, history, utils, mediator, PageController;
 
     document = window.document;
     location = window.location;
+    history = window.history;
     utils = Chaplin.utils;
     mediator = Chaplin.mediator;
 
@@ -213,10 +214,10 @@ define([
                 return;
             }
 
-            // @TODO make common handler for 403 response and might for other responses
             payload = {stopPageProcessing: false};
             this.publishEvent('page:beforeError', xhr, payload);
             if (payload.stopPageProcessing) {
+                history.back();
                 return;
             }
 

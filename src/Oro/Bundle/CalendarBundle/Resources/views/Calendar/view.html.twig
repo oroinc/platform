@@ -53,15 +53,26 @@
                 <span class="calendar-color" <% if (!_.isEmpty(backgroundColor)) { %>
                 style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
             <% } %> ></span>
-            <div class="pull-left media-body usser-calendar"
+            <div class="media-body">
+                <div
                     <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
-                ><%- calendarName %></div>
-            <% if (removable) { %>
-            <div class="pull-right icons-holder"><a
-                href="javascript: void(0);" class="icons-holder-text no-hash remove-connection-button"
-                title="{{ 'Exclude this calendar'|trans }}"><i
-                    class="icon-remove hide-text"></i></a></div>
-            <% } %>
+                    class="user-calendar"
+                    title="<%- calendarName %>"
+                >
+                    <%- calendarName %>
+                </div>
+                <% if (removable) { %>
+                    <div class="pull-right icons-holder">
+                        <a
+                            href="javascript: void(0);"
+                            class="icons-holder-text no-hash remove-connection-button"
+                            title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
+                        >
+                                <i class="icon-remove hide-text"></i>
+                        </a>
+                    </div>
+                <% } %>
+            </div>
         </li>
     </script>
 
