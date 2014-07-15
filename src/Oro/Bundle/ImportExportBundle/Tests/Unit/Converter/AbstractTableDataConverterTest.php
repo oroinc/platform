@@ -128,11 +128,12 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $exportedRecord
      * @param array $result
+     * @param bool  $skipNull
      * @dataProvider convertToImportDataProvider
      */
-    public function testConvertToImportFormat(array $exportedRecord, array $result)
+    public function testConvertToImportFormat(array $exportedRecord, array $result, $skipNull = true)
     {
-        $this->assertEquals($result, $this->dataConverter->convertToImportFormat($exportedRecord));
+        $this->assertEquals($result, $this->dataConverter->convertToImportFormat($exportedRecord, $skipNull));
     }
 
     /**
@@ -143,7 +144,19 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
         return array(
             'no data' => array(
                 'exportedRecord' => array(),
-                'result' => array()
+                'result'         => array(),
+            ),
+            'plain data skip null values' => array(
+                'exportedRecord' => array(
+                    'First Name' => 'John',
+                    'Last Name'  => 'Doe',
+                    'Job Title'  => '',
+                    'Email'      => '',
+                ),
+                'result' => array(
+                    'firstName' => 'John',
+                    'lastName'  => 'Doe',
+                )
             ),
             'plain data' => array(
                 'exportedRecord' => array(
@@ -155,7 +168,10 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'result' => array(
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                )
+                    'jobTitle'  => '',
+                    'emails'    => array('')
+                ),
+                'skipNull' => false
             ),
             'complex data' => array(
                 'exportedRecord' => array(
