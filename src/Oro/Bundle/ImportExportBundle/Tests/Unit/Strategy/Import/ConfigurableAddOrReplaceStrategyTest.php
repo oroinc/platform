@@ -128,7 +128,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
      * @param array       $identifier
      * @param object|null $existingEntity
      * @param array       $objectValue
-     * @param array       $importedAttributes optional
+     * @param array       $itemData optional
      *
      * @dataProvider entityProvider
      */
@@ -138,10 +138,15 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         array $identifier,
         $existingEntity,
         array $objectValue,
-        $importedAttributes = array()
+        $itemData = null
     ) {
         $singleIdentifier = !empty($identifier[0]) ? $identifier[0] : null;
         $object           = new $className;
+
+        $this->context->expects($this->once())
+            ->method('getValue')
+            ->with('itemData')
+            ->will($this->returnValue($itemData));
 
         if ($existingEntity) {
             $this->importStrategyHelper
@@ -150,22 +155,13 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 ->with(
                     $existingEntity,
                     $object,
-                    $this->calcExcludedFields($fields, $singleIdentifier, $importedAttributes)
+                    $this->calcExcludedFields($fields, $singleIdentifier, $itemData)
                 )
                 ->will($this->returnSelf());
-
-            $this->context->expects($this->once())
-                ->method('getValue')
-                ->with('importedAttributes')
-                ->will($this->returnValue($importedAttributes));
-
         } else {
             $this->importStrategyHelper
                 ->expects($this->never())
                 ->method('importEntity');
-
-            $this->context->expects($this->never())
-                ->method('getValue');
         }
 
         $this->fieldHelper
@@ -315,7 +311,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 'objectValue'    => array(
                     'identity' => 'value',
                 ),
-                'importedAttributes' => array(
+                'itemData' => array(
                     'identity' => 'value',
                     'imported' => 'value'
                 )
@@ -353,6 +349,17 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         $field = $fields[$fieldName];
 
                         return $field['value'];
+                    }
+                )
+            );
+
+        $this->fieldHelper
+            ->expects($this->any())
+            ->method('getItemData')
+            ->will(
+                $this->returnCallback(
+                    function ($data, $fieldName) {
+                        return !empty($data[$fieldName]) ? $data[$fieldName] : array();
                     }
                 )
             );
@@ -488,17 +495,17 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array  $fields
      * @param string $singleIdentifier
-     * @param array  $importedAttributes optional
+     * @param array|null  $itemData optional
      * @return array
      */
-    protected function calcExcludedFields($fields, $singleIdentifier, $importedAttributes = array())
+    protected function calcExcludedFields($fields, $singleIdentifier, array $itemData = null)
     {
         $excludedFields = array($singleIdentifier);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if ($field['excluded']
-                || (!empty($importedAttributes) && !array_key_exists($fieldName, $importedAttributes))
+                || ($itemData !== null && !array_key_exists($fieldName, $itemData))
                 && !$field['identity']
             ) {
                 $excludedFields[] = $fieldName;

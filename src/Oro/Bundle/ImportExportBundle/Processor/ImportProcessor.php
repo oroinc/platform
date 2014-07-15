@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 
 class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface, EntityNameAwareInterface
 {
@@ -86,6 +86,8 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
             $item = $this->dataConverter->convertToImportFormat($item, false);
         }
 
+        $this->context->setValue('itemData', $item);
+
         $object = $this->serializer->deserialize(
             $item,
             $this->context->getOption('entityName'),
@@ -94,7 +96,6 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         );
 
         if ($this->strategy) {
-            $this->context->setValue('importedAttributes', $item);
             $object = $this->strategy->process($object);
         }
 
