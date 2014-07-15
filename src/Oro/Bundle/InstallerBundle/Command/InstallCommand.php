@@ -82,7 +82,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         if ($input->getOption('drop-database')) {
             $output->writeln(
-                sprintf('<info>WARNING: All data will be lost.</info>', $input->getOption('env'))
+                sprintf('<comment>All data will be lost.</comment>', $input->getOption('env'))
             );
         }
 
