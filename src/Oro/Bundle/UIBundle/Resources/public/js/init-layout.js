@@ -26,8 +26,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * from layout.js
      * ============================================================ */
     $(function () {
-        layout.init();
-
         if ($('#page-title').size()) {
             document.title = _.unescape($('#page-title').text());
         }

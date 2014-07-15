@@ -47,7 +47,8 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        $plainDataWithFrontendHeader = $this->removeEmptyColumns($importedRecord, $skipNullValues);
+        $plainDataWithFrontendHeader = $skipNullValues ? $this->removeEmptyColumns($importedRecord) : $importedRecord;
+
         $frontendHeader = array_keys($plainDataWithFrontendHeader);
         $frontendToBackendHeader = $this->convertHeaderToBackend($frontendHeader);
         $plainDataWithBackendHeader = $this->replaceKeys(
