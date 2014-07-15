@@ -26,6 +26,9 @@ class OroTranslationPackCommand extends ContainerAwareCommand
     /** @var  boolean */
     protected $hasNewKeywords;
 
+    /** @var  array */
+    protected $bundlesToChange;
+
     /**
      * {@inheritdoc}
      */
@@ -297,13 +300,13 @@ EOF
                     $this->createDirectory($bundleLanguagePackPath);
                 }
 
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $output->writeln(
                     sprintf(
                         'Writing files for <info>%s</info>',
                         $bundle->getName()
                     )
                 );
+                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $writer->writeTranslations(
                     $messageCatalog,
                     $input->getOption('output-format'),
@@ -313,8 +316,11 @@ EOF
         }
         if ($this->hasNewKeywords) {
             $output->writeln(
-                '<question>Found new untranslated labels. In some of the files need to make changes before upload.</question>'
+                '<question>' .
+                'Found new untranslated labels. In some of the files need to make changes before upload.' .
+                '</question>'
             );
+            $output->writeln($this->bundlesToChange);
         }
         return true;
     }
@@ -382,11 +388,12 @@ EOF
         foreach ($operation->getDomains() as $domain) {
             $newMessages = $operation->getNewMessages($domain);
             if (count($newMessages) > 0) {
-                $output->writeln(sprintf('<comment>New keywords in %s</comment>', $domain));
+                $output->writeln(sprintf('<comment>New keywords in %s domain</comment>', $domain));
+                $this->bundlesToChange[] = '- ' . $bundle->getName() . ' ' . $domain;
                 foreach ($newMessages as $newMessage) {
                     if (preg_match('#\.[^\s]#', $newMessage)) {
                         $this->hasNewKeywords = true;
-                        $output->writeln($newMessage);
+                        $output->writeln('- ' . $newMessage);
                     }
                 }
             }

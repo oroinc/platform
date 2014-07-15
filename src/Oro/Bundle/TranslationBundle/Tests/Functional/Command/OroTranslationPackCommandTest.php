@@ -18,10 +18,10 @@ class OroTranslationPackCommandTest extends WebTestCase
     public function testCommand($commandName, array $params, $expectedContent = null, $notExpectedContent = null)
     {
         $result = $this->runCommand($commandName, $params);
-        if (isset($expectedContent)){
+        if (isset($expectedContent)) {
             $this->assertContains($expectedContent, $result);
         }
-        if(isset($notExpectedContent)) {
+        if (isset($notExpectedContent)) {
             $this->assertNotContains($notExpectedContent, $result);
         }
     }
@@ -35,9 +35,10 @@ class OroTranslationPackCommandTest extends WebTestCase
                     '--quiet' => true,
                     '--upload' => true,
                     'project' => 'OroCRM',
-                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/language-pack'
+                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/' .
+                    'language-pack'
                 ],
-                'expectedContent' => 'Some files require correction. Sending canceled.'
+                'expectedContent' => 'Some files require correction. Upload canceled.'
             ],
             'force upload files' => [
                 'commandName' => 'oro:translation:pack',
@@ -46,7 +47,8 @@ class OroTranslationPackCommandTest extends WebTestCase
                     '--upload' => true,
                     '--skipCheck' => true,
                     'project' => 'OroCRM',
-                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/language-pack'
+                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/' .
+                    'language-pack'
                 ],
                 'expectedContent' => 'Force sending, without check files.'
             ],
@@ -56,12 +58,12 @@ class OroTranslationPackCommandTest extends WebTestCase
                     '--quiet' => true,
                     '--upload' => true,
                     'project' => 'Oro',
-                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/language-pack'
+                    '--path' => '/../src/Oro/src/Oro/Bundle/TranslationBundle/Tests/Functional/Fixtures/Resources/' .
+                    'language-pack'
                 ],
-                'expectedContent' => NULL,
+                'expectedContent' => null,
                 'notExpectedContent' => 'Force sending, without check files.'
             ]
         ];
     }
 }
- 
