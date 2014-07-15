@@ -64,13 +64,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
 
         // if there is application is not installed or no --force option
-        if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
-            && !$forceInstall
+        $isInstalled = $this->getContainer()->hasParameter('installed')
+            && $this->getContainer()->getParameter('installed');
+        if ($isInstalled && !$forceInstall
         ) {
             throw new \RuntimeException('Oro Application already installed.');
         }
 
-        if (false === $input->getOption('drop-database')) {
+        if ($isInstalled && false === $input->getOption('drop-database')) {
             $output->writeln(
                 'To reinstall over existing database - run command with <info>--drop-database</info> option:'
             );
