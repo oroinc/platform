@@ -70,9 +70,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         if ($isInstalled && !$forceInstall) {
             $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
             $output->writeln(
-                'To reinstall over existing database - run command with <info>--drop-database --force</info> option:'
+                'To proceed with install - run command with <info>--force</info> option:'
             );
-            $output->writeln(sprintf('    <info>%s --drop-database --force</info>', $this->getName()));
+            $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+            $output->writeln(
+                'To reinstall over existing database - run command with <info>--force --drop-database</info> options:'
+            );
+            $output->writeln(sprintf('    <info>%s --force --drop-database</info>', $this->getName()));
             $output->writeln(
                 '<comment>ATTENTION</comment>: All data will be lost. ' .
                 'Database backup is highly recommended before executing this command.'
