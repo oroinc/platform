@@ -96,7 +96,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             );
         }
 
-die();
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
