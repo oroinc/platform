@@ -8,10 +8,12 @@ parameters:
     oro_locale.format_converter.date_time.intl.class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
     oro_locale.format_converter.date_time.moment.class: Oro\Bundle\LocaleBundle\Converter\MomentDateTimeFormatConverter
 
-    oro_locale.formatter.name.class: Oro\Bundle\LocaleBundle\Formatter\NameFormatter
-    oro_locale.formatter.address.class: Oro\Bundle\LocaleBundle\Formatter\AddressFormatter
+    oro_locale.formatter.name.class:      Oro\Bundle\LocaleBundle\Formatter\NameFormatter
+    oro_locale.formatter.address.class:   Oro\Bundle\LocaleBundle\Formatter\AddressFormatter
     oro_locale.formatter.date_time.class: Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter
-    oro_locale.formatter.number.class: Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+    oro_locale.formatter.number.class:    Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
+
+    oro_locale.dql.formatter.name.class:  Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter
 
     oro_locale.form.type.country.class:  Oro\Bundle\LocaleBundle\Form\Type\CountryType
     oro_locale.form.type.currency.class: Oro\Bundle\LocaleBundle\Form\Type\CurrencyType
@@ -150,6 +152,12 @@ services:
         class: %oro_locale.formatter.number.class%
         arguments:
             - @oro_locale.settings
+
+    # DQL formatter
+    oro_locale.dql.formatter.name:
+        class: %oro_locale.dql.formatter.name.class%
+        arguments:
+            - @oro_locale.formatter.name
 
     # Twig extensions
     oro_locale.twig.date_format:

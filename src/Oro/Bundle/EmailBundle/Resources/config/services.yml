@@ -214,7 +214,7 @@ services:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
             - @oro_email.email.owner.provider.storage
-            - @oro_locale.formatter.name
+            - @oro_locale.dql.formatter.name
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
