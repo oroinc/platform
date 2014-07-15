@@ -477,3 +477,75 @@ datagrid:
                             choices:
                                 false: Inactive
                                 true:  Active
+
+    owner-users-select-grid:
+        extended_entity_name: %oro_user.entity.class%
+        options:
+            entityHint: user
+            skip_acl_walker_check: true
+        source:
+            acl_resource: oro_user_user_view
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.username
+                    - u.firstName
+                    - u.lastName
+                    - u.enabled
+                from:
+                    - { table: %oro_user.entity.class%, alias: u }
+        columns:
+            username:
+                label: oro.user.username.label
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+        properties:
+            id: ~
+        sorters:
+            columns:
+                username:
+                    data_name: u.username
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                enabled:
+                    data_name: u.enabled
+            default:
+                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: u.username
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                false: Inactive
+                                true:  Active
+
+    users-select-grid-exclude-owner:
+        extends: users-select-grid
+        source:
+            query:
+                where:
+                    and:
+                        - u.id != @oro_security.security_facade->getLoggedUserId
