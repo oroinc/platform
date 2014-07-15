@@ -68,7 +68,23 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             && !$forceInstall
         ) {
             throw new \RuntimeException('Oro Application already installed.');
-        } elseif ($forceInstall) {
+        }
+
+        if (false === $input->getOption('drop-database')) {
+            $output->writeln(
+                'To reinstall over existing database - run command with <info>--drop-database</info> option:'
+            );
+            $output->writeln(sprintf('    <info>%s --drop-database --force</info>', $this->getName()));
+            $output->writeln(
+                '<comment>ATTENTION</comment>: All data will be lost. ' .
+                'Database backup is highly recommended before executing this command.'
+            );
+            $output->writeln('');
+
+            return;
+        }
+
+        if ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
             $commandExecutor->runCommand(
@@ -80,12 +96,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             );
         }
 
-        if ($input->getOption('drop-database')) {
-            $output->writeln(
-                sprintf('<comment>All data will be lost.</comment>', $input->getOption('env'))
-            );
-        }
-
+die();
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
