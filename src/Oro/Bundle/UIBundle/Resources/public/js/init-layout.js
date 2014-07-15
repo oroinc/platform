@@ -37,7 +37,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 myParentHolder = $(myParent).parent().height() - 18;
             $(myParent).height(myParentHolder);
             /* open close bar */
-            $(this).find("span.maximaze-bar").click(function () {
+            $(this).find("span.maximize-bar").click(function () {
                 if (($(myParent).hasClass("side-nav-open")) || ($(myParent).hasClass("side-nav-locked"))) {
                     $(myParent).removeClass("side-nav-locked side-nav-open");
                     if ($(myParent).hasClass('left-panel')) {
