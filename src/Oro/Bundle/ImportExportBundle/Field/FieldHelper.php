@@ -204,4 +204,22 @@ class FieldHelper
             }
         }
     }
+
+    /**
+     * @param mixed $data
+     * @param string $fieldName
+     * @return array
+     */
+    public function getItemData($data, $fieldName = null)
+    {
+        if (!is_array($data)) {
+            return array();
+        }
+
+        if (null === $fieldName) {
+            return $data;
+        }
+
+        return !empty($data[$fieldName]) ? $data[$fieldName] : array();
+    }
 }
