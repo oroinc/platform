@@ -66,14 +66,11 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         // if there is application is not installed or no --force option
         $isInstalled = $this->getContainer()->hasParameter('installed')
             && $this->getContainer()->getParameter('installed');
-        if ($isInstalled && !$forceInstall
-        ) {
-            throw new \RuntimeException('Oro Application already installed.');
-        }
 
         if ($isInstalled && false === $input->getOption('drop-database')) {
+            $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
             $output->writeln(
-                'To reinstall over existing database - run command with <info>--drop-database</info> option:'
+                'To reinstall over existing database - run command with <info>--drop-database --force</info> option:'
             );
             $output->writeln(sprintf('    <info>%s --drop-database --force</info>', $this->getName()));
             $output->writeln(
