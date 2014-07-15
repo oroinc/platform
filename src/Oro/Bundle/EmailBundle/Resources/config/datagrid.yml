@@ -6,12 +6,11 @@ datagrid:
             query:
                 select:
                     - e
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
 
         columns:
-            fromEmailAddress:
+            fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
                 frontend_type: html
@@ -35,6 +34,7 @@ datagrid:
             columns:
                 subject: { data_name: e.subject }
                 sentAt:  { data_name: e.sentAt }
+                fromEmailExpression: { data_name: fromEmailExpression }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
@@ -55,9 +55,9 @@ datagrid:
                         - { join: e.fromEmailAddress, alias: a }
         filters:
             columns:
-                fromEmailAddress: { type: string,   data_name: a.email }
-                subject:          { type: string,   data_name: e.subject }
-                sentAt:           { type: datetime, data_name: e.sentAt }
+                fromEmailExpression: { type: string,   data_name: fromEmailExpression }
+                subject:             { type: string,   data_name: e.subject }
+                sentAt:              { type: datetime, data_name: e.sentAt }
 
     activity-email-grid:
         extends: email-grid

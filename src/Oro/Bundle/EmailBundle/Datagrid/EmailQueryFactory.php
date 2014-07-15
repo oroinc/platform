@@ -3,135 +3,122 @@
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EmailQueryFactory
 {
-    /**
-     * A list of field names of all email owners
-     *
-     * @var string[]
-     */
-    protected $emailOwnerFieldNames = array();
+    /** @var EmailOwnerProviderStorage */
+    protected $emailOwnerProviderStorage;
 
-    /**
-     * @var string
-     */
+    /** @var NameFormatter */
+    protected $nameFormatter;
+
+    /** @var string */
     protected $fromEmailExpression;
 
-    /**
-     * @var RegistryInterface
-     */
-    protected $registry;
+    /** @var array */
+    protected $namePartsMap = [
+        'prefix'      => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NamePrefixInterface',
+            'suggestedFieldName' => 'namePrefix'
+        ],
+        'first_name'  => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\FirstNameInterface',
+            'suggestedFieldName' => 'firstName'
+        ],
+        'middle_name' => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\MiddleNameInterface',
+            'suggestedFieldName' => 'middleName'
+        ],
+        'last_name'   => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\LastNameInterface',
+            'suggestedFieldName' => 'lastName'
+        ],
+        'suffix'      => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NameSuffixInterface',
+            'suggestedFieldName' => 'nameSuffix'
+        ],
+    ];
 
     /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var string
-     */
-    protected $alias;
-
-    /**
-     * @param RegistryInterface $registry
-     * @param string $className
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param UserConfigManager $userConfigManager
+     * @param NameFormatter             $nameFormatter
      */
-    public function __construct(
-        RegistryInterface $registry,
-        $className,
-        EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        UserConfigManager $userConfigManager
-    ) {
-        $this->registry = $registry;
-        $this->className = $className;
-        $this->alias = 'o'; // default
-
-        $providers = $emailOwnerProviderStorage->getProviders();
-        foreach ($providers as $provider) {
-            $this->emailOwnerFieldNames[] = $emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
-        }
-
-        $firstNames = array();
-        $lastNames = array();
-        foreach ($this->emailOwnerFieldNames as $fieldName) {
-            $firstNames[] = sprintf('%s.firstName', $fieldName);
-            $lastNames[] = sprintf('%s.lastName', $fieldName);
-        }
-
-        $firstName = sprintf('COALESCE(%s, \'\')', implode(', ', $firstNames));
-        $lastName = sprintf('COALESCE(%s, \'\')', implode(', ', $lastNames));
-
-        // TODO: refactor usage of email name formats https://magecore.atlassian.net/browse/BAP-2007
-        $nameFormat = '%first% %last%';
-        $this->fromEmailExpression = $this->buildFromEmailExpression($nameFormat, $firstName, $lastName)
-            . ' as FromEmailExpression';
+    public function __construct(EmailOwnerProviderStorage $emailOwnerProviderStorage, NameFormatter $nameFormatter)
+    {
+        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
+        $this->nameFormatter             = $nameFormatter;
     }
 
+    /**
+     * @param QueryBuilder $qb                  Source query builder
+     * @param string       $emailFromTableAlias EmailAddress table alias of joined Email#fromEmailAddress association
+     */
+    public function prepareQuery(QueryBuilder $qb, $emailFromTableAlias = 'a')
+    {
+        $qb->addSelect($this->getFromEmailExpression($emailFromTableAlias));
+        foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
+            $fieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+
+            $qb->leftJoin(sprintf('%s.%s', $emailFromTableAlias, $fieldName), $fieldName);
+        }
+    }
 
     /**
+     * @param string $emailFromTableAlias EmailAddress table alias of joined Email#fromEmailAddress association
+     *
      * @return string
      */
-    public function getFromEmailExpression()
+    protected function getFromEmailExpression($emailFromTableAlias)
     {
-        return $this->fromEmailExpression;
-    }
+        $nameFormat  = $this->nameFormatter->getNameFormat();
+        $expressions = [];
+        foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
+            $relationAlias = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+            $nameParts     = $this->extractNamePartsPaths($provider->getEmailOwnerClass(), $relationAlias);
 
-    /**
-     * @param QueryBuilder $qb
-     * @return $this
-     */
-    public function prepareQuery(QueryBuilder $qb)
-    {
-        foreach ($this->emailOwnerFieldNames as $fieldName) {
-            $qb->leftJoin('a.' . $fieldName, $fieldName);
+            $expressions[$relationAlias] = $this->buildExpression($nameFormat, $nameParts);
         }
 
-        return $this;
+        $expression = '';
+        foreach ($expressions as $alias => $expressionPart) {
+            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s', $emailFromTableAlias, $alias, $expressionPart);
+        }
+
+        return sprintf("(CASE %s ELSE '' END) as fromEmailExpression", $expression);
     }
 
     /**
-     * @param string $nameFormat
-     * @param string $firstNameExpr
-     * @param string $lastNameExpr
+     * @param string $nameFormat Localized name format string
+     * @param array  $nameParts  Parts array
+     *
+     * @throws \LogicException
      * @return string
      */
-    protected function buildFromEmailExpression($nameFormat, $firstNameExpr, $lastNameExpr)
+    private function buildExpression($nameFormat, array $nameParts)
     {
-        $parts = array();
-        $isFirst = true;
-        $lastPos = -1;
-        $pos = strpos($nameFormat, '%');
-        while ($pos !== false) {
-            if ($isFirst && $pos > $lastPos + 1) {
-                $val = substr($nameFormat, $lastPos + 1, $pos - $lastPos - 1);
-                $parts[] = sprintf('\'%s\'', str_replace('\'', '\\\'', $val));
-            }
-            $lastPos = $pos;
-            $pos = strpos($nameFormat, '%', $pos + 1);
-            if ($pos !== false) {
-                if ($isFirst) {
-                    $name = substr($nameFormat, $lastPos + 1, $pos - $lastPos - 1);
-                    if ($name === 'first') {
-                        $parts[] = $firstNameExpr;
-                    } elseif ($name === 'last') {
-                        $parts[] = $lastNameExpr;
+        $parts = $stack = [];
+        preg_match_all('/%(\w+)%([^%]*)/', $nameFormat, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $idx => $match) {
+                $key              = $matches[1][$idx];
+                $prependSeparator = isset($matches[2], $matches[2][$idx]) ? $matches[2][$idx] : '';
+                $lowerCaseKey     = strtolower($key);
+                if (isset($nameParts[$lowerCaseKey])) {
+                    if ($key !== $lowerCaseKey) {
+                        $nameParts[$lowerCaseKey] = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
                     }
+                    $parts[] = $nameParts[$lowerCaseKey];
                 }
-                $isFirst = !$isFirst;
-            } elseif ($lastPos + 1 < strlen($nameFormat)) {
-                $val = substr($nameFormat, $lastPos + 1);
-                $parts[] = sprintf('\'%s\'', str_replace('\'', '\\\'', $val));
+
+                $parts[] = sprintf("'%s'", $prependSeparator);
             }
+        } else {
+            throw new \LogicException('Unexpected name format given');
         }
 
-        $stack = array();
         for ($i = count($parts) - 1; $i >= 0; $i--) {
             if (count($stack) === 0) {
                 array_push($stack, $parts[$i]);
@@ -145,5 +132,28 @@ class EmailQueryFactory
         }
 
         return array_pop($stack);
+    }
+
+    /**
+     * Extract name parts paths for given entity based on interfaces implemented
+     *
+     * @param string $className     Entity FQCN
+     * @param string $relationAlias Join alias for entity relation
+     *
+     * @return array
+     */
+    private function extractNamePartsPaths($className, $relationAlias)
+    {
+        $nameParts  = array_fill_keys(array_keys($this->namePartsMap), []);
+        $interfaces = class_implements($className);
+
+        foreach ($this->namePartsMap as $part => $metadata) {
+            if (in_array($metadata['interface'], $interfaces)) {
+                $format           = 'CASE WHEN %1$s.%2$s IS NOT NULL THEN %1$s.%2$s ELSE \'\' END';
+                $nameParts[$part] = sprintf($format, $relationAlias, $metadata['suggestedFieldName']);
+            }
+        }
+
+        return $nameParts;
     }
 }
