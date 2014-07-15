@@ -13,17 +13,17 @@ oro:
         datagrid:
             usage_count: Usage Count
 
+        created.label:       Created At
+        created_by.label:    Created By
+        entity_description:  Show records tagged by this tag
         entity_label:        Tag
         entity_plural_label: Tags
-        entity_description:  Show records tagged by this tag
-        id.label:         Id
-        name.label:       Tag
-        tagging.label:    Tagging
-        owner.label:      Owner
-        created.label:    Created
-        created_by.label: Created by
-        updated.label:    Updated
-        updated_by.label: Updated by
+        id.label:            Id
+        name.label:          Tag
+        owner.label:         Owner
+        tagging.label:       Tagging
+        updated.label:       Updated At
+        updated_by.label:    Updated By
 
         action:
             assign_unassign: "Tag assign/unassign"
@@ -31,13 +31,13 @@ oro:
             view_cloud: "View tag cloud"
 
         tagging:
-            entity_label:        Tagging
-            entity_plural_label: Taggings
+            alias.label:         Alias
+            created.label:       Created At
             entity_description:  Represent tagging
-            alias.label:       Alias
-            created.label:     Created
-            entity_name.label: Entity name
-            id.label:          Id
-            owner.label:       Owner
-            record_id.label:   Record
-            tag.label:         Tag
+            entity_label:        Tagging
+            entity_name.label:   Entity name
+            entity_plural_label: Taggings
+            id.label:            Id
+            owner.label:         Owner
+            record_id.label:     Record
+            tag.label:           Tag

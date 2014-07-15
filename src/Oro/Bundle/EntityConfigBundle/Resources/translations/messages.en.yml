@@ -42,14 +42,14 @@ oro:
         entity_config:
             entity_name.label: Name
             module_name.label: Module
-            updated.label:     Updated at
+            updated.label:     Updated At
 
         field_config:
             field_name.label: Name
             type.label:       Data Type
 
         info:
-            created.label:       Created
+            created.label:       Created At
             new_field.label:     New Field
             records_count.label: Number of records
-            updated.label:       Updated
+            updated.label:       Updated At

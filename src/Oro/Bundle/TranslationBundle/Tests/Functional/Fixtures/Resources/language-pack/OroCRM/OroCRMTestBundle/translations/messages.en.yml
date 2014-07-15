@@ -1,143 +1,11 @@
 'Add Address': 'Add Address'
-oro.importexport.import.orocrm_contact.add_or_replace: 'Add and Replace'
-orocrm.dashboard.my_contacts_activity.title: 'Recently accessed contacts'
-orocrm.dashboard.my_contacts_activity.view_all: 'View all'
-orocrm.dashboard.my_contacts_activity.description: 'This widget displays the list of recently accessed contacts'
-orocrm.contact.menu.contact_group_list.description: 'List of contact groups'
-orocrm.contact.menu.contact_list.description: 'List of contacts'
-orocrm.contact.menu.customers_tab.label: Customers
-orocrm.contact.menu.shortcut_list_contacts.description: 'List of contacts'
-orocrm.contact.menu.shortcut_list_contacts.label: 'Show contacts list'
-orocrm.contact.menu.shortcut_new_contact.description: 'Create new contact instance'
-orocrm.contact.menu.shortcut_new_contact.label: 'Create new contact'
-orocrm.contact.menu.shortcut_new_contact_group.description: 'Create new contact group instance'
-orocrm.contact.menu.shortcut_new_contact_group.label: 'Create new contact group'
-orocrm.contact.controller.contact_group.saved.message: 'Contact Group saved'
-orocrm.contact.controller.contact.saved.message: 'Contact saved'
-orocrm.contact.form.choose_contact: 'Choose a contact...'
-orocrm.contact.form.choose_contact_method: 'Choose a contact method...'
-orocrm.contact.form.choose_phone: 'Choose a phone...'
-orocrm.contact.datagrid.contact_name: 'Contact name'
-orocrm.contact.datagrid.delete: Delete
-orocrm.contact.datagrid.view: View
-orocrm.contact.datagrid.update: Update
-orocrm.contact.entity_description: 'Represent contact'
-orocrm.contact.entity_label: Contact
-orocrm.contact.entity_plural_label: Contacts
-orocrm.contact.import: 'Import Contacts'
-orocrm.contact.accounts.label: Accounts
-orocrm.contact.add_entity: 'Add contact'
-orocrm.contact.addresses.label: Addresses
-orocrm.contact.assigned_to.label: 'Assigned to'
-orocrm.contact.birthday.label: Birthday
-orocrm.contact.created_at.label: 'Created At'
-orocrm.contact.created_by.label: 'Created By'
-orocrm.contact.description.label: Description
-orocrm.contact.email.label: Email
-orocrm.contact.emails.label: Emails
-orocrm.contact.facebook.label: Facebook
-orocrm.contact.fax.label: Fax
-orocrm.contact.first_name.label: 'First name'
-orocrm.contact.gender.label: Gender
-orocrm.contact.google_plus.label: Google+
-orocrm.contact.groups.label: Groups
-orocrm.contact.id.label: Id
-orocrm.contact.linked_in.label: LinkedIn
-orocrm.contact.job_title.label: 'Job Title'
-orocrm.contact.last_name.label: 'Last name'
-orocrm.contact.method.label: 'Contact Method'
-orocrm.contact.middle_name.label: 'Middle name'
-orocrm.contact.name_prefix.label: 'Name prefix'
-orocrm.contact.name_suffix.label: 'Name suffix'
-orocrm.contact.owner.label: Owner
-orocrm.contact.reports_to.label: 'Reports to'
-orocrm.contact.phones.label: Phones
-orocrm.contact.primary_email.label: 'Primary Email'
-orocrm.contact.primary_phone.label: 'Primary Phone'
-orocrm.contact.skype.label: Skype
-orocrm.contact.social.label: Social
-orocrm.contact.source.label: Source
-orocrm.contact.twitter.label: Twitter
-orocrm.contact.updated_at.label: 'Updated At'
-orocrm.contact.updated_by.label: 'Updated By'
-orocrm.contact.picture.label: Picture
-orocrm.contact.contactaddress.city.label: City
-orocrm.contact.contactaddress.country.label: Country
-orocrm.contact.contactaddress.created.label: Created
-orocrm.contact.contactaddress.entity_description: 'Represent contact''s address'
-orocrm.contact.contactaddress.entity_label: 'Contact Address'
-orocrm.contact.contactaddress.entity_plural_label: 'Contact Addresses'
-orocrm.contact.contactaddress.first_name.label: 'First name'
-orocrm.contact.contactaddress.id.label: Id
-orocrm.contact.contactaddress.label.label: Label
-orocrm.contact.contactaddress.last_name.label: 'Last name'
-orocrm.contact.contactaddress.middle_name.label: 'Middle name'
-orocrm.contact.contactaddress.name_prefix.label: 'Name prefix'
-orocrm.contact.contactaddress.name_suffix.label: 'Name suffix'
-orocrm.contact.contactaddress.organization.label: Organization
-orocrm.contact.contactaddress.owner.label: Owner
-orocrm.contact.contactaddress.postal_code.label: 'Zip/postal code'
-orocrm.contact.contactaddress.primary.label: Primary
-orocrm.contact.contactaddress.region.label: State
-orocrm.contact.contactaddress.region_text.label: State
-orocrm.contact.contactaddress.street.label: Street
-orocrm.contact.contactaddress.street2.label: 'Street 2'
-orocrm.contact.contactaddress.types.label: Types
-orocrm.contact.contactaddress.updated.label: Updated
-orocrm.contact.contactaddress.country_name.label: 'Country name'
-orocrm.contact.contactaddress.country_iso2_code.label: 'Country ISO2 code'
-orocrm.contact.contactaddress.country_iso3_code.label: 'Country ISO3 code'
-orocrm.contact.contactaddress.region_name.label: 'State name'
-orocrm.contact.contactaddress.region_code.label: 'State ISO code'
-orocrm.contact.contactemail.email.label: Email
-orocrm.contact.contactemail.entity_description: 'Represent contact''s email'
-orocrm.contact.contactemail.entity_label: 'Contact Email'
-orocrm.contact.contactemail.entity_plural_label: 'Contact Emails'
-orocrm.contact.contactemail.id.label: Id
-orocrm.contact.contactemail.owner.label: Owner
-orocrm.contact.contactemail.primary.label: Primary
-orocrm.contact.contactphone.entity_description: 'Represent contact''s phone'
-orocrm.contact.contactphone.entity_label: 'Contact Phone'
-orocrm.contact.contactphone.entity_plural_label: 'Contact Phones'
-orocrm.contact.contactphone.id.label: Id
-orocrm.contact.contactphone.owner.label: Owner
-orocrm.contact.contactphone.phone.label: Phone
-orocrm.contact.contactphone.primary.label: Primary
-orocrm.contact.group.entity_description: 'Represent contact''s group'
-orocrm.contact.group.entity_label: 'Contact Group'
-orocrm.contact.group.entity_plural_label: 'Contact Groups'
-orocrm.contact.group.id.label: Id
-orocrm.contact.group.label.label: Label
-orocrm.contact.group.manage: 'Manage groups'
-orocrm.contact.group.owner.label: Owner
-orocrm.contact.method.entity_description: 'Represent contact''s method'
-orocrm.contact.method.entity_label: 'Contact Method'
-orocrm.contact.method.entity_plural_label: 'Contact Methods'
-orocrm.contact.method.label.label: Label
-orocrm.contact.method.name.label: Name
-orocrm.contact.source.entity_description: 'Represent contact''s source'
-orocrm.contact.source.entity_label: 'Contact Source'
-orocrm.contact.source.entity_plural_label: 'Contact Sources'
-orocrm.contact.source.label.label: Label
-orocrm.contact.source.name.label: Name
-orocrm.contact.widgets.account_contacts: Contacts
-orocrm.contact.account.no_contacts_exist: 'No contacts exist'
-oro.ui.create_entity: oro.ui.create_entity
 General: General
 'Basic Information': 'Basic Information'
-oro.dashboard.list: oro.dashboard.list
 'Contact Information': 'Contact Information'
 Additional: Additional
 N/A: N/A
-oro.email.send_email: oro.email.send_email
-orocrm.call.log_call: orocrm.call.log_call
 'Address Book': 'Address Book'
 'General Information': 'General Information'
-oro.email.entity_plural_label: oro.email.entity_plural_label
-orocrm.account.default_contact.label: orocrm.account.default_contact.label
-orocrm.account.phone.label: orocrm.account.phone.label
-orocrm.account.email.label: orocrm.account.email.label
-oro.tag.entity_plural_label: oro.tag.entity_plural_label
 Cancel: Cancel
 Save: Save
 '%contact.name%': '%contact.name%'
@@ -145,3 +13,176 @@ Save: Save
 '%contact.name% - Edit': '%contact.name% - Edit'
 'Create Contact Group': 'Create Contact Group'
 '%group.label% - Edit': '%group.label% - Edit'
+
+oro:
+    dashboard.list: oro.dashboard.list
+
+    email:
+        entity_plural_label: oro.email.entity_plural_label
+        send_email: oro.email.send_email
+
+    importexport.import.orocrm_contact.add_or_replace: 'Add and Replace'
+    tag.entity_plural_label: oro.tag.entity_plural_label
+    ui.create_entity: oro.ui.create_entity
+
+orocrm:
+    account:
+        default_contact.label: orocrm.account.default_contact.label
+        phone.label: orocrm.account.phone.label
+        email.label: orocrm.account.email.label
+
+    call.log_call: orocrm.call.log_call
+
+    dashboard:
+        my_contacts_activity:
+            description: 'This widget displays the list of recently accessed contacts'
+            title:       'Recently accessed contacts'
+            view_all:    'View all'
+
+    contact:
+        menu:
+            contact_group_list.description: 'List of contact groups'
+            contact_list.description:       'List of contacts'
+            customers_tab.label:            Customers
+
+            shortcut_list_contacts:
+                  description: 'List of contacts'
+                  label:       'Show contacts list'
+
+            shortcut_new_contact:
+                  description: 'Create new contact instance'
+                  label:       'Create new contact'
+
+            shortcut_new_contact_group:
+                description: 'Create new contact group instance'
+                label:       'Create new contact group'
+
+        controller:
+            contact_group.saved.message: 'Contact Group saved'
+            contact.saved.message:       'Contact saved'
+
+        form:
+            choose_contact:        'Choose a contact...'
+            choose_contact_method: 'Choose a contact method...'
+            choose_phone:          'Choose a phone...'
+
+        datagrid:
+            contact_name: 'Contact name'
+            delete: Delete
+            view: View
+            update: Update
+
+        entity_description: 'Represent contact'
+        entity_label: Contact
+        entity_plural_label: Contacts
+        import: 'Import Contacts'
+        accounts.label: Accounts
+        add_entity: 'Add contact'
+        addresses.label: Addresses
+        assigned_to.label: 'Assigned to'
+        birthday.label: Birthday
+        created_at.label: 'Created At'
+        created_by.label: 'Created By'
+        description.label: Description
+        email.label: Email
+        emails.label: Emails
+        facebook.label: Facebook
+        fax.label: Fax
+        first_name.label: 'First name'
+        gender.label: Gender
+        google_plus.label: Google+
+        groups.label: Groups
+        id.label: Id
+        linked_in.label: LinkedIn
+        job_title.label: 'Job Title'
+        last_name.label: 'Last name'
+        method.label: 'Contact Method'
+        middle_name.label: 'Middle name'
+        name_prefix.label: 'Name prefix'
+        name_suffix.label: 'Name suffix'
+        owner.label: Owner
+        reports_to.label: 'Reports to'
+        phones.label: Phones
+        primary_email.label: 'Primary Email'
+        primary_phone.label: 'Primary Phone'
+        skype.label: Skype
+        social.label: Social
+        source.label: Source
+        twitter.label: Twitter
+        updated_at.label: 'Updated At'
+        updated_by.label: 'Updated By'
+        picture.label: Picture
+
+        contactaddress:
+            city.label: City
+            country.label: Country
+            created.label: Created At
+            entity_description: 'Represent contact''s address'
+            entity_label: 'Contact Address'
+            entity_plural_label: 'Contact Addresses'
+            first_name.label: 'First name'
+            id.label: Id
+            label.label: Label
+            last_name.label: 'Last name'
+            middle_name.label: 'Middle name'
+            name_prefix.label: 'Name prefix'
+            name_suffix.label: 'Name suffix'
+            organization.label: Organization
+            owner.label: Owner
+            postal_code.label: 'Zip/postal code'
+            primary.label: Primary
+            region.label: State
+            region_text.label: State
+            street.label: Street
+            street2.label: 'Street 2'
+            types.label: Types
+            updated.label: Updated At
+            country_name.label: 'Country name'
+            country_iso2_code.label: 'Country ISO2 code'
+            country_iso3_code.label: 'Country ISO3 code'
+            region_name.label: 'State name'
+            region_code.label: 'State ISO code'
+
+        contactemail:
+            email.label: Email
+            entity_description: 'Represent contact''s email'
+            entity_label: 'Contact Email'
+            entity_plural_label: 'Contact Emails'
+            id.label: Id
+            owner.label: Owner
+            primary.label: Primary
+
+        contactphone:
+            entity_description: 'Represent contact''s phone'
+            entity_label: 'Contact Phone'
+            entity_plural_label: 'Contact Phones'
+            id.label: Id
+            owner.label: Owner
+            phone.label: Phone
+            primary.label: Primary
+
+        group:
+            entity_description: 'Represent contact''s group'
+            entity_label: 'Contact Group'
+            entity_plural_label: 'Contact Groups'
+            id.label: Id
+            label.label: Label
+            manage: 'Manage groups'
+            owner.label: Owner
+
+        method:
+            entity_description: 'Represent contact''s method'
+            entity_label: 'Contact Method'
+            entity_plural_label: 'Contact Methods'
+            label.label: Label
+            name.label: Name
+
+        source:
+            entity_description: 'Represent contact''s source'
+            entity_label: 'Contact Source'
+            entity_plural_label: 'Contact Sources'
+            label.label: Label
+            name.label: Name
+
+        widgets.account_contacts: Contacts
+        account.no_contacts_exist: 'No contacts exist'

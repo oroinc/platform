@@ -123,8 +123,8 @@ oro:
         processdefinition:
             entity_label:                 Process
             entity_plural_label:          Processes
-            created_at.label:             Created
-            updated_at.label:             Updated
+            created_at.label:             Created At
+            updated_at.label:             Updated At
             actions_configuration.label:  Actions configuration
             enabled.label:                Enabled
             execution_order.label:        Execution order
@@ -136,8 +136,8 @@ oro:
             entity_label:         Process Trigger
             entity_plural_label:  Process Triggers
             id.label:             ID
-            created_at.label:     Created
-            updated_at.label:     Updated
+            created_at.label:     Created At
+            updated_at.label:     Updated At
             definition.label:     Process definition
             event.label:          Event
             field.label:          Field
@@ -151,8 +151,8 @@ oro:
         workflowdefinition:
             entity_label:                 Workflow
             entity_plural_label:          Workflows
-            created_at.label:             Created
-            updated_at.label:             Updated
+            created_at.label:             Created At
+            updated_at.label:             Updated At
             label.label:                  Name # this translation has been chosen because it doesn't confuse users
             system.label:                 System
             configuration.label:          Configuration
@@ -186,8 +186,8 @@ oro:
             serialized_data.label:    Serialized data
             transition_records.label: Transition records
             workflow_name.label:      Workflow name
-            created.label:            Created
-            updated.label:            Updated
+            created.label:            Created At
+            updated.label:            Updated At
 
             related_entity.label:       Workflow Item
             related_entity.description: Related field for Workflow Item

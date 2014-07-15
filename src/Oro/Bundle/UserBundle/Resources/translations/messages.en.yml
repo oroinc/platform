@@ -119,7 +119,7 @@ oro:
         birthday.label:              Birthday
         business_units.label:        Business Units
         confirmation_token.label:    Confirmation token
-        created_at.label:            Created
+        created_at.label:            Created At
         current_status.label:        Current status
         groups.label:                Groups
         email.label:                 Primary Email
@@ -145,7 +145,7 @@ oro:
         roles.label:                 Roles
         salt.label:                  Salt
         statuses.label:              Statuses
-        updated_at.label:            Updated
+        updated_at.label:            Updated At
         username.label:              Username
         #
         # Oro/Bundle/UserBundle/Entity/Group

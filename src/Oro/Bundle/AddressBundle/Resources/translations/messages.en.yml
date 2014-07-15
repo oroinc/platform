@@ -9,7 +9,7 @@ oro:
     address:
         city.label:          City
         country.label:       Country
-        created.label:       Created at
+        created.label:       Created At
         entity_description:  Represent address
         entity_label:        Address
         entity_plural_label: Addresses
@@ -26,7 +26,7 @@ oro:
         region_text.label:   State
         street.label:        Street
         street2.label:       Street 2
-        updated.label:       Updated at
+        updated.label:       Updated At
 
         country_name.label:      Country name
         country_iso2_code.label: Country ISO2 code

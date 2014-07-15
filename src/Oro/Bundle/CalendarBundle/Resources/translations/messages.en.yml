@@ -58,11 +58,11 @@ oro:
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
         #
         calendarconnection:
-            entity_label:        Calendar of other users
-            entity_plural_label: Calendars of other users
-            entity_description:  Represent calendar connection
+            entity_label:             Calendar of other users
+            entity_plural_label:      Calendars of other users
+            entity_description:       Represent calendar connection
             id.label:                 Id
-            created_at.label:         Created
+            created_at.label:         Created At
             connected_calendar.label: Connected calendar
             color.label:              Color
             calendar.label:           Calendar

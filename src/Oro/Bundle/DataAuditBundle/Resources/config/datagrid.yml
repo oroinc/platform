@@ -86,9 +86,9 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                update: Updated
-                                create: Created
-                                remove: Deleted
+                                update: Updated At
+                                create: Created At
+                                remove: Deleted At
                 version:
                     type: number
                     data_name: a.version

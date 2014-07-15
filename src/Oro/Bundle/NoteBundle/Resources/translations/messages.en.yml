@@ -1,14 +1,12 @@
 oro:
     note:
+        created_at.label:     Created At
         enabled:              Enable notes
-
         entity_label:         Note
         entity_plural_label:  Notes
-
         id.label:             Id
         message.label:        Message
         owner.label:          Created By
-        created_at.label:     Created At
         updated_at.label:     Updated At
         updated_by.label:     Updated By
 

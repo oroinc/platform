@@ -45,7 +45,7 @@ oro:
             choose_report_type:     Choose a report type...
 
         chart_options.label: Chart Options
-        created_at.label:    Created at
+        created_at.label:    Created At
         definition.label:    Definition
         description.label:   Description
         entity.label:        Entity
@@ -56,7 +56,7 @@ oro:
         name.label:          Name
         owner.label:         Owner
         type.label:          Report type
-        updated_at.label:    Updated at
+        updated_at.label:    Updated At
 
         reporttype:
             entity_label:        Report Type
