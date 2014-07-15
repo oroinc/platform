@@ -398,4 +398,41 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @param mixed $data
+     * @param string $fieldName
+     * @param mixed $expected
+     * @dataProvider getItemDataDataProvider
+     */
+    public function testGetItemData($data, $fieldName, $expected)
+    {
+        $this->assertSame($expected, $this->helper->getItemData($data, $fieldName));
+    }
+
+    public function getItemDataDataProvider()
+    {
+        return array(
+            'not an array' => array(
+                'data' => new \stdClass(),
+                'fieldName' => 'field',
+                'expected' => array(),
+            ),
+            'null field' => array(
+                'data' => array('field' => 'value'),
+                'fieldName' => null,
+                'expected' => array('field' => 'value'),
+            ),
+            'existing field' => array(
+                'data' => array('field' => array('value')),
+                'fieldName' => 'field',
+                'expected' => array('value'),
+            ),
+            'not existing field' => array(
+                'data' => array(),
+                'fieldName' => 'field',
+                'expected' => array(),
+            ),
+        );
+    }
 }
