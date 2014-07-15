@@ -44,7 +44,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'drop-database',
                 null,
                 InputOption::VALUE_NONE,
-                'Database will be dropped and all data will be vanished.'
+                'Database will be dropped and all data will be deleted.'
             );
     }
 
