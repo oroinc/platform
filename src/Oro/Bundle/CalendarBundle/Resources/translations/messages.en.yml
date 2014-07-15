@@ -1,6 +1,5 @@
 "My Calendar": "My Calendar"
 "Today calendar": "Today's Calendar"
-"Exclude this calendar": "Exclude this calendar"
 "Delete event": "Delete event"
 "Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
 
@@ -11,7 +10,9 @@ oro:
             view_calendar: My Calendar
 
     calendar:
-        form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
+        form:
+            choose_user_to_add_calendar: "Choose a user to add a calendar ..."
+            exclude_calendar:            "Exclude this calendar"
 
         my_calendar_widget_descriptions: This widget displays a calendar for today.
 
