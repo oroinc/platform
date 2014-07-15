@@ -34,9 +34,9 @@
             <div class="calendars">
                 <div class="calendar-connections"></div>
                 {% if resource_granted('oro_calendar_connection_view') %}
-                <form action="#">
-                    {{ form_row(user_select_form) }}
-                </form>
+                    <form action="#">
+                        {{ form_row(user_select_form) }}
+                    </form>
                 {% endif %}
             </div>
         </div>
