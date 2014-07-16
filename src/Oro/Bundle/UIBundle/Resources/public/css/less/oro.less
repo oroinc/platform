@@ -1867,8 +1867,13 @@ ul.inline-extra {
 }
 .navbar-extra-right {
   padding-right: 20px;
-  .btn-group{
-    margin-left: 8px;
+  .title-buttons-container {
+    .btn-group{
+      margin-left: 8px;
+    }
+    .btn-group .btn-group {
+      margin-left: 0;
+    }
   }
 }
 .row-oro {
@@ -2165,12 +2170,17 @@ div.selector span {
   line-height: 28px;
   .box-sizing(border-box);
   padding: 0 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
   &:after {
-    float:right;
     margin:2px 2px 0 0;
     display:inline-block;
     font:15px 'FontAwesome';
     content: "\f0dd";
+    position: absolute;
+    right: 5px;
   }
 }
 

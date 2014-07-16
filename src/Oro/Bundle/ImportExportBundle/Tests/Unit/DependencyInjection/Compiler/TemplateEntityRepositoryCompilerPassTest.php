@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateFixtureCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TemplateFixtureCompilerPassTest extends \PHPUnit_Framework_TestCase
+class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
@@ -16,8 +16,7 @@ class TemplateFixtureCompilerPassTest extends \PHPUnit_Framework_TestCase
         $taggedServices = array(
             'oro_test.foo_import_fixture' => array(
                 array(
-                    'name' => TemplateFixtureCompilerPass::TEMPLATE_FIXTURE_TAG,
-                    'entity' => 'FooEntity',
+                    'name' => TemplateEntityRepositoryCompilerPass::TEMPLATE_FIXTURE_TAG
                 )
             )
         );
@@ -26,21 +25,21 @@ class TemplateFixtureCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $containerBuilder->expects($this->once())
             ->method('hasDefinition')
-            ->with(TemplateFixtureCompilerPass::TEMPLATE_REGISTRY_KEY)
+            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_MANAGER_KEY)
             ->will($this->returnValue(true));
         $containerBuilder->expects($this->once())
             ->method('getDefinition')
-            ->with(TemplateFixtureCompilerPass::TEMPLATE_REGISTRY_KEY)
+            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_MANAGER_KEY)
             ->will($this->returnValue($definition));
         $containerBuilder->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with(TemplateFixtureCompilerPass::TEMPLATE_FIXTURE_TAG)
+            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_FIXTURE_TAG)
             ->will($this->returnValue($taggedServices));
         $definition->expects($this->once())
             ->method('addMethodCall')
-            ->with('addEntityFixture', array('FooEntity',  new Reference('oro_test.foo_import_fixture')));
+            ->with('addEntityRepository', array(new Reference('oro_test.foo_import_fixture')));
 
-        $pass = new TemplateFixtureCompilerPass();
+        $pass = new TemplateEntityRepositoryCompilerPass();
         $pass->process($containerBuilder);
     }
 }
