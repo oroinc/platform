@@ -84,6 +84,8 @@ class NumberFilter extends AbstractFilter
                 return $ds->expr()->lt($fieldName, $parameterName, true);
             case NumberFilterType::TYPE_NOT_EQUAL:
                 return $ds->expr()->neq($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }

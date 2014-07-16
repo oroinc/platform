@@ -57,6 +57,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                         NumberFilterType::TYPE_GREATER_THAN => 'oro.filter.form.label_type_greater_than',
                         NumberFilterType::TYPE_LESS_EQUAL => 'oro.filter.form.label_type_less_equal',
                         NumberFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_type_less_than',
+                        NumberFilterType::TYPE_EMPTY => 'oro.filter.form.label_type_empty',
                     ),
                     'data_type' => NumberFilterType::DATA_INTEGER,
                     'formatter_options' => array()

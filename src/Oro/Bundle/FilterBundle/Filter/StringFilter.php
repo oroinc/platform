@@ -83,6 +83,8 @@ class StringFilter extends AbstractFilter
                 return $ds->expr()->in($fieldName, $parameterName, true);
             case TextFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
+            case TextFilterType::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }
