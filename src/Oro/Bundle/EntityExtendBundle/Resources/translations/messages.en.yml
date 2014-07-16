@@ -3,7 +3,12 @@
 oro:
     entity_extend:
         form:
+            data_type_group:
+                fields:             Fields
+                relations:          Relations
             data_type:
+                choose_value:       Choose a field type...
+
                 string:             String
                 integer:            Integer
                 smallint:           SmallInt
@@ -22,6 +27,8 @@ oro:
 
                 ref-one:            System relation
                 ref-many:           System relation
+
+                inverse_relation:   Relation (%entity_name%) %field_name%
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
