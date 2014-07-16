@@ -89,6 +89,7 @@ class TemplateManager
 
     /**
      * @param string $entityClass
+     * 
      * @return bool
      */
     public function hasEntityFixture($entityClass)

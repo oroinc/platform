@@ -72,7 +72,7 @@ abstract class AbstractTemplateRepository implements
     }
 
     /**
-     * Creates a new instance of the entity, without invoking the constructor.
+     * Creates a new instance of the entity
      *
      * @param string $key
      *
