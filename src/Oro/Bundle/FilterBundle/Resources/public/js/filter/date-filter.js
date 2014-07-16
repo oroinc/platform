@@ -257,8 +257,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             _.each(this.criteriaValueSelectors.value, _.bind(this._appendDropdown, this, dropdownTemplate));
 
-            this.dateWidgets.start.datepicker('setDate', displayValue.value.start);
-            this.dateWidgets.end.datepicker('setDate', displayValue.value.end);
+            if (!this._isDateVariable(displayValue.value.start)) {
+                this.dateWidgets.start.datepicker('setDate', displayValue.value.start);
+            }
+            if (!this._isDateVariable(displayValue.value.end)) {
+                this.dateWidgets.end.datepicker('setDate', displayValue.value.end);
+            }
 
             this.$('.nav-tabs a').click(function (e) {
                 e.preventDefault();
@@ -268,6 +272,28 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             this._criteriaRenderd = true;
         },
 
+        /**
+         * @param {string} value
+         * @returns {boolean}
+         * @private
+         */
+        _isDateVariable: function (value) {
+            var dateVars = this.dateWidgetOptions.dateVars;
+            for (var i in dateVars.value) {
+                if (dateVars.value[i] == value) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        /**
+         * @param {function} template
+         * @param {string} actualSelector
+         * @param {string} name
+         * @private
+         */
         _appendDropdown: function (template, actualSelector, name) {
             var $calendar, $el = this.$el,
                 $input = this.$(actualSelector),
