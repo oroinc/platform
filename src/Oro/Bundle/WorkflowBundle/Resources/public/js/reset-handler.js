@@ -38,7 +38,7 @@ define([
             $.ajax({
                 url:  element.data('url'),
                 type: 'DELETE',
-                success: function (response) {
+                success: function () {
                     mediator.execute('refreshPage');
                 },
                 error: function () {

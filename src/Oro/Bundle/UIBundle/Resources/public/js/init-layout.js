@@ -26,8 +26,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * from layout.js
      * ============================================================ */
     $(function () {
-        if ($('#page-title').size()) {
-            document.title = _.unescape($('#page-title').text());
+        var $pageTitle = $('#page-title');
+        if ($pageTitle.size()) {
+            document.title = _.unescape($pageTitle.text());
         }
         layout.hideProgressBar();
 
@@ -91,10 +92,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 var myItem = $(this);
                 $(myItem).find('.sn-opener').click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
-                    var overlayHeight = $('#page').height(),
-                        overlayWidth = $('#page > .wrapper').width();
-                    $('#bar-drop-overlay').width(overlayWidth).height(overlayHeight);
-                    $('#bar-drop-overlay').toggleClass('bar-open-overlay');
+
+                    var $barOverlay   = $('#bar-drop-overlay'),
+                        $page         = $('#page'),
+                        overlayHeight = $page.height(),
+                        overlayWidth  = $page.children('.wrapper').width();
+                    $barOverlay.width(overlayWidth).height(overlayHeight);
+                    $barOverlay.toggleClass('bar-open-overlay');
                 });
                 $(myItem).find("span.close").click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
@@ -357,7 +361,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         error: function () {
                             var message;
                             message = el.data('error-message') ||
-                                __('Unexpected error occured. Please contact system administrator.');
+                                __('Unexpected error occurred. Please contact system administrator.');
                             mediator.execute('hideLoading');
                             mediator.execute('showMessage', 'error', message);
                         }
