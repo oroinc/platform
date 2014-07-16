@@ -205,10 +205,7 @@
 {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
     with {
         'script': block('head_script'),
-        'content': block('page_container'),
-        'menu': block('application_menu'),
-        'breadcrumb': block('breadcrumb'),
-        'userMenu': block('user_menu')
+        'content': block('page_container')
     }
     %}
 {% endif %}
