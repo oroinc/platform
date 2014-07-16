@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 abstract class BaseDriver
 {
@@ -66,6 +65,8 @@ abstract class BaseDriver
         if ($query->getFirstResult() > 0) {
             $qb->setFirstResult($query->getFirstResult());
         }
+
+        $qb->groupBy('search.id');
 
         return $qb->getQuery()
             ->getResult();
