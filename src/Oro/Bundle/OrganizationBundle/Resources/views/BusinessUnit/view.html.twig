@@ -2,7 +2,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% oro_title_set({params : {"%business_unit.name%": entity.name|default('N/A') }}) %}
-{% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
 
 {% block navButtons %}
     {% if resource_granted('EDIT', entity) %}

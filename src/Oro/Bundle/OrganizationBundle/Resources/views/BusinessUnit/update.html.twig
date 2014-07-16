@@ -5,7 +5,7 @@
 
 {% set entityId = form.vars.value.id %}
 {% oro_title_set({params : { "%business_unit.name%": form.vars.value.name } }) %}
-{% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
+
 {% set gridName = 'bu-update-users-grid' %}
 {% set formAction = entityId ? path('oro_business_unit_update', { 'id': entityId}) : path('oro_business_unit_create') %}
 

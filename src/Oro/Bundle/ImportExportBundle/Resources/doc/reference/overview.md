@@ -60,7 +60,7 @@ manages entity import. StrategyInterface defines interface for custom strategies
 ### TemplateFixture
 
 TemplateFixture namespace contains template fixtures functionality, TemplateFixtureInterface - interface used to create
-fixtures. TemplateFixtureRegistry is a storage for import template fixtures.
+fixtures. TemplateManager is a storage for import template fixtures.
 
 OroBatchBundle Configuration
 ----------------------------

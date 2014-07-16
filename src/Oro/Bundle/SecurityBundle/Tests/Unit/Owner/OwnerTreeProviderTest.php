@@ -15,7 +15,14 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $treeProvider;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $em;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $cache;
 
     protected function setUp()
@@ -56,6 +63,8 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
                         if ($repoName == 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
                             return $buRepo;
                         }
+
+                        return null;
                     }
                 )
             );
@@ -143,6 +152,10 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $user3 = new User();
         $this->setId($user3, 3);
         $user3->setOwner($childBu);
+        $user3->addBusinessUnit($childBu);
+
+        $user3 = new User();
+        $this->setId($user3, 4);
         $user3->addBusinessUnit($childBu);
 
         return [
