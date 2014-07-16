@@ -177,8 +177,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             foreach ($aces as $ace) {
                 if ($sid->equals($ace->getSecurityIdentity())) {
                     foreach ($masks as $requiredMask) {
-                        if ($this->isAceApplicable($requiredMask, $ace, $acl))
-                        {
+                        if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
 
                             // give an additional chance for the appropriate ACL extension to decide
@@ -205,7 +204,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                                     $triggeredAce = $ace;
                                     $triggeredMask = $requiredMask;
                                 }
-                                // go to the next mask
+                                // break for all masks
+                                break 3;
                             }
                         }
                     }
