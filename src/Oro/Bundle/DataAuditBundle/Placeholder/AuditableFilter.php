@@ -22,6 +22,12 @@ class AuditableFilter
         $this->configProvider = $configProvider;
     }
 
+    /**
+     * @param mixed  $entity
+     * @param string $entityClass
+     * @param bool   $show
+     * @return bool
+     */
     public function isEntityAuditable($entity, $entityClass, $show)
     {
         if (!is_object($entity) || $show) {
