@@ -317,7 +317,6 @@ class OwnerFormExtension extends AbstractTypeExtension
 
         if (is_object($entity)
             && $entity->getId()
-            && $form->has($this->fieldName)
         ) {
             $permission = 'ASSIGN';
             $this->checkIsGranted($permission, $entity);
@@ -326,16 +325,15 @@ class OwnerFormExtension extends AbstractTypeExtension
             $metadata = $this->getMetadata($dataClassName);
 
             if ($metadata) {
+                if ($form->has($this->fieldName)) {
+                    $form->remove($this->fieldName);
+                }
                 if ($this->isAssignGranted) {
                     if ($metadata->isUserOwned()) {
-                        $form->remove($this->fieldName);
                         $this->addUserOwnerField($form, $dataClassName, $permission, $owner, $entity->getId());
                     } elseif ($metadata->isBusinessUnitOwned()) {
-                        $form->remove($this->fieldName);
                         $this->addBusinessUnitOwnerField($form, $this->getCurrentUser(), $dataClassName);
                     }
-                } else {
-                    $form->remove($this->fieldName);
                 }
             }
         }
