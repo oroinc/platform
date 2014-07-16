@@ -54,7 +54,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         $this->managerRegistry = $managerRegistry;
         $this->fieldName = $fieldName;
         $this->fieldLabel = $fieldLabel;
-        $this->isAssignGranted = $isAssignGranted;
+        $this->isAssignGranted = &$isAssignGranted;
         $this->defaultOwner = $defaultOwner;
     }
 
