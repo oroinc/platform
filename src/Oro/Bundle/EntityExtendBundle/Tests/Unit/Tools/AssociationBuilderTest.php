@@ -230,15 +230,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['id'], $columnNames);
     }
 
-    public function testPrimaryKeyColumnNamesWithMappingException()
+    public function testPrimaryKeyColumnNamesWithORMMappingException()
     {
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->once())
             ->method('getEntityManager')
             ->will($this->throwException(new ORMMappingException('test')));
-
-        $this->configManager->expects($this->at(1))
-            ->method('getEntityManager')
-            ->will($this->throwException(new PersistenceMappingException('test')));
 
         $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
@@ -249,12 +245,21 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $columnNames);
         $this->assertSame(['id'], $columnNames);
+    }
 
+    public function testPrimaryKeyColumnNamesWithPersistenceMappingException()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->throwException(new PersistenceMappingException('test')));
+
+        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
             ['Test']
         );
+
         $this->assertCount(1, $columnNames);
         $this->assertSame(['id'], $columnNames);
     }
