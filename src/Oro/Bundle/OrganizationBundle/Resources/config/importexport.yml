@@ -1,0 +1,8 @@
+parameters:
+    oro_organization.importexport.template_fixture.business_unit.class: Oro\Bundle\OrganizationBundle\ImportExport\TemplateFixture\BusinessUnitFixture
+
+services:
+    oro_organization.importexport.template_fixture.business_unit:
+        class: %oro_organization.importexport.template_fixture.business_unit.class%
+        tags:
+            - { name: oro_importexport.template_fixture }

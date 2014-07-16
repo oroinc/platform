@@ -481,7 +481,7 @@ Class used to count collections and countable items inside import templates
 * **getMaxRelatedEntities(entityName, fieldName)** - count entities in relation
 
 **Classes:**
-* **TemplateFixtureRegistry** - fixture storage
+* **TemplateManager** - fixture storage
 * **FieldHelper** - helper to work with entity config
 
 Strategy
@@ -666,12 +666,12 @@ Interface for import fixtures
 ### Template Fixture Registry
 
 **Class:**
-Oro\Bundle\ImportExportBundle\Serializer\Normalizer\TemplateFixtureRegistry
+Oro\Bundle\ImportExportBundle\Serializer\Normalizer\TemplateManager
 
 **Description:**
 Fixtures registry
 
 **Methods:**
-* **addEntityFixture(entityClass, fixture)** - add fixture to registry
+* **addEntityRepository(fixture)**  - add repository to registry
 * **hasEntityFixture(entityClass)** - check that fixture exist for given `entityClass`
 * **getEntityFixture(entityClass)** - returns fixture for given `entityClass`
