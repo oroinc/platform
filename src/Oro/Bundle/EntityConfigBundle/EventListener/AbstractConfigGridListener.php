@@ -226,12 +226,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             }
         }
 
-        $result = [
+        return [
             'filters' => $filters,
             'sorters' => $sorters
         ];
-
-        return $result;
     }
 
     /**
