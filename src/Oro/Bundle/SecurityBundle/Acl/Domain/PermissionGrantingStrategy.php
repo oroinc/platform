@@ -173,40 +173,40 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $triggeredMask = 0;
         $result = false;
 
-        foreach ($masks as $requiredMask) {
-            foreach ($sids as $sid) {
-                foreach ($aces as $ace) {
-                    if ($sid->equals($ace->getSecurityIdentity())
-                        && $this->isAceApplicable($requiredMask, $ace, $acl)
-                    ) {
-                        $isGranting = $ace->isGranting();
+        foreach ($sids as $sid) {
+            foreach ($aces as $ace) {
+                if ($sid->equals($ace->getSecurityIdentity())) {
+                    foreach ($masks as $requiredMask) {
+                        if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
+                            $isGranting = $ace->isGranting();
 
-                        // give an additional chance for the appropriate ACL extension to decide
-                        // whether an access to a domain object is granted or not
-                        $decisionResult = $this->getContext()->getAclExtension()->decideIsGranting(
-                            $requiredMask,
-                            $this->getContext()->getObject(),
-                            $this->getContext()->getSecurityToken()
-                        );
-                        if (!$decisionResult) {
-                            $isGranting = !$isGranting;
-                        }
+                            // give an additional chance for the appropriate ACL extension to decide
+                            // whether an access to a domain object is granted or not
+                            $decisionResult = $this->getContext()->getAclExtension()->decideIsGranting(
+                                $requiredMask,
+                                $this->getContext()->getObject(),
+                                $this->getContext()->getSecurityToken()
+                            );
+                            if (!$decisionResult) {
+                                $isGranting = !$isGranting;
+                            }
 
-                        if ($isGranting) {
-                            // the access is granted if there is at least one granting ACE
-                            $triggeredAce = $ace;
-                            $triggeredMask = $requiredMask;
-                            $result = true;
-                            // break all loops when granting ACE was found
-                            break 3;
-                        } else {
-                            // remember the first denying ACE
-                            if (null === $triggeredAce) {
+                            if ($isGranting) {
+                                // the access is granted if there is at least one granting ACE
                                 $triggeredAce = $ace;
                                 $triggeredMask = $requiredMask;
+                                $result = true;
+                                // break all loops when granting ACE was found
+                                break 3;
+                            } else {
+                                // remember the first denying ACE
+                                if (null === $triggeredAce) {
+                                    $triggeredAce = $ace;
+                                    $triggeredMask = $requiredMask;
+                                }
+                                // break for all masks
+                                break 3;
                             }
-                            // go to the next mask
-                            break 2;
                         }
                     }
                 }

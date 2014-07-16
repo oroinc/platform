@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define, console*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
     './optional-validation-handler', 'jquery.validate'
@@ -140,7 +141,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     /**
      * change asterisk for optional validation group fields
      */
-    $.validator.prototype.init = _.wrap($.validator.prototype.init, function(init){
+    $.validator.prototype.init = _.wrap($.validator.prototype.init, function (init) {
         validationHandler.initialize($(this.currentForm));
         init.apply(this, arguments);
     });
