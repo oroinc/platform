@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
-use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -231,9 +232,13 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithMappingException()
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->at(0))
             ->method('getEntityManager')
-            ->will($this->throwException(new MappingException('test')));
+            ->will($this->throwException(new ORMMappingException('test')));
+
+        $this->configManager->expects($this->at(1))
+            ->method('getEntityManager')
+            ->will($this->throwException(new PersistenceMappingException('test')));
 
         $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
@@ -242,6 +247,14 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ['Test']
         );
 
+        $this->assertCount(1, $columnNames);
+        $this->assertSame(['id'], $columnNames);
+
+        $columnNames = ReflectionUtil::callProtectedMethod(
+            $builder,
+            'getPrimaryKeyColumnNames',
+            ['Test']
+        );
         $this->assertCount(1, $columnNames);
         $this->assertSame(['id'], $columnNames);
     }

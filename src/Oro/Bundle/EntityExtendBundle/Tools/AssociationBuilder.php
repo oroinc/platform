@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
+use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -173,9 +174,12 @@ class AssociationBuilder
         } catch (\ReflectionException $e) {
             // ignore entity not found exception
             return ['id'];
-        } catch (MappingException $e) {
-            // ignore any doctrine mapping exceptions
-            // it may happens if the entity has relation to deleted custom entity
+        }
+        // ignore any doctrine mapping exceptions
+        // it may happens if the entity has relation to deleted custom entity
+        catch (ORMMappingException $e) {
+            return ['id'];
+        } catch (PersistenceMappingException $e) {
             return ['id'];
         }
     }
