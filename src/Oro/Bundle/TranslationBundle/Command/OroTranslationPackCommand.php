@@ -7,9 +7,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Yaml\Parser;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
@@ -94,6 +96,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Download all language packs from project at translation service'
                     ),
+                    new InputOption(
+                        'skipCheck',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Skip check files before upload/update'
+                    ),
                 )
             )
             ->setHelp(
@@ -152,11 +160,32 @@ EOF
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectName      = $input->getArgument('project');
-        $languagePackPath = $this->getLangPackDir($projectName);
+        $projectName            = $input->getArgument('project');
+        $skipCheckNewKeywords   = $input->getOption('skipCheck');
+        $languagePackPath       = $this->getLangPackDir($projectName);
+        $translationService     = $this->getTranslationService($input, $output);
+        $mode                   = $input->getOption('upload-mode');
 
-        $translationService = $this->getTranslationService($input, $output);
-        $mode = $input->getOption('upload-mode');
+        if (!$skipCheckNewKeywords && is_dir($languagePackPath)) {
+            if (!$this->checkFiles($languagePackPath, $output)) {
+                /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
+                $dialog = $this->getHelperSet()->get('dialog');
+                if (!$input->isInteractive()) {
+                    $output->writeln('Some files require correction. Upload canceled.');
+                    return;
+                }
+                $ask = $dialog->askConfirmation(
+                    $output,
+                    '<question>Some files require correction, send anyway? (y/n)</question>',
+                    false
+                );
+                if (!$ask) {
+                    return;
+                }
+            }
+        } else {
+            $output->writeln('Force sending, without check files.');
+        }
 
         if ($mode == 'update') {
             $translationService->update($languagePackPath);
@@ -249,6 +278,7 @@ EOF
     {
         $projectNamespace = $input->getArgument('project');
         $defaultLocale    = $input->getArgument('locale');
+        $languagePackPath = $this->getLangPackDir($projectNamespace);
 
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
 
@@ -265,13 +295,13 @@ EOF
                     $this->createDirectory($bundleLanguagePackPath);
                 }
 
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle);
                 $output->writeln(
                     sprintf(
                         'Writing files for <info>%s</info>',
                         $bundle->getName()
                     )
                 );
+                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $writer->writeTranslations(
                     $messageCatalog,
                     $input->getOption('output-format'),
@@ -279,7 +309,9 @@ EOF
                 );
             }
         }
-
+        if (is_dir($languagePackPath)) {
+            $this->checkFiles($languagePackPath, $output);
+        }
         return true;
     }
 
@@ -318,10 +350,11 @@ EOF
      *
      * @param string          $defaultLocale
      * @param BundleInterface $bundle
+     * @param OutputInterface $output
      *
      * @return MessageCatalogue
      */
-    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle)
+    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle, OutputInterface $output)
     {
         $bundleTransPath = $bundle->getPath() . '/Resources/translations';
         $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
@@ -343,5 +376,45 @@ EOF
         $messageCatalogue = $operation->getResult();
 
         return $messageCatalogue;
+    }
+
+    /**
+     * Check yaml files in translation pack and display files and keywords that need translation.
+     *
+     * @param string $languagePackPath
+     * @param OutputInterface $output
+     * @return bool
+     */
+    protected function checkFiles($languagePackPath, OutputInterface $output)
+    {
+        $needTranslate  = array();
+        $result         = true;
+        $finder         = Finder::create()->files()->name('*.yml')->in($languagePackPath);
+        $yaml           = new Parser();
+
+        foreach ($finder->files() as $file) {
+            $value = $yaml->parse(file_get_contents((string)$file));
+            array_walk(
+                $value,
+                function (&$value, $key) {
+                    if ($value != $key || strpos($key, ' ') || !preg_match('#\.[^\s]#', $key)) {
+                        $value = false;
+                    } else {
+                        $value = '- ' . $value;
+                    }
+                }
+            );
+            $tempArr = array_filter($value);
+            if (count($tempArr) > 0) {
+                $needTranslate[(string)$file] = $tempArr;
+                $result = false;
+            }
+        }
+
+        foreach ($needTranslate as $key => $value) {
+            $output->writeln(sprintf('<comment>Need translate keywords in %s</comment>', $key));
+            $output->writeln($value);
+        }
+        return $result;
     }
 }

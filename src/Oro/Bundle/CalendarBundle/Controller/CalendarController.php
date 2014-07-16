@@ -75,7 +75,16 @@ class CalendarController extends Controller
                         'required' => true,
                         'configs'  => array(
                             'placeholder' => 'oro.calendar.form.choose_user_to_add_calendar',
-                        )
+                            'permission' => 'VIEW',
+                            'extra_config' => 'acl_user_autocomplete',
+                            'entity_name' => 'OroCalendarBundle:Calendar',
+                            'entity_id' => $calendar->getId(),
+                            'excludeCurrent' => true,
+                            'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                            'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                        ),
+                        'autocomplete_alias' => 'acl_users',
+                        'grid_name' => 'users-select-grid-exclude-owner'
                     )
                 )
                 ->createView(),

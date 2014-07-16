@@ -65,7 +65,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
-     *              "order"=80
+     *              "order"=80,
+     *              "identity"=true
      *          }
      *      }
      * )
@@ -95,7 +96,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
-     *              "order"=110
+     *              "order"=110,
+     *              "identity"=true
      *          }
      *      }
      * )
@@ -110,7 +112,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
-     *              "order"=100
+     *              "order"=100,
+     *              "identity"=true
      *          }
      *      }
      * )
@@ -127,7 +130,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *      defaultValues={
      *          "importexport"={
      *              "order"=140,
-     *              "short"=true
+     *              "short"=true,
+     *              "identity"=true
      *          }
      *      }
      * )
@@ -144,7 +148,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *      defaultValues={
      *          "importexport"={
      *              "order"=130,
-     *              "short"=true
+     *              "short"=true,
+     *              "identity"=true
      *          }
      *      }
      * )

@@ -41,3 +41,4 @@ oro:
             config_field:
                 message:
                     saved: "Field saved"
+        unique_keys: Unique Keys
