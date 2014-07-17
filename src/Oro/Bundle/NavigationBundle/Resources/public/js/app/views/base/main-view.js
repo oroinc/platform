@@ -59,7 +59,7 @@ define([
                 error: function (model, xhr) {
                     if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {
                         // Suppress error if it's 404 response and not debug mode
-                        //@TODO remove item view
+                        model.unset('id').destroy();
                     } else {
                         error.handle({}, xhr, {enforce: true});
                     }
