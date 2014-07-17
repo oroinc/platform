@@ -21,32 +21,26 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
      */
     public function normalize($data, $format = null, array $context = array())
     {
-        $this->cleanCacheIfDataIsCollection($data, $format, $context);
-
         if (null === $data || is_scalar($data)) {
             return $data;
-        }
-        if (is_object($data) && $this->supportsNormalization($data, $format)) {
+        } elseif (is_object($data) && $this->supportsNormalization($data, $format)) {
+            $this->cleanCacheIfDataIsCollection($data, $format, $context);
             return $this->normalizeObject($data, $format, $context);
-        }
-        if ($data instanceof \Traversable) {
+        } elseif ($data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
             }
 
             return $normalized;
-        }
-        if (is_object($data)) {
-            return $this->normalizeObject($data, $format, $context);
-        }
-        if (is_array($data)) {
+        } elseif (is_array($data)) {
             foreach ($data as $key => $val) {
                 $data[$key] = $this->normalize($val, $format, $context);
             }
 
             return $data;
         }
+
         throw new UnexpectedValueException(
             sprintf('An unexpected value could not be normalized: %s', var_export($data, true))
         );
@@ -140,9 +134,8 @@ class Serializer extends BaseSerializer implements DenormalizerInterface, Normal
      */
     protected function cleanCacheIfDataIsCollection($data, $format, $context)
     {
-        $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
-
         if ($data instanceof Collection) {
+            $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
             // Clear cache of normalizer for collections,
             // because of wrong behaviour when selecting normalizer for collections of elements with different types
             unset($this->normalizerCache[$cacheKey]);
