@@ -255,3 +255,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     overflow: hidden;
     vertical-align: bottom;
 }
+
+.filter-item .filter-update-empty {
+    margin-left: -2px;
+}
