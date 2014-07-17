@@ -2,6 +2,8 @@ parameters:
     oro_email.email.entity.class:                 Oro\Bundle\EmailBundle\Entity\Email
     oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
+    oro_email.email.holder.helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
+    oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
     oro_email.email.owner.provider.storage.class: Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage
@@ -76,6 +78,14 @@ services:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
 
+    oro_email.email.holder.helper:
+        class: %oro_email.email.holder.helper.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+
+    oro_email.email.address.helper:
+        class: %oro_email.email.address.helper.class%
+
     oro_email.email_body_loader_selector:
         public: false
         class: %oro_email.email_body_loader_selector.class%
@@ -109,6 +119,7 @@ services:
         arguments:
             - @oro_email.email.entity.batch_processor
             - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -229,6 +240,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_email.direct_mailer
+            - @oro_email.email.address.helper
             - @oro_email.email.entity.builder=
             - @oro_email.email.owner.provider
             - @oro_email.email.activity.manager
@@ -238,6 +250,7 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @oro_email.mailer.processor
+            - @oro_email.email.address.helper
             - @oro_locale.formatter.name
         tags:
             - { name: oro_workflow.action, alias: send_email }
@@ -299,5 +312,7 @@ services:
 
     oro_entity.twig.extension.email:
         class: %oro_entity.twig.extension.email.class%
+        arguments:
+            - @oro_email.email.holder.helper
         tags:
             - { name: twig.extension }

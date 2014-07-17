@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 
@@ -39,7 +40,12 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->action = new SendEmail($this->contextAccessor, $this->emailProcessor, $this->nameFormatter);
+        $this->action = new SendEmail(
+            $this->contextAccessor,
+            $this->emailProcessor,
+            new EmailAddressHelper(),
+            $this->nameFormatter
+        );
     }
 
     /**
