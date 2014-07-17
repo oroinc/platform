@@ -132,7 +132,7 @@ class SearchHandler implements SearchHandlerInterface
             $items = [
                 $this->objectManager
                     ->getRepository($this->entityName)
-                    ->findOneBy($query)
+                    ->find($query)
             ];
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
