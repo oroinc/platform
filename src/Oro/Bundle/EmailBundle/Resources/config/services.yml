@@ -213,10 +213,8 @@ services:
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
-            - @doctrine
-            - %oro_email.email.entity.class%
             - @oro_email.email.owner.provider.storage
-            - @oro_config.user
+            - @oro_locale.dql.formatter.name
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
