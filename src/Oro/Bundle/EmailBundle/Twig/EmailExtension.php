@@ -2,11 +2,22 @@
 
 namespace Oro\Bundle\EmailBundle\Twig;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 
 class EmailExtension extends \Twig_Extension
 {
     const NAME = 'oro_email';
+
+    /** @var EmailHolderHelper */
+    protected $emailHolderHelper;
+
+    /**
+     * @param EmailHolderHelper $emailHolderHelper
+     */
+    public function __construct(EmailHolderHelper $emailHolderHelper)
+    {
+        $this->emailHolderHelper = $emailHolderHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -27,7 +38,7 @@ class EmailExtension extends \Twig_Extension
      */
     public function hasEmail($objectOrClassName)
     {
-        return EmailUtil::hasEmail($objectOrClassName);
+        return $this->emailHolderHelper->hasEmail($objectOrClassName);
     }
 
     /**
@@ -38,7 +49,7 @@ class EmailExtension extends \Twig_Extension
      */
     public function getEmail($object)
     {
-        $result = EmailUtil::getEmail($object);
+        $result = $this->emailHolderHelper->getEmail($object);
 
         return null !== $result
             ? $result

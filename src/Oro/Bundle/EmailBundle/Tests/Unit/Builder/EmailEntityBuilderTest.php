@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +27,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $addrManager = new EmailAddressManager('Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures', 'Test%sProxy');
-        $this->builder = new EmailEntityBuilder($this->batch, $addrManager);
+        $this->builder = new EmailEntityBuilder($this->batch, $addrManager, new EmailAddressHelper());
     }
 
     private function initEmailStorage()
