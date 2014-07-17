@@ -39,7 +39,9 @@
         {% if form.startDashboard is defined %}
             {{ form_row(form.startDashboard) }}
         {% endif %}
+    {% if form.owner is defined %}
         {{ form_row(form.owner) }}
+    {% endif %}
     {% endset %}
 
     {% set dataBlocks = [{
