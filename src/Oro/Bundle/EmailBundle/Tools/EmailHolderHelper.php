@@ -12,8 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 class EmailHolderHelper
 {
-    const GET_EMAIL_METHOD       = 'getEmail';
-    const EMAIL_HOLDER_INTERFACE = 'Oro\Bundle\EmailBundle\Model\EmailHolderInterface';
+    const GET_EMAIL_METHOD = 'getEmail';
 
     /** @var ConfigProviderInterface */
     protected $extendConfigProvider;
@@ -52,35 +51,10 @@ class EmailHolderHelper
     }
 
     /**
-     * Checks if the given object can have the email address
-     *
-     * @param object|string $objectOrClassName
-     * @return bool
-     */
-    public function hasEmail($objectOrClassName)
-    {
-        if (empty($objectOrClassName)) {
-            return false;
-        }
-
-        if (is_object($objectOrClassName)) {
-            return
-                $objectOrClassName instanceof EmailHolderInterface
-                || method_exists($objectOrClassName, self::GET_EMAIL_METHOD);
-        }
-        if (is_string($objectOrClassName)) {
-            return
-                is_subclass_of($objectOrClassName, self::EMAIL_HOLDER_INTERFACE)
-                || method_exists($objectOrClassName, self::GET_EMAIL_METHOD);
-        }
-
-        return false;
-    }
-
-    /**
      * Gets the email address of the given object
      *
      * @param object $object
+     *
      * @return string|null The email address or null if the object has no email
      */
     public function getEmail($object)
@@ -89,12 +63,14 @@ class EmailHolderHelper
             return null;
         }
 
-        if ($this->hasEmail($object)) {
+        $canHaveEmail = $object instanceof EmailHolderInterface
+            || method_exists($object, self::GET_EMAIL_METHOD);
+        if ($canHaveEmail) {
             return $object->getEmail();
         }
 
-        // check may be an entity has related contact
-        // in this case we can get its email
+        // check may be an entity has related entity which has an email
+        // in this case we can use this email
         return $this->getEmailFromRelatedObject($object);
     }
 
@@ -110,15 +86,14 @@ class EmailHolderHelper
             return null;
         }
 
-        $targetEntities = $this->getTargetEntities();
+        $targetEntities   = $this->getTargetEntities();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($targetEntities as $className) {
-            if (isset($applicableRelations[$className])) {
-                foreach ($applicableRelations[$className] as $fieldName) {
-                    $propertyAccessor = PropertyAccess::createPropertyAccessor();
-                    $relatedObject    = $propertyAccessor->getValue($object, $fieldName);
-
-                    return $this->getEmail($relatedObject);
-                }
+            if (!isset($applicableRelations[$className])) {
+                continue;
+            }
+            foreach ($applicableRelations[$className] as $fieldName) {
+                return $this->getEmail($propertyAccessor->getValue($object, $fieldName));
             }
         }
 
@@ -146,19 +121,22 @@ class EmailHolderHelper
 
         $targetEntities = $this->getTargetEntities();
         foreach ($relations as $relation) {
-            if (isset($relation['owner']) && $relation['owner']) {
-                /** @var FieldConfigId $fieldId */
-                $fieldId = $relation['field_id'];
-                if ($fieldId->getFieldType() === 'manyToOne') {
-                    $relatedEntityClass = $relation['target_entity'];
-                    if (in_array($relatedEntityClass, $targetEntities)) {
-                        if (!isset($result[$relatedEntityClass])) {
-                            $result[$relatedEntityClass] = [];
-                        }
-                        $result[$relatedEntityClass][] = $fieldId->getFieldName();
-                    }
-                }
+            if (empty($relation['owner'])) {
+                continue;
             }
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $relation['field_id'];
+            if ($fieldId->getFieldType() !== 'manyToOne') {
+                continue;
+            }
+            $relatedEntityClass = $relation['target_entity'];
+            if (!in_array($relatedEntityClass, $targetEntities)) {
+                continue;
+            }
+            if (!isset($result[$relatedEntityClass])) {
+                $result[$relatedEntityClass] = [];
+            }
+            $result[$relatedEntityClass][] = $fieldId->getFieldName();
         }
 
         return $result;

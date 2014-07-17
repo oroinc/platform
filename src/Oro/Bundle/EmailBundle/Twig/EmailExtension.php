@@ -25,20 +25,8 @@ class EmailExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_has_email', [$this, 'hasEmail']),
             new \Twig_SimpleFunction('oro_get_email', [$this, 'getEmail']),
         ];
-    }
-
-    /**
-     * Checks if the given object can have the email address
-     *
-     * @param object|string $objectOrClassName
-     * @return bool
-     */
-    public function hasEmail($objectOrClassName)
-    {
-        return $this->emailHolderHelper->hasEmail($objectOrClassName);
     }
 
     /**

@@ -27,14 +27,6 @@ class EmailHolderHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider hasEmailProvider
-     */
-    public function testHasEmail($objectOrClassName, $expected)
-    {
-        $this->assertEquals($expected, $this->helper->hasEmail($objectOrClassName));
-    }
-
-    /**
      * @dataProvider getEmailProvider
      */
     public function testGetEmail($object, $expected)
@@ -141,26 +133,6 @@ class EmailHolderHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper->addTargetEntity('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder', -10);
 
         $this->assertEquals('test@example.com', $this->helper->getEmail($object));
-    }
-
-    public function hasEmailProvider()
-    {
-        return array(
-            'null'                                => array(null, false),
-            'not obj and not str'                 => array(123, false),
-            'obj without email'                   => array(new \stdClass(), false),
-            'obj implements EmailHolderInterface' => array(new TestEmailHolder(), true),
-            'obj has getEmail method'             => array(new TestUser(), true),
-            'cls without email'                   => array('stdClass', false),
-            'cls implements EmailHolderInterface' => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder',
-                true
-            ),
-            'cls has getEmail method'             => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
-                true
-            ),
-        );
     }
 
     public function getEmailProvider()
