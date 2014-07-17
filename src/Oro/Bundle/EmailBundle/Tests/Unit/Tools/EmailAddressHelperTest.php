@@ -1,19 +1,27 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Util;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 
-class EmailUtilTest extends \PHPUnit_Framework_TestCase
+class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var EmailAddressHelper */
+    protected $helper;
+
+    protected function setUp()
+    {
+        $this->helper = new EmailAddressHelper();
+    }
+
     /**
      * @dataProvider emailAddressProvider
      */
     public function testExtractPureEmailAddress($fullEmailAddress, $pureEmailAddress, $name)
     {
-        $this->assertEquals($pureEmailAddress, EmailUtil::extractPureEmailAddress($fullEmailAddress));
+        $this->assertEquals($pureEmailAddress, $this->helper->extractPureEmailAddress($fullEmailAddress));
     }
 
     /**
@@ -21,7 +29,7 @@ class EmailUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtractEmailAddressName($fullEmailAddress, $pureEmailAddress, $name)
     {
-        $this->assertEquals($name, EmailUtil::extractEmailAddressName($fullEmailAddress));
+        $this->assertEquals($name, $this->helper->extractEmailAddressName($fullEmailAddress));
     }
 
     /**
@@ -29,7 +37,7 @@ class EmailUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtractEmailAddresses($src, $expected)
     {
-        $this->assertEquals($expected, EmailUtil::extractEmailAddresses($src));
+        $this->assertEquals($expected, $this->helper->extractEmailAddresses($src));
     }
 
     /**
@@ -37,7 +45,7 @@ class EmailUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildFullEmailAddress($pureEmailAddress, $name, $fullEmailAddress)
     {
-        $this->assertEquals($fullEmailAddress, EmailUtil::buildFullEmailAddress($pureEmailAddress, $name));
+        $this->assertEquals($fullEmailAddress, $this->helper->buildFullEmailAddress($pureEmailAddress, $name));
     }
 
     /**
@@ -45,23 +53,7 @@ class EmailUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsFullEmailAddress($emailAddress, $isFull)
     {
-        $this->assertEquals($isFull, EmailUtil::isFullEmailAddress($emailAddress));
-    }
-
-    /**
-     * @dataProvider hasEmailProvider
-     */
-    public function testHasEmail($objectOrClassName, $expected)
-    {
-        $this->assertEquals($expected, EmailUtil::hasEmail($objectOrClassName));
-    }
-
-    /**
-     * @dataProvider getEmailProvider
-     */
-    public function testGetEmail($object, $expected)
-    {
-        $this->assertEquals($expected, EmailUtil::getEmail($object));
+        $this->assertEquals($isFull, $this->helper->isFullEmailAddress($emailAddress));
     }
 
     public static function emailAddressProvider()
@@ -115,45 +107,6 @@ class EmailUtilTest extends \PHPUnit_Framework_TestCase
             array('john@example.com', array('john@example.com')),
             array(array('john@example.com'), array('john@example.com')),
             array(array($emailObj), array('john@example.com')),
-        );
-    }
-
-    public function hasEmailProvider()
-    {
-        return array(
-            'null'                                => array(null, false),
-            'not obj and not str'                 => array(123, false),
-            'obj without email'                   => array(new \stdClass(), false),
-            'obj implements EmailHolderInterface' => array(new TestEmailHolder(), true),
-            'obj has getEmail method'             => array(new TestUser(), true),
-            'cls without email'                   => array('stdClass', false),
-            'cls implements EmailHolderInterface' => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder',
-                true
-            ),
-            'cls has getEmail method'             => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
-                true
-            ),
-        );
-    }
-
-    public function getEmailProvider()
-    {
-        return array(
-            'null'                                => array(null, null),
-            'not obj'                             => array(
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder',
-                null
-            ),
-            'obj implements EmailHolderInterface' => array(
-                new TestEmailHolder('test@example.com'),
-                'test@example.com'
-            ),
-            'obj has getEmail method'             => array(
-                new TestUser('test@example.com'),
-                'test@example.com'
-            ),
         );
     }
 }

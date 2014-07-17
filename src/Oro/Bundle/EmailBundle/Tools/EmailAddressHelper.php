@@ -1,15 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Entity\Util;
+namespace Oro\Bundle\EmailBundle\Tools;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
-class EmailUtil
+class EmailAddressHelper
 {
-    const GET_EMAIL_METHOD       = 'getEmail';
-    const EMAIL_HOLDER_INTERFACE = 'Oro\Bundle\EmailBundle\Model\EmailHolderInterface';
-
     /**
      * Extract 'pure' email address from the given email address
      *
@@ -22,7 +19,7 @@ class EmailUtil
      * @param string $fullEmailAddress
      * @return string
      */
-    public static function extractPureEmailAddress($fullEmailAddress)
+    public function extractPureEmailAddress($fullEmailAddress)
     {
         $atPos = strrpos($fullEmailAddress, '@');
         if ($atPos === false) {
@@ -54,7 +51,7 @@ class EmailUtil
      * @param string $fullEmailAddress
      * @return string|null
      */
-    public static function extractEmailAddressName($fullEmailAddress)
+    public function extractEmailAddressName($fullEmailAddress)
     {
         $addrPos = strrpos($fullEmailAddress, '<');
         if ($addrPos === false) {
@@ -74,7 +71,7 @@ class EmailUtil
      * @return string[]
      * @throws \InvalidArgumentException
      */
-    public static function extractEmailAddresses($emails)
+    public function extractEmailAddresses($emails)
     {
         if (is_string($emails)) {
             return empty($emails)
@@ -113,7 +110,7 @@ class EmailUtil
      * @param string $emailAddressOwnerName
      * @return string
      */
-    public static function buildFullEmailAddress($pureEmailAddress, $emailAddressOwnerName)
+    public function buildFullEmailAddress($pureEmailAddress, $emailAddressOwnerName)
     {
         if ($pureEmailAddress === null) {
             $pureEmailAddress = '';
@@ -133,53 +130,12 @@ class EmailUtil
      * @param string $emailAddress
      * @return bool
      */
-    public static function isFullEmailAddress($emailAddress)
+    public function isFullEmailAddress($emailAddress)
     {
         if (empty($emailAddress)) {
             return false;
         }
 
         return (strpos($emailAddress, '<') !== false);
-    }
-
-    /**
-     * Checks if the given object can have the email address
-     *
-     * @param object|string $objectOrClassName
-     * @return bool
-     */
-    public static function hasEmail($objectOrClassName)
-    {
-        if (empty($objectOrClassName)) {
-            return false;
-        }
-
-        if (is_object($objectOrClassName)) {
-            return
-                $objectOrClassName instanceof EmailHolderInterface
-                || method_exists($objectOrClassName, self::GET_EMAIL_METHOD);
-        }
-        if (is_string($objectOrClassName)) {
-            return
-                is_subclass_of($objectOrClassName, self::EMAIL_HOLDER_INTERFACE)
-                || method_exists($objectOrClassName, self::GET_EMAIL_METHOD);
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the email address of the given object
-     *
-     * @param object $object
-     * @return string|null The email address or null if the object has no email
-     */
-    public static function getEmail($object)
-    {
-        if (is_object($object) && self::hasEmail($object)) {
-            return $object->getEmail();
-        }
-
-        return null;
     }
 }

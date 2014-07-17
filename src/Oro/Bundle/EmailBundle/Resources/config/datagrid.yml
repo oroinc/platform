@@ -75,15 +75,9 @@ datagrid:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
                     inner:
-                        folder:
-                            join: e.folders
-                            alias: f
-                        origin:
-                            join: f.origin
-                            alias: o
-                        from_email_address:
-                            join: e.fromEmailAddress
-                            alias: a
+                        - { join: e.folders, alias: f }
+                        - { join: f.origin, alias: o }
+                        - { join: e.fromEmailAddress, alias: a }
                 where:
                     and:
                         - o.id IN (:origin_ids)
@@ -101,8 +95,6 @@ datagrid:
         extends: dashboard-recent-emails-grid
         source:
             query:
-                select:
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression
                 where:
                     and:
                         - f.type = '%oro_email.email_folder.entity.class%::INBOX'
@@ -110,7 +102,7 @@ datagrid:
             receivedAt:
                 label: oro.email.received_at.label
                 frontend_type: datetime
-            fromEmailAddress:
+            fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
                 frontend_type: html
@@ -122,6 +114,7 @@ datagrid:
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
             columns:
+                fromEmailExpression: { data_name: fromEmailExpression }
                 receivedAt:  { data_name: e.receivedAt }
             default:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
