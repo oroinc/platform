@@ -96,7 +96,6 @@ class EmailHolderHelper
         // check may be an entity has related contact
         // in this case we can get its email
         return $this->getEmailFromRelatedObject($object);
-
     }
 
     /**
