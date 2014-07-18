@@ -90,6 +90,10 @@ class ChannelHandler
      */
     protected function getIntegration(Integration $integration)
     {
+        if (!$integration->getId()) {
+            return null;
+        }
+
         $oldIntegration = $this->em->find('OroIntegrationBundle:Channel', $integration->getId());
 
         return $oldIntegration ? clone($oldIntegration) : null;
