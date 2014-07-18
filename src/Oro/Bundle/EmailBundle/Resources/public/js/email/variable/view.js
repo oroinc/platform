@@ -1,7 +1,10 @@
+/*jslint browser:true, nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
     ], function ($, _, Backbone, __) {
     'use strict';
+
+    var document = window.document;
 
     /**
      * @export  oroemail/js/email/variable/view
@@ -26,9 +29,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
 
             this.listenTo(this.model, 'sync', this.render);
             this.target.on('change', _.bind(this.selectionChanged, this));
-
-            $('input[name*="subject"], textarea[name*="content"]')
-                .on('blur', _.bind(this._updateElementsMetaData, this));
+            this.fields = $('input[name*="subject"], textarea[name*="content"]');
+            this.fields.on('blur', _.bind(this._updateElementsMetaData, this));
 
             // set default to content
             this.lastElement = $('textarea[name*="content"]');
@@ -53,14 +55,15 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @returns {*}
          */
         render: function () {
-            var userVars   = this.model.get('user'),
+            var html,
+                userVars   = this.model.get('user'),
                 entityVars = this.model.get('entity'),
                 $el        = $(this.el);
 
             if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
                 $el.parent().hide();
             } else {
-                var html = _.template(this.options.template.html(), {
+                html = _.template(this.options.template.html(), {
                     userVars: this.model.get('user'),
                     entityVars: this.model.get('entity'),
                     title: __('Click to insert variable or drag it.')
@@ -70,7 +73,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
                 $el.parent().show();
 
                 $el.find('ul li a').draggable({helper: 'clone'});
-                $('input[name*="subject"], textarea[name*="content"]')
+                this.fields
                     .droppable({
                         drop: function Drop(event, ui) {
                             var variable = ui.draggable.text(),
@@ -91,10 +94,16 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @returns {*}
          */
         addVariable: function (e) {
-            if (!_.isNull(this.lastElement) && this.lastElement.is(':visible')) {
-                this.lastElement.val(this.lastElement.val() + $(e.currentTarget).html());
+            var field;
+            field = this.fields.filter(document.activeElement);
+
+            if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
+                field = this.lastElement;
             }
 
+            if (field) {
+                field.val(field.val() + $(e.currentTarget).html());
+            }
             return this;
         },
 

@@ -214,8 +214,8 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     background: #fff;
     color: #6d6d6d;
 }
-.filter-criteria .tab-content a:hover,
-.filter-criteria .tab-content a:focus{
+.filter-criteria .tab-content a:not(.ui-slider-handle):hover,
+.filter-criteria .tab-content a:not(.ui-slider-handle):focus{
     background: transparent;
 }
 .filter-criteria .datetime-visual-element {
@@ -229,7 +229,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     width: auto !important;
 }
 
-.filter-item-simple .choicefilter > .dropdown,
+.filter-item-simple .choice-filter > .dropdown,
 .filter-item-simple .filter-select {
     display: inline-block;
 }
@@ -254,4 +254,8 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     white-space: nowrap;
     overflow: hidden;
     vertical-align: bottom;
+}
+
+.filter-item .filter-update-empty {
+    margin-left: -2px;
 }

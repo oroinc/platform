@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
@@ -53,6 +54,7 @@ class TextFilterTypeTest extends AbstractTypeTestCase
                         TextFilterType::TYPE_ENDS_WITH    => 'oro.filter.form.label_type_end_with',
                         TextFilterType::TYPE_IN           => 'oro.filter.form.label_type_in',
                         TextFilterType::TYPE_NOT_IN       => 'oro.filter.form.label_type_not_in',
+                        FilterUtility::TYPE_EMPTY         => 'oro.filter.form.label_type_empty',
                     )
                 )
             )

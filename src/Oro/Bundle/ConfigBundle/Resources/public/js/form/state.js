@@ -28,6 +28,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/transl
                     if (this.isChanged()) {
                         return this.CONFIRMATION_MESSAGE;
                     }
+
+                    return null;
                 }, this));
                 mediator.on('openLink:before', this._confirmOpenLink, this);
             },

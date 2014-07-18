@@ -21,7 +21,7 @@ datagrid:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
         columns:
             updated:
-                label: oro.entity_config.entity_config.updated.label
+                label: oro.ui.updated_at
                 frontend_type: datetime
 
         properties:

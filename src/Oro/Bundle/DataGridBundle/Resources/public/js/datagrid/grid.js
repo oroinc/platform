@@ -166,7 +166,7 @@ define(function (require) {
         },
 
         /**
-         * Inits this.rowActions and this.rowClickAction
+         * Init this.rowActions and this.rowClickAction
          *
          * @private
          */
@@ -389,7 +389,7 @@ define(function (require) {
          * @private
          */
         _listenToCollectionEvents: function () {
-            this.collection.on('request', function (model, xhr, options) {
+            this.collection.on('request', function (model, xhr) {
                 this._beforeRequest();
                 var self = this;
                 var always = xhr.always;
@@ -528,12 +528,12 @@ define(function (require) {
          */
         _defineNoDataBlock: function () {
             var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
-                template = _.isEmpty(this.collection.state.filters) ?
-                        'oro.datagrid.noentities' : 'oro.datagrid.noresults';
-            template = this.noColumnsFlag ? 'oro.datagrid.nocolumns' : template;
+                message = _.isEmpty(this.collection.state.filters) ?
+                        'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+            message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hint: __(template, placeholders).replace('\n', '<br />')
+                hint: __(message, placeholders).replace('\n', '<br />')
             }))).hide();
         },
 

@@ -166,6 +166,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms refresh action that before it will be executed
          *
+         * @param {$.Event} e
          * @param {orodatagrid.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
@@ -180,6 +181,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms reset action that before it will be executed
          *
+         * @param {$.Event} e
          * @param {orodatagrid.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
