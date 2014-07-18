@@ -23,9 +23,6 @@ class OroTranslationPackCommand extends ContainerAwareCommand
     /** @var string */
     protected $path;
 
-    /** @var  boolean */
-    protected $hasNewKeywords;
-
     /**
      * {@inheritdoc}
      */
@@ -281,6 +278,7 @@ EOF
     {
         $projectNamespace = $input->getArgument('project');
         $defaultLocale    = $input->getArgument('locale');
+        $languagePackPath = $this->getLangPackDir($projectNamespace);
 
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
 
@@ -297,13 +295,13 @@ EOF
                     $this->createDirectory($bundleLanguagePackPath);
                 }
 
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $output->writeln(
                     sprintf(
                         'Writing files for <info>%s</info>',
                         $bundle->getName()
                     )
                 );
+                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
                 $writer->writeTranslations(
                     $messageCatalog,
                     $input->getOption('output-format'),
@@ -311,10 +309,8 @@ EOF
                 );
             }
         }
-        if ($this->hasNewKeywords) {
-            $output->writeln(
-                '<question>Found new untranslated labels. In some of the files need to make changes before upload.</question>'
-            );
+        if (is_dir($languagePackPath)) {
+            $this->checkFiles($languagePackPath, $output);
         }
         return true;
     }
@@ -379,18 +375,6 @@ EOF
         $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
         $messageCatalogue = $operation->getResult();
 
-        foreach ($operation->getDomains() as $domain) {
-            $newMessages = $operation->getNewMessages($domain);
-            if (count($newMessages) > 0) {
-                $output->writeln(sprintf('<comment>New keywords in %s</comment>', $domain));
-                foreach ($newMessages as $newMessage) {
-                    if (preg_match('#\.[^\s]#', $newMessage)) {
-                        $this->hasNewKeywords = true;
-                        $output->writeln($newMessage);
-                    }
-                }
-            }
-        }
         return $messageCatalogue;
     }
 
@@ -413,8 +397,10 @@ EOF
             array_walk(
                 $value,
                 function (&$value, $key) {
-                    if ($value != $key || strpos($key, ' ')) {
+                    if ($value != $key || strpos($key, ' ') || !preg_match('#\.[^\s]#', $key)) {
                         $value = false;
+                    } else {
+                        $value = '- ' . $value;
                     }
                 }
             );

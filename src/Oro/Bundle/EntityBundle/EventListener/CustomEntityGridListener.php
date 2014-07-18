@@ -83,7 +83,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     ) {
         parent::__construct($configManager, $datagridResolver);
 
-        $this->router        = $router;
+        $this->router = $router;
     }
 
     /**
@@ -124,7 +124,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         $additionalColumnSettings = $this->getDynamicFields(
             $config->offsetGetByPath('[source][query][from][0][alias]', 'ce')
         );
-        $filtersSorters           = $this->getDynamicSortersAndFilters($additionalColumnSettings);
+        $filtersSorters           = $this->getDynamicSortersAndFilters($additionalColumnSettings['columns'], 'ce.');
         $additionalColumnSettings = array_merge(
             $additionalColumnSettings,
             [
@@ -323,7 +323,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         }
 
         return function (ResultRecord $record) use ($gridName, $router, $route) {
-            $datagrid = $this->getVisitedDatagrid($gridName);
+            $datagrid  = $this->getVisitedDatagrid($gridName);
             $className = $this->getParam($datagrid, 'class_name');
             return $router->generate(
                 $route,
@@ -341,8 +341,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      * - then from master request attributes
      *
      * @param DatagridInterface $datagrid
-     * @param string $name
-     * @param bool   $default
+     * @param string            $name
+     * @param bool              $default
      *
      * @return mixed
      */
@@ -350,13 +350,8 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     {
         $paramValue = $datagrid->getParameters()->get($name, $default);
         if ($paramValue === false) {
-            $paramNameCamelCase = str_replace(
-                ' ',
-                '',
-                lcfirst(ucwords(str_replace('_', ' ', $name)))
-            );
-
-            $paramValue = $this->request->attributes->get($paramNameCamelCase, $default);
+            $paramNameCamelCase = str_replace(' ', '', lcfirst(ucwords(str_replace('_', ' ', $name))));
+            $paramValue         = $this->request->attributes->get($paramNameCamelCase, $default);
         }
 
         return $paramValue;
