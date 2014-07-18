@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
@@ -56,12 +57,11 @@ class ChannelHandler
     {
         $userOwner   = $entity->getDefaultUserOwner();
         $isNewEntity = !$entity->getId();
-
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+            $oldState = $this->getIntegration($entity);
             $this->form->submit($this->request);
-
             if (!$this->request->get(self::UPDATE_MARKER, false) && $this->form->isValid()) {
                 $this->em->persist($entity);
                 $this->em->flush();
@@ -70,10 +70,28 @@ class ChannelHandler
                     $this->eventDispatcher->dispatch(DefaultOwnerSetEvent::NAME, new DefaultOwnerSetEvent($entity));
                 }
 
+                if (!$isNewEntity && $oldState) {
+                    $this->eventDispatcher->dispatch(
+                        IntegrationUpdateEvent::NAME,
+                        new IntegrationUpdateEvent($entity, $oldState)
+                    );
+                }
+
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param Integration $integration
+     * @return Integration|null
+     */
+    protected function getIntegration(Integration $integration)
+    {
+        $oldIntegration = $this->em->find('OroIntegrationBundle:Channel', $integration->getId());
+
+        return $oldIntegration ? clone $oldIntegration : null;
     }
 }
