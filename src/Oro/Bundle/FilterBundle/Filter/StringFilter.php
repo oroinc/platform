@@ -17,19 +17,23 @@ class StringFilter extends AbstractFilter
             return false;
         }
 
+        $type = $data['type'];
+
         $parameterName = $ds->generateParameterName($this->getName());
 
         $this->applyFilterToClause(
             $ds,
             $this->buildComparisonExpr(
                 $ds,
-                $data['type'],
+                $type,
                 $this->get(FilterUtility::DATA_NAME_KEY),
                 $parameterName
             )
         );
 
-        $ds->setParameter($parameterName, $data['value']);
+        if ($type !== FilterUtility::TYPE_EMPTY) {
+            $ds->setParameter($parameterName, $data['value']);
+        }
 
         return true;
     }
@@ -49,11 +53,11 @@ class StringFilter extends AbstractFilter
      */
     protected function parseData($data)
     {
-        if (!is_array($data) || !array_key_exists('value', $data) || !$data['value']) {
+        if (!is_array($data) || !array_key_exists('value', $data) || empty($data['value'])) {
             return false;
         }
 
-        $data['type'] = isset($data['type']) ? $data['type'] : null;
+        $data['type']  = isset($data['type']) ? $data['type'] : null;
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;
@@ -83,6 +87,8 @@ class StringFilter extends AbstractFilter
                 return $ds->expr()->in($fieldName, $parameterName, true);
             case TextFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
+            case FilterUtility::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }

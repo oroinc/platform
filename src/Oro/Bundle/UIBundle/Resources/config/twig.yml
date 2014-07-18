@@ -78,6 +78,8 @@ services:
             - @twig
             - @oro_ui.placeholder.provider
             - @twig.extension.httpkernel
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: twig.extension }
 
