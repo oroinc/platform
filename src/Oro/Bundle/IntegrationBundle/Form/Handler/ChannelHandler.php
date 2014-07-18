@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\IntegrationBundle\Event\TwoWaySyncEnableEvent;
+use Oro\Bundle\IntegrationBundle\Event\ChannelUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
@@ -60,7 +60,7 @@ class ChannelHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $isSyncEnabledBefore = $this->isTwoWaySyncAlreadyEnabled($entity);
+            $oldState = clone($this->getChannel($entity));
             $this->form->submit($this->request);
             if (!$this->request->get(self::UPDATE_MARKER, false) && $this->form->isValid()) {
                 $this->em->persist($entity);
@@ -70,8 +70,11 @@ class ChannelHandler
                     $this->eventDispatcher->dispatch(DefaultOwnerSetEvent::NAME, new DefaultOwnerSetEvent($entity));
                 }
 
-                if (!$isNewEntity && !$isSyncEnabledBefore && $this->isTwoWaySyncEnabled($entity)) {
-                    $this->eventDispatcher->dispatch(TwoWaySyncEnableEvent::NAME, new TwoWaySyncEnableEvent($entity));
+                if (!$isNewEntity) {
+                    $this->eventDispatcher->dispatch(
+                        ChannelUpdateEvent::NAME,
+                        new ChannelUpdateEvent($entity, $oldState)
+                    );
                 }
 
                 return true;
@@ -83,27 +86,13 @@ class ChannelHandler
 
     /**
      * @param Integration $channel
-     * @return bool
+     * @return Integration
      */
-    protected function isTwoWaySyncAlreadyEnabled(Integration $channel)
+    protected function getChannel(Integration $channel)
     {
         $oldChannel = $this->em->getRepository('OroIntegrationBundle:Channel')
             ->find($channel->getId());
 
-        if (!$oldChannel) {
-            return false;
-        }
-
-        return $this->isTwoWaySyncEnabled($oldChannel);
-    }
-
-    /**
-     * @param Integration $channel
-     * @return bool
-     */
-    protected function isTwoWaySyncEnabled(Integration $channel)
-    {
-        return $channel->getSynchronizationSettings()
-            ->offsetGetOr('isTwoWaySyncEnabled', false);
+        return $oldChannel;
     }
 }

@@ -6,9 +6,9 @@ use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class TwoWaySyncEnableEvent extends Event
+class ChannelUpdateEvent extends Event
 {
-    const NAME = 'oro_integration.two_way_sync.set_on';
+    const NAME = 'oro_integration.channel_update';
 
     /**
      * @var Channel
@@ -16,11 +16,18 @@ class TwoWaySyncEnableEvent extends Event
     protected $channel;
 
     /**
-     * @param Channel $channel
+     * @var Channel
      */
-    public function __construct(Channel $channel)
+    protected $oldState;
+
+    /**
+     * @param Channel $channel
+     * @param Channel $oldState
+     */
+    public function __construct(Channel $channel, Channel $oldState)
     {
         $this->channel = $channel;
+        $this->oldState = $oldState;
     }
 
     /**
@@ -29,5 +36,13 @@ class TwoWaySyncEnableEvent extends Event
     public function getChannel()
     {
         return $this->channel;
+    }
+
+    /**
+     * @return Channel
+     */
+    public function getOldState()
+    {
+        return $this->oldState;
     }
 }
