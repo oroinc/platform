@@ -9,11 +9,12 @@ define([
 ], function (_, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, history, utils, mediator, PageController;
+    var document, location, history, console, utils, mediator, PageController;
 
     document = window.document;
     location = window.location;
     history = window.history;
+    console = window.console;
     utils = Chaplin.utils;
     mediator = Chaplin.mediator;
 
@@ -226,7 +227,10 @@ define([
                 model.set(data, options);
             } else {
                 if (mediator.execute('retrieveOption', 'debug')) {
-                    document.body.innerHTML = rawData;
+                    document.writeln(rawData);
+                    if (console) {
+                        console.error('Unexpected content format');
+                    }
                 } else {
                     mediator.execute('showMessage', 'error', __('Sorry, page was not loaded correctly'));
                 }
@@ -311,7 +315,8 @@ define([
             } else if (jsonStartPos === 0) {
                 dataObj = JSON.parse(rawData);
             } else {
-                throw "Unexpected content format";
+                // there's nothing to do
+                dataObj = rawData;
             }
 
             if (additionalData) {

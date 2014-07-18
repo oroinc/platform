@@ -47,10 +47,14 @@
         {% endif %}
 
         {{ form_row(form.all) }}
-        {{ form_row(form.owner) }}
+        {% if form.owner is defined %}
+            {{ form_row(form.owner) }}
+        {% endif %}
     {% else %}
         {{ form_row(form.all) }}
-        {{ form_row(form.owner) }}
+        {% if form.owner is defined %}
+            {{ form_row(form.owner) }}
+        {% endif %}
     {% endif %}
 {% endblock %}
 

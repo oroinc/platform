@@ -176,7 +176,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
          */
         _onValueUpdated: function(newValue, oldValue) {
             // synchronize choice selector with new value
-            var menu = this.$('.choicefilter .dropdown-menu');
+            var menu = this.$('.choice-filter .dropdown-menu');
             menu.find('li a').each(function() {
                 var item = $(this);
                 if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {

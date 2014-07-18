@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -23,24 +23,32 @@ class SendEmail extends AbstractAction
     protected $emailProcessor;
 
     /**
+     * @var EmailAddressHelper
+     */
+    protected $emailAddressHelper;
+
+    /**
      * @var NameFormatter
      */
     protected $nameFormatter;
 
     /**
-     * @param ContextAccessor $contextAccessor
-     * @param Processor $emailProcessor
-     * @param NameFormatter $nameFormatter
+     * @param ContextAccessor    $contextAccessor
+     * @param Processor          $emailProcessor
+     * @param EmailAddressHelper $emailAddressHelper
+     * @param NameFormatter      $nameFormatter
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
+        EmailAddressHelper $emailAddressHelper,
         NameFormatter $nameFormatter
     ) {
         parent::__construct($contextAccessor);
 
-        $this->emailProcessor = $emailProcessor;
-        $this->nameFormatter = $nameFormatter;
+        $this->emailProcessor     = $emailProcessor;
+        $this->emailAddressHelper = $emailAddressHelper;
+        $this->nameFormatter      = $nameFormatter;
     }
 
     /**
@@ -139,6 +147,6 @@ class SendEmail extends AbstractAction
             }
         }
 
-        return EmailUtil::buildFullEmailAddress($emailAddress, $name);
+        return $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $name);
     }
 }

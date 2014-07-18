@@ -66,7 +66,7 @@ define([
 
         /**
          * Check whenever form change and shows confirmation
-         * @param $.Event e
+         * @param {$.Event} e
          */
         changeHandler: function (e) {
             var $el = $(e.currentTarget);
@@ -97,7 +97,7 @@ define([
         /**
          * Updates form via ajax, renders dynamic fields
          *
-         * @param $.element $el
+         * @param {$.element} $el
          */
         processChange: function ($el) {
             this.memoizeValue($el);
@@ -134,8 +134,6 @@ define([
         /**
          * Check whenever form fields are empty
          *
-         * @param $.element $el
-         *
          * @returns {boolean}
          */
         isEmpty: function () {
@@ -151,7 +149,7 @@ define([
         /**
          * Remember current value in case if in future we will need to undo changes
          *
-         * @param HTMLSelectElement el
+         * @param {HTMLSelectElement} el
          */
         memoizeValue: function (el) {
             var $el = $(el);

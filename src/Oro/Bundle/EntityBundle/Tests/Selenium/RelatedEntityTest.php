@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
 
 class RelatedEntityTest extends Selenium2TestCase
 {
@@ -18,6 +20,8 @@ class RelatedEntityTest extends Selenium2TestCase
         );
 
         $login = $this->login();
+
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
             ->assertTitle('New Entity - Entity Management - Entities - System')
@@ -34,7 +38,7 @@ class RelatedEntityTest extends Selenium2TestCase
             ->assertMessage('Field saved')
             ->createField()
             ->setFieldName($entityData['relationField'])
-            ->setType('Relation one to many')
+            ->setType('One to many')
             ->proceed()
             ->setTargetEntity('OroUserBundle:User')
             ->setRelation('Related entity data fields', array('First name', 'Last name'))
@@ -56,6 +60,8 @@ class RelatedEntityTest extends Selenium2TestCase
     public function testCreateNewEntityRecord($entityData)
     {
         $login = $this->login();
+
+        /** @var Navigation $login */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')

@@ -10,7 +10,8 @@ datagrid:
                     - ce.id
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
-        columns: ~ # no static columns
+        columns: # no static columns
+            id: {renderable: false} #required because of OrmSorterExtension
         properties:
             id: ~
             update_link:
@@ -49,7 +50,7 @@ datagrid:
                 label: Delete
                 icon: trash
                 link: delete_link
-        sorters: ~
+        sorters: { columns: { id: { data_name: ce.id } } }
         filters: ~
 
     entity-relation-grid:
