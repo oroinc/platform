@@ -332,7 +332,15 @@
                 changeMonth: true,
                 changeYear: true,
                 yearRange: '-80:+1',
-                showButtonPanel: true
+                showButtonPanel: true,
+                onSelect: function () {
+                    var form = selector.parents('form');
+
+                    if (form.length && form.data('validator')) {
+                        form.validate()
+                            .element(selector);
+                    }
+                }
             });
             selector.keyup(
                 function () {
