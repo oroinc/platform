@@ -3,13 +3,12 @@
 namespace Oro\Bundle\UIBundle\ContentProvider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContentProviderManager
 {
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|ContentProviderInterface[]
      */
     protected $contentProviders;
 
@@ -18,6 +17,9 @@ class ContentProviderManager
      */
     protected $container;
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->contentProviders = new ArrayCollection();
@@ -37,7 +39,7 @@ class ContentProviderManager
             $contentProvider = $this->container->get($contentProvider);
         }
         if (!$contentProvider instanceof ContentProviderInterface) {
-            throw new \InvalidArgumentException('contentProvider must be instance of ContentProviderInterface');
+            throw new \InvalidArgumentException('$contentProvider must be instance of ContentProviderInterface');
         }
         $contentProvider->setEnabled($enabled);
         $this->contentProviders->set($contentProvider->getName(), $contentProvider);
