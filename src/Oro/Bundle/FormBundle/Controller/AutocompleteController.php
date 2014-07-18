@@ -6,12 +6,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
+use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 
@@ -21,36 +21,57 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 class AutocompleteController extends Controller
 {
     /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     * @throws HttpException|AccessDeniedHttpException
+     *
      * @Route("/search", name="oro_form_autocomplete_search")
      * AclAncestor("oro_search")
      */
     public function searchAction(Request $request)
     {
-        $name    = $request->get('name');
-        $query   = $request->get('query');
-        $page    = intval($request->get('page', 1));
-        $perPage = intval($request->get('per_page', 50));
-        $searchById = (bool) $request->get('search_by_id', false);
+        $autocompleteRequest = new AutocompleteRequest($request);
+        $validator           = $this->get('validator');
+        $isXmlHttpRequest    = $request->isXmlHttpRequest();
+        $code                = 200;
+        $result              = [
+            'results' => [],
+            'hasMore' => false,
+            'errors'  => []
+        ];
 
-        if (!$name) {
-            throw new HttpException(400, 'Parameter "name" is required');
+        if ($violations = $validator->validate($autocompleteRequest)) {
+            /** @var ConstraintViolation $violation */
+            foreach ($violations as $violation) {
+                $result['errors'][] = $violation->getMessage();
+            }
         }
 
-        if ($page <= 0) {
-            throw new HttpException(400, 'Parameter "page" must be greater than 0');
+        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+            $result['errors'][] = 'Access denied.';
         }
 
-        if ($perPage <= 0) {
-            throw new HttpException(400, 'Parameter "per_page" must be greater than 0');
-        }
+        if (!empty($result['errors'])) {
+            if ($isXmlHttpRequest) {
+                return new JsonResponse($result, $code);
+            }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($name)) {
-            throw new AccessDeniedHttpException('Access denied.');
+            throw new HttpException($code, implode(', ', $result['errors']));
         }
 
         /** @var SearchHandlerInterface $searchHandler */
-        $searchHandler = $this->get('oro_form.autocomplete.search_registry')->getSearchHandler($name);
+        $searchHandler = $this
+            ->get('oro_form.autocomplete.search_registry')
+            ->getSearchHandler($autocompleteRequest->getName());
 
-        return new JsonResponse($searchHandler->search($query, $page, $perPage, $searchById));
+        return new JsonResponse(
+            $searchHandler->search(
+                $autocompleteRequest->getQuery(),
+                $autocompleteRequest->getPage(),
+                $autocompleteRequest->getPerPage(),
+                $autocompleteRequest->isSearchById()
+            )
+        );
     }
 }

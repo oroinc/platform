@@ -20,15 +20,15 @@ oro:
                 float:              Float
                 money:              Currency
                 percent:            Percent
-                oneToMany:          Relation one to many
-                manyToOne:          Relation many to one
-                manyToMany:         Relation many to many
+                oneToMany:          One to many
+                manyToOne:          Many to one
+                manyToMany:         Many to many
                 optionSet:          Option set
 
                 ref-one:            System relation
                 ref-many:           System relation
 
-                inverse_relation:   Relation (%entity_name%) %field_name%
+                inverse_relation:   Reuse "%field_name%" of %entity_name%
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:

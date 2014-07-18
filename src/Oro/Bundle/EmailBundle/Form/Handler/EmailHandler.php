@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 
@@ -64,6 +64,11 @@ class EmailHandler
     protected $emailAddressManager;
 
     /**
+     * @var EmailAddressHelper
+     */
+    protected $emailAddressHelper;
+
+    /**
      * @var NameFormatter
      */
     protected $nameFormatter;
@@ -80,6 +85,7 @@ class EmailHandler
      * @param Translator               $translator
      * @param SecurityContextInterface $securityContext
      * @param EmailAddressManager      $emailAddressManager
+     * @param EmailAddressHelper       $emailAddressHelper
      * @param LoggerInterface          $logger
      * @param Processor                $emailProcessor
      * @param NameFormatter            $nameFormatter
@@ -94,6 +100,7 @@ class EmailHandler
         Translator $translator,
         SecurityContextInterface $securityContext,
         EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper,
         Processor $emailProcessor,
         LoggerInterface $logger,
         NameFormatter $nameFormatter,
@@ -105,6 +112,7 @@ class EmailHandler
         $this->translator          = $translator;
         $this->securityContext     = $securityContext;
         $this->emailAddressManager = $emailAddressManager;
+        $this->emailAddressHelper  = $emailAddressHelper;
         $this->emailProcessor      = $emailProcessor;
         $this->logger              = $logger;
         $this->nameFormatter       = $nameFormatter;
@@ -172,7 +180,7 @@ class EmailHandler
             $user = $this->getUser();
             if ($user) {
                 $model->setFrom(
-                    EmailUtil::buildFullEmailAddress(
+                    $this->emailAddressHelper->buildFullEmailAddress(
                         $user->getEmail(),
                         $this->nameFormatter->format($user)
                     )
@@ -199,13 +207,13 @@ class EmailHandler
      */
     protected function preciseFullEmailAddress(&$emailAddress, $ownerClass = null, $ownerId = null)
     {
-        if (!EmailUtil::isFullEmailAddress($emailAddress)) {
+        if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
                 $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
                 if ($owner) {
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
-                        $emailAddress = EmailUtil::buildFullEmailAddress($emailAddress, $ownerName);
+                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 
                         return;
                     }
@@ -218,7 +226,7 @@ class EmailHandler
                 if ($owner) {
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
-                        $emailAddress = EmailUtil::buildFullEmailAddress($emailAddress, $ownerName);
+                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
                     }
                 }
             }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -12,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailEntityBuilder
 {
@@ -26,15 +26,25 @@ class EmailEntityBuilder
     private $emailAddressManager;
 
     /**
+     * @var EmailAddressHelper
+     */
+    private $emailAddressHelper;
+
+    /**
      * Constructor
      *
      * @param EmailEntityBatchProcessor $batch
-     * @param EmailAddressManager $emailAddressManager
+     * @param EmailAddressManager       $emailAddressManager
+     * @param EmailAddressHelper        $emailAddressHelper
      */
-    public function __construct(EmailEntityBatchProcessor $batch, EmailAddressManager $emailAddressManager)
-    {
-        $this->batch = $batch;
+    public function __construct(
+        EmailEntityBatchProcessor $batch,
+        EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper
+    ) {
+        $this->batch               = $batch;
         $this->emailAddressManager = $emailAddressManager;
+        $this->emailAddressHelper  = $emailAddressHelper;
     }
 
     /**
@@ -112,7 +122,7 @@ class EmailEntityBuilder
      */
     public function address($email)
     {
-        $pureEmail = EmailUtil::extractPureEmailAddress($email);
+        $pureEmail = $this->emailAddressHelper->extractPureEmailAddress($email);
         $result = $this->batch->getAddress($pureEmail);
         if ($result === null) {
             $result = $this->emailAddressManager->newEmailAddress()
