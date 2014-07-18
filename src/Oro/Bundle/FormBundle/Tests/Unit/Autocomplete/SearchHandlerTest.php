@@ -7,8 +7,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -16,8 +14,8 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
-
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -83,6 +81,11 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $searchHandler;
 
+    /**
+     * @var AclHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $aclHelper;
+
     protected function setUp()
     {
         $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
@@ -136,7 +139,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(array('getResult', 'getAST'))
             ->getMockForAbstractClass();
 
         $this->expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
@@ -149,6 +152,11 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()
+            ->setMethods(array('apply'))
+            ->getMock();
+
         $this->searchHandler = new SearchHandler(
             self::TEST_ENTITY_CLASS,
             $this->testProperties
@@ -156,6 +164,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->managerRegistry);
         $this->searchHandler->initSearchIndexer($this->indexer, $this->testSearchConfig);
+        $this->searchHandler->setAclHelper($this->aclHelper);
     }
 
     public function testConstructorAndInitialize()
@@ -207,6 +216,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
      * @param array  $expectQueryBuilderCalls
      * @param array  $expectExprCalls
      * @param array  $expectQueryCalls
+     * @param array  $expectAclHelperCalls
      */
     public function testSearch(
         $query,
@@ -216,7 +226,8 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         $expectEntityRepositoryCalls,
         $expectQueryBuilderCalls,
         $expectExprCalls,
-        $expectQueryCalls
+        $expectQueryCalls,
+        $expectAclHelperCalls
     ) {
         MockHelper::addMockExpectedCalls($this->indexer, $expectedIndexerCalls, $this);
         MockHelper::addMockExpectedCalls($this->searchResult, $expectSearchResultCalls, $this);
@@ -224,6 +235,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         MockHelper::addMockExpectedCalls($this->queryBuilder, $expectQueryBuilderCalls, $this);
         MockHelper::addMockExpectedCalls($this->expr, $expectExprCalls, $this);
         MockHelper::addMockExpectedCalls($this->query, $expectQueryCalls, $this);
+        MockHelper::addMockExpectedCalls($this->aclHelper, $expectAclHelperCalls, $this);
 
         $actualResult = $this->searchHandler->search($query['query'], $query['page'], $query['perPage']);
         $this->assertEquals($expectedResult, $actualResult);
@@ -262,7 +274,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                 'expectQueryBuilderCalls' => array(
                     array('expr', array(), 'getMockExpr'),
                     array('where', array('e.id IN (1, 2, 3, 4)'), 'getMockQueryBuilder'),
-                    array('getQuery', array(), 'getMockQuery'),
                 ),
                 'expectExprCalls' => array(
                     array('in', array('e.' . self::TEST_ID_FIELD, array(1, 2, 3, 4)), 'e.id IN (1, 2, 3, 4)')
@@ -287,8 +298,11 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                                 )
                             )
                         )
-                    )
+                    ),
                 ),
+                'expectAclHelperCalls' => array(
+                    array('apply', array(), 'getMockQuery')
+                )
             ),
             'hasMore' => array(
                 'query' => array('query' => 'search', 'page' => 1, 'perPage' => 1),
@@ -314,7 +328,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                 'expectQueryBuilderCalls' => array(
                     array('expr', array(), 'getMockExpr'),
                     array('where', array('e.id IN (1, 2)'), 'getMockQueryBuilder'),
-                    array('getQuery', array(), 'getMockQuery'),
                 ),
                 'expectExprCalls' => array(
                     array('in', array('e.' . self::TEST_ID_FIELD, array(1, 2)), 'e.id IN (1, 2)')
@@ -331,8 +344,11 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                                 array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
                             )
                         )
-                    )
+                    ),
                 ),
+                'expectAclHelperCalls' => array(
+                    array('apply', array(), 'getMockQuery')
+                )
             ),
         );
     }
