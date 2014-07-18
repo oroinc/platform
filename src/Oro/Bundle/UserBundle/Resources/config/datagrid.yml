@@ -20,21 +20,21 @@ datagrid:
                     - { table: %oro_user.entity.class%, alias: u }
         columns:
             username:
-                label: oro.user.username.label
+                label:         oro.user.username.label
             email:
-                label: oro.user.email.label
+                label:         oro.user.email.label
             firstName:
-                label: oro.user.first_name.label
+                label:         oro.user.first_name.label
             lastName:
-                label: oro.user.last_name.label
+                label:         oro.user.last_name.label
             createdAt:
-                label: oro.user.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
             updatedAt:
-                label: oro.user.updated_at.label
+                label:         oro.ui.updated_at
                 frontend_type: datetime
             enabled:
-                label: oro.user.enabled.label
+                label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
                    - Inactive

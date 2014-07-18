@@ -20,24 +20,24 @@ datagrid:
                         - { join: website.owner, alias: owner }
         columns:
             name:
-                label: oro.tracking.trackingwebsite.name.label
+                label:         oro.tracking.trackingwebsite.name.label
             identifier:
-                label: oro.tracking.trackingwebsite.identifier.label
+                label:         oro.tracking.trackingwebsite.identifier.label
             url:
-                type: twig
-                label: oro.tracking.trackingwebsite.url.label
+                type:          twig
+                label:         oro.tracking.trackingwebsite.url.label
                 frontend_type: html
-                template: OroTrackingBundle:TrackingWebsite:Property/url.html.twig
+                template:      OroTrackingBundle:TrackingWebsite:Property/url.html.twig
             ownerName:
-                type: twig
-                label: oro.tracking.trackingwebsite.owner.label
+                type:          twig
+                label:         oro.tracking.trackingwebsite.owner.label
                 frontend_type: html
-                template: OroTrackingBundle:TrackingWebsite:Property/owner.html.twig
+                template:      OroTrackingBundle:TrackingWebsite:Property/owner.html.twig
             createdAt:
-                label:   oro.tracking.trackingwebsite.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
             updatedAt:
-                label:   oro.tracking.trackingwebsite.updated_at.label
+                label:         oro.ui.updated_at
                 frontend_type: datetime
         sorters:
             columns:

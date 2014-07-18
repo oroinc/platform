@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
@@ -285,5 +286,28 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
     protected function getNewMock($class)
     {
         return $this->getMock($class, [], [], '', false);
+    }
+
+    public function testRemovePlaceholders()
+    {
+        $testArr = array(
+            'oro.entity_merge.before_merge_entity' => 'oro entity merge before merge entity',
+            'oro.entity_merge.after_merge_entity' => 'oro entity merge after merge entity',
+            '%oro.entity_merge%' => '%oro.entity_merge%',
+            'oro.entity_merge.after_merge_field' => 'oro entity merge after mergefield',
+            'oro.entity_merge.build_metadata' => 'oro entity merge build metadata',
+            '%oro.entity.name% merge 20% create %entity_data%' => '%oro.entity.name% merge 20% create %entity.data%',
+            '%oro.before_value_render%' => '%oro.before_value_render%'
+        );
+
+        $messageCatalogue = new MessageCatalogue('en');
+        $messageCatalogue->add($testArr);
+        $this->assertCount(7, $messageCatalogue->all('messages'));
+        $cmd = $this->getCommandMock();
+        $class = new \ReflectionClass($cmd);
+        $method = $class->getMethod('removePlaceholders');
+        $method->setAccessible(true);
+        $method->invokeArgs($cmd, array($messageCatalogue));
+        $this->assertCount(5, $messageCatalogue->all('messages'));
     }
 }
