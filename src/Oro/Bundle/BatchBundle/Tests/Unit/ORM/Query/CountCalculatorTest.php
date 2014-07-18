@@ -47,7 +47,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->will($this->returnValue(self::TEST_COUNT));
 
-        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
+        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, false));
     }
 
     /**

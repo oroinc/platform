@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * Calculates total count of query records
@@ -16,14 +17,16 @@ class QueryCountCalculator
      * Calculates total count of query records
      *
      * @param Query $query
+     * @param bool  $useWalker
+     *
      * @return integer
      */
-    public static function calculateCount(Query $query)
+    public static function calculateCount(Query $query, $useWalker = true)
     {
         /** @var QueryCountCalculator $instance */
         $instance = new static();
 
-        return $instance->getCount($query);
+        return $instance->getCount($query, $useWalker);
     }
 
     /**
@@ -31,21 +34,31 @@ class QueryCountCalculator
      * Notes: this method do not make any modifications of the given query
      *
      * @param Query $query
+     * @param bool  $useWalker Determine should CountWalker be used or wrap count query with additional select.
+     *                         Walker might be turned of on queries where exists GROUP BY statement and count select
+     *                         will returns large dataset(it's only critical when more then e.g. 1000 results returned)
+     *
      * @return integer
      */
-    public function getCount(Query $query)
+    public function getCount(Query $query, $useWalker = true)
     {
-        $parser            = new Parser($query);
-        $parserResult      = $parser->parse();
-        $parameterMappings = $parserResult->getParameterMappings();
-        list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
+        if ($useWalker) {
+            $paginator = new Paginator($query);
+            $paginator->setUseOutputWalkers(false);
+            $result    = $paginator->count();
+        } else {
+            $parser            = new Parser($query);
+            $parserResult      = $parser->parse();
+            $parameterMappings = $parserResult->getParameterMappings();
+            list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
 
-        $statement = $query->getEntityManager()->getConnection()->executeQuery(
-            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
-            $sqlParameters,
-            $parameterTypes
-        );
-        $result    = $statement->fetchColumn();
+            $statement = $query->getEntityManager()->getConnection()->executeQuery(
+                'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+                $sqlParameters,
+                $parameterTypes
+            );
+            $result    = $statement->fetchColumn();
+        }
 
         return $result ? (int)$result : 0;
     }
@@ -53,6 +66,7 @@ class QueryCountCalculator
     /**
      * @param Query $query
      * @param array $paramMappings
+     *
      * @return array
      * @throws QueryException
      */
