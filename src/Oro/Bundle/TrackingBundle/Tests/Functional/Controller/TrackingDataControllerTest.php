@@ -41,15 +41,19 @@ class TrackingDataControllerTest extends WebTestCase
         return [
             'simple' => [
                 [
-                    'param' => 'value',
+                    'param'    => 'value',
+                    'url'      => 'example.com',
+                    'loggedAt' => '2014-07-18T15:00:00+0300'
                 ]
             ],
             'event'  => [
                 [
-                    'param' => 'value',
-                    'name'   => 'name',
-                    'value'  => 'value',
-                    'user'   => 'user',
+                    'param'    => 'value',
+                    'name'     => 'name',
+                    'value'    => 'value',
+                    'user'     => 'user',
+                    'url'      => 'example.com',
+                    'loggedAt' => '2014-07-18T15:00:00+0300'
                 ]
             ],
         ];
