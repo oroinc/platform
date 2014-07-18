@@ -1,41 +1,70 @@
+/*jslint nomen:true*/
 /*global define*/
 define([
-    './../base/page-region-view',
-    'oroui/js/mediator',
-    'underscore'
-], function (PageRegionView, mediator, _) {
+    'underscore',
+    './../base/view'
+], function (_, BaseView) {
     'use strict';
 
-    var PageBreadcrumbView;
+    var BreadcrumbView;
 
-    PageBreadcrumbView = PageRegionView.extend({
-        template: function (data) {
-            return data.breadcrumb;
+    BreadcrumbView = BaseView.extend({
+        listen: {
+            'mainMenuUpdated mediator': 'onMenuUpdate'
         },
-        breadcrumbsTemplate: _.template('<ul class="breadcrumb">' +
-            '<% for (var i =0; i < breadcrumbs.length; i++) { %>'
-                + '<li>'
-                    + '<%= breadcrumbs[i] %>'
-                    + '<%if (i+1 != breadcrumbs.length) { %><span class="divider">/&nbsp;</span><% } %>'
-                + '</li>'
-                +'<% } %>' +
+
+        template: _.template('<ul class="breadcrumb">' +
+            '<% for (var i =0; i < breadcrumbs.length; i++) { %>' +
+                '<li>' +
+                    '<%= breadcrumbs[i] %>' +
+                    '<%if (i+1 != breadcrumbs.length) { %><span class="divider">/&nbsp;</span><% } %>' +
+                '</li>' +
+            '<% } %>' +
             '</ul>'),
-        pageItems: ['breadcrumb'],
 
-        initialize: function(options) {
-            mediator.on('mainMenuUpdated', this.update, this);
-            PageBreadcrumbView.__super__.initialize.call(this, options);
+        data: null,
+
+        /**
+         * Handles menu update event
+         *  - prepares data for breadcrumbs rendering
+         *  - renders view
+         *  - dispose cached data
+         *
+         * @param {Object} menuView
+         */
+        onMenuUpdate: function (menuView) {
+            this.data = {
+                breadcrumbs: menuView.getActiveItems()
+            };
+            this.render();
+            this.data = null;
         },
 
-        update: function(breadcrumbs) {
-            if (breadcrumbs.length) {
-                this.data = {
-                    'breadcrumb': this.breadcrumbsTemplate({'breadcrumbs': breadcrumbs})
-                };
-                this.render();
+        /**
+         * Prevents rendering a view without page data
+         *
+         * @override
+         */
+        render: function () {
+            var data;
+            data = this.getTemplateData();
+            if (!data) {
+                return;
             }
+
+            BreadcrumbView.__super__.render.call(this);
+        },
+
+        /**
+         * Gets cached page data
+         *
+         * @returns {Object}
+         * @override
+         */
+        getTemplateData: function () {
+            return this.data;
         }
     });
 
-    return PageBreadcrumbView;
+    return BreadcrumbView;
 });

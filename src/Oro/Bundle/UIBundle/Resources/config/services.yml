@@ -9,6 +9,9 @@ parameters:
 
     oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
     oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+    oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
+
+    oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
 services:
     # Placeholder services
@@ -40,6 +43,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
+    oro_ui.view.content_provider.listener:
+        class: %oro_ui.view.content_provider.listener.class%
+        arguments:
+            - @oro_ui.content_provider.manager
+        tags:
+            - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
@@ -56,3 +66,8 @@ services:
         class: %oro_ui.widget_provider.view_actions.class%
         arguments:
             - @oro_ui.label_provider.action_button_group
+
+    oro_ui.content_provider.manager:
+        class: %oro_ui.content_provider.manager.class%
+        arguments:
+            - @service_container

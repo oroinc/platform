@@ -204,8 +204,10 @@
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
 {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
     with {
-        'script': block('head_script'),
-        'content': block('page_container')
+        'data': {
+            'scripts': block('head_script'),
+            'content': block('page_container')
+        }
     }
-    %}
+%}
 {% endif %}

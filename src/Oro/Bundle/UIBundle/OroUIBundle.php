@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle;
 
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -19,5 +20,6 @@ class OroUIBundle extends Bundle
 
         $container->addCompilerPass(new TwigConfigurationPass());
         $container->addCompilerPass(new ViewActionWidgetProviderPass());
+        $container->addCompilerPass(new ContentProviderPass());
     }
 }

@@ -15,8 +15,15 @@ define([
             return data.mainMenu;
         },
         pageItems: ['mainMenu', 'currentRoute'],
-        routeMatchSearchers: [],
-        matchesCache: {},
+
+        initialize: function (options) {
+            // Array of search callback, that match route to menu item
+            this.routeMatchSearchers = [];
+            // Local cache of route to menu item
+            this.routeMatchedMenuItemsCache = {};
+
+            PageMainMenuView.__super__.initialize.call(this, options);
+        },
 
         render: function () {
             var data = this.getTemplateData();
@@ -26,17 +33,24 @@ define([
                     this.initRouteMatches();
                 } else if (!_.isUndefined(data.currentRoute)) {
                     this.toggleActiveMenuItem(data.currentRoute);
-                    mediator.trigger('mainMenuUpdated', this.getActiveItems());
                 }
-
-                this.$el.trigger('mainMenuUpdated');
             } else {
                 this.initRouteMatches();
             }
+
+            mediator.trigger('mainMenuUpdated', this);
+            this.$el.trigger('mainMenuUpdated');
         },
 
+        /**
+         * Initialize route matcher callbacks.
+         */
         initRouteMatches: function() {
+            this.routeMatchSearchers = [];
+            this.routeMatchedMenuItemsCache = {};
+
             var createRouteSearchCallback = function(matchRule, $el) {
+                var matcherCallback;
                 if (matchRule.indexOf('*') > -1 || matchRule.indexOf('/') > -1) {
                     if (matchRule.indexOf('*') > -1) {
                         matchRule = '^' + matchRule.replace('*', '\\w+') + '$';
@@ -44,7 +58,7 @@ define([
                         matchRule = matchRule.replace(/^\/|\/$/g, '');
                     }
                     // RegExp matcher
-                    return function (route) {
+                    matcherCallback = function (route) {
                         var matchRegExp = new RegExp(matchRule, 'ig');
                         if (matchRegExp.test(route)) {
                             return $el;
@@ -52,12 +66,14 @@ define([
                     };
                 } else {
                     // Simple equal matcher
-                    return function(route) {
+                    matcherCallback = function(route) {
                         if (route === matchRule) {
                             return $el;
                         }
                     };
                 }
+
+                return matcherCallback;
             };
 
             var self = this;
@@ -71,9 +87,15 @@ define([
                 });
         },
 
-        getMatchesMenuItem: function(route) {
-            if (this.matchesCache.hasOwnProperty(route)) {
-                return this.matchesCache[route];
+        /**
+         * Get active menu item element.
+         *
+         * @param {String} route
+         * @returns {HTMLElement}
+         */
+        getMatchedMenuItem: function(route) {
+            if (this.routeMatchedMenuItemsCache.hasOwnProperty(route)) {
+                return this.routeMatchedMenuItemsCache[route];
             }
 
             var match = this.$el.find('[data-route="' + route + '"]');
@@ -87,16 +109,19 @@ define([
             }
 
             if (match && match.length) {
-                this.matchesCache[route] = match;
+                this.routeMatchedMenuItemsCache[route] = match;
                 return match;
             }
-
-            return false;
         },
 
+        /**
+         * Add active CSS class to menu item and it's parents.
+         *
+         * @param {String} route
+         */
         toggleActiveMenuItem: function(route) {
-            var item = this.getMatchesMenuItem(route);
-            if (item) {
+            var item = this.getMatchedMenuItem(route);
+            if (!_.isUndefined(item)) {
                 this.$el
                     .find('.active')
                     .removeClass('active');
@@ -105,15 +130,20 @@ define([
             }
         },
 
+        /**
+         * Get labels of active menu items.
+         *
+         * @returns {Array}
+         */
         getActiveItems: function() {
-            var breadcrumbs = [];
+            var activeMenuItemLabels = [];
             this.$el
                 .find('.active')
                 .each(function(idx, el) {
-                    breadcrumbs.push($.trim($(el).find('.title').first().text()));
+                    activeMenuItemLabels.push($.trim($(el).find('.title').first().text()));
                 });
 
-            return breadcrumbs;
+            return activeMenuItemLabels;
         }
     });
 
