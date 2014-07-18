@@ -134,27 +134,33 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
             ->with('OroIntegrationBundle:Channel', $entity->getId())
             ->will($this->returnValue($oldIntegration));
 
+        $dispatchCallIndex = 0;
         if ($expectOwnerSetEvent) {
-            $this->eventDispatcher->expects($this->at(0))->method('dispatch')
+            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
+                ->method('dispatch')
                 ->with(
                     $this->equalTo(DefaultOwnerSetEvent::NAME),
                     $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent')
                 );
-            if ($expectIntegrationUpdateEvent) {
-                $this->eventDispatcher->expects($this->at(1))
-                    ->method('dispatch')
-                    ->with(
-                        $this->equalTo(IntegrationUpdateEvent::NAME),
-                        $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
-                    );
-            }
         }
         if ($expectIntegrationUpdateEvent) {
-            $this->eventDispatcher->expects($this->once())
+            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
                 ->method('dispatch')
                 ->with(
                     $this->equalTo(IntegrationUpdateEvent::NAME),
-                    $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
+                    $this->callback(
+                        function ($event) use ($entity, $oldIntegration) {
+                            $this->assertInstanceOf(
+                                'Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent',
+                                $event
+                            );
+
+                            $this->assertSame($entity, $event->getIntegration());
+                            $this->assertEquals($oldIntegration, $event->getOldState());
+
+                            return true;
+                        }
+                    )
                 );
         } elseif (!$expectOwnerSetEvent) {
             $this->eventDispatcher->expects($this->never())->method('dispatch');
@@ -171,17 +177,18 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $newIntegration = new Integration();
         $newOwner   = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $refProperty = new \ReflectionProperty('Oro\Bundle\IntegrationBundle\Entity\Channel', 'id');
-        $refProperty->setAccessible(true);
+        $idProperty = new \ReflectionProperty('Oro\Bundle\IntegrationBundle\Entity\Channel', 'id');
+        $idProperty->setAccessible(true);
 
         $oldIntegration = new Integration();
-        $refProperty->setValue($oldIntegration, 123);
+        $idProperty->setValue($oldIntegration, 100);
 
         $someOwner           = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $oldIntegrationWithOwner = clone $oldIntegration;
         $oldIntegrationWithOwner->setDefaultUserOwner($someOwner);
 
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = new Integration();
+        $idProperty->setValue($integration, 200);
         return [
             'new entity, should not dispatch'                                             => [
                 $newIntegration,
