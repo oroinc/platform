@@ -148,17 +148,16 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
                         $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
                     );
             }
-        } else {
-            if ($expectIntegrationUpdateEvent) {
-                $this->eventDispatcher->expects($this->once())
-                    ->method('dispatch')
-                    ->with(
-                        $this->equalTo(IntegrationUpdateEvent::NAME),
-                        $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
-                    );
-            } else {
-                $this->eventDispatcher->expects($this->never())->method('dispatch');
-            }
+        }
+        if ($expectIntegrationUpdateEvent) {
+            $this->eventDispatcher->expects($this->once())
+                ->method('dispatch')
+                ->with(
+                    $this->equalTo(IntegrationUpdateEvent::NAME),
+                    $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
+                );
+        } elseif (!$expectOwnerSetEvent) {
+            $this->eventDispatcher->expects($this->never())->method('dispatch');
         }
 
         $this->assertTrue($this->handler->process($entity));
