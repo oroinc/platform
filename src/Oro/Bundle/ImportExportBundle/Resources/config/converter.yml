@@ -31,5 +31,5 @@ services:
     oro_importexport.data_converter.template_fixture.relation_calculator:
         class: %oro_importexport.data_converter.template_fixture.relation_calculator.class%
         arguments:
-            - @oro_importexport.template_fixture.registry
+            - @oro_importexport.template_fixture.manager
             - @oro_importexport.field.field_helper

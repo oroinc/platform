@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
@@ -46,6 +47,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->emailEntityBuilder,
             $this->emailAddressManager,
+            new EmailAddressHelper(),
             $this->knownEmailAddressChecker
         );
 
