@@ -25,7 +25,7 @@ class ShowPinButtonContentProvider extends AbstractContentProvider
     public function getContent()
     {
         $attributes = $this->request->attributes;
-        return $attributes->get('_route') && !$attributes->get('exception');
+        return $attributes->get('_route') != 'oro_default' && !$attributes->get('exception');
     }
 
     /**
