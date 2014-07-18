@@ -79,6 +79,10 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector           = $input->getOption('connector');
@@ -120,7 +124,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 }
 
                 $result   = $processor->process($integration, $connector, $connectorParameters);
-                $exitCode = $result ?: self::STATUS_FAILED;
+                $exitCode = $result ? : self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
 
