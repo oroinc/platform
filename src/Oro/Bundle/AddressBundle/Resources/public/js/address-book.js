@@ -5,7 +5,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget',
-    'oroaddress/js/mapservice/mapservice',
+    'oroaddress/js/mapservice/googlemaps',
     'oroaddress/js/address/view',
     'oroaddress/js/address/collection'
 ], function (
