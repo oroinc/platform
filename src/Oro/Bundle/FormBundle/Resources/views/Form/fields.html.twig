@@ -333,9 +333,13 @@
                 changeYear: true,
                 yearRange: '-80:+1',
                 showButtonPanel: true,
-                onSelect: function() {
-                    var validator = selector.parents('form').validate();
-                    validator.element(selector);
+                onSelect: function () {
+                    var form = selector.parents('form');
+
+                    if (form.length && form.data('validator')) {
+                        form.validate()
+                            .element(selector);
+                    }
                 }
             });
             selector.keyup(
