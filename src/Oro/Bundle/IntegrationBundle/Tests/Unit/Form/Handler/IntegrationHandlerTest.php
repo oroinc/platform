@@ -129,10 +129,12 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once()) ->method('persist') ->with($entity);
         $this->em->expects($this->once())->method('flush');
 
-        $this->em->expects($this->once())
-            ->method('find')
-            ->with('OroIntegrationBundle:Channel', $entity->getId())
-            ->will($this->returnValue($oldIntegration));
+        if ($entity->getId()) {
+            $this->em->expects($this->once())
+                ->method('find')
+                ->with('OroIntegrationBundle:Channel', $entity->getId())
+                ->will($this->returnValue($oldIntegration));
+        }
 
         $dispatchCallIndex = 0;
         if ($expectOwnerSetEvent) {
