@@ -383,11 +383,12 @@ EOF
      *
      * @param string $languagePackPath
      * @param OutputInterface $output
+     *
      * @return bool
      */
     protected function checkFiles($languagePackPath, OutputInterface $output)
     {
-        $needTranslate  = array();
+        $needTranslate  = [];
         $result         = true;
         $finder         = Finder::create()->files()->name('*.yml')->in($languagePackPath);
         $yaml           = new Parser();
@@ -397,10 +398,16 @@ EOF
             array_walk(
                 $value,
                 function (&$value, $key) {
-                    if ($value != $key || strpos($key, ' ') || !preg_match('#\.[^\s]#', $key)) {
-                        $value = false;
-                    } else {
+                    // key equal to value and key is dotted string, e.g. test.key.param
+                    $wrongItemFlag = $value == $key && preg_match('#[^\s\.]\.[^\s\.]#', $key);
+
+                    // semicolon exists in key and not encoded in value, should be
+                    $semicolonDetected = (false !== strpos($key, ':')) && (false !== strpos($value, ':'));
+
+                    if ($wrongItemFlag || $semicolonDetected) {
                         $value = '- ' . $value;
+                    } else {
+                        $value = false;
                     }
                 }
             );
@@ -412,7 +419,7 @@ EOF
         }
 
         foreach ($needTranslate as $key => $value) {
-            $output->writeln(sprintf('<comment>Need translate keywords in %s</comment>', $key));
+            $output->writeln(sprintf('<comment>Fix translation strings in %s</comment>', $key));
             $output->writeln($value);
         }
         return $result;
