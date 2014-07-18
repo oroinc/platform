@@ -3,6 +3,7 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 
 class VersionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,6 +13,11 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $factory;
+
+    /**
+     * @var VersionHelper
+     */
+    protected $helper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -26,10 +32,28 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->repo = $this->getMock('Composer\Repository\WritableRepositoryInterface');
+        $this->helper = new VersionHelper($this->factory);
     }
 
-    public function testGetVersion()
+    /**
+     * @dataProvider hasCacheDataProvider
+     * @param bool $hasCache
+     */
+    public function testGetVersion($hasCache)
     {
+        if ($hasCache) {
+            $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+                ->disableOriginalConstructor()
+                ->setMethods(array('save'))
+                ->getMockForAbstractClass();
+
+            $cache->expects($this->once())
+                ->method('save')
+                ->with(OroPlatformBundle::PACKAGE_NAME, self::VERSION);
+
+            $this->helper->setCache($cache);
+        }
+
         $package = $this
             ->getMock('Composer\Package\PackageInterface');
 
@@ -48,9 +72,17 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getLocalRepository')
             ->will($this->returnValue($this->repo));
 
-        $helper = new VersionHelper($this->factory);
+        $this->assertEquals(self::VERSION, $this->helper->getVersion());
+        // Check that local cache used
+        $this->assertEquals(self::VERSION, $this->helper->getVersion());
+    }
 
-        $this->assertEquals(self::VERSION, $helper->getVersion());
+    public function hasCacheDataProvider()
+    {
+        return array(
+            array(false),
+            array(true)
+        );
     }
 
     public function testGetVersionNotAvailable()
@@ -65,8 +97,28 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getLocalRepository')
             ->will($this->returnValue($this->repo));
 
-        $helper = new VersionHelper($this->factory);
+        $this->assertEquals(VersionHelper::UNDEFINED_VERSION, $this->helper->getVersion());
+    }
 
-        $this->assertEquals(VersionHelper::UNDEFINED_VERSION, $helper->getVersion());
+    public function testGetVersionCached()
+    {
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->disableOriginalConstructor()
+            ->setMethods(array('save', 'contains', 'fetch'))
+            ->getMockForAbstractClass();
+
+        $cache->expects($this->once())
+            ->method('contains')
+            ->with(OroPlatformBundle::PACKAGE_NAME)
+            ->will($this->returnValue(true));
+        $cache->expects($this->once())
+            ->method('fetch')
+            ->with(OroPlatformBundle::PACKAGE_NAME)
+            ->will($this->returnValue('1.1'));
+        $cache->expects($this->never())
+            ->method('save');
+
+        $this->helper->setCache($cache);
+        $this->assertEquals('1.1', $this->helper->getVersion());
     }
 }

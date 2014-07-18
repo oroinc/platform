@@ -85,10 +85,10 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param object $entity
      * @param bool   $isFullData
      * @param bool   $isPersistNew
-     * @param array|null $itemData
+     * @param mixed|array|null $itemData
      * @return null|object
      */
-    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, array $itemData = null)
+    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, $itemData = null)
     {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {

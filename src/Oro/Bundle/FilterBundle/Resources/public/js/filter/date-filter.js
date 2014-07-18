@@ -280,7 +280,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         _isDateVariable: function (value) {
             var dateVars = this.dateWidgetOptions.dateVars;
             for (var i in dateVars.value) {
-                if (dateVars.value[i] == value) {
+                if (dateVars.value.hasOwnProperty(i) && dateVars.value[i] == value) {
                     return true;
                 }
             }
@@ -328,7 +328,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             $calendar.data('datepicker').inline = false;
             $calendar.datepicker('refresh');
-            $calendar.on('click', '.ui-datepicker-close', function(e) {
+            $calendar.on('click', '.ui-datepicker-close', function() {
                 $dropdown.removeClass('open');
             });
 
@@ -451,7 +451,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         /**
-         * Format datetes in a valut to another format
+         * Format dates in a vault to another format
          *
          * @param {Object} value
          * @param {String} fromFormat
@@ -475,14 +475,22 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             if (mode == 'raw') {
                 for (var part in dateVars) {
-                    for (var varCode in dateVars[part]) {
-                        value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
+                    if (dateVars.hasOwnProperty(part)) {
+                        for (var varCode in dateVars[part]) {
+                            if (dateVars[part].hasOwnProperty(varCode)) {
+                                value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
+                            }
+                        }
                     }
                 }
             } else {
                 for (var part in dateVars) {
-                    for (var varCode in dateVars[part]) {
-                        value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
+                    if (dateVars.hasOwnProperty(part)) {
+                        for (var varCode in dateVars[part]) {
+                            if (dateVars[part].hasOwnProperty(varCode)) {
+                                value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
+                            }
+                        }
                     }
                 }
             }

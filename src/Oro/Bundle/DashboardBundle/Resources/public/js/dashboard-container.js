@@ -8,7 +8,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
      * @export orodashboard/js/dashboard-container
      * @class  orodashboard.DashboardContainer
      */
-    var dashboardContainer = {
+    return {
         /**
          * @property {Object}
          */
@@ -33,7 +33,6 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                     )[0];
                 },
                 update: function(container, p) {
-                    return;
                 }
             }
         },
@@ -285,6 +284,4 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
             });
         }
     };
-
-    return dashboardContainer;
 });

@@ -4,8 +4,15 @@ parameters:
     oro_help.listener.help_link.class: Oro\Bundle\HelpBundle\EventListener\HelpLinkRequestListener
 
 services:
+    oro_help.help_link.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_help.help_link.cache" ] ]
+
     oro_help.model.help_link_provider:
         class: %oro_help.model.help_link_provider.class%
+        calls:
+            - [ setCache, [ @oro_help.help_link.cache ] ]
         arguments:
             - @controller_name_converter
             - @oro_platform.composer.version_helper
@@ -21,6 +28,5 @@ services:
         class: %oro_help.listener.help_link.class%
         arguments:
             - @service_container
-            - @oro_help.model.help_link_provider
         tags:
             - { name: kernel.event_listener, priority: -200, event: kernel.controller, method: onKernelController }
