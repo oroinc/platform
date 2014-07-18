@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\IntegrationBundle\Event\ChannelUpdateEvent;
+use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
@@ -42,16 +42,6 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em              = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $channelRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $channelRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue($channel));
-        $this->em->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValue($channelRepository));
         $this->entity  = new Integration();
         $this->handler = new IntegrationHandler($this->request, $this->form, $this->em, $this->eventDispatcher);
     }
@@ -109,13 +99,19 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider eventDataProvider
      *
-     * @param Integration $entity
-     * @param null|User   $newOwner
-     * @param bool        $expectedDispatch
-     * @param bool        $onlyOwner
+     * @param Integration      $entity
+     * @param null|User        $newOwner
+     * @param Integration|null $oldIntegration
+     * @param bool             $expectOwnerSetEvent
+     * @param bool             $expectIntegrationUpdateEvent
      */
-    public function testDefaultUserOwnerSetEventDispatching($entity, $newOwner, $expectedDispatch, $onlyOwner = false)
-    {
+    public function testEventDispatching(
+        $entity,
+        $newOwner,
+        $oldIntegration,
+        $expectOwnerSetEvent,
+        $expectIntegrationUpdateEvent
+    ) {
         $this->request->setMethod('POST');
 
         $this->form->expects($this->once())->method('setData')->with($entity)
@@ -133,25 +129,32 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once()) ->method('persist') ->with($entity);
         $this->em->expects($this->once())->method('flush');
 
-        if ($expectedDispatch) {
+        $this->em->expects($this->once())
+            ->method('find')
+            ->with('OroIntegrationBundle:Channel', $entity->getId())
+            ->will($this->returnValue($oldIntegration));
+
+        if ($expectOwnerSetEvent) {
             $this->eventDispatcher->expects($this->at(0))->method('dispatch')
                 ->with(
                     $this->equalTo(DefaultOwnerSetEvent::NAME),
                     $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent')
                 );
-            $this->eventDispatcher->expects($this->at(1))
-                ->method('dispatch')
-                ->with(
-                    $this->equalTo(ChannelUpdateEvent::NAME),
-                    $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\ChannelUpdateEvent')
-                );
+            if ($expectIntegrationUpdateEvent) {
+                $this->eventDispatcher->expects($this->at(1))
+                    ->method('dispatch')
+                    ->with(
+                        $this->equalTo(IntegrationUpdateEvent::NAME),
+                        $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
+                    );
+            }
         } else {
-            if ($onlyOwner) {
+            if ($expectIntegrationUpdateEvent) {
                 $this->eventDispatcher->expects($this->once())
                     ->method('dispatch')
                     ->with(
-                        $this->equalTo(ChannelUpdateEvent::NAME),
-                        $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\ChannelUpdateEvent')
+                        $this->equalTo(IntegrationUpdateEvent::NAME),
+                        $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent')
                     );
             } else {
                 $this->eventDispatcher->expects($this->never())->method('dispatch');
@@ -161,17 +164,6 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->process($entity));
     }
 
-    public function testTwoWaySyncEnableEventNotDispatch()
-    {
-        $this->request->setMethod('POST');
-        $this->eventDispatcher->expects($this->never())
-            ->method('dispatch');
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
-        //case if channel is new
-        $this->handler->process($this->entity);
-    }
     /**
      * @return array
      */
@@ -190,10 +182,36 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $oldIntegrationWithOwner = clone $oldIntegration;
         $oldIntegrationWithOwner->setDefaultUserOwner($someOwner);
 
+        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         return [
-            'new entity, should not dispatch'              => [$newIntegration, $newOwner, false],
-            'integration is not new, but owner existed before' => [$oldIntegrationWithOwner, $newOwner, false, true],
-            'old integration without owner, should dispatch'   => [$oldIntegration, $newOwner, true]
+            'new entity, should not dispatch'                                             => [
+                $newIntegration,
+                $newOwner,
+                $integration,
+                false,
+                false
+            ],
+            'integration is not new, but owner existed before'                            => [
+                $oldIntegrationWithOwner,
+                $newOwner,
+                $integration,
+                false,
+                true
+            ],
+            'old integration without owner, should dispatch'                              => [
+                $oldIntegration,
+                $newOwner,
+                $integration,
+                true,
+                false
+            ],
+            'should not dispatch if integration not found' => [
+                $oldIntegrationWithOwner,
+                $newOwner,
+                null,
+                false,
+                false
+            ]
         ];
     }
 }

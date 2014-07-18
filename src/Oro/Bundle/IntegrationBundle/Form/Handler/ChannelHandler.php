@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\IntegrationBundle\Event\ChannelUpdateEvent;
+use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 
@@ -60,7 +60,7 @@ class ChannelHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $oldState = clone($this->getChannel($entity));
+            $oldState = $this->getIntegration($entity);
             $this->form->submit($this->request);
             if (!$this->request->get(self::UPDATE_MARKER, false) && $this->form->isValid()) {
                 $this->em->persist($entity);
@@ -70,10 +70,10 @@ class ChannelHandler
                     $this->eventDispatcher->dispatch(DefaultOwnerSetEvent::NAME, new DefaultOwnerSetEvent($entity));
                 }
 
-                if (!$isNewEntity) {
+                if (!$isNewEntity && $oldState) {
                     $this->eventDispatcher->dispatch(
-                        ChannelUpdateEvent::NAME,
-                        new ChannelUpdateEvent($entity, $oldState)
+                        IntegrationUpdateEvent::NAME,
+                        new IntegrationUpdateEvent($entity, $oldState)
                     );
                 }
 
@@ -85,14 +85,13 @@ class ChannelHandler
     }
 
     /**
-     * @param Integration $channel
-     * @return Integration
+     * @param Integration $integration
+     * @return Integration|null
      */
-    protected function getChannel(Integration $channel)
+    protected function getIntegration(Integration $integration)
     {
-        $oldChannel = $this->em->getRepository('OroIntegrationBundle:Channel')
-            ->find($channel->getId());
+        $oldIntegration = $this->em->find('OroIntegrationBundle:Channel', $integration->getId());
 
-        return $oldChannel;
+        return $oldIntegration ? clone($oldIntegration) : null;
     }
 }
