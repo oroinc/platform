@@ -51,7 +51,7 @@ class TrackingDataController extends Controller
 
         $response['success'] = $isSuccessful;
 
-        return new JsonResponse($response, $isSuccessful ? 201 : 403);
+        return new JsonResponse($response, $isSuccessful ? 201 : 400);
     }
 
     /**
