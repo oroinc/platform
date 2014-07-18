@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
@@ -27,6 +27,9 @@ class Processor
     /** @var \Swift_Mailer */
     protected $mailer;
 
+    /** @var EmailAddressHelper */
+    protected $emailAddressHelper;
+
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
@@ -39,6 +42,7 @@ class Processor
     /**
      * @param DoctrineHelper       $doctrineHelper
      * @param \Swift_Mailer        $mailer
+     * @param EmailAddressHelper   $emailAddressHelper
      * @param EmailEntityBuilder   $emailEntityBuilder
      * @param EmailOwnerProvider   $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
@@ -46,12 +50,14 @@ class Processor
     public function __construct(
         DoctrineHelper $doctrineHelper,
         \Swift_Mailer $mailer,
+        EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
+        $this->emailAddressHelper   = $emailAddressHelper;
         $this->emailEntityBuilder   = $emailEntityBuilder;
         $this->emailOwnerProvider   = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
@@ -127,7 +133,7 @@ class Processor
     {
         $emailOwner = $this->emailOwnerProvider->findEmailOwner(
             $this->getEntityManager(),
-            EmailUtil::extractPureEmailAddress($email)
+            $this->emailAddressHelper->extractPureEmailAddress($email)
         );
 
         if ($emailOwner instanceof User) {
@@ -213,11 +219,11 @@ class Processor
         }
 
         foreach ($addresses as $address) {
-            $name = EmailUtil::extractEmailAddressName($address);
+            $name = $this->emailAddressHelper->extractEmailAddressName($address);
             if (empty($name)) {
-                $result[] = EmailUtil::extractPureEmailAddress($address);
+                $result[] = $this->emailAddressHelper->extractPureEmailAddress($address);
             } else {
-                $result[EmailUtil::extractPureEmailAddress($address)] = $name;
+                $result[$this->emailAddressHelper->extractPureEmailAddress($address)] = $name;
             }
         }
 
