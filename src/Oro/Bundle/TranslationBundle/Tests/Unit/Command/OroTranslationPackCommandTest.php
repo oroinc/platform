@@ -296,7 +296,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             '%oro.entity_merge%' => '%oro.entity_merge%',
             'oro.entity_merge.after_merge_field' => 'oro entity merge after mergefield',
             'oro.entity_merge.build_metadata' => 'oro entity merge build metadata',
-            'oro entity merge create %entity_data%' => 'oro entity merge create %entity.data%',
+            '%oro.entity.name% merge 20% create %entity_data%' => '%oro.entity.name% merge 20% create %entity.data%',
             '%oro.before_value_render%' => '%oro.before_value_render%'
         );
 

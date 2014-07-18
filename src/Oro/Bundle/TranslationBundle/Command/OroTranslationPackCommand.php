@@ -429,7 +429,7 @@ EOF
         foreach ($domains as $domain) {
             $messages = $messageCatalogue->all($domain);
             foreach ($messages as $key => $value) {
-                if (preg_match('#^%.*%$#', $key)) {
+                if (preg_match('#^%[^%\s]*%$#', $key)) {
                     $messages[$key] = false;
                 }
             }
