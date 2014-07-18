@@ -161,11 +161,11 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_o_t_m' => [
                 'assign'          => true,
                 'field_id'        => new FieldConfigId(
-                        'extend',
-                        'Extend\Entity\testEntity1',
-                        'rel_o_t_m',
-                        'oneToMany'
-                    ),
+                    'extend',
+                    'Extend\Entity\testEntity1',
+                    'rel_o_t_m',
+                    'oneToMany'
+                ),
                 'owner'           => true,
                 'target_entity'   => 'Extend\Entity\testEntity1',
                 'target_field_id' => false
@@ -178,11 +178,11 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o' => [
                 'assign'          => true,
                 'field_id'        => new FieldConfigId(
-                        'extend',
-                        'Extend\Entity\testEntity1',
-                        'rel_m_t_o',
-                        'manyToOne'
-                    ),
+                    'extend',
+                    'Extend\Entity\testEntity1',
+                    'rel_m_t_o',
+                    'manyToOne'
+                ),
                 'owner'           => true,
                 'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                 'target_field_id' => false
