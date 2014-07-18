@@ -23,7 +23,7 @@ oro:
         actions:        %entityName% Actions
         create:         Create
         create_entity:  Create %entityName%
-        created:        Created At
+        created_at:     Created At
         delete:         Delete
         delete_confirm: Are you sure you want to delete this %entity_label%?
         delete_entity:  Delete %entityName%
@@ -33,7 +33,7 @@ oro:
         empty:          N/A
         item:           item
         owner:          Owner
-        updated:        Updated At
+        updated_at:     Updated At
         system_configuration:
             groups:
                 navbar_settings:

@@ -13,7 +13,6 @@ oro:
         datagrid:
             usage_count: Usage Count
 
-        created.label:       Created At
         created_by.label:    Created By
         entity_description:  Show records tagged by this tag
         entity_label:        Tag
@@ -22,7 +21,6 @@ oro:
         name.label:          Tag
         owner.label:         Owner
         tagging.label:       Tagging
-        updated.label:       Updated At
         updated_by.label:    Updated By
 
         action:
@@ -32,7 +30,6 @@ oro:
 
         tagging:
             alias.label:         Alias
-            created.label:       Created At
             entity_description:  Represent tagging
             entity_label:        Tagging
             entity_name.label:   Entity name

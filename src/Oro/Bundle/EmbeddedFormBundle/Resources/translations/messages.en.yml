@@ -1,13 +1,11 @@
 oro:
     embeddedform:
-        created_at.label:    Created At
         css.label:           CSS
         entity_label:        Embedded Form
         entity_plural_label: Embedded Forms
         form_type.label:     Form Type
         id.label:            ID
         title.label:         Title
-        updated_at.label:    Updated At
 
         back_link_default_text: Back
         get_code:               Get code

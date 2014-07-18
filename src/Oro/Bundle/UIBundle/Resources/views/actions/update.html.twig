@@ -61,14 +61,14 @@
                                             {% block stats %}
                                                 {% if breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.updatedAt is defined %}
                                                     <li>
-                                                        {{ 'oro.ui.created'|trans }}:
+                                                        {{ 'oro.ui.created_at'|trans }}:
                                                         {{ breadcrumbs.entity.createdAt ?
                                                             breadcrumbs.entity.createdAt|oro_format_datetime :
                                                             'oro.ui.empty'|trans
                                                         }}
                                                     </li>
                                                     <li>
-                                                        {{ 'oro.ui.updated'|trans }}:
+                                                        {{ 'oro.ui.updated_at'|trans }}:
                                                         {{ breadcrumbs.entity.updatedAt ?
                                                             breadcrumbs.entity.updatedAt|oro_format_datetime :
                                                             'oro.ui.empty'|trans

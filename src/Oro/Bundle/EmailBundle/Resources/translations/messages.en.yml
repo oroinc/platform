@@ -55,7 +55,6 @@ oro:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
             unable_to_send_email:         "Unable to send the email."
 
-        created.label:            Created At
         folders.label:            Folders
         from_email_address.label: From
         from_name.label:          From

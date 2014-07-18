@@ -20,15 +20,15 @@ datagrid:
             label:
                 label: oro.dashboard.label.label
             ownerName:
-                type: twig
-                label: oro.dashboard.owner.label
+                type:          twig
+                label:         oro.dashboard.owner.label
                 frontend_type: html
-                template: OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+                template:      OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
             createdAt:
-                label:   oro.dashboard.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
             updatedAt:
-                label:   oro.dashboard.updated_at.label
+                label:         oro.ui.updated_at
                 frontend_type: datetime
         sorters:
             columns:

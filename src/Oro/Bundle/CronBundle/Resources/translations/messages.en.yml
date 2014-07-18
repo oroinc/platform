@@ -5,7 +5,6 @@ oro:
 
         header:
             command:      Command
-            created:      Created At
             error:        Error output
             id:           ID
             jobs:         Jobs

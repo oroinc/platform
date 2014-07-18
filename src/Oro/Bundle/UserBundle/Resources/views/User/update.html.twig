@@ -49,8 +49,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'oro.user.created_at.label'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.user.updated_at.label'|trans }}: {{ form.vars.value.updatedAt ? form.vars.value.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ form.vars.value.updatedAt ? form.vars.value.updatedAt|oro_format_datetime : 'N/A' }}</li>
     <li>{{ 'oro.user.last_login.label'|trans }}: {{ form.vars.value.lastLogin ? form.vars.value.lastLogin|oro_format_datetime : 'N/A' }}</li>
     <li>{{ 'oro.user.login_count.label'|trans }}: {{ form.vars.value.loginCount|default(0) }}</li>
 {% endblock stats %}

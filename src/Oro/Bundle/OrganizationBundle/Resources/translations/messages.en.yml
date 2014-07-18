@@ -32,7 +32,6 @@ oro:
             choose_organization: Choose a organization...
 
         businessunit:
-            created_at.label:    Created At
             email.label:         Email
             entity_description:  Represent business unit
             entity_label:        Business Unit
@@ -44,6 +43,5 @@ oro:
             owner.label:         Owner
             parent.label:        Parent Business Unit
             phone.label:         Phone
-            updated_at.label:    Updated At
             users.label:         Users
             website.label:       Website

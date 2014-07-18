@@ -62,7 +62,6 @@ oro:
             entity_plural_label:      Calendars of other users
             entity_description:       Represent calendar connection
             id.label:                 Id
-            created_at.label:         Created At
             connected_calendar.label: Connected calendar
             color.label:              Color
             calendar.label:           Calendar
