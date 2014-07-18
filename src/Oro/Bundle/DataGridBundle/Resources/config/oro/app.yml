@@ -1,0 +1,5 @@
+doctrine:
+    orm:
+        dql:
+            string_functions:
+                group_concat: Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat

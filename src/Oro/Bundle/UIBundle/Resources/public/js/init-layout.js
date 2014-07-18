@@ -189,8 +189,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
-
-        layout.pageRendered();
     });
 
     mediator.bind('page:beforeChange', function () {

@@ -135,7 +135,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
 
         _getValidator: function () {
             var validator;
-            if (this.form.validate) {
+            if (this.form.data('validator')) {
                 validator = this.form.validate();
             }
             return validator;

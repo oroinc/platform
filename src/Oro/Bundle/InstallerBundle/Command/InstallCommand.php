@@ -41,11 +41,10 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'Determines whether sample data need to be loaded or not'
             )
             ->addOption(
-                'full-database',
+                'drop-database',
                 null,
                 InputOption::VALUE_NONE,
-                'Instead of using the Class Metadata to detect the database table schema,
-                    drop ALL assets that the database contains.'
+                'Database will be dropped and all data will be deleted.'
             );
     }
 
@@ -65,11 +64,29 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
 
         // if there is application is not installed or no --force option
-        if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
-            && !$forceInstall
-        ) {
-            throw new \RuntimeException('Oro Application already installed.');
-        } elseif ($forceInstall) {
+        $isInstalled = $this->getContainer()->hasParameter('installed')
+            && $this->getContainer()->getParameter('installed');
+
+        if ($isInstalled && !$forceInstall) {
+            $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
+            $output->writeln(
+                'To proceed with install - run command with <info>--force</info> option:'
+            );
+            $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+            $output->writeln(
+                'To reinstall over existing database - run command with <info>--force --drop-database</info> options:'
+            );
+            $output->writeln(sprintf('    <info>%s --force --drop-database</info>', $this->getName()));
+            $output->writeln(
+                '<comment>ATTENTION</comment>: All data will be lost. ' .
+                'Database backup is highly recommended before executing this command.'
+            );
+            $output->writeln('');
+
+            return;
+        }
+
+        if ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
             $commandExecutor->runCommand(
@@ -106,6 +123,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
     /**
      * @param OutputInterface $output
+     *
      * @return InstallCommand
      * @throws \RuntimeException
      */
@@ -162,7 +180,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             '--process-isolation' => true,
         );
 
-        if ($input->getOption('full-database')) {
+        if ($input->getOption('drop-database')) {
             $schemaDropOptions['--full-database'] = true;
         }
 

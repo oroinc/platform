@@ -11,6 +11,7 @@ use Psr\Log\NullLogger;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 abstract class AbstractEmailSynchronizer
 {
@@ -39,6 +40,11 @@ abstract class AbstractEmailSynchronizer
     protected $emailAddressManager;
 
     /**
+     * @var EmailAddressHelper
+     */
+    protected $emailAddressHelper;
+
+    /**
      * @var KnownEmailAddressChecker
      */
     protected $knownEmailAddressChecker;
@@ -46,18 +52,21 @@ abstract class AbstractEmailSynchronizer
     /**
      * Constructor
      *
-     * @param EntityManager $em
-     * @param EmailEntityBuilder $emailEntityBuilder
+     * @param EntityManager       $em
+     * @param EmailEntityBuilder  $emailEntityBuilder
      * @param EmailAddressManager $emailAddressManager
+     * @param EmailAddressHelper  $emailAddressHelper
      */
     protected function __construct(
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager
+        EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper
     ) {
-        $this->em = $em;
-        $this->emailEntityBuilder = $emailEntityBuilder;
+        $this->em                  = $em;
+        $this->emailEntityBuilder  = $emailEntityBuilder;
         $this->emailAddressManager = $emailAddressManager;
+        $this->emailAddressHelper  = $emailAddressHelper;
     }
 
     /**
@@ -252,7 +261,8 @@ abstract class AbstractEmailSynchronizer
             $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
                 $this->log,
                 $this->em,
-                $this->emailAddressManager
+                $this->emailAddressManager,
+                $this->emailAddressHelper
             );
         }
     }
