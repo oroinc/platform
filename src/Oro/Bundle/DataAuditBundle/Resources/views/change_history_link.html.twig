@@ -1,15 +1,11 @@
-{% if resource_granted('oro_dataaudit_history') and (
-    (entity is auditable or entity_class is auditable) or
-    (audit_show_change_history is defined and audit_show_change_history)
-   )
-%}
-    <li>
-        <a class="no-hash"
-           href="{{ path(audit_path, {entity:entity_class, id:id}) }}"
-           id="view-activity-btn"
-           title="{{ title }} - {{ 'Change History'|trans }}">
-            {{ 'Change History'|trans }}
-        </a>
-    </li>
+{% if entity_class is empty %}
+    {% set entity_class = oro_class_name(entity, true) %}
 {% endif %}
-
+<li>
+    <a class="no-hash"
+       href="{{ path(audit_path, {entity:entity_class, id:id}) }}"
+       id="view-activity-btn"
+       title="{{ title }} - {{ 'Change History'|trans }}">
+        {{ 'Change History'|trans }}
+    </a>
+</li>

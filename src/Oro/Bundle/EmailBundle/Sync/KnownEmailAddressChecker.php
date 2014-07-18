@@ -8,7 +8,7 @@ use Doctrine\ORM\Query;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class KnownEmailAddressChecker
 {
@@ -28,6 +28,11 @@ class KnownEmailAddressChecker
     protected $emailAddressManager;
 
     /**
+     * @var EmailAddressHelper
+     */
+    protected $emailAddressHelper;
+
+    /**
      * @var array
      */
     protected $knownEmailAddresses = [];
@@ -38,15 +43,18 @@ class KnownEmailAddressChecker
      * @param LoggerInterface     $log
      * @param EntityManager       $em
      * @param EmailAddressManager $emailAddressManager
+     * @param EmailAddressHelper  $emailAddressHelper
      */
     public function __construct(
         LoggerInterface $log,
         EntityManager $em,
-        EmailAddressManager $emailAddressManager
+        EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper
     ) {
         $this->log                 = $log;
         $this->em                  = $em;
         $this->emailAddressManager = $emailAddressManager;
+        $this->emailAddressHelper  = $emailAddressHelper;
     }
 
     /**
@@ -65,7 +73,7 @@ class KnownEmailAddressChecker
             if (!empty($arg)) {
                 $emails = array_map(
                     function ($email) {
-                        return strtolower(EmailUtil::extractPureEmailAddress($email));
+                        return strtolower($this->emailAddressHelper->extractPureEmailAddress($email));
                     },
                     (array)$arg
                 );
