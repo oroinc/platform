@@ -53,11 +53,19 @@ class NumberFilter extends AbstractFilter
      */
     public function parseData($data)
     {
-        if (!is_array($data) || !array_key_exists('value', $data) || !is_numeric($data['value'])) {
+        if (!is_array($data) || !array_key_exists('value', $data)) {
             return false;
         }
 
         $data['type'] = isset($data['type']) ? $data['type'] : null;
+
+        if (!is_numeric($data['value'])) {
+            if ($data['type'] === FilterUtility::TYPE_EMPTY) {
+                return $data;
+            }
+
+            return false;
+        }
 
         return $data;
     }

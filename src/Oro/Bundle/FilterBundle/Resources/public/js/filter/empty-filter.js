@@ -15,7 +15,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
          *
          * @property
          */
-        emptyOption: 'empty',
+        emptyOption: 'filter_empty_option',
 
         /**
          * Stores old value for empty filter
@@ -132,6 +132,20 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
 
             button.removeClass(this.updateSelectorEmptyClass);
             item.show();
+        },
+
+        /**
+         * @inheritDoc
+         */
+        isEmptyValue: function() {
+            if (this.value.type === this.emptyOption) {
+                return false;
+            }
+
+            if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
+                return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
+            }
+            return true;
         }
     });
 });
