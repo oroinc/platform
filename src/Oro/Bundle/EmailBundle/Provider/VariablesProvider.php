@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Util\Inflector;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,7 +51,7 @@ class VariablesProvider
                 $fields = array_values(
                     array_map(
                         function (ConfigInterface $field) {
-                            return $field->getId()->getFieldName();
+                            return Inflector::camelize($field->getId()->getFieldName());
                         },
                         $fields
                     )

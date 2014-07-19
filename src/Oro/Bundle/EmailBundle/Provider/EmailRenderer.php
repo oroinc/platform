@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Util\Inflector;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
@@ -90,8 +91,9 @@ class EmailRenderer extends \Twig_Environment
 
             if (count($fields)) {
                 $configuration[$className] = array();
+                /** @var ConfigInterface $fieldConfig */
                 foreach ($fields as $fieldConfig) {
-                    $configuration[$className][] = 'get' . strtolower($fieldConfig->getId()->getFieldName());
+                    $configuration[$className][] = 'get' . Inflector::camelize($fieldConfig->getId()->getFieldName());
                 }
             }
         }
