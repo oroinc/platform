@@ -302,6 +302,7 @@ EOF
                     )
                 );
                 $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
+                $this->removePlaceholders($messageCatalog);
                 $writer->writeTranslations(
                     $messageCatalog,
                     $input->getOption('output-format'),
@@ -416,5 +417,24 @@ EOF
             $output->writeln($value);
         }
         return $result;
+    }
+
+    /**
+     * Remove placeholders from MessageCatalogue
+     * @param MessageCatalogue $messageCatalogue
+     */
+    protected function removePlaceholders(MessageCatalogue $messageCatalogue)
+    {
+        $domains = $messageCatalogue->getDomains();
+        foreach ($domains as $domain) {
+            $messages = $messageCatalogue->all($domain);
+            foreach ($messages as $key => $value) {
+                if (preg_match('#^%[^%\s]*%$#', $key)) {
+                    $messages[$key] = false;
+                }
+            }
+            $clearMessages = array_filter($messages);
+            $messageCatalogue->replace($clearMessages, $domain);
+        }
     }
 }

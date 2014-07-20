@@ -34,7 +34,7 @@ datagrid:
                 label:         oro.workflow.processdefinition.enabled.label
                 frontend_type: boolean
             createdAt:
-                label:         oro.workflow.processdefinition.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
 
         properties:
@@ -125,22 +125,22 @@ datagrid:
                     - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
         columns:
             label:
-                label: oro.workflow.workflowdefinition.label.label
+                label:         oro.workflow.workflowdefinition.label.label
             relatedEntity:
-                label: oro.workflow.workflowdefinition.related_entity.label
-                data_name: relatedEntity
+                label:         oro.workflow.workflowdefinition.related_entity.label
+                data_name:     relatedEntity
                 frontend_type: select
-                choices: @oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice
+                choices:       @oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice
             active:
-                label:  oro.workflow.workflowdefinition.active.label
-                type: twig
-                template: OroWorkflowBundle:Datagrid:Column/active.html.twig
+                label:         oro.workflow.workflowdefinition.active.label
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/active.html.twig
                 frontend_type: html
             system:
-                label: oro.workflow.workflowdefinition.system.label
+                label:         oro.workflow.workflowdefinition.system.label
                 frontend_type: boolean
             createdAt:
-                label: oro.workflow.workflowdefinition.created_at.label
+                label:         oro.ui.created_at.
                 frontend_type: datetime
         properties:
             id: ~

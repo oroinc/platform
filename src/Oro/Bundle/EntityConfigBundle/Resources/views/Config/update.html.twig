@@ -31,8 +31,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'oro.entity_config.info.created.label'|trans }}: {{ entity.created|oro_format_datetime }}</li>
-    <li>{{ 'oro.entity_config.info.updated.label'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.created|oro_format_datetime }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
     {% if link is defined and link %}
         <li>
             {{ [
