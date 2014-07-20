@@ -77,7 +77,7 @@ class Pager extends AbstractPager implements PagerInterface
             $query = $this->aclHelper->apply($query);
         }
 
-        return QueryCountCalculator::calculateCount($query, empty($countQb->getDQLPart('groupBy')));
+        return QueryCountCalculator::calculateCount($query);
     }
 
     /**

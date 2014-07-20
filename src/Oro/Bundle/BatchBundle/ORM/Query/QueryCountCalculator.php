@@ -13,6 +13,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 class QueryCountCalculator
 {
+    /** @var bool|null */
+    private $shouldUseWalker;
+
     /**
      * Calculates total count of query records
      *
@@ -21,12 +24,25 @@ class QueryCountCalculator
      *
      * @return integer
      */
-    public static function calculateCount(Query $query, $useWalker = true)
+    public static function calculateCount(Query $query, $useWalker = null)
     {
         /** @var QueryCountCalculator $instance */
         $instance = new static();
 
-        return $instance->getCount($query, $useWalker);
+        $instance->setUseWalker($useWalker);
+        return $instance->getCount($query);
+    }
+
+    /**
+     * @param bool $value  Determine should CountWalker be used or wrap count query with additional select.
+     *                     Walker might be turned off on queries where exists GROUP BY statement and count select
+     *                     will returns large dataset(it's only critical when more then e.g. 1000 results returned)
+     *                     Another point to disable it, when query has LIMIT and you want to count results
+     *                     relatively to it.
+     */
+    public function setUseWalker($value)
+    {
+        $this->shouldUseWalker = $value;
     }
 
     /**
@@ -34,18 +50,15 @@ class QueryCountCalculator
      * Notes: this method do not make any modifications of the given query
      *
      * @param Query $query
-     * @param bool  $useWalker Determine should CountWalker be used or wrap count query with additional select.
-     *                         Walker might be turned of on queries where exists GROUP BY statement and count select
-     *                         will returns large dataset(it's only critical when more then e.g. 1000 results returned)
      *
      * @return integer
      */
-    public function getCount(Query $query, $useWalker = true)
+    public function getCount(Query $query)
     {
-        if ($useWalker) {
+        if ($this->useWalker($query)) {
             $paginator = new Paginator($query);
             $paginator->setUseOutputWalkers(false);
-            $result    = $paginator->count();
+            $result = $paginator->count();
         } else {
             $parser            = new Parser($query);
             $parserResult      = $parser->parse();
@@ -57,7 +70,7 @@ class QueryCountCalculator
                 $sqlParameters,
                 $parameterTypes
             );
-            $result    = $statement->fetchColumn();
+            $result = $statement->fetchColumn();
         }
 
         return $result ? (int)$result : 0;
@@ -114,5 +127,21 @@ class QueryCountCalculator
         }
 
         return array($sqlParams, $types);
+    }
+
+    /**
+     * If flag to use walker not set manually we try to figure out if it will not brake query logic
+     *
+     * @param Query $query
+     *
+     * @return bool
+     */
+    private function useWalker(Query $query)
+    {
+        if (null === $this->shouldUseWalker) {
+            $this->shouldUseWalker = !$query->contains('GROUP BY') && null === $query->getMaxResults();
+        }
+
+        return $this->shouldUseWalker;
     }
 }
