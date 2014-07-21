@@ -1,31 +1,24 @@
 <?php
 
-namespace Oro\Bundle\MigrationBundle\Command\Logger;
+namespace Oro\Component\Log\Logger;
 
 use Symfony\Component\Console\Output\OutputInterface;
+
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
 
 class OutputLogger extends AbstractLogger
 {
-    /**
-     * @var OutputInterface
-     */
+    /** @var OutputInterface */
     protected $output;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $alwaysLogErrors;
 
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     protected $verbosity;
 
-    /**
-     * @var string|null
-     */
+    /** @var string|null */
     protected $indent;
 
     /**
@@ -50,14 +43,13 @@ class OutputLogger extends AbstractLogger
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function log($level, $message, array $context = array())
     {
         $verbosity = null !== $this->verbosity
             ? $this->verbosity
             : $this->output->getVerbosity();
+
         switch ($level) {
             case LogLevel::EMERGENCY:
             case LogLevel::ALERT:
@@ -85,19 +77,20 @@ class OutputLogger extends AbstractLogger
                 break;
         }
 
-        $this->output->writeln(sprintf($this->getTemplate($level), $message));
+        $this->output->writeln(sprintf($this->getTemplate($level), $level, $message));
 
         // based on PSR-3 recommendations if an Exception object is passed in the context data,
         // it MUST be in the 'exception' key.
         if (isset($context['exception']) && $context['exception'] instanceof \Exception) {
             $this->output->writeln(
-                sprintf($this->getTemplate(LogLevel::ERROR), (string)$context['exception'])
+                sprintf($this->getTemplate(LogLevel::ERROR), LogLevel::ERROR, (string)$context['exception'])
             );
         }
     }
 
     /**
      * @param string $level
+     *
      * @return string
      */
     protected function getTemplate($level)
@@ -107,13 +100,13 @@ class OutputLogger extends AbstractLogger
             case LogLevel::ALERT:
             case LogLevel::CRITICAL:
             case LogLevel::ERROR:
-                $result = '<error>%s</error>';
+                $result = '<error>[%s]</error> [%s]';
                 break;
             case LogLevel::WARNING:
-                $result = '<comment>%s</comment>';
+                $result = '<comment>[%s]</comment> [%s';
                 break;
             default:
-                $result = '<info>%s</info>';
+                $result = '<info>[%s]</info> [%s';
                 break;
         }
 

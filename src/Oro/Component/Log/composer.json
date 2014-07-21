@@ -1,0 +1,23 @@
+{
+    "name": "oro/log",
+    "type": "library",
+    "description": "ORO Log Component",
+    "keywords": ["ORO", "BAP", "Log"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.4",
+        "symfony/config": "~2.1",
+        "symfony/dependency-injection": "~2.1",
+        "symfony/yaml": "~2.1"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\Log": "" }
+    },
+    "target-dir": "Oro/Component/Log",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

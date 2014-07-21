@@ -11,7 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Component\Log\Logger\OutputLogger;
+
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
 /**

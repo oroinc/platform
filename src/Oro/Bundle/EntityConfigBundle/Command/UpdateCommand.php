@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
+use Oro\Component\Log\Logger\OutputLogger;
 
 class UpdateCommand extends BaseCommand
 {

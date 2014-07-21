@@ -7,10 +7,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
+
+use Oro\Component\Log\Logger\OutputLogger;
+
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
 
 class MigrationUpdateConfigCommand extends ContainerAwareCommand
 {
