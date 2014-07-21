@@ -223,6 +223,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
             $query = $this->cloneQuery($this->getQuery());
             // restore original max results
             $query->setMaxResults($this->maxResults);
+
             $this->totalCount = QueryCountCalculator::calculateCount($query);
         }
 
