@@ -18,10 +18,10 @@ Login page: Login page
 
 change_password:
     flash:
-        success: The password has been changed 123
+        success: The password has been changed
 resetting:
     flash:
-        success: The password has been successfully reset 123
+        success: The password has been successfully reset
 
 oro:
     user:
