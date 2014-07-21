@@ -7,7 +7,6 @@ oro:
             reports_tab.label: Reports & Segments
             manage_segments.label: Manage Segments
 
-        created_at.label:    Created At
         definition.label:    Definition
         description.label:   Description
         entity_label:        Segment
@@ -16,7 +15,6 @@ oro:
         last_run.label:      Last run
         name.label:          Name
         owner.label:         Owner
-        updated_at.label:    Updated At
 
         entity:
             label:   Entity

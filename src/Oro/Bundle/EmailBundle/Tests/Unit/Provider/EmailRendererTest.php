@@ -87,9 +87,14 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * configureSanbox method with not cached scenario
+     * configure Sanbox method with not cached scenario
+     *
+     * @param string $fieldName
+     * @param string $method
+     *
+     * @dataProvider fieldNameProvider
      */
-    public function testConfigureSandboxNotCached()
+    public function testConfigureSandboxNotCached($fieldName, $method)
     {
         $entityClass = 'Oro\Bundle\UserBundle\Entity\User';
 
@@ -99,9 +104,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityClass));
 
         $configuredData = array(
-            $entityClass => array(
-                'getsomecode'
-            )
+            $entityClass => array($method)
         );
 
         $this->cache
@@ -137,7 +140,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $field1Id->expects($this->once())
             ->method('getFieldName')
-            ->will($this->returnValue('someCode'));
+            ->will($this->returnValue($fieldName));
 
         $field1 = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->disableOriginalConstructor()
@@ -164,6 +167,23 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $fieldsCollection->add($field2);
 
         $this->getRendererInstance();
+    }
+
+    /**
+     * @return array
+     */
+    public function fieldNameProvider()
+    {
+        return [
+            'camel_case' => [
+                'camelProperty',
+                'getcamelProperty'
+            ],
+            'underscore' => [
+                'underscored_property',
+                'getunderscoredProperty'
+            ]
+        ];
     }
 
     /**

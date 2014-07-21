@@ -13,6 +13,7 @@ oro_entity_config:
                         priority:           100
                         default_value:      false
                         auditable:          false
+                        require_schema_update: true
                     form:
                         type:               oro_entity_extend_association_choice
                         options:

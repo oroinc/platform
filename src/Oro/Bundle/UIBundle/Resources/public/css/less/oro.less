@@ -444,7 +444,7 @@ footer {
   .lock-bar {
     display: block;
   }
-  .maximaze-bar {
+  .maximize-bar {
     float: right;
   }
   .icon-arrow-left {
@@ -535,7 +535,7 @@ footer {
   .nav-content {
     padding-top: 10px;
   }
-  .maximaze-bar {
+  .maximize-bar {
     width: 100%;
     overflow: hidden;
   }
@@ -934,7 +934,7 @@ footer {
       }
     }
     .select-filter-widget .caret { margin-top:8px; }
-    .choicefilter {
+    .choice-filter {
       input[type='text'] {
         margin-right: -3px;
         .border-radius(0);
@@ -1156,7 +1156,7 @@ footer {
 }
 .loading-wrapper {
   background: #000;
-  opacity: 0.3;
+  opacity: 0.2;
   position: absolute;
   top: 0;
   left: 0;
@@ -1867,8 +1867,13 @@ ul.inline-extra {
 }
 .navbar-extra-right {
   padding-right: 20px;
-  .btn-group{
-    margin-left: 8px;
+  .title-buttons-container {
+    .btn-group{
+      margin-left: 8px;
+    }
+    .btn-group .btn-group {
+      margin-left: 0;
+    }
   }
 }
 .row-oro {
@@ -2165,12 +2170,17 @@ div.selector span {
   line-height: 28px;
   .box-sizing(border-box);
   padding: 0 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
   &:after {
-    float:right;
     margin:2px 2px 0 0;
     display:inline-block;
     font:15px 'FontAwesome';
     content: "\f0dd";
+    position: absolute;
+    right: 5px;
   }
 }
 
@@ -2737,7 +2747,7 @@ label.radio.error {
     margin: 0 0 0 4px;
   }
 }
-.choicefilter {
+.choice-filter {
   select,
   textarea,
   input[type="text"],
@@ -2758,8 +2768,8 @@ label.radio.error {
     height:19px;
   }
 }
-.choicefilter .input-append,
-.choicefilter .input-prepend {
+.choice-filter .input-append,
+.choice-filter .input-prepend {
   margin-bottom: 0;
 }
 .input-append .add-on,

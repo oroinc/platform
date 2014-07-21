@@ -82,7 +82,7 @@ class EntityGenerator
         // write PHP class aliases to the file
         file_put_contents(
             ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            Yaml::dump($aliases)
+            serialize($aliases)
         );
     }
 

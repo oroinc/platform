@@ -1,0 +1,20 @@
+parameters:
+    oro_address.importexport.template_fixture.country.class:  Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\CountryFixture
+    oro_address.importexport.template_fixture.region.class:   Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\RegionFixture
+    oro_address.importexport.template_fixture.address.class:  Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressFixture
+
+services:
+    oro_address.importexport.template_fixture.country:
+        class: %oro_address.importexport.template_fixture.country.class%
+        tags:
+            - { name: oro_importexport.template_fixture }
+
+    oro_address.importexport.template_fixture.region:
+        class: %oro_address.importexport.template_fixture.region.class%
+        tags:
+            - { name: oro_importexport.template_fixture }
+
+    oro_address.importexport.template_fixture.address:
+        class: %oro_address.importexport.template_fixture.address.class%
+        tags:
+            - { name: oro_importexport.template_fixture }

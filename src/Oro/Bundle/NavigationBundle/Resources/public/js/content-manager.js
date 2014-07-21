@@ -141,7 +141,6 @@ define([
      *
      * @param {string} path
      * @param {Array} callbacks
-     * @param {Object} obj
      */
     function refreshHandler(path, callbacks) {
         if (path === current.path) {

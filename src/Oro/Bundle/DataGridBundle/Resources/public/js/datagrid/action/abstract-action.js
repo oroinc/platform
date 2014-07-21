@@ -192,7 +192,7 @@ define(['jquery', 'underscore', 'backbone', 'routing',
             }
         },
 
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch({reset: true});
@@ -202,7 +202,7 @@ define(['jquery', 'underscore', 'backbone', 'routing',
 
         _showAjaxSuccessMessage: function (data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                message = __(data.message || defaultMessage);
+                message = data.message || __(defaultMessage);
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);
             }

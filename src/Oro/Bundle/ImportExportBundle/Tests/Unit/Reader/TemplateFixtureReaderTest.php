@@ -9,7 +9,7 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fixtureRegistry;
+    protected $templateManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -23,8 +23,8 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fixtureRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry')
+        $this->templateManager = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -32,7 +32,7 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->fixtureRegistry);
+        $this->reader = new TemplateFixtureReader($this->contextRegistry, $this->templateManager);
     }
 
     /**
@@ -46,33 +46,6 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
             ->method('hasOption')
             ->with('entityName')
             ->will($this->returnValue(false));
-
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contextRegistry->expects($this->once())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
-
-        $this->reader->setStepExecution($stepExecution);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage There is no template fixture registered for "stdClass".
-     */
-    public function testInitializeFromContextExceptionNoFixture()
-    {
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())
-            ->method('hasOption')
-            ->with('entityName')
-            ->will($this->returnValue(true));
-        $context->expects($this->atLeastOnce())
-            ->method('getOption')
-            ->with('entityName')
-            ->will($this->returnValue('stdClass'));
 
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
@@ -110,7 +83,7 @@ class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
         $fixture->expects($this->once())
             ->method('getData')
             ->will($this->returnValue($iterator));
-        $this->fixtureRegistry->expects($this->once())
+        $this->templateManager->expects($this->once())
             ->method('getEntityFixture')
             ->with('stdClass')
             ->will($this->returnValue($fixture));
