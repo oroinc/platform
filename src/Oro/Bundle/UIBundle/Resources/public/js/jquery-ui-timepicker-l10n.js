@@ -7,7 +7,7 @@ function($, __, localeSettings) {
 
     $.timepicker.regional[locale] = { // Default regional settings
         currentText: __('Now'),
-        closeText: __('Done'),
+        closeText: __('Close'),
         amNames: [__('AM'), __('A')],
         pmNames: [__('PM'), __('P')],
         timeFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'time', 'HH:mm'),
