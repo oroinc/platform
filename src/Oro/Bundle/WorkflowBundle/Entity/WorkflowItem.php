@@ -35,6 +35,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
