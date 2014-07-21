@@ -3,10 +3,10 @@
 namespace Oro\Bundle\UIBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentProviderListener
 {
