@@ -22,8 +22,7 @@ class PercentType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        $sqlDeclaration = $platform->getFloatDeclarationSQL($fieldDeclaration);
-        return $sqlDeclaration . " COMMENT '(DC2Type:" . $this->getName() . ")'";
+        return $platform->getFloatDeclarationSQL($fieldDeclaration);
     }
 
     /**
@@ -32,5 +31,13 @@ class PercentType extends Type
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         return (null === $value) ? null : (double) $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    {
+        return true;
     }
 }

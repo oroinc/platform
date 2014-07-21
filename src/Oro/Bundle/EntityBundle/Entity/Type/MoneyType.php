@@ -27,8 +27,7 @@ class MoneyType extends Type
         $fieldDeclaration['precision'] = self::TYPE_PRECISION;
         $fieldDeclaration['scale']     = self::TYPE_SCALE;
 
-        $sqlDeclaration = $platform->getDecimalTypeDeclarationSQL($fieldDeclaration);
-        return $sqlDeclaration . " COMMENT '(DC2Type:" . $this->getName() . ")'";
+        return $platform->getDecimalTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
@@ -38,4 +37,14 @@ class MoneyType extends Type
     {
         return $value;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    {
+        return true;
+    }
+
+
 }

@@ -31,7 +31,7 @@ class PercentTypeTest extends \PHPUnit_Framework_TestCase
         $platform = new MySqlPlatform();
         $output = $this->percentType->getSQLDeclaration([], $platform);
 
-        $this->assertEquals("DOUBLE PRECISION COMMENT '(DC2Type:percent)'", $output);
+        $this->assertEquals("DOUBLE PRECISION", $output);
     }
 
     public function testConvertToPHPValue()
@@ -39,5 +39,11 @@ class PercentTypeTest extends \PHPUnit_Framework_TestCase
         $platform = new MySqlPlatform();
         $this->assertNull($this->percentType->convertToPHPValue(null, $platform));
         $this->assertEquals(12.4, $this->percentType->convertToPHPValue(12.4, $platform));
+    }
+
+    public function testRequiresSQLCommentHint()
+    {
+        $platform = new MySqlPlatform();
+        $this->assertTrue($this->percentType->requiresSQLCommentHint($platform));
     }
 }

@@ -31,7 +31,7 @@ class MoneyTypeTest extends \PHPUnit_Framework_TestCase
         $platform = new MySqlPlatform();
         $output = $this->type->getSQLDeclaration([], $platform);
 
-        $this->assertEquals("NUMERIC(19, 4) COMMENT '(DC2Type:money)'", $output);
+        $this->assertEquals("NUMERIC(19, 4)", $output);
     }
 
     public function testConvertToPHPValue()
@@ -39,5 +39,11 @@ class MoneyTypeTest extends \PHPUnit_Framework_TestCase
         $platform = new MySqlPlatform();
         $this->assertNull($this->type->convertToPHPValue(null, $platform));
         $this->assertEquals(12.1, $this->type->convertToPHPValue(12.1, $platform));
+    }
+
+    public function testRequiresSQLCommentHint()
+    {
+        $platform = new MySqlPlatform();
+        $this->assertTrue($this->type->requiresSQLCommentHint($platform));
     }
 }
