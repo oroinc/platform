@@ -975,7 +975,7 @@ class ConfigManager
         $translatablePropertyNames = $provider->getPropertyConfig()
             ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {
-            if (!in_array($propertyName, $defaultValues)) {
+            if (!array_key_exists($propertyName, $defaultValues)) {
                 $defaultValues[$propertyName] =
                     ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
             }
