@@ -25,7 +25,13 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *              "type"="ACL",
  *              "group_name"=""
  *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }

@@ -28,6 +28,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
