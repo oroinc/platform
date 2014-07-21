@@ -18,7 +18,7 @@ class OroEmbeddedFormBundle implements Migration
         /** Generate table oro_embedded_form **/
         $table = $schema->createTable('oro_embedded_form');
         $table->addColumn('id', 'string', ['length' => 255]);
-        $table->addColumn('channel_id', 'smallint', ['notnull' => false]);
+        $table->addColumn('channel_id', 'integer', ['notnull' => false]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('css', 'text', []);
         $table->addColumn('form_type', 'string', ['length' => 255]);

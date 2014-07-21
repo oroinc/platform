@@ -92,7 +92,7 @@ class OroNotificationBundle implements Migration
         /** Generate table oro_notification_recipient_group **/
         $table = $schema->createTable($tableName ? : 'oro_notification_recipient_group');
         $table->addColumn('recipient_list_id', 'integer', []);
-        $table->addColumn('group_id', 'smallint', []);
+        $table->addColumn('group_id', 'integer', []);
         $table->setPrimaryKey(['recipient_list_id', 'group_id']);
         $table->addIndex(['recipient_list_id'], 'IDX_F6E3D23E2B9E3E89', []);
         $table->addIndex(['group_id'], 'IDX_F6E3D23EFE54D947', []);
