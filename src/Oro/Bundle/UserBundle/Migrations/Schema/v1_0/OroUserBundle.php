@@ -48,7 +48,7 @@ class OroUserBundle implements Migration
     {
         /** Generate table oro_access_group **/
         $table = $schema->createTable('oro_access_group');
-        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 30]);
         $table->setPrimaryKey(['id']);
@@ -66,7 +66,7 @@ class OroUserBundle implements Migration
     {
         /** Generate table oro_access_role **/
         $table = $schema->createTable('oro_access_role');
-        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('role', 'string', ['length' => 30]);
         $table->addColumn('label', 'string', ['length' => 30]);
@@ -166,8 +166,8 @@ class OroUserBundle implements Migration
     {
         /** Generate table oro_user_access_group_role **/
         $table = $schema->createTable('oro_user_access_group_role');
-        $table->addColumn('group_id', 'smallint', []);
-        $table->addColumn('role_id', 'smallint', []);
+        $table->addColumn('group_id', 'integer', []);
+        $table->addColumn('role_id', 'integer', []);
         $table->setPrimaryKey(['group_id', 'role_id']);
         $table->addIndex(['group_id'], 'IDX_E7E7E38EFE54D947', []);
         $table->addIndex(['role_id'], 'IDX_E7E7E38ED60322AC', []);
@@ -184,7 +184,7 @@ class OroUserBundle implements Migration
         /** Generate table oro_user_access_role **/
         $table = $schema->createTable('oro_user_access_role');
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('role_id', 'smallint', []);
+        $table->addColumn('role_id', 'integer', []);
         $table->setPrimaryKey(['user_id', 'role_id']);
         $table->addIndex(['user_id'], 'IDX_290571BEA76ED395', []);
         $table->addIndex(['role_id'], 'IDX_290571BED60322AC', []);
