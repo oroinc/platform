@@ -48,7 +48,7 @@ services:
         arguments:
             - @oro_ui.content_provider.manager
         tags:
-            - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%

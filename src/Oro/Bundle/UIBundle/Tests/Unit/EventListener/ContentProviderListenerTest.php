@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\UIBundle\EventListener\ContentProviderListener;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,9 +25,12 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent')
+        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->event->expects($this->any())
+            ->method('getRequestType')
+            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
         $this->contentProviderManager = $this
             ->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager')
             ->disableOriginalConstructor()
@@ -42,7 +46,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($request));
         $this->contentProviderManager->expects($this->never())
             ->method($this->anything());
-        $this->listener->onKernelView($this->event);
+        $this->listener->onKernelRequest($this->event);
     }
 
     public function testOnKernelViewToEnable()
@@ -72,7 +76,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $this->listener->onKernelView($this->event);
+        $this->listener->onKernelRequest($this->event);
     }
 
     public function testOnKernelViewToDisplay()
@@ -121,6 +125,6 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        $this->listener->onKernelView($this->event);
+        $this->listener->onKernelRequest($this->event);
     }
 }

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentProviderListener
 {
@@ -27,25 +28,27 @@ class ContentProviderListener
     /**
      * {@inheritdoc}
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelRequest(GetResponseEvent $event)
     {
-        $request = $event->getRequest();
-        $contentProvidersToEnable = $request->get('_enableContentProviders');
-        $displayContentProviders = $request->get('_displayContentProviders');
+        if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
+            $request = $event->getRequest();
+            $contentProvidersToEnable = $request->get('_enableContentProviders');
+            $displayContentProviders = $request->get('_displayContentProviders');
 
-        if ($contentProvidersToEnable || $displayContentProviders) {
-            if ($contentProvidersToEnable) {
-                foreach (explode(',', $contentProvidersToEnable) as $name) {
-                    $this->contentProviderManager->enableContentProvider($name);
+            if ($contentProvidersToEnable || $displayContentProviders) {
+                if ($contentProvidersToEnable) {
+                    foreach (explode(',', $contentProvidersToEnable) as $name) {
+                        $this->contentProviderManager->enableContentProvider($name);
+                    }
                 }
-            }
 
-            if ($displayContentProviders) {
-                $displayContentProviders = explode(',', $displayContentProviders);
-                /** @var ContentProviderInterface $provider */
-                foreach ($this->contentProviderManager->getContentProviders() as $provider) {
-                    if (!in_array($provider->getName(), $displayContentProviders)) {
-                        $provider->setEnabled(false);
+                if ($displayContentProviders) {
+                    $displayContentProviders = explode(',', $displayContentProviders);
+                    /** @var ContentProviderInterface $provider */
+                    foreach ($this->contentProviderManager->getContentProviders() as $provider) {
+                        if (!in_array($provider->getName(), $displayContentProviders)) {
+                            $provider->setEnabled(false);
+                        }
                     }
                 }
             }
