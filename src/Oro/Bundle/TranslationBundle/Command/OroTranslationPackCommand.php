@@ -250,7 +250,6 @@ EOF
     protected function dump(InputInterface $input, OutputInterface $output)
     {
         $projectNamespace = $input->getArgument('project');
-        $defaultLocale    = $input->getArgument('locale');
 
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
 
@@ -262,6 +261,7 @@ EOF
             new Filesystem(),
             $container->get('kernel')->getBundles()
         );
+        $dumper->setLogger(new OutputLogger($output));
 
         $languagePackPath = $this->getLangPackDir($projectNamespace);
         $dumper->dump(
@@ -270,36 +270,6 @@ EOF
             $input->getOption('output-format'),
             $input->getArgument('locale')
         );
-
-
-
-        foreach ($bundles as $bundle) {
-            $namespaceParts = explode('\\', $bundle->getNamespace());
-            if ($namespaceParts && reset($namespaceParts) === $projectNamespace) {
-                $bundleLanguagePackPath = $this->getLangPackDir($projectNamespace, $bundle->getName());
-
-                if (!is_dir($bundleLanguagePackPath)) {
-                    $this->createDirectory($bundleLanguagePackPath);
-                }
-
-                $output->writeln(
-                    sprintf(
-                        'Writing files for <info>%s</info>',
-                        $bundle->getName()
-                    )
-                );
-
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
-                $this->removePlaceholders($messageCatalog);
-                $writer->writeTranslations(
-                    $messageCatalog,
-                    $input->getOption('output-format'),
-                    array('path' => $bundleLanguagePackPath)
-                );
-            }
-        }
-
-        $this->checkFiles($languagePackPath, $output);
 
         return true;
     }
@@ -368,24 +338,5 @@ EOF
             $output->writeln($value);
         }
         return $result;
-    }
-
-    /**
-     * Remove placeholders from MessageCatalogue
-     * @param MessageCatalogue $messageCatalogue
-     */
-    protected function removePlaceholders(MessageCatalogue $messageCatalogue)
-    {
-        $domains = $messageCatalogue->getDomains();
-        foreach ($domains as $domain) {
-            $messages = $messageCatalogue->all($domain);
-            foreach ($messages as $key => $value) {
-                if (preg_match('#^%[^%\s]*%$#', $key)) {
-                    $messages[$key] = false;
-                }
-            }
-            $clearMessages = array_filter($messages);
-            $messageCatalogue->replace($clearMessages, $domain);
-        }
     }
 }

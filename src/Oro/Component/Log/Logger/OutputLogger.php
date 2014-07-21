@@ -21,24 +21,30 @@ class OutputLogger extends AbstractLogger
     /** @var string|null */
     protected $indent;
 
+    /** @var bool   use message level-based templates */
+    protected $useTemplate;
+
     /**
      * Constructor
      *
      * @param OutputInterface $output
      * @param bool            $alwaysLogErrors
-     * @param int|null        $verbosity NULL or OutputInterface::VERBOSITY_*
+     * @param int|null        $verbosity        NULL or OutputInterface::VERBOSITY_*
      * @param string|null     $indent
+     * @param bool            $useTemplate
      */
     public function __construct(
         OutputInterface $output,
         $alwaysLogErrors = true,
         $verbosity = null,
-        $indent = null
+        $indent = null,
+        $useTemplate = false
     ) {
         $this->output          = $output;
         $this->alwaysLogErrors = $alwaysLogErrors;
         $this->verbosity       = $verbosity;
         $this->indent          = $indent;
+        $this->useTemplate     = $useTemplate;
     }
 
     /**
@@ -77,7 +83,15 @@ class OutputLogger extends AbstractLogger
                 break;
         }
 
-        $this->output->writeln(sprintf($this->getTemplate($level), $level, $message));
+        if ($this->useTemplate && is_string($message)) {
+            $message = sprintf($this->getTemplate($level), $level, $message);
+        }
+
+        if (!is_null($this->indent) && is_string($message)) {
+            $message = $this->indent . $message;
+        }
+
+        $this->output->writeln($message);
 
         // based on PSR-3 recommendations if an Exception object is passed in the context data,
         // it MUST be in the 'exception' key.
@@ -103,15 +117,13 @@ class OutputLogger extends AbstractLogger
                 $result = '<error>[%s]</error> [%s]';
                 break;
             case LogLevel::WARNING:
-                $result = '<comment>[%s]</comment> [%s';
+                $result = '<comment>[%s]</comment> [%s]';
                 break;
             default:
-                $result = '<info>[%s]</info> [%s';
+                $result = '<info>[%s]</info> [%s]';
                 break;
         }
 
-        return $this->indent
-            ? $this->indent . $result
-            : $result;
+        return $result;
     }
 }
