@@ -4,6 +4,8 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+
 /**
  * Class BaseProduct
  *
@@ -60,6 +62,13 @@ class BaseProduct
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime", name="created_at")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -67,6 +76,13 @@ class BaseProduct
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime", name="updated_at")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 
