@@ -7,6 +7,7 @@ oro:
             label_type_greater_than:      >
             label_type_less_equal:        <=
             label_type_less_than:         <
+            label_type_empty:             is empty
             label_type_in:                is any of
             label_type_not_in:            is not any of
             label_type_yes:               Yes

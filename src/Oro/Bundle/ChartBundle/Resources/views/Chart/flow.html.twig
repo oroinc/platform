@@ -108,7 +108,11 @@
         </div>
     {% endif %}
 {% else %}
-    <div class="clearfix no-data">
-        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    <div class="container-fluid grid-container-parent">
+        <div class="grid-container">
+            <div class="clearfix no-data">
+                <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+            </div>
+        </div>
     </div>
 {% endif %}

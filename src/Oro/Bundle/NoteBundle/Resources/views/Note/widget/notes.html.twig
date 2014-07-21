@@ -31,7 +31,7 @@
         {% endblock %}
 
         {% block items_container %}
-            <div class="accordion" id="note-list"></div>
+            <div class="container-fluid accordion" id="note-list"></div>
             {% include 'OroNoteBundle:Note:js/list.js.twig' with {'id': 'template-note-list'} %}
             {% include 'OroNoteBundle:Note:js/view.js.twig' with {'id': 'template-note-item'} %}
         {% endblock %}

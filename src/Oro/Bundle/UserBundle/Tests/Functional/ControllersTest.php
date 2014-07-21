@@ -167,7 +167,7 @@ class ControllersTest extends WebTestCase
                 'page' => 1,
                 'per_page' => 10,
                 'name' => 'acl_users',
-                'query' => 'John Doe;Oro_Bundle_UserBundle_Entity_User;CREATE;0',
+                'query' => 'John Doe;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
             )
         );
 

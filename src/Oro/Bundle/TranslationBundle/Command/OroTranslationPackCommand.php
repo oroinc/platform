@@ -96,12 +96,6 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Download all language packs from project at translation service'
                     ),
-                    new InputOption(
-                        'skipCheck',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Skip check files before upload/update'
-                    ),
                 )
             )
             ->setHelp(
@@ -161,31 +155,9 @@ EOF
     protected function upload(InputInterface $input, OutputInterface $output)
     {
         $projectName            = $input->getArgument('project');
-        $skipCheckNewKeywords   = $input->getOption('skipCheck');
         $languagePackPath       = $this->getLangPackDir($projectName);
         $translationService     = $this->getTranslationService($input, $output);
         $mode                   = $input->getOption('upload-mode');
-
-        if (!$skipCheckNewKeywords && is_dir($languagePackPath)) {
-            if (!$this->checkFiles($languagePackPath, $output)) {
-                /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
-                $dialog = $this->getHelperSet()->get('dialog');
-                if (!$input->isInteractive()) {
-                    $output->writeln('Some files require correction. Upload canceled.');
-                    return;
-                }
-                $ask = $dialog->askConfirmation(
-                    $output,
-                    '<question>Some files require correction, send anyway? (y/n)</question>',
-                    false
-                );
-                if (!$ask) {
-                    return;
-                }
-            }
-        } else {
-            $output->writeln('Force sending, without check files.');
-        }
 
         if ($mode == 'update') {
             $translationService->update($languagePackPath);
@@ -302,6 +274,7 @@ EOF
                     )
                 );
                 $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
+                $this->removePlaceholders($messageCatalog);
                 $writer->writeTranslations(
                     $messageCatalog,
                     $input->getOption('output-format'),
@@ -416,5 +389,24 @@ EOF
             $output->writeln($value);
         }
         return $result;
+    }
+
+    /**
+     * Remove placeholders from MessageCatalogue
+     * @param MessageCatalogue $messageCatalogue
+     */
+    protected function removePlaceholders(MessageCatalogue $messageCatalogue)
+    {
+        $domains = $messageCatalogue->getDomains();
+        foreach ($domains as $domain) {
+            $messages = $messageCatalogue->all($domain);
+            foreach ($messages as $key => $value) {
+                if (preg_match('#^%[^%\s]*%$#', $key)) {
+                    $messages[$key] = false;
+                }
+            }
+            $clearMessages = array_filter($messages);
+            $messageCatalogue->replace($clearMessages, $domain);
+        }
     }
 }
