@@ -58,9 +58,8 @@ class VariablesValidator extends ConstraintValidator
             }
         }
 
-        if (class_exists($emailTemplate->getEntityName())) {
-            $className = $emailTemplate->getEntityName();
-
+        $className = $emailTemplate->getEntityName();
+        if (class_exists($className)) {
             /** @var ClassMetadataInfo $metadata */
             $classMetadata = $this->entityManager->getClassMetadata($className);
             if ($classMetadata->getReflectionClass()->isAbstract()) {
