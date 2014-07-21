@@ -28,7 +28,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "type"="ACL",
  *              "group_name"=""
  *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }

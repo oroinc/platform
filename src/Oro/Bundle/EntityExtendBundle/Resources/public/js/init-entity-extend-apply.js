@@ -40,6 +40,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                     confirmUpdate.close();
                 });
 
+                var delimiter = url.indexOf('?') > -1 ? '&' : '?';
+                url = url + delimiter + '_enableContentProviders=mainMenu';
                 mediator.execute('redirectTo', {url: url});
             });
             confirmUpdate.open();

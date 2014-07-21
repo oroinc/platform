@@ -27,6 +27,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
