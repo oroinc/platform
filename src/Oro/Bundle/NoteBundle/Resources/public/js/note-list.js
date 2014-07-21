@@ -12,8 +12,8 @@ function (
     var $ = Backbone.$;
 
     var notesDialogWidget = DialogWidget.extend({
-        _onContentLoadFail: function(event, jqxhr){
-            if (jqxhr.status != 403) {
+        _onContentLoadFail: function(jqxhr){
+            if (jqxhr.status == 403) {
                 var failContent = '<div class="widget-content">' +
                     '<div class="alert alert-error">'+__('oro.note.forbidden_error')+'</div>' +
                     '</div>';
