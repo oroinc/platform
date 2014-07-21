@@ -11,6 +11,19 @@ function (
 
     var $ = Backbone.$;
 
+    var notesDialogWidget = DialogWidget.extend({
+        _onContentLoadFail: function(event, jqxhr){
+            if (jqxhr.status != 403) {
+                var failContent = '<div class="widget-content">' +
+                    '<div class="alert alert-error">'+__('oro.note.forbidden_error')+'</div>' +
+                    '</div>';
+                this._onContentLoad(failContent);
+            } else {
+                notesDialogWidget.__super__.initialize.apply(this, arguments);
+            }
+        }
+    });
+
     /**
      * @export  oronote/js/note-list
      * @class   oronote.NoteList
@@ -257,7 +270,7 @@ function (
 
         _openItemEditForm: function (title, url) {
             if (!this.itemEditDialog) {
-                this.itemEditDialog = new DialogWidget({
+                this.itemEditDialog = new notesDialogWidget({
                     'url': url,
                     'title': title,
                     'regionEnabled': false,
