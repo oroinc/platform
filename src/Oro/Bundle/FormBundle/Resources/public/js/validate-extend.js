@@ -186,6 +186,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     var methods = [
         'oroform/js/validator/count',
         'oroform/js/validator/date',
+        'oroform/js/validator/datetime',
         'oroform/js/validator/email',
         'oroform/js/validator/length',
         'oroform/js/validator/notblank',
