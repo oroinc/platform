@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
-
 use Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider;
 
-class TitleShortContentProviderTest extends \PHPUnit_Framework_TestCase
+class TitleSerializedContentProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

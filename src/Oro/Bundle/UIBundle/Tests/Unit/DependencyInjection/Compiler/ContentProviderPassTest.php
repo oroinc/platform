@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ContentProviderPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +31,7 @@ class ContentProviderPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($services));
         $definition->expects($this->once())
             ->method('addMethodCall')
-            ->with('addContentProvider', array('testId', false));
+            ->with('addContentProvider', array(new Reference('testId'), false));
 
         $pass = new ContentProviderPass();
         $pass->process($containerBuilder);

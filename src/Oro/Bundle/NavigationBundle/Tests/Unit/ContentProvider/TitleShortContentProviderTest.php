@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
-
 use Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider;
 
 class TitleShortContentProviderTest extends \PHPUnit_Framework_TestCase

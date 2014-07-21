@@ -7,45 +7,13 @@ use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 class ContentProviderManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $container;
-
-    /**
      * @var ContentProviderManager
      */
     protected $manager;
 
     protected function setUp()
     {
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->getMock();
-        $this->manager = new ContentProviderManager($this->container);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $contentProvider must be instance of ContentProviderInterface
-     */
-    public function testAddContentProviderObjectException()
-    {
-        $contentProvider = new \stdClass();
-        $this->manager->addContentProvider($contentProvider);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $contentProvider must be instance of ContentProviderInterface
-     */
-    public function testAddContentProviderServiceException()
-    {
-        $contentProviderServiceId = 'test';
-        $contentProvider = new \stdClass();
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with($contentProviderServiceId)
-            ->will($this->returnValue($contentProvider));
-        $this->manager->addContentProvider($contentProviderServiceId);
+        $this->manager = new ContentProviderManager();
     }
 
     public function testProviderAddGet()

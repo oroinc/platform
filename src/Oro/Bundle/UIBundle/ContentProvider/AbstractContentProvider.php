@@ -14,7 +14,7 @@ abstract class AbstractContentProvider implements ContentProviderInterface
      */
     public function setEnabled($enabled = true)
     {
-        $this->enabled = $enabled;
+        $this->enabled = (bool)$enabled;
     }
 
     /**

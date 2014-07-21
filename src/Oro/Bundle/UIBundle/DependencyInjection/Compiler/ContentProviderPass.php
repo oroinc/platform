@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ContentProviderPass implements CompilerPassInterface
 {
@@ -31,7 +32,7 @@ class ContentProviderPass implements CompilerPassInterface
             }
             $contentProviderManagerDefinition->addMethodCall(
                 'addContentProvider',
-                array($id, $isEnabled)
+                array(new Reference($id), $isEnabled)
             );
         }
     }

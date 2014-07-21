@@ -45,7 +45,9 @@ class ContentExtension extends \Twig_Extension
     public function getContent(array $additionalContent = null, array $keys = null)
     {
         $content = $this->contentProviderManager->getContent($keys);
-        $content = array_merge($content, $additionalContent);
+        if ($additionalContent) {
+            $content = array_merge($content, $additionalContent);
+        }
         if ($keys) {
             $content = array_intersect_key($content, array_combine($keys, $keys));
         }

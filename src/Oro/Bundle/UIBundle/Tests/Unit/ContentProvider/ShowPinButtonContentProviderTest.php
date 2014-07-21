@@ -32,6 +32,7 @@ class ShowPinButtonContentProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->request->attributes->set('_route', $route);
         $this->request->attributes->set('exception', $exception);
+        $this->provider->setRequest($this->request);
         $this->assertEquals($expected, $this->provider->getContent());
     }
 
@@ -43,6 +44,11 @@ class ShowPinButtonContentProviderTest extends \PHPUnit_Framework_TestCase
             array('oro_not_default', false, true),
             array('oro_not_default', true, false)
         );
+    }
+
+    public function testGetContentNoRequest()
+    {
+        $this->assertFalse($this->provider->getContent());
     }
 
     public function testGetName()

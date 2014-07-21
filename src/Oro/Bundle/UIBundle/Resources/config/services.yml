@@ -69,5 +69,3 @@ services:
 
     oro_ui.content_provider.manager:
         class: %oro_ui.content_provider.manager.class%
-        arguments:
-            - @service_container

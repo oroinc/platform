@@ -45,16 +45,37 @@ class ContentExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetContent()
+    /**
+     * @dataProvider contentDataProvider
+     * @param array $content
+     * @param array|null $additionalContent
+     * @param array|null $keys
+     * @param array $expected
+     */
+    public function testGetContent($content, $additionalContent, $keys, $expected)
     {
-        $additionalContent = array('a' => 'b');
-        $keys = array('a', 'b', 'c');
-        $expected = array('a' => 'b', 'b' => 'c');
-
         $this->contentProviderManager->expects($this->once())
             ->method('getContent')
             ->with($keys)
-            ->will($this->returnValue(array('b' => 'c')));
+            ->will($this->returnValue($content));
         $this->assertEquals($expected, $this->extension->getContent($additionalContent, $keys));
+    }
+
+    public function contentDataProvider()
+    {
+        return array(
+            array(
+                'content' => array('b' => 'c'),
+                'additionalContent' => array('a' => 'b'),
+                'keys' => array('a', 'b', 'c'),
+                'expected' => array('a' => 'b', 'b' => 'c')
+            ),
+            array(
+                'content' => array('b' => 'c'),
+                'additionalContent' => null,
+                'keys' => null,
+                'expected' => array('b' => 'c')
+            ),
+        );
     }
 }

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 class ContentProviderListener
 {

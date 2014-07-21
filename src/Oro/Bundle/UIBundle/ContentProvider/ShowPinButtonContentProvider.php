@@ -12,11 +12,13 @@ class ShowPinButtonContentProvider extends AbstractContentProvider
     protected $request;
 
     /**
-     * @param Request $request
+     * @param Request|null $request
      */
-    public function __construct(Request $request)
+    public function setRequest(Request $request = null)
     {
-        $this->request = $request;
+        if (!is_null($request)) {
+            $this->request = $request;
+        }
     }
 
     /**
@@ -24,8 +26,12 @@ class ShowPinButtonContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        $attributes = $this->request->attributes;
-        return $attributes->get('_route') != 'oro_default' && !$attributes->get('exception');
+        if ($this->request) {
+            $attributes = $this->request->attributes;
+            return $attributes->get('_route') != 'oro_default' && !$attributes->get('exception');
+        }
+
+        return false;
     }
 
     /**

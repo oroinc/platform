@@ -6,17 +6,17 @@ parameters:
 services:
     oro_ui.content_provider.current_route:
         class: %oro_ui.content_provider.current_route.class%
-        scope: request
-        arguments:
-            - @request
+        synchronized: true
+        calls:
+            - [setRequest, ["@?request="]]
         tags:
             - { name: oro_ui.content_provider }
 
     oro_ui.content_provider.show_pin_button:
         class: %oro_ui.content_provider.show_pin_button.class%
-        scope: request
-        arguments:
-            - @request
+        synchronized: true
+        calls:
+            - [setRequest, ["@?request="]]
         tags:
             - { name: oro_ui.content_provider }
 

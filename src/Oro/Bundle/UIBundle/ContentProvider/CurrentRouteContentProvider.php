@@ -12,11 +12,13 @@ class CurrentRouteContentProvider extends AbstractContentProvider
     protected $request;
 
     /**
-     * @param Request $request
+     * @param Request|null $request
      */
-    public function __construct(Request $request)
+    public function setRequest(Request $request = null)
     {
-        $this->request = $request;
+        if (!is_null($request)) {
+            $this->request = $request;
+        }
     }
 
     /**
@@ -24,7 +26,11 @@ class CurrentRouteContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        return $this->request->attributes->get('_route');
+        if ($this->request) {
+            return $this->request->attributes->get('_route');
+        }
+
+        return null;
     }
 
     /**

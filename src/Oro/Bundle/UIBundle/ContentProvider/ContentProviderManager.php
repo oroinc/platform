@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UIBundle\ContentProvider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContentProviderManager
 {
@@ -12,18 +11,9 @@ class ContentProviderManager
      */
     protected $contentProviders;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct()
     {
         $this->contentProviders = new ArrayCollection();
-        $this->container = $container;
     }
 
     /**
@@ -33,14 +23,8 @@ class ContentProviderManager
      * @param bool $enabled
      * @return ContentProviderManager
      */
-    public function addContentProvider($contentProvider, $enabled = true)
+    public function addContentProvider(ContentProviderInterface $contentProvider, $enabled = true)
     {
-        if (is_string($contentProvider)) {
-            $contentProvider = $this->container->get($contentProvider);
-        }
-        if (!$contentProvider instanceof ContentProviderInterface) {
-            throw new \InvalidArgumentException('$contentProvider must be instance of ContentProviderInterface');
-        }
         $contentProvider->setEnabled($enabled);
         $this->contentProviders->set($contentProvider->getName(), $contentProvider);
 
@@ -61,7 +45,7 @@ class ContentProviderManager
     /**
      * Get all content providers.
      *
-     * @return ArrayCollection
+     * @return ArrayCollection|ContentProviderInterface[]
      */
     public function getContentProviders()
     {
@@ -101,7 +85,7 @@ class ContentProviderManager
     /**
      * Get enabled content providers.
      *
-     * @return ArrayCollection
+     * @return ArrayCollection|ContentProviderInterface[]
      */
     public function getEnabledContentProviders()
     {
@@ -116,7 +100,7 @@ class ContentProviderManager
      * Get content providers by given keys.
      *
      * @param array $keys
-     * @return ArrayCollection
+     * @return ArrayCollection|ContentProviderInterface[]
      */
     public function getContentProvidersByKeys(array $keys)
     {
