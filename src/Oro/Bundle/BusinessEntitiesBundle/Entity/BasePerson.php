@@ -98,6 +98,13 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -105,6 +112,13 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 
