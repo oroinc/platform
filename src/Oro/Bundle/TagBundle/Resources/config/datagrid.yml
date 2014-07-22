@@ -103,7 +103,7 @@ datagrid:
                         tagging:
                             join: tt.tag
                             alias: t
-                groupBy: tt.entityName, tt.recordId
+                groupBy: tt.entityName, tt.recordId, tt.id, t.id
                 where:
                     and:
                         - tt.tag = :tag

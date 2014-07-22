@@ -65,7 +65,8 @@ class SearchProvider extends ResultStatisticsProvider
             ->where('t.tag = :tag')
             ->setParameter('tag', $tagId)
             ->addGroupBy('t.entityName')
-            ->addGroupBy('t.recordId');
+            ->addGroupBy('t.recordId')
+            ->addGroupBy('t.id');
         $this->securityProvider->applyAcl($queryBuilder, 't');
 
         $originResults = $queryBuilder->getQuery()
