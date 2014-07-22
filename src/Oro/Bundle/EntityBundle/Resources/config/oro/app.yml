@@ -3,3 +3,4 @@ doctrine:
         types:
             percent: Oro\Bundle\EntityBundle\Entity\Type\PercentType
             money:   Oro\Bundle\EntityBundle\Entity\Type\MoneyType
+            object:  Oro\Bundle\EntityBundle\Entity\Type\ObjectType
