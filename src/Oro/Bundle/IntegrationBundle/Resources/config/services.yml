@@ -31,6 +31,8 @@ parameters:
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
+    oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
+
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -112,6 +114,7 @@ services:
         class: %oro_integration.writer.persistent_batch_writer.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @event_dispatcher
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
@@ -182,3 +185,10 @@ services:
         class: %oro_integration.utils.form_utils.class%
         arguments:
             - @oro_integration.manager.types_registry
+
+    oro_integration.event_listener.keep_avile:
+        class: %oro_integration.event_listener.keep_avile.class%
+        arguments:
+            - @akeneo_batch.job_repository
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
