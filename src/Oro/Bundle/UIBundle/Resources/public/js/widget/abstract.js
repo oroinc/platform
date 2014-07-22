@@ -1,7 +1,7 @@
 /* jshint devel:true*/
 /*global define, require*/
-define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 'jquery.form'
-    ], function (_, Backbone, mediator, LoadingMask) {
+define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 'orotranslation/js/translator', 'jquery.form'
+    ], function (_, Backbone, mediator, LoadingMask, __) {
     'use strict';
 
     var $ = Backbone.$;
@@ -561,10 +561,18 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
          * Handle content loading failure.
          * @private
          */
-        _onContentLoadFail: function() {
+        _onContentLoadFail: function(jqxhr) {
+
+            var message = __('oro.ui.widget_loading_filed');
+
+            if (jqxhr.status == 403) {
+                message = __('oro.ui.forbidden_error');
+            }
+
             var failContent = '<div class="widget-content">' +
-                '<div class="alert alert-error">Widget content loading failed</div>' +
+                '<div class="alert alert-error">'+message+'</div>' +
                 '</div>';
+
             this._onContentLoad(failContent);
         },
 

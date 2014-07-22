@@ -33,6 +33,9 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )

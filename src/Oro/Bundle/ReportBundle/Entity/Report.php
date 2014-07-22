@@ -29,6 +29,9 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
