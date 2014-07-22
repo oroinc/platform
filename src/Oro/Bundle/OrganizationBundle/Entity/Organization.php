@@ -14,6 +14,7 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  *
  * @ORM\Table(name="oro_organization")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "security"={
@@ -22,6 +23,9 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  *          },
  *          "form"={
  *              "form_type"="oro_organization_select"
+ *          },
+ *          "dataaudit"={
+ *              "auditable"=true
  *          }
  *      }
  * )
@@ -43,6 +47,9 @@ class Organization implements NotificationEmailInterface
      * @ORM\Column(name="name", type="string", length=255)
      * @ConfigField(
      *  defaultValues={
+     *    "dataaudit"={
+     *       "auditable"=true
+     *    },
      *    "importexport"={
      *       "identity"=true
      *    }
@@ -50,20 +57,6 @@ class Organization implements NotificationEmailInterface
      * )
      */
     protected $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="currency", type="string", length=3)
-     */
-    protected $currency;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="currency_precision", type="string", length=10)
-     */
-    protected $precision;
 
     /**
      * @var ArrayCollection
@@ -76,6 +69,51 @@ class Organization implements NotificationEmailInterface
      * )
      */
     protected $businessUnits;
+
+    /**
+     * @var \Datetime $created
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $createdAt;
+
+    /**
+     * @var \Datetime $updated
+     *
+     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $updatedAt;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     * @JMS\Type("boolean")
+     * @JMS\Expose
+     * @Oro\Versioned
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $enabled = true;
 
     /**
      * Get id
@@ -111,49 +149,43 @@ class Organization implements NotificationEmailInterface
     }
 
     /**
-     * Set Currency
+     * @param \Datetime $createdAt
      *
-     * @param string $currency
-     * @return Organization
+     * @return $this
      */
-    public function setCurrency($currency)
+    public function setCreatedAt($createdAt)
     {
-        $this->currency = $currency;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     /**
-     * Get Currency
-     *
-     * @return string
+     * @return \Datetime
      */
-    public function getCurrency()
+    public function getCreatedAt()
     {
-        return $this->currency;
+        return $this->createdAt;
     }
 
     /**
-     * Set Precision
+     * @param \Datetime $updatedAt
      *
-     * @param string $precision
-     * @return Organization
+     * @return $this
      */
-    public function setPrecision($precision)
+    public function setUpdatedAt($updatedAt)
     {
-        $this->precision = $precision;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     /**
-     * Get Precision
-     *
-     * @return string
+     * @return \Datetime
      */
-    public function getPrecision()
+    public function getUpdatedAt()
     {
-        return $this->precision;
+        return $this->updatedAt;
     }
 
     /**
@@ -197,5 +229,45 @@ class Organization implements NotificationEmailInterface
         );
 
         return new ArrayCollection($emails);
+    }
+
+    /**
+     * @param  bool $enabled User state
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = (boolean) $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return Boolean true if organization is enabled, false otherwise
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * Pre persist event handler
+     *
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
