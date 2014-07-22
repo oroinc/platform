@@ -29,6 +29,7 @@ oro:
         #
         # Oro/Bundle/CalendarBundle/Entity/Calendar
         #
+        entity_name:         Calendar
         entity_label:        Calendar
         entity_plural_label: Calendars
         entity_description:  Represent calendar
