@@ -38,7 +38,11 @@ class AddressType extends AbstractType
             ->add('lastName', 'text', array('required' => false, 'label' => 'oro.address.last_name.label'))
             ->add('nameSuffix', 'text', array('required' => false, 'label' => 'oro.address.name_suffix.label'))
             ->add('organization', 'text', array('required' => false, 'label' => 'oro.address.organization.label'))
-            ->add('country', 'oro_country', array('required' => true, 'random_id' => true, 'label' => 'oro.address.country.label'))
+            ->add(
+                'country',
+                'oro_country',
+                array('required' => true, 'random_id' => true, 'label' => 'oro.address.country.label')
+            )
             ->add('street', 'text', array('required' => true, 'label' => 'oro.address.street.label'))
             ->add('street2', 'text', array('required' => false, 'label' => 'oro.address.street2.label'))
             ->add('city', 'text', array('required' => true, 'label' => 'oro.address.city.label'))
