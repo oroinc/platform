@@ -110,7 +110,9 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
                 });
             }
             this._hideLoading();
-            this.widget.remove();
+            if (this.widget) {
+                this.widget.remove();
+            }
             AbstractWidget.prototype.remove.call(this);
         },
 
