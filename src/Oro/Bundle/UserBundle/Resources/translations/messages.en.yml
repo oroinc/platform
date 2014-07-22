@@ -88,6 +88,8 @@ Login: Login
 "View role": "View role"
 "Remove role": "Remove role"
 "Template controller": "Template controller"
+"Generate key was successful. New key:": "Generate key was successful. New key&#58;"
+"Generate key": "Generate key"
 oro:
     user:
         menu:

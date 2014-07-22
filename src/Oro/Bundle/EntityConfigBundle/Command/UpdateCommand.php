@@ -8,9 +8,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Component\Log\OutputLogger;
+
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
-use Oro\Component\Log\Logger\OutputLogger;
 
 class UpdateCommand extends BaseCommand
 {

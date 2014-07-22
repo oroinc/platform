@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Component\Log\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;

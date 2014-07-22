@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\Log\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLogger;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;

@@ -6,20 +6,16 @@ use Psr\Log\LogLevel;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Component\Log\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
 
 class OutputLoggerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $output;
 
-    /** @var OutputLogger */
-    protected $logger;
-
     protected function setUp()
     {
         $this->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $this->logger = new OutputLogger($this->output);
     }
 
     /**
@@ -44,7 +40,36 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
                 ->method('writeln');
         }
 
-        $this->logger->log($level, $message, $context);
+        $logger = new OutputLogger($this->output);
+        $logger->log($level, $message, $context);
+    }
+
+    /**
+     * @dataProvider withTagsProvider
+     */
+    public function testLogWithTags($level, $message, $expected)
+    {
+        $this->output->expects($this->once())
+            ->method('getVerbosity')
+            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG));
+
+        $this->output->expects($this->exactly(1))
+            ->method('writeln')
+            ->with($expected);
+
+
+
+        $logger = new OutputLogger($this->output, true, null, null, true);
+        $logger->log($level, $message);
+    }
+
+    public function withTagsProvider()
+    {
+        return [
+            [LogLevel::EMERGENCY, 'test', '<error>[emergency]</error> test'],
+            [LogLevel::WARNING, 'test', '<comment>[warning]</comment> test'],
+            [LogLevel::NOTICE, 'test', '<info>[notice]</info> test'],
+        ];
     }
 
     public function itemProvider()
@@ -103,28 +128,28 @@ class OutputLoggerTest extends \PHPUnit_Framework_TestCase
             [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::ERROR, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::WARNING, 'test', []],
-            [true, OutputInterface::VERBOSITY_NORMAL, LogLevel::WARNING, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERBOSE, LogLevel::WARNING, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::WARNING, 'test', []],
-            [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::WARNING, 'test', []],
+            [true,  OutputInterface::VERBOSITY_NORMAL, LogLevel::WARNING, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::WARNING, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::WARNING, 'test', []],
+            [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::WARNING, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::NOTICE, 'test', []],
-            [true, OutputInterface::VERBOSITY_NORMAL, LogLevel::NOTICE, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERBOSE, LogLevel::NOTICE, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::NOTICE, 'test', []],
-            [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::NOTICE, 'test', []],
+            [true,  OutputInterface::VERBOSITY_NORMAL, LogLevel::NOTICE, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::NOTICE, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::NOTICE, 'test', []],
+            [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::NOTICE, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::INFO, 'test', []],
             [false, OutputInterface::VERBOSITY_NORMAL, LogLevel::INFO, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERBOSE, LogLevel::INFO, 'test', []],
-            [true, OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::INFO, 'test', []],
-            [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::INFO, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERBOSE, LogLevel::INFO, 'test', []],
+            [true,  OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::INFO, 'test', []],
+            [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::INFO, 'test', []],
 
             [false, OutputInterface::VERBOSITY_QUIET, LogLevel::DEBUG, 'test', []],
             [false, OutputInterface::VERBOSITY_NORMAL, LogLevel::DEBUG, 'test', []],
             [false, OutputInterface::VERBOSITY_VERBOSE, LogLevel::DEBUG, 'test', []],
             [false, OutputInterface::VERBOSITY_VERY_VERBOSE, LogLevel::DEBUG, 'test', []],
-            [true, OutputInterface::VERBOSITY_DEBUG, LogLevel::DEBUG, 'test', []],
+            [true,  OutputInterface::VERBOSITY_DEBUG, LogLevel::DEBUG, 'test', []],
         ];
     }
 }

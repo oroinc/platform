@@ -8,10 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Component\Log\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
@@ -251,7 +250,7 @@ EOF
     {
         $projectNamespace = $input->getArgument('project');
 
-        $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
+        $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
         $container = $this->getContainer();
         $dumper = new TranslationPackDumper(

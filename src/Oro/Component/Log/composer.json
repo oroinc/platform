@@ -6,9 +6,6 @@
     "license": "MIT",
     "require": {
         "php": ">=5.4.4",
-        "symfony/config": "~2.1",
-        "symfony/dependency-injection": "~2.1",
-        "symfony/yaml": "~2.1"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\Log": "" }
