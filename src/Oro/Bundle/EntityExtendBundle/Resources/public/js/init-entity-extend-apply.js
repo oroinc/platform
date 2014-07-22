@@ -8,40 +8,48 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
         $(document).on('click', '.entity-extend-apply', function (e) {
             var el = $(this),
                 message = el.data('message'),
+                title = __('Schema update confirmation'),
+                content = '<p>' + __('Your config changes will be applied to schema.') + '</p>' +
+                    '</p>' + __('It may take few minutes...') + '</p>',
                 /** @type oro.Modal */
                 confirmUpdate = new Modal({
                     allowCancel: true,
                     cancelText: __('Cancel'),
-                    title: __('Schema update confirmation'),
-                    content: '<p>' + __('Your config changes will be applied to schema.') +
-                        '</p></p>' + __('It may take few minutes...') + '</p>',
-                    okText: __('Yes, Proceed')
+                    okText: __('Yes, Proceed'),
+                    title: title,
+                    content: content
                 });
 
-            confirmUpdate.on('ok', function () {
-                confirmUpdate.preventClose();
+            function execute() {
+                var url, delimiter, modal, progress;
 
-                var url = $(el).data('url'),
-                    progressbar = $('#progressbar').clone();
-                progressbar
-                    .attr('id', 'confirmUpdateLoading')
-                    .css({'display': 'block', 'margin': '0 auto'})
-                    .find('h3').remove();
+                url = $(el).data('url');
+                delimiter = url.indexOf('?') > -1 ? '&' : '?';
+                url = url + delimiter + '_enableContentProviders=mainMenu';
 
-                confirmUpdate.$content.parent().find('a.cancel').hide();
-                confirmUpdate.$content.parent().find('a.close').hide();
-                confirmUpdate.$content.parent().find('a.btn-primary').replaceWith(progressbar);
+                progress = $('#progressbar').clone();
+                progress.removeAttr('id').find('h3').remove();
 
-                $('#confirmUpdateLoading').show();
+                modal = new Modal({
+                    allowCancel: false,
+                    title: title,
+                    content: content
+                });
+                modal.open();
+                modal.$el.find('.modal-footer').html(progress);
+                progress.show();
+
                 mediator.once('page:request', function () {
                     mediator.execute('hideLoading');
-                });
-                mediator.once('page:afterChange', function () {
-                    confirmUpdate.close();
+                    mediator.once('page:beforeChange', function () {
+                        modal.close();
+                    });
                 });
 
                 mediator.execute('redirectTo', {url: url});
-            });
+            }
+
+            confirmUpdate.on('ok', execute);
             confirmUpdate.open();
 
             return false;
