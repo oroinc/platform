@@ -296,7 +296,7 @@ EOF
     /**
      * Check yaml files in translation pack and display files and keywords that need translation.
      *
-     * @param string $languagePackPath
+     * @param string          $languagePackPath
      * @param OutputInterface $output
      *
      * @return bool

@@ -147,14 +147,14 @@ class TranslationPackDumper implements LoggerAwareInterface
         foreach ($allMessages as $domain => $messages) {
             foreach ($messages as $key => $value) {
                 // key is something like %segment.name%, so called parameter
-                if (preg_match('#^%[^%\s]*%$#', $key)) {
+                if (preg_match('#^%[^%\s]+%$#', $key)) {
                     $messages[$key] = false;
                     $notTranslated[$domain][] = $key;
                     continue;
                 }
 
-                $isTranslationExist = $this->checkTranslationExists($key, $domain);
-                $isDottedKey        = preg_match('#^[^\s\.]\.[^\s\.].?#', $key);
+                $isTranslationExist = $this->checkTranslationExists($key);
+                $isDottedKey        = (bool) preg_match('#^[^\s\.]+\.(?:[^\s\.]+\.?)+$#', $key);
                 $isKeyValueEqual    = $key == $value;
 
                 // untranslated string, and translation doesn't exist in any other catalogue
@@ -168,7 +168,6 @@ class TranslationPackDumper implements LoggerAwareInterface
                 // untranslated dotted string, but translation exists in some other catalogue
                 if ($isDottedKey && $isKeyValueEqual && $isTranslationExist) {
                     $messages[$key] = false;
-                    $notTranslated[$domain][] = $key;
                     continue;
                 }
 
@@ -199,15 +198,17 @@ class TranslationPackDumper implements LoggerAwareInterface
      * Check if key exists in loaded catalogue and it's not equal to value, e.g. have translation
      *
      * @param string $key
-     * @param string $domain
      *
      * @return bool
      */
-    protected function checkTranslationExists($key, $domain)
+    protected function checkTranslationExists($key)
     {
         foreach ($this->loadedTranslations as $catalogue) {
-            if ($key != $catalogue->get($key, $domain)) {
-                return true;
+            foreach ($catalogue->getDomains() as $domain) {
+                // key not equal to value only if translation exists
+                if ($key != $catalogue->get($key, $domain)) {
+                    return true;
+                }
             }
         }
 
