@@ -3,7 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -18,6 +20,9 @@ class ConnectorContextMediator
     /** @var ChannelRepository */
     protected $channelRepository;
 
+    /** @var UnitOfWork  */
+    protected $unitOfWork;
+
     /**
      * @param ServiceLink   $registryLink
      * @param EntityManager $em
@@ -26,26 +31,34 @@ class ConnectorContextMediator
     {
         $this->registryLink      = $registryLink;
         $this->channelRepository = $em->getRepository('OroIntegrationBundle:Channel');
+        $this->unitOfWork        = $em->getUnitOfWork();
     }
 
     /**
      * Get prepared transport
      *
      * @param ContextInterface|Integration $source
+     * @param boolean $isReadOnly
      *
-     * @throws \LogicException
+     * @throws LogicException
      * @return TransportInterface
      */
-    public function getTransport($source)
+    public function getTransport($source, $isReadOnly = false)
     {
         if ($source instanceof ContextInterface) {
             $source = $this->getChannel($source);
         } elseif (!$source instanceof Integration) {
-            throw new \LogicException('Expected type ContextInterface or Channel');
+            throw new LogicException('Expected type ContextInterface or Channel');
+        }
+
+        $transport = $source->getTransport();
+
+        if ($isReadOnly) {
+            $this->unitOfWork->markReadOnly($transport);
         }
 
         return clone $this->registryLink->getService()
-            ->getTransportTypeBySettingEntity($source->getTransport(), $source->getType());
+            ->getTransportTypeBySettingEntity($transport, $source->getType());
     }
 
     /**

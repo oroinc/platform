@@ -1,7 +1,6 @@
 /*global define*/
-define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/translator', 'oronavigation/js/navigation',
-    'oroui/js/messenger'],
-    function (AjaxAction, __, Navigation, messenger) {
+define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/translator', 'oroui/js/messenger'
+    ], function (AjaxAction, __, messenger) {
     'use strict';
 
     /**
@@ -12,7 +11,7 @@ define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/transla
      * @extends orodatagrid.datagrid.action.ModelAction
      */
     return AjaxAction.extend({
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
@@ -26,12 +25,6 @@ define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/transla
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);
             }
-            
-            var navigation = Navigation.getInstance();
-            if (navigation && data.successful) {
-                navigation.processClicks($('.job-view-link'));
-            }
-
         }
     });
 });

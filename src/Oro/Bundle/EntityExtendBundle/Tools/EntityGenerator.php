@@ -7,6 +7,8 @@ use Symfony\Component\Yaml\Yaml;
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
+
 class EntityGenerator
 {
     /** @var string */
@@ -80,7 +82,7 @@ class EntityGenerator
         // write PHP class aliases to the file
         file_put_contents(
             ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            Yaml::dump($aliases)
+            serialize($aliases)
         );
     }
 

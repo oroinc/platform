@@ -12,7 +12,12 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(name="oro_integration_channel")
+ * @ORM\Table(
+ *      name="oro_integration_channel",
+ *      indexes={
+ *          @ORM\Index(name="oro_integration_channel_name_idx",columns={"name"})
+ *      }
+ * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
  * @Config(
  *      routeName="oro_integration_index",
@@ -25,6 +30,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -210,7 +218,7 @@ class Channel
     }
 
     /**
-     * @param [] $connectors
+     * @param array $connectors
      *
      * @return $this
      */
@@ -222,7 +230,7 @@ class Channel
     }
 
     /**
-     * @return []
+     * @return array
      */
     public function getConnectors()
     {

@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', './text-filter'
-    ], function ($, _, __, app, TextFilter) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', './text-filter'
+    ], function ($, _, __, tools, TextFilter) {
     'use strict';
 
     /**
@@ -120,15 +120,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var option, hint,
-                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            if (!value.value) {
-                hint = this.placeholder;
-            } else {
-                option = this._getChoiceOption(value.type);
-                hint = (option ? option.label + ' ' : '') + '"' + value.value + '"';
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var option = this._getChoiceOption(value.type);
+
+            if (value.type == this.emptyOption) {
+                return option ? option.label : this.placeholder;
             }
-            return hint;
+
+            if (!value.value) {
+                return this.placeholder;
+            }
+
+            return (option ? option.label + ' ' : '') + '"' + value.value + '"';
         },
 
         /**
@@ -166,7 +169,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!app.isEqualsLoosely(newValue, oldValue)) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
         },
@@ -176,7 +179,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          */
         _onValueUpdated: function(newValue, oldValue) {
             // synchronize choice selector with new value
-            var menu = this.$('.choicefilter .dropdown-menu');
+            var menu = this.$('.choice-filter .dropdown-menu');
             menu.find('li a').each(function() {
                 var item = $(this);
                 if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
@@ -188,25 +191,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
             });
 
             TextFilter.prototype._onValueUpdated.apply(this, arguments);
-        },
-
-        /**
-         * Open/close select dropdown
-         *
-         * @param {Event} e
-         * @protected
-         */
-        _onClickChoiceValue: function(e) {
-            $(e.currentTarget).parent().parent().find('li').each(function() {
-                $(this).removeClass('active');
-            });
-            $(e.currentTarget).parent().addClass('active');
-            var parentDiv = $(e.currentTarget).parent().parent().parent();
-            parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value')).trigger('change');
-            var choiceName = $(e.currentTarget).html();
-            choiceName += '<span class="caret"></span>';
-            parentDiv.find('.dropdown-toggle').html(choiceName);
-            e.preventDefault();
         }
     });
 });

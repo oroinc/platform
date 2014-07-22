@@ -79,13 +79,16 @@
                                     {% endif %}
                                 {% endif %}
                             {% endblock pageActions %}
-                            {% if entity is defined and audit_entity_class is defined %}
+
+                            {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
+                            {% if audit_entity_id %}
                                 {% placeholder change_history_block with {
                                     'entity': entity,
-                                    'entity_class': audit_entity_class,
-                                    'id': entity.id,
+                                    'entity_class': audit_entity_class|default(null),
+                                    'id': audit_entity_id,
                                     'title': audit_title|default(entity),
-                                    'audit_path': audit_path|default('oro_dataaudit_history')
+                                    'audit_path': audit_path|default('oro_dataaudit_history'),
+                                    'audit_show_change_history': audit_show_change_history|default(false)
                                 } %}
                             {% endif %}
                         </ul>

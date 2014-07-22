@@ -86,9 +86,9 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                update: Updated
-                                create: Created
-                                remove: Deleted
+                                update: oro.ui.updated_at
+                                create: oro.ui.created_at
+                                remove: Deleted At
                 version:
                     type: number
                     data_name: a.version

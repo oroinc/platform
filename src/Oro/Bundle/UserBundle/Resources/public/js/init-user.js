@@ -1,8 +1,8 @@
 /* jshint browser:true */
 /* global require */
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/messenger',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget', 'jquery.dialog.extended'],
-function($, _, __, app, mediator, messenger, DialogWidget) {
+function($, _, __, mediator, messenger, DialogWidget) {
     'use strict';
 
     /* ============================================================
@@ -10,7 +10,7 @@ function($, _, __, app, mediator, messenger, DialogWidget) {
      * ============================================================ */
     $(function() {
         function checkRoleInputs() {
-            var inputs = $('#roles-list .controls').find(':checkbox');
+            var inputs = $('#roles-list').find('.controls :checkbox');
             inputs.attr('required', inputs.filter(':checked').length > 0 ? null : 'required');
         }
 
@@ -18,21 +18,21 @@ function($, _, __, app, mediator, messenger, DialogWidget) {
             messenger.setup();
         }
 
-        $(document).on('click', '#roles-list input', function (e) {
+        $(document).on('click', '#roles-list input', function () {
             checkRoleInputs();
         });
 
         /**
-         * Process role checkboxes after hash navigation request is completed
+         * Process role checkboxes after navigation request is completed
          */
-        mediator.on("hash_navigation_request:complete", checkRoleInputs);
+        mediator.on("page:afterChange", checkRoleInputs);
 
         /**
          * Process flash messages stored in queue or storage
          */
-        mediator.on("hash_navigation_request:complete", initFlashMessages);
+        mediator.on("page:afterChange", initFlashMessages);
 
-        $(document).on('change', '#btn-enable input', function(e) {
+        $(document).on('change', '#btn-enable input', function() {
             $('.status-enabled').toggleClass('hide');
             $('.status-disabled').toggleClass('hide');
         });
@@ -84,12 +84,12 @@ function($, _, __, app, mediator, messenger, DialogWidget) {
             return false;
         });
 
-        $(document).on('submit', '#create-status-form', function(e) {
+        $(document).on('submit', '#create-status-form', function() {
             $.ajax({
                 type:'POST',
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
-                success: function(response) {
+                success: function() {
                     dialogBlock.dialog("destroy");
                 }
             });

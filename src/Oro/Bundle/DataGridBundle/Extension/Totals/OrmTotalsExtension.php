@@ -115,7 +115,8 @@ class OrmTotalsExtension extends AbstractExtension
                     $this->getData(
                         $result,
                         $rowConfig['columns'],
-                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
+                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
+                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
                     )
                 );
             }
@@ -132,6 +133,7 @@ class OrmTotalsExtension extends AbstractExtension
     {
         $totals = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $metaData
+            ->offsetAddToArray('initialState', ['totals' => $totals])
             ->offsetAddToArray('state', ['totals' => $totals])
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/totals-builder']);
     }
@@ -266,9 +268,10 @@ class OrmTotalsExtension extends AbstractExtension
      * @param ResultsObject $pageData Grid page data
      * @param array $columnsConfig Total row columns config
      * @param bool $perPage Get data only for page data or for all data
+     * @param bool $skipAclWalkerCheck Check Acl with acl helper or not
      * @return array
      */
-    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
+    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false, $skipAclWalkerCheck = false)
     {
         // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
         //       can be unexpected
@@ -295,7 +298,11 @@ class OrmTotalsExtension extends AbstractExtension
 
         $this->addPageLimits($query, $pageData, $perPage);
 
-        $resultData = $this->aclHelper->apply($query)
+        if (!$skipAclWalkerCheck) {
+            $query = $this->aclHelper->apply($query);
+        }
+
+        $resultData = $query
             ->setFirstResult(null)
             ->setMaxResults(1)
             ->getScalarResult();

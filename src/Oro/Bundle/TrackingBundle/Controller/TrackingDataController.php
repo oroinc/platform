@@ -37,15 +37,21 @@ class TrackingDataController extends Controller
         );
 
         $isSuccessful = $jobResult->isSuccessful();
-        $response     = [
-            'success' => $isSuccessful
-        ];
+        $response     = [];
 
         if (!$isSuccessful) {
             $response['errors'] = $jobResult->getFailureExceptions();
         }
 
-        return new JsonResponse($response, 201);
+        if ($validationErrors = $jobResult->getContext()->getErrors()) {
+            $isSuccessful = false;
+
+            $response['validation'] = $validationErrors;
+        }
+
+        $response['success'] = $isSuccessful;
+
+        return new JsonResponse($response, $isSuccessful ? 201 : 400);
     }
 
     /**

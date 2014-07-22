@@ -1,8 +1,9 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation',
+define(['jquery', 'underscore', 'backbone', 'routing',
         'orotranslation/js/translator', 'oroui/js/mediator',
         'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
-    ], function ($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
+    ], function ($, _, Backbone, routing, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 
     /**
@@ -159,16 +160,8 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
             if (this.dispatched) {
                 return;
             }
-            var url = this.getLinkWithParameters(),
-                navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.processRedirect({
-                    fullRedirect: false,
-                    location: url
-                });
-            } else {
-                location.href = url;
-            }
+            var url = this.getLinkWithParameters();
+            mediator.execute('redirectTo', {url: url, redirect: true});
         },
 
         _handleAjax: function () {
@@ -199,7 +192,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
             }
         },
 
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch({reset: true});
@@ -209,7 +202,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
 
         _showAjaxSuccessMessage: function (data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                message = __(data.message || defaultMessage);
+                message = data.message || __(defaultMessage);
             if (message) {
                 messenger.notificationFlashMessage(data.successful ? 'success' : 'error', message);
             }

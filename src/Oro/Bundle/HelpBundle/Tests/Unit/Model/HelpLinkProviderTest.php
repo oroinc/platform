@@ -11,57 +11,120 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
     const VERSION = '1.0';
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $parser;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $helper;
+
+    /**
+     * @var HelpLinkProvider
+     */
+    protected $provider;
+    
+    protected function setUp()
+    {
+        $this->parser = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->helper = $this
+            ->getMockBuilder('Oro\Bundle\PlatformBundle\Composer\VersionHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = new HelpLinkProvider($this->parser, $this->helper);
+    }
+
+    public function testGetHelpLinkCached()
+    {
+        $expectedLink = 'http://test.com/help/test?v=1.1';
+        $routeName = 'test_route';
+
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->disableOriginalConstructor()
+            ->setMethods(array('save', 'contains', 'fetch'))
+            ->getMockForAbstractClass();
+
+        $cache->expects($this->once())
+            ->method('contains')
+            ->with($routeName)
+            ->will($this->returnValue(true));
+        $cache->expects($this->once())
+            ->method('fetch')
+            ->with($routeName)
+            ->will($this->returnValue($expectedLink));
+        $cache->expects($this->never())
+            ->method('save');
+        $this->provider->setCache($cache);
+
+        $request = new Request();
+        $request->attributes->add(
+            array('_route' => $routeName)
+        );
+        $this->provider->setRequest($request);
+
+        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+    }
+    
+    /**
      * @dataProvider configurationDataProvider
      * @param array $configuration
      * @param array $requestAttributes
      * @param array $parserResults
      * @param string $expectedLink
+     * @param bool $hasCache
      */
     public function testGetHelpLinkUrl(
         array $configuration,
         array $requestAttributes,
         array $parserResults,
-        $expectedLink
+        $expectedLink,
+        $hasCache = false
     ) {
-        $parser = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         if (isset($parserResults['buildResult'])) {
             $this->assertArrayHasKey('_controller', $requestAttributes);
-            $parser->expects($this->once())
+            $this->parser->expects($this->once())
                 ->method('build')
                 ->with($requestAttributes['_controller'])
                 ->will($this->returnValue($parserResults['buildResult']));
         } elseif (isset($parserResults['parseResult'])) {
             $this->assertArrayHasKey('_controller', $requestAttributes);
-            $parser->expects($this->once())
+            $this->parser->expects($this->once())
                 ->method('parse')
                 ->with($requestAttributes['_controller'])
                 ->will($this->returnValue($parserResults['parseResult']));
         } else {
-            $parser->expects($this->never())->method($this->anything());
+            $this->parser->expects($this->never())->method($this->anything());
         }
 
-        $helper = $this
-            ->getMockBuilder('Oro\Bundle\PlatformBundle\Composer\VersionHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $helper
+        $this->helper
             ->expects($this->any())
             ->method('getVersion')
             ->will($this->returnValue(self::VERSION));
 
-        $provider = new HelpLinkProvider($parser, $helper);
-        $provider->setConfiguration($configuration);
+        $this->provider->setConfiguration($configuration);
 
         $request = new Request();
         $request->attributes->add($requestAttributes);
 
-        $provider->setRequest($request);
+        $this->provider->setRequest($request);
 
-        $this->assertEquals($expectedLink, $provider->getHelpLinkUrl());
+        if ($hasCache) {
+            $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+                ->disableOriginalConstructor()
+                ->setMethods(array('save'))
+                ->getMockForAbstractClass();
+
+            $cache->expects($this->once())
+                ->method('save')
+                ->with($requestAttributes['_route'], $expectedLink);
+
+            $this->provider->setCache($cache);
+        }
+
+        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
     }
 
     /**
@@ -71,15 +134,32 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
     public function configurationDataProvider()
     {
         return array(
-            'simple default' => array(
+            'simple default no cache' => array(
                 'configuration' => array(
                     'defaults' => array(
                         'server' => 'http://test.com/wiki/'
                     )
                 ),
-                'requestAttributes' => array('_controller' => 'Acme\DemoBundle\Controller\TestController::runAction'),
+                'requestAttributes' => array(
+                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                    '_route' => 'test_route'
+                ),
                 'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
                 'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION
+            ),
+            'simple default with cache' => array(
+                'configuration' => array(
+                    'defaults' => array(
+                        'server' => 'http://test.com/wiki/'
+                    )
+                ),
+                'requestAttributes' => array(
+                    '_controller' => 'Acme\DemoBundle\Controller\TestController::runAction',
+                    '_route' => 'test_route'
+                ),
+                'parserResults' => array('buildResult' => 'AcmeDemoBundle:Test:run'),
+                'expectedLink' => 'http://test.com/wiki/Acme/AcmeDemoBundle/Test_run?v=' . self::VERSION,
+                true
             ),
             'simple default with controller short name' => array(
                 'configuration' => array(

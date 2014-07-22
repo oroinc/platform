@@ -33,6 +33,8 @@ Oro\Bundle\TrackingBundle\Entity\TrackingEvent:
         title:
             - Length:
                 max: 255
+        loggedAt:
+            - NotBlank: ~
 
 Oro\Bundle\TrackingBundle\Entity\TrackingData:
     properties:

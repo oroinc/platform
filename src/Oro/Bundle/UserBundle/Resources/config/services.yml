@@ -14,7 +14,6 @@ parameters:
     oro_user.role.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
     oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_user.entity_with_image.listener.class:    Oro\Bundle\UserBundle\Entity\EventListener\UploadedImageListener
     oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
@@ -23,7 +22,7 @@ parameters:
     oro_user.handler.delete.class:                Oro\Bundle\UserBundle\Handler\UserDeleteHandler
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
     oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
-
+    oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
 services:
     oro_user.manager:
         class:                        %oro_user.manager.class%
@@ -171,3 +170,13 @@ services:
            - %oro_user.entity.class%
         tags:
            - { name: oro_activity.activity_widget_provider, priority: -10 }
+
+    oro_user.event_listener.owner_user_grid_listener:
+        class: %oro_user.event_listener.owner_user_grid_listener.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.link.security_context
+            - @oro_security.ownership_tree_provider
+            - @?security.acl.voter.basic_permissions
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }

@@ -370,7 +370,7 @@
     {% endif %}
 
     {% if parameters.aCss is defined %}
-        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+        {% set aCss = aCss ~ ' ' ~ parameters.aCss %}
     {% endif %}
 
     {% set parameters = parameters|merge({'aCss': aCss}) %}
@@ -399,7 +399,7 @@
         'data': {
             'message': message,
             'success-message': successMessage,
-            'url':url
+            'url': url
         },
         'iCss': 'icon-trash',
         'aCss': parameters.aCss,
@@ -417,7 +417,12 @@
         {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
         {% set linkParams = linkParams|merge({ 'data': data }) %}
     {% endif %}
-
+    {% if parameters.data is defined %}
+        {% for dataItemName,dataItemValue in parameters.data %}
+            {% set data = linkParams.data|merge({(dataItemName): dataItemValue}) %}
+            {% set linkParams = linkParams|merge({ 'data': data }) %}
+        {% endfor %}
+    {% endif %}
     {{ _self.link(linkParams) }}
 {% endmacro %}
 
@@ -744,24 +749,22 @@
 #}
 {% macro entityOwnerLink(entity) %}
     {%- if entity.owner is defined and entity.owner %}
-        {% set ownerType = oro_get_owner_type(entity) %}
-        {% if (ownerType == 'USER') %}
-            {% if resource_granted('oro_user_user_view') %}
+        {% if resource_granted('VIEW', entity.owner)  %}
+            {% set ownerType = oro_get_owner_type(entity) %}
+            {% if (ownerType == 'USER') %}
                 {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
                 {% set ownerName = entity.owner|oro_format_name %}
-            {% endif %}
-        {% elseif (ownerType == 'BUSINESS_UNIT') %}
-            {% if resource_granted('oro_business_unit_view') %}
+            {% elseif (ownerType == 'BUSINESS_UNIT') %}
                 {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
                 {% set ownerName = entity.owner.name %}
             {% endif %}
-        {% endif %}
-        {% if ownerName is defined %}
-            {{ 'oro.ui.owner'|trans }}:
-            {% if ownerPath is defined %}
-                <a href="{{ ownerPath }}">{{ ownerName }}</a>
-            {% else %}
-                {{ ownerName }}
+            {% if ownerName is defined %}
+                {{ 'oro.ui.owner'|trans }}:
+                {% if ownerPath is defined %}
+                    <a href="{{ ownerPath }}">{{ ownerName }}</a>
+                {% else %}
+                    {{ ownerName }}
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif -%}

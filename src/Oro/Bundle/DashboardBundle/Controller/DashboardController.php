@@ -145,11 +145,18 @@ class DashboardController extends Controller
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     array(
                         'route'      => 'oro_dashboard_update',
-                        'parameters' => array('id' => $dashboardModel->getId()),
+                        'parameters' => array(
+                            'id' => $dashboardModel->getId(),
+                            '_enableContentProviders' => 'mainMenu'
+                        ),
                     ),
                     array(
                         'route'      => 'oro_dashboard_view',
-                        'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
+                        'parameters' => array(
+                            'id' => $dashboardModel->getId(),
+                            'change_dashboard' => true,
+                            '_enableContentProviders' => 'mainMenu'
+                        ),
                     )
                 );
             }

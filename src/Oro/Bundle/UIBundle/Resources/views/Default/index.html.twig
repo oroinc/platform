@@ -6,6 +6,10 @@
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
             <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
+            <meta http-equiv="cache-control" content="max-age=0" />
+            <meta http-equiv="cache-control" content="no-cache" />
+            <meta http-equiv="expires" content="0" />
+            <meta http-equiv="pragma" content="no-cache" />
             {% block head_style %}
                 {% if oro_theme_icon() %}
                     <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
@@ -18,24 +22,26 @@
                     {% placeholder scripts_before %}
                 {% endblock %}
                 {% set requirejs_config_extend %}
-                    {% placeholder requirejs_config_extend %}
+                    {%- placeholder requirejs_config_extend -%}
                 {% endset %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {
                     compressed: not app.debug,
                     config_extend: requirejs_config_extend
                 } %}
+                {% block application %}
+                <script type="text/javascript">
+                    require(['oroui/js/app']);
+                </script>
+                {% endblock %}
                 <script type="text/javascript">
                     require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oroui/js/app'], function(app){app.debug = true;});
+                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
                 {% endif %}
                 </script>
-                {% block hash_nav %}
-                    {% placeholder hash_nav %}
-                {% endblock %}
                 {% placeholder scripts_after %}
                 {% block head_script %}
                 {% endblock %}
@@ -198,11 +204,10 @@
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
 {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
     with {
-        'script': block('head_script'),
-        'content': block('page_container'),
-        'menu': block('application_menu'),
-        'breadcrumb': block('breadcrumb'),
-        'userMenu': block('user_menu')
+        'data': {
+            'scripts': block('head_script'),
+            'content': block('page_container')
+        }
     }
-    %}
+%}
 {% endif %}

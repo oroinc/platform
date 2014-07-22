@@ -29,8 +29,15 @@ services:
             - @filesystem
             - %oro_platform.composer.installed_json%
 
+    oro_platform.version.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_platform.version.cache" ] ]
+
     oro_platform.composer.version_helper:
         class: %oro_platform.composer.version_helper.class%
+        calls:
+            - [ setCache, [ @oro_platform.version.cache ] ]
         arguments:
             - @oro_platform.composer.local_repo_factory
 

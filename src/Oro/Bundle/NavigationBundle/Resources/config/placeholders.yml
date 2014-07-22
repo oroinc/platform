@@ -9,10 +9,6 @@ placeholders:
         items:
             navigationItem:
                 order: 100
-    hash_nav:
-        items:
-            hashNavigation:
-                order: 100
     navbar:
         items:
             shortcuts:
@@ -37,18 +33,12 @@ placeholders:
         items:
             pin_button:
                 order: 100
-    breadcrumb:
-        items:
-            breadcrumbs:
-                order: 100
     requirejs_config_extend:
         items:
             routing_requirejs_config:
                 order: 100
 
 items:
-   hashNavigation:
-        template: OroNavigationBundle:HashNav:script.js.twig
    dot_menu_js:
         template: OroNavigationBundle:Js:dot.menu.js.twig
    pinbar_js:
@@ -65,5 +55,3 @@ items:
         template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
    pin_button:
         template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
-   breadcrumbs:
-        template: OroNavigationBundle:ApplicationMenu:breabcrumbs.html.twig

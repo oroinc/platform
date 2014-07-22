@@ -63,7 +63,11 @@
                                     show: true,
                                     position: 'ct',
                                     labelFormatter: function (data) {
-                                        return numberFormatter.formatCurrency(data.y);
+                                        {% if options.data_schema.value.formatter is defined %}
+                                        return numberFormatter.{{ options.data_schema.value.formatter }}(data.y);
+                                        {% else %}
+                                        return data.y;
+                                        {% endif %}
                                     }
                                 }
                             };
@@ -84,17 +88,29 @@
                                             track : true,
                                             relative : true,
                                             trackFormatter: function (data) {
-                                                return xLabels[parseInt(data.x)] + ': ' + numberFormatter.formatCurrency(data.y);
+                                                {% if options.data_schema.value.formatter is defined %}
+                                                var yValue = numberFormatter.{{ options.data_schema.value.formatter }}(data.y)
+                                                {% else %}
+                                                var yValue = data.y;
+                                                {% endif %}
+
+                                                return xLabels[parseInt(data.x)] + ': ' + yValue;
                                             }
                                         },
                                         yaxis: {
                                             min: 0,
                                             tickFormatter: function (y) {
+                                                {% if options.data_schema.value.formatter is defined %}
                                                 return numberFormatter.formatCurrency(y);
+                                                {% else %}
+                                                return y;
+                                                {% endif %}
                                             }
                                         },
                                         xaxis: {
-                                            noTicks: 2,
+                                            {% if options.settings.xNoTicks is defined %}
+                                            noTicks: {{ options.settings.xNoTicks }},
+                                            {% endif %}
                                             tickFormatter: function (x) {
                                                 return xLabels[parseInt(x)];
                                             }
@@ -122,7 +138,11 @@
                 });
     </script>
 {% else %}
-    <div class="clearfix no-data">
-        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    <div class="container-fluid grid-container-parent">
+        <div class="grid-container">
+            <div class="clearfix no-data">
+                <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+            </div>
+        </div>
     </div>
 {% endif %}

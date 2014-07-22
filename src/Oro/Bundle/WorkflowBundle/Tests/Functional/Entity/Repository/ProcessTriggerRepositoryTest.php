@@ -63,17 +63,29 @@ class ProcessTriggerRepositoryTest extends WebTestCase
         $this->assertFalse($this->repository->isEqualTriggerExists($notEqualTrigger));
     }
 
-    public function testfindAllWithEnabledDefinitions()
+    public function testFindAllWithDefinitions()
     {
-        $expectedCount = (int)$this->repository->createQueryBuilder('trigger')
-            ->select('COUNT(trigger.id) as triggerCount')
-            ->getQuery()
-            ->getSingleScalarResult();
+        // all definitions
+        $triggers = $this->repository->findAllWithDefinitions();
+        $this->assertCount($this->getTriggersCount(), $triggers);
+        $this->assertTriggersOrder($triggers);
 
-        $triggers = $this->repository->findAllWithEnabledDefinitions();
-        $this->assertCount($expectedCount, $triggers);
+        // enabled definitions
+        $triggers = $this->repository->findAllWithDefinitions(true);
+        $this->assertCount($this->getTriggersCount(true), $triggers);
+        $this->assertTriggersOrder($triggers);
 
-        $definition    = null;
+        // disabled definitions
+        $triggers = $this->repository->findAllWithDefinitions(false);
+        $this->assertCount($this->getTriggersCount(false), $triggers);
+        $this->assertTriggersOrder($triggers);
+    }
+
+    /**
+     * @param ProcessTrigger[] $triggers
+     */
+    protected function assertTriggersOrder(array $triggers)
+    {
         $previousOrder = null;
         foreach ($triggers as $trigger) {
             $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', $trigger);
@@ -88,15 +100,22 @@ class ProcessTriggerRepositoryTest extends WebTestCase
             $this->assertGreaterThanOrEqual($previousOrder, $executionOrder);
             $previousOrder = $executionOrder;
         }
+    }
 
-        // check is the function returns only enabled process definitions
-        if ($definition) {
-            $definition->setEnabled(false);
-            $this->entityManager->persist($definition);
-            $this->entityManager->flush();
+    /**
+     * @param bool|null $enabled
+     * @return int
+     */
+    protected function getTriggersCount($enabled = null)
+    {
+        $queryBuilder = $this->repository->createQueryBuilder('trigger')
+            ->select('COUNT(trigger.id) as triggerCount')
+            ->innerJoin('trigger.definition', 'definition');
 
-            $triggersAfter = $this->repository->findAllWithEnabledDefinitions();
-            $this->assertLessThan(count($triggers), count($triggersAfter));
+        if (null !== $enabled) {
+            $queryBuilder->andWhere('definition.enabled = :enabled')->setParameter('enabled', $enabled);
         }
+
+        return (int)$queryBuilder->getQuery()->getSingleScalarResult();
     }
 }

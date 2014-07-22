@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
@@ -25,7 +26,13 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *              "type"="ACL",
  *              "group_name"=""
  *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -80,6 +87,13 @@ class ProcessDefinition implements DomainObjectInterface
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -87,6 +101,13 @@ class ProcessDefinition implements DomainObjectInterface
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

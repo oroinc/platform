@@ -55,9 +55,9 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $result = null;
-        $entity =  $this->attachmentManager->prepareRemoteFile($data);
+        $entity = $this->attachmentManager->prepareRemoteFile($data);
         if ($entity) {
-            $violations = $this->validator->validate($context['entityName'], $context['fieldName'], $entity);
+            $violations = $this->validator->validate($context['entityName'], $entity, $context['fieldName']);
             if (!$violations->count()) {
                 $this->attachmentManager->upload($entity);
                 $result = $entity;

@@ -3,7 +3,7 @@
 define(['jquery', 'jquery-ui'], function ($) {
     'use strict';
 
-    /* datapicker extend:start */
+    /* datepicker extend:start */
     (function () {
 
         /**
@@ -22,6 +22,31 @@ define(['jquery', 'jquery-ui'], function ($) {
             });
 
             return events.join(' ');
+        }
+
+        /**
+         * Process position update for datepicker element
+         */
+        function updatePos() {
+            var pos, isFixed, offset, inst,
+                input = this;
+
+            inst = $.datepicker._getInst(input);
+
+            if (!$.datepicker._pos) { // position below input
+                pos = $.datepicker._findPos(input);
+                pos[1] += input.offsetHeight; // add the height
+            }
+
+            isFixed = false;
+            $(input).parents().each(function () {
+                isFixed |= $(this).css("position") === "fixed";
+                return !isFixed;
+            });
+
+            offset = {left: pos[0], top: pos[1]};
+            offset = $.datepicker._checkOffset(inst, offset, isFixed);
+            inst.dpDiv.css({left: offset.left + "px", top: offset.top + "px"});
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker,
@@ -43,11 +68,14 @@ define(['jquery', 'jquery-ui'], function ($) {
             events = getEvents(input.id);
 
             $(input).parents().add(window).each(function () {
-                $(this).on(events, function () {
+                $(this).on(events, $.proxy(updatePos, input));
+                // @TODO develop other approach than hide on scroll
+                // because on mobile devices it's impossible to open calendar without scrolling
+                /*$(this).on(events, function () {
                     // just close datepicker
                     $.datepicker._hideDatepicker();
                     input.blur();
-                });
+                });*/
             });
         };
 
@@ -62,6 +90,9 @@ define(['jquery', 'jquery-ui'], function ($) {
             var events, input = elem;
 
             if (!elem) {
+                if (!$.datepicker._curInst) {
+                    return;
+                }
                 input = $.datepicker._curInst.input.get(0);
             }
             events = getEvents(input.id);
@@ -73,5 +104,5 @@ define(['jquery', 'jquery-ui'], function ($) {
             _hideDatepicker.apply(this, arguments);
         };
     }());
-    /* datapicker extend:end */
+    /* datepicker extend:end */
 });

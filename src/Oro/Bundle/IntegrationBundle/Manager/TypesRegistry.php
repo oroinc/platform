@@ -5,6 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
@@ -41,7 +43,7 @@ class TypesRegistry
         if (!$this->integrationTypes->containsKey($typeName)) {
             $this->integrationTypes->set($typeName, $type);
         } else {
-            throw new \LogicException(sprintf('Trying to redeclare integration type "%s".', $typeName));
+            throw new LogicException(sprintf('Trying to redeclare integration type "%s".', $typeName));
         }
 
         return $this;
@@ -116,7 +118,7 @@ class TypesRegistry
         }
 
         if ($this->transportTypes[$integrationTypeName]->containsKey($typeName)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'Trying to redeclare transport type "%s" for "%s" integration type.',
                     $typeName,
@@ -140,9 +142,9 @@ class TypesRegistry
     public function getTransportType($integrationTypeName, $transportType)
     {
         if (!isset($this->transportTypes[$integrationTypeName])) {
-            throw new \LogicException(sprintf('Transports not found for integration "%s".', $integrationTypeName));
+            throw new LogicException(sprintf('Transports not found for integration "%s".', $integrationTypeName));
         } elseif (!$this->transportTypes[$integrationTypeName]->containsKey($transportType)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'Transports type "%s"  not found for integration "%s".',
                     $transportType,
@@ -210,7 +212,7 @@ class TypesRegistry
         $key   = reset($keys);
 
         if ($key === false) {
-            throw new \LogicException(sprintf('Transport not found for integration type "%s".', $integrationType));
+            throw new LogicException(sprintf('Transport not found for integration type "%s".', $integrationType));
         }
         if ($typeNameOnly) {
             return $key;
@@ -236,7 +238,7 @@ class TypesRegistry
         }
 
         if ($this->connectorTypes[$integrationTypeName]->containsKey($typeName)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'Trying to redeclare connector type "%s" for "%s" integration type.',
                     $typeName,
@@ -255,14 +257,14 @@ class TypesRegistry
      * @param string $type
      *
      * @return ConnectorInterface
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function getConnectorType($integrationType, $type)
     {
         if (!isset($this->connectorTypes[$integrationType])) {
-            throw new \LogicException(sprintf('Connectors not found for integration "%s".', $integrationType));
+            throw new LogicException(sprintf('Connectors not found for integration "%s".', $integrationType));
         } elseif (!$this->connectorTypes[$integrationType]->containsKey($type)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'Connector type "%s"  not found for integration "%s".',
                     $type,

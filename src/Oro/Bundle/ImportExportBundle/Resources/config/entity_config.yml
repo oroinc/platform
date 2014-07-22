@@ -11,7 +11,7 @@ oro_entity_config:
                 header:
                     options: []
                     form:
-                        type:               text
+                        type:               oro_entity_extend_text
                         options:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
@@ -44,7 +44,7 @@ oro_entity_config:
                             - money
                             - percent
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             label:          oro.importexport.entity_config.identity.label
                             choices:
@@ -57,7 +57,7 @@ oro_entity_config:
                 excluded:
                     options: []
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             label:          oro.importexport.entity_config.excluded.label
                             choices:
@@ -69,9 +69,9 @@ oro_entity_config:
                 # is relation must be represented by all it's fields
                 full:
                     options:
-                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, file, image]
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_choice
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:

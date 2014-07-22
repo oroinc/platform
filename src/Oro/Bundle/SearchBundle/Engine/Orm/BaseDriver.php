@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 abstract class BaseDriver
 {
@@ -66,6 +65,8 @@ abstract class BaseDriver
         if ($query->getFirstResult() > 0) {
             $qb->setFirstResult($query->getFirstResult());
         }
+
+        $qb->groupBy('search.id');
 
         return $qb->getQuery()
             ->getResult();
@@ -229,13 +230,11 @@ abstract class BaseDriver
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
         $qb = $this->createQueryBuilder('search')
-            ->select(array('search as item', 'text'))
-            ->leftJoin('search.textFields', 'text', 'WITH', 'text.field = :allTextField')
+            ->select(array('search as item', 'textField'))
             ->leftJoin('search.textFields', 'textField')
             ->leftJoin('search.integerFields', 'integerField')
             ->leftJoin('search.decimalFields', 'decimalField')
-            ->leftJoin('search.datetimeFields', 'datetimeField')
-            ->setParameter('allTextField', Indexer::TEXT_ALL_DATA_FIELD);
+            ->leftJoin('search.datetimeFields', 'datetimeField');
 
         $this->setFrom($query, $qb);
 

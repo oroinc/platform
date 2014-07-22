@@ -5,7 +5,6 @@ oro:
 
         header:
             command:      Command
-            created:      Created at
             error:        Error output
             id:           ID
             jobs:         Jobs
@@ -44,7 +43,20 @@ oro:
             stop:         Stop daemon
 
         view:
-            deps:         Dendencies
+            dependencies: Dendencies
             in_deps:      Incoming Dependencies
             original:     Original Job
             related:      Related Entities
+            related:      Related Entities
+
+        job:
+            status:
+                new:        New
+                pending:    Pending
+                canceled:   Canceled
+                running:    Running
+                finished:   Finished
+                failed:     Failed
+                terminated: Terminated
+                incomplete: Incomplete
+                unknown:    Unknown

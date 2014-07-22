@@ -83,10 +83,11 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test init method errors
+     *
+     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
      */
     public function testInitErrors()
     {
-        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->transport->init($this->transportEntity);
     }
 }
