@@ -71,7 +71,7 @@ class EmailQueryFactory
 
         // if has owner then use expression to expose formatted name, use email otherwise
         return sprintf(
-            'CONCAT(\'\', CASE WHEN %1$s.hasOwner = 1 THEN (%2$s) ELSE %1$s.email END) as fromEmailExpression',
+            'CONCAT(\'\', CASE WHEN %1$s.hasOwner = true THEN (%2$s) ELSE %1$s.email END) as fromEmailExpression',
             $emailFromTableAlias,
             $expression
         );
