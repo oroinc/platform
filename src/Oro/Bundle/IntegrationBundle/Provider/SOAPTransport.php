@@ -19,7 +19,7 @@ use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 abstract class SOAPTransport implements TransportInterface
 {
     const ATTEMPTS = 5;
-    const SLEEP_BETWEEN_QUERIES = 1000000;
+    const SLEEP_BETWEEN_QUERIES = 1;
 
     /** @var ParameterBag */
     protected $settings;
@@ -60,7 +60,7 @@ abstract class SOAPTransport implements TransportInterface
         } catch (\Exception $e) {
 
             if ($this->isRepetitionNecessary()) {
-                usleep(self::SLEEP_BETWEEN_QUERIES);
+                sleep(self::SLEEP_BETWEEN_QUERIES);
                 $this->increaseRepeated();
                 $result = $this->call($action, $params);
             } else {
