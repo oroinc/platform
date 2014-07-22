@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReportBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
@@ -27,6 +28,9 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -97,6 +101,13 @@ class Report extends AbstractQueryDesigner
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -104,6 +115,13 @@ class Report extends AbstractQueryDesigner
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

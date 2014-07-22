@@ -22,17 +22,6 @@ require([
     });
 
     /**
-     * Init PageBreadcrumbView
-     */
-    BaseController.loadBeforeAction([
-        'oroui/js/app/views/page/breadcrumb-view'
-    ], function (PageBreadcrumbView) {
-        BaseController.addToReuse('breadcrumb', PageBreadcrumbView, {
-            el: 'breadcrumb'
-        });
-    });
-
-    /**
      * Init PageContentView
      */
     BaseController.loadBeforeAction([
@@ -44,11 +33,15 @@ require([
     });
 
     /**
-     * Init PageMainMenuView
+     * Init PageMainMenuView and BreadcrumbView
      */
     BaseController.loadBeforeAction([
-        'oroui/js/app/views/page/main-menu-view'
-    ], function (PageMainMenuView) {
+        'oroui/js/app/views/page/main-menu-view',
+        'oroui/js/app/views/page/breadcrumb-view'
+    ], function (PageMainMenuView, BreadcrumbView) {
+        BaseController.addToReuse('breadcrumb', BreadcrumbView, {
+            el: 'breadcrumb'
+        });
         BaseController.addToReuse('mainMenu', PageMainMenuView, {
             el: 'mainMenu'
         });

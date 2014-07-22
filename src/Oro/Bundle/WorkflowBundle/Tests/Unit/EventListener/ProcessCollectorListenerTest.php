@@ -735,7 +735,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
                         $executeAfter = new \DateTime('now', new \DateTimeZone('UTC'));
                         $executeAfter->add($timeShiftInterval);
 
-                        $this->assertEquals($executeAfter, $jmsJob->getExecuteAfter());
+                        $this->assertLessThanOrEqual($executeAfter, $jmsJob->getExecuteAfter());
                     }
                 )
             );

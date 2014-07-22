@@ -35,6 +35,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )

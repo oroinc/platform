@@ -1,0 +1,54 @@
+parameters:
+    oro_navigation.content_provider.menu.class:             Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
+    oro_navigation.content_provider.title.class:            Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
+    oro_navigation.content_provider.title_short.class:      Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider
+    oro_navigation.content_provider.title_serialized.class: Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider
+
+services:
+    oro_navigation.content_provider.menu.history_menu:
+        class: %oro_navigation.content_provider.menu.class%
+        arguments:
+            - @oro_menu.twig.extension
+            - "history"
+            - "history"
+        tags:
+            - { name: oro_ui.content_provider }
+
+    oro_navigation.content_provider.menu.mostviewed_menu:
+        class: %oro_navigation.content_provider.menu.class%
+        arguments:
+            - @oro_menu.twig.extension
+            - "mostviewed"
+            - "mostviewed"
+        tags:
+            - { name: oro_ui.content_provider }
+
+    oro_navigation.content_provider.menu.application_menu:
+        class: %oro_navigation.content_provider.menu.class%
+        arguments:
+            - @oro_menu.twig.extension
+            - "application_menu"
+            - "mainMenu"
+        tags:
+            - { name: oro_ui.content_provider, enabled: false }
+
+    oro_navigation.content_provider.title:
+        class: %oro_navigation.content_provider.title.class%
+        arguments:
+            - @oro_navigation.title_service
+        tags:
+            - { name: oro_ui.content_provider }
+
+    oro_navigation.content_provider.title_short:
+        class: %oro_navigation.content_provider.title_short.class%
+        arguments:
+            - @oro_navigation.title_service
+        tags:
+            - { name: oro_ui.content_provider }
+
+    oro_navigation.content_provider.title_serialized:
+        class: %oro_navigation.content_provider.title_serialized.class%
+        arguments:
+            - @oro_navigation.title_service
+        tags:
+            - { name: oro_ui.content_provider }

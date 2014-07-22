@@ -13,9 +13,7 @@ define([
         defaults: {
             content: '',
             scripts: '',
-            mainMenu: '',
-            userMenu: '',
-            breadcrumb: '',
+            currentRoute: '',
 
             history: '',
             mostviewed: '',
