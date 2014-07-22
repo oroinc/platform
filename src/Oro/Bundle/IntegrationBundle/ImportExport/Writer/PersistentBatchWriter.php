@@ -4,16 +4,24 @@ namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class PersistentBatchWriter extends EntityWriter
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+
+class PersistentBatchWriter implements ItemWriterInterface
 {
+    /** @var RegistryInterface */
+    protected $registry;
+
+    /** @var EntityManager */
+    protected $em;
+
     /**
-     * @param EntityManager $entityManager
+     * @param RegistryInterface $registry
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->entityManager = $entityManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -21,18 +29,36 @@ class PersistentBatchWriter extends EntityWriter
      */
     public function write(array $items)
     {
+        $this->ensureEntityManagerReady();
+
         try {
-            $this->entityManager->beginTransaction();
+            $this->em->beginTransaction();
+
             foreach ($items as $item) {
-                $this->entityManager->persist($item);
+                $this->em->persist($item);
             }
-            $this->entityManager->commit();
+
+            $this->em->flush();
+
+            $this->em->commit();
+            $this->em->clear();
         } catch (\Exception $exception) {
-            $this->entityManager->rollback();
+            $this->em->rollback();
 
             throw $exception;
         }
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+    }
+
+    /**
+     * Prepares EntityManager, reset it if closed with error
+     */
+    protected function ensureEntityManagerReady()
+    {
+        $this->em = $this->registry->getManager();
+
+        if (!$this->em->isOpen()) {
+            $this->registry->resetManager();
+            $this->ensureEntityManagerReady();
+        }
     }
 }
