@@ -16,11 +16,12 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class TranslationPackDumper implements LoggerAwareInterface
 {
+    const ERR_PARAM = 1;
+    const ERR_NOT_TRANSLATED = 2;
+    const ERR_INVALID = 3;
+
     /** @var TranslationWriter */
     protected $writer;
 
@@ -42,6 +43,13 @@ class TranslationPackDumper implements LoggerAwareInterface
     /** @var MessageCatalogue[] Translations loaded from yaml files, existing */
     protected $loadedTranslations = [];
 
+    /**
+     * @param TranslationWriter  $writer
+     * @param ExtractorInterface $extractor
+     * @param TranslationLoader  $loader
+     * @param Filesystem         $filesystem
+     * @param array              $bundles
+     */
     public function __construct(
         TranslationWriter $writer,
         ExtractorInterface $extractor,
@@ -80,7 +88,7 @@ class TranslationPackDumper implements LoggerAwareInterface
                 continue;
             }
 
-            $this->logger->log(LogLevel::INFO,  '');
+            $this->logger->log(LogLevel::INFO, '');
             $this->logger->log(LogLevel::INFO, sprintf('Writing files for <info>%s</info>', $bundle->getName()));
 
             /** @var MessageCatalogue $currentCatalogue */
@@ -171,35 +179,15 @@ class TranslationPackDumper implements LoggerAwareInterface
 
         foreach ($allMessages as $domain => $messages) {
             foreach ($messages as $key => $value) {
-                // key is something like %segment.name%, so called parameter
-                if (preg_match('#^%[^%\s]+%$#', $key)) {
-                    $messages[$key] = false;
-                    continue;
-                }
-
-                $isTranslationExist = $this->checkTranslationExists($key);
-                $isDottedKey        = (bool) preg_match('#^[^\s\.]+\.(?:[^\s\.]+\.?)+$#', $key);
-                $isKeyValueEqual    = $key == $value;
-
-                // untranslated dotted string, but translation exists in some other catalogue
-                if ($isDottedKey && $isKeyValueEqual && $isTranslationExist) {
-                    $messages[$key] = false;
-                    continue;
-                }
-
-                // dotted key that finish with dot, e.g. segment.type. meaning that suffix can be added dynamically
-                $isDotAtTheEnd = $isKeyValueEqual && $isDottedKey && '.' == $key[strlen($key) - 1];
-                $isPlaceholder = $isKeyValueEqual && $isDottedKey && '%s' == substr($key, -2);
-                if ($isDotAtTheEnd || $isPlaceholder) {
-                    $messages[$key] = false;
-                    continue;
-                }
-
-                // untranslated string, and translation doesn't exist in any other catalogue
-                // remove it and warn
-                if ($isDottedKey && $isKeyValueEqual && !$isTranslationExist) {
-                    $messages[$key] = false;
+                try {
+                    $result = $this->validateMessage($key, $value);
+                } catch (\Exception $e) {
+                    $result = false;
                     $notTranslatedKeys[$domain][] = $key;
+                }
+
+                if ($result === false) {
+                    $messages[$key] = false;
                     continue;
                 }
             }
@@ -217,6 +205,44 @@ class TranslationPackDumper implements LoggerAwareInterface
         }
 
         return $isEmpty;
+    }
+
+    /**
+     * Check if message valid
+     *
+     * @param string $key
+     * @param string $message
+     *
+     * @throws \Exception if key is not translated
+     * @return bool
+     */
+    protected function validateMessage($key, $message)
+    {
+        $isKeyValueEqual    = $key == $message;
+        $isDottedKey        = (bool) preg_match('#^[^\s\.]+\.(?:[^\s\.]+\.?)+$#', $key);
+
+        // dotted key that finish with dot, e.g. segment.type. meaning that suffix can be added dynamically
+        $isDotAtTheEnd = $isKeyValueEqual && $isDottedKey && '.' == $key[strlen($key) - 1];
+        // dotted key that finish with %s, e.g. segment.type.%s meaning that suffix can be added dynamically
+        $isPlaceholder = $isKeyValueEqual && $isDottedKey && '%s' == substr($key, -2);
+        // key is something like %segment.name%, so called parameter
+        $isParameter   = preg_match('#^%[^%\s]+%$#', $key);
+
+        if ($isParameter | $isDotAtTheEnd | $isPlaceholder) {
+            return false;
+        }
+
+        if ($isDottedKey && $isKeyValueEqual) {
+            if ($this->checkTranslationExists($key)) {
+                // untranslated dotted string, but translation exists in some other catalogue
+                return false;
+            } else {
+                // untranslated string, and translation doesn't exist in any other catalogue
+                new \Exception(sprintf('Key %s not translated', $key));
+            }
+        }
+
+        return true;
     }
 
     /**
