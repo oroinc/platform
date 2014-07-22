@@ -192,10 +192,7 @@ abstract class SOAPTransport implements TransportInterface
     protected function isRepetitionNecessary()
     {
         if ($this->repeated < self::ATTEMPTS) {
-
             $headers = $this->getLastCallHeaders();
-
-
 
             if (!$this->isResultOk($headers)) {
                 $statusCode = $this->getHttpStatusCode($headers);
