@@ -103,7 +103,7 @@ class Runner
      */
     public function runPlatformUpdate()
     {
-        return $this->runCommand('oro:platform:update');
+        return $this->runCommand('oro:platform:update --force');
     }
 
     /**

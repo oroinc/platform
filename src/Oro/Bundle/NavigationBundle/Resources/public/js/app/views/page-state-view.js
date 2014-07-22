@@ -16,17 +16,14 @@ define([
     var PageStateView;
 
     PageStateView = BaseView.extend({
-        events: {
-            'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
-        },
-
         listen: {
             'change:data model': '_saveModel',
             'change model': '_updateCache',
 
             'page:request mediator': 'onPageRequest',
             'page:update mediator': 'onPageUpdate',
-            'page:afterChange mediator': 'afterPageChange'
+            'page:afterChange mediator': 'afterPageChange',
+            'page:beforeRefresh mediator': 'beforePageRefresh'
         },
 
         initialize: function () {
@@ -43,8 +40,6 @@ define([
                 okButtonClass: 'btn-primary btn-large',
                 cancelText: __('Cancel')
             });
-            this.listenTo(confirmModal, 'ok', this._refreshPage);
-
             this.subview('confirmModal', confirmModal);
 
             if (this._hasForm()) {
@@ -53,24 +48,33 @@ define([
         },
 
         /**
-         * Handles click on page refresh element
-         * @param {jQuery.Event} e
+         * Handle page's refresh action
+         * if confirmation is required:
+         *  - prepares deferred object
+         *  - puts deferred object into refresh
+         *
+         * @param {Array} queue
          */
-        onRefreshClick: function (e) {
-            e.preventDefault();
+        beforePageRefresh: function (queue) {
+            var deferred, confirmModal, self;
             if (this._initialData !== null && this.model.get('data') !== this._initialData) {
-                this.subview('confirmModal').open();
-            } else {
-                this._refreshPage();
-            }
-        },
+                self = this;
+                confirmModal = this.subview('confirmModal');
+                deferred = $.Deferred();
 
-        /**
-         * Calls global refreshPage handler with proper options
-         * @private
-         */
-        _refreshPage: function () {
-            mediator.execute('refreshPage', {restore: true});
+                deferred.always(function () {
+                    self.stopListening(confirmModal);
+                });
+                this.listenTo(confirmModal, 'ok', function () {
+                    deferred.resolve({restore: true});
+                });
+                this.listenTo(confirmModal, 'cancel', function () {
+                    deferred.reject();
+                });
+
+                queue.push(deferred);
+                confirmModal.open();
+            }
         },
 
         /**
@@ -156,6 +160,8 @@ define([
             if (this.model.get('restore')) {
                 this._restoreState();
                 this.model.set('restore', false);
+            } else {
+                this.model.set('data', this._initialData, {silent: true});
             }
             this.$el.on('change.page-state', _.bind(this._collectState, this));
         },

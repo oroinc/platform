@@ -929,7 +929,7 @@ class ConfigManager
             $translatablePropertyNames = $provider->getPropertyConfig()
                 ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
             foreach ($translatablePropertyNames as $propertyName) {
-                if (!in_array($propertyName, $defaultValues)) {
+                if (empty($defaultValues[$propertyName])) {
                     $defaultValues[$propertyName] =
                         ConfigHelper::getTranslationKey($scope, $propertyName, $className);
                 }
@@ -975,7 +975,7 @@ class ConfigManager
         $translatablePropertyNames = $provider->getPropertyConfig()
             ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {
-            if (!in_array($propertyName, $defaultValues)) {
+            if (empty($defaultValues[$propertyName])) {
                 $defaultValues[$propertyName] =
                     ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
             }

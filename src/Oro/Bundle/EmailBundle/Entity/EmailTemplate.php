@@ -36,6 +36,9 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )

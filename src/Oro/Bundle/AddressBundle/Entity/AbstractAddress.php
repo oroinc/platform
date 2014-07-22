@@ -267,6 +267,9 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ORM\Column(type="datetime")
      * @ConfigField(
      *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          },
      *          "importexport"={
      *              "excluded"=true
      *          }
@@ -281,6 +284,9 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      * @ORM\Column(type="datetime")
      * @ConfigField(
      *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          },
      *          "importexport"={
      *              "excluded"=true
      *          }
