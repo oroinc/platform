@@ -8,7 +8,7 @@ datagrid:
                     - c.id
                     - c.name
                     - c.type
-                    - CASE WHEN c.enabled = 1 THEN 'enabled' ELSE 'disabled' END as enabled
+                    - CASE WHEN c.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
                 from:
                     - { table: %oro_integration.entity.class%, alias: c }
         columns:
