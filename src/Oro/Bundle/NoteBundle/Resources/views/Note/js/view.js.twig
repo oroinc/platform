@@ -29,26 +29,16 @@
                 <% if (hasUpdate) { %>
                 <div class="details">
                     <div>
-                        <% if (updatedBy) { %>
-                            <%= _.template(
-                                {{ 'oro.note.updated_by'|trans|json_encode|raw }},
-                                {
-                                    user: updatedBy_url
-                                        ? '<a class="user" href="' + updatedBy_url + '">' + updatedBy + '</a>'
-                                        : '<i class="user">' + updatedBy + '</i>',
-                                    date: '<i class="date">' + updatedAt + '</i>'
-                                },
-                                {interpolate: /\{\{(.+?)\}\}/g}
-                            ) %>
-                        <% } else { %>
-                            <%= _.template(
-                                {{ 'oro.note.updated_at'|trans|json_encode|raw }},
-                                {
-                                    date: '<i class="date">' + updatedAt + '</i>'
-                                },
-                                {interpolate: /\{\{(.+?)\}\}/g}
-                            ) %>
-                        <% } %>
+                        <%= _.template(
+                            {{ 'oro.note.updated_by'|trans|json_encode|raw }},
+                            {
+                                user: updatedBy_url
+                                    ? '<a class="user" href="' + updatedBy_url + '">' + updatedBy + '</a>'
+                                    : '<i class="user">' + updatedBy + '</i>',
+                                date: '<i class="date">' + updatedAt + '</i>'
+                            },
+                            {interpolate: /\{\{(.+?)\}\}/g}
+                        ) %>
                     </div>
                 </div>
                 <% } %>
