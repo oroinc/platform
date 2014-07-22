@@ -281,6 +281,10 @@ class WorkflowManager
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
+        if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
+            return null;
+        }
+
         return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 

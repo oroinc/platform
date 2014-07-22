@@ -646,11 +646,16 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($workflow, $this->workflowManager->getApplicableWorkflow($entity));
     }
 
-    public function testGetWorkflowItemByEntity()
+    /**
+     * @param mixed $entityId
+     * @param WorkflowItem $workflowItem
+     *
+     * @dataProvider entityDataProvider
+     */
+    public function testGetWorkflowItemByEntity($entityId, WorkflowItem $workflowItem = null)
     {
         $entity = new \DateTime('now');
         $entityClass = get_class($entity);
-        $entityId = 1;
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
@@ -661,8 +666,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->will($this->returnValue($entityId));
-
-        $workflowItem = $this->createWorkflowItem();
 
         $workflowItemsRepository =
             $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
@@ -682,6 +685,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $workflowItem,
             $this->workflowManager->getWorkflowItemByEntity($entity)
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function entityDataProvider()
+    {
+        return [
+            'integer'           => [1, $this->createWorkflowItem()],
+            'integer_as_string' => ['123', $this->createWorkflowItem()],
+            'string'            => ['identifier', null],
+            'null'              => [null, null],
+            'object'            => [new \stdClass(), null],
+        ];
     }
 
     /**
