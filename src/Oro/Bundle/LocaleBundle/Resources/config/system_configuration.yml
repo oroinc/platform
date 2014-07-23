@@ -3,6 +3,7 @@ oro_system_configuration:
         localization:
             title: 'Localization'
             icon:  'icon-flag'
+            page_reload: true
         language_settings:
             title: 'Language settings'
             icon:  'icon-font'

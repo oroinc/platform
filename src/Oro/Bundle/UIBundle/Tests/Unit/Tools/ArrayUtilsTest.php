@@ -372,4 +372,109 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
 
         return $obj;
     }
+
+    /**
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     * @param array $expected
+     *
+     * @dataProvider arrayColumnProvider
+     */
+    public function testArrayColumn(array $array, $columnKey, $indexKey, array $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ArrayUtils::arrayColumn($array, $columnKey, $indexKey)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnProvider()
+    {
+        return [
+            'no_index'     => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                null,
+                ['value2']
+            ],
+            'index'        => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                'id',
+                ['id1' => 'value2']
+            ],
+            'wrong_index'  => [
+                [
+                    ['value' => 'value2']
+                ],
+                'value',
+                'id',
+                []
+            ],
+            'wrong_column' => [
+                [
+                    ['value' => 'value2']
+                ],
+                'id',
+                null,
+                []
+            ],
+
+        ];
+    }
+
+    /**
+     * @param array  $array
+     * @param mixed  $columnKey
+     * @param mixed  $indexKey
+     * @param string $expectedMessage
+     *
+     * @dataProvider arrayColumnInputData
+     */
+    public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            $expectedMessage
+        );
+
+        ArrayUtils::arrayColumn($array, $columnKey, $indexKey);
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnInputData()
+    {
+        return [
+            'empty_data' => [
+                [],
+                null,
+                null,
+                'Array is empty'
+            ],
+            'empty_column_key' => [
+                [
+                    ['id' => 'value']
+                ],
+                null,
+                null,
+                'Column key is empty'
+            ]
+        ];
+    }
 }

@@ -25,9 +25,8 @@
             }) }}
         {% endif %}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/messenger', 'oronavigation/js/navigation', 'oroui/js/mediator', 'oroui/js/error'],
-            function($, Messenger, Navigation, mediator, Error) {
-                var navigation = Navigation.getInstance();
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
+            function($, mediator, Error) {
                 $('#{{ idButton }}').on('click', function(e) {
                     e.preventDefault();
                     var el = $(this);
@@ -35,17 +34,12 @@
                         url: el.prop('href'),
                         type: 'GET',
                         success: function(response) {
-                            if (navigation) {
-                                if (response.message) {
-                                    mediator.once('hash_navigation_request:complete', function() {
-                                        Messenger.notificationFlashMessage('success', response.message);
-                                    });
-                                }
-                                navigation.loadPage(true);
-
-                            } else {
-                                window.location.reload();
+                            if (response.message) {
+                                mediator.once('page:afterChange', function() {
+                                    mediator.execute('showFlashMessage', 'success', response.message);
+                                });
                             }
+                            mediator.execute('refreshPage');
                         },
                         error: function(xhr) {
                             Error.handle({}, xhr, {enforce: true});
@@ -70,8 +64,8 @@
 {% endblock breadcrumbs %}
 
 {% block stats %}
-    <li>{{ 'oro.workflow.processdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.workflow.processdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block pageHeader %}

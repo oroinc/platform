@@ -5,11 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeListener;
 
-class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var WorkflowDataSerializeListener
@@ -73,7 +74,10 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->listener->postLoad($args);
     }
 
-    public function testOnFlush()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testOnFlushAndPostFlush()
     {
         $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
             ->disableOriginalConstructor()
@@ -122,72 +126,87 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->serializer->expects($this->at(0))->method('setWorkflowName')
             ->with($entity1->getWorkflowName());
         $this->serializer->expects($this->at(1))->method('serialize')
-            ->with($data1, 'json')->will($this->returnValue($expectedSerializedData1));
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), 'json')
+            ->will(
+                $this->returnCallback(
+                    function ($data) use ($data1, $expectedSerializedData1) {
+                        $this->assertEquals($data1, $data);
+                        return $expectedSerializedData1;
+                    }
+                )
+            );
 
         $this->serializer->expects($this->at(2))->method('setWorkflowName')
             ->with($entity2->getWorkflowName());
         $this->serializer->expects($this->at(3))->method('serialize')
-            ->with($data2, 'json')->will($this->returnValue($expectedSerializedData2));
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), 'json')
+            ->will(
+                $this->returnCallback(
+                    function ($data) use ($data2, $expectedSerializedData2) {
+                        $this->assertEquals($data2, $data);
+                        return $expectedSerializedData2;
+                    }
+                )
+            );
 
         $this->serializer->expects($this->at(4))->method('setWorkflowName')
             ->with($entity4->getWorkflowName());
         $this->serializer->expects($this->at(5))->method('serialize')
-            ->with($data4, 'json')->will($this->returnValue($expectedSerializedData4));
-
-        $this->listener->onFlush(
-            new OnFlushEventArgs(
-                $this->getOnFlushEntityManagerMock(
-                    array(
-                        array(
-                            'getScheduledEntityInsertions',
-                            array(),
-                            $this->returnValue(array($entity1, $entity2, $entity3))
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity1, 'serializedData', $entity1->getSerializedData(), $expectedSerializedData1)
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity2, 'serializedData', $entity2->getSerializedData(), $expectedSerializedData2)
-                        ),
-                        array(
-                            'getScheduledEntityUpdates',
-                            array(),
-                            $this->returnValue(array($entity4, $entity5, $entity6))
-                        ),
-                        array(
-                            'propertyChanged',
-                            array($entity4, 'serializedData', $entity4->getSerializedData(), $expectedSerializedData4)
-                        ),
-                    )
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData'), 'json')
+            ->will(
+                $this->returnCallback(
+                    function ($data) use ($data4, $expectedSerializedData4) {
+                        $this->assertEquals($data4, $data);
+                        return $expectedSerializedData4;
+                    }
                 )
+            );
+
+        $entityManager = $this->getPostFlushEntityManagerMock(
+            array(
+                array(
+                    'getScheduledEntityInsertions',
+                    array(),
+                    $this->returnValue(array($entity1, $entity2, $entity3))
+                ),
+                array(
+                    'getScheduledEntityUpdates',
+                    array(),
+                    $this->returnValue(array($entity4, $entity5, $entity6))
+                ),
             )
         );
+
+        $this->listener->onFlush(new OnFlushEventArgs($entityManager));
+        $this->listener->postFlush(new PostFlushEventArgs($entityManager));
 
         $this->assertAttributeEquals($expectedSerializedData1, 'serializedData', $entity1);
         $this->assertAttributeEquals($expectedSerializedData2, 'serializedData', $entity2);
         $this->assertAttributeEquals($expectedSerializedData4, 'serializedData', $entity4);
         $this->assertAttributeEquals(null, 'serializedData', $entity5);
+
+        $this->assertFalse($entity1->getData()->isModified());
+        $this->assertFalse($entity2->getData()->isModified());
+        $this->assertFalse($entity4->getData()->isModified());
+        $this->assertFalse($entity5->getData()->isModified());
     }
 
     /**
      * @param array $uowExpectedCalls
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\EntityManager
      */
-    protected function getOnFlushEntityManagerMock(array $uowExpectedCalls)
+    protected function getPostFlushEntityManagerMock(array $uowExpectedCalls)
     {
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getUnitOfWork'))
             ->disableOriginalConstructor()
             ->getMock();
 
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->setMethods(array('getScheduledEntityInsertions', 'getScheduledEntityUpdates', 'propertyChanged'))
             ->disableOriginalConstructor()
             ->getMock();
 
-        $em->expects($this->once())->method('getUnitOfWork')->will($this->returnValue($uow));
+        $em->expects($this->any())->method('getUnitOfWork')->will($this->returnValue($uow));
+        $em->expects($this->once())->method('flush');
 
         $index = 0;
         foreach ($uowExpectedCalls as $expectedCall) {

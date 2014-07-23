@@ -32,6 +32,9 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )

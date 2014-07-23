@@ -30,11 +30,16 @@ class HelpLinkRequestListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new HelpLinkRequestListener($this->container, $this->linkProvider);
+        $this->listener = new HelpLinkRequestListener($this->container);
     }
 
     public function testOnKernelControllerMasterRequest()
     {
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('oro_help.model.help_link_provider')
+            ->will($this->returnValue($this->linkProvider));
+
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterControllerEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -66,6 +71,7 @@ class HelpLinkRequestListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequestType')
             ->will($this->returnValue(HttpKernel::SUB_REQUEST));
 
+        $this->container->expects($this->never())->method('get');
         $this->linkProvider->expects($this->never())->method($this->anything());
 
         $this->listener->onKernelController($event);

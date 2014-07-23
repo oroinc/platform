@@ -3,12 +3,12 @@
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SearchHandler implements SearchHandlerInterface
 {
@@ -26,6 +26,7 @@ class SearchHandler implements SearchHandlerInterface
      * @var string
      */
     protected $entityName;
+
     /**
      * @var string
      */
@@ -42,18 +43,18 @@ class SearchHandler implements SearchHandlerInterface
     protected $properties;
 
     /**
-     * @var boolean
+     * @var ObjectManager
      */
-    private $hasMore;
+    protected $objectManager;
 
     /**
-     * @var EntityManager $manager
+     * @var AclHelper $aclHelper
      */
-    protected $manager;
+    protected $aclHelper;
 
     /**
      * @param string $entityName
-     * @param array $properties
+     * @param array  $properties
      */
     public function __construct($entityName, array $properties)
     {
@@ -71,7 +72,7 @@ class SearchHandler implements SearchHandlerInterface
 
     /**
      * @param Indexer $indexer
-     * @param array $config
+     * @param array   $config
      * @throws \RuntimeException
      */
     public function initSearchIndexer(Indexer $indexer, array $config)
@@ -90,34 +91,29 @@ class SearchHandler implements SearchHandlerInterface
     public function initDoctrinePropertiesByManagerRegistry(ManagerRegistry $managerRegistry)
     {
         $objectManager = $managerRegistry->getManagerForClass($this->entityName);
-        if (!$objectManager instanceof EntityManager) {
+        if (!$objectManager instanceof ObjectManager) {
             throw new \RuntimeException(
-                'Object manager for "%s" expected to be an instance of "%s".',
-                $this->entityName,
-                'Doctrine\ORM\EntityManager'
+                sprintf(
+                    'Object manager for "%s" expected to be an instance of "%s".',
+                    $this->entityName,
+                    'Doctrine\ORM\ObjectManager'
+                )
             );
         }
         $this->initDoctrinePropertiesByEntityManager($objectManager);
     }
 
     /**
-     * @param EntityManager $entityManager
+     * @param ObjectManager $objectManager
      */
-    public function initDoctrinePropertiesByEntityManager(EntityManager $entityManager)
-    {
-        $this->entityRepository = $entityManager->getRepository($this->entityName);
-        $this->idFieldName = $this->getEntityIdentifierFieldName($entityManager);
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     * @return string
-     */
-    protected function getEntityIdentifierFieldName(EntityManager $entityManager)
+    public function initDoctrinePropertiesByEntityManager(ObjectManager $objectManager)
     {
         /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
-        $metadata = $entityManager->getMetadataFactory()->getMetadataFor($this->entityName);
-        return $metadata->getSingleIdentifierFieldName();
+        $metadata = $objectManager->getMetadataFactory()->getMetadataFor($this->entityName);
+
+        $this->entityRepository = $objectManager->getRepository($this->entityName);
+        $this->idFieldName      = $metadata->getSingleIdentifierFieldName();
+        $this->objectManager    = $objectManager;
     }
 
     /**
@@ -127,27 +123,30 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->checkAllDependenciesInjected();
 
-        $page = (int)$page > 0 ? (int)$page : 1;
+        $page    = (int)$page > 0 ? (int)$page : 1;
         $perPage = (int)$perPage > 0 ? (int)$perPage : 10;
         $perPage += 1;
         $firstResult = ($page - 1) * $perPage;
 
-        if ($query == '') {
-            $items = $this->manager->getRepository($this->entityName)->findBy(array(), null, $perPage, $firstResult);
-        } elseif ($searchById) {
-            $items = array(
-                $this->manager->getRepository($this->entityName)->find($query, null, $perPage, $firstResult)
-            );
+        if ($searchById) {
+            $items = [
+                $this->objectManager
+                    ->getRepository($this->entityName)
+                    ->find($query)
+            ];
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
 
-        $this->hasMore = count($items) == $perPage;
-        if ($this->hasMore) {
+        $hasMore = count($items) == $perPage;
+        if ($hasMore) {
             $items = array_slice($items, 0, $perPage - 1);
         }
 
-        return $this->formatResult($items);
+        return array(
+            'results' => $this->convertItems($items),
+            'more'    => $hasMore
+        );
     }
 
     /**
@@ -161,23 +160,11 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param array $items
-     * @return array
-     */
-    protected function formatResult(array $items)
-    {
-        return array(
-            'results' => $this->convertItems($items),
-            'more' => $this->hasMore
-        );
-    }
-
-    /**
      * Search and return entities
      *
      * @param string $search
-     * @param int $firstResult
-     * @param int $maxResults
+     * @param int    $firstResult
+     * @param int    $maxResults
      * @return array
      */
     protected function searchEntities($search, $firstResult, $maxResults)
@@ -190,11 +177,8 @@ class SearchHandler implements SearchHandlerInterface
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
             $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-            $currentEntities = $queryBuilder->getQuery()->getResult();
-
-            foreach ($currentEntities as $entity) {
-                $resultEntities[] = $entity;
-            }
+            $query = $this->aclHelper->apply($queryBuilder, 'ASSIGN');
+            $resultEntities = $query->getResult();
         }
 
         return $resultEntities;
@@ -202,13 +186,13 @@ class SearchHandler implements SearchHandlerInterface
 
     /**
      * @param string $search
-     * @param int $firstResult
-     * @param int $maxResults
+     * @param int    $firstResult
+     * @param int    $maxResults
      * @return array
      */
     protected function searchIds($search, $firstResult, $maxResults)
     {
-        $result = $this->indexer->simpleSearch($search, $firstResult, $maxResults, $this->entitySearchAlias);
+        $result   = $this->indexer->simpleSearch($search, $firstResult, $maxResults, $this->entitySearchAlias);
         $elements = $result->getElements();
 
         $ids = array();
@@ -251,7 +235,7 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|array $item
      * @return mixed
      */
@@ -282,10 +266,10 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param EntityManager $manager
+     * @param AclHelper $aclHelper
      */
-    public function setEntityManager(EntityManager $manager)
+    public function setAclHelper(AclHelper $aclHelper)
     {
-        $this->manager = $manager;
+        $this->aclHelper = $aclHelper;
     }
 }

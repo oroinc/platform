@@ -192,19 +192,22 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     }
 
     /**
-     * @param array $orderedFields
+     * @param array  $orderedFields
+     * @param string $alias
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getDynamicSortersAndFilters(array $orderedFields)
+    public function getDynamicSortersAndFilters(array $orderedFields, $alias = '')
     {
         $filters = $sorters = [];
 
         // add sorters and filters if needed
         foreach ($orderedFields as $fieldName => $field) {
             if (isset($field['sortable']) && $field['sortable']) {
-                $sorters['columns'][$fieldName] = ['data_name' => $field['expression']];
+                $sorters['columns'][$fieldName] = [
+                    'data_name' =>  isset($field['expression']) ? $field['expression'] : $alias . $fieldName
+                ];
             }
 
             if (isset($field['filterable']) && $field['filterable']) {

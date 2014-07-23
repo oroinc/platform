@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app'],
-function($, _, __, app) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'],
+function($, _, __, tools) {
     'use strict';
 
     return {
@@ -24,7 +24,7 @@ function($, _, __, app) {
                 errors.push(err);
             } if (!_.isUndefined(err.message)) {
                 // exception object
-                if (app.debug) {
+                if (tools.debug) {
                     errors.push(err.message);
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
@@ -35,7 +35,7 @@ function($, _, __, app) {
             }
             if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
                 // JSON REST response
-                _.each(err.errors, function(value) { errors.push(__(value)); });
+                _.each(err.errors, function(value) { errors.push(value); });
             }
             this.addErrors(container, errors);
 
@@ -50,8 +50,7 @@ function($, _, __, app) {
                         this.removeFieldErrors(field);
 
                         if (!_.isUndefined(value.errors) && _.isArray(value.errors)) {
-                            this.addFieldErrors(field,
-                                _.map(value.errors, function(val) { return __(val) }));
+                            this.addFieldErrors(field, value.errors);
                         }
                     }, this));
                 this.setFocusOnFirstErrorField(container);

@@ -1,6 +1,6 @@
 /*global define, alert*/
-define(['underscore', 'backbone', 'routing', 'oronavigation/js/navigation', 'orolocale/js/formatter/datetime', 'autolinker'],
-function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
+define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime', 'autolinker'],
+function (_, Backbone, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
     var $ = Backbone.$;
@@ -35,10 +35,24 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
         },
 
         render: function (collapsed) {
+            this.collapsed = _.isUndefined(collapsed) ? false : collapsed;;
+
+            var html = this.template(this._prepareTemplateData());
+
+            this.$el.empty();
+            this.$el.append(html);
+
+            return this;
+        },
+
+        _prepareTemplateData: function () {
             var data = this.model.toJSON();
-            data['collapsed'] = _.isUndefined(collapsed) ? false : collapsed;
+
+            data['collapsed'] = this.collapsed;
             data['createdAt'] = dateTimeFormatter.formatDateTime(data['createdAt']);
             data['updatedAt'] = dateTimeFormatter.formatDateTime(data['updatedAt']);
+            data['createdBy_url'] = null;
+            data['updatedBy_url'] = null;
             if (data['createdBy_id'] && data['createdBy_viewable']) {
                 data['createdBy_url'] = routing.generate('oro_user_view', {'id': data['createdBy_id']});
             }
@@ -54,17 +68,7 @@ function (_, Backbone, routing, Navigation, dateTimeFormatter, autolinker) {
             }
             data['brief_message'] = autolinker.link(data['brief_message'], {className: 'no-hash'});
 
-            var html = this.template(data);
-
-            this.$el.empty();
-            this.$el.append(html);
-
-            var navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.processClicks(this.$el.find('a'));
-            }
-
-            return this;
+            return data;
         },
 
         _edit: function () {

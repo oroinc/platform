@@ -7,7 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\MigrationBundle\Command\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
+
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
@@ -71,12 +72,13 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                         $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                     }
                 } else {
-                    $logger      = new OutputLogger($output, true, null, '  ');
+                    $logger      = new OutputLogger($output, true, null, '  ', true);
                     $queryLogger = new OutputLogger(
                         $output,
                         true,
                         $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
-                        '    '
+                        '    ',
+                        true
                     );
                     $executor    = $this->getMigrationExecutor($input);
                     $executor->setLogger($logger);

@@ -1,9 +1,10 @@
 parameters:
-    oro_attachment.form.type.file_config.class: Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
-    oro_attachment.form.type.file.class:              Oro\Bundle\AttachmentBundle\Form\Type\FileType
-    oro_attachment.form.type.image.class:             Oro\Bundle\AttachmentBundle\Form\Type\ImageType
-    oro_attachment.form.file_subscriber.class:        Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
+    oro_attachment.form.type.file_config.class:           Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
+    oro_attachment.form.type.file.class:                  Oro\Bundle\AttachmentBundle\Form\Type\FileType
+    oro_attachment.form.type.image.class:                 Oro\Bundle\AttachmentBundle\Form\Type\ImageType
+    oro_attachment.form.file_subscriber.class:            Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
     oro_attachment.validator.file_config_validator.class: Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator
+    oro_attachment.form.handler.attachment.class:         Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler
 
 services:
     oro_attachment.form.type.file_config:
@@ -32,3 +33,10 @@ services:
     oro_attachment.validator.file_config_validator:
         class: %oro_attachment.validator.file_config_validator.class%
         arguments: [@validator, @oro_entity_config.config_manager, @oro_config.user]
+
+    oro_attachment.form.handler.attachment:
+        class: %oro_attachment.form.handler.attachment.class%
+        scope: request
+        arguments:
+            - @request
+            - @doctrine.orm.entity_manager

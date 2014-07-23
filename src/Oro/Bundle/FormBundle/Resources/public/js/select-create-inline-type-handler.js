@@ -1,6 +1,6 @@
 /* global define */
-define(['oro/dialog-widget', 'orotranslation/js/translator', 'jquery.select2'],
-function (DialogWidget, __) {
+define(['oro/dialog-widget', 'oroui/js/widget-manager', 'orotranslation/js/translator', 'jquery.select2'],
+function (DialogWidget, widgetManager, __) {
     'use strict';
 
     /**
@@ -32,8 +32,16 @@ function (DialogWidget, __) {
             });
 
             var processSelectedEntities = function (data) {
-                selectorEl.select2('val', data.model.get(existingEntityGridId));
-                entitySelectDialog.remove();
+                entitySelectDialog._showLoading();
+                selectorEl.select2('val', data.model.get(existingEntityGridId), true);
+                selectorEl.on('change', function(){
+                    widgetManager.getWidgetInstance(
+                        entitySelectDialog._wid,
+                        function(widget) {
+                            widget.remove();
+                        }
+                    );
+                })
             };
 
             entitySelectDialog.on('grid-row-select', _.bind(processSelectedEntities, this));

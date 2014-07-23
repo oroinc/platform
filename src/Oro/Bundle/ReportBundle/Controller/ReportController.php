@@ -39,26 +39,26 @@ class ReportController extends Controller
 
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
-            }
 
-            $datagrid = $this->get('oro_datagrid.datagrid.manager')
-                ->getDatagrid(
-                    $gridName,
-                    array(PagerInterface::PAGER_ROOT_PARAM => array(PagerInterface::DISABLED_PARAM => true))
-                );
+                $datagrid = $this->get('oro_datagrid.datagrid.manager')
+                    ->getDatagrid(
+                        $gridName,
+                        [PagerInterface::PAGER_ROOT_PARAM => [PagerInterface::DISABLED_PARAM => true]]
+                    );
 
-            $chartOptions = $this
-                ->get('oro_chart.options_builder')
-                ->buildOptions(
-                    $entity->getChartOptions(),
-                    $datagrid->getConfig()->toArray()
-                );
+                $chartOptions = $this
+                    ->get('oro_chart.options_builder')
+                    ->buildOptions(
+                        $entity->getChartOptions(),
+                        $datagrid->getConfig()->toArray()
+                    );
 
-            if (!empty($chartOptions)) {
-                $parameters['chartView'] = $this->get('oro_chart.view_builder')
-                    ->setDataGrid($datagrid)
-                    ->setOptions($chartOptions)
-                    ->getView();
+                if (!empty($chartOptions)) {
+                    $parameters['chartView'] = $this->get('oro_chart.view_builder')
+                        ->setDataGrid($datagrid)
+                        ->setOptions($chartOptions)
+                        ->getView();
+                }
             }
         }
 
@@ -129,8 +129,20 @@ class ReportController extends Controller
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_report_update', 'parameters' => ['id' => $entity->getId()]],
-                ['route' => 'oro_report_view', 'parameters' => ['id' => $entity->getId()]],
+                [
+                    'route' => 'oro_report_update',
+                    'parameters' => [
+                        'id' => $entity->getId(),
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
+                [
+                    'route' => 'oro_report_view',
+                    'parameters' => [
+                        'id' => $entity->getId(),
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
                 $entity
             );
         }

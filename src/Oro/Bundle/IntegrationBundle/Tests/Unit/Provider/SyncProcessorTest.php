@@ -64,13 +64,24 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject|SyncProcessor
      */
-    protected function getSyncProcessor($mockedMethods = [])
+    protected function getSyncProcessor($mockedMethods = null)
     {
+        $repository = $this
+            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry->expects($this->any())->method('getManager')
+            ->will($this->returnValue($this->em));
+        $registry->expects($this->any())->method('getRepository')
+            ->will($this->returnValue($repository));
+
         return $this->getMock(
             'Oro\Bundle\IntegrationBundle\Provider\SyncProcessor',
             $mockedMethods,
             [
-                $this->em,
+                $registry,
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,
@@ -97,24 +108,35 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testOneChannelConnectorProcess()
     {
-        $connector = 'testConnector';
-        $this->integration->expects($this->never())
-            ->method('getConnectors');
-        $this->integration->expects($this->once())
+        $connector  = 'testConnector';
+        $connectors = [$connector];
+
+        $this->integration
+            ->expects($this->once())
+            ->method('getConnectors')
+            ->will($this->returnValue($connectors));
+
+        $this->integration
+            ->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('testChannel'));
-        $this->integration->expects($this->once())
+
+        $this->integration
+            ->expects($this->once())
             ->method('getEnabled')
             ->will($this->returnValue(true));
+
         $realConnector = new TestConnector();
-        $this->registry->expects($this->once())
+        $this->registry
+            ->expects($this->once())
             ->method('getConnectorType')
             ->will($this->returnValue($realConnector));
-        $this->processorRegistry->expects($this->once())
+
+        $this->processorRegistry
+            ->expects($this->once())
             ->method('getProcessorAliasesByEntity')
             ->will($this->returnValue([]));
-        $this->em->expects($this->never())
-            ->method('getRepository');
+
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
@@ -134,14 +156,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($jobResult));
 
-        $processor = new SyncProcessor(
-            $this->em,
-            $this->processorRegistry,
-            $this->jobExecutor,
-            $this->registry,
-            $this->log
-        );
-
+        $processor = $this->getSyncProcessor();
         $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 }

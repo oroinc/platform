@@ -1,0 +1,42 @@
+<div class="widget-content">
+    {% if saved is defined and saved %}
+        <script type="text/javascript">
+            require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
+            function(_, __, widgetManager, messenger, mediator) {
+                widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    {% if update is defined and update %}
+                    messenger.notificationFlashMessage('success', __('Attachment updated successfully'));
+                    mediator.trigger('datagrid:doRefresh:' + 'attachment-grid');
+                    {% else %}
+                    messenger.notificationFlashMessage('success', __('Attachment created successfully'));
+                    {% endif %}
+
+                    mediator.trigger('widget_success:' + widget.getWid());
+
+                    widget.remove();
+                });
+            });
+        </script>
+    {% else %}
+        {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+        <div class="form-container">
+            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post">
+                <fieldset class="form form-horizontal">
+                    <div class="span6">
+                        {{ form_row(form.file) }}
+                        {{ form_row(form.comment) }}
+                        {% if form.owner is defined %}
+                            {{ form_row(form.owner) }}
+                        {% endif %}
+                        {{ form_rest(form) }}
+                    </div>
+                    <div class="widget-actions form-actions" style="display: none;">
+                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    </div>
+                </fieldset>
+            </form>
+            {{ oro_form_js_validation(form) }}
+        </div>
+    {% endif %}
+</div>

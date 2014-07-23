@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
@@ -20,16 +21,16 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
+class FieldTypeReverseRelationTest extends TypeTestCase
 {
+    const FIELDS_GROUP    = 'oro.entity_extend.form.data_type_group.fields';
+    const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
+
     /** @var  FieldType $type */
     protected $type;
 
     /** @var  \ReflectionClass */
     protected $typeReflection;
-
-    /** @var  FormFactory */
-    protected $factory;
 
     /** @var  ConfigManager */
     protected $configManagerMock;
@@ -37,24 +38,28 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
     /** @var  Translator */
     protected $translatorMock;
 
-    protected $defaultFieldTypesKeys = [
-        'string',
-        'integer',
-        'smallint',
-        'bigint',
-        'boolean',
-        'decimal',
-        'date',
-        'text',
-        'float',
-        'money',
-        'percent',
-        'file',
-        'image',
-        'oneToMany',
-        'manyToOne',
-        'manyToMany',
-        'optionSet'
+    protected $defaultFieldTypeChoices = [
+        self::FIELDS_GROUP    => [
+            'bigint'   => 'oro.entity_extend.form.data_type.bigint',
+            'boolean'  => 'oro.entity_extend.form.data_type.boolean',
+            'date'     => 'oro.entity_extend.form.data_type.date',
+            'decimal'  => 'oro.entity_extend.form.data_type.decimal',
+            'file'     => 'oro.entity_extend.form.data_type.file',
+            'float'    => 'oro.entity_extend.form.data_type.float',
+            'image'    => 'oro.entity_extend.form.data_type.image',
+            'integer'  => 'oro.entity_extend.form.data_type.integer',
+            'money'    => 'oro.entity_extend.form.data_type.money',
+            'percent'  => 'oro.entity_extend.form.data_type.percent',
+            'smallint' => 'oro.entity_extend.form.data_type.smallint',
+            'string'   => 'oro.entity_extend.form.data_type.string',
+            'text'     => 'oro.entity_extend.form.data_type.text',
+        ],
+        self::RELATIONS_GROUP => [
+            'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
+            'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
+            'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
+            'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
+        ]
     ];
 
     protected $formOptions = array(
@@ -65,16 +70,6 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $validator = new Validator(
-            new ClassMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new DefaultTranslator()
-        );
-
-        $this->factory           = Forms::createFormFactoryBuilder()
-            ->addTypeExtension(new DataBlockExtension())
-            ->addTypeExtension(new FormTypeValidatorExtension($validator))
-            ->getFormFactory();
         $this->configManagerMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -100,18 +95,46 @@ class FieldTypeReverseRelationTest extends \PHPUnit_Framework_TestCase
         $this->typeReflection = new \ReflectionClass($this->type);
     }
 
+    protected function getExtensions()
+    {
+        $validator = new Validator(
+            new ClassMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory(),
+            new DefaultTranslator()
+        );
+
+        $select2ChoiceType = new Select2Type('choice');
+
+        return array(
+            new PreloadedExtension(
+                [
+                    $select2ChoiceType->getName() => $select2ChoiceType,
+                ],
+                [
+                    'form' => [
+                        new DataBlockExtension(),
+                        new FormTypeValidatorExtension($validator)
+                    ]
+                ]
+            )
+        );
+    }
+
     public function testTypeWithReverseRelationManyToOne()
     {
         $this->prepareTestTypeWithRelations();
 
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
-        $this->assertEquals(
-            array_merge(
-                $this->defaultFieldTypesKeys,
-                ['manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o||']
-            ),
-            array_keys($form->offsetGet('type')->getConfig()->getOption('choices'))
+        $expectedChoices = $this->defaultFieldTypeChoices;
+        $typeName = 'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o||';
+        $expectedChoices[self::RELATIONS_GROUP] = array_merge(
+            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation'],
+            $expectedChoices[self::RELATIONS_GROUP]
+        );
+        $this->assertSame(
+            $expectedChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
         );
 
         $form->submit(['fieldName' => 'rev_rel_m_t_o', 'type' => 'oneToMany']);

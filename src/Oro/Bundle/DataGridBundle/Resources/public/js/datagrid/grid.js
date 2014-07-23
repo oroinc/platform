@@ -46,12 +46,12 @@ define(function (require) {
         /** @property */
         template: _.template(
             '<div class="toolbar"></div>' +
-                '<div class="container-fluid">' +
+                '<div class="container-fluid grid-container-parent">' +
                 '<div class="grid-container">' +
                 '<table class="grid table-hover table table-bordered table-condensed"></table>' +
                 '<div class="no-data"></div>' +
-                '<div class="loading-mask"></div>' +
                 '</div>' +
+                '<div class="loading-mask"></div>' +
                 '</div>'
         ),
 
@@ -166,7 +166,7 @@ define(function (require) {
         },
 
         /**
-         * Inits this.rowActions and this.rowClickAction
+         * Init this.rowActions and this.rowClickAction
          *
          * @private
          */
@@ -389,7 +389,7 @@ define(function (require) {
          * @private
          */
         _listenToCollectionEvents: function () {
-            this.collection.on('request', function (model, xhr, options) {
+            this.collection.on('request', function (model, xhr) {
                 this._beforeRequest();
                 var self = this;
                 var always = xhr.always;
@@ -504,6 +504,8 @@ define(function (require) {
                 $el.append(this.footer.render().$el);
             }
             $el.append(this.body.render().$el);
+
+            mediator.trigger("grid_load:complete", this.collection, $el);
         },
 
         /**
@@ -526,12 +528,12 @@ define(function (require) {
          */
         _defineNoDataBlock: function () {
             var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
-                template = _.isEmpty(this.collection.state.filters) ?
-                        'oro.datagrid.noentities' : 'oro.datagrid.noresults';
-            template = this.noColumnsFlag ? 'oro.datagrid.nocolumns' : template;
+                message = _.isEmpty(this.collection.state.filters) ?
+                        'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+            message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hint: __(template, placeholders).replace('\n', '<br />')
+                hint: __(message, placeholders).replace('\n', '<br />')
             }))).hide();
         },
 

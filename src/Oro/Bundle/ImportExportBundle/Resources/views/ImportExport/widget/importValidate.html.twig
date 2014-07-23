@@ -122,7 +122,7 @@
 
     <script type="text/javascript">
         require(['jquery', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
-        function($, __, WidgetManager, Messanger) {
+        function($, __, WidgetManager, Messenger) {
             var container = $('#import-validation');
             var toggleErrors = function(e) {
                 e.preventDefault();
@@ -150,7 +150,7 @@
                 {% if isSuccessful %}
                     var importAction = $('<button type="button" class="btn btn-primary">{{ 'Import'|trans }}</button>');
                     importAction.on('click', function(e) {
-                        Messanger.notificationFlashMessage(
+                        Messenger.notificationFlashMessage(
                             'info',
                             {{ 'Import started, please wait...'|trans|json_encode|raw }}
                         );
@@ -164,10 +164,10 @@
                                 var link = '<a href="' + data.errorsUrl + '" class="no-hash" target="_blank">' + __('Download error log') + '</a>';
                                 message += ' ' + link;
                             }
-                            Messanger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
+                            Messenger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
                             widget.remove();
                         }).fail(function() {
-                            Messanger.notificationFlashMessage('error', {{ 'Import process failed'|trans|json_encode|raw }});
+                            Messenger.notificationFlashMessage('error', {{ 'Import process failed'|trans|json_encode|raw }});
                             widget.trigger('contentLoad', '', widget);
                         });
 

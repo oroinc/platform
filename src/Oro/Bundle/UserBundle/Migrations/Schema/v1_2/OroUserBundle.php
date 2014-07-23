@@ -58,7 +58,22 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         if (!empty($userImages)) {
             foreach ($userImages as $userData) {
                 $filePath = $this->getUploadFileName($userData);
-                $this->container->get('oro_attachment.manager')->copyLocalFileToStorage($filePath, $userData['image']);
+                // file doesn't exists or not readable
+                if (false === $filePath || !is_readable($filePath)) {
+                    $this->container->get('logger')
+                        ->addAlert(
+                            sprintf('There\'s no image %s for user %d exists.', $userData['image'], $userData['id'])
+                        );
+                    continue;
+                }
+
+                try {
+                    $this->container->get('oro_attachment.manager')
+                        ->copyLocalFileToStorage($filePath, $userData['image']);
+                } catch (\Exception $e) {
+                    $this->container->get('logger')
+                        ->addError(sprintf('File copy error: %s', $e->getMessage()));
+                }
 
                 $file       = new SymfonyFile($filePath);
                 $fileEntity = new File();
@@ -104,7 +119,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
             $schema->getTable('oro_user'),
             ['owner_user_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 
@@ -126,7 +141,12 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         );
     }
 
-    protected function getUploadFileName($userData)
+    /**
+     * @param array $userData
+     *
+     * @return string|false
+     */
+    protected function getUploadFileName(array $userData)
     {
         $ds         = DIRECTORY_SEPARATOR;
         $dateObject = new \DateTime($userData['createdAt']);

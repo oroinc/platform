@@ -91,7 +91,7 @@ class EntitySecurityMetadataProvider
         $securityTypes = array();
         foreach ($this->securityConfigProvider->getConfigs() as $securityConfig) {
             $securityType = $securityConfig->get('type');
-            if (!in_array($securityType, $securityTypes, true)) {
+            if ($securityType && !in_array($securityType, $securityTypes, true)) {
                 $securityTypes[] = $securityType;
             }
         }

@@ -9,6 +9,7 @@ parameters:
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
     oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
     oro_ui.twig.tab.class:               Oro\Bundle\UIBundle\Twig\TabExtension
+    oro_ui.twig.content.class:           Oro\Bundle\UIBundle\Twig\ContentExtension
 
     twig.class:                          Oro\Bundle\UIBundle\Twig\Environment
     twig.cache_warmer.class:             Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
@@ -45,6 +46,8 @@ services:
 
     oro_ui.twig.widget_extension:
         class: %oro_ui.twig.widget.class%
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: twig.extension }
 
@@ -76,5 +79,19 @@ services:
             - @twig
             - @oro_ui.placeholder.provider
             - @twig.extension.httpkernel
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: twig.extension }
+
+    twig.extension.text:
+        class: Twig_Extensions_Extension_Text
+        tags:
+           - { name: twig.extension }
+
+    oro_ui.twig.content_extension:
+        class: %oro_ui.twig.content.class%
+        arguments:
+            - @oro_ui.content_provider.manager
         tags:
             - { name: twig.extension }

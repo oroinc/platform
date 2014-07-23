@@ -3,9 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
@@ -19,6 +17,7 @@ class Builder
     const DATASOURCE_TYPE_PATH     = '[source][type]';
     const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
     const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
+    const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
 
     /** @var string */
     protected $baseDatagridClass;
@@ -35,19 +34,16 @@ class Builder
     /** @var ExtensionVisitorInterface[] */
     protected $extensions = [];
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    public function __construct(
-        $baseDatagridClass,
-        $acceptorClass,
-        EventDispatcherInterface $eventDispatcher,
-        SecurityFacade $securityFacade
-    ) {
+    /**
+     * @param                          $baseDatagridClass
+     * @param                          $acceptorClass
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct($baseDatagridClass, $acceptorClass, EventDispatcherInterface $eventDispatcher)
+    {
         $this->baseDatagridClass = $baseDatagridClass;
         $this->acceptorClass     = $acceptorClass;
         $this->eventDispatcher   = $eventDispatcher;
-        $this->securityFacade    = $securityFacade;
     }
 
     /**
@@ -67,14 +63,6 @@ class Builder
         $acceptor = new $this->acceptorClass();
         $acceptor->setConfig($config);
 
-        /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor, $parameters);
-
-        $event = new BuildBefore($datagrid, $config);
-        $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
-
-        $this->buildDataSource($datagrid, $config);
-
         foreach ($this->extensions as $extension) {
             /**
              * ATTENTION: extension object should be cloned cause it can contain some state
@@ -87,6 +75,13 @@ class Builder
             }
         }
 
+        /** @var DatagridInterface $datagrid */
+        $datagrid = new $class($name, $acceptor, $parameters);
+
+        $event = new BuildBefore($datagrid, $config);
+        $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
+
+        $this->buildDataSource($datagrid, $config);
         $acceptor->processConfiguration();
 
         $event = new BuildAfter($datagrid);
@@ -146,23 +141,6 @@ class Builder
             throw new \RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
         }
 
-        $acl = $config->offsetGetByPath(self::DATASOURCE_ACL_PATH);
-        if ($acl && !$this->isResourceGranted($acl)) {
-            throw new AccessDeniedException('Access denied.');
-        }
-
         $this->dataSources[$sourceType]->process($grid, $config->offsetGetByPath(self::DATASOURCE_PATH, []));
-    }
-
-    /**
-     * Checks if an access to a resource is granted or not
-     *
-     * @param string $aclResource An ACL annotation id or "permission;descriptor"
-     *
-     * @return bool
-     */
-    protected function isResourceGranted($aclResource)
-    {
-        return $this->securityFacade->isGranted($aclResource);
     }
 }

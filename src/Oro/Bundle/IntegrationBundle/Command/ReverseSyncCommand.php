@@ -11,7 +11,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
+
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 
 /**
@@ -27,6 +28,8 @@ class ReverseSyncCommand extends ContainerAwareCommand
     const INTEGRATION_ARG_NAME = 'integration';
     const CONNECTOR_ARG_NAME   = 'connector';
     const PARAMETERS_ARG_NAME  = 'params';
+    const STATUS_SUSSES        = 0;
+    const STATUS_FAILED        = 255;
 
     /**
      * {@inheritdoc}
@@ -51,6 +54,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
         $convertedParams = unserialize(stripslashes($params));
         $logger          = new OutputLogger($output);
         $processor       = $this->getService(self::SYNC_PROCESSOR);
+        $exitCode        = self::STATUS_SUSSES;
         /** @var ChannelRepository $repository */
         $repository = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');
@@ -69,7 +73,8 @@ class ReverseSyncCommand extends ContainerAwareCommand
 
         if ($this->isJobRunning($integrationId, $connectorType, $params)) {
             $logger->warning('Job already running. Terminating....');
-            return 0;
+
+            return self::STATUS_SUCCESS;
         }
 
         try {
@@ -89,11 +94,13 @@ class ReverseSyncCommand extends ContainerAwareCommand
             $processor->process($integration, $connectorType, $convertedParams);
         } catch (\Exception $e) {
             $logger->critical($e->getMessage(), ['exception' => $e]);
+
+            $exitCode = self::STATUS_FAILED;
         }
 
         $logger->notice('Completed');
 
-        return 0;
+        return $exitCode;
     }
 
     /**

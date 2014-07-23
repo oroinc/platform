@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
@@ -30,6 +31,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      * @param EntityManager        $em
      * @param EmailEntityBuilder   $emailEntityBuilder
      * @param EmailAddressManager  $emailAddressManager
+     * @param EmailAddressHelper   $emailAddressHelper
      * @param ImapConnectorFactory $connectorFactory
      * @param Mcrypt               $encryptor
      */
@@ -37,10 +39,11 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
         EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper,
         ImapConnectorFactory $connectorFactory,
         Mcrypt $encryptor
     ) {
-        parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
+        parent::__construct($em, $emailEntityBuilder, $emailAddressManager, $emailAddressHelper);
         $this->connectorFactory = $connectorFactory;
         $this->encryptor        = $encryptor;
     }

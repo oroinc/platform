@@ -32,6 +32,9 @@ parameters:
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
+    oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
+    oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
+
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -120,7 +123,9 @@ services:
     oro_integration.writer.persistent_batch_writer:
         class: %oro_integration.writer.persistent_batch_writer.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
+            - @event_dispatcher
+            - @oro_importexport.context_registry
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
@@ -131,14 +136,14 @@ services:
     oro_integration.helper.default_owner_helper:
         class: %oro_integration.helper.default_owner_helper.class%
         arguments:
-            - @doctrine.orm.default_entity_manager
+            - @doctrine
             - @oro_security.owner.ownership_metadata_provider
 
     # sync processor
     oro_integration.sync.processor:
         class: %oro_integration.sync.processor.class%
         arguments:
-          - @doctrine.orm.entity_manager
+          - @doctrine
           - @oro_importexport.processor.registry
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
@@ -149,7 +154,7 @@ services:
         class: %oro_integration.provider.connector_context_mediator.class%
         arguments:
             - @oro_integration.manager.types_registry.link
-            - @doctrine.orm.entity_manager
+            - @doctrine
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
@@ -165,7 +170,6 @@ services:
     oro_integration.reverse_sync.processor:
         class: %oro_integration.reverse_sync.processor.class%
         arguments:
-            - @doctrine.orm.entity_manager
             - @oro_importexport.processor.registry
             - @oro_integration.job_executor
             - @oro_integration.manager.types_registry
@@ -191,4 +195,20 @@ services:
         class: %oro_integration.utils.form_utils.class%
         arguments:
             - @oro_integration.manager.types_registry
+
+    oro_integration.datagrid.status_grid_helper:
+        class: %oro_integration.datagrid.status_grid_helper.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @translator
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-integration-status-grid, method: statusGridBuildBefore }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.oro-integration-status-grid, method: statusGridBuildAfter }
+
+    oro_integration.event_listener.keep_avile:
+        class: %oro_integration.event_listener.keep_avile.class%
+        arguments:
+            - @akeneo_batch.job_repository
+        tags:
+            - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 

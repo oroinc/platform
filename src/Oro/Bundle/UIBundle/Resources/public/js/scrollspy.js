@@ -5,13 +5,13 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var app = require('oroui/js/app');
+    var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
 
     var scrollspy = {};
 
     scrollspy.init = function (container) {
-        if (app.isMobile()) {
+        if (tools.isMobile()) {
             scrollspy._replaceWithCollapse(container);
             return;
         }
@@ -57,7 +57,7 @@ define(function (require) {
     };
 
     scrollspy.adjust = function () {
-        if (app.isMobile()) {
+        if (tools.isMobile()) {
             return;
         }
 
@@ -79,12 +79,14 @@ define(function (require) {
                 }
             });
 
-            $spy.scrollspy('refresh').scrollspy('process');
+            if ($spy.data('scrollspy')) {
+                $spy.scrollspy('refresh').scrollspy('process');
+            }
         });
     };
 
     scrollspy.top = function () {
-        if (app.isMobile()) {
+        if (tools.isMobile()) {
             return;
         }
 

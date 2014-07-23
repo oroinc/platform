@@ -1,6 +1,7 @@
 .list-bar-wrapper {
   background-image: none;
   background-color: @logoBackgroundColor;
+  min-height: 24px;
 }
 .pin-bar {
   float: right;
@@ -179,17 +180,23 @@
           text-overflow:ellipsis;
           -o-text-overflow:ellipsis;
         }
-        &.icon-remove {
-          position:absolute;
-          right:14px;
-          font-size:0;
-          color: transparent;
-          &:before {
-            position:absolute;
-            top:5px;
-            font-size:12px;
-            color:@headerTextColor;
-          }
+      }
+      .icon-remove {
+        position:absolute;
+        top: 5px;
+        right: 5px;
+        width: 13px;
+        height: 13px;
+        display: block;
+        background-color: transparent;
+        color: transparent;
+        font-size:0;
+        padding: 0;
+        margin: 0;
+        border-width: 0;
+        &:before {
+          font-size:12px;
+          color:@headerTextColor;
         }
       }
       &:hover {

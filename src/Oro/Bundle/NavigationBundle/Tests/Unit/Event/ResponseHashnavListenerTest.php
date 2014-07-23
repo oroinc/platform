@@ -128,7 +128,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
         $this->response->setStatusCode(503);
         $this->templating->expects($this->never())->method('renderResponse');
 
-        $this->event->expects($this->never())->method('setResponse');
+        $this->event->expects($this->once())->method('setResponse');
         $listener->onResponse($this->event);
     }
 

@@ -61,7 +61,7 @@ class ProcessorRegistry
 
         if (!empty($this->processors[$type][$alias])) {
             throw new LogicException(
-                sprintf('Processor with type "%s" and alias "%s" already exists', $type, $entityName)
+                sprintf('Processor with type "%s" and alias "%s" already exists', $type, $alias)
             );
         }
 

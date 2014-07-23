@@ -27,8 +27,8 @@
 {% set entityType = entity_output.name|trans %}
 
 {% set entityInfo = [
-    {'title': 'oro.user.created_at.label', 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
-    {'title': 'oro.user.updated_at.label', 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
-    {'title': 'oro.user.last_login.label', 'value': entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'},
-    {'title': 'oro.user.login_count.label', 'value': entity.loginCount|default(0)}
+    {'title': 'oro.ui.created_at'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.ui.updated_at'|trans, 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.user.last_login.label'|trans, 'value': entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'},
+    {'title': 'oro.user.login_count.label'|trans, 'value': entity.loginCount|default(0)}
 ] %}

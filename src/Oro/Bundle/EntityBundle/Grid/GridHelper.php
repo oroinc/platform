@@ -6,14 +6,10 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 
 class GridHelper
 {
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $entityProvider;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $entityNames;
 
     /**

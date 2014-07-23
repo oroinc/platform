@@ -4,7 +4,9 @@
 
 require(['oroui/js/mediator'], function (mediator) {
     'use strict';
-    mediator.once('tab:changed', function () {
+    mediator.once('page:afterChange', function () {
+        //@TODO remove delay, when afterChange event will
+        // take in account rendering from inline scripts
         setTimeout(function () {
             // emulates 'document ready state' for selenium tests
             document['page-rendered'] = true;
@@ -13,26 +15,22 @@ require(['oroui/js/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
-        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
-        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
+        'oroui/js/mediator', 'oroui/js/layout',
+        'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
+    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
     /* ============================================================
      * from layout.js
      * ============================================================ */
     $(function () {
-        layout.init();
-
-        /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
-            if ($('#page-title').size()) {
-                document.title = _.unescape($('#page-title').text());
-            }
-            layout.hideProgressBar();
+        var $pageTitle = $('#page-title');
+        if ($pageTitle.size()) {
+            document.title = _.unescape($pageTitle.text());
         }
+        layout.hideProgressBar();
 
         /* side bar functionality */
         $('div.side-nav').each(function () {
@@ -40,7 +38,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 myParentHolder = $(myParent).parent().height() - 18;
             $(myParent).height(myParentHolder);
             /* open close bar */
-            $(this).find("span.maximaze-bar").click(function () {
+            $(this).find("span.maximize-bar").click(function () {
                 if (($(myParent).hasClass("side-nav-open")) || ($(myParent).hasClass("side-nav-locked"))) {
                     $(myParent).removeClass("side-nav-locked side-nav-open");
                     if ($(myParent).hasClass('left-panel')) {
@@ -94,10 +92,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 var myItem = $(this);
                 $(myItem).find('.sn-opener').click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
-                    var overlayHeight = $('#page').height(),
-                        overlayWidth = $('#page > .wrapper').width();
-                    $('#bar-drop-overlay').width(overlayWidth).height(overlayHeight);
-                    $('#bar-drop-overlay').toggleClass('bar-open-overlay');
+
+                    var $barOverlay   = $('#bar-drop-overlay'),
+                        $page         = $('#page'),
+                        overlayHeight = $page.height(),
+                        overlayWidth  = $page.children('.wrapper').width();
+                    $barOverlay.width(overlayWidth).height(overlayHeight);
+                    $barOverlay.toggleClass('bar-open-overlay');
                 });
                 $(myItem).find("span.close").click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
@@ -176,6 +177,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             $(openDropdownsSelector).removeClass('open');
         });
 
+        mediator.on('page:beforeChange', function () {
+            $('.pin-menus.dropdown.open, .nav .dropdown.open').removeClass('open');
+        });
+
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function (e) {
             var $elem = $(e.target),
@@ -188,20 +193,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
-
-        layout.pageRendered();
     });
 
-    mediator.bind('hash_navigation_request:before', function () {
+    mediator.bind('page:beforeChange', function () {
         layout.pageRendering();
     });
 
     /**
-     * Init page layout js and hide progress bar after hash navigation request is completed
+     * Init page layout js after navigation request is completed
      */
-    mediator.bind("hash_navigation_request:complete", function () {
+    mediator.bind("page:afterChange", function () {
         layout.init();
-        layout.hideProgressBar();
         layout.pageRendered();
     });
 
@@ -209,7 +211,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
      * from height_fix.js
      * ============================================================ */
     (function () {
-        if (app.isMobile()) {
+        if (tools.isMobile()) {
             return;
         }
         /* dynamic height for central column */
@@ -219,7 +221,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
         var initializeContent = function () {
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                if (!app.isMobile()) {
+                if (!tools.isMobile()) {
                     content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
@@ -307,7 +309,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
 
         $(window).on('resize', adjustHeight);
 
-        mediator.on("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("page:afterChange", adjustReloaded);
 
         mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);
@@ -342,37 +344,26 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 });
 
                 confirm.on('ok', function () {
-                    var navigation = Navigation.getInstance();
-                    if (navigation) {
-                        navigation.loadingMask.show();
-                    }
+                    mediator.execute('showLoading');
 
                     $.ajax({
                         url: el.data('url'),
                         type: 'DELETE',
                         success: function (data) {
                             el.trigger('removesuccess');
-                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                            mediator.execute('addMessage', 'success', el.data('success-message'));
                             if (el.data('redirect')) {
-                                $.isActive(true);
-                                if (navigation) {
-                                    navigation.setLocation(el.data('redirect'));
-                                } else {
-                                    window.location.href = el.data('redirect');
-                                }
-                            } else if (navigation) {
-                                navigation.loadingMask.hide();
+                                mediator.execute('redirectTo', {url: el.data('redirect')});
+                            } else {
+                                mediator.execute('hideLoading');
                             }
                         },
                         error: function () {
-                            if (navigation) {
-                                navigation.loadingMask.hide();
-                            }
-
-                            messenger.notificationMessage(
-                                'error',
-                                el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
-                            );
+                            var message;
+                            message = el.data('error-message') ||
+                                __('Unexpected error occurred. Please contact system administrator.');
+                            mediator.execute('hideLoading');
+                            mediator.execute('showMessage', 'error', message);
                         }
                     });
                 });

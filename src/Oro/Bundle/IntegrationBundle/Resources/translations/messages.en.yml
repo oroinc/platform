@@ -42,18 +42,26 @@ oro:
                 active.label:    Active
                 inactive.label:  Inactive
         channel:
-            entity_label:        Integration
-            entity_plural_label: Integrations
-            entity_description:  Represent integration
-            id.label:         Id
-            type.label:       Type
-            transport.label:  Transport type
-            statuses.label:   Statuses
-            name.label:       Name
-            connectors.label: Connectors
+            entity_label:                   Integration
+            entity_plural_label:            Integrations
+            entity_description:             Represent integration
+            id.label:                       Id
+            type.label:                     Type
+            transport.label:                Transport type
+            enabled.label:                  Enabled
+            mapping_settings.label:         Mapping Setting
+            statuses.label:                 Statuses
+            name.label:                     Name
+            connectors.label:               Connectors
             synchronization_settings.label: Synchronization Settings
-            organization.label: Organization
-            default_user_owner.label: Default owner
+            organization.label:             Organization
+            default_user_owner.label:       Default owner
+        integration_status:
+            competed.label:  Completed
+            failed.label:    Failed
+            code.label:      Status
+            message.label:   Message
+            connector.label: Connector
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: Failed to add sync job to the queue. Error: %s.

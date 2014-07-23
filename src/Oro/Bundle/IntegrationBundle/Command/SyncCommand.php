@@ -7,7 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
@@ -21,6 +22,9 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 class SyncCommand extends AbstractSyncCronCommand
 {
     const COMMAND_NAME = 'oro:cron:integration:sync';
+
+    const STATUS_SUCCESS = 0;
+    const STATUS_FAILED  = 255;
 
     /**
      * {@inheritdoc}
@@ -76,6 +80,10 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector           = $input->getOption('connector');
@@ -86,6 +94,7 @@ class SyncCommand extends AbstractSyncCronCommand
         $repository          = $entityManager->getRepository('OroIntegrationBundle:Channel');
         $logger              = new OutputLogger($output);
         $processor           = $this->getService(self::SYNC_PROCESSOR);
+        $exitCode            = self::STATUS_SUCCESS;
 
         $processor->getLoggerStrategy()->setLogger($logger);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -93,7 +102,7 @@ class SyncCommand extends AbstractSyncCronCommand
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
 
-            return 0;
+            return self::STATUS_SUCCESS;
         }
 
         if ($integrationId) {
@@ -103,7 +112,7 @@ class SyncCommand extends AbstractSyncCronCommand
             }
             $integrations = [$integration];
         } else {
-            $integrations = $repository->getConfiguredChannelsForSync();
+            $integrations = $repository->getConfiguredChannelsForSync(null, true);
         }
 
         /** @var Integration $integration */
@@ -114,17 +123,21 @@ class SyncCommand extends AbstractSyncCronCommand
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
-                $processor->process($integration, $connector, $connectorParameters);
+
+                $result   = $processor->process($integration, $connector, $connectorParameters);
+                $exitCode = $result ? : self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
-                //process another integration even in case if exception thrown
+
+                $exitCode = self::STATUS_FAILED;
+
                 continue;
             }
         }
 
         $logger->notice('Completed');
 
-        return 0;
+        return $exitCode;
     }
 
     /**
@@ -137,7 +150,8 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     protected function getConnectorParameters(InputInterface $input)
     {
-        $result              = ['force' => $input->getOption('force')];
+        $result = ['force' => $input->getOption('force')];
+
         $connectorParameters = $input->getArgument('connector-parameters');
         if (!empty($connectorParameters)) {
             foreach ($connectorParameters as $parameterString) {

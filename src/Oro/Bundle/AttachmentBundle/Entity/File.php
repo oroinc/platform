@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 
 /**
@@ -25,6 +26,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -88,6 +92,13 @@ class File extends ExtendFile
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -95,6 +106,13 @@ class File extends ExtendFile
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 
@@ -111,7 +129,7 @@ class File extends ExtendFile
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -134,7 +152,7 @@ class File extends ExtendFile
     /**
      * Get filename
      *
-     * @return string 
+     * @return string
      */
     public function getFilename()
     {
@@ -157,7 +175,7 @@ class File extends ExtendFile
     /**
      * Get originalFilename
      *
-     * @return string 
+     * @return string
      */
     public function getOriginalFilename()
     {
@@ -180,7 +198,7 @@ class File extends ExtendFile
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -203,7 +221,7 @@ class File extends ExtendFile
     /**
      * Get updatedAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -325,7 +343,7 @@ class File extends ExtendFile
 
     public function __toString()
     {
-        return (string) $this->getFilename()
+        return (string)$this->getFilename()
             ? $this->getFilename() . ' (' . $this->getOriginalFilename() . ')'
             : '';
     }
@@ -338,8 +356,6 @@ class File extends ExtendFile
     public function setOwner($owningUser)
     {
         $this->owner = $owningUser;
-
-        return $this;
     }
 
     /**

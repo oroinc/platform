@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 /**
@@ -98,6 +99,13 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -105,6 +113,13 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

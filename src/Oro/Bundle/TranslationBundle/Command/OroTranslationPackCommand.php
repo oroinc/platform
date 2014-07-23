@@ -7,14 +7,16 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
-use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Parser;
+
+use Oro\Component\Log\OutputLogger;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -152,11 +154,10 @@ EOF
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectName      = $input->getArgument('project');
-        $languagePackPath = $this->getLangPackDir($projectName);
-
-        $translationService = $this->getTranslationService($input, $output);
-        $mode = $input->getOption('upload-mode');
+        $projectName            = $input->getArgument('project');
+        $languagePackPath       = $this->getLangPackDir($projectName);
+        $translationService     = $this->getTranslationService($input, $output);
+        $mode                   = $input->getOption('upload-mode');
 
         if ($mode == 'update') {
             $translationService->update($languagePackPath);
@@ -248,37 +249,26 @@ EOF
     protected function dump(InputInterface $input, OutputInterface $output)
     {
         $projectNamespace = $input->getArgument('project');
-        $defaultLocale    = $input->getArgument('locale');
 
-        $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
+        $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
         $container = $this->getContainer();
-        $bundles   = $container->get('kernel')->getBundles();
-        $writer    = $container->get('translation.writer');
+        $dumper = new TranslationPackDumper(
+            $container->get('translation.writer'),
+            $container->get('translation.extractor'),
+            $container->get('translation.loader'),
+            new Filesystem(),
+            $container->get('kernel')->getBundles()
+        );
+        $dumper->setLogger(new OutputLogger($output));
 
-        foreach ($bundles as $bundle) {
-            $namespaceParts = explode('\\', $bundle->getNamespace());
-            if ($namespaceParts && reset($namespaceParts) === $projectNamespace) {
-                $bundleLanguagePackPath = $this->getLangPackDir($projectNamespace, $bundle->getName());
-
-                if (!is_dir($bundleLanguagePackPath)) {
-                    $this->createDirectory($bundleLanguagePackPath);
-                }
-
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle);
-                $output->writeln(
-                    sprintf(
-                        'Writing files for <info>%s</info>',
-                        $bundle->getName()
-                    )
-                );
-                $writer->writeTranslations(
-                    $messageCatalog,
-                    $input->getOption('output-format'),
-                    array('path' => $bundleLanguagePackPath)
-                );
-            }
-        }
+        $languagePackPath = $this->getLangPackDir($projectNamespace);
+        $dumper->dump(
+            $languagePackPath,
+            $projectNamespace,
+            $input->getOption('output-format'),
+            $input->getArgument('locale')
+        );
 
         return true;
     }
@@ -300,48 +290,5 @@ EOF
         }
 
         return $path;
-    }
-
-    /**
-     * Create directory using Filesystem object
-     *
-     * @param string $dirPath
-     */
-    protected function createDirectory($dirPath)
-    {
-        $fs = new Filesystem();
-        $fs->mkdir($dirPath);
-    }
-
-    /**
-     * Merge current and extracted translations
-     *
-     * @param string          $defaultLocale
-     * @param BundleInterface $bundle
-     *
-     * @return MessageCatalogue
-     */
-    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle)
-    {
-        $bundleTransPath = $bundle->getPath() . '/Resources/translations';
-        $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
-
-        $container = $this->getContainer();
-        $loader    = $container->get('translation.loader');
-
-        $currentCatalogue   = new MessageCatalogue($defaultLocale);
-        $extractedCatalogue = new MessageCatalogue($defaultLocale);
-        if (is_dir($bundleViewsPath)) {
-            $extractor = $container->get('translation.extractor');
-            $extractor->extract($bundleViewsPath, $extractedCatalogue);
-        }
-        if (is_dir($bundleTransPath)) {
-            $loader->loadMessages($bundleTransPath, $currentCatalogue);
-        }
-
-        $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
-        $messageCatalogue = $operation->getResult();
-
-        return $messageCatalogue;
     }
 }

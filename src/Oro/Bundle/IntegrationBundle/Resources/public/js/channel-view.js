@@ -1,6 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oronavigation/js/navigation', 'oroui/js/delete-confirmation'
-    ], function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
+define([
+    'jquery',
+    'backbone',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/delete-confirmation'
+], function ($, Backbone, _, __, mediator, DeleteConfirmation) {
     "use strict";
 
     /**
@@ -59,7 +66,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
 
         /**
          * Check whenever form change and shows confirmation
-         * @param $.Event e
+         * @param {$.Event} e
          */
         changeHandler: function (e) {
             var $el = $(e.currentTarget);
@@ -90,15 +97,12 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
         /**
          * Updates form via ajax, renders dynamic fields
          *
-         * @param $.element $el
+         * @param {$.element} $el
          */
         processChange: function ($el) {
             this.memoizeValue($el);
 
-            var navigation = Navigation.getInstance();
-            if (navigation) {
-                navigation.loadingMask.show();
-            }
+            mediator.execute('showLoading');
 
             var $form = $(this.options.formSelector),
                 data = $form.serializeArray(),
@@ -112,30 +116,23 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            $.post(url, data,function (res, status, jqXHR) {
+            $.post(url, data, function (res, status, jqXHR) {
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
                     $form.replaceWith(formContent);
                     formContent.validate({});
-
-                    // trigger hash navigation event for processing UI decorators
-                    navigation.processClicks(formContent.find(navigation.selectors.links));
-                    navigation.processAnchors(formContent.find(navigation.selectors.scrollLinks));
                     // update wdt
-                    navigation.updateDebugToolbar(jqXHR);
-                    mediator.trigger("hash_navigation_request:complete", navigation);
+                    mediator.execute({name: 'updateDebugToolbar', silent: true}, jqXHR);
+                    // process UI decorators
+                    mediator.execute('afterPageChange');
                 }
             }).always(function () {
-                if (navigation) {
-                    navigation.loadingMask.hide();
-                }
+                mediator.execute('hideLoading');
             });
         },
 
         /**
          * Check whenever form fields are empty
-         *
-         * @param $.element $el
          *
          * @returns {boolean}
          */
@@ -152,7 +149,7 @@ define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro
         /**
          * Remember current value in case if in future we will need to undo changes
          *
-         * @param HTMLSelectElement el
+         * @param {HTMLSelectElement} el
          */
         memoizeValue: function (el) {
             var $el = $(el);
