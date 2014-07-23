@@ -18,10 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 class TranslationPackDumper implements LoggerAwareInterface
 {
-    const ERR_PARAM = 1;
-    const ERR_NOT_TRANSLATED = 2;
-    const ERR_INVALID = 3;
-
     /** @var TranslationWriter */
     protected $writer;
 

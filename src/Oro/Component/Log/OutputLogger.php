@@ -15,29 +15,29 @@ use Psr\Log\LogLevel;
  */
 class OutputLogger extends AbstractLogger
 {
-    /** @var OutputInterface output object, e.g. cli output */
+    /** @var OutputInterface */
     protected $output;
 
-    /** @var bool always log messages with level more than ERROR */
+    /** @var bool */
     protected $alwaysLogErrors;
 
-    /** @var int|null verbosity level, see LogLevel for details */
+    /** @var int|null */
     protected $verbosity;
 
-    /** @var string|null ident string prefix - allow to prepend some string to all messages */
+    /** @var string|null */
     protected $indent;
 
-    /** @var bool use message level-based output tags */
+    /** @var bool */
     protected $useTags;
 
     /**
      * Constructor
      *
-     * @param OutputInterface $output
-     * @param bool            $alwaysLogErrors
-     * @param int|null        $verbosity        NULL or OutputInterface::VERBOSITY_*
-     * @param string|null     $indent
-     * @param bool            $useTags
+     * @param OutputInterface $output           output object, e.g. cli output
+     * @param bool            $alwaysLogErrors  always log messages with level more than ERROR
+     * @param int|null        $verbosity        verbosity level, NULL or OutputInterface::VERBOSITY_*
+     * @param string|null     $indent           ident string prefix - allow to prepend some string to all messages
+     * @param bool            $useTags          use message level-based output tags
      */
     public function __construct(
         OutputInterface $output,
