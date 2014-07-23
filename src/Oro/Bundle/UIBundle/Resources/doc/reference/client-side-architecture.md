@@ -24,7 +24,7 @@ Application gets initialized requiring `oroui/js/app` module on a page (it's req
         require(['oroui/js/app']);
     </script>
 ```
-This module exports an instance of `Application` (extend of `Caplin.Application`), depends on:
+This module exports an instance of `Application` (extend of `Chaplin.Application`), depends on:
  1. `oroui/js/app/application`, Application class
  1. `oroui/js/app/routes`, collection of routers
  1. `oroui/js/app`'s configuration
@@ -63,11 +63,11 @@ It's placed in a twig-template in order to get access to backend variables in ru
 ##App Modules
 App modules are atomic parts of general application, responsible for:
 
- * defining global view (which lives beside active controller);
+ * defining global view (which live beside active controller);
  * register handlers in `mediator` (see [Chaplin.mediator](http://docs.chaplinjs.org/chaplin.mediator.html));
  * and do all actions which precede creating an instance of application.
 
-App modules are not actually modules, they export nothing. It's `requirejs()` just call which is executed right before the application is started.
+App modules are not actually modules, they export nothing. It's `requirejs()` just call, which is executed right before the application is started.
 
 App modules are declared in `requirejs.yml` configuration file, in custom section `appmodules`:
 ```
@@ -76,7 +76,7 @@ config:
         - oroui/js/app/modules/views
         - oroui/js/app/modules/messenger
 ```
-This approach allows to define in each bundle code which should be executed on the application starts.
+This approach allows to define in each bundle code which should be executed on the application start.
 
 ##### Example 1
 `oroui/js/app/modules/views` - declares global views which will be instantiated right before an action point of controller gains control
@@ -121,7 +121,7 @@ require([
 ```
 
 ##Page Controller
-Page Controller is a central part of platform's architecture. After [Chaplin.Dispatcher](http://docs.chaplinjs.org/chaplin.dispatcher.html) calls the target method (which is `page#index`), Page Controller executes whole stack of page loading and triggers proper events on each stage. Page Model (`oroui/js/app/models/page-model`) is used as container for page's data and performs interactions with server (loads data on navigation, posts data on form submit). Page Controller also works with pages cache component and declares some navigation handlers.
+Page Controller is a central part of platform's architecture. After [Chaplin.Dispatcher](http://docs.chaplinjs.org/chaplin.dispatcher.html) call the target method (which is `page#index`), Page Controller executes whole stack of page loading and triggers proper events on each stage. Page Model (`oroui/js/app/models/page-model`) is used as container for page's data and performs interactions with server (loads data on navigation, posts data on form submit). Page Controller also works with pages cache component and declares some navigation handlers.
 ###Events
 
 ####Page loading stages

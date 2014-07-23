@@ -5,7 +5,7 @@ OroNavigationBundle declares some mediator handlers.
 
 ##Content Manager
 
-###Cache management handler
+###Cache management handlers
 
 Handler Name | Method | Description
 ------------ | ------ | -----------
@@ -14,7 +14,7 @@ Handler Name | Method | Description
 `pageCache:get` | `contentManager.get` | fetches cache data for url, by default for current url
 `pageCache:remove` | `contentManager.remove` | clear cached data, by default for current url
 
-###State management handler
+###State management handlers
 
 Handler Name | Method | Description
 ------------ | ------ | -----------
@@ -22,7 +22,7 @@ Handler Name | Method | Description
 `pageCache:state:fetch` | `contentManager.fetchState` | fetches state of a page component from cached page
 `pageCache:state:check` | `contentManager.checkState` | check if state's GET parameter (pair key and hash) reflects current URL
 
-###Helper methods handler
+###Helper methods handlers
 
 Handler Name | Method | Description
 ------------ | ------ | -----------
