@@ -15,6 +15,8 @@ Login page: Login page
 "Forgot Password": "Forgot Password"
 "Password Reset": "Password Reset"
 "Reset password": "Reset password"
+"Generate key was successful. New key:": "Generate key was successful. New key&#58;"
+"Generate key": "Generate key"
 
 change_password:
     flash:
@@ -22,6 +24,7 @@ change_password:
 resetting:
     flash:
         success: The password has been successfully reset
+
 
 oro:
     user:
