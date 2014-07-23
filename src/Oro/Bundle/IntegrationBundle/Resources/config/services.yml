@@ -31,6 +31,8 @@ parameters:
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
+    oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
+
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -181,3 +183,12 @@ services:
         class: %oro_integration.utils.form_utils.class%
         arguments:
             - @oro_integration.manager.types_registry
+
+    oro_integration.datagrid.status_grid_helper:
+        class: %oro_integration.datagrid.status_grid_helper.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+            - @translator
+        tags:
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-integration-status-grid, method: statusGridBuildBefore }
+          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.oro-integration-status-grid, method: statusGridBuildAfter }
