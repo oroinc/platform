@@ -66,9 +66,13 @@ abstract class BaseDriver
             $qb->setFirstResult($query->getFirstResult());
         }
 
-        $qb->groupBy('search.id');
+        $qb
+            ->addGroupBy('search.id')
+            ->addGroupBy('textField.id')
+            ->addGroupBy('textField.value');
 
-        return $qb->getQuery()
+        return $qb
+            ->getQuery()
             ->getResult();
     }
 
