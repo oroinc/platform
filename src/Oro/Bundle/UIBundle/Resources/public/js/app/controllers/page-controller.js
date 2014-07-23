@@ -1,4 +1,4 @@
-/*jslint browser:true, nomen:true*/
+/*jslint browser:true, eqeq:true, nomen:true*/
 /*global define*/
 define([
     'jquery',
@@ -247,7 +247,7 @@ define([
          */
         _processRedirect: function (data, options) {
             var url, delimiter, parser;
-            url = data.url || data.location;
+            url = data.url != null ? data.url : data.location;
             if (data.fullRedirect) {
                 delimiter = url.indexOf('?') === -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
