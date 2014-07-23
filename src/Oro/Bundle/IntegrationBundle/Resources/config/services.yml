@@ -31,11 +31,8 @@ parameters:
     oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
-<<<<<<< HEAD
     oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
-=======
     oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
->>>>>>> master
 
 services:
     oro_integration.manager.api:
@@ -117,12 +114,8 @@ services:
     oro_integration.writer.persistent_batch_writer:
         class: %oro_integration.writer.persistent_batch_writer.class%
         arguments:
-<<<<<<< HEAD
             - @doctrine
-=======
-            - @doctrine.orm.entity_manager
             - @event_dispatcher
->>>>>>> master
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%

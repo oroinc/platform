@@ -7,11 +7,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
-class PersistentBatchWriter implements ItemWriterInterface
+class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
     /** @var RegistryInterface */
     protected $registry;
@@ -19,7 +23,11 @@ class PersistentBatchWriter implements ItemWriterInterface
     /** @var EntityManager */
     protected $em;
 
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var StepExecution */
+    protected $stepExecution;
 
     /**
      * @param RegistryInterface        $registry
@@ -52,10 +60,31 @@ class PersistentBatchWriter implements ItemWriterInterface
         } catch (\Exception $exception) {
             $this->em->rollback();
 
-            throw $exception;
+            $event = new WriterErrorEvent($items, $this->stepExecution->getJobExecution(), $exception);
+            $this->eventDispatcher->dispatch(WriterErrorEvent::NAME, $event);
+
+            if ($event->getCouldBeSkipped()) {
+                if ($event->getException() === $exception) {
+                    // exception are already handled and job can move forward
+                    throw new InvalidItemException($event->getWarning(), $items);
+                } else {
+                    // exception are already created and ready to be rethrown
+                    throw $event->getException();
+                }
+            } else {
+                throw $exception;
+            }
         }
 
         $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($this->em));
+    }
+
+    /**
+     * @param StepExecution $stepExecution
+     */
+    public function setStepExecution(StepExecution $stepExecution)
+    {
+        $this->stepExecution = $stepExecution;
     }
 
     /**
