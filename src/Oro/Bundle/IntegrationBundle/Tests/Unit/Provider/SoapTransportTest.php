@@ -111,6 +111,9 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
         $this->transport->call('test');
     }
 
+    /**
+     * @return array
+     */
     public function exceptionProvider()
     {
         return [

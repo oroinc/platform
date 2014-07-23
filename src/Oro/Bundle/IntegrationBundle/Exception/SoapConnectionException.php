@@ -14,13 +14,17 @@ class SoapConnectionException extends TransportException
      */
     public static function createFromResponse($response, \Exception $exception = null, $request = '', $headers = '')
     {
+        $exceptionMessage = null !== $exception ? $exception->getMessage() : '';
+        $exceptionCode    = null !== $exception ? $exception->getCode() : 0;
+        $code             = !empty($headers['code']) ? $headers['code'] : 'unknown';
+
         $message = PHP_EOL;
-        $message .= '[message] ' . (!empty($exception) ? $exception->getMessage() : '') . PHP_EOL;
-        $message .= '[request] ' . $request . PHP_EOL;
-        $message .= '[response] ' . $response . PHP_EOL;
-        $message .= '[headers] ' . (!empty($headers['code']) ? $headers['code'] : '') . PHP_EOL;
+        $message .= str_pad('[message]', 20, ' ', STR_PAD_RIGHT) . $exceptionMessage . PHP_EOL;
+        $message .= str_pad('[request]', 20, ' ', STR_PAD_RIGHT) . $request . PHP_EOL;
+        $message .= str_pad('[response]', 20, ' ', STR_PAD_RIGHT) . $response . PHP_EOL;
+        $message .= str_pad('[code]', 20, ' ', STR_PAD_RIGHT) . $code . PHP_EOL;
         $message .= PHP_EOL;
 
-        return new static($message, (!empty($exception) ? $exception->getCode() : 0), $exception);
+        return new static($message, $exceptionCode, $exception);
     }
 }
