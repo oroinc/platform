@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Component\Log\OutputLogger;
 
-
 class OroTranslationDumpCommand extends ContainerAwareCommand
 {
     /**
