@@ -63,7 +63,7 @@ class NoteManager
         $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
             ->orderBy('note.createdAt', $sorting);
 
-        $query = $this->aclHelper->apply($qb);
+        $query = $this->aclHelper->apply($qb, 'VIEW', false);
 
         return $query->getResult();
     }

@@ -13,6 +13,7 @@ config:
         'oroform/js/validate-extend': 'bundles/oroform/js/validate-extend.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
+        'oroform/js/validator/datetime': 'bundles/oroform/js/validator/datetime.js'
         'oroform/js/validator/email': 'bundles/oroform/js/validator/email.js'
         'oroform/js/validator/length': 'bundles/oroform/js/validator/length.js'
         'oroform/js/validator/notblank': 'bundles/oroform/js/validator/notblank.js'

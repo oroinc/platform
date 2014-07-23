@@ -33,10 +33,6 @@ placeholders:
         items:
             pin_button:
                 order: 100
-    breadcrumb:
-        items:
-            breadcrumbs:
-                order: 100
     requirejs_config_extend:
         items:
             routing_requirejs_config:
@@ -59,5 +55,3 @@ items:
         template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
    pin_button:
         template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
-   breadcrumbs:
-        template: OroNavigationBundle:ApplicationMenu:breabcrumbs.html.twig

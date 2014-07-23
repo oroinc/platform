@@ -48,11 +48,6 @@ datagrid:
 
     email-grid:
         extends: base-email-grid
-        source:
-            query:
-                join:
-                    inner:
-                        - { join: e.fromEmailAddress, alias: a }
         filters:
             columns:
                 fromEmailExpression: { type: string,   data_name: fromEmailExpression }

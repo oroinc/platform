@@ -92,7 +92,7 @@ class ConfigManager
         } else {
             $setting = $settings[$section][$key];
 
-            return is_array($setting) && isset($setting['value']) && !$full ? $setting['value'] : $setting;
+            return is_array($setting) && array_key_exists('value', $setting) && !$full ? $setting['value'] : $setting;
         }
     }
 
