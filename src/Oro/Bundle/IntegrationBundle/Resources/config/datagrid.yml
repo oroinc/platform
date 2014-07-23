@@ -122,7 +122,10 @@ datagrid:
                 label:    oro.integration.integration_status.connector.label
                 callable: @oro_integration.datagrid.status_grid_helper->connectorCodeProperty()
             message:
-                label: oro.integration.integration_status.message.label
+                label:          oro.integration.integration_status.message.label
+                type:           twig
+                template:       OroIntegrationBundle:Integration:Datagrid/message.html.twig
+                frontend_type:  html
             date:
                 label:         oro.ui.created_at
                 frontend_type: datetime

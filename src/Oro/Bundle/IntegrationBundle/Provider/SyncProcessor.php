@@ -224,14 +224,17 @@ class SyncProcessor
             );
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
+            $message = '';
             if ($context->getErrors()) {
-                $this->logger->warning('Some entities were skipped due to warnings:');
+                $message = 'Some entities were skipped due to warnings:';
                 foreach ($context->getErrors() as $error) {
-                    $this->logger->warning($error);
+                    $message .= $error . PHP_EOL;
                 }
+
+                $this->logger->warning($message);
             }
 
-            $message = sprintf(
+            $message .= sprintf(
                 "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
                 $counts['read'],
                 $counts['process'],

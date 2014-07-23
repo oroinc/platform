@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
@@ -32,11 +33,16 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
     /**
      * @param RegistryInterface        $registry
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ContextRegistry          $contextRegistry
      */
-    public function __construct(RegistryInterface $registry, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        RegistryInterface $registry,
+        EventDispatcherInterface $eventDispatcher,
+        ContextRegistry $contextRegistry
+    ) {
         $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
+        $this->contextRegistry = $contextRegistry;
     }
 
     /**
@@ -60,13 +66,22 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
         } catch (\Exception $exception) {
             $this->em->rollback();
 
-            $event = new WriterErrorEvent($items, $this->stepExecution->getJobExecution(), $exception);
+            $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
+
+            $event = new WriterErrorEvent($items, $jobName, $exception);
             $this->eventDispatcher->dispatch(WriterErrorEvent::NAME, $event);
 
             if ($event->getCouldBeSkipped()) {
+                $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
+                $importContext->setValue(
+                    'error_entries_count',
+                    (int)$importContext->getValue('error_entries_count') + count($items)
+                );
+                $importContext->addError($event->getWarning());
+
                 if ($event->getException() === $exception) {
                     // exception are already handled and job can move forward
-                    throw new InvalidItemException($event->getWarning(), $items);
+                    throw new InvalidItemException($event->getWarning(), []);
                 } else {
                     // exception are already created and ready to be rethrown
                     throw $event->getException();
