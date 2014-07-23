@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
-use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
+use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
 class PersistentBatchWriter extends EntityWriter
 {
