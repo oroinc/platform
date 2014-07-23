@@ -33,7 +33,9 @@ class EmailGridListener
         $queryBuilder = $ormDataSource->getQueryBuilder();
         $parameters = $event->getDatagrid()->getParameters();
 
-        $this->factory->prepareQuery($queryBuilder);
+        $alias = 'a';
+        $queryBuilder->leftJoin('e.fromEmailAddress', $alias);
+        $this->factory->prepareQuery($queryBuilder, $alias);
 
         if ($parameters->has('emailIds')) {
             $emailIds = $parameters->get('emailIds');

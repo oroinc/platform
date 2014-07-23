@@ -1,12 +1,13 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
 define([
+    'jquery',
     'underscore',
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page'
-], function (_, Chaplin, __, BaseController, PageModel) {
+], function ($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
     var document, location, history, console, utils, mediator, PageController;
@@ -115,10 +116,7 @@ define([
          */
         _beforePageLoad: function (route, params, options) {
             var oldRoute, newRoute, url, opts;
-            // suppress 'page:beforeChange' event, on server redirection
-            if (options.redirection) {
-                return true;
-            }
+
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
@@ -175,7 +173,7 @@ define([
         onPageUpdated: function (model, resp, options) {
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
-                return true;
+                return;
             }
             //@todo develop approach to postpone 'page:afterChange' event
             // until all inline scripts on a page have not finished changes
@@ -274,13 +272,21 @@ define([
          */
         _setNavigationHandlers: function (url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
+
             mediator.setHandler('refreshPage', function (options) {
+                var queue;
+                mediator.trigger('page:beforeRefresh', (queue = []));
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                utils.redirectTo({url: url}, options);
-                mediator.trigger('page:refreshed');
+                $.when.apply($, queue).done(function (customOptions) {
+                    _.extend(options, customOptions || {});
+                    utils.redirectTo({url: url}, options);
+                    mediator.trigger('page:afterRefresh');
+                });
             });
+
             mediator.setHandler('submitPage', this._submitPage, this);
+
             //@TODO discuss why is this handler needed
             mediator.setHandler('afterPageChange', function () {
                 // fake page:afterChange event trigger
