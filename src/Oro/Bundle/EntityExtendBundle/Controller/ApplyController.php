@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
@@ -43,6 +42,13 @@ class ApplyController extends Controller
             );
         }
 
-        return $this->redirect($this->generateUrl('oro_entityconfig_index'));
+        return $this->redirect(
+            $this->generateUrl(
+                'oro_entityconfig_index',
+                [
+                    '_enableContentProviders' => 'mainMenu'
+                ]
+            )
+        );
     }
 }
