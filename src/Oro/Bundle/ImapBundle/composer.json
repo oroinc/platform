@@ -8,6 +8,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/symfony": "2.1.*",
+        "oro/log": "dev-master",
         "zendframework/zend-mail": "2.1.*",
         "oro/platform-bundle": "dev-master",
         "oro/email-bundle": "dev-master"
