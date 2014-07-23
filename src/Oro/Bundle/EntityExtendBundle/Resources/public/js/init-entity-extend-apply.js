@@ -1,8 +1,8 @@
 /*jshint browser:true*/
 /*jslint nomen:true, browser:true*/
 /*global require*/
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator'
-    ], function ($, _, __, Modal, mediator) {
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator', 'routing', 'oroui/js/messenger'
+    ], function ($, _, __, Modal, mediator, routing, messenger) {
     'use strict';
     $(function () {
         $(document).on('click', '.entity-extend-apply', function (e) {
@@ -41,12 +41,19 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
 
                 mediator.once('page:request', function () {
                     mediator.execute('hideLoading');
-                    mediator.once('page:beforeChange', function () {
-                        modal.close();
-                    });
                 });
 
-                mediator.execute('redirectTo', {url: url});
+                $.post(url, {}, function(){
+                    mediator.once('page:afterChange', function () {
+                        modal.close();
+                        messenger.notificationFlashMessage('success', __('oro.entity_extend.schema_updated'));
+                    });
+                    var url = routing.generate('oro_entityconfig_index', {'_enableContentProviders': 'mainMenu'});
+                    mediator.execute('redirectTo', {url: url});
+                }).fail(function () {
+                    modal.close();
+                });
+
             }
 
             confirmUpdate.on('ok', execute);
