@@ -5,7 +5,7 @@ define([
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page'
+    'oroui/js/app/models/page-model'
 ], function (_, Chaplin, __, BaseController, PageModel) {
     'use strict';
 

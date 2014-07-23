@@ -25,7 +25,7 @@ define([
         },
 
         /**
-         * Returns application's  initialization option by its name
+         * Returns application's initialization option by its name
          *
          * @param prop name of property
          * @returns {*}
@@ -35,6 +35,7 @@ define([
         },
 
         /**
+         * Removes root prefix and returns meaningful part of path
          *
          * @param {string} path
          * @returns {string}
@@ -62,8 +63,8 @@ define([
 
         /**
          *
-         * @param {string} path
-         * @param {string} query
+         * @param {(string|Object)} path
+         * @param {string=} query
          * @returns {string}
          */
         combineFullUrl: function (path, query) {
