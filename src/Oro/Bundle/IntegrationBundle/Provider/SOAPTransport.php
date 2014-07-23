@@ -135,7 +135,7 @@ abstract class SOAPTransport implements TransportInterface
     }
 
     /**
-     * Reset repeat count to 0
+     * Reset count attempt into 0
      */
     protected function resetAttemptCount()
     {
@@ -143,7 +143,7 @@ abstract class SOAPTransport implements TransportInterface
     }
 
     /**
-     * Increment repeat count on one
+     * Increment count attempt on one
      */
     protected function attempt()
     {
@@ -163,7 +163,7 @@ abstract class SOAPTransport implements TransportInterface
      *
      * @return array
      */
-    protected function getLastCallHeaders()
+    protected function getLastResponseHeaders()
     {
         return ParserRegistry::getInstance()->getParser('message')
             ->parseResponse($this->client->__getLastResponseHeaders());
@@ -198,7 +198,7 @@ abstract class SOAPTransport implements TransportInterface
     protected function isAttemptNecessary()
     {
         if ($this->shouldAttempt()) {
-            $headers = $this->getLastCallHeaders();
+            $headers = $this->getLastResponseHeaders();
 
             if (!empty($headers) && !$this->isResultOk($headers)) {
                 $statusCode = $this->getHttpStatusCode($headers);
