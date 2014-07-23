@@ -4,6 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -14,8 +16,8 @@ use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
 class SyncProcessor
 {
-    /** @var EntityManager */
-    protected $em;
+    /** @var RegistryInterface */
+    protected $doctrineRegistry;
 
     /** @var ProcessorRegistry */
     protected $processorRegistry;
@@ -30,20 +32,20 @@ class SyncProcessor
     protected $logger;
 
     /**
-     * @param EntityManager     $em
+     * @param RegistryInterface $doctrineRegistry
      * @param ProcessorRegistry $processorRegistry
      * @param Executor          $jobExecutor
      * @param TypesRegistry     $registry
      * @param LoggerStrategy    $logger
      */
     public function __construct(
-        EntityManager $em,
+        RegistryInterface $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
         LoggerStrategy $logger
     ) {
-        $this->em                = $em;
+        $this->doctrineRegistry  = $doctrineRegistry;
         $this->processorRegistry = $processorRegistry;
         $this->jobExecutor       = $jobExecutor;
         $this->registry          = $registry;
@@ -141,10 +143,17 @@ class SyncProcessor
         if (!$integration->getEnabled()) {
             return false;
         }
+
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
             // Clone object here because it will be modified and changes should not be shared between
             $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
+
+            $jobName          = $realConnector->getImportJobName();
+            $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
+                ProcessorRegistry::TYPE_IMPORT,
+                $realConnector->getImportEntityFQCN()
+            );
         } catch (\Exception $e) {
             // log and continue
             $this->logger->error($e->getMessage());
@@ -154,20 +163,14 @@ class SyncProcessor
                 ->setMessage($e->getMessage())
                 ->setConnector($connector);
 
-            $this->em
+            $this->doctrineRegistry
                 ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
 
             return false;
         }
 
-        $jobName = $realConnector->getImportJobName();
-
-        $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
-            ProcessorRegistry::TYPE_IMPORT,
-            $realConnector->getImportEntityFQCN()
-        );
-        $configuration    = [
+        $configuration = [
             ProcessorRegistry::TYPE_IMPORT =>
                 array_merge(
                     [
@@ -221,14 +224,17 @@ class SyncProcessor
             );
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
+            $message = '';
             if ($context->getErrors()) {
-                $this->logger->warning('Some entities were skipped due to warnings:');
+                $message = 'Some entities were skipped due to warnings:';
                 foreach ($context->getErrors() as $error) {
-                    $this->logger->warning($error);
+                    $message .= $error . PHP_EOL;
                 }
+
+                $this->logger->warning($message);
             }
 
-            $message = sprintf(
+            $message .= sprintf(
                 "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
                 $counts['read'],
                 $counts['process'],
@@ -242,7 +248,7 @@ class SyncProcessor
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
         if ($saveStatus) {
-            $this->em
+            $this->doctrineRegistry
                 ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
         }

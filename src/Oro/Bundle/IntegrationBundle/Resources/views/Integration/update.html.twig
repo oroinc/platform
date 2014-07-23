@@ -1,4 +1,5 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% form_theme form with ['OroIntegrationBundle:Form:fields.html.twig'] %}
 
@@ -93,7 +94,6 @@
     {% if (form.synchronizationSettings is defined and form.synchronizationSettings.count) %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Synchronization Settings'|trans,
-            'class': 'active',
             'subblocks': [{
                 'title': '',
                 'data':  [form_widget(form.synchronizationSettings)]
@@ -104,11 +104,25 @@
     {% if (form.mappingSettings is defined and form.mappingSettings.count) %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Mapping Settings'|trans,
-            'class': 'active',
             'subblocks': [{
                 'title': '',
                 'data':  [form_widget(form.mappingSettings)]
             }]
+        }]) %}
+    {% endif %}
+
+    {% if entity.id %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'Statuses'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'data':  [
+                        dataGrid.renderGrid('oro-integration-status-grid', {
+                            integrationId:   entity.id,
+                            integrationType: entity.type
+                        })
+                    ]
+                }]
         }]) %}
     {% endif %}
 
