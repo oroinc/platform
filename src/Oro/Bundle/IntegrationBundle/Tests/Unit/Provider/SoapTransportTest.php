@@ -60,14 +60,11 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
      */
     public function testInit()
     {
-        $isDebug = false;
-
         $this->transport->expects($this->once())
             ->method('getSoapClient')
             ->will($this->returnValue($this->soapClientMock));
 
         $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
-        $this->settings->set('debug', $isDebug);
 
         try {
             $this->transport->init($this->transportEntity);

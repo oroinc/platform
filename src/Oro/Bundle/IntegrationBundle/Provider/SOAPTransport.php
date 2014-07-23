@@ -18,8 +18,8 @@ use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
  */
 abstract class SOAPTransport implements TransportInterface
 {
-    const ATTEMPTS = 5;
-    const SLEEP_BETWEEN_QUERIES = 1;
+    const ATTEMPTS              = 5;
+    const SLEEP_BETWEEN_ATTEMPT = 1;
 
     /** @var ParameterBag */
     protected $settings;
@@ -28,14 +28,14 @@ abstract class SOAPTransport implements TransportInterface
     protected $client;
 
     /** @var int */
-    protected $repeated;
+    protected $attempted;
 
     /**
      * {@inheritdoc}
      */
     public function init(Transport $transportEntity)
     {
-        $this->resetRepetition();
+        $this->resetAttemptCount();
         $this->settings = $transportEntity->getSettingsBag();
         $wsdlUrl        = $this->settings->get('wsdl_url');
 
@@ -51,31 +51,34 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function call($action, $params = [])
     {
+        ini_set('default_socket_timeout', 1);
+
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
-
         try {
             $result = $this->client->__soapCall($action, $params);
+            var_dump($result);
         } catch (\Exception $e) {
 
-            if ($this->isRepetitionNecessary()) {
-                sleep(self::SLEEP_BETWEEN_QUERIES);
-                $this->increaseRepeated();
+            if ($this->isAttemptNecessary()) {
+
+                sleep(self::SLEEP_BETWEEN_ATTEMPT);
+                $this->attempt();
                 $result = $this->call($action, $params);
             } else {
-                $this->resetRepetition();
+                $this->resetAttemptCount();
 
                 throw SoapConnectionException::createFromResponse(
-                    $e,
                     $this->getLastResponse(),
+                    $e,
                     $this->getLastRequest(),
                     $this->client->__getLastResponseHeaders()
                 );
             }
         }
 
-        $this->resetRepetition();
+        $this->resetAttemptCount();
 
         return $result;
     }
@@ -139,17 +142,25 @@ abstract class SOAPTransport implements TransportInterface
     /**
      * Reset repeat count to 0
      */
-    protected function resetRepetition()
+    protected function resetAttemptCount()
     {
-        $this->repeated = 0;
+        $this->attempted = 0;
     }
 
     /**
      * Increment repeat count on one
      */
-    protected function increaseRepeated()
+    protected function attempt()
     {
-        ++$this->repeated;
+        ++$this->attempted;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldAttempt()
+    {
+        return $this->attempted < self::ATTEMPTS;
     }
 
     /**
@@ -171,7 +182,7 @@ abstract class SOAPTransport implements TransportInterface
     protected function isResultOk(array $headers = [])
     {
         if (!empty($headers['code']) && Codes::HTTP_OK === (int)$headers['code']) {
-                return true;
+            return true;
         }
         return false;
     }
@@ -189,22 +200,29 @@ abstract class SOAPTransport implements TransportInterface
     /**
      * @return bool
      */
-    protected function isRepetitionNecessary()
+    protected function isAttemptNecessary()
     {
-        if ($this->repeated < self::ATTEMPTS) {
+        if ($this->shouldAttempt()) {
             $headers = $this->getLastCallHeaders();
 
-            if (!$this->isResultOk($headers)) {
+            if (!empty($headers) && !$this->isResultOk($headers)) {
                 $statusCode = $this->getHttpStatusCode($headers);
 
-                if ($statusCode === Codes::HTTP_BAD_GATEWAY
-                    || $statusCode === Codes::HTTP_SERVICE_UNAVAILABLE
-                    || $statusCode === Codes::HTTP_GATEWAY_TIMEOUT
-                ) {
+                if (in_array($statusCode, $this->getHttpStatusesForAttempt())) {
                     return true;
                 }
+            } elseif (empty($headers)) {
+                return true;
             }
         }
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getHttpStatusesForAttempt()
+    {
+        return [Codes::HTTP_BAD_GATEWAY, Codes::HTTP_SERVICE_UNAVAILABLE, Codes::HTTP_GATEWAY_TIMEOUT];
     }
 }
