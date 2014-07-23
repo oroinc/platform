@@ -8,15 +8,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Translation\Catalogue\MergeOperation;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Parser;
+
+use Oro\Component\Log\OutputLogger;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Bundle\TranslationBundle\Provider\TranslationPackDumper;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -249,42 +249,27 @@ EOF
     protected function dump(InputInterface $input, OutputInterface $output)
     {
         $projectNamespace = $input->getArgument('project');
-        $defaultLocale    = $input->getArgument('locale');
-        $languagePackPath = $this->getLangPackDir($projectNamespace);
 
-        $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
+        $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
         $container = $this->getContainer();
-        $bundles   = $container->get('kernel')->getBundles();
-        $writer    = $container->get('translation.writer');
+        $dumper = new TranslationPackDumper(
+            $container->get('translation.writer'),
+            $container->get('translation.extractor'),
+            $container->get('translation.loader'),
+            new Filesystem(),
+            $container->get('kernel')->getBundles()
+        );
+        $dumper->setLogger(new OutputLogger($output));
 
-        foreach ($bundles as $bundle) {
-            $namespaceParts = explode('\\', $bundle->getNamespace());
-            if ($namespaceParts && reset($namespaceParts) === $projectNamespace) {
-                $bundleLanguagePackPath = $this->getLangPackDir($projectNamespace, $bundle->getName());
+        $languagePackPath = $this->getLangPackDir($projectNamespace);
+        $dumper->dump(
+            $languagePackPath,
+            $projectNamespace,
+            $input->getOption('output-format'),
+            $input->getArgument('locale')
+        );
 
-                if (!is_dir($bundleLanguagePackPath)) {
-                    $this->createDirectory($bundleLanguagePackPath);
-                }
-
-                $output->writeln(
-                    sprintf(
-                        'Writing files for <info>%s</info>',
-                        $bundle->getName()
-                    )
-                );
-                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle, $output);
-                $this->removePlaceholders($messageCatalog);
-                $writer->writeTranslations(
-                    $messageCatalog,
-                    $input->getOption('output-format'),
-                    array('path' => $bundleLanguagePackPath)
-                );
-            }
-        }
-        if (is_dir($languagePackPath)) {
-            $this->checkFiles($languagePackPath, $output);
-        }
         return true;
     }
 
@@ -305,108 +290,5 @@ EOF
         }
 
         return $path;
-    }
-
-    /**
-     * Create directory using Filesystem object
-     *
-     * @param string $dirPath
-     */
-    protected function createDirectory($dirPath)
-    {
-        $fs = new Filesystem();
-        $fs->mkdir($dirPath);
-    }
-
-    /**
-     * Merge current and extracted translations
-     *
-     * @param string          $defaultLocale
-     * @param BundleInterface $bundle
-     * @param OutputInterface $output
-     *
-     * @return MessageCatalogue
-     */
-    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle, OutputInterface $output)
-    {
-        $bundleTransPath = $bundle->getPath() . '/Resources/translations';
-        $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
-
-        $container = $this->getContainer();
-        $loader    = $container->get('translation.loader');
-
-        $currentCatalogue   = new MessageCatalogue($defaultLocale);
-        $extractedCatalogue = new MessageCatalogue($defaultLocale);
-        if (is_dir($bundleViewsPath)) {
-            $extractor = $container->get('translation.extractor');
-            $extractor->extract($bundleViewsPath, $extractedCatalogue);
-        }
-        if (is_dir($bundleTransPath)) {
-            $loader->loadMessages($bundleTransPath, $currentCatalogue);
-        }
-
-        $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
-        $messageCatalogue = $operation->getResult();
-
-        return $messageCatalogue;
-    }
-
-    /**
-     * Check yaml files in translation pack and display files and keywords that need translation.
-     *
-     * @param string $languagePackPath
-     * @param OutputInterface $output
-     * @return bool
-     */
-    protected function checkFiles($languagePackPath, OutputInterface $output)
-    {
-        $needTranslate  = array();
-        $result         = true;
-        $finder         = Finder::create()->files()->name('*.yml')->in($languagePackPath);
-        $yaml           = new Parser();
-
-        foreach ($finder->files() as $file) {
-            $value = $yaml->parse(file_get_contents((string)$file));
-            array_walk(
-                $value,
-                function (&$value, $key) {
-                    if ($value != $key || strpos($key, ' ') || !preg_match('#\.[^\s]#', $key)) {
-                        $value = false;
-                    } else {
-                        $value = '- ' . $value;
-                    }
-                }
-            );
-            $tempArr = array_filter($value);
-            if (count($tempArr) > 0) {
-                $needTranslate[(string)$file] = $tempArr;
-                $result = false;
-            }
-        }
-
-        foreach ($needTranslate as $key => $value) {
-            $output->writeln(sprintf('<comment>Need translate keywords in %s</comment>', $key));
-            $output->writeln($value);
-        }
-        return $result;
-    }
-
-    /**
-     * Remove placeholders from MessageCatalogue
-     * @param MessageCatalogue $messageCatalogue
-     */
-    protected function removePlaceholders(MessageCatalogue $messageCatalogue)
-    {
-        $domains = $messageCatalogue->getDomains();
-        foreach ($domains as $domain) {
-            $messages = $messageCatalogue->all($domain);
-            foreach ($messages as $key => $value) {
-                if (preg_match('#^%[^%\s]*%$#', $key)) {
-                    $messages[$key] = false;
-                }
-            }
-            $clearMessages = array_filter($messages);
-            $messageCatalogue->replace($clearMessages, $domain);
-        }
     }
 }
