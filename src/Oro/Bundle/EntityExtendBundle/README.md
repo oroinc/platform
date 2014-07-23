@@ -183,17 +183,3 @@ The following command removes all data related to entity extend functionality fr
 php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
-
-Backing up entity data
-----------------------
-The following command can be used to backup data of particular entity:
-
-```bash
-php app/console oro:entity-extend:backup [entity class name] [backup path]
-```
-
-This command has two arguments:
- - `entity class name` - It is required. It is used to specify which entity need to be backed up.
- - `backup path` - It is optional. Using this argument you can specify a folder where this command will store backed up data. If this argument is omitted the data will be stored in a folder specified in oro_entity_extend.backup parameter. The value of this parameter can be changed in application configuration file.
-
-By now backup is supported for MySql and Postgres databases only.

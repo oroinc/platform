@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
+
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class ConnectorContextMediator
@@ -17,33 +19,29 @@ class ConnectorContextMediator
     /** @var TypesRegistry */
     protected $registry;
 
-    /** @var ChannelRepository */
-    protected $channelRepository;
-
-    /** @var UnitOfWork  */
-    protected $unitOfWork;
+    /** @var RegistryInterface */
+    protected $doctrineRegistry;
 
     /**
-     * @param ServiceLink   $registryLink
-     * @param EntityManager $em
+     * @param ServiceLink       $registryLink
+     * @param RegistryInterface $doctrineRegistry
      */
-    public function __construct(ServiceLink $registryLink, EntityManager $em)
+    public function __construct(ServiceLink $registryLink, RegistryInterface $doctrineRegistry)
     {
-        $this->registryLink      = $registryLink;
-        $this->channelRepository = $em->getRepository('OroIntegrationBundle:Channel');
-        $this->unitOfWork        = $em->getUnitOfWork();
+        $this->registryLink     = $registryLink;
+        $this->doctrineRegistry = $doctrineRegistry;
     }
 
     /**
      * Get prepared transport
      *
      * @param ContextInterface|Integration $source
-     * @param boolean $isReadOnly
+     * @param boolean                      $markReadOnly
      *
      * @throws LogicException
      * @return TransportInterface
      */
-    public function getTransport($source, $isReadOnly = false)
+    public function getTransport($source, $markReadOnly = false)
     {
         if ($source instanceof ContextInterface) {
             $source = $this->getChannel($source);
@@ -52,9 +50,8 @@ class ConnectorContextMediator
         }
 
         $transport = $source->getTransport();
-
-        if ($isReadOnly) {
-            $this->unitOfWork->markReadOnly($transport);
+        if ($markReadOnly) {
+            $this->getUow()->markReadOnly($transport);
         }
 
         return clone $this->registryLink->getService()
@@ -70,6 +67,26 @@ class ConnectorContextMediator
      */
     public function getChannel(ContextInterface $context)
     {
-        return $this->channelRepository->getOrLoadById($context->getOption('channel'));
+        $channel = $this->getEm()
+            ->getRepository('OroIntegrationBundle:Channel')
+            ->getOrLoadById($context->getOption('channel'));
+
+        return $channel;
+    }
+
+    /**
+     * @return UnitOfWork
+     */
+    private function getUow()
+    {
+        return $this->getEm()->getUnitOfWork();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEm()
+    {
+        return $this->doctrineRegistry->getManager();
     }
 }
