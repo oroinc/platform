@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
@@ -16,12 +19,16 @@ class PersistentBatchWriter implements ItemWriterInterface
     /** @var EntityManager */
     protected $em;
 
+    protected $eventDispatcher;
+
     /**
-     * @param RegistryInterface $registry
+     * @param RegistryInterface        $registry
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, EventDispatcherInterface $eventDispatcher)
     {
-        $this->registry = $registry;
+        $this->registry        = $registry;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -47,6 +54,8 @@ class PersistentBatchWriter implements ItemWriterInterface
 
             throw $exception;
         }
+
+        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($this->em));
     }
 
     /**
