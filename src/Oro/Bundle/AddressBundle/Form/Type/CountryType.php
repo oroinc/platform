@@ -13,6 +13,7 @@ class CountryType extends AbstractType
             array(
                 'label' => 'oro.address.country.entity_label',
                 'class' => 'OroAddressBundle:Country',
+                'random_id' => true,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
