@@ -49,7 +49,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->from('OroUserBundle:User', 'u')
                     ->select(array('u.id', 'u.username as uName'))
                     ->groupBy('uName'),
-                'expectedDQL' => 'SELECT u.id, u.username as uName FROM OroUserBundle:User u GROUP BY uName'
+                'expectedDQL' => 'SELECT u.username as uName FROM OroUserBundle:User u GROUP BY uName'
             ),
             'function_group_test' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -57,7 +57,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'SUBSTRING(u.username, 1, 3) as uName'))
                     ->groupBy('uName'),
                 'expectedDQL' =>
-                    'SELECT u.id, SUBSTRING(u.username, 1, 3) as uName FROM OroUserBundle:User u GROUP BY uName'
+                    'SELECT SUBSTRING(u.username, 1, 3) as uName FROM OroUserBundle:User u GROUP BY uName'
             ),
             'one_table' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -109,7 +109,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->groupBy('gr.id')
                     ->having('u.username LIKE :test'),
-                'expectedDQL' => 'SELECT DISTINCT u.id, u.username as _havingField0 FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT DISTINCT gr.id, u.username as _havingField0 FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr '
@@ -242,7 +242,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                         ->leftJoin('OroUserBundle:Status', 's', Join::WITH, 's.user = eu')
                         ->groupBy('eu.username')
                         ->where('s.status = :statusName'),
-                'expectedDQL'  => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
+                'expectedDQL'  => 'SELECT DISTINCT eu.username FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
                     . 'LEFT JOIN e.user eu '
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '

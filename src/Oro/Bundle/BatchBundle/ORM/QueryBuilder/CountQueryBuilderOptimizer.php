@@ -70,6 +70,7 @@ class CountQueryBuilderOptimizer
         if ($parts['groupBy']) {
             $groupBy = (array) $parts['groupBy'];
             $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases($groupBy));
+            // Add all group by fields to select, otherwise add identifier
             foreach ($groupBy as $groupByPart) {
                 $fieldsToSelect = array_merge($fieldsToSelect, $this->qbTools->getFields($groupByPart));
             }
