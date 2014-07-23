@@ -65,15 +65,22 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
-        $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
+        $fieldsToSelect = array();
         $usedAliases = array();
         if ($parts['groupBy']) {
-            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases((array) $parts['groupBy']));
+            $groupBy = (array) $parts['groupBy'];
+            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases($groupBy));
+            foreach ($groupBy as $groupByPart) {
+                $fieldsToSelect = array_merge($fieldsToSelect, $this->qbTools->getFields($groupByPart));
+            }
         } elseif (!$parts['where'] && $parts['having']) {
+            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
             // If there is no where and group by, but having is present - convert having to where.
             $parts['where'] = $parts['having'];
             $parts['having'] = null;
             $qb->resetDQLPart('having');
+        } else {
+            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
         }
 
         if ($parts['having']) {
