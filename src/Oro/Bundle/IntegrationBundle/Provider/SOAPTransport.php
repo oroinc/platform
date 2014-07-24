@@ -12,14 +12,14 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
 abstract class SOAPTransport implements TransportInterface
 {
-    const ATTEMPTS              = 5;
-    const SLEEP_BETWEEN_ATTEMPT = 1;
+    const ATTEMPTS = 7;
 
     /** @var ParameterBag */
     protected $settings;
@@ -29,6 +29,12 @@ abstract class SOAPTransport implements TransportInterface
 
     /** @var int */
     protected $attempted;
+
+    /** @var array */
+    protected $sleepBetweenAttempt;
+
+    /** @var LoggerStrategy */
+    protected $logger;
 
     /**
      * {@inheritdoc}
@@ -44,6 +50,8 @@ abstract class SOAPTransport implements TransportInterface
         }
 
         $this->client = $this->getSoapClient($wsdlUrl);
+
+        $this->setSleepBetweenAttempts([5, 10, 20, 40, 80, 160, 320, 640]);
     }
 
     /**
@@ -51,6 +59,8 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function call($action, $params = [])
     {
+        ini_set('default_socket_timeout', 1);
+
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
@@ -58,7 +68,8 @@ abstract class SOAPTransport implements TransportInterface
             $result = $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
             if ($this->isAttemptNecessary()) {
-                sleep(self::SLEEP_BETWEEN_ATTEMPT);
+                $this->logAttempt();
+                $this->runSleepBetweenAttempt();
                 $this->attempt();
                 $result = $this->call($action, $params);
             } else {
@@ -111,6 +122,11 @@ abstract class SOAPTransport implements TransportInterface
     public function __sleep()
     {
         return [];
+    }
+
+    public function setLogger(LoggerStrategy $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -219,5 +235,47 @@ abstract class SOAPTransport implements TransportInterface
     protected function getHttpStatusesForAttempt()
     {
         return [Codes::HTTP_BAD_GATEWAY, Codes::HTTP_SERVICE_UNAVAILABLE, Codes::HTTP_GATEWAY_TIMEOUT];
+    }
+
+
+    protected function runSleepBetweenAttempt()
+    {
+        sleep($this->getSleepBetweenAttempt());
+    }
+
+    /**
+     * Returns the current item by $attempted or the last of them
+     *
+     * @return int
+     */
+    protected function getSleepBetweenAttempt()
+    {
+        if (!empty($this->sleepBetweenAttempt[$this->attempted])) {
+            return (int)$this->sleepBetweenAttempt[$this->attempted];
+        }
+
+        reset($this->sleepBetweenAttempt);
+        return (int)end($this->sleepBetweenAttempt);
+    }
+
+    /**
+     * @param array $range
+     */
+    protected function setSleepBetweenAttempts(array $range)
+    {
+        $this->sleepBetweenAttempt = $range;
+    }
+
+    /**
+     * Log attempt
+     */
+    protected function logAttempt()
+    {
+        if (!empty($this->logger)) {
+            $this->logger->warning(
+                '[Warning] Attempt number ' . ($this->attempted+1)
+                . ' with ' . $this->getSleepBetweenAttempt() . ' sec delay.'
+            );
+        }
     }
 }
