@@ -4,8 +4,9 @@ define([
     './../base/page-region-view',
     'underscore',
     'jquery',
-    'oroui/js/mediator'
-], function (PageRegionView, _, $, mediator) {
+    'oroui/js/mediator',
+    'oroui/js/tools'
+], function (PageRegionView, _, $, mediator, tools) {
     'use strict';
 
     var PageMainMenuView;
@@ -26,16 +27,23 @@ define([
         },
 
         render: function () {
-            var data = this.getTemplateData();
+            var data = this.getTemplateData(),
+                currentRoute = (data && !_.isUndefined(data.currentRoute))
+                    ? data.currentRoute
+                    : tools.currentRoute;
+
             if (data) {
                 if (!_.isUndefined(data.mainMenu)) {
                     PageMainMenuView.__super__.render.call(this);
                     this.initRouteMatches();
-                } else if (!_.isUndefined(data.currentRoute)) {
-                    this.toggleActiveMenuItem(data.currentRoute);
                 }
             } else {
                 this.initRouteMatches();
+            }
+
+            if (!_.isUndefined(currentRoute)) {
+                this.toggleActiveMenuItem(currentRoute);
+                tools.currentRoute = currentRoute;
             }
 
             mediator.trigger('mainMenuUpdated', this);
