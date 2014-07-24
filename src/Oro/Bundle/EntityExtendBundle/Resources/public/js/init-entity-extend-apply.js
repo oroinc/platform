@@ -1,8 +1,8 @@
 /*jshint browser:true*/
 /*jslint nomen:true, browser:true*/
 /*global require*/
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator', 'routing', 'oroui/js/messenger'
-    ], function ($, _, __, Modal, mediator, routing, messenger) {
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/mediator', 'routing'
+    ], function ($, _, __, Modal, mediator, routing) {
     'use strict';
     $(function () {
         $(document).on('click', '.entity-extend-apply', function (e) {
@@ -39,20 +39,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                 modal.$el.find('.modal-footer').html(progress);
                 progress.show();
 
-                mediator.once('page:request', function () {
-                    mediator.execute('hideLoading');
-                });
-
-                $.post(url, {}, function(){
-                    mediator.once('page:afterChange', function () {
+                $.post(url, function () {
+                    mediator.once('page:beforeChange', function () {
                         modal.close();
-                        messenger.notificationFlashMessage('success', __('oro.entity_extend.schema_updated'));
                     });
-                    var url = routing.generate('oro_entityconfig_index', {'_enableContentProviders': 'mainMenu'});
-                    mediator.execute('redirectTo', {url: url});
+                    mediator.once('page:afterChange', function () {
+                        mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'));
+                    });
+                    mediator.execute('redirectTo', {url: routing.generate('oro_entityconfig_index')});
                 }).fail(function () {
                     modal.close();
-                    messenger.notificationFlashMessage('error', __('oro.entity_extend.schema_update_failed'));
+                    mediator.execute('showFlashMessage', 'error', __('oro.entity_extend.schema_update_failed'));
                 });
             }
 
