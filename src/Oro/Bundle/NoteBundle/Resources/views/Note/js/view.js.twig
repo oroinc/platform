@@ -34,7 +34,7 @@
                             {
                                 user: updatedBy_url
                                     ? '<a class="user" href="' + updatedBy_url + '">' + updatedBy + '</a>'
-                                    : (updatedBy ? '<i class="user">' + updatedBy + '</i>' : ''),
+                                    : '<i class="user">' + updatedBy + '</i>',
                                 date: '<i class="date">' + updatedAt + '</i>'
                             },
                             {interpolate: /\{\{(.+?)\}\}/g}

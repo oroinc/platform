@@ -1,3 +1,15 @@
+CHANGELOG for 1.3.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.3.0 versions.
+
+* 1.3.0 (2014-07-23)
+ * Redesign of the Navigation panel and left-side menu bar
+ * Website event tracking
+ * Processes
+ * New custom field types for entities: File and Image
+ * New control for record lookup (relations)
+ * Data import in CSV format
+
 CHANGELOG for 1.2.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.2.0 versions.
@@ -39,18 +51,18 @@ CHANGELOG for 1.0.1
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.1 versions.
 
 * 1.0.1 (2014-04-18)
- * Issue #3979 – Problems with DB server verification on install
- * Issue #3916 – Memory consumption is too high on installation
- * Issue #3918 – Problems with installation of packages from console
- * Issue #3841 – Very slow installation of packages
- * Issue #3916 – Installed application is not working correctly because of knp-menu version
- * Issue #3839 – Cache regeneration is too slow
- * Issue #3525 – Broken filters on Entity Configuration grid
- * Issue #3974 – Settings are not saved in sidebar widgets 
- * Issue #3962 – Workflow window opens with a significant delay
- * Issue #2203 – Incorrect timezone processing in Calendar
- * Issue #3909 – Multi-selection filters might be too long
- * Issue #3899 – Broken link from Opportunity to related Contact Request
+ * Issue #3979 ï¿½ Problems with DB server verification on install
+ * Issue #3916 ï¿½ Memory consumption is too high on installation
+ * Issue #3918 ï¿½ Problems with installation of packages from console
+ * Issue #3841 ï¿½ Very slow installation of packages
+ * Issue #3916 ï¿½ Installed application is not working correctly because of knp-menu version
+ * Issue #3839 ï¿½ Cache regeneration is too slow
+ * Issue #3525 ï¿½ Broken filters on Entity Configuration grid
+ * Issue #3974 ï¿½ Settings are not saved in sidebar widgets 
+ * Issue #3962 ï¿½ Workflow window opens with a significant delay
+ * Issue #2203 ï¿½ Incorrect timezone processing in Calendar
+ * Issue #3909 ï¿½ Multi-selection filters might be too long
+ * Issue #3899 ï¿½ Broken link from Opportunity to related Contact Request
 
 CHANGELOG for 1.0.0
 ===================

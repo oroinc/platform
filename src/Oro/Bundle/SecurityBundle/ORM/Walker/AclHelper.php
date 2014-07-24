@@ -50,11 +50,11 @@ class AclHelper
      * Mark query as acl protected
      *
      * @param Query|QueryBuilder $query
-     * @param string $permission
-     *
+     * @param string             $permission
+     * @param bool               $checkRelations
      * @return Query
      */
-    public function apply($query, $permission = "VIEW")
+    public function apply($query, $permission = "VIEW", $checkRelations = true)
     {
         $this->entityAliases = [];
         if ($query instanceof QueryBuilder) {
@@ -66,7 +66,7 @@ class AclHelper
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
             list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission, $query);
-            $conditionStorage = new AclConditionStorage($whereConditions, $joinConditions);
+            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : array());
             if ($ast->whereClause) {
                 $this->processSubselects($ast, $conditionStorage, $permission, $query);
             }

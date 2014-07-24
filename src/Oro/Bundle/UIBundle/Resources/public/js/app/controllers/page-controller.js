@@ -1,4 +1,4 @@
-/*jslint browser:true, nomen:true*/
+/*jslint browser:true, eqeq:true, nomen:true*/
 /*global define*/
 define([
     'jquery',
@@ -116,10 +116,7 @@ define([
          */
         _beforePageLoad: function (route, params, options) {
             var oldRoute, newRoute, url, opts;
-            // suppress 'page:beforeChange' event, on server redirection
-            if (options.redirection) {
-                return true;
-            }
+
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
@@ -176,7 +173,7 @@ define([
         onPageUpdated: function (model, resp, options) {
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
-                return true;
+                return;
             }
             //@todo develop approach to postpone 'page:afterChange' event
             // until all inline scripts on a page have not finished changes
@@ -250,7 +247,7 @@ define([
          */
         _processRedirect: function (data, options) {
             var url, delimiter, parser;
-            url = data.url || data.location;
+            url = data.url != null ? data.url : data.location;
             if (data.fullRedirect) {
                 delimiter = url.indexOf('?') === -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
