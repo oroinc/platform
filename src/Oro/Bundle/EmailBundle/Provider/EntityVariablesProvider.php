@@ -48,7 +48,21 @@ class EntityVariablesProvider implements VariablesProviderInterface
             }
 
             $fieldName = $fieldConfig->getId()->getFieldName();
-            if ($reflClass->hasProperty($fieldName) && $reflClass->pro($fieldName)
+            $getter = null;
+            if ($reflClass->hasProperty($fieldName) && $reflClass->getProperty($fieldName)->isPublic()) {
+                $varName = $fieldName;
+            } else {
+                $varName = Inflector::camelize($fieldName);
+                $methodName = 'get' . $varName;
+                if ($reflClass->hasMethod($methodName) && $reflClass->getMethod($methodName)->isPublic()) {
+                    $getter = $methodName;
+                } else {
+                    $methodName = 'is' . $varName;
+                    if ($reflClass->hasMethod($methodName) && $reflClass->getMethod($methodName)->isPublic()) {
+                        $getter = $methodName;
+                    }
+                }
+            }
 
             method_exists()
 
@@ -64,5 +78,31 @@ class EntityVariablesProvider implements VariablesProviderInterface
         );
 
         return ['entity' => $fields];
+    }
+
+    /**
+     * @param \ReflectionClass $reflClass
+     * @param string           $fieldName
+     * @return array [variable name, getter method name]
+     */
+    protected function getFieldAccessInfo(\ReflectionClass $reflClass, $fieldName)
+    {
+        $getter = null;
+        if ($reflClass->hasProperty($fieldName) && $reflClass->getProperty($fieldName)->isPublic()) {
+            return [$fieldName, null];
+        }
+
+        $varName = Inflector::camelize($fieldName);
+        $getter = 'get' . $varName;
+        if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
+            return [$varName, $getter];
+        }
+
+        $methodName = 'is' . $varName;
+        if ($reflClass->hasMethod($methodName) && $reflClass->getMethod($methodName)->isPublic()) {
+            return [$varName, $getter];
+        }
+
+        return [null, null];
     }
 }

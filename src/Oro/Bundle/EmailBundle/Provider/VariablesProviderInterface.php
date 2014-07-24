@@ -14,8 +14,8 @@ interface VariablesProviderInterface
      * @return array The list of variables in the following format:
      *               '[scope name]' => [
      *                  '[variable path]' => [
-     *                      'getter' => 'the method name',
-     *                      'type'   => 'variable type',
+     *                      'getter' => 'the method name', // optional
+     *                      'type'   => 'variable data type',
      *                      'label'  => 'variable label'
      *                  ]
      *               ]
