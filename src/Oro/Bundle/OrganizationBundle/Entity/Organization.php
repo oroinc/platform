@@ -87,6 +87,11 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     protected $businessUnits;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organization")
+     */
+    protected $users;
+
+    /**
      * @var \Datetime $created
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
