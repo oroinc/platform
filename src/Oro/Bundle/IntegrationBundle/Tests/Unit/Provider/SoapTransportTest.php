@@ -33,7 +33,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
             true,
             true,
             true,
-            ['getSoapClient']
+            ['getSoapClient', 'getSleepBetweenAttempt']
         );
 
         $this->soapClientMock = $this->getMockBuilder('\SoapClient')
@@ -45,6 +45,10 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
         $this->transportEntity = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
         $this->transportEntity->expects($this->any())->method('getSettingsBag')
             ->will($this->returnValue($this->settings));
+
+        $this->transport->expects($this->any())
+            ->method('getSleepBetweenAttempt')
+            ->will($this->returnValue(1));
     }
 
     /**
@@ -119,7 +123,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
         return [
             'Attempts'              => [
                 "HTTP/1.1 502 Bad gateway\n\r",
-                6,
+                (SOAPTransport::ATTEMPTS+1),
                 502
             ],
             'Internal server error' => [
