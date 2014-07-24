@@ -59,8 +59,6 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function call($action, $params = [])
     {
-        ini_set('default_socket_timeout', 1);
-
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
