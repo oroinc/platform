@@ -42,6 +42,7 @@ abstract class SOAPTransport implements TransportInterface
     public function init(Transport $transportEntity)
     {
         $this->resetAttemptCount();
+        $this->setSleepBetweenAttempts([5, 10, 20, 40, 80, 160, 320, 640]);
         $this->settings = $transportEntity->getSettingsBag();
         $wsdlUrl        = $this->settings->get('wsdl_url');
 
@@ -50,8 +51,6 @@ abstract class SOAPTransport implements TransportInterface
         }
 
         $this->client = $this->getSoapClient($wsdlUrl);
-
-        $this->setSleepBetweenAttempts([5, 10, 20, 40, 80, 160, 320, 640]);
     }
 
     /**
@@ -67,7 +66,7 @@ abstract class SOAPTransport implements TransportInterface
         } catch (\Exception $e) {
             if ($this->isAttemptNecessary()) {
                 $this->logAttempt();
-                $this->runSleepBetweenAttempt();
+                sleep($this->getSleepBetweenAttempt());
                 $this->attempt();
                 $result = $this->call($action, $params);
             } else {
@@ -233,12 +232,6 @@ abstract class SOAPTransport implements TransportInterface
     protected function getHttpStatusesForAttempt()
     {
         return [Codes::HTTP_BAD_GATEWAY, Codes::HTTP_SERVICE_UNAVAILABLE, Codes::HTTP_GATEWAY_TIMEOUT];
-    }
-
-
-    protected function runSleepBetweenAttempt()
-    {
-        sleep($this->getSleepBetweenAttempt());
     }
 
     /**
