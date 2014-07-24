@@ -121,6 +121,9 @@ abstract class SOAPTransport implements TransportInterface
         return [];
     }
 
+    /**
+     * @param LoggerStrategy $logger
+     */
     public function setLogger(LoggerStrategy $logger)
     {
         $this->logger = $logger;
