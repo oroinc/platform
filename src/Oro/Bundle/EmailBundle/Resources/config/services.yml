@@ -30,7 +30,7 @@ parameters:
     oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
 
     # Providers
-    oro_email.provider.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
+    oro_email.provider.variable_provider.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'

@@ -19,7 +19,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
-use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
+use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 
 /**
@@ -115,9 +115,9 @@ class EmailTemplateController extends RestController
     {
         $entityName = str_replace('_', '\\', $entityName);
 
-        /** @var VariablesProvider $provider */
+        /** @var EntityVariablesProvider $provider */
         $provider = $this->get('oro_email.provider.variable_provider');
-        $allowedData = $provider->getTemplateVariables($entityName);
+        $allowedData = $provider->getTemplateVariables(['entityName' => $entityName]);
 
         return $this->handleView(
             $this->view($allowedData, Codes::HTTP_OK)

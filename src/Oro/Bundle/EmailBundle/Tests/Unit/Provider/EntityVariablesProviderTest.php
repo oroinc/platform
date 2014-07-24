@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
+use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
 
-class VariableProviderTest extends \PHPUnit_Framework_TestCase
+class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ENTITY_NAME = 'someEntity';
     const TEST_NOT_NEEDED_ENTITY_NAME = 'anotherEntity';
@@ -21,7 +21,7 @@ class VariableProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject  */
     protected $user;
 
-    /** @var VariablesProvider */
+    /** @var EntityVariablesProvider */
     protected $provider;
 
     protected function setUp()
@@ -40,7 +40,7 @@ class VariableProviderTest extends \PHPUnit_Framework_TestCase
         $this->securityContext->expects($this->any())->method('getToken')
             ->will($this->returnValue($token));
 
-        $this->provider = new VariablesProvider($this->securityContext, $this->configProvider);
+        $this->provider = new EntityVariablesProvider($this->securityContext, $this->configProvider);
     }
 
     protected function tearDown()
@@ -136,9 +136,9 @@ class VariableProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-            $result = $this->provider->getTemplateVariables(self::TEST_ENTITY_NAME);
+            $result = $this->provider->getTemplateVariables(['entityName' => self::TEST_ENTITY_NAME]);
         } else {
-            $result = $this->provider->getTemplateVariables(get_class($this->user));
+            $result = $this->provider->getTemplateVariables(['entityName' => get_class($this->user)]);
         }
 
         $this->assertArrayHasKey('user', $result);
