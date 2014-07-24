@@ -98,6 +98,7 @@ class ExtendConfigDumper
                 if ($extendConfig->is('is_extend')) {
                     $this->checkSchema($extendConfig, $aliases);
                 }
+                $extendProvider->flush();
                 $this->checkState($extendConfig);
                 $extendProvider->flush();
             }
