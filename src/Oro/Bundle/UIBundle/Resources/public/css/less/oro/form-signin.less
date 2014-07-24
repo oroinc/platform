@@ -59,7 +59,8 @@
     padding:0 10px;
   }
   input[type="text"],
-  input[type="password"] {
+  input[type="password"],
+  select{
     height: 16px;
     font: 14px/16px @baseFontFamily;
     color: #000;
@@ -72,7 +73,8 @@
   }
   .add-on {
     & + input[type="text"],
-    & + input[type="password"] {
+    & + input[type="password"],
+    & + select{
       width: 205px;
       border-left-color:#ccc;
       .border-radius(0 5px 5px 0);

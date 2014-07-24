@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationFormLoginFactory;
 
 class OroSecurityBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroSecurityBundle extends Bundle
 
         $container->addCompilerPass(new AclConfigurationPass());
         $container->addCompilerPass(new AclAnnotationProviderPass());
+        $container->getExtension('security')->addSecurityListenerFactory(new OrganizationFormLoginFactory());
     }
 }

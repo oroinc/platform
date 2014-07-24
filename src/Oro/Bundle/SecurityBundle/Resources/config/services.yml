@@ -372,3 +372,21 @@ services:
             - @oro_security.link.ownership_tree_provider
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+
+    oro_security.authentication.listener.form:
+        class: Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+        parent: security.authentication.listener.abstract
+        abstract: true
+        calls:
+            - [setEntityManager, [@doctrine.orm.entity_manager]]
+
+    oro_security.authentication.provider.username_password_organization:
+        class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+        arguments:
+            - null
+            - @security.user_checker
+            - null
+            - @security.encoder_factory
+            - %security.authentication.hide_user_not_found%
+        abstract: true
+        public: false

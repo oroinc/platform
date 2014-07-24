@@ -7,14 +7,12 @@
 
     <form action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
         <div class="title-box">
+            {% if oro_theme_logo() %}
             <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}" title="{{ oro_config_value('oro_ui.application_title')|escape }}">
-                {% if oro_theme_logo() %}
-                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
-                {% else %}
-                    {{ oro_config_value('oro_ui.application_name') }}
-                {% endif %}
+                <img src="{{ asset(oro_theme_logo()) }}">
             </h1>
             <span class="divider-vertical"></span>
+            {% endif %}
             <h2 class="title">{{ 'Login'|trans }}</h2>
         </div>
         <fieldset>
@@ -25,6 +23,7 @@
             {% endif %}
             {%- set usernameLabel = 'Username'|trans %}
             {%- set passwordLabel = 'Password'|trans %}
+            {%- set organizationLabel = 'Organization'|trans %}
             {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
             <div class="input-prepend">
                 {% if showLabels %}
@@ -38,6 +37,7 @@
                 {% endif %}
                 <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
             </div>
+            {{ oro_get_login_organizations('_organization', organizationLabel, 'showLabels') }}
             <label class="checkbox oro-remember-me">
                 <input type="checkbox" id="remember_me" name="_remember_me" value="on" /> {{ 'Remember me on this computer'|trans }}
             </label>

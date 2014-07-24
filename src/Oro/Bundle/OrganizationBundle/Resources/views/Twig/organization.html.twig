@@ -1,0 +1,15 @@
+{% if organizations|length > 1 %}
+    <div class="input-prepend">
+        {% if showLabels %}
+            <span class="add-on">{{ label }}</span>
+        {% endif %}
+        <select id="prependedInput3" class="span2" name="_organization" required="required" >
+            <option value="">{{ 'Choose a organization...'|trans }}</option>
+            {% for organization in organizations %}
+                <option value="{{ organization.id }}">{{ organization.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% else %}
+    <input type="hidden" id="prependedInput3" class="span2" name="_organization" required="required" value="{{ organizations[0].id }}" />
+{% endif %}
