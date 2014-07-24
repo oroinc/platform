@@ -9,17 +9,21 @@ use FOS\Rest\Util\Codes;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
-use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
-abstract class SOAPTransport implements TransportInterface
+abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
     const ATTEMPTS = 7;
+
+    use LoggerAwareTrait;
 
     /** @var ParameterBag */
     protected $settings;
@@ -32,9 +36,6 @@ abstract class SOAPTransport implements TransportInterface
 
     /** @var array */
     protected $sleepBetweenAttempt;
-
-    /** @var LoggerStrategy */
-    protected $logger;
 
     /**
      * {@inheritdoc}
@@ -76,7 +77,7 @@ abstract class SOAPTransport implements TransportInterface
                     $this->getLastResponse(),
                     $e,
                     $this->getLastRequest(),
-                    $this->client->__getLastResponseHeaders()
+                    $this->getLastResponseHeaders()
                 );
             }
         }
@@ -119,14 +120,6 @@ abstract class SOAPTransport implements TransportInterface
     public function __sleep()
     {
         return [];
-    }
-
-    /**
-     * @param LoggerStrategy $logger
-     */
-    public function setLogger(LoggerStrategy $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -192,7 +185,7 @@ abstract class SOAPTransport implements TransportInterface
      */
     protected function isResultOk(array $headers = [])
     {
-        if (!empty($headers['code']) && Codes::HTTP_OK === (int)$headers['code']) {
+        if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
             return true;
         }
         return false;
@@ -266,7 +259,7 @@ abstract class SOAPTransport implements TransportInterface
     {
         if (!empty($this->logger)) {
             $this->logger->warning(
-                '[Warning] Attempt number ' . ($this->attempted+1)
+                '[Warning] Attempt number ' . ($this->attempted + 1)
                 . ' with ' . $this->getSleepBetweenAttempt() . ' sec delay.'
             );
         }
