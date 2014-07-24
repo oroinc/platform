@@ -2,18 +2,23 @@
 /*global define*/
 define([
     'underscore',
-    './../base/view'
-], function (_, BaseView) {
+    './../base/page-region-view'
+], function (_, PageRegionView) {
     'use strict';
 
     var BreadcrumbView;
 
-    BreadcrumbView = BaseView.extend({
+    BreadcrumbView = PageRegionView.extend({
         listen: {
             'mainMenuUpdated mediator': 'onMenuUpdate'
         },
+        pageItems: ['breadcrumb'],
 
-        template: _.template('<ul class="breadcrumb">' +
+        template: function (data) {
+            return data.breadcrumb;
+        },
+
+        breadcrumbsTemplate: _.template('<ul class="breadcrumb">' +
             '<% for (var i =0; i < breadcrumbs.length; i++) { %>' +
                 '<li>' +
                     '<%= breadcrumbs[i] %>' +
@@ -33,26 +38,14 @@ define([
          * @param {Object} menuView
          */
         onMenuUpdate: function (menuView) {
-            this.data = {
-                breadcrumbs: menuView.getActiveItems()
-            };
-            this.render();
-            this.data = null;
-        },
-
-        /**
-         * Prevents rendering a view without page data
-         *
-         * @override
-         */
-        render: function () {
-            var data;
-            data = this.getTemplateData();
-            if (!data) {
-                return;
+            var breadcrumbs = menuView.getActiveItems();
+            if (breadcrumbs.length) {
+                this.data = {
+                    'breadcrumb': this.breadcrumbsTemplate({'breadcrumbs': breadcrumbs})
+                };
+                this.render();
+                this.data = null;
             }
-
-            BreadcrumbView.__super__.render.call(this);
         },
 
         /**
