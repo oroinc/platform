@@ -248,7 +248,6 @@ abstract class SOAPTransport implements TransportInterface
             return (int)$this->sleepBetweenAttempt[$this->attempted];
         }
 
-        reset($this->sleepBetweenAttempt);
         return (int)end($this->sleepBetweenAttempt);
     }
 
