@@ -208,8 +208,9 @@ services:
     oro_email.provider.variable_provider:
         class: %oro_email.provider.variable_provider.class%
         arguments:
-            - @security.context
             - @oro_entity_config.provider.email
+            - @oro_entity_config.provider.entity
+            - @translator
         lazy: true
 
     oro_email.validator.variables_validator:

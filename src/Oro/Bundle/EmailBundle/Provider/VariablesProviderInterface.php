@@ -12,11 +12,11 @@ interface VariablesProviderInterface
      *                       template type etc.
      *
      * @return array The list of variables in the following format:
-     *               '[scope name]' => [
-     *                  '[variable path]' => [
-     *                      'getter' => 'the method name', // optional
-     *                      'type'   => 'variable data type',
-     *                      'label'  => 'variable label'
+     *               {scope name} => [
+     *                  {variable path} => [
+     *                      'type'   => {variable data type}
+     *                      'name'   => {translated variable name}
+     *                      'getter' => {method name} // optional
      *                  ]
      *               ]
      *               The variable path should be compatible with Symfony PropertyAccess Component

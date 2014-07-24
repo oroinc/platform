@@ -10,8 +10,7 @@ define(['backbone', 'routing'
      */
     return Backbone.Model.extend({
         defaults: {
-            user:   [],
-            entity: [],
+            variables:  [],
             entityName: null
         },
 

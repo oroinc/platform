@@ -56,16 +56,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          */
         render: function () {
             var html,
-                userVars   = this.model.get('user'),
-                entityVars = this.model.get('entity'),
-                $el        = $(this.el);
+                vars   = this.model.get('variables'),
+                $el    = $(this.el);
 
-            if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
+            if (_.isEmpty(vars)) {
                 $el.parent().hide();
             } else {
                 html = _.template(this.options.template.html(), {
-                    userVars: this.model.get('user'),
-                    entityVars: this.model.get('entity'),
+                    vars:  vars,
                     title: __('Click to insert variable or drag it.')
                 });
 

@@ -113,11 +113,14 @@ class EmailTemplateController extends RestController
      */
     public function getAvailableVariablesAction($entityName = null)
     {
-        $entityName = str_replace('_', '\\', $entityName);
-
         /** @var EntityVariablesProvider $provider */
         $provider = $this->get('oro_email.provider.variable_provider');
-        $allowedData = $provider->getTemplateVariables(['entityName' => $entityName]);
+
+        $context = [];
+        if ($entityName) {
+            $context['entityClass'] = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        }
+        $allowedData = $provider->getTemplateVariables($context);
 
         return $this->handleView(
             $this->view($allowedData, Codes::HTTP_OK)
