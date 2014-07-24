@@ -6,3 +6,4 @@
 oro:
     entity_extend:
         schema_updated: Schema updated
+        schema_update_failed: Schema update failed
