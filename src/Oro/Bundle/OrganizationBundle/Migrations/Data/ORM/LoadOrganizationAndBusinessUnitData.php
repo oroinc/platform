@@ -18,8 +18,12 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture
         $defaultOrganization = new Organization();
         $defaultOrganization
             ->setName(self::MAIN_ORGANIZATION)
-            ->setCurrency('USD')
-            ->setPrecision('000 000.00');
+            ->setEnabled(true);
+
+//            ->setName(self::MAIN_ORGANIZATION)
+//            ->setCurrency('USD')
+//            ->setPrecision('000 000.00');
+
         $manager->persist($defaultOrganization);
 
         // load default business unit

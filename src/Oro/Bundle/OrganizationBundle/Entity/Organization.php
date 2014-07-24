@@ -7,7 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
+use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
 
 /**
  * Organization
@@ -30,7 +32,7 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  *      }
  * )
  */
-class Organization implements NotificationEmailInterface
+class Organization extends ExtendOrganization implements NotificationEmailInterface
 {
     /**
      * @var integer
@@ -57,6 +59,20 @@ class Organization implements NotificationEmailInterface
      * )
      */
     protected $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="text", nullable=true)
+     * @ConfigField(
+     *  defaultValues={
+     *    "dataaudit"={
+     *       "auditable"=true
+     *    }
+     *   }
+     * )
+     */
+    protected $description;
 
     /**
      * @var ArrayCollection
@@ -101,10 +117,7 @@ class Organization implements NotificationEmailInterface
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
-     * @Oro\Versioned
+     * @ORM\Column(name="enabled", type="boolean")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -113,7 +126,7 @@ class Organization implements NotificationEmailInterface
      *      }
      * )
      */
-    protected $enabled = true;
+    protected $enabled;
 
     /**
      * Get id
@@ -146,6 +159,26 @@ class Organization implements NotificationEmailInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $description
+     *
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
