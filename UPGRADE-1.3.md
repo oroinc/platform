@@ -2,56 +2,57 @@ UPGRADE FROM 1.2 to 1.3
 =======================
 
 ### General
-*	Activity bundle was added
-*	Attachment bundle was added
-*	Note bundle was added
-*	Tracking bundle was added
-*	Address bundle changed:
-	*	Country form type and Region form type now have option `random_id` equal to true by default
-	*	Remove normalizers because we don’t need them anymore
-	*	Add `region_name` virtual field for AbstractAddress entity. It’s done for use  `region_name` field only  in filters and reports instead of using `AbstractAddress:: regionText` field and relation to region dictionary table separate.
-*	Chart bundle changed:
-	*	Add `ChartOptionsBuilder` class. It help build chart options. We moved this logic from `getChartOptions` method  in `OroReportBundle:Report` entity.
-*	Cron bundle changed:
-	*	Remove `RaiseExceptionLogger` - not used anywhere 
-	*	Move `OutputLogger` to Oro Log Component 
-	*	Move dump logic to `TranslationPackDumper` from `TranslationDump` command
-*	Data Audit bundle changed:
-	*	Modify `change_history_block` placeholder `audit_entity_class` not need to be define anymore “Change History” link will be shown if entity is auditable.
-*	Data Grid bundle changed:
-	*	Add `GroupConcat`  custom DQL function. Used for concatenation contact groups.
-*	Distribution bundle changed:
-	*	Add php v.5.3 changed for `OroKernel` class for correct run install page with php v.5.3 installed
-	*	Add check php version before boot in `OroKernel` to prevent boot application page with php v.5.3 installed.
-*	Email bundle changed:
-	*	Make email entity extend
-	*	Add `EmailHolderHelper` class. It help receive email address  from object.
-	*	Add `oro_get_email` twig function. It gets the email address of the given object.
-* Entity Config bundle changed:
-	* Add FieldAccessor class. Useful for access to object fields.
-* Import Export bundle changed:
-	* Add `EntityNameAwareInterface`. Interface used to work with entity class.
-	* Add `EntityNameAwareProcessor`. Interface used to work with entity class inside processors. Aggregates ProcessorInterface and EntityNameAwareInterface
-* Installer bundle changed:
-	* Remove unused `'oro:platform:check-requirements'` commnd
-	* Remove unused `RequirementsListener` class and `RequirementsHelper` class
-	* Remove not needed `ChannelFormTwoWaySyncSubscriber`
-	* Rename `ChannelDeleteProviderInterface` -> `DeleteProviderInterface`
-	* Add `RestClientInterface` and `GuzzleRestClient`. Realisation of rest client based on Guzzle http client.
-	* Add `AbstractRestTransport` class - base class for rest transports
-	* Remove `SimpleChannelType` and SimpleTransport because it is not used.
-* Navigation bundle changed:
-	* Remove navigation.js. In exchange you can use events through mediator. An example, some new events: `'page:beforeChange'`, `'page:afterChange'`, `'page:request'`, etc.
-* Organization bundle changed:
-	* Add Organization select form type `'oro_organization_select'`.
-* Requirejs bundle changed:
-	* Removed `requirejs_config_extend` placeholder.
-* Security bundle changed:
-	* Add to AclHelper::apply possibility to not check entity relations.
-* Ui bundle changed:
-	* Add Chaplin 1.0.0 js librarie and use it in routing etc.
-	* Add `'oro_sort_by'` twig filter. It sorts an array by specified property
-* User bundle changed:
-	* Remove `UserNormalizer`.
-* Windows bundle changed:
-	* Add default forbidden error handler for `oro.DialogWidget`.
+*	Activity bundle has been added.
+*	Attachment bundle has been added.
+*	Note bundle has been added.
+*	Tracking bundle has been added.
+*	Address bundle has been modified:
+	*	Country and Region form types now have `random_id` options set to true by default.
+	*	Normalizers were removed because they are no longer needed.
+	*	`region_name` virtual field has been added for `AbstractAddress` entity. The purpose is to use `region_name` field only in filters and reports instead of simultaneous use of `AbstractAddress:: regionText` field and relation to region dictionary table.
+*	Chart bundle has been modified:
+	*	`ChartOptionsBuilder` class has been added to help building chart options. Its logic was moved from `getChartOptions` method in `OroReportBundle:Report` entity.
+*	Cron bundle has been modified:
+	*	Unused `RaiseExceptionLogger` has been removed.
+	*	`OutputLogger` has been moved to Oro Log Component.
+	*	Dump logic has been moved to `TranslationPackDumper` from `TranslationDump` command.
+*	Data Audit bundle has been modified:
+	*	`change_history_block` placeholder has been modified so it is no longer needed to define `audit_entity_class`. Change History link will appear on auditable entities.
+*	Data Grid bundle has been modified:
+	*	`GroupConcat` custom DQL function has been added to allow concatenation of contact groups.
+*	 Distribution bundle has been modified:
+	*	Support of php v.5.3 has been added to `OroKernel` class for correct run of application install with php v.5.3.
+	*	Pre-boot check of php version has been added to `OroKernel` in order to prevent application start with php v.5.3 installed.
+*	Email bundle has been modified:
+	*	`Email` entity is now extended.
+	*	`EmailHolderHelper` class has been added to help getting email address from object.
+	*	`oro_get_email` twig function has been added to gets the email address of the given object.
+*	Entity Config bundle has been modified:
+	*	`FieldAccessor` class has been added to ease access to object fields.
+*	Import Export bundle has been modified:
+	*	`EntityNameAwareInterface` interface has been added to work with entity class.
+	*	`EntityNameAwareProcessor` interface has been added to work with entity class inside processors. It aggregates `ProcessorInterface` and `EntityNameAwareInterface`.
+* Installer bundle has been modified:
+	* Unused `oro:platform:check-requirements` command has been removed
+	* Unused `RequirementsListener` and `RequirementsHelper` classes have been removed
+	* `ChannelFormTwoWaySyncSubscriber` has been removed because it is no longer needed
+	* `ChannelDeleteProviderInterface` was renamed to `DeleteProviderInterface`
+	* `RestClientInterface` and `GuzzleRestClient` have been added. Realization of REST client is based on Guzzle http client.
+	* `AbstractRestTransport` base class for REST transports has been added.
+	* Unused `SimpleChannelType` and `SimpleTransport` have been removed.
+*	Navigation bundle has been modified:
+	*	navigation.js has been removed. Instead, you may use events through mediator: `page:beforeChange`, `page:afterChange`, `page:request`, etc.
+*	Organization bundle has been modified:
+	*	Organization select form type `oro_organization_select` has been added.
+*	Requirejs bundle has been modified:
+	*	`requirejs_config_extend` placeholder has been removed.
+*	Security bundle has been modified:
+	*	It is now possible to omit checking entity relations in `AclHelper::apply`.
+*	Ui bundle has been modified:
+	*	Chaplin 1.0.0 js library has been introduced.
+	*	`oro_sort_by`' twig filter has been added to handle array sorting by specified property
+*	User bundle has been modified:
+	*	`UserNormalizer` has been removed.
+*	Windows bundle has been modified:
+	* Default forbidden error handler has been added for `oro.DialogWidget`.
+
