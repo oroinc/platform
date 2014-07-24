@@ -52,8 +52,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                     mediator.execute('redirectTo', {url: url});
                 }).fail(function () {
                     modal.close();
+                    messenger.notificationFlashMessage('error', __('oro.entity_extend.schema_update_failed'));
                 });
-
             }
 
             confirmUpdate.on('ok', execute);

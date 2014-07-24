@@ -98,6 +98,9 @@ class ExtendConfigDumper
                 if ($extendConfig->is('is_extend')) {
                     $this->checkSchema($extendConfig, $aliases);
                 }
+                // some bundles can change configs in pre persist events,
+                // and other bundles can produce more changes depending on already made, it's a bit hacky,
+                // but it's a service operation so called inevitable evil
                 $extendProvider->flush();
                 $this->checkState($extendConfig);
                 $extendProvider->flush();
