@@ -102,55 +102,6 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     *
-     * @dataProvider formatProvider
-     *
-     * @param string $expectedFormat
-     * @param string $inputFormat
-     */
-    public function testDump($expectedFormat, $inputFormat)
-    {
-        $kernel = new TestKernel();
-        $kernel->boot();
-
-        $phpUnit    = $this;
-        $writerMock = $this->getMock('Symfony\Component\Translation\Writer\TranslationWriter');
-        $writerMock->expects($this->once())->method('writeTranslations')->will(
-            $this->returnCallback(
-                function ($result, $format, $path) use ($phpUnit, $expectedFormat) {
-                    $separator = DIRECTORY_SEPARATOR;
-                    $result    = strpos(
-                        $path['path'],
-                        "language-pack/SomeProject{$separator}SomeBundle{$separator}translations"
-                    );
-                    $phpUnit->assertTrue($result !== false);
-
-                    $phpUnit->assertEquals($format, $expectedFormat);
-                }
-            )
-        );
-
-        $extractor = new ChainExtractor();
-        $kernel->getContainer()->set('translation.writer', $writerMock);
-        $kernel->getContainer()->set('translation.loader', new TranslationLoader());
-        $kernel->getContainer()->set('translation.extractor', $extractor);
-
-        $app         = new Application($kernel);
-        $commandMock = $this->getCommandMock(array('createDirectory'));
-        $commandMock->expects($this->once())->method('createDirectory');
-        $app->add($commandMock);
-        $command = $app->find('oro:translation:pack');
-        $command->setApplication($app);
-
-        $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), '--dump' => true, 'project' => 'SomeProject');
-        if ($inputFormat) {
-            $input['--output-format'] = $inputFormat;
-        }
-        $tester->execute($input);
-    }
-
     public function testUpload()
     {
         $this->runUploadDownloadTest('upload');
@@ -247,21 +198,6 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCreateDirectory()
-    {
-        $dirPath = sys_get_temp_dir() . '/testDir';
-        $cmd     = $this->getCommandMock();
-
-        $class  = new \ReflectionClass($cmd);
-        $method = $class->getMethod('createDirectory');
-        $method->setAccessible(true);
-
-        $method->invokeArgs($cmd, array($dirPath));
-
-        $this->assertTrue(is_dir($dirPath));
-        rmdir($dirPath);
-    }
-
     /**
      * Prepares command mock
      * asText mocked by default in case when we don't need to mock anything
@@ -286,28 +222,5 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
     protected function getNewMock($class)
     {
         return $this->getMock($class, [], [], '', false);
-    }
-
-    public function testRemovePlaceholders()
-    {
-        $testArr = array(
-            'oro.entity_merge.before_merge_entity' => 'oro entity merge before merge entity',
-            'oro.entity_merge.after_merge_entity' => 'oro entity merge after merge entity',
-            '%oro.entity_merge%' => '%oro.entity_merge%',
-            'oro.entity_merge.after_merge_field' => 'oro entity merge after mergefield',
-            'oro.entity_merge.build_metadata' => 'oro entity merge build metadata',
-            '%oro.entity.name% merge 20% create %entity_data%' => '%oro.entity.name% merge 20% create %entity.data%',
-            '%oro.before_value_render%' => '%oro.before_value_render%'
-        );
-
-        $messageCatalogue = new MessageCatalogue('en');
-        $messageCatalogue->add($testArr);
-        $this->assertCount(7, $messageCatalogue->all('messages'));
-        $cmd = $this->getCommandMock();
-        $class = new \ReflectionClass($cmd);
-        $method = $class->getMethod('removePlaceholders');
-        $method->setAccessible(true);
-        $method->invokeArgs($cmd, array($messageCatalogue));
-        $this->assertCount(5, $messageCatalogue->all('messages'));
     }
 }
