@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TrackingBundle\Tests\Unit\ImportExport;
+namespace Oro\Bundle\TrackingBundle\Tests\Functional\ImportExport;
 
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -62,11 +62,6 @@ class LogReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader = new LogReader($this->contextRegistry);
     }
 
-    public function tearDown()
-    {
-        $this->fs->remove($this->directory);
-    }
-
     public function testRead()
     {
         $data = [
@@ -74,7 +69,7 @@ class LogReaderTest extends \PHPUnit_Framework_TestCase
             'value' => 'done'
         ];
 
-        $filename = $this->directory . DIRECTORY_SEPARATOR . time() . '.log';
+        $filename = $this->directory . DIRECTORY_SEPARATOR . 'valid.log';
         $this->fs->dumpFile($filename, json_encode($data));
 
         $this->context
@@ -121,7 +116,7 @@ class LogReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadFileNotValid()
     {
-        $filename = $this->directory . DIRECTORY_SEPARATOR . time() . '.log';
+        $filename = $this->directory . DIRECTORY_SEPARATOR . 'not_valid.log';
         $this->fs->touch($filename);
 
         $this->context

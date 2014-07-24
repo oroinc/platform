@@ -23,10 +23,10 @@ oro:
         entity_label:         Organization
         entity_plural_label:  Organizations
         entity_description:   Represent organization
-        id.label:        Id
-        precision.label: Precision
-        name.label:      Name
-        currency.label:  Currency
+        id.label:          Id
+        name.label:        Name
+        description.label: Description
+        enabled.label:     Enabled
         business_units.label: Bussines units
         form:
             choose_organization: Choose a organization...

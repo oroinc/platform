@@ -11,12 +11,8 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 
 class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
-
     /** @var Integration|\PHPUnit_Framework_MockObject_MockObject */
     protected $integration;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $processorRegistry;
@@ -35,11 +31,6 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder', 'getRepository'))
-            ->getMock();
-
         $this->processorRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
 
         $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
@@ -60,7 +51,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        unset($this->em, $this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
+        unset($this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
     }
 
     /**
@@ -103,9 +94,6 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getConnectorType')
             ->will($this->returnValue($realConnector));
 
-        $this->em->expects($this->never())
-            ->method('getRepository');
-
         $this->integration->expects($this->once())
             ->method('getEnabled')
             ->will($this->returnValue(true));
@@ -130,14 +118,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($jobResult));
 
-        $processor = new ReverseSyncProcessor(
-            $this->em,
-            $this->processorRegistry,
-            $this->jobExecutor,
-            $this->registry,
-            $this->log
-        );
-
+        $processor = $this->getReverseSyncProcessor();
         $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 
@@ -148,13 +129,12 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
      */
-    protected function getReverseSyncProcessor($mockedMethods = [])
+    protected function getReverseSyncProcessor($mockedMethods = null)
     {
         return $this->getMock(
             'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor',
             $mockedMethods,
             [
-                $this->em,
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,

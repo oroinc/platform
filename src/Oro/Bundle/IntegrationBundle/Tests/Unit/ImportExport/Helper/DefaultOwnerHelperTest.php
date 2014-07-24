@@ -40,7 +40,11 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $this->helper = new DefaultOwnerHelper($this->em, $this->metadataProvider);
+        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry->expects($this->any())->method('getManager')
+            ->will($this->returnValue($this->em));
+
+        $this->helper = new DefaultOwnerHelper($registry, $this->metadataProvider);
     }
 
     public function tearDown()

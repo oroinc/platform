@@ -38,7 +38,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
 
         $this->soapClientMock = $this->getMockBuilder('\SoapClient')
             ->disableOriginalConstructor()
-            ->setMethods(['__soapCall'])
+            ->setMethods(['__soapCall', '__getLastResponseHeaders'])
             ->getMock();
 
         $this->settings        = new ParameterBag();
@@ -60,14 +60,11 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
      */
     public function testInit()
     {
-        $isDebug = false;
-
         $this->transport->expects($this->once())
             ->method('getSoapClient')
             ->will($this->returnValue($this->soapClientMock));
 
         $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
-        $this->settings->set('debug', $isDebug);
 
         try {
             $this->transport->init($this->transportEntity);
@@ -89,5 +86,85 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
     public function testInitErrors()
     {
         $this->transport->init($this->transportEntity);
+    }
+
+    /**
+     * @dataProvider exceptionProvider
+     *
+     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException
+     */
+    public function testMultipleAttemptException($header, $attempt, $code)
+    {
+        $this->soapClientMock->expects($this->any())
+            ->method('__getLastResponseHeaders')
+            ->will($this->returnValue($header));
+        $this->soapClientMock->expects($this->exactly($attempt))
+            ->method('__soapCall')
+            ->will($this->throwException(new \Exception('error', $code)));
+
+        $this->transport->expects($this->once())
+            ->method('getSoapClient')
+            ->will($this->returnValue($this->soapClientMock));
+
+        $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
+        $this->transport->init($this->transportEntity);
+        $this->transport->call('test');
+    }
+
+    /**
+     * @return array
+     */
+    public function exceptionProvider()
+    {
+        return [
+            'Attempts'              => [
+                "HTTP/1.1 502 Bad gateway\n\r",
+                6,
+                502
+            ],
+            'Internal server error' => [
+                "HTTP/1.1 500 Internal server error\n\r",
+                1,
+                500
+            ]
+        ];
+    }
+
+    public function testMultipleAttempt()
+    {
+        $this->soapClientMock->expects($this->at(0))
+            ->method('__getLastResponseHeaders')
+            ->will($this->returnValue("HTTP/1.1 502 Bad gateway\n\r"));
+        $this->soapClientMock->expects($this->at(0))
+            ->method('__soapCall')
+            ->will($this->throwException(new \Exception('error', 502)));
+
+        $this->soapClientMock->expects($this->at(1))
+            ->method('__getLastResponseHeaders')
+            ->will($this->returnValue("HTTP/1.1 503 Service unavailable Explained\n\r"));
+        $this->soapClientMock->expects($this->at(1))
+            ->method('__soapCall')
+            ->will($this->throwException(new \Exception('error', 503)));
+
+        $this->soapClientMock->expects($this->at(2))
+            ->method('__getLastResponseHeaders')
+            ->will($this->returnValue("HTTP/1.1 504 Gateway timeout Explained\n\r"));
+        $this->soapClientMock->expects($this->at(2))
+            ->method('__soapCall')
+            ->will($this->throwException(new \Exception('error', 504)));
+
+        $this->soapClientMock->expects($this->at(4))
+            ->method('__getLastResponseHeaders')
+            ->will($this->returnValue("HTTP/1.1 200 OK\n\r"));
+        $this->soapClientMock->expects($this->at(4))
+            ->method('__soapCall');
+
+        $this->transport->expects($this->once())
+            ->method('getSoapClient')
+            ->will($this->returnValue($this->soapClientMock));
+
+        $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
+        $this->transport->init($this->transportEntity);
+        $this->transport->call('test');
     }
 }
