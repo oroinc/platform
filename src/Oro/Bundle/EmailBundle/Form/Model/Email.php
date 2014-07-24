@@ -2,41 +2,32 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
-class Email
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+
+class Email implements EmailTemplateAwareInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $gridName;
 
-    /**
-     * @var string
-     */
-    protected $entityClass;
+    /** @var string */
+    protected $entityName;
 
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     protected $entityId;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $from;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     protected $to;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $subject;
 
-    /**
-     * @var string
-     */
+    /** @var EmailTemplate */
+    protected $template;
+
+    /** @var string */
     protected $body;
 
     /**
@@ -61,6 +52,7 @@ class Email
      * Set id of emails datagrid
      *
      * @param string $gridName
+     *
      * @return $this
      */
     public function setGridName($gridName)
@@ -71,24 +63,23 @@ class Email
     }
 
     /**
-     * Get class name of the target entity
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getEntityClass()
+    public function getEntityName()
     {
-        return $this->entityClass;
+        return $this->entityName;
     }
 
     /**
      * Set class name of the target entity
      *
-     * @param string $entityClass
+     * @param string $entityName
+     *
      * @return $this
      */
-    public function setEntityClass($entityClass)
+    public function setEntityName($entityName)
     {
-        $this->entityClass = $entityClass;
+        $this->entityName = $entityName;
 
         return $this;
     }
@@ -107,6 +98,7 @@ class Email
      * Set id of the target entity
      *
      * @param string $entityId
+     *
      * @return $this
      */
     public function setEntityId($entityId)
@@ -140,6 +132,7 @@ class Email
      * Set FROM email address
      *
      * @param string $from
+     *
      * @return $this
      */
     public function setFrom($from)
@@ -163,6 +156,7 @@ class Email
      * Set TO email addresses
      *
      * @param string[] $to
+     *
      * @return $this
      */
     public function setTo(array $to)
@@ -186,6 +180,7 @@ class Email
      * Set email subject
      *
      * @param string $subject
+     *
      * @return $this
      */
     public function setSubject($subject)
@@ -193,6 +188,26 @@ class Email
         $this->subject = $subject;
 
         return $this;
+    }
+
+    /**
+     * @param EmailTemplate $template
+     *
+     * @return $this
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTemplate()
+    {
+        return $this->template;
     }
 
     /**
@@ -209,6 +224,7 @@ class Email
      * Set email body
      *
      * @param string $body
+     *
      * @return $this
      */
     public function setBody($body)

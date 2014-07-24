@@ -9,26 +9,23 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
+use Oro\Bundle\EmailBundle\Form\Model\EmailTemplateAwareInterface;
 
+/**
+ * BuildTemplateFormSubscriber used for populating templates choices
+ *
+ * @package Oro\Bundle\EmailBundle
+ */
 class BuildTemplateFormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     private $em;
 
-    /**
-     * Form factory.
-     *
-     * @var FormFactoryInterface
-     */
+    /** @var FormFactoryInterface */
     private $factory;
 
     /**
-     * Constructor.
-     *
-     * @param EntityManager $em
+     * @param EntityManager        $em
      * @param FormFactoryInterface $factory
      */
     public function __construct(EntityManager $em, FormFactoryInterface $factory)
@@ -42,57 +39,55 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_SUBMIT   => 'preSubmit'
-        );
+        ];
     }
 
     /**
-     * Removes or adds a template field based on the entity set.
+     * Adds a template field based on the entity set
      *
      * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
-        $notification = $event->getData();
+        /** @var EmailTemplateAwareInterface $eventObject */
+        $eventObject = $event->getData();
         $form = $event->getForm();
 
-        if (null === $notification) {
+        if (null === $eventObject || null === $eventObject->getEntityName()) {
             return;
         }
+        $entityName = $eventObject->getEntityName();
 
-        $entityName = $notification->getEntityName();
-
-        if ($entityName) {
-            if ($form->has('template')) {
-                $config = $form->get('template')->getConfig()->getOptions();
-                unset($config['choice_list']);
-                unset($config['choices']);
-            } else {
-                $config = array();
-            }
-
-            $config['selectedEntity'] = $entityName;
-            $config['query_builder'] = $this->getTemplateClosure($entityName);
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
-            $form->add(
-                $this->factory->createNamed(
-                    'template',
-                    'oro_email_template_list',
-                    $notification->getTemplate(),
-                    $config
-                )
-            );
+        if ($form->has('template')) {
+            $config = $form->get('template')->getConfig()->getOptions();
+            unset($config['choice_list']);
+            unset($config['choices']);
+        } else {
+            $config = [];
         }
+
+        $config['selectedEntity'] = $entityName;
+        $config['query_builder']  = $this->getTemplateClosure($entityName);
+
+        if (array_key_exists('auto_initialize', $config)) {
+            $config['auto_initialize'] = false;
+        }
+
+        $form->add(
+            $this->factory->createNamed(
+                'template',
+                'oro_email_template_list',
+                $eventObject->getTemplate(),
+                $config
+            )
+        );
     }
 
     /**
-     * Removes or adds a template field based on the entity set on submitted form.
+     * Adds a template field based on the entity set on submitted form
      *
      * @param FormEvent $event
      */
@@ -102,32 +97,33 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
         $form = $event->getForm();
 
         $entityName = isset($data['entityName']) ? $data['entityName'] : false;
-
-        if ($entityName) {
-            $config = $form->get('template')->getConfig()->getOptions();
-            unset($config['choice_list']);
-            unset($config['choices']);
-
-            $config['selectedEntity'] = $entityName;
-            $config['query_builder'] = $this->getTemplateClosure($entityName);
-
-            if (array_key_exists('auto_initialize', $config)) {
-                $config['auto_initialize'] = false;
-            }
-
-            $form->add(
-                $this->factory->createNamed(
-                    'template',
-                    'oro_email_template_list',
-                    null,
-                    $config
-                )
-            );
+        if (false === $entityName) {
+            return;
         }
+        $config = $form->get('template')->getConfig()->getOptions();
+        unset($config['choice_list']);
+        unset($config['choices']);
+
+        $config['selectedEntity'] = $entityName;
+        $config['query_builder']  = $this->getTemplateClosure($entityName);
+
+        if (array_key_exists('auto_initialize', $config)) {
+            $config['auto_initialize'] = false;
+        }
+
+        $form->add(
+            $this->factory->createNamed(
+                'template',
+                'oro_email_template_list',
+                null,
+                $config
+            )
+        );
     }
 
     /**
      * @param string $entityName
+     *
      * @return callable
      */
     protected function getTemplateClosure($entityName)

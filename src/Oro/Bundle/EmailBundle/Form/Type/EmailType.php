@@ -14,17 +14,18 @@ class EmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('gridName', 'hidden', array('required' => false))
-            ->add('entityClass', 'hidden', array('required' => false))
-            ->add('entityId', 'hidden', array('required' => false))
+            ->add('gridName', 'hidden', ['required' => false])
+            ->add('entityClass', 'hidden', ['required' => false])
+            ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
                 'oro_email_email_address',
-                array('required' => true, 'label' => 'oro.email.from_email_address.label')
+                ['required' => true, 'label' => 'oro.email.from_email_address.label']
             )
-            ->add('to', 'oro_email_email_address', array('required' => true, 'multiple' => true))
-            ->add('subject', 'text', array('required' => true, 'label' => 'oro.email.subject.label'))
-            ->add('body', 'textarea', array('required' => false, 'label' => 'oro.email.email_body.label'));
+            ->add('to', 'oro_email_email_address', ['required' => true, 'multiple' => true])
+            ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
+            ->add('body', 'textarea', ['required' => false, 'label' => 'oro.email.email_body.label'])
+            ->add('template', 'oro_email_template_list', ['required' => false]);
     }
 
     /**
@@ -33,12 +34,12 @@ class EmailType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                 'intention'          => 'email',
                 'csrf_protection'    => true,
                 'cascade_validation' => true,
-            )
+            ]
         );
     }
 

@@ -43,13 +43,13 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $obj = new Email();
         $this->assertFalse($obj->hasEntity());
 
-        $obj->setEntityClass('Test\Entity');
+        $obj->setEntityName('Test\Entity');
         $this->assertFalse($obj->hasEntity());
 
         $obj->setEntityId(123);
         $this->assertTrue($obj->hasEntity());
 
-        $obj->setEntityClass(null);
+        $obj->setEntityName(null);
         $this->assertFalse($obj->hasEntity());
     }
 }

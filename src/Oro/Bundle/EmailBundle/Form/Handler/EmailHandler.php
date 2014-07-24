@@ -163,7 +163,7 @@ class EmailHandler
             $model->setGridName($this->request->query->get('gridName'));
         }
         if ($this->request->query->has('entityClass')) {
-            $model->setEntityClass(
+            $model->setEntityName(
                 $this->entityRoutingHelper->decodeClassName($this->request->query->get('entityClass'))
             );
         }

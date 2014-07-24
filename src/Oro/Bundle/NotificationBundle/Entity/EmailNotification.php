@@ -5,8 +5,9 @@ namespace Oro\Bundle\NotificationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EmailBundle\Form\Model\EmailTemplateAwareInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * EmailNotification
@@ -31,7 +32,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *      }
  * )
  */
-class EmailNotification
+class EmailNotification implements EmailTemplateAwareInterface
 {
     /**
      * @var integer
@@ -89,6 +90,7 @@ class EmailNotification
      * Set entityName
      *
      * @param string $entityName
+     *
      * @return EmailNotification
      */
     public function setEntityName($entityName)
@@ -99,9 +101,7 @@ class EmailNotification
     }
 
     /**
-     * Get entityName
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getEntityName()
     {
@@ -135,6 +135,7 @@ class EmailNotification
      * Set template
      *
      * @param EmailTemplate $template
+     *
      * @return EmailNotification
      */
     public function setTemplate(EmailTemplate $template)
@@ -145,9 +146,7 @@ class EmailNotification
     }
 
     /**
-     * Get template
-     *
-     * @return EmailTemplate
+     * {@inheritdoc}
      */
     public function getTemplate()
     {
@@ -158,6 +157,7 @@ class EmailNotification
      * Set recipient
      *
      * @param RecipientList $recipientList
+     *
      * @return EmailNotification
      */
     public function setRecipientList(RecipientList $recipientList)
