@@ -45,11 +45,13 @@ define([
         /**
          * Initialize route matcher callbacks.
          */
-        initRouteMatches: function() {
+        initRouteMatches: function () {
+            var self, createRouteSearchCallback;
+
             this.routeMatchSearchers = [];
             this.routeMatchedMenuItemsCache = {};
 
-            var createRouteSearchCallback = function(matchRule, $el) {
+            createRouteSearchCallback = function (matchRule, $el) {
                 var matcherCallback;
                 if (matchRule.indexOf('*') > -1 || matchRule.indexOf('/') > -1) {
                     if (matchRule.indexOf('*') > -1) {
@@ -66,7 +68,7 @@ define([
                     };
                 } else {
                     // Simple equal matcher
-                    matcherCallback = function(route) {
+                    matcherCallback = function (route) {
                         if (route === matchRule) {
                             return $el;
                         }
@@ -76,10 +78,10 @@ define([
                 return matcherCallback;
             };
 
-            var self = this;
+            self = this;
             this.$el
                 .find('[data-routes]')
-                .each(function(idx, el) {
+                .each(function (idx, el) {
                     var $el = $(el);
                     _.each($el.data('routes'), function (matchRule) {
                         self.routeMatchSearchers.push(createRouteSearchCallback(matchRule, $el));
@@ -90,28 +92,34 @@ define([
         /**
          * Get active menu item element.
          *
-         * @param {String} route
-         * @returns {HTMLElement}
+         * @param {string} route
+         * @returns {jQuery.Element}
          */
-        getMatchedMenuItem: function(route) {
+        getMatchedMenuItem: function (route) {
+            var match;
             if (this.routeMatchedMenuItemsCache.hasOwnProperty(route)) {
-                return this.routeMatchedMenuItemsCache[route];
-            }
-
-            var match = this.$el.find('[data-route="' + route + '"]');
-            if (!match.length) {
-                for (var i = 0; i < this.routeMatchSearchers.length; i++) {
-                    match = this.routeMatchSearchers[i](route);
-                    if (!_.isUndefined(match)) {
-                        break;
-                    }
+                match = this.routeMatchedMenuItemsCache[route];
+            } else {
+                match = this.$el.find('[data-route="' + route + '"]');
+                if (!match.length) {
+                    _.find(this.routeMatchSearchers, function (searcher) {
+                        match = searcher(route);
+                        return match;
+                    });
                 }
             }
 
             if (match && match.length) {
                 this.routeMatchedMenuItemsCache[route] = match;
-                return match;
+                if (match.length > 1) {
+                    match = _.find(match, function (el) {
+                        var link = $(el).find('a[href]:first')[0];
+                        return link ? mediator.execute('compareUrl', link.pathname) : false;
+                    });
+                }
             }
+
+            return $(match);
         },
 
         /**
@@ -119,7 +127,7 @@ define([
          *
          * @param {String} route
          */
-        toggleActiveMenuItem: function(route) {
+        toggleActiveMenuItem: function (route) {
             var item = this.getMatchedMenuItem(route);
             if (!_.isUndefined(item)) {
                 this.$el
@@ -135,11 +143,11 @@ define([
          *
          * @returns {Array}
          */
-        getActiveItems: function() {
+        getActiveItems: function () {
             var activeMenuItemLabels = [];
             this.$el
                 .find('.active')
-                .each(function(idx, el) {
+                .each(function (idx, el) {
                     activeMenuItemLabels.push($.trim($(el).find('.title').first().text()));
                 });
 
