@@ -140,7 +140,7 @@ datagrid:
                 label:         oro.workflow.workflowdefinition.system.label
                 frontend_type: boolean
             createdAt:
-                label:         oro.ui.created_at.
+                label:         oro.ui.created_at
                 frontend_type: datetime
         properties:
             id: ~
