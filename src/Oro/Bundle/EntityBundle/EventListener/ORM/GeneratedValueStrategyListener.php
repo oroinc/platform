@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener\ORM;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
@@ -10,7 +11,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\OroEntityExtension;
 
-class DefaultMappingListener
+class GeneratedValueStrategyListener
 {
     /**
      * @var string
@@ -49,8 +50,9 @@ class DefaultMappingListener
 
         $sequenceName = $sequenceGeneratorDefinition['sequenceName'];
         $fieldName    = $classMetadata->getSingleIdentifierFieldName();
+        $fieldMapping = $classMetadata->getFieldMapping($fieldName);
 
-        $generator = ($fieldName && $classMetadata->fieldMappings[$fieldName]['type'] === 'bigint')
+        $generator = ($fieldName && $fieldMapping['type'] === Type::BIGINT)
             ? new BigIntegerIdentityGenerator($sequenceName)
             : new IdentityGenerator($sequenceName);
 

@@ -21,7 +21,8 @@ parameters:
 
     # override default Doctrine event manager class
     doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
-    oro_entity.listener.orm.default_mapping_listener.class:        Oro\Bundle\EntityBundle\EventListener\ORM\DefaultMappingListener
+
+    oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
@@ -159,8 +160,8 @@ services:
             - @oro_entity.doctrine_helper
             - @router
 
-    oro_entity.listener.orm.default_mapping_listener:
-        class: %oro_entity.listener.orm.default_mapping_listener.class%
+    oro_entity.listener.orm.generated_value_strategy_listener:
+        class: %oro_entity.listener.orm.generated_value_strategy_listener.class%
         arguments:
             - %database_driver%
         tags:
