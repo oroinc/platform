@@ -136,9 +136,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-            $result = $this->provider->getTemplateVariables(['entityClass' => self::TEST_ENTITY_NAME]);
+            $result = $this->provider->getTemplateVariables(self::TEST_ENTITY_NAME);
         } else {
-            $result = $this->provider->getTemplateVariables(['entityClass' => get_class($this->user)]);
+            $result = $this->provider->getTemplateVariables(get_class($this->user));
         }
 
         $this->assertArrayHasKey('user', $result);

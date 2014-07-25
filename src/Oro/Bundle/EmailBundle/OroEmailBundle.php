@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle;
 
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
@@ -47,6 +48,7 @@ class OroEmailBundle extends Bundle
         $this->addDoctrineOrmMappingsPass($container);
         $container->addCompilerPass(new EmailBodyLoaderPass());
         $container->addCompilerPass(new EmailSynchronizerPass());
+        $container->addCompilerPass(new EmailTemplateVariablesPass());
     }
 
     /**

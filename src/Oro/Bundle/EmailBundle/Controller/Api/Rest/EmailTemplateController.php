@@ -19,7 +19,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
-use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
+use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 
 /**
@@ -91,7 +91,7 @@ class EmailTemplateController extends RestController
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
-        $templates = $emailTemplateRepository->getTemplateByEntityName($entityName);
+        $templates               = $emailTemplateRepository->getTemplateByEntityName($entityName);
 
         return $this->handleView(
             $this->view($templates, Codes::HTTP_OK)
@@ -113,17 +113,19 @@ class EmailTemplateController extends RestController
      */
     public function getAvailableVariablesAction($entityName = null)
     {
-        /** @var EntityVariablesProvider $provider */
-        $provider = $this->get('oro_email.provider.variable_provider');
+        /** @var VariablesProvider $provider */
+        $provider = $this->get('oro_email.emailtemplate.variable_provider');
 
-        $context = [];
+        $data = [
+            'system' => $provider->getSystemVariableDefinitions()
+        ];
         if ($entityName) {
-            $context['entityClass'] = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+            $entityName     = str_replace('_', '\\', $entityName);
+            $data['entity'] = $provider->getEntityVariableDefinitions($entityName);
         }
-        $allowedData = $provider->getTemplateVariables($context);
 
         return $this->handleView(
-            $this->view($allowedData, Codes::HTTP_OK)
+            $this->view($data, Codes::HTTP_OK)
         );
     }
 

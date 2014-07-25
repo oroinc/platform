@@ -44,8 +44,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @param e {Object}
          */
         selectionChanged: function (e) {
-            var entityName = $(e.currentTarget).val();
-            this.model.set('entityName', entityName.split('\\').join('_'));
+            var entityName = $(e.currentTarget).val().split('\\').join('_');
+            this.model.setEntityName(entityName);
             this.model.fetch();
         },
 
@@ -56,16 +56,13 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          */
         render: function () {
             var html,
-                vars   = this.model.get('variables'),
+                vars   = this.model.attributes,
                 $el    = $(this.el);
 
             if (_.isEmpty(vars)) {
                 $el.parent().hide();
             } else {
-                html = _.template(this.options.template.html(), {
-                    vars:  vars,
-                    title: __('Click to insert variable or drag it.')
-                });
+                html = _.template(this.options.template.html(), {vars:  vars});
 
                 $el.html(html);
                 $el.parent().show();

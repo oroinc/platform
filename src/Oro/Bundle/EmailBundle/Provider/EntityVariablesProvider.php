@@ -10,49 +10,82 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class EntityVariablesProvider implements VariablesProviderInterface
+class EntityVariablesProvider implements EntityVariablesProviderInterface
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var ConfigProvider */
     protected $emailConfigProvider;
 
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
-     * @param ConfigProvider $emailConfigProvider
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $translator
+     * @param TranslatorInterface $translator
+     * @param ConfigProvider      $emailConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
      */
     public function __construct(
+        TranslatorInterface $translator,
         ConfigProvider $emailConfigProvider,
-        ConfigProvider $entityConfigProvider,
-        ConfigProvider $translator
+        ConfigProvider $entityConfigProvider
     ) {
+        $this->translator           = $translator;
         $this->emailConfigProvider  = $emailConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
-        $this->translator           = $translator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTemplateVariables(array $context = [])
+    public function getVariableDefinitions($entityClass)
     {
-        if (!isset($context['entityClass'])) {
+        $entityClass = ClassUtils::getRealClass($entityClass);
+        if (!$this->emailConfigProvider->hasConfig($entityClass)) {
             return [];
         }
 
-        $entityClassName = ClassUtils::getRealClass($context['entityClass']);
-        if (!$this->emailConfigProvider->hasConfig($entityClassName)) {
+        $result       = [];
+        $reflClass    = new \ReflectionClass($entityClass);
+        $fieldConfigs = $this->emailConfigProvider->getConfigs($entityClass);
+        foreach ($fieldConfigs as $fieldConfig) {
+            if (!$fieldConfig->is('available_in_template')) {
+                continue;
+            }
+
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $fieldConfig->getId();
+
+            list($varName) = $this->getFieldAccessInfo($reflClass, $fieldId->getFieldName());
+            if (!$varName) {
+                continue;
+            }
+
+            $var = [
+                'type' => $fieldId->getFieldType(),
+                'name' => $this->translator->trans($this->getFieldLabel($entityClass, $fieldId->getFieldName()))
+            ];
+
+            $result[$varName] = $var;
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVariableGetters($entityClass)
+    {
+        $entityClass = ClassUtils::getRealClass($entityClass);
+        if (!$this->emailConfigProvider->hasConfig($entityClass)) {
             return [];
         }
 
-        $variables    = [];
-        $reflClass    = new \ReflectionClass($entityClassName);
-        $fieldConfigs = $this->emailConfigProvider->getConfigs($entityClassName);
+        $result       = [];
+        $reflClass    = new \ReflectionClass($entityClass);
+        $fieldConfigs = $this->emailConfigProvider->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if (!$fieldConfig->is('available_in_template')) {
                 continue;
@@ -66,18 +99,10 @@ class EntityVariablesProvider implements VariablesProviderInterface
                 continue;
             }
 
-            $var = [
-                'type' => $fieldId->getFieldType(),
-                'name' => $this->translator->trans($this->getFieldLabel($entityClassName, $fieldId->getFieldName()))
-            ];
-            if ($getter) {
-                $var['getter'] = $getter;
-            }
-
-            $variables[$varName] = $var;
+            $result[$varName] = $getter;
         }
 
-        return ['entity' => $variables];
+        return $result;
     }
 
     /**
@@ -93,15 +118,15 @@ class EntityVariablesProvider implements VariablesProviderInterface
             return [$fieldName, null];
         }
 
-        $varName = Inflector::camelize($fieldName);
-        $getter  = 'get' . $varName;
+        $name   = Inflector::classify($fieldName);
+        $getter = 'get' . $name;
         if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
-            return [$varName, $getter];
+            return [lcfirst($name), $getter];
         }
 
-        $methodName = 'is' . $varName;
+        $methodName = 'is' . $name;
         if ($reflClass->hasMethod($methodName) && $reflClass->getMethod($methodName)->isPublic()) {
-            return [$varName, $getter];
+            return [lcfirst($name), $getter];
         }
 
         return [null, null];

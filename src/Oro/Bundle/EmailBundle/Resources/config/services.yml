@@ -30,7 +30,10 @@ parameters:
     oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
 
     # Providers
-    oro_email.provider.variable_provider.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
+    oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
+    oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
+    oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
+    oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
@@ -205,13 +208,38 @@ services:
             - @oro_email.twig.email_security_policy
             - true # use sandbox globally in instance
 
-    oro_email.provider.variable_provider:
-        class: %oro_email.provider.variable_provider.class%
+    oro_email.emailtemplate.variable_provider:
+        class: %oro_email.emailtemplate.variable_provider.class%
+
+    oro_email.emailtemplate.variable_provider.entity:
+        class: %oro_email.emailtemplate.variable_provider.entity.class%
+        lazy: true
         arguments:
+            - @translator
             - @oro_entity_config.provider.email
             - @oro_entity_config.provider.entity
-            - @translator
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    oro_email.emailtemplate.variable_provider.system:
+        class: %oro_email.emailtemplate.variable_provider.system.class%
         lazy: true
+        arguments:
+            - @translator
+            - @oro_config.global
+            - @oro_locale.formatter.date_time
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: system }
+
+    oro_email.emailtemplate.variable_provider.user:
+        class: %oro_email.emailtemplate.variable_provider.user.class%
+        lazy: true
+        arguments:
+            - @translator
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
     oro_email.validator.variables_validator:
         class: Oro\Bundle\EmailBundle\Validator\VariablesValidator
