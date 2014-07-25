@@ -40,7 +40,7 @@ define([
          * @returns {string}
          */
         retrievePath: function (path) {
-            return path.replace(this.router.removeRoot, '');
+            return path.replace(this.router.removeRoot, '').replace(/^\//i, '');
         },
 
         /**
