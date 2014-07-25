@@ -51,7 +51,8 @@ class DashboardController extends Controller
      * @Route(
      *      "/view/{id}",
      *      name="oro_dashboard_view",
-     *      defaults={"id" = ""}
+     *      requirements={"id"="\d+"},
+     *      defaults={"id" = "0"}
      * )
      * @return \Symfony\Component\HttpFoundation\Response
      */
