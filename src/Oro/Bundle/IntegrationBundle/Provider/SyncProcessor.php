@@ -210,11 +210,16 @@ class SyncProcessor
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
         }
 
-        $exceptions = $jobResult->getFailureExceptions();
-        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
-
-        $status = new Status();
+        $exceptions    = $jobResult->getFailureExceptions();
+        $isSuccess     = $jobResult->isSuccessful() && empty($exceptions);
+        $connectorData = $context->getValue('connectorData');
+        $status        = new Status();
         $status->setConnector($connector);
+
+        if (is_array($connectorData)) {
+            $status->setData($connectorData);
+        }
+
         if (!$isSuccess) {
             $this->logger->error('Errors were occurred:');
             $exceptions = implode(PHP_EOL, $exceptions);

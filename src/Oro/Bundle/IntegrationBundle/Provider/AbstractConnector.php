@@ -89,6 +89,19 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     }
 
     /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    protected function addStatusData($key, $value)
+    {
+        $context    = $this->getStepExecution()->getExecutionContext();
+        $data       = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+        $data[$key] = $value;
+
+        $context->put(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY, $data);
+    }
+
+    /**
      * Return source iterator to read from
      *
      * @return \Iterator
