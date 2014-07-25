@@ -52,16 +52,16 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="float", nullable=true)
+     * @ORM\Column(name="value", type="integer")
      */
     protected $value;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="user", type="string", length=255)
+     * @ORM\Column(name="user_identifier", type="string", length=255)
      */
-    protected $user;
+    protected $userIdentifier;
 
     /**
      * @var string
@@ -149,7 +149,7 @@ class TrackingEvent
     /**
      * Set value
      *
-     * @param string $value
+     * @param float $value
      * @return TrackingEvent
      */
     public function setValue($value)
@@ -162,7 +162,7 @@ class TrackingEvent
     /**
      * Get value
      *
-     * @return string
+     * @return float
      */
     public function getValue()
     {
@@ -170,26 +170,26 @@ class TrackingEvent
     }
 
     /**
-     * Set user
+     * Set userIdentifier
      *
-     * @param string $user
+     * @param string $userIdentifier
      * @return TrackingEvent
      */
-    public function setUser($user)
+    public function setUserIdentifier($userIdentifier)
     {
-        $this->user = $user;
+        $this->userIdentifier = $userIdentifier;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get userIdentifier
      *
      * @return string
      */
-    public function getUser()
+    public function getUserIdentifier()
     {
-        return $this->user;
+        return $this->userIdentifier;
     }
 
     /**
@@ -236,6 +236,29 @@ class TrackingEvent
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * Set code
+     *
+     * @param string $code
+     * @return TrackingEvent
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    /**
+     * Get code
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 
     /**
@@ -305,28 +328,5 @@ class TrackingEvent
     public function getWebsite()
     {
         return $this->website;
-    }
-
-    /**
-     * Set code
-     *
-     * @param string $code
-     * @return TrackingEvent
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-
-        return $this;
-    }
-
-    /**
-     * Get code
-     *
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->code;
     }
 }

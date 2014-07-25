@@ -122,10 +122,10 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
     public function dataProvider()
     {
         $data = [
-            'website' => 'id1',
-            'name'    => 'name',
-            'value'   => 100,
-            'user'    => 'user',
+            'website'        => 'id1',
+            'name'           => 'name',
+            'value'          => 100,
+            'userIdentifier' => 'userIdentifier',
         ];
 
         return [
@@ -134,7 +134,7 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                 [
                     'data'  => json_encode([]),
                     'event' => [
-                        'name' => DataNormalizer::DEFAULT_NAME,
+                        'name'  => DataNormalizer::DEFAULT_NAME,
                         'value' => 1
                     ]
                 ]
@@ -144,12 +144,12 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                 [
                     'data'  => json_encode($data),
                     'event' => [
-                        'website' => [
+                        'website'        => [
                             'identifier' => 'id1',
                         ],
-                        'name'    => 'name',
-                        'value'   => 100,
-                        'user'    => 'user',
+                        'name'           => 'name',
+                        'value'          => 100,
+                        'userIdentifier' => 'userIdentifier',
                     ]
                 ]
             ]

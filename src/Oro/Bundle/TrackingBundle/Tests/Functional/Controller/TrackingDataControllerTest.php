@@ -42,20 +42,19 @@ class TrackingDataControllerTest extends WebTestCase
         return [
             'simple' => [
                 [
-                    'param'    => 'value',
-                    'url'      => 'example.com',
-                    'user'     => 'user',
-                    'loggedAt' => '2014-07-18T15:00:00+0300'
+                    'param'          => 'value',
+                    'url'            => 'example.com',
+                    'userIdentifier' => 'username',
+                    'loggedAt'       => '2014-07-18T15:00:00+0300'
                 ]
             ],
             'event'  => [
                 [
-                    'param'    => 'value',
-                    'name'     => 'name',
-                    'value'    => 'value',
-                    'user'     => 'user',
-                    'url'      => 'example.com',
-                    'loggedAt' => '2014-07-18T15:00:00+0300'
+                    'param'          => 'value',
+                    'name'           => 'name',
+                    'userIdentifier' => 'username',
+                    'url'            => 'example.com',
+                    'loggedAt'       => '2014-07-18T15:00:00+0300'
                 ]
             ],
         ];
@@ -91,27 +90,27 @@ class TrackingDataControllerTest extends WebTestCase
     public function validationProvider()
     {
         return [
-            'empty' => [
+            'empty'          => [
                 [],
                 [
-                    'event.user: This value should not be blank',
+                    'event.userIdentifier: This value should not be blank',
                     'event.url: This value should not be blank',
                     'event.loggedAt: This value should not be blank',
                 ]
             ],
-            'user'  => [
+            'userIdentifier' => [
                 [
-                    'user' => 'user'
+                    'userIdentifier' => 'user_identifier'
                 ],
                 [
                     'event.url: This value should not be blank',
                     'event.loggedAt: This value should not be blank',
                 ]
             ],
-            'url'   => [
+            'url'            => [
                 [
-                    'user' => 'user',
-                    'url'  => 'example.com'
+                    'userIdentifier' => 'user_identifier',
+                    'url'            => 'example.com'
                 ],
                 [
                     'event.loggedAt: This value should not be blank',
