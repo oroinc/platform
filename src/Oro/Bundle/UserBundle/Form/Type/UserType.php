@@ -109,15 +109,28 @@ class UserType extends AbstractType
             );
         }
 
+//        if ($this->securityFacade->isGranted('oro_business_unit_view')) {
+//            $builder->add(
+//                'businessUnits',
+//                'oro_business_unit_tree',
+//                array(
+//                    'multiple' => true,
+//                    'expanded' => true,
+//                    'required' => false,
+//                    'label'    => 'oro.user.business_units.label'
+//                )
+//            );
+//        }
+
         if ($this->securityFacade->isGranted('oro_business_unit_view')) {
             $builder->add(
-                'businessUnits',
-                'oro_business_unit_tree',
+                'organizations',
+                'oro_organization_bu_tree_select',
                 array(
                     'multiple' => true,
                     'expanded' => true,
                     'required' => false,
-                    'label'    => 'oro.user.business_units.label'
+                    'label'    => 'oro.user.organizations.label'
                 )
             );
         }

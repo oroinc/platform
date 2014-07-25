@@ -1,14 +1,121 @@
 parameters:
-    oro_organization.form.type.business_unit_select.class:   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
-    oro_organization.form.type.organization_select.class:    Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
+    oro_organization.form.type.organization_select.class:             Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
+
+    oro_organization.form.type.business_unit.class:                   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
+    oro_organization.form.handler.business_unit.class:                Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
+
+    oro_organization.form.type.business_unit_tree_type.class:         Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
+    oro_organization.form.type.business_unit_tree_select_type.class:  Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
+    oro_organization.form.type.business_unit.api.class:               Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
+
+    oro_organization.form.type.oro_organization_bu_tree_select.class: Oro\Bundle\OrganizationBundle\Form\Type\OrganizationBUTreeSelectType
+
+    oro_organization.form.type.ownership_type.class:                  Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
+
+    oro_organization.form.extension.owner.class:                      Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
 
 services:
-    oro_organization.form.type.business_unit_select:
-        class: %oro_organization.form.type.business_unit_select.class%
+    #
+    # Business Unit
+    #
+    oro_organization.form.business_unit:
+        class:           Symfony\Component\Form\Form
+        factory_method:  createNamed
+        factory_service: form.factory
+        arguments:
+            - oro_business_unit_form
+            - oro_business_unit
+
+    oro_organization.form.type.business_unit:
+        class: %oro_organization.form.type.business_unit.class%
         tags:
-            - { name: form.type, alias: oro_business_unit_select }
+            - { name: form.type, alias: oro_business_unit }
+
+    oro_organization.form.handler.business_unit:
+        class: %oro_organization.form.handler.business_unit.class%
+        scope: request
+        arguments:
+            - @oro_organization.form.business_unit
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_organization.form.type.business_unit_tree_type:
+        class: %oro_organization.form.type.business_unit_tree_type.class%
+        arguments:
+            - @oro_organization.business_unit_manager
+        tags:
+            - { name: form.type, alias: oro_business_unit_tree }
+
+    oro_organization.form.type.business_unit_tree_select_type:
+        class: %oro_organization.form.type.business_unit_tree_select_type.class%
+        tags:
+            - { name: form.type, alias: oro_business_unit_tree_select }
+
+    oro_organization.form.type.business_unit.api:
+        class: %oro_organization.form.type.business_unit.api.class%
+        tags:
+            - { name: form.type, alias: business_unit }
+
+    oro_organization.form.handler.business_unit.api:
+        class: %oro_organization.form.handler.business_unit.class%
+        scope: request
+        arguments:
+            - @oro_organization.form.business_unit.api
+            - @request
+            - @doctrine.orm.entity_manager
+    #
+    # Organization
+    #
+    oro_organization.form.business_unit.api:
+        class:           Symfony\Component\Form\Form
+        factory_method:  createNamed
+        factory_service: form.factory
+        arguments:       ["business_unit", "business_unit", null]
 
     oro_organization.form.type.organization_select:
         class: %oro_organization.form.type.organization_select.class%
         tags:
             - { name: form.type, alias: oro_organization_select }
+
+    oro_organization.form.type.oro_organization_bu_tree_select:
+        class: %oro_organization.form.type.oro_organization_bu_tree_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_organization.business_unit_manager
+        tags:
+            - { name: form.type, alias: oro_organization_bu_tree_select }
+    #
+    # Ownership
+    #
+    oro_organization.form.extension.owner:
+        class: %oro_organization.form.extension.owner.class%
+        arguments:
+            - @security.context
+            - @doctrine
+            - @oro_security.owner.ownership_metadata_provider
+            - @oro_organization.business_unit_manager
+            - @oro_security.security_facade
+            - @translator
+            - @?security.acl.voter.basic_permissions
+            - @oro_security.ownership_tree_provider
+        tags:
+            - { name: form.type_extension, alias: form }
+    #
+    # Listeners
+    #
+    oro_organization.form.listener:
+        class: %oro_organization.form.listener.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: addOwnerField }
+    #
+    # Autocomplete search handler
+    #
+    oro_organization.autocomplete.organization.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_organization.organization.entity.class%
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: organization, acl_resource: oro_organization_view }
