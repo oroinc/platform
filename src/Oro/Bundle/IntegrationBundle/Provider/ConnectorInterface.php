@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-
 interface ConnectorInterface
 {
     const CONTEXT_CONNECTOR_DATA_KEY = 'connectorData';

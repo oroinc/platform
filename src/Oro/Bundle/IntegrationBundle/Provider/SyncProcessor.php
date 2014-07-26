@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
