@@ -11,8 +11,8 @@ interface EntityVariablesProviderInterface
      *
      * @return array The list of variables in the following format:
      *                  {variable name} => array
-     *                      'type' => {variable data type}
-     *                      'name' => {translated variable name}
+     *                      'type'  => {variable data type}
+     *                      'label' => {translated variable name}
      */
     public function getVariableDefinitions($entityClass);
 

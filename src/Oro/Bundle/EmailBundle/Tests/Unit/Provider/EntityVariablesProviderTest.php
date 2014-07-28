@@ -2,168 +2,160 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ENTITY_NAME = 'someEntity';
-    const TEST_NOT_NEEDED_ENTITY_NAME = 'anotherEntity';
+    const TEST_ENTITY_NAME = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider';
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
-    protected $configProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
-    protected $user;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityConfigProvider;
 
     /** @var EntityVariablesProvider */
     protected $provider;
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
-        $token = $this->getMockForAbstractClass(
-            'Symfony\Component\Security\Core\Authentication\Token\TokenInterface'
+        $this->emailConfigProvider  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->provider = new EntityVariablesProvider(
+            $translator,
+            $this->emailConfigProvider,
+            $this->entityConfigProvider
         );
-        $this->user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()->getMock();
-        $token->expects($this->any())->method('getUser')
-            ->will($this->returnValue($this->user));
-        $this->securityContext->expects($this->any())->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->provider = new EntityVariablesProvider($this->securityContext, $this->configProvider);
     }
 
     protected function tearDown()
     {
-        unset($this->securityContext);
-        unset($this->configProvider);
-        unset($this->user);
+        unset($this->emailConfigProvider);
+        unset($this->entityConfigProvider);
         unset($this->provider);
     }
 
-    /**
-     * @dataProvider fieldsDataProvider
-     * @param $entityIsUser
-     */
-    public function testGetTemplateVariables($entityIsUser)
+    public function testGetVariableDefinitions()
     {
-        $configId1Mock = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $configId1Mock
-            ->expects($this->once())->method('getClassName')
-            ->will($this->returnValue(get_class($this->user)));
-        $configId2Mock = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $configId2Mock
-            ->expects($this->once())->method('getClassName')
-            ->will($this->returnValue(self::TEST_ENTITY_NAME));
-        $configId3Mock = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $configId3Mock
-            ->expects($this->once())->method('getClassName')
-            ->will($this->returnValue(self::TEST_NOT_NEEDED_ENTITY_NAME));
+        $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $field1Config->set('available_in_template', true);
+        $field2Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field2', 'integer'));
+        $field3Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
+        $field3Config->set('available_in_template', true);
+        $field4Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field4', 'string'));
+        $field4Config->set('available_in_template', true);
+        $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
+        $field5Config->set('available_in_template', true);
 
-        $configurableEntities =  array($configId1Mock, $configId2Mock, $configId3Mock);
+        $field1EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $field1EntityConfig->set('label', 'field1_label');
+        $field3EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
+        $field3EntityConfig->set('label', 'field3_label');
+        $field5EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
+        $field5EntityConfig->set('label', 'field5_label');
 
-        $this->configProvider->expects($this->once())->method('getIds')
-            ->will($this->returnValue($configurableEntities));
-
-        $field1Id = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $field1Id->expects($this->any())
-            ->method('getFieldName')
-            ->will($this->returnValue('someCode'));
-
-        $field1 = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $field2 = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $field1->expects($this->any())
-            ->method('is')
-            ->with('available_in_template')
+        $this->emailConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue(true));
-        $field1->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($field1Id));
-
-        $field2->expects($this->any())
-            ->method('is')
-            ->with('available_in_template')
-            ->will($this->returnValue(false));
-
-        // fields for entity
-        $fieldsCollection = new ArrayCollection();
-        $this->configProvider->expects($this->at(1))->method('filter')->will(
-            $this->returnCallback(
-                function ($callback) use ($fieldsCollection) {
-                    return $fieldsCollection->filter($callback)->toArray();
-                }
-            )
-        );
-        $fieldsCollection[] = $field1;
-        $fieldsCollection[] = $field2;
-
-        if (!$entityIsUser) {
-            $field3Id = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $field3Id->expects($this->any())->method('getFieldName')->will($this->returnValue('someAnotherCode'));
-
-            $field3 = clone $field1;
-            $field3->expects($this->atLeastOnce())->method('is')->with('available_in_template')
-                ->will($this->returnValue(true));
-            $field3->expects($this->atLeastOnce())->method('getId')
-                ->will($this->returnValue($field3Id));
-
-            $this->configProvider->expects($this->at(2))->method('filter')->will(
-                $this->returnCallback(
-                    function ($callback) use ($fieldsCollection, $field3) {
-                        $fieldsCollection[] = $field3;
-                        return $fieldsCollection->filter($callback)->toArray();
-                    }
+        $this->emailConfigProvider->expects($this->once())
+            ->method('getConfigs')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will(
+                $this->returnValue(
+                    [$field1Config, $field2Config, $field3Config, $field4Config, $field5Config]
                 )
             );
 
-            $result = $this->provider->getTemplateVariables(self::TEST_ENTITY_NAME);
-        } else {
-            $result = $this->provider->getTemplateVariables(get_class($this->user));
-        }
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, 'field1', $field1EntityConfig],
+                        [self::TEST_ENTITY_NAME, 'field3', $field3EntityConfig],
+                        [self::TEST_ENTITY_NAME, 'field5', $field5EntityConfig],
+                    ]
+                )
+            );
 
-        $this->assertArrayHasKey('user', $result);
-        $this->assertArrayHasKey('entity', $result);
-
-        $this->assertInternalType('array', $result['user']);
-        $this->assertInternalType('array', $result['entity']);
-
-        if ($entityIsUser) {
-            $this->assertEquals($result['user'], $result['entity']);
-        }
+        $result = $this->provider->getVariableDefinitions(self::TEST_ENTITY_NAME);
+        $this->assertEquals(
+            [
+                'field1' => ['type' => 'string', 'label' => 'field1_label'],
+                'field3' => ['type' => 'boolean', 'label' => 'field3_label'],
+                'field5' => ['type' => 'string', 'label' => 'field5_label'],
+            ],
+            $result
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function fieldsDataProvider()
+    public function testGetVariableGetters()
     {
-        return array(
-            'entity is not user' => array(
-                'entityIsUser' => false
-            ),
-            'entity is user' => array(
-                'entityIsUser' => true
-            )
+        $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $field1Config->set('available_in_template', true);
+        $field2Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field2', 'integer'));
+        $field3Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
+        $field3Config->set('available_in_template', true);
+        $field4Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field4', 'string'));
+        $field4Config->set('available_in_template', true);
+        $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
+        $field5Config->set('available_in_template', true);
+
+        $field1EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $field1EntityConfig->set('label', 'field1_label');
+        $field3EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
+        $field3EntityConfig->set('label', 'field3_label');
+        $field5EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
+        $field5EntityConfig->set('label', 'field5_label');
+
+        $this->emailConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue(true));
+        $this->emailConfigProvider->expects($this->once())
+            ->method('getConfigs')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will(
+                $this->returnValue(
+                    [$field1Config, $field2Config, $field3Config, $field4Config, $field5Config]
+                )
+            );
+
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, 'field1', $field1EntityConfig],
+                        [self::TEST_ENTITY_NAME, 'field3', $field3EntityConfig],
+                        [self::TEST_ENTITY_NAME, 'field5', $field5EntityConfig],
+                    ]
+                )
+            );
+
+        $result = $this->provider->getVariableGetters(self::TEST_ENTITY_NAME);
+        $this->assertEquals(
+            [
+                'field1' => 'getField1',
+                'field3' => 'isField3',
+                'field5' => null,
+            ],
+            $result
         );
     }
 }

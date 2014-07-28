@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
      */
     return Backbone.View.extend({
         events: {
-            'click ul li a': 'addVariable'
+            'click .variables a': 'addVariable'
         },
         target: null,
         lastElement: null,

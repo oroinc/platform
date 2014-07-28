@@ -1,10 +1,10 @@
 oro:
     email:
         emailtemplate:
-            variable_title: '{{ variable_name }}. Click to insert variable or drag it.'
+            variable_title: '{{ variable_label }}. Click to insert variable or drag it.'
             variables:
-                system: 'System:'
-                entity: 'Related entity:'
+                system: 'System variables'
+                entity: 'Entity variables'
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"

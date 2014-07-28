@@ -63,8 +63,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             }
 
             $var = [
-                'type' => $fieldId->getFieldType(),
-                'name' => $this->translator->trans($this->getFieldLabel($entityClass, $fieldId->getFieldName()))
+                'type'  => $fieldId->getFieldType(),
+                'label' => $this->translator->trans($this->getFieldLabel($entityClass, $fieldId->getFieldName()))
             ];
 
             $result[$varName] = $var;
@@ -124,8 +124,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             return [lcfirst($name), $getter];
         }
 
-        $methodName = 'is' . $name;
-        if ($reflClass->hasMethod($methodName) && $reflClass->getMethod($methodName)->isPublic()) {
+        $getter = 'is' . $name;
+        if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             return [lcfirst($name), $getter];
         }
 

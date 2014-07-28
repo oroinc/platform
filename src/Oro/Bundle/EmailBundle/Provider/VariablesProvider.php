@@ -102,7 +102,7 @@ class VariablesProvider
      *                      key = {variable name}
      *                      value = {method name} // can be NULL if entity field is public
      */
-    public function getSystemVariableGetters($entityClass)
+    public function getEntityVariableGetters($entityClass)
     {
         $result = [];
 

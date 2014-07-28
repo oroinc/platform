@@ -85,8 +85,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = $user->getUsername();
             } else {
                 $val = [
-                    'type' => 'string',
-                    'name' => $this->translator->trans('oro.email.emailtemplate.user_name')
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.emailtemplate.user_name')
                 ];
             }
             $result['userName'] = $val;
@@ -105,8 +105,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = $user->getFirstName();
             } else {
                 $val = [
-                    'type' => 'string',
-                    'name' => $this->translator->trans('oro.email.emailtemplate.user_first_name')
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.emailtemplate.user_first_name')
                 ];
             }
             $result['userFirstName'] = $val;
@@ -125,8 +125,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = $user->getLastName();
             } else {
                 $val = [
-                    'type' => 'string',
-                    'name' => $this->translator->trans('oro.email.emailtemplate.user_last_name')
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.emailtemplate.user_last_name')
                 ];
             }
             $result['userLastName'] = $val;
@@ -145,8 +145,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 $val = $this->nameFormatter->format($user);
             } else {
                 $val = [
-                    'type' => 'string',
-                    'name' => $this->translator->trans('oro.email.emailtemplate.user_full_name')
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.emailtemplate.user_full_name')
                 ];
             }
             $result['userFullName'] = $val;

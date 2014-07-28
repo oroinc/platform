@@ -29,11 +29,6 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $user;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $twig;
 
     /**
@@ -50,11 +45,6 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->user = $this
-            ->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->context = $this
             ->getMock('Symfony\Component\Validator\ExecutionContextInterface');
 
@@ -65,7 +55,6 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
     {
         unset($this->variablesConstraint);
         unset($this->twig);
-        unset($this->user);
         unset($this->context);
     }
 
@@ -81,7 +70,7 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity',
                 $params['entity']
             );
-            $this->assertInstanceOf(get_class($this->user), $params['user']);
+            $this->assertSame(['testVar' => 'test'], $params['system']);
         };
 
         $map = [
@@ -181,21 +170,12 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('sandbox'))
             ->will($this->returnValue($sandbox));
 
-        $securityContext = $this->getMock(
-            'Symfony\Component\Security\Core\SecurityContextInterface'
+        $variablesProvider = $this->getMock(
+            'Oro\Bundle\EmailBundle\Provider\VariablesProvider'
         );
-
-        $token = $this->getMock(
-            'Symfony\Component\Security\Core\Authentication\Token\TokenInterface'
-        );
-        $token->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue($this->user));
-
-        $securityContext
-            ->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+        $variablesProvider->expects($this->any())
+            ->method('getSystemVariableValues')
+            ->will($this->returnValue(['testVar' => 'test']));
 
         $entityManager = $this
             ->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -226,7 +206,7 @@ class VariablesValidatorTest extends \PHPUnit_Framework_TestCase
 
         $validator = new VariablesValidator(
             $this->twig,
-            $securityContext,
+            $variablesProvider,
             $entityManager
         );
         $validator->initialize($this->context);

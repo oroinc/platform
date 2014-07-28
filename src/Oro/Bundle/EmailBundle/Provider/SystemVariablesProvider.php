@@ -75,8 +75,8 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
             $val = $this->configManager->get('oro_ui.application_name');
         } else {
             $val = [
-                'type' => 'string',
-                'name' => $this->translator->trans('oro.email.emailtemplate.app_short_name')
+                'type'  => 'string',
+                'label' => $this->translator->trans('oro.email.emailtemplate.app_short_name')
             ];
         }
         $result['appShortName'] = $val;
@@ -92,8 +92,8 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
             $val = $this->configManager->get('oro_ui.application_title');
         } else {
             $val = [
-                'type' => 'string',
-                'name' => $this->translator->trans('oro.email.emailtemplate.app_full_name')
+                'type'  => 'string',
+                'label' => $this->translator->trans('oro.email.emailtemplate.app_full_name')
             ];
         }
         $result['appFullName'] = $val;
@@ -113,20 +113,22 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
             $timeVal     = $this->dateTimeFormatter->formatTime($dateTime);
         } else {
             $dateTimeVal = [
-                'type' => 'datetime',
-                'name' => $this->translator->trans('oro.email.emailtemplate.current_datetime')
+                'type'  => 'datetime',
+                'label' => $this->translator->trans('oro.email.emailtemplate.current_datetime')
             ];
             $dateVal     = [
-                'type' => 'string',
-                'name' => $this->translator->trans('oro.email.emailtemplate.current_date')
+                'type'  => 'string',
+                'label' => $this->translator->trans('oro.email.emailtemplate.current_date')
             ];
             $timeVal     = [
-                'type' => 'string',
-                'name' => $this->translator->trans('oro.email.emailtemplate.current_time')
+                'type'  => 'string',
+                'label' => $this->translator->trans('oro.email.emailtemplate.current_time')
             ];
         }
-        $result['currentDateTime'] = $dateTimeVal;
-        $result['currentDate']     = $dateVal;
-        $result['currentTime']     = $timeVal;
+        // @todo: the datetime object cannot be added due __toString of DateTime is not allowed error
+        //        this code can be uncommented after validation and formatting are fixed
+        //$result['currentDateTime'] = $dateTimeVal;
+        $result['currentDate'] = $dateVal;
+        $result['currentTime'] = $timeVal;
     }
 }

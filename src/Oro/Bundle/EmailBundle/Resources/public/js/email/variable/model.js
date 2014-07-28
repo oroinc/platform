@@ -9,8 +9,8 @@ define(['backbone', 'routing'
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
-        route:      'oro_api_get_emailtemplate_available_variables',
-        url:        null,
+        route: 'oro_api_get_emailtemplate_available_variables',
+        url:   null,
 
         /**
          * Entity class name
