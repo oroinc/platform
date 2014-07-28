@@ -12,8 +12,6 @@ doctrine:
                 time:         Oro\ORM\Query\AST\Functions\SimpleFunction
                 timestamp:    Oro\ORM\Query\AST\Functions\SimpleFunction
             numeric_functions:
-                dayofmonth:   Oro\ORM\Query\AST\Functions\SimpleFunction
-                dayofweek:    Oro\ORM\Query\AST\Functions\SimpleFunction
                 dayofyear:    Oro\ORM\Query\AST\Functions\SimpleFunction
                 week:         Oro\ORM\Query\AST\Functions\SimpleFunction
                 day:          Oro\ORM\Query\AST\Functions\SimpleFunction

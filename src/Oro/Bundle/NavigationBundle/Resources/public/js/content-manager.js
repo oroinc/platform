@@ -375,14 +375,16 @@ define([
          * Retrieve meaningful part of path from url and compares it with reference path
          * (assumes that URL contains only path and query)
          *
-         * @param {script} url
-         * @param {script} refPath
+         * @param {string} url
+         * @param {string} refPath
          * @returns {boolean}
          */
         compareUrl: function (url, refPath) {
             var comparePath;
             if (refPath == null) {
                 refPath = current.path;
+            } else {
+                refPath = fetchPath(refPath);
             }
             comparePath = fetchPath(url);
             return refPath === comparePath;
