@@ -18,7 +18,6 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->markTestSkipped('Postgres issues');
         $this->initClient();
         $this->loadFixtures(array('Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData'));
     }
@@ -111,7 +110,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     ->setParameter('className' . $key, $className);
             }
 
-            $expectedCondition[$className]['entityIds'][] = reset($entityIds);
+            $expectedCondition[$className]['entityIds'][] = (string)reset($entityIds);
         }
 
         $segments = $segmentQB->getQuery()->getResult();
@@ -138,7 +137,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     $selectQB->expr()->in('snp.segment', ':segmentIds' . $suffix),
                     $selectQB->expr()->in('snp.entityId', ':entityIds' . $suffix)
                 ))
-                ->setParameter('segmentIds' . $suffix, implode(',', $params['segmentIds']))
+                ->setParameter('segmentIds' . $suffix, $params['segmentIds'])
                 ->setParameter('entityIds' . $suffix, $params['entityIds']);
         }
 
@@ -162,7 +161,12 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         if ($withSegmentSnapshot) {
             $queryBuilder
-                ->innerJoin('OroSegmentBundle:SegmentSnapshot', 'snp', Join::WITH, 'snp.entityId = entity.id');
+                ->innerJoin(
+                    'OroSegmentBundle:SegmentSnapshot',
+                    'snp',
+                    Join::WITH,
+                    'snp.entityId = CONCAT(entity.id, \'\')'
+                );
         } else {
             $queryBuilder
                 ->leftJoin('OroSegmentBundle:SegmentSnapshot', 'snp')
