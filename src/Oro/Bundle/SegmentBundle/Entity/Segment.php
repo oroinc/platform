@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -344,10 +345,10 @@ class Segment extends AbstractQueryDesigner
     /**
      * Set organization
      *
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
-     * @return Customer
+     * @param Organization $organization
+     * @return Segment
      */
-    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    public function setOrganization(Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -357,7 +358,7 @@ class Segment extends AbstractQueryDesigner
     /**
      * Get organization
      *
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     * @return Organization
      */
     public function getOrganization()
     {

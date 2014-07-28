@@ -12,6 +12,7 @@ use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Role Entity
@@ -248,10 +249,10 @@ class Role extends BaseRole
     /**
      * Set organization
      *
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
-     * @return Customer
+     * @param Organization $organization
+     * @return Role
      */
-    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    public function setOrganization(Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -261,7 +262,7 @@ class Role extends BaseRole
     /**
      * Get organization
      *
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     * @return Organization
      */
     public function getOrganization()
     {

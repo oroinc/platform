@@ -31,6 +31,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\UserBundle\Model\ExtendUser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -1550,10 +1551,10 @@ class User extends ExtendUser implements
     /**
      * Set organization
      *
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
-     * @return Customer
+     * @param Organization $organization
+     * @return User
      */
-    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    public function setOrganization(Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -1563,7 +1564,7 @@ class User extends ExtendUser implements
     /**
      * Get organization
      *
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     * @return Organization
      */
     public function getOrganization()
     {

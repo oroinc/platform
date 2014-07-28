@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -238,10 +239,10 @@ class Calendar
     /**
      * Set organization
      *
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
-     * @return Customer
+     * @param Organization $organization
+     * @return Calendar
      */
-    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    public function setOrganization(Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -251,7 +252,7 @@ class Calendar
     /**
      * Get organization
      *
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     * @return Organization
      */
     public function getOrganization()
     {

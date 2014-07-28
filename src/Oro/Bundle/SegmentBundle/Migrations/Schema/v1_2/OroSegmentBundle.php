@@ -10,9 +10,19 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroSegmentBundle implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
+    {
+        self::addOrganization($schema);
+    }
+
+    /**
+     * Adds organization_id field
+     *
+     * @param Schema $schema
+     */
+    public static function addOrganization(Schema $schema)
     {
         $table = $schema->getTable('oro_segment');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
