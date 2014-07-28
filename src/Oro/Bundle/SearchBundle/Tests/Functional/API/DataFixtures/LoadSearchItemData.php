@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Rhumsaa\Uuid\Uuid;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
-* Load customers
-*
-* Execute with "php app/console doctrine:fixtures:load"
-*/
+ * Load customers
+ *
+ * Execute with "php app/console doctrine:fixtures:load"
+ */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
 
@@ -53,15 +57,15 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function loadItems($manager)
     {
-        for ($ind= 1; $ind < 10; $ind++) {
+        for ($ind = 1; $ind < 10; $ind++) {
             //create item
             /** @var $item Item */
             $item = new Item();
             //string value
-            $item->stringValue = 'item' . $ind . '@mail.com';
-            $item->integerValue = $ind*1000;
+            $item->stringValue  = sprintf('search item %d', $ind);
+            $item->integerValue = $ind * 1000;
             //decimal
-            $item->decimalValue = $ind / 10.0 ;
+            $item->decimalValue = $ind / 10.0;
             //float
             $item->floatValue = $ind / 10.0 + 10;
             //boolean
@@ -75,7 +79,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             $date->add(new \DateInterval("P{$ind}Y"));
             $item->datetimeValue = $date;
             //guid
-            $item->guidValue = uniqid();
+            $item->guidValue = Uuid::uuid4();
             //object
             $item->objectValue = new \stdClass();
 

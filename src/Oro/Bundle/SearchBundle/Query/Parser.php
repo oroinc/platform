@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Oro\Bundle\SearchBundle\Query\Query;
-
 class Parser
 {
     protected $orderDirections = array(
@@ -142,7 +140,7 @@ class Parser
      * ORDER BY keyword
      *
      * @param  \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param  type                                 $inputString
+     * @param  string                               $inputString
      * @return string
      */
     private function orderBy(Query $query, $inputString)
@@ -261,7 +259,7 @@ class Parser
         // check operator
         if (!in_array($operatorWord, $this->typeOperators[$typeWord])) {
             throw new \InvalidArgumentException(
-                'Type ' . $typeWord . ' does not support operator "' . $operatorWord . '"'
+                sprintf('Type %s does not support operator "%s"', $typeWord, $operatorWord)
             );
         }
         $inputString = $this->trimString($inputString, $operatorWord);

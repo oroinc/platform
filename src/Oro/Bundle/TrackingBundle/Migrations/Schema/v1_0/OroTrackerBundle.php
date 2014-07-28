@@ -28,8 +28,10 @@ class OroTrackerBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('value', 'float', ['notnull' => false]);
-        $table->addColumn('user', 'string', ['length' => 255]);
+
+        // @todo: move this changes to new migration CRM-1610
+        $table->addColumn('value', 'integer');
+        $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);
         $table->addColumn('url', 'string', ['length' => 255]);

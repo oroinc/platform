@@ -5,7 +5,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
@@ -54,10 +53,10 @@ class PdoPgsql extends BaseDriver
     {
         $stringQuery = '';
         if ($useFieldName) {
-            $stringQuery = ' AND textField.field = :field' .$index;
+            $stringQuery = ' AND textField.field = :field' . $index;
         }
 
-        return '(TsvectorTsquery(textField.value, :value' .$index. ')) = TRUE' . $stringQuery;
+        return '(TsvectorTsquery(textField.value, :value' . $index . ')) = TRUE' . $stringQuery;
     }
 
     /**
@@ -84,13 +83,13 @@ class PdoPgsql extends BaseDriver
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
         $searchArray = explode(' ', $fieldValue);
-        foreach ($searchArray as $index => $string) {
-            $searchArray[$index] = $string . ':*';
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
         }
 
         if ($searchCondition != Query::OPERATOR_CONTAINS) {
-            foreach ($searchArray as $index => $string) {
-                $searchArray[$index] = '!' . $string;
+            foreach ($searchArray as $key => $string) {
+                $searchArray[$key] = '!' . $string;
             }
         }
 
@@ -107,9 +106,9 @@ class PdoPgsql extends BaseDriver
     {
         $qb->select(
             array(
-                 'search as item',
-                 'textField',
-                 'TsRank(textField.value, :value' .$index. ') AS rankField'
+                'search as item',
+                'textField',
+                'TsRank(textField.value, :value' . $index . ') AS rankField'
             )
         );
         $qb->orderBy('rankField', 'DESC');
