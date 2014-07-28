@@ -9,17 +9,21 @@ use FOS\Rest\Util\Codes;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
-abstract class SOAPTransport implements TransportInterface
+abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
-    const ATTEMPTS              = 5;
-    const SLEEP_BETWEEN_ATTEMPT = 1;
+    const ATTEMPTS = 7;
+
+    use LoggerAwareTrait;
 
     /** @var ParameterBag */
     protected $settings;
@@ -30,12 +34,16 @@ abstract class SOAPTransport implements TransportInterface
     /** @var int */
     protected $attempted;
 
+    /** @var array */
+    protected $sleepBetweenAttempt;
+
     /**
      * {@inheritdoc}
      */
     public function init(Transport $transportEntity)
     {
         $this->resetAttemptCount();
+        $this->setSleepBetweenAttempts([5, 10, 20, 40, 80, 160, 320, 640]);
         $this->settings = $transportEntity->getSettingsBag();
         $wsdlUrl        = $this->settings->get('wsdl_url');
 
@@ -58,7 +66,8 @@ abstract class SOAPTransport implements TransportInterface
             $result = $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
             if ($this->isAttemptNecessary()) {
-                sleep(self::SLEEP_BETWEEN_ATTEMPT);
+                $this->logAttempt();
+                sleep($this->getSleepBetweenAttempt());
                 $this->attempt();
                 $result = $this->call($action, $params);
             } else {
@@ -68,7 +77,7 @@ abstract class SOAPTransport implements TransportInterface
                     $this->getLastResponse(),
                     $e,
                     $this->getLastRequest(),
-                    $this->client->__getLastResponseHeaders()
+                    $this->getLastResponseHeaders()
                 );
             }
         }
@@ -176,7 +185,7 @@ abstract class SOAPTransport implements TransportInterface
      */
     protected function isResultOk(array $headers = [])
     {
-        if (!empty($headers['code']) && Codes::HTTP_OK === (int)$headers['code']) {
+        if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
             return true;
         }
         return false;
@@ -219,5 +228,40 @@ abstract class SOAPTransport implements TransportInterface
     protected function getHttpStatusesForAttempt()
     {
         return [Codes::HTTP_BAD_GATEWAY, Codes::HTTP_SERVICE_UNAVAILABLE, Codes::HTTP_GATEWAY_TIMEOUT];
+    }
+
+    /**
+     * Returns the current item by $attempted or the last of them
+     *
+     * @return int
+     */
+    protected function getSleepBetweenAttempt()
+    {
+        if (!empty($this->sleepBetweenAttempt[$this->attempted])) {
+            return (int)$this->sleepBetweenAttempt[$this->attempted];
+        }
+
+        return (int)end($this->sleepBetweenAttempt);
+    }
+
+    /**
+     * @param array $range
+     */
+    protected function setSleepBetweenAttempts(array $range)
+    {
+        $this->sleepBetweenAttempt = $range;
+    }
+
+    /**
+     * Log attempt
+     */
+    protected function logAttempt()
+    {
+        if (!empty($this->logger)) {
+            $this->logger->warning(
+                '[Warning] Attempt number ' . ($this->attempted + 1)
+                . ' with ' . $this->getSleepBetweenAttempt() . ' sec delay.'
+            );
+        }
     }
 }
