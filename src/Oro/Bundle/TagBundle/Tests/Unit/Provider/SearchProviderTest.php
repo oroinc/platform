@@ -77,7 +77,7 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())->method('where')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))->method('addGroupBy')
+        $qb->expects($this->exactly(3))->method('addGroupBy')
             ->will($this->returnSelf());
         $qb->expects($this->once())->method('setParameter')
             ->will($this->returnSelf());
