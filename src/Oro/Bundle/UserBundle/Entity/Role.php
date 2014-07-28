@@ -24,7 +24,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -82,6 +84,14 @@ class Role extends BaseRole
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Populate the role field
@@ -233,5 +243,28 @@ class Role extends BaseRole
         $this->setRole($roleValue);
 
         return true;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
+     * @return Customer
+     */
+    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

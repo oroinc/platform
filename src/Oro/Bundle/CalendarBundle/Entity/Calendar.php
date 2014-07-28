@@ -20,7 +20,9 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id"
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -76,6 +78,14 @@ class Calendar
      * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="calendar", cascade={"persist"})
      */
     protected $events;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Constructor
@@ -223,5 +233,28 @@ class Calendar
         $event->setCalendar($this);
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
+     * @return Customer
+     */
+    public function setOrganization(\Oro\Bundle\OrganizationBundle\Entity\Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }
