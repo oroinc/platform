@@ -14,7 +14,8 @@
         "oro/navigation-bundle": "dev-master",
         "oro/data-audit-bundle": "dev-master",
         "oro/form-bundle": "dev-master",
-        "oro/user-bundle": "dev-master"
+        "oro/user-bundle": "dev-master",
+        "oro/doctrine-extensions": "1.0.x-dev"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\EntityBundle": "" }
