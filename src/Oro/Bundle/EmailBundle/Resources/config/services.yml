@@ -45,7 +45,7 @@ parameters:
     oro_email.helper.datagrid.emails.class:           Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
     oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
-    oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesGridHelper
+    oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
 
     # Datagrid event listeners
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
@@ -265,6 +265,9 @@ services:
 
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
+        arguments:
+            - @oro_entity.entity_provider
+            - @translator
 
     oro_email.mailer.processor:
         class: %oro_email.mailer.processor.class%

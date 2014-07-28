@@ -53,6 +53,8 @@ oro:
                     type:
                         html: "Html"
                         txt:  "Plain text"
+                    entityName:
+                        empty: Empty
                 page_size:
                     all: "All"
                 view:
