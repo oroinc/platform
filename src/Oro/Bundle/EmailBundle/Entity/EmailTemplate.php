@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * EmailTemplate
@@ -27,6 +28,11 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id"
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
@@ -83,6 +89,14 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @JMS\Expose
      */
     protected $name;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @var integer
@@ -220,6 +234,29 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Gets owning user
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Sets owning user
+     *
+     * @param User $owningUser
+     * @return EmailTemplate
+     */
+    public function setOwner($owningUser)
+    {
+        $this->owner = $owningUser;
+
+        return $this;
     }
 
     /**

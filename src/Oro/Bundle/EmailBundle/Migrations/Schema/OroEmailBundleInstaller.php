@@ -8,6 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_0\OroEmailBundle;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_1\OroEmailBundle as OroEmailBundle11;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_2\SetOwnerForEmailTemplates as OroEmailBundle12;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -16,7 +17,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -35,6 +36,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle11::oroEmailToFolderRelationTable($schema);
 
         OroEmailBundle::oroEmailTemplateTable($schema);
+        OroEmailBundle12::addOwnerToOroEmailTemplate($schema);
         OroEmailBundle::oroEmailTemplateTranslationTable($schema);
 
         OroEmailBundle::oroEmailForeignKeys($schema, false);
