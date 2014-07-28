@@ -10,27 +10,27 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item6@mail.com
+                record_string: 'search item 6'
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item7@mail.com
+                record_string: 'search item 7'
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item8@mail.com
+                record_string: 'search item 8'
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item9@mail.com
+                record_string: 'search item 9'
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item6@mail.com
+                recordTitle: 'search item 6'
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item7@mail.com
+                recordTitle: 'search item 7'
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item8@mail.com
+                recordTitle: 'search item 8'
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: item9@mail.com
+                recordTitle: 'search item 9'

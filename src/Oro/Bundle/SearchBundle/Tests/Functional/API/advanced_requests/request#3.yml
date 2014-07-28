@@ -10,4 +10,4 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: item1@mail.com
+                record_string: 'search item 1'
