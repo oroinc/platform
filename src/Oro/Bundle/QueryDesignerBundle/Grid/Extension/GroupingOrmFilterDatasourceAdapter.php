@@ -98,9 +98,14 @@ class GroupingOrmFilterDatasourceAdapter extends OrmFilterDatasourceAdapter
      */
     public function applyRestrictions()
     {
+        if (empty($this->exprStack)) {
+            return;
+        }
+
         if ($this->currentExpr === null) {
             $this->currentExpr = array_pop($this->exprStack);
         }
+
         $this->qb->andWhere($this->currentExpr);
         $this->resetState();
     }
