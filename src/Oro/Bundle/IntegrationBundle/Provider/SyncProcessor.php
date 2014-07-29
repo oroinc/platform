@@ -11,6 +11,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 
 class SyncProcessor
 {
@@ -210,7 +211,7 @@ class SyncProcessor
 
         $exceptions    = $jobResult->getFailureExceptions();
         $isSuccess     = $jobResult->isSuccessful() && empty($exceptions);
-        $connectorData = $context->getValue('connectorData');
+        $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         $status        = new Status();
         $status->setConnector($connector);
 
