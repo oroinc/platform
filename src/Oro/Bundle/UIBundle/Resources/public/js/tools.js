@@ -10,7 +10,6 @@ define(['jquery', 'underscore'], function ($, _) {
     return {
         /** @type {boolean} */
         debug: false,
-
         /**
          * Pack object to string
          *

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -440,6 +441,16 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $entity->setOwner($businessUnit);
 
         $this->assertEquals($businessUnit, $entity->getOwner());
+    }
+
+    public function testOrganization()
+    {
+        $entity         = new User();
+        $organization   = new Organization();
+
+        $this->assertNull($entity->getOrganization());
+        $entity->setOrganization($organization);
+        $this->assertSame($organization, $entity->getOrganization());
     }
 
     public function testImapConfiguration()
