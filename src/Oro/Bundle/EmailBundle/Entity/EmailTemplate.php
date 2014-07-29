@@ -250,6 +250,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Sets owning user
      *
      * @param User $owningUser
+     *
      * @return EmailTemplate
      */
     public function setOwner($owningUser)
