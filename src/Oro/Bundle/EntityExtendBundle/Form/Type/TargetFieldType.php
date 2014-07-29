@@ -55,7 +55,7 @@ class TargetFieldType extends AbstractType
         $fields = $this->configProvider->filter(
             function (Config $config) {
                 return
-                    $config->getId()->getFieldType() == 'string'
+                    in_array($config->getId()->getFieldType(), array('integer', 'string', 'smallint'))
                     && $config->is('is_deleted', false);
             },
             $this->entityClass
