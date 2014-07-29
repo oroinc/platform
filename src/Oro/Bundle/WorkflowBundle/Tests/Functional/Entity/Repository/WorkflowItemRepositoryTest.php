@@ -98,7 +98,12 @@ class WorkflowItemRepositoryTest extends WebTestCase
         $registry->getManager()->clear();
 
         /** @var WorkflowAwareEntity[] $entities */
-        $entities = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')->findAll();
+        $entities = $registry
+            ->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity')
+            ->findBy(
+                array(),
+                array('id' => 'ASC')
+            );
 
         $ids = array('none' => array());
         foreach ($entities as $entity) {
