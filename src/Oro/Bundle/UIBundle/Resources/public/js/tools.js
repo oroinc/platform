@@ -10,10 +10,6 @@ define(['jquery', 'underscore'], function ($, _) {
     return {
         /** @type {boolean} */
         debug: false,
-
-        /** @type {String} */
-        currentRoute: '',
-
         /**
          * Pack object to string
          *
