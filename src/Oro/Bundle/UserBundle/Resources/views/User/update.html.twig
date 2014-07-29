@@ -159,21 +159,6 @@
         }] ) %}
     {% endif %}
 
-    {% if form.businessUnits is defined %}
-        {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'oro.user.business_units.label'|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        form_row(form.businessUnits)
-                    ]
-                }
-            ]
-        }] ) %}
-    {% endif %}
-
     {% if form.organizations is defined %}
         {% set dataBlocks = dataBlocks|merge( [{
             'title': 'Access Settings'|trans,
@@ -184,6 +169,21 @@
             }]
         }] ) %}
     {% endif %}
+
+    {#{% if form.businessUnits is defined %}#}
+        {#{% set dataBlocks = dataBlocks|merge( [{#}
+            {#'title': 'oro.user.business_units.label'|trans,#}
+            {#'subblocks': [#}
+                {#{#}
+                    {#'title': '',#}
+                    {#'useSpan': false,#}
+                    {#'data': [#}
+                        {#form_row(form.businessUnits)#}
+                    {#]#}
+                {#}#}
+            {#]#}
+        {#}] ) %}#}
+    {#{% endif %}#}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': 'oro.user.imap_configuration.label'|trans,
