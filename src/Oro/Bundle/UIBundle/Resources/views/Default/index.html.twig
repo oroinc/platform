@@ -38,13 +38,9 @@
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
-
-                require(['oroui/js/tools'], function (tools) {
-                    tools.currentRoute = {{ app.request.attributes.get('_route')|json_encode|raw }};
-                    {% if app.debug %}
-                    tools.debug = true;
-                    {% endif %}
-                });
+                {% if app.debug %}
+                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
+                {% endif %}
                 </script>
                 {% placeholder scripts_after %}
                 {% block head_script %}
