@@ -89,7 +89,9 @@ function(_, Backbone, AttributeFormOptionRowView) {
                     var i = collection.length - 1;
                     while (i >= 0) {
                         if (collection[i].attribute_name == data.attribute_name) {
-                            delete this.rowViewsByAttribute[data.attribute_name];
+                            if (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)) {
+                                delete this.rowViewsByAttribute[data.attribute_name];
+                            }
                             collection.splice(i, 1);
                         }
                         i--;
