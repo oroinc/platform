@@ -9,25 +9,23 @@ define(['backbone', 'routing'
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
-        defaults: {
-            user:   [],
-            entity: [],
-            entityName: null
-        },
-
         route: 'oro_api_get_emailtemplate_available_variables',
-        url: null,
-
-        initialize: function () {
-            this.updateUrl();
-            this.bind('change:entityName', this.updateUrl, this);
-        },
+        url:   null,
 
         /**
-         * onChange entityName attribute
+         * Entity class name
+         *
+         * @property {string}
          */
-        updateUrl: function () {
-            this.url = routing.generate(this.route, {entityName: this.get('entityName')});
+        entityName: null,
+
+        setEntityName: function (entityName) {
+            this.url = routing.generate(this.route, {entityName: entityName});
+        },
+
+        fetch: function(options) {
+            this.clear({silent: true});
+            Backbone.Model.prototype.fetch.apply(this, arguments);
         }
     });
 });

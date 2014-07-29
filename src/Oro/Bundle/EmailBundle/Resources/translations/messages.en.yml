@@ -28,6 +28,17 @@ oro:
             type.label:          Type
             translations.label:  Translations
 
+            # email template system variables
+            user_name:           Username of logged in user
+            user_first_name:     First name of logged in user
+            user_last_name:      Last name of logged in user
+            user_full_name:      Full name of logged in user
+            app_short_name:      Short name of application
+            app_full_name:       Full name of application
+            current_datetime:    Current date & time
+            current_date:        Current date
+            current_time:        Current time
+
         menu:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
@@ -42,6 +53,8 @@ oro:
                     type:
                         html: "Html"
                         txt:  "Plain text"
+                    entityName:
+                        empty: Empty
                 page_size:
                     all: "All"
                 view:
@@ -87,4 +100,3 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
-"Click to insert variable or drag it.": "Click to insert variable or drag it."
