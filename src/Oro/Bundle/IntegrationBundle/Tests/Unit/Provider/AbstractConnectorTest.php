@@ -108,25 +108,6 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testAddStatusData()
-    {
-        $connector = $this->getConnector($this->transportMock, $this->stepExecutionMock);
-        $connector->setStepExecution($this->stepExecutionMock);
-
-        $reflection = new \ReflectionMethod(
-            '\Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector',
-            'addStatusData'
-        );
-        $reflection->setAccessible(true);
-        $reflection->invoke($connector, 'key', 'value');
-
-        $context = $this->stepExecutionMock->getExecutionContext();
-        $date    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
-
-        $this->assertArrayHasKey('key', $date);
-        $this->assertSame('value', $date['key']);
-    }
-
     /**
      * @param mixed            $transport
      * @param mixed            $stepExecutionMock
@@ -165,5 +146,34 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
         $logger = new LoggerStrategy(new NullLogger());
 
         return new TestConnector($contextRegistryMock, $logger, $contextMediatorMock);
+    }
+
+    public function testGetStatusData()
+    {
+        $connector = $this->getConnector($this->transportMock, $this->stepExecutionMock);
+        $connector->setStepExecution($this->stepExecutionMock);
+
+        $reflection = new \ReflectionMethod(
+            '\Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector',
+            'addStatusData'
+        );
+        $reflection->setAccessible(true);
+        $reflection->invoke($connector, 'key', 'value');
+
+        $context = $this->stepExecutionMock->getExecutionContext();
+        $date    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+
+        $this->assertArrayHasKey('key', $date);
+        $this->assertSame('value', $date['key']);
+
+        $reflection1 = new \ReflectionMethod(
+            '\Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector',
+            'getStatusData'
+        );
+
+        $reflection1->setAccessible(true);
+        $result = $reflection1->invoke($connector, 'key', 'value');
+
+        $this->assertSame('value', $result);
     }
 }
