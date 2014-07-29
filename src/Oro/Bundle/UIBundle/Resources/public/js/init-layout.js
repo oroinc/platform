@@ -195,18 +195,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         });
     });
 
-    mediator.bind('page:beforeChange', function () {
-        layout.pageRendering();
-    });
-
-    /**
-     * Init page layout js after navigation request is completed
-     */
-    mediator.bind("page:afterChange", function () {
-        layout.init();
-        layout.pageRendered();
-    });
-
     /* ============================================================
      * from height_fix.js
      * ============================================================ */

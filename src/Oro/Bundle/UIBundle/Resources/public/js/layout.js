@@ -1,144 +1,185 @@
-/*global define*/
+/*global define, window*/
 /*jslint nomen: true*/
-/*jshint browser: true, devel: true*/
+/*jshint browser:true, devel:true*/
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var bootstrap = require('bootstrap');
-    var __ = require('orotranslation/js/translator');
-
-    var scrollspy = require('oroui/js/scrollspy');
-    var widgetControlInitializer = require('oroui/js/widget-control-initializer');
-    var mediator = require('oroui/js/mediator');
-
-    var pageRenderedCbPool = [];
-    var layout = {};
-
+    var layout, pageRenderedCbPool, document, console,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        bootstrap = require('bootstrap'),
+        __ = require('orotranslation/js/translator'),
+        scrollspy = require('oroui/js/scrollspy'),
+        widgetControlInitializer = require('oroui/js/widget-control-initializer'),
+        mediator = require('oroui/js/mediator'),
+        tools = require('oroui/js/tools');
     require('jquery-ui');
     require('jquery-ui-timepicker');
+    require('jquery.uniform');
 
-    layout.init = function (container) {
-        container = $(container || document.body);
-        this.styleForm(container);
+    document = window.document;
+    console = window.console;
+    pageRenderedCbPool = [];
 
-        scrollspy.init(container);
+    layout = {
+        init: function (container) {
+            var promise;
+            container = $(container);
+            this.styleForm(container);
 
-        container.find('[data-toggle="tooltip"]').tooltip();
+            scrollspy.init(container);
 
-        this.initPopover(container.find('form label'));
-        widgetControlInitializer.init(container);
+            container.find('[data-toggle="tooltip"]').tooltip();
 
-//        @todo: BAP-3374
-//        layout.onPageRendered(function () {
-//            scrollspy.top();
-//        });
-    };
+            this.initPopover(container.find('form label'));
+            widgetControlInitializer.init(container);
 
-    layout.initPopover = function (container) {
-        var $items = container.find('[data-toggle="popover"]');
-        $items.not('[data-close="false"]').each(function (i, el) {
-            //append close link
-            var content = $(el).data('content');
-            content += '<i class="icon-remove popover-close"></i>';
-            $(el).data('content', content);
-        });
+            promise = this.initPageComponents(container);
+            return promise;
+        },
 
-        $items.popover({
-            animation: false,
-            delay: { show: 0, hide: 0 },
-            html: true,
-            container: false,
-            trigger: 'manual'
-        }).on('click.popover', function (e) {
-            $(this).popover('toggle');
-            e.preventDefault();
-        });
+        initPageComponents: function (container) {
+            var loads, initialized;
+            loads = [];
+            initialized = $.Deferred();
 
-        $('body')
-            .on('click.popover-hide', function (e) {
-                $items.each(function () {
-                    //the 'is' for buttons that trigger popups
-                    //the 'has' for icons within a button that triggers a popup
-                    if (!$(this).is(e.target)
-                        && $(this).has(e.target).length === 0
-                        && ($('.popover').has(e.target).length === 0 || ~e.target.className.indexOf('popover-close'))) {
-                        $(this).popover('hide');
-                    }
+            container.find('[data-page-component-module]').each(function () {
+                var $elem, module, options, loaded;
+
+                $elem = $(this);
+                module = $elem.data('pageComponentModule');
+                options = $elem.data('pageComponentOptions');
+                $elem
+                    .removeData('pageComponentModule')
+                    .removeData('pageComponentOptions')
+                    .removeAttr('data-page-component-module')
+                    .removeAttr('data-page-component-options');
+                loaded = $.Deferred();
+
+                require([module], function (component) {
+                    loaded.resolve(component(options));
+                }, function () {
+                    loaded.resolve();
                 });
-            }).on('click.popover-prevent', '.popover', function(e) {
-                if (e.target.tagName.toLowerCase() != 'a') {
-                    e.preventDefault();
-                }
-            }).on('focus.popover-hide', 'select, input, textarea', function() {
-                $items.popover('hide');
+
+                loads.push(loaded.promise());
             });
-        mediator.once('page:request', function () {
-            $('body').off('.popover-hide .popover-prevent');
-        });
-    };
 
-    layout.hideProgressBar = function () {
-        var $bar = $('#progressbar');
-        if ($bar.is(':visible')) {
-            $bar.hide();
-            $('#page').show();
-        }
-    };
+            $.when.apply($, loads).always(function () {
+                var initializes = _.flatten(_.toArray(arguments), true);
+                $.when.apply($, initializes).always(function () {
+                    var components = _.compact(_.flatten(_.toArray(arguments), true));
+                    initialized.resolve(components);
+                });
+            });
 
-    layout.styleForm = function (container) {
-        if ($.isPlainObject($.uniform)) {
-            var selectElements = $(container).find('select:not(.select2)');
-            selectElements.uniform();
+            return initialized.promise();
+        },
 
-            var fileElements = $(container).find('input:file');
-            fileElements.uniform({fileDefaultHtml: __('Please select a file...')});
+        initPopover: function (container) {
+            var $items = container.find('[data-toggle="popover"]');
+            $items.not('[data-close="false"]').each(function (i, el) {
+                //append close link
+                var content = $(el).data('content');
+                content += '<i class="icon-remove popover-close"></i>';
+                $(el).data('content', content);
+            });
 
-            selectElements.trigger('uniformInit');
-            fileElements.trigger('uniformInit');
-        }
-    };
+            $items.popover({
+                animation: false,
+                delay: { show: 0, hide: 0 },
+                html: true,
+                container: false,
+                trigger: 'manual'
+            }).on('click.popover', function (e) {
+                $(this).popover('toggle');
+                e.preventDefault();
+            });
 
-    layout.onPageRendered = function (cb) {
-        if (document.pageReady) {
-            setTimeout(cb, 0);
-        } else {
-            pageRenderedCbPool.push(cb);
-        }
-    };
+            $('body')
+                .on('click.popover-hide', function (e) {
+                    var $target = $(e.target);
+                    $items.each(function () {
+                        //the 'is' for buttons that trigger popups
+                        //the 'has' for icons within a button that triggers a popup
+                        if (
+                            !$(this).is($target) &&
+                                $(this).has($target).length === 0 &&
+                                ($('.popover').has($target).length === 0 || $target.hasClass('popover-close'))
+                        ) {
+                            $(this).popover('hide');
+                        }
+                    });
+                }).on('click.popover-prevent', '.popover', function (e) {
+                    if (e.target.tagName.toLowerCase() !== 'a') {
+                        e.preventDefault();
+                    }
+                }).on('focus.popover-hide', 'select, input, textarea', function () {
+                    $items.popover('hide');
+                });
+            mediator.once('page:request', function () {
+                $('body').off('.popover-hide .popover-prevent');
+            });
+        },
 
-    layout.pageRendering = function () {
-        document.pageReady = false;
-
-        pageRenderedCbPool = [];
-    };
-
-    layout.pageRendered = function () {
-        document.pageReady = true;
-
-        _.each(pageRenderedCbPool, function (cb) {
-            try {
-                cb();
-            } catch (ex) {
-                if (console && (typeof console.log === 'function')) {
-                    console.log(ex);
-                }
+        hideProgressBar: function () {
+            var $bar = $('#progressbar');
+            if ($bar.is(':visible')) {
+                $bar.hide();
+                $('#page').show();
             }
-        });
+        },
 
-        pageRenderedCbPool = [];
+        styleForm: function (container) {
+            var selectElements, fileElements;
+            if ($.isPlainObject($.uniform)) {
+                selectElements = $(container).find('select:not(.select2)');
+                selectElements.uniform();
+
+                fileElements = $(container).find('input:file');
+                fileElements.uniform({fileDefaultHtml: __('Please select a file...')});
+
+                selectElements.trigger('uniformInit');
+                fileElements.trigger('uniformInit');
+            }
+        },
+
+        onPageRendered: function (cb) {
+            if (document.pageReady) {
+                _.defer(cb);
+            } else {
+                pageRenderedCbPool.push(cb);
+            }
+        },
+
+        pageRendering: function () {
+            document.pageReady = false;
+
+            pageRenderedCbPool = [];
+        },
+
+        pageRendered: function () {
+            document.pageReady = true;
+
+            _.each(pageRenderedCbPool, function (cb) {
+                try {
+                    cb();
+                } catch (ex) {
+                    if (console && (typeof console.log === 'function')) {
+                        console.log(ex);
+                    }
+                }
+            });
+
+            pageRenderedCbPool = [];
+        }
     };
 
-    mediator.on('layout.init', function(element) {
-        layout.init(element);
-    });
-
-    mediator.on('grid_load:complete', function(collection, element) {
+    mediator.on('grid_load:complete', function (collection, element) {
         widgetControlInitializer.init(element);
     });
 
-    mediator.on('grid_render:complete', function(element) {
+    mediator.on('grid_render:complete', function (element) {
         widgetControlInitializer.init(element);
     });
 

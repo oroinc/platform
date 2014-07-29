@@ -442,14 +442,12 @@ define(function (require) {
          * Listen to commands on mediator
          */
         _listenToCommands: function () {
-            var grid = this;
+            mediator.on('datagrid:setParam:' + this.name, function (param, value) {
+                this.setAdditionalParameter(param, value);
+            }, this);
 
-            mediator.on('datagrid:setParam:' + grid.name, function (param, value) {
-                grid.setAdditionalParameter(param, value);
-            });
-
-            mediator.on('datagrid:restoreState:' + grid.name, function (columnName, dataField, included, excluded) {
-                grid.collection.each(function (model) {
+            mediator.on('datagrid:restoreState:' + this.name, function (columnName, dataField, included, excluded) {
+                this.collection.each(function (model) {
                     if (_.indexOf(included, model.get(dataField)) !== -1) {
                         model.set(columnName, true);
                     }
@@ -457,7 +455,7 @@ define(function (require) {
                         model.set(columnName, false);
                     }
                 });
-            });
+            }, this);
         },
 
         /**
