@@ -260,7 +260,7 @@ class ConfigController extends Controller
                     ->findBy(
                         [
                             'entity' => $entity->getId(),
-                            'type'   => 'string'
+                            'type'   => array('integer', 'string', 'smallint')
                         ]
                     );
 
