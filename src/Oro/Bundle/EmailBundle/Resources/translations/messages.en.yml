@@ -21,6 +21,7 @@ oro:
             is_system.label:     Is system
             is_editable.label:   Is editable
             name.label:          Template name
+            owner.label:         Owner
             parent.label:        Parent
             subject.label:       Subject
             content.label:       Content
