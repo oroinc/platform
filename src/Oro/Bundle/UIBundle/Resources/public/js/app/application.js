@@ -1,8 +1,9 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'chaplin'
-], function (Chaplin) {
+    'chaplin',
+    'oroui/js/mediator'
+], function (Chaplin, mediator) {
     'use strict';
 
     var Application;
@@ -10,16 +11,16 @@ define([
     Application = Chaplin.Application.extend({
         initialize: function (options) {
             this.options = options || {};
-            Chaplin.mediator.setHandler('retrieveOption', this.retrieveOption, this);
-            Chaplin.mediator.setHandler('retrievePath', this.retrievePath, this);
-            Chaplin.mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
-            Chaplin.mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
+            mediator.setHandler('retrieveOption', this.retrieveOption, this);
+            mediator.setHandler('retrievePath', this.retrievePath, this);
+            mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
+            mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
 
             // stub handlers, should be defined in some modules
-            Chaplin.mediator.setHandler('showLoading', function () {});
-            Chaplin.mediator.setHandler('hideLoading', function () {});
-            Chaplin.mediator.setHandler('redirectTo', function () {});
-            Chaplin.mediator.setHandler('refreshPage', function () {});
+            mediator.setHandler('showLoading', function () {});
+            mediator.setHandler('hideLoading', function () {});
+            mediator.setHandler('redirectTo', function () {});
+            mediator.setHandler('refreshPage', function () {});
 
             Application.__super__.initialize.apply(this, arguments);
         },
