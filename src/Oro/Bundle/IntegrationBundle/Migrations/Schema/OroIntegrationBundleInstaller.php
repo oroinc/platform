@@ -33,8 +33,8 @@ class OroIntegrationBundleInstaller implements Installation
         v12::modifyChannelTable($schema);
         v13::modifyChannelTable($schema);
         v14::modifyChannelTable($schema);
-        v15::modifyChannelTable($schema);
 
         v10::createChannelStatusTable($schema);
+        v15::modifyChannelStatusTable($schema);
     }
 }

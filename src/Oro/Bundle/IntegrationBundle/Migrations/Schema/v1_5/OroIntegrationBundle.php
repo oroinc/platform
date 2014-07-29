@@ -15,7 +15,7 @@ class OroIntegrationBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::modifyChannelTable($schema);
+        self::modifyChannelStatusTable($schema);
     }
 
     /**
@@ -23,7 +23,7 @@ class OroIntegrationBundle implements Migration
      *
      * @param Schema $schema
      */
-    public static function modifyChannelTable(Schema $schema)
+    public static function modifyChannelStatusTable(Schema $schema)
     {
         $table = $schema->getTable('oro_integration_channel_status');
         $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false]);
