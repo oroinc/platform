@@ -18,19 +18,13 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     protected $security;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isMyProfilePage;
 
     /**
@@ -55,41 +49,37 @@ class UserType extends AbstractType
         $this->addEntityFields($builder);
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
         // user fields
-        $builder->addEventSubscriber(
-            new UserSubscriber($builder->getFormFactory(), $this->security)
-        );
+        $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->security));
         $this->setDefaultUserFields($builder);
 
         if ($this->securityFacade->isGranted('oro_user_role_view')) {
-            $builder
-                ->add(
-                    'roles',
-                    'entity',
-                    array(
-                        'property_path' => 'rolesCollection',
-                        'label'         => 'oro.user.roles.label',
-                        'class'         => 'OroUserBundle:Role',
-                        'property'      => 'label',
-                        'query_builder' => function (EntityRepository $er) {
-                            return $er->createQueryBuilder('r')
-                                ->where('r.role <> :anon')
-                                ->setParameter('anon', User::ROLE_ANONYMOUS)
-                                ->orderBy('r.label');
-                        },
-                        'multiple'      => true,
-                        'expanded'      => true,
-                        'required'      => !$this->isMyProfilePage,
-                        'read_only'     => $this->isMyProfilePage,
-                        'disabled'      => $this->isMyProfilePage,
-                    )
-                );
+            $builder->add(
+                'roles',
+                'entity',
+                array(
+                    'property_path' => 'rolesCollection',
+                    'label'         => 'oro.user.roles.label',
+                    'class'         => 'OroUserBundle:Role',
+                    'property'      => 'label',
+                    'query_builder' => function (EntityRepository $er) {
+                        return $er->createQueryBuilder('r')
+                            ->where('r.role <> :anon')
+                            ->setParameter('anon', User::ROLE_ANONYMOUS)
+                            ->orderBy('r.label');
+                    },
+                    'multiple'      => true,
+                    'expanded'      => true,
+                    'required'      => !$this->isMyProfilePage,
+                    'read_only'     => $this->isMyProfilePage,
+                    'disabled'      => $this->isMyProfilePage,
+                )
+            );
         }
 
         if ($this->securityFacade->isGranted('oro_user_group_view')) {
@@ -109,26 +99,11 @@ class UserType extends AbstractType
             );
         }
 
-//        if ($this->securityFacade->isGranted('oro_business_unit_view')) {
-//            $builder->add(
-//                'businessUnits',
-//                'oro_business_unit_tree',
-//                array(
-//                    'multiple' => true,
-//                    'expanded' => true,
-//                    'required' => false,
-//                    'label'    => 'oro.user.business_units.label'
-//                )
-//            );
-//        }
-
-        if ($this->securityFacade->isGranted('oro_business_unit_view')) {
+        if ($this->securityFacade->isGranted('oro_organization_view')) {
             $builder->add(
                 'organizations',
-                'oro_organization_bu_tree_select',
+                'oro_organizations_select',
                 array(
-                    'multiple' => true,
-                    'expanded' => true,
                     'required' => false,
                     'label'    => 'oro.user.organizations.label'
                 )
