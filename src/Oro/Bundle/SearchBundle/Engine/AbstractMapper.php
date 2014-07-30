@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Query\Query;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMapper
@@ -64,8 +64,8 @@ abstract class AbstractMapper
      */
     public function getEntityConfig($entity)
     {
-        if (isset($this->mappingConfig[(string) $entity])) {
-            return $this->mappingConfig[(string) $entity];
+        if (isset($this->mappingConfig[(string)$entity])) {
+            return $this->mappingConfig[(string)$entity];
         }
 
         return false;
@@ -88,7 +88,7 @@ abstract class AbstractMapper
             $value = $this->getFieldValue($relationObject, $relationObjectField['name']);
             if ($value) {
                 $relationObjectField['name'] = $parentName;
-                $objectData = $this->setDataValue(
+                $objectData                  = $this->setDataValue(
                     $alias,
                     $objectData,
                     $relationObjectField,
@@ -116,7 +116,7 @@ abstract class AbstractMapper
             //check if field have target_fields parameter
             $targetFields = isset($fieldConfig['target_fields'])
                 ? $fieldConfig['target_fields']
-                : array($fieldConfig['name']);
+                : [$fieldConfig['name']];
 
             if ($fieldConfig['target_type'] != 'text') {
                 foreach ($targetFields as $targetField) {
@@ -129,10 +129,27 @@ abstract class AbstractMapper
                     }
                     $objectData[$fieldConfig['target_type']][$targetField] .= $value . ' ';
                 }
-                if (!isset($objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD])) {
-                    $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = '';
+
+                $textAllDataField = '';
+                if (isset($objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD])) {
+                    $textAllDataField = $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD];
                 }
-                $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] .= $value . ' ';
+
+                $textAllDataField .= sprintf(
+                    '%s %s ',
+                    $value,
+                    Query::clearString($value)
+                );
+
+                $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = implode(
+                    Query::DELIMITER,
+                    array_unique(
+                        explode(
+                            Query::DELIMITER,
+                            $textAllDataField
+                        )
+                    )
+                );
             }
         }
 

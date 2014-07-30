@@ -10,9 +10,9 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: 'search item 9'
+                record_string: item9@mail.com
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: 'search item 9'
+                recordTitle: item9@mail.com

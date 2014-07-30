@@ -1,6 +1,6 @@
 # common test case
 request:
-    query: "from oro_test_item where stringValue !~ item_5"
+    query: "from oro_test_item where stringValue !~ item5"
     offset: ~
     max_results: ~
 response:
@@ -10,4 +10,4 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: 'search item 1'
+                record_string: item1@mail.com
