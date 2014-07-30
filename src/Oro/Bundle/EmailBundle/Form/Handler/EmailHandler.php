@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\FormError;
@@ -163,7 +164,7 @@ class EmailHandler
             $model->setGridName($this->request->query->get('gridName'));
         }
         if ($this->request->query->has('entityClass')) {
-            $model->setEntityName(
+            $model->setEntityClass(
                 $this->entityRoutingHelper->decodeClassName($this->request->query->get('entityClass'))
             );
         }

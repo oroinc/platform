@@ -4,13 +4,13 @@ namespace Oro\Bundle\EmailBundle\Form\Model;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
-class Email implements EmailTemplateAwareInterface
+class Email
 {
     /** @var string */
     protected $gridName;
 
     /** @var string */
-    protected $entityName;
+    protected $entityClass;
 
     /** @var mixed */
     protected $entityId;
@@ -63,23 +63,25 @@ class Email implements EmailTemplateAwareInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get class name of the target entity
+     *
+     * @return string
      */
-    public function getEntityName()
+    public function getEntityClass()
     {
-        return $this->entityName;
+        return $this->entityClass;
     }
 
     /**
      * Set class name of the target entity
      *
-     * @param string $entityName
+     * @param string $entityClass
      *
      * @return $this
      */
-    public function setEntityName($entityName)
+    public function setEntityClass($entityClass)
     {
-        $this->entityName = $entityName;
+        $this->entityClass = $entityClass;
 
         return $this;
     }
@@ -203,7 +205,7 @@ class Email implements EmailTemplateAwareInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return EmailTemplate
      */
     public function getTemplate()
     {
