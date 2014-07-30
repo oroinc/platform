@@ -17,6 +17,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
     /** @var EntityVariablesProvider */
     protected $provider;
 
@@ -36,10 +39,15 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->provider = new EntityVariablesProvider(
             $translator,
             $this->emailConfigProvider,
-            $this->entityConfigProvider
+            $this->entityConfigProvider,
+            $this->doctrine
         );
     }
 
@@ -69,6 +77,21 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5EntityConfig->set('label', 'field5_label');
 
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($classMetadata));
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($em));
+
         $this->emailConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::TEST_ENTITY_NAME)
@@ -94,17 +117,40 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $classMetadata->expects($this->exactly(3))
+            ->method('hasAssociation')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['field1', false],
+                        ['field3', false],
+                        ['field5', true],
+                    ]
+                )
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('field5')
+            ->will($this->returnValue('RelatedEntity'));
+
         $result = $this->provider->getVariableDefinitions(self::TEST_ENTITY_NAME);
         $this->assertEquals(
             [
                 'field1' => ['type' => 'string', 'label' => 'field1_label'],
                 'field3' => ['type' => 'boolean', 'label' => 'field3_label'],
-                'field5' => ['type' => 'string', 'label' => 'field5_label'],
+                'field5' => [
+                    'type'                => 'string',
+                    'label'               => 'field5_label',
+                    'related_entity_name' => 'RelatedEntity'
+                ],
             ],
             $result
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetVariableDefinitionsForAllEntities()
     {
         $entity1field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
@@ -119,6 +165,36 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1Config->set('available_in_template', true);
         $entity2field1EntityConfig = new Config(new FieldConfigId('entity', $entity2Class, 'email', 'string'));
         $entity2field1EntityConfig->set('label', 'email_label');
+
+        $classMetadata1 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetadata2 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->exactly(2))
+            ->method('getClassMetadata')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, $classMetadata1],
+                        [$entity2Class, $classMetadata2],
+                    ]
+                )
+            );
+        $this->doctrine->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, $em],
+                        [$entity2Class, $em],
+                    ]
+                )
+            );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('getIds')
