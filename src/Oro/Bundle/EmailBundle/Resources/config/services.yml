@@ -181,7 +181,6 @@ services:
             - @oro_email.twig.string_loader
             -  # twig environment options
               strict_variables: true
-            - @oro_entity_config.provider.email
             - @oro_email.emailtemplate.variable_provider
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
@@ -217,6 +216,7 @@ services:
             - @translator
             - @oro_entity_config.provider.email
             - @oro_entity_config.provider.entity
+            - @doctrine
         lazy: true
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }

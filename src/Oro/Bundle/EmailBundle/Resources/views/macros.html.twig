@@ -4,42 +4,98 @@
         function($, View, Model){
             $(function() {
                 'use strict';
-                new View({
-                    el:       $('#oro-email-available-variables'),
-                    template: $('#available-variables-lists-template'),
-                    target:   $('#{{ dependentFieldId }}'),
-                    model:    new Model({{ render(path('oro_api_get_emailtemplate_available_variables', { 'entityName': entityName }))}})
+                var model, view;
+
+                model = new Model({{ render(path('oro_api_get_emailtemplate_available_variables'))}});
+                model.setEntityName({{ entityName|json_encode|raw }});
+
+                view = new View({
+                    el:                      $('#oro-email-template-variables'),
+                    templateSelector:        '#oro-email-template-variables-template',
+                    sectionTemplateSelector: '#oro-email-template-variables-{sectionName}-template',
+                    sectionContentSelector:  '#oro-email-template-variables-{sectionName}',
+                    sectionTabSelector:      '#oro-email-template-variables-{sectionName}-tab',
+                    model:                   model
                 });
+                $('#{{ dependentFieldId }}').on('change', function (e) {
+                    view.changeEntity($(e.currentTarget).val().split('_').join('\\'));
+                });
+                view.render();
             });
         });
     </script>
 
-    <script type="text/template" id="available-variables-lists-template">
+    <script type="text/template" id="oro-email-template-variables-template">
         <div class="emailtemplate-variables oro-tabs tabbable">
             <ul class="nav nav-tabs">
-            <% _.each(vars, function(variables, scope) { %>
-                <li<% if (scope === 'system') { %> class="active"<% } %>>
-                    <a href="javascript:void(0);" data-target=".variables-<%= scope %>" data-toggle="tab">
-                        <%= _.__('oro.email.emailtemplate.variables.' + scope) %>
+                <li class="active" id="oro-email-template-variables-system-tab">
+                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-system" data-toggle="tab">
+                        {{ 'oro.email.emailtemplate.variables.system' | trans }}
                     </a>
                 </li>
-            <% }); %>
+                <li id="oro-email-template-variables-entity-tab">
+                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-entity" data-toggle="tab">
+                        {{ 'oro.email.emailtemplate.variables.entity' | trans }}
+                    </a>
+                </li>
             </ul>
             <div class="tab-content">
-            <% _.each(vars, function(variables, scope) { %>
-                <div class="variables variables-<%= scope %> tab-pane<% if (scope === 'system') { %> active<% } %>">
-                    <ul class="nav nav-list">
-                        <% _.each(variables, function(variable, varName) { %>
-                        <li><a href="javascript:void(0);" title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= scope %>.<%= varName %> }}{% endverbatim %}</a></li>
-                        <% }); %>
-                    </ul>
+                <div class="variables tab-pane active" id="oro-email-template-variables-system">
+                    <%= variables.system %>
                 </div>
-            <% }); %>
+                <div class="variables tab-pane" id="oro-email-template-variables-entity">
+                </div>
             </div>
         </div>
     </script>
+    <script type="text/template" id="oro-email-template-variables-system-template">
+        <ul class="nav nav-list">
+            <% _.each(variables, function(variable, varName) { %>
+            <li><a href="javascript:void(0);"
+                   class="variable"
+                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %> }}{% endverbatim %}</a></li>
+            <% }); %>
+        </ul>
+    </script>
+    <script type="text/template" id="oro-email-template-variables-entity-template">
+        <% if (path) { %>
+        <% var breadcrumbs = path.split('/'); breadcrumbs[0] = root; %>
+        <ul class="breadcrumb">
+            <% var breadcrumbPath = ''; %>
+            <% for (var i = 0; i < breadcrumbs.length; i++) { %>
+            <% breadcrumbPath += '/' + breadcrumbs[i]; %>
+            <li<% if (i === breadcrumbs.length - 1) { %> class="active"<% } %>>
+                <% if (i !== breadcrumbs.length - 1) { %>
+                <a href="javascript:void(0);"
+                   class="reference"
+                   data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbs[i] %></a>
+                <span class="divider">/&nbsp;</span>
+                <% } else { %>
+                <%= breadcrumbs[i] %>
+                <% } %>
+            </li>
+            <% } %>
+        </ul>
+        <% } %>
+        <ul class="nav nav-list">
+            <% var varPrefix = path.split('/'); varPrefix[0] = root; varPrefix = varPrefix.join('.') %>
+            <% _.each(variables, function(variable, varName) { %>
+            <li>
+                <% if (_.has(variable, 'related_entity_name')) { %>
+                <a href="javascript:void(0);"
+                   class="reference"
+                   data-path="<%= path + '/' + varName %>"
+                   title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a></li>
+                <% } else { %>
+                <a href="javascript:void(0);"
+                   class="variable"
+                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a></li>
+                <% } %>
+            <% }); %>
+        </ul>
+    </script>
 
-    <div id="oro-email-available-variables"></div>
+    <div id="oro-email-template-variables"></div>
 {% endmacro %}
 
 {% macro renderPreviewDialog(formName, title) %}

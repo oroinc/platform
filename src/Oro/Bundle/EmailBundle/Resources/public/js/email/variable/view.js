@@ -1,7 +1,7 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
-    ], function ($, _, Backbone, __) {
+    ], function ($, _, Backbone) {
     'use strict';
 
     var document = window.document;
@@ -12,85 +12,209 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
      * @extends Backbone.View
      */
     return Backbone.View.extend({
-        events: {
-            'click .variables a': 'addVariable'
+        options: {
+            templateSelector:        null,
+            sectionTemplateSelector: null,
+            sectionContentSelector:  null,
+            sectionTabSelector:      null,
+            fieldsSelectors:         ['input[name*="subject"]', 'textarea[name*="content"]'],
+            defaultFieldIndex:       1 // index in fieldsSelectors
         },
-        target: null,
+
+        events: {
+            'click a.variable':  '_handleVariableClick',
+            'click a.reference': '_handleReferenceClick'
+        },
+
+        sections: {
+            system: 'system',
+            entity: 'entity'
+        },
+
+         /**
+         * @property {jQuery}
+         */
         lastElement: null,
 
         /**
          * Constructor
          *
-         * @param options {Object}
+         * @param {Object} options
          */
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            this.target = options.target;
 
-            this.listenTo(this.model, 'sync', this.render);
-            this.target.on('change', _.bind(this.selectionChanged, this));
-            this.fields = $('input[name*="subject"], textarea[name*="content"]');
+            this.template = _.template($(this.options.templateSelector).html());
+            this.systemTemplate = _.template(
+                $(this._getSectionSelector(this.options.sectionTemplateSelector, this.sections.system)).html()
+            );
+            this.entityTemplate = _.template(
+                $(this._getSectionSelector(this.options.sectionTemplateSelector, this.sections.entity)).html()
+            );
+
+            this.listenTo(this.model, 'change:entity', this._renderEntityVariables);
+
+            this.fields = $(this.options.fieldsSelectors.join(','));
             this.fields.on('blur', _.bind(this._updateElementsMetaData, this));
+            this.fields
+                .droppable({
+                    drop: function Drop(event, ui) {
+                        var variable = ui.draggable.text(),
+                            $targetEl = $(this);
 
-            // set default to content
-            this.lastElement = $('textarea[name*="content"]');
+                        $targetEl.val($targetEl.val() + variable);
+                    }
+                });
 
-            this.render();
+            this.lastElement = $(this.options.fieldsSelectors[this.options.defaultFieldIndex]);
         },
 
         /**
-         * onChange event listener
-         *
-         * @param e {Object}
+         * @param {string} entityName
          */
-        selectionChanged: function (e) {
-            var entityName = $(e.currentTarget).val().split('\\').join('_');
+        changeEntity: function (entityName) {
             this.model.setEntityName(entityName);
-            this.model.fetch();
         },
 
         /**
-         * Renders target element
+         * Renders the view
          *
          * @returns {*}
          */
         render: function () {
-            var html,
-                vars   = this.model.attributes,
-                $el    = $(this.el);
+            var vars = {system: this._getSystemVariablesHtml(this.model.getSystemVariables())};
 
-            if (_.isEmpty(vars)) {
-                $el.parent().hide();
-            } else {
-                html = _.template(this.options.template.html(), {vars:  vars});
-
-                $el.html(html);
-                $el.parent().show();
-
-                $el.find('ul li a').draggable({helper: 'clone'});
-                this.fields
-                    .droppable({
-                        drop: function Drop(event, ui) {
-                            var variable = ui.draggable.text(),
-                                textarea = $(this);
-
-                            textarea.val(textarea.val() + variable);
-                        }
-                    });
-            }
+            this.$el.empty();
+            this.$el.html(this.template({variables: vars}));
+            this._applyDraggable(this._getSectionContent(this.sections.system));
+            this._renderEntityVariables();
 
             return this;
         },
 
         /**
-         * Add variable to last element
+         * Renders section contains entity related variables
          *
-         * @param e
-         * @returns {*}
+         * @private
          */
-        addVariable: function (e) {
-            var field;
-            field = this.fields.filter(document.activeElement);
+        _renderEntityVariables: function () {
+            var $el = this._getSectionContent(this.sections.entity),
+                $tabEl = this._getSectionTab(this.sections.entity),
+                entityVars = this.model.getEntityVariables(),
+                path = this.model.getPath();
+
+            // remove old content
+            $el.empty();
+
+            if (_.isEmpty(entityVars) && !path) {
+                // hide section and switch to 'system' section if 'entity' section is active
+                if (this._isVisible($tabEl)) {
+                    if ($tabEl.hasClass('active')) {
+                        $tabEl.removeClass('active');
+                        this._getSectionTab(this.sections.system).addClass('active');
+                    }
+                    $tabEl.hide();
+                }
+                if (this._isVisible($el)) {
+                    if ($el.hasClass('active')) {
+                        $el.removeClass('active');
+                        this._getSectionContent(this.sections.system).addClass('active');
+                    }
+                    $el.hide();
+                }
+            } else {
+                // show 'entity' section if it is invisible
+                // we cannot use 'show' method here because it adds 'display: block' inline style
+                // and as result both 'system' and 'entity' variables are visible in the 'system' section
+                if (!this._isVisible($tabEl)) {
+                    $tabEl.removeAttr("style");
+                }
+                if (!this._isVisible($el)) {
+                    $el.removeAttr("style");
+                }
+                // add new content
+                $el.html(this._getEntityVariablesHtml(entityVars, path));
+                this._applyDraggable($el);
+            }
+        },
+
+        /**
+         * Checks whether the given element is visible or not
+         *
+         * @param {jQuery} $el
+         * @returns {boolean}
+         * @private
+         */
+        _isVisible: function ($el) {
+            // $el.is(':visible') cannot be used here because it is possible that this method
+            // is called when the element is temporary not visible
+            // for example this view is rendered when 'Loading ...' mask is not hidden yet
+            return $el.css('display') !== 'none';
+        },
+
+        /**
+         * @param {Array} variables
+         * @returns {string}
+         * @private
+         */
+        _getSystemVariablesHtml: function (variables) {
+            return this.systemTemplate({variables: variables, root: this.sections.system});
+        },
+
+        /**
+         * @param {Array}  variables
+         * @param {string} path
+         * @returns {string}
+         * @private
+         */
+        _getEntityVariablesHtml: function (variables, path) {
+            return this.entityTemplate({variables: variables, path: path, root: this.sections.entity});
+        },
+
+        /**
+         * @param {jQuery} $el
+         * @private
+         */
+        _applyDraggable: function ($el) {
+            $el.find('a.variable').draggable({helper: 'clone'});
+        },
+
+        /**
+         * @param {string} selectorTemplate
+         * @param {string} sectionName
+         * @returns {string}
+         * @private
+         */
+        _getSectionSelector: function (selectorTemplate, sectionName) {
+            return selectorTemplate.replace(/\{sectionName\}/g, sectionName);
+        },
+
+        /**
+         * @param {string} sectionName
+         * @returns {jQuery}
+         * @private
+         */
+        _getSectionTab: function (sectionName) {
+            return this.$el.find(this._getSectionSelector(this.options.sectionTabSelector, sectionName));
+        },
+
+        /**
+         * @param {string} sectionName
+         * @returns {jQuery}
+         * @private
+         */
+        _getSectionContent: function (sectionName) {
+            return this.$el.find(this._getSectionSelector(this.options.sectionContentSelector, sectionName));
+        },
+
+        /**
+         * Handle onClick event for 'variable' links
+         * This method adds a variable to the last element
+         *
+         * @param {Event} e
+         */
+        _handleVariableClick: function (e) {
+            var field = this.fields.filter(document.activeElement);
 
             if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
                 field = this.lastElement;
@@ -99,20 +223,30 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
             if (field) {
                 field.val(field.val() + $(e.currentTarget).html());
             }
-            return this;
+        },
+
+        /**
+         * Handle onClick event for 'reference' links
+         * This method change the current entity path in the model
+         *
+         * @param {Event} e
+         * @private
+         */
+        _handleReferenceClick: function (e) {
+            var $el = $(e.currentTarget),
+                path = $el.data('path');
+
+            this.model.setPath(path);
         },
 
         /**
          * Update elements metadata
          *
-         * @param e
+         * @param {Event} e
          * @private
-         * @returns {*}
          */
         _updateElementsMetaData: function (e) {
             this.lastElement = $(e.currentTarget);
-
-            return this;
         }
     });
 });

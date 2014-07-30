@@ -6,13 +6,9 @@ use Doctrine\Common\Cache\Cache;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EmailRenderer extends \Twig_Environment
 {
-    /** @var  ConfigProvider */
-    protected $configProvider;
-
     /** @var VariablesProvider */
     protected $variablesProvider;
 
@@ -25,7 +21,6 @@ class EmailRenderer extends \Twig_Environment
     public function __construct(
         \Twig_LoaderInterface $loader,
         $options,
-        ConfigProvider $configProvider,
         VariablesProvider $variablesProvider,
         Cache $cache,
         $cacheKey,
@@ -33,7 +28,6 @@ class EmailRenderer extends \Twig_Environment
     ) {
         parent::__construct($loader, $options);
 
-        $this->configProvider     = $configProvider;
         $this->variablesProvider  = $variablesProvider;
         $this->sandBoxConfigCache = $cache;
         $this->cacheKey           = $cacheKey;
@@ -74,12 +68,10 @@ class EmailRenderer extends \Twig_Environment
     {
         $configuration = array();
 
-        foreach ($this->configProvider->getIds() as $entityConfigId) {
-            $className = $entityConfigId->getClassName();
-
+        $allGetters = $this->variablesProvider->getEntityVariableGetters();
+        foreach ($allGetters as $className => $getters) {
             $properties = [];
             $methods    = [];
-            $getters    = $this->variablesProvider->getEntityVariableGetters($className);
             foreach ($getters as $varName => $getter) {
                 if (empty($getter)) {
                     $properties[] = $varName;
