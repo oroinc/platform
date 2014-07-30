@@ -77,6 +77,9 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->will($this->returnSelf());
         $qb->expects($this->once())
+            ->method('orWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
             ->method('orderBy')
             ->will($this->returnSelf());
         $qb->expects($this->once())

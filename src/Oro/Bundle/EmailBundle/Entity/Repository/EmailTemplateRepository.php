@@ -41,6 +41,7 @@ class EmailTemplateRepository extends EntityRepository
     {
         return $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
+            ->orWhere('e.entityName IS NULL')
             ->orderBy('e.name', 'ASC')
             ->setParameter('entityName', $entityName);
     }
