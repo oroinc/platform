@@ -40,18 +40,18 @@ class MultipleEntityType extends AbstractType
             ->add(
                 'added',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => $options['class'],
                     'multiple' => true
-                )
+                ]
             )
             ->add(
                 'removed',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => $options['class'],
                     'multiple' => true
-                )
+                ]
             );
 
         if ($options['extend']) {
@@ -66,17 +66,21 @@ class MultipleEntityType extends AbstractType
                     $targetData = $event->getForm()->getParent()->getData();
                     $fieldName  = $event->getForm()->getName();
 
-                    foreach (explode(',', $data['added']) as $id) {
-                        $entity = $repository->find($id);
-                        if ($entity) {
-                            FieldAccessor::addValue($targetData, $fieldName, $entity);
+                    if (!empty($data['added'])) {
+                        foreach (explode(',', $data['added']) as $id) {
+                            $entity = $repository->find($id);
+                            if ($entity) {
+                                FieldAccessor::addValue($targetData, $fieldName, $entity);
+                            }
                         }
                     }
 
-                    foreach (explode(',', $data['removed']) as $id) {
-                        $entity = $repository->find($id);
-                        if ($entity) {
-                            FieldAccessor::removeValue($targetData, $fieldName, $entity);
+                    if (!empty($data['removed'])) {
+                        foreach (explode(',', $data['removed']) as $id) {
+                            $entity = $repository->find($id);
+                            if ($entity) {
+                                FieldAccessor::removeValue($targetData, $fieldName, $entity);
+                            }
                         }
                     }
                 }
@@ -89,9 +93,9 @@ class MultipleEntityType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('class'));
+        $resolver->setRequired(['class']);
         $resolver->setDefaults(
-            array(
+            [
                 'add_acl_resource'      => null,
                 'class'                 => null,
                 'default_element'       => null,
@@ -100,7 +104,7 @@ class MultipleEntityType extends AbstractType
                 'initial_elements'      => null,
                 'mapped'                => false,
                 'selector_window_title' => null,
-            )
+            ]
         );
     }
 
