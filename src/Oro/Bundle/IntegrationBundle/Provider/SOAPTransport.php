@@ -34,6 +34,9 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     /** @var int */
     protected $attempted;
 
+    /** @var bool */
+    protected $multipleAttemptsEnabled = true;
+
     /** @var array */
     protected $sleepBetweenAttempt;
 
@@ -123,6 +126,22 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
+     * @param boolean $multipleAttemptsEnabled
+     */
+    public function setMultipleAttemptsEnabled($multipleAttemptsEnabled)
+    {
+        $this->multipleAttemptsEnabled = $multipleAttemptsEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getMultipleAttemptsEnabled()
+    {
+        return $this->multipleAttemptsEnabled;
+    }
+
+    /**
      * @param string $wsdlUrl
      *
      * @return \SoapClient
@@ -164,7 +183,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      */
     protected function shouldAttempt()
     {
-        return $this->attempted < self::ATTEMPTS;
+        return $this->multipleAttemptsEnabled && ($this->attempted < self::ATTEMPTS);
     }
 
     /**
