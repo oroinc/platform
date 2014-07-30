@@ -27,6 +27,9 @@ class Email
     /** @var EmailTemplate */
     protected $template;
 
+    /** @var string text or html */
+    protected $type;
+
     /** @var string */
     protected $body;
 
@@ -210,6 +213,26 @@ class Email
     public function getTemplate()
     {
         return $this->template;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**

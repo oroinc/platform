@@ -38,6 +38,16 @@ class EmailType extends AbstractType
                     'required' => false,
                 ]
             )
+            ->add(
+                'type',
+                'choice',
+                [
+                    'required'   => true,
+                    'data'       => 0, // default text
+                    'choices'    => ['text', 'html'],
+                    'expanded'   => true
+                ]
+            )
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);

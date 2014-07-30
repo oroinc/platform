@@ -50,6 +50,7 @@ class EmailTypeTest extends TypeTestCase
             'to'       => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
             'subject'  => 'Test subject',
             'body'     => 'Test body',
+            'type'     => 'text',
             'template' => new EmailTemplate(),
         ];
 
