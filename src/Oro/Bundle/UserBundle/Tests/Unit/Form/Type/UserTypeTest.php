@@ -12,7 +12,6 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
 {
     const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
     const OTHER_PROFILE_ROUTE = 'oro_user_update';
-    //const RULE_BUSINESS_UNIT  = 'oro_business_unit_view';
     const RULE_BUSINESS_UNIT  = 'oro_organization_view';
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';

@@ -32,7 +32,6 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
