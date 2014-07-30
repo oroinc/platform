@@ -20,19 +20,6 @@
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
-            {#{% for id, child in form %}#}
-                {#<div class="oro-clearfix" style="border:1px solid red;">#}
-                    {#{{ form_widget(child) }}#}
-                {#</div>#}
-            {#{% endfor %}#}
-
-            {#{{ dump(form.vars.full_name) }}#}
-            {#{{ dump(form.vars.name) }}#}
-            {#{{ dump(form.vars|keys) }}#}
-            {#{{ dump(form.vars.form|keys) }}#}
-            {#{{ dump(form|keys) }}#}
-            {#{{ dump(form.vars.id) }} oro_user_user_form_organizations#}
-
             {% for org in form.vars.organization_tree_ids %}
                 <div class="oro-clearfix">
                     <input type="checkbox"

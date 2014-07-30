@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
 class OrganizationsSelectType extends AbstractType
@@ -72,7 +71,6 @@ class OrganizationsSelectType extends AbstractType
                 'choices'  => $this->getOrganizationOptions(),
             ]
         );
-
         $builder->add(
             'businessUnits',
             'oro_business_unit_tree',

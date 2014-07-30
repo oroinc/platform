@@ -99,7 +99,9 @@ class UserType extends AbstractType
             );
         }
 
-        if ($this->securityFacade->isGranted('oro_organization_view')) {
+        if ($this->securityFacade->isGranted('oro_organization_view')
+            && $this->securityFacade->isGranted('oro_business_unit_view')
+        ) {
             $builder->add(
                 'organizations',
                 'oro_organizations_select',
@@ -195,28 +197,6 @@ class UserType extends AbstractType
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
             ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false]);
-    }
-
-    /**
-     * Calculate bytes from config string
-     *
-     * @param string $value
-     * @return int
-     */
-    protected function getBytes($value)
-    {
-        switch(substr($value, -1)) {
-            case 'G':
-                $value = (int)$value * 1024;
-                // break intentionally omitted
-            case 'M':
-                $value = (int)$value * 1024;
-                // break intentionally omitted
-            case 'K':
-                $value = (int)$value * 1024;
-        }
-
-        return $value;
     }
 
     /**

@@ -1499,7 +1499,6 @@ class User extends ExtendUser implements
         return $this;
     }
 
-
     /**
      * @return BusinessUnit
      */

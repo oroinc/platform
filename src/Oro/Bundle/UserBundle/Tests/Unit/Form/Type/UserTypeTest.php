@@ -12,7 +12,8 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
 {
     const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
     const OTHER_PROFILE_ROUTE = 'oro_user_update';
-    const RULE_BUSINESS_UNIT  = 'oro_organization_view';
+    const RULE_BUSINESS_UNIT  = 'oro_business_unit_view';
+    const RULE_ORGANIZATION   = 'oro_organization_view';
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';
 
@@ -97,10 +98,9 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 ->with('groups', 'entity', $arr)
                 ->will($this->returnValue($builder));
         }
-        if ($permissions[self::RULE_BUSINESS_UNIT]) {
+        if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
             $builder->expects($this->at(++$order))
                 ->method('add')
-                //->with('businessUnits', 'oro_business_unit_tree')
                 ->with('organizations', 'oro_organizations_select')
                 ->will($this->returnValue($builder));
         }
@@ -147,6 +147,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -155,6 +156,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => false
@@ -163,6 +165,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -171,6 +174,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => false,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -179,6 +183,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
                 ),
                 'isMyProfile' => true
@@ -187,6 +192,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => false,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
                 ),
                 'isMyProfile' => true

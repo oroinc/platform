@@ -27,9 +27,6 @@ class OroOrganizationBundle implements Migration
     {
         $table = $schema->getTable('oro_organization');
 
-        $table->dropColumn('currency');
-        $table->dropColumn('currency_precision');
-
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
@@ -48,6 +45,11 @@ class OroOrganizationBundle implements Migration
      */
     public static function updateConfigs(Schema $schema, QueryBag $queries)
     {
+        $table = $schema->getTable('oro_organization');
+
+        $table->dropColumn('currency');
+        $table->dropColumn('currency_precision');
+
         if ($schema->hasTable('oro_entity_config_index_value')
             && $schema->hasTable('oro_entity_config_field')
         ) {
