@@ -50,13 +50,15 @@ class EmailType extends AbstractType
      */
     public function initChoicesByEntityName(FormEvent $event)
     {
-        /** @var Email $eventObject */
-        $eventObject = $event->getData();
-        if (null === $eventObject || null === $eventObject->getEntityClass()) {
+        /** @var Email|array $data */
+        $data = $event->getData();
+        if (null === $data ||
+            is_array($data) && empty($data['entityClass']) ||
+            is_object($data) && null === $data->getEntityClass()) {
             return;
         }
 
-        $entityClass = $eventObject->getEntityClass();
+        $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
 
         FormUtils::replaceField(

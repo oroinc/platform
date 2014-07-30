@@ -52,12 +52,12 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
     public function preSubmit(FormEvent $event)
     {
         /** @var EmailNotification $eventObject */
-        $eventObject = $event->getData();
-        if (null === $eventObject || null === $eventObject->getEntityName()) {
+        $data = $event->getData();
+        if (empty($data['entityName'])) {
             return;
         }
 
-        $this->initChoicesByEntityName($eventObject->getEntityName(), 'template', $event->getForm());
+        $this->initChoicesByEntityName($data['entityName'], 'template', $event->getForm());
     }
 
     /**

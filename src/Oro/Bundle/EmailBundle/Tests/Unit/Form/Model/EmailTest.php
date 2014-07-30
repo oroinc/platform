@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
-use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Bundle\EmailBundle\Form\Model\Email;
 
 class EmailTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,13 +44,13 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $obj = new Email();
         $this->assertFalse($obj->hasEntity());
 
-        $obj->setEntityName('Test\Entity');
+        $obj->setEntityClass('Test\Entity');
         $this->assertFalse($obj->hasEntity());
 
         $obj->setEntityId(123);
         $this->assertTrue($obj->hasEntity());
 
-        $obj->setEntityName(null);
+        $obj->setEntityClass(null);
         $this->assertFalse($obj->hasEntity());
     }
 }
