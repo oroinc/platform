@@ -505,4 +505,22 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($apiKey->getApiKey(), $entity->getApiKey(), 'Should delegate call to userApi entity');
     }
+
+    public function testOrganizations()
+    {
+        $user  = new User;
+        $organization = new Organization();
+
+        $user->setOrganizations(new ArrayCollection(array($organization)));
+
+        $this->assertContains($organization, $user->getOrganizations());
+
+        $user->removeOrganization($organization);
+
+        $this->assertNotContains($organization, $user->getOrganizations());
+
+        $user->addOrganization($organization);
+
+        $this->assertContains($organization, $user->getOrganizations());
+    }
 }

@@ -50,9 +50,7 @@ class OroOrganizationBundle implements Migration
         $table->dropColumn('currency');
         $table->dropColumn('currency_precision');
 
-        if ($schema->hasTable('oro_entity_config_index_value')
-            && $schema->hasTable('oro_entity_config_field')
-        ) {
+        if ($schema->hasTable('oro_entity_config_index_value') && $schema->hasTable('oro_entity_config_field')) {
             $queries->addPostQuery(
                 'DELETE FROM oro_entity_config_index_value
                  WHERE entity_id IS NULL AND field_id IN(

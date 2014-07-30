@@ -1472,6 +1472,18 @@ class User extends ExtendUser implements
     }
 
     /**
+     * @param ArrayCollection $organizations
+     * @return User
+     */
+    public function setOrganizations($organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+
+    /**
      * Add Organization to User
      *
      * @param  Organization $organization
