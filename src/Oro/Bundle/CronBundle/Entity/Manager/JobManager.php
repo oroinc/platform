@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class JobManager
 {
@@ -57,13 +58,16 @@ class JobManager
     {
         $statisticData         = array();
         $dataPerCharacteristic = array();
-        $statistics            = $this->em->getConnection()
-            ->query("SELECT * FROM jms_job_statistics WHERE job_id = " . $job->getId());
 
+        $stmt = $this->em->getConnection()->prepare('SELECT * FROM jms_job_statistics WHERE job_id = :jobId');
+        $stmt->execute(array('jobId' => $job->getId()));
+        $statistics = $stmt->fetchAll();
+
+        $propertyAccess = PropertyAccess::createPropertyAccessor();
         foreach ($statistics as $row) {
-            $dataPerCharacteristic[$row['characteristic']][] = array(
-                $row['createdAt'],
-                $row['charValue'],
+            $dataPerCharacteristic[$propertyAccess->getValue($row, '[characteristic]')][] = array(
+                $propertyAccess->getValue($row, '[createdAt]'),
+                $propertyAccess->getValue($row, '[charValue]')
             );
         }
 
