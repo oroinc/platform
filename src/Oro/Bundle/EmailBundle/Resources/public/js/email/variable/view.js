@@ -158,7 +158,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @private
          */
         _getSystemVariablesHtml: function (variables) {
-            return this.systemTemplate({variables: variables, root: this.sections.system});
+            return this.systemTemplate({
+                variables: variables,
+                root: this.sections.system
+            });
         },
 
         /**
@@ -168,7 +171,21 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @private
          */
         _getEntityVariablesHtml: function (variables, path) {
-            return this.entityTemplate({variables: variables, path: path, root: this.sections.entity});
+            var fields = {},
+                relations = {};
+            _.each(variables, function (variable, varName) {
+                if (_.has(variable, 'related_entity_name')) {
+                    relations[varName] = variable;
+                } else {
+                    fields[varName] = variable;
+                }
+            });
+            return this.entityTemplate({
+                fields: fields,
+                relations: relations,
+                path: path,
+                root: this.sections.entity
+            });
         },
 
         /**

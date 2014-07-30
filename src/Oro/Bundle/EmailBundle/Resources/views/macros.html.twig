@@ -51,9 +51,11 @@
     <script type="text/template" id="oro-email-template-variables-system-template">
         <ul class="nav nav-list">
             <% _.each(variables, function(variable, varName) { %>
-            <li><a href="javascript:void(0);"
+            <li>
+                <a href="javascript:void(0);"
                    class="variable"
-                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %> }}{% endverbatim %}</a></li>
+                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %> }}{% endverbatim %}</a>
+            </li>
             <% }); %>
         </ul>
     </script>
@@ -77,22 +79,40 @@
             <% } %>
         </ul>
         <% } %>
-        <ul class="nav nav-list">
-            <% var varPrefix = path.split('/'); varPrefix[0] = root; varPrefix = varPrefix.join('.') %>
-            <% _.each(variables, function(variable, varName) { %>
+        <% var varPrefix = path.split('/'); varPrefix[0] = root; varPrefix = varPrefix.join('.'); %>
+        <% if (!_.isEmpty(fields) || !_.isEmpty(relations)) { %>
+        <ul class="nav groups">
+            <% if (!_.isEmpty(fields)) { %>
             <li>
-                <% if (_.has(variable, 'related_entity_name')) { %>
-                <a href="javascript:void(0);"
-                   class="reference"
-                   data-path="<%= path + '/' + varName %>"
-                   title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a></li>
-                <% } else { %>
-                <a href="javascript:void(0);"
-                   class="variable"
-                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a></li>
-                <% } %>
-            <% }); %>
+                <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
+                <ul class="nav nav-list">
+                    <% _.each(fields, function(variable, varName) { %>
+                   <li>
+                        <a href="javascript:void(0);"
+                           class="variable"
+                           title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </li>
+            <% } %>
+            <% if (!_.isEmpty(relations)) { %>
+            <li>
+                <div class="group-label"><%= _.__('oro.entity.field_choice.relations') %></div>
+                <ul class="nav nav-list">
+                    <% _.each(relations, function(variable, varName) { %>
+                    <li>
+                        <a href="javascript:void(0);"
+                           class="reference"
+                           data-path="<%= path + '/' + varName %>"
+                           title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                    </li>
+                    <% }); %>
+                </ul>
+            </li>
+            <% } %>
         </ul>
+        <% } %>
     </script>
 
     <div id="oro-email-template-variables"></div>

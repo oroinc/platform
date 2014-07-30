@@ -20,6 +20,12 @@
     text-transform: none;
     font-size: 13px;
 }
+.emailtemplate-variables .variables .groups {
+    padding-left: 15px;
+}
+.emailtemplate-variables .variables .group-label {
+    font-weight: bold;
+}
 
 .modal-body .loading-content {
     background: #fff url('../img/loader.gif') no-repeat center left;
