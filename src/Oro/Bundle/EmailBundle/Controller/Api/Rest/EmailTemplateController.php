@@ -91,7 +91,7 @@ class EmailTemplateController extends RestController
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
-        $templates = $emailTemplateRepository->getTemplateByEntityName($entityName);
+        $templates               = $emailTemplateRepository->getTemplateByEntityName($entityName);
 
         return $this->handleView(
             $this->view($templates, Codes::HTTP_OK)
@@ -113,14 +113,19 @@ class EmailTemplateController extends RestController
      */
     public function getAvailableVariablesAction($entityName = null)
     {
-        $entityName = str_replace('_', '\\', $entityName);
-
         /** @var VariablesProvider $provider */
-        $provider = $this->get('oro_email.provider.variable_provider');
-        $allowedData = $provider->getTemplateVariables($entityName);
+        $provider = $this->get('oro_email.emailtemplate.variable_provider');
+
+        $data = [
+            'system' => $provider->getSystemVariableDefinitions()
+        ];
+        if ($entityName) {
+            $entityName     = str_replace('_', '\\', $entityName);
+            $data['entity'] = $provider->getEntityVariableDefinitions($entityName);
+        }
 
         return $this->handleView(
-            $this->view($allowedData, Codes::HTTP_OK)
+            $this->view($data, Codes::HTTP_OK)
         );
     }
 

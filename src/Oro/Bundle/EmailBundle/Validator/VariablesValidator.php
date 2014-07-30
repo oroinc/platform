@@ -7,10 +7,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Validator\Constraints\VariablesConstraint;
 
 class VariablesValidator extends ConstraintValidator
@@ -18,25 +17,25 @@ class VariablesValidator extends ConstraintValidator
     /** @var \Twig_Environment */
     protected $twig;
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var VariablesProvider */
+    protected $variablesProvider;
 
     /** @var EntityManager */
     protected $entityManager;
 
     /**
-     * @param \Twig_Environment        $twig
-     * @param SecurityContextInterface $securityContext
-     * @param EntityManager            $entityManager
+     * @param \Twig_Environment $twig
+     * @param VariablesProvider $variablesProvider
+     * @param EntityManager     $entityManager
      */
     public function __construct(
         \Twig_Environment $twig,
-        SecurityContextInterface $securityContext,
+        VariablesProvider $variablesProvider,
         EntityManager $entityManager
     ) {
-        $this->twig            = $twig;
-        $this->securityContext = $securityContext;
-        $this->entityManager   = $entityManager;
+        $this->twig              = $twig;
+        $this->variablesProvider = $variablesProvider;
+        $this->entityManager     = $entityManager;
     }
 
     /**
@@ -81,7 +80,7 @@ class VariablesValidator extends ConstraintValidator
                         $template,
                         array(
                             'entity' => $entity,
-                            'user'   => $this->getUser()
+                            'system' => $this->variablesProvider->getSystemVariableValues()
                         )
                     );
                 } catch (\Twig_Error $e) {
@@ -95,16 +94,5 @@ class VariablesValidator extends ConstraintValidator
                 $this->context->addViolation($constraint->message);
             }
         }
-    }
-
-    /**
-     * Return current user
-     *
-     * @return UserInterface|bool
-     */
-    private function getUser()
-    {
-        return $this->securityContext->getToken() && !is_string($this->securityContext->getToken()->getUser())
-            ? $this->securityContext->getToken()->getUser() : false;
     }
 }

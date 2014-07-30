@@ -3,47 +3,40 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Util\Inflector;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\UserBundle\Entity\User;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EmailRenderer extends \Twig_Environment
 {
-    /** @var  Cache|null */
-    protected $sandBoxConfigCache;
-
     /** @var  ConfigProvider */
     protected $configProvider;
 
+    /** @var VariablesProvider */
+    protected $variablesProvider;
+
+    /** @var  Cache|null */
+    protected $sandBoxConfigCache;
+
     /** @var  string */
     protected $cacheKey;
-
-    /** @var User */
-    protected $user;
 
     public function __construct(
         \Twig_LoaderInterface $loader,
         $options,
         ConfigProvider $configProvider,
+        VariablesProvider $variablesProvider,
         Cache $cache,
         $cacheKey,
-        SecurityContextInterface $securityContext,
         \Twig_Extension_Sandbox $sandbox
     ) {
         parent::__construct($loader, $options);
 
-        $this->configProvider = $configProvider;
+        $this->configProvider     = $configProvider;
+        $this->variablesProvider  = $variablesProvider;
         $this->sandBoxConfigCache = $cache;
-        $this->cacheKey = $cacheKey;
-        $this->user = $securityContext->getToken() && !is_string($securityContext->getToken()->getUser())
-            ? $securityContext->getToken()->getUser() : false;
+        $this->cacheKey           = $cacheKey;
 
         $this->addExtension($sandbox);
         $this->configureSandbox();
@@ -68,7 +61,8 @@ class EmailRenderer extends \Twig_Environment
         $sandbox = $this->getExtension('sandbox');
         /** @var \Twig_Sandbox_SecurityPolicy $security */
         $security = $sandbox->getSecurityPolicy();
-        $security->setAllowedMethods($allowedData);
+        $security->setAllowedProperties($allowedData['properties']);
+        $security->setAllowedMethods($allowedData['methods']);
     }
 
     /**
@@ -82,20 +76,20 @@ class EmailRenderer extends \Twig_Environment
 
         foreach ($this->configProvider->getIds() as $entityConfigId) {
             $className = $entityConfigId->getClassName();
-            $fields    = $this->configProvider->filter(
-                function (ConfigInterface $fieldConfig) {
-                    return $fieldConfig->is('available_in_template');
-                },
-                $className
-            );
 
-            if (count($fields)) {
-                $configuration[$className] = array();
-                /** @var ConfigInterface $fieldConfig */
-                foreach ($fields as $fieldConfig) {
-                    $configuration[$className][] = 'get' . Inflector::camelize($fieldConfig->getId()->getFieldName());
+            $properties = [];
+            $methods    = [];
+            $getters    = $this->variablesProvider->getEntityVariableGetters($className);
+            foreach ($getters as $varName => $getter) {
+                if (empty($getter)) {
+                    $properties[] = $varName;
+                } else {
+                    $methods[] = $getter;
                 }
             }
+
+            $configuration['properties'][$className] = $properties;
+            $configuration['methods'][$className]    = $methods;
         }
 
         return $configuration;
@@ -115,7 +109,7 @@ class EmailRenderer extends \Twig_Environment
         $content = $template->getContent();
         $content = $template->getType() == 'txt' ? strip_tags($content) : $content;
 
-        $templateParams['user'] = $this->user;
+        $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
         $templateRendered = $this->render($content, $templateParams);
         $subjectRendered  = $this->render($template->getSubject(), $templateParams);
@@ -136,9 +130,7 @@ class EmailRenderer extends \Twig_Environment
         $content = $entity->getContent();
         $content = $entity->getType() == 'txt' ? strip_tags($content) : $content;
 
-        $templateParams['user'] = $this->user;
-
-        $templateRendered = $this->render('{% verbatim %}' . $content . '{% endverbatim %}', $templateParams);
+        $templateRendered = $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
 
         return $templateRendered;
     }

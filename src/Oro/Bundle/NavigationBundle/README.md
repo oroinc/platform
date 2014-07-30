@@ -9,8 +9,8 @@ ACL implementation from Oro UserBundle.
 
 * [Your first menu](#first-menu)
 * [Rendering Menus](#rendering-menus)
-* [Hash Navigation](#hash-navigation)
-* [Content outdating notifications](./Resources/doc/content_outdating.md)
+* [Content Outdating Notifications](./Resources/doc/content_outdating.md)
+* [Mediator Handlers](./Resources/doc/mediator-handlers.md)
 
 <a name="first-menu"></a>
 
@@ -162,60 +162,4 @@ arguments and call KmpMenu renderer with the resulting options.
     {{ oro_menu_render('navbar', array('template' => 'SomeUserBundle:Menu:customdesign.html.twig')) }}
 {% endblock content %}
 ```
-
-<a name="hash-navigation"></a>
-
-## Hashtag Navigation
-
-To simplify site navigation and make it work without full page reloads hashtag navigation is implemented.
-
-To enable hashtag navigation, we need to follow next steps:
-
-* In main layout template additional check must be added, so it should look like:
-
-```
-{% if not oro_is_hash_navigation() %}
-<!DOCTYPE html>
-<html>
-...
-[content]
-...
-</html>
-{% else %}
-{# Template for hash tag navigation#}
-{% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
-    with {'script': block('head_script'), 'messages':block('messages'), 'content': block('page_container')}
-%}
-{% endif %}
-```
-
-where
-
-block('head_script') - block with additional javascripts
-
-block('messages') - block with system messages
-
-block('page_container') - content area block (without header/footer), that will be realoaded during navigation
-
-* This code must be added at the end of head section of main layout template:
-
-```
-      <script type="text/javascript">
-            $(function() {
-                if (Oro.hashNavigationEnabled()) {
-                    new Oro.Navigation({baseUrl : '{{ app.request.getSchemeAndHttpHost() }}'});
-                    Backbone.history.start();
-                }
-            })
-      </script>
-```
-
-* To exclude links from processing with hash navigation (like windows open buttons, delete links), additional css class
-"no-hash" should be added to the tag, e.g.
-
-```
-      <a href="page-url" class="no-hash">
-```
-
-As a part of hashtag navigation, form submit is also processed with Ajax.
 

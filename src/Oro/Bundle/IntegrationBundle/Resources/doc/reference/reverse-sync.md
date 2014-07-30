@@ -1,29 +1,34 @@
 #Reverse synchronization
 
-There is possibility to push data back to channel. Export process could be used for this purposes.
-Your connector should implement `Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface` to declare what's job name
-will do export.
+For integration that requires synchronization in both sides there is possibility to declare export process on connector level.
+Your connector should implement `Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface` to expose job name
+that will make export.
 
 ##Export job definition
-This will export your data to your store based on channel definition.
 
-**oro_integration.reader.entity.by_id** - service reads from entity by ID.
+Definition of the export job is very similar to import. Basically it's additional job for `Akeneo\Bundle\BatchBundle`
+that should be added to `batch_job.yml`. Job might be declared with multiple steps, but good practice is to use one connector for one entity.
+In order to read entity from database there is additional reader placed in OroIntegrationBundle `oro_integration.reader.entity.by_id`,
+it takes `EntityReaderById::ID_FILTER` option from context object(`ContextInterface`) for matching entity to read.
+
+_Note: for now only non-composite identifiers are supported_
 
 ####Example:
 ``` yaml
     #batch_job.yml
     example_export:
-        title: "Entity export"
+        title: Job title here
         type:  export
         steps:
-            export:
-                title: export
-                class: Oro\Bundle\BatchBundle\Step\ItemStep
+            export_entity_1:
+                title:      Step title here
+                class:      Oro\Bundle\BatchBundle\Step\ItemStep
                 services:
                     reader:    oro_integration.reader.entity.by_id  # read entity from database by identifier
-                    processor: YOUR_PROCESSOR                       # service which processing each record. Could prepare changeset for writer.
-                    writer:    YOUR_REVERSE_WRITER                  # service that are responsible for data push to remote instance
+                    processor: YOUR_PROCESSOR                       # service which process each record. Could prepare changeset for writer.
+                    writer:    YOUR_REVERSE_WRITER                  # service that are responsible for pushing data to remote instance
                 parameters: ~
+            # .... another steps
 ```
 
 Processor and writer could be initialized in your bundle in service.yaml

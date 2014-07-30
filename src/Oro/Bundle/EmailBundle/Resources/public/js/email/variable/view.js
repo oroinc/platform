@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
      */
     return Backbone.View.extend({
         events: {
-            'click ul li a': 'addVariable'
+            'click .variables a': 'addVariable'
         },
         target: null,
         lastElement: null,
@@ -44,8 +44,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          * @param e {Object}
          */
         selectionChanged: function (e) {
-            var entityName = $(e.currentTarget).val();
-            this.model.set('entityName', entityName.split('\\').join('_'));
+            var entityName = $(e.currentTarget).val().split('\\').join('_');
+            this.model.setEntityName(entityName);
             this.model.fetch();
         },
 
@@ -56,18 +56,13 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
          */
         render: function () {
             var html,
-                userVars   = this.model.get('user'),
-                entityVars = this.model.get('entity'),
-                $el        = $(this.el);
+                vars   = this.model.attributes,
+                $el    = $(this.el);
 
-            if (_.isEmpty(userVars) && _.isEmpty(entityVars)) {
+            if (_.isEmpty(vars)) {
                 $el.parent().hide();
             } else {
-                html = _.template(this.options.template.html(), {
-                    userVars: this.model.get('user'),
-                    entityVars: this.model.get('entity'),
-                    title: __('Click to insert variable or drag it.')
-                });
+                html = _.template(this.options.template.html(), {vars:  vars});
 
                 $el.html(html);
                 $el.parent().show();

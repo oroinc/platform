@@ -15,29 +15,31 @@
     </script>
 
     <script type="text/template" id="available-variables-lists-template">
-        <% if (userVars.length > 0) { %>
-        <div>
-            <h4>{{ 'Logged in user:'|trans }}</h4>
-            <ul class="nav nav-list">
-                <% _.each(userVars, function(variable, i) { %>
-                    <li><a href="javascript:void(0);" title="<%= title %>">{% verbatim %}{{ user.<%= variable %> }}{% endverbatim %}</a></li>
-                <% }); %>
+        <div class="emailtemplate-variables oro-tabs tabbable">
+            <ul class="nav nav-tabs">
+            <% _.each(vars, function(variables, scope) { %>
+                <li<% if (scope === 'system') { %> class="active"<% } %>>
+                    <a href="javascript:void(0);" data-target=".variables-<%= scope %>" data-toggle="tab">
+                        <%= _.__('oro.email.emailtemplate.variables.' + scope) %>
+                    </a>
+                </li>
+            <% }); %>
             </ul>
+            <div class="tab-content">
+            <% _.each(vars, function(variables, scope) { %>
+                <div class="variables variables-<%= scope %> tab-pane<% if (scope === 'system') { %> active<% } %>">
+                    <ul class="nav nav-list">
+                        <% _.each(variables, function(variable, varName) { %>
+                        <li><a href="javascript:void(0);" title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= scope %>.<%= varName %> }}{% endverbatim %}</a></li>
+                        <% }); %>
+                    </ul>
+                </div>
+            <% }); %>
+            </div>
         </div>
-        <% } %>
-        <% if (entityVars.length > 0) { %>
-        <div>
-            <h4>{{ 'Related entity:'|trans }}</h4>
-            <ul class="nav nav-list">
-                <% _.each(entityVars, function(variable, i) { %>
-                    <li><a href="javascript:void(0);" title="<%= title %>">{% verbatim %}{{ entity.<%= variable %> }}{% endverbatim %}</a></li>
-                <% }); %>
-            </ul>
-        </div>
-        <% } %>
     </script>
 
-    <div class="well well-small" id="oro-email-available-variables"></div>
+    <div id="oro-email-available-variables"></div>
 {% endmacro %}
 
 {% macro renderPreviewDialog(formName, title) %}
