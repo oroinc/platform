@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Entity;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -124,5 +125,15 @@ class RoleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         return $event;
+    }
+
+    public function testOrganization()
+    {
+        $entity         = $this->getRole();
+        $organization   = new Organization();
+
+        $this->assertNull($entity->getOrganization());
+        $entity->setOrganization($organization);
+        $this->assertSame($organization, $entity->getOrganization());
     }
 }

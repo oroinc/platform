@@ -32,6 +32,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -51,7 +52,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "dataaudit"={"auditable"=true},
  *          "security"={
@@ -517,6 +520,14 @@ class User extends ExtendUser implements
      * )
      */
     protected $updatedAt;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     public function __construct()
     {
@@ -1593,5 +1604,28 @@ class User extends ExtendUser implements
         $this->emailOrigins->removeElement($emailOrigin);
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return User
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }
