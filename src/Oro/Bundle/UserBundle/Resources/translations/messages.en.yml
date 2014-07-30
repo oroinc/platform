@@ -56,6 +56,7 @@ oro:
         api.label:                   API key
         birthday.label:              Birthday
         business_units.label:        Business Units
+        organizations.label:         Organizations
         confirmation_token.label:    Confirmation token
         current_status.label:        Current status
         groups.label:                Groups
