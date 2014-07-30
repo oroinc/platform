@@ -43,8 +43,8 @@ class EmailType extends AbstractType
                 'choice',
                 [
                     'required'   => true,
-                    'data'       => 0, // default text
-                    'choices'    => ['text', 'html'],
+                    'data'       => 'text',
+                    'choices'    => ['text' => 'text', 'html' => 'html'],
                     'expanded'   => true
                 ]
             )

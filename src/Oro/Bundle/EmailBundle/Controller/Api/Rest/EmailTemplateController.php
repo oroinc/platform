@@ -12,6 +12,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -21,6 +23,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 /**
  * @RouteResource("emailtemplate")
@@ -54,8 +57,6 @@ class EmailTemplateController extends RestController
 
         /**
          * Deny to remove system templates
-         *
-         * @TODO hide icon in datagrid when it'll be possible
          */
         if ($entity->getIsSystem()) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
@@ -78,6 +79,8 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
+     * @GetRoute(requirements={"entityName"="(^[^\d][.]+)"})
+     *
      * @return Response
      */
     public function getAction($entityName = null)
@@ -109,6 +112,7 @@ class EmailTemplateController extends RestController
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
      * @GetRoute(requirements={"entityName"="(.*)"})
+     *
      * @return Response
      */
     public function getAvailableVariablesAction($entityName = null)
@@ -123,6 +127,43 @@ class EmailTemplateController extends RestController
             $entityName     = str_replace('_', '\\', $entityName);
             $data['entity'] = $provider->getEntityVariableDefinitions($entityName);
         }
+
+        return $this->handleView(
+            $this->view($data, Codes::HTTP_OK)
+        );
+    }
+
+    /**
+     * REST GET email template
+     *
+     * @param EmailTemplate $emailTemplate
+     * @param int           $entityId
+     *
+     *
+     * @ApiDoc(
+     *     description="Get email template subject, type and content",
+     *     resource=true
+     * )
+     * @AclAncestor("oro_email_emailtemplate_view")
+     * @GetRoute("/emailtemplates/{id}/{entityId}", requirements={"id" = "\d+","entityId" = "\d+"})
+     * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
+     *
+     * @return Response
+     */
+    public function getTemplateAction(EmailTemplate $emailTemplate, $entityId)
+    {
+        $entity = $this->getDoctrine()
+            ->getRepository($emailTemplate->getEntityName())
+            ->find($entityId);
+
+        list($subject, $body) = $this->get('oro_email.email_renderer')
+            ->compileMessage($emailTemplate, ['entity' => $entity]);
+
+        $data = [
+            'subject' => $subject,
+            'body'    => $body,
+            'type'    => $emailTemplate->getType(),
+        ];
 
         return $this->handleView(
             $this->view($data, Codes::HTTP_OK)
