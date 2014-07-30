@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 
@@ -56,6 +55,9 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         $userImages = $em->getConnection()->executeQuery($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         if (!empty($userImages)) {
+            $maxId = (int)$em->getConnection()
+                ->executeQuery('SELECT MAX(id) FROM oro_attachment_file;')
+                ->fetchColumn();
             foreach ($userImages as $userData) {
                 $filePath = $this->getUploadFileName($userData);
                 // file doesn't exists or not readable
@@ -74,21 +76,29 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
                     $this->container->get('logger')
                         ->addError(sprintf('File copy error: %s', $e->getMessage()));
                 }
-
-                $file       = new SymfonyFile($filePath);
-                $fileEntity = new File();
-                $fileEntity->setExtension($file->guessExtension());
-                $fileEntity->setOriginalFilename($file->getFileName());
-                $fileEntity->setMimeType($file->getMimeType());
-                $fileEntity->setFileSize($file->getSize());
-                $fileEntity->setFilename($userData['image']);
-
-                $em->persist($fileEntity);
-                $em->flush();
+                $maxId++;
+                $file = new SymfonyFile($filePath);
+                $currentDate = new \DateTime();
+                $query = sprintf(
+                    'INSERT INTO oro_attachment_file
+                    (id, filename, extension, mime_type, file_size, original_filename,
+                     created_at, updated_at, owner_user_id)
+                    values (%s, \'%s\', \'%s\', \'%s\', %s, \'%s\', \'%s\', \'%s\', %s);',
+                    $maxId,
+                    $file->getFileName(),
+                    $file->guessExtension(),
+                    $file->getMimeType(),
+                    $file->getSize(),
+                    $userData['image'],
+                    $currentDate->format('Y-m-d'),
+                    $currentDate->format('Y-m-d'),
+                    $userData['id']
+                );
+                $queries->addQuery($query);
 
                 $query = sprintf(
-                    'UPDATE oro_user set avatar_id = %d WHERE id = %d',
-                    $fileEntity->getId(),
+                    'UPDATE oro_user set avatar_id = %d WHERE id = %d;',
+                    $maxId,
                     $userData['id']
                 );
 
