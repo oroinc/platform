@@ -21,6 +21,11 @@ define(['underscore', 'backbone'
         entityName: null,
 
         /**
+         * @property {string}
+         */
+        entityLabel: null,
+
+        /**
          * @property {array} Each item is {Object} with 'relatedEntityName' and 'fieldName' properties
          */
         path: [],
@@ -33,10 +38,19 @@ define(['underscore', 'backbone'
         },
 
         /**
-         * @param {string} entityName
+         * @returns {string}
          */
-        setEntityName: function (entityName) {
+        getEntityLabel: function () {
+            return this.entityLabel;
+        },
+
+        /**
+         * @param {string} entityName
+         * @param {string} entityLabel
+         */
+        setEntity: function (entityName, entityLabel) {
             this.entityName = entityName;
+            this.entityLabel = entityLabel;
             this.path = [];
             this.trigger('change:entity');
         },
@@ -69,21 +83,21 @@ define(['underscore', 'backbone'
         },
 
         /**
-         * @returns {Array}
+         * @returns {Object}
          */
         getSystemVariables: function () {
             return this.attributes.system;
         },
 
         /**
-         * @returns {Array}
+         * @returns {Object}
          */
         getEntityVariables: function () {
             var entityName = this._getCurrentEntityName();
             if (entityName && _.has(this.attributes.entity, entityName)) {
                 return this.attributes.entity[entityName];
             }
-            return [];
+            return {};
         },
 
         /**

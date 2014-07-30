@@ -1,4 +1,4 @@
-{% macro renderAvailableVariablesWidget(entityName, dependentFieldId) %}
+{% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
     <script type="text/javascript">
         require(['jquery', 'oroemail/js/email/variable/view', 'oroemail/js/email/variable/model'],
         function($, View, Model){
@@ -7,7 +7,7 @@
                 var model, view;
 
                 model = new Model({{ render(path('oro_api_get_emailtemplate_available_variables'))}});
-                model.setEntityName({{ entityName|json_encode|raw }});
+                model.setEntity({{ entityName|json_encode|raw }}, {{ oro_entity_config_value(entityName, 'label')|trans|json_encode|raw }});
 
                 view = new View({
                     el:                      $('#oro-email-template-variables'),
@@ -17,8 +17,11 @@
                     sectionTabSelector:      '#oro-email-template-variables-{sectionName}-tab',
                     model:                   model
                 });
-                $('#{{ dependentFieldId }}').on('change', function (e) {
-                    view.changeEntity($(e.currentTarget).val().split('_').join('\\'));
+                $('#{{ entityChoiceFieldId }}').on('change', function (e) {
+                    var $el = $(e.currentTarget),
+                        entityName = $el.val().split('_').join('\\'),
+                        entityLabel = $el.find(":selected").data('label');
+                    model.setEntity(entityName, entityLabel);
                 });
                 view.render();
             });
@@ -60,25 +63,24 @@
         </ul>
     </script>
     <script type="text/template" id="oro-email-template-variables-entity-template">
-        <% if (path) { %>
         <% var breadcrumbs = path.split('/'); breadcrumbs[0] = root; %>
         <ul class="breadcrumb">
             <% var breadcrumbPath = ''; %>
             <% for (var i = 0; i < breadcrumbs.length; i++) { %>
             <% breadcrumbPath += '/' + breadcrumbs[i]; %>
+            <% breadcrumbItemLabel = (i === 0 ? entityLabel : breadcrumbs[i]); %>
             <li<% if (i === breadcrumbs.length - 1) { %> class="active"<% } %>>
                 <% if (i !== breadcrumbs.length - 1) { %>
                 <a href="javascript:void(0);"
                    class="reference"
-                   data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbs[i] %></a>
+                   data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
                 <% } else { %>
-                <%= breadcrumbs[i] %>
+                <%= breadcrumbItemLabel %>
                 <% } %>
             </li>
             <% } %>
         </ul>
-        <% } %>
         <% var varPrefix = path.split('/'); varPrefix[0] = root; varPrefix = varPrefix.join('.'); %>
         <% if (!_.isEmpty(fields) || !_.isEmpty(relations)) { %>
         <ul class="nav groups">

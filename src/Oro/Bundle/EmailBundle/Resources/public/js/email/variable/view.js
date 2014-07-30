@@ -70,13 +70,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
         },
 
         /**
-         * @param {string} entityName
-         */
-        changeEntity: function (entityName) {
-            this.model.setEntityName(entityName);
-        },
-
-        /**
          * Renders the view
          *
          * @returns {*}
@@ -101,6 +94,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
             var $el = this._getSectionContent(this.sections.entity),
                 $tabEl = this._getSectionTab(this.sections.entity),
                 entityVars = this.model.getEntityVariables(),
+                entityLabel = this.model.getEntityLabel(),
                 path = this.model.getPath();
 
             // remove old content
@@ -133,7 +127,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
                     $el.removeAttr("style");
                 }
                 // add new content
-                $el.html(this._getEntityVariablesHtml(entityVars, path));
+                $el.html(this._getEntityVariablesHtml(entityVars, entityLabel, path));
                 this._applyDraggable($el);
             }
         },
@@ -167,10 +161,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
         /**
          * @param {Array}  variables
          * @param {string} path
+         * @param {string} entityLabel
          * @returns {string}
          * @private
          */
-        _getEntityVariablesHtml: function (variables, path) {
+        _getEntityVariablesHtml: function (variables, entityLabel, path) {
             var fields = {},
                 relations = {};
             _.each(variables, function (variable, varName) {
@@ -183,6 +178,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
             return this.entityTemplate({
                 fields: fields,
                 relations: relations,
+                entityLabel: entityLabel,
                 path: path,
                 root: this.sections.entity
             });
