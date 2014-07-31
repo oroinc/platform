@@ -8,7 +8,8 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 /**
- * Sets email.available_in_template to TRUE for all fields except a value of this attribute is changed be an user
+ * Sets value of email.available_in_template attribute to TRUE for all fields
+ * except a value of this attribute is changed by an user
  */
 class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
 {
