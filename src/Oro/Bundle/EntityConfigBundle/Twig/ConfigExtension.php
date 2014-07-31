@@ -39,33 +39,28 @@ class ConfigExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $className  The entity class name
-     * @param string $scope      The entity config scope name
-     * @param null   $configCode
+     * @param string $className The entity class name
+     * @param string $scope     The entity config scope name
      *
      * @return array
      */
-    public function getClassConfig($className, $scope = 'entity', $configCode = null)
+    public function getClassConfig($className, $scope = 'entity')
     {
         if (!$this->configManager->hasConfig($className)) {
             return array();
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
-        $configs      = $this->configManager->getConfig($entityConfig);
 
-        if (null === $configCode) {
-            return $configs->all();
-        }
-
-        return $configs->get($configCode);
+        return $this->configManager->getConfig($entityConfig)->all();
     }
 
     /**
      * @param string $className The entity class name
      * @param string $attrName  The entity config attribute name
      * @param string $scope     The entity config scope name
-     * @return array
+     *
+     * @return mixed
      */
     public function getClassConfigValue($className, $attrName, $scope = 'entity')
     {
