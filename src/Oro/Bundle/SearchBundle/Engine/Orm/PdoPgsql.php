@@ -57,7 +57,6 @@ class PdoPgsql extends BaseDriver
             $stringQuery .= ' AND textField.field = :field' . $index;
         }
 
-        /** @todo: skip if false condition */
         $stringQuery .= ' AND TsRank(textField.value, :value' . $index . ') > ' . Query::FINITY;
 
         return $stringQuery;
@@ -73,7 +72,13 @@ class PdoPgsql extends BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
-        return $this->createContainsStringQuery($index, $useFieldName);
+        $stringQuery = '(TsvectorTsquery(textField.value, :value' . $index . ')) = TRUE';
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND textField.field = :field' . $index;
+        }
+
+        return $stringQuery;
     }
 
     /**
@@ -86,10 +91,8 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $valueDelimiter    = ' & ';
-        $nonValueDelimiter = ' | ';
-        $notContains       = $searchCondition != Query::OPERATOR_CONTAINS;
-        $searchArray       = explode(Query::DELIMITER, $fieldValue);
+        $notContains = $searchCondition != Query::OPERATOR_CONTAINS;
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
 
         foreach ($searchArray as $key => $string) {
             $searchArray[$key] = $string . ':*';
@@ -99,13 +102,13 @@ class PdoPgsql extends BaseDriver
             foreach ($searchArray as $key => $string) {
                 $searchArray[$key] = '!' . $string;
             }
-
-            $nonValueDelimiter = $valueDelimiter;
         }
 
-        $qb
-            ->setParameter('value' . $index, implode($valueDelimiter, $searchArray))
-            ->setParameter('non_value' . $index, implode($nonValueDelimiter, $searchArray));
+        $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+
+        if (!$notContains) {
+            $qb->setParameter('non_value' . $index, implode(' | ', $searchArray));
+        }
     }
 
     /**
