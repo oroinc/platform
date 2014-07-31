@@ -171,6 +171,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
             _.each(variables, function (variable, varName) {
                 if (_.has(variable, 'related_entity_name')) {
                     relations[varName] = variable;
+                    fields[varName] = variable;
                 } else {
                     fields[varName] = variable;
                 }
