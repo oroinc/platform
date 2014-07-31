@@ -17,7 +17,7 @@ Login page: Login page
 "Reset password": "Reset password"
 "Generate key was successful. New key:": "Generate key was successful. New key&#58;"
 "Generate key": "Generate key"
-"Access Settings: "Access Settings"
+"Access Settings": "Access Settings"
 
 change_password:
     flash:
