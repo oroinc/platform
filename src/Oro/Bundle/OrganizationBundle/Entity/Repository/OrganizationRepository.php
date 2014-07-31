@@ -26,6 +26,7 @@ class OrganizationRepository extends EntityRepository
      *
      * @param string  $tableName table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
      * @param integer $id        Organization id
+     *
      * @return integer Number of rows affected
      */
     public function updateWithOrganization($tableName, $id)
