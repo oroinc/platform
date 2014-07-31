@@ -7,9 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Organization
-     */
+    /** @var Organization */
     protected $organization;
 
     protected function setUp()
@@ -29,21 +27,5 @@ class OrganizationTest extends \PHPUnit_Framework_TestCase
     public function testId()
     {
         $this->assertNull($this->organization->getId());
-    }
-
-    public function testCurrency()
-    {
-        $currency = 'USD';
-        $this->assertNull($this->organization->getCurrency());
-        $this->organization->setCurrency($currency);
-        $this->assertEquals($currency, $this->organization->getCurrency());
-    }
-
-    public function testPrecision()
-    {
-        $precision = '000 000.00';
-        $this->assertNull($this->organization->getPrecision());
-        $this->organization->setPrecision($precision);
-        $this->assertEquals($precision, $this->organization->getPrecision());
     }
 }

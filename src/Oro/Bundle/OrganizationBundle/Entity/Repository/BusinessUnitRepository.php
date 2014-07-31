@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class BusinessUnitRepository extends EntityRepository
 {
-     /**
+    /**
      * Build business units tree for user page
      *
      * @param User $user
@@ -17,14 +17,14 @@ class BusinessUnitRepository extends EntityRepository
      */
     public function getBusinessUnitsTree(User $user = null)
     {
-        $businessUnits = $this->createQueryBuilder('businessUnit')
-                    ->select(
-                        array(
-                            'businessUnit.id',
-                            'businessUnit.name',
-                            'IDENTITY(businessUnit.owner) parent',
-                        )
-                    );
+        $businessUnits = $this->createQueryBuilder('businessUnit')->select(
+            array(
+                'businessUnit.id',
+                'businessUnit.name',
+                'IDENTITY(businessUnit.owner) parent',
+                'IDENTITY(businessUnit.organization) organization',
+            )
+        );
         if ($user && $user->getId()) {
             $units = $user->getBusinessUnits()->map(
                 function (BusinessUnit $businessUnit) {
@@ -38,10 +38,10 @@ class BusinessUnitRepository extends EntityRepository
             }
         }
         $businessUnits = $businessUnits->getQuery()->getArrayResult();
-        $children = array();
+        $children      = array();
         foreach ($businessUnits as &$businessUnit) {
-            $parent = $businessUnit['parent'] ?: 0;
-            $children[$parent][] = &$businessUnit;
+            $parent              = $businessUnit['parent'] ? : 0;
+            $children[$parent][] = & $businessUnit;
         }
         unset($businessUnit);
         foreach ($businessUnits as &$businessUnit) {
@@ -58,13 +58,44 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
+     * Build business units tree by organization
+     *
+     * @return array
+     */
+    public function getOrganizationBusinessUnitsTree()
+    {
+        $tree          = [];
+        $businessUnits = $this->getBusinessUnitsTree();
+
+        $organizationsQuery  = $this->_em->getRepository('OroOrganizationBundle:Organization')
+            ->createQueryBuilder('organization')
+            ->select(['organization.id', 'organization.name'])
+            ->getQuery();
+        $organizationsResult = $organizationsQuery->getArrayResult();
+
+        foreach ($organizationsResult as $organizationItem) {
+            $tree[$organizationItem['id']] = [
+                'id'       => $organizationItem['id'],
+                'name'     => $organizationItem['name'],
+                'children' => []
+            ];
+        }
+
+        foreach ($businessUnits as $businessUnit) {
+            $tree[$businessUnit['organization']]['children'][] = $businessUnit;
+        }
+
+        return $tree;
+    }
+
+    /**
      * Get business units ids
      *
      * @return array
      */
     public function getBusinessUnitIds()
     {
-        $result = [];
+        $result        = [];
         $businessUnits = $this->createQueryBuilder('businessUnit')
             ->select('businessUnit.id')
             ->getQuery()
@@ -123,7 +154,7 @@ class BusinessUnitRepository extends EntityRepository
             ->getQuery()
             ->getArrayResult();
 
-        foreach ((array) $result as $value) {
+        foreach ((array)$result as $value) {
             $options[$value[$field]] = current(
                 array_reverse(
                     explode('\\', $value[$field])

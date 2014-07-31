@@ -8,6 +8,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class BusinessUnitTreeSelectType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'oro_business_unit_tree';
@@ -24,7 +27,7 @@ class BusinessUnitTreeSelectType extends AbstractType
                     'is_translated_option' => false,
                     'is_safe'              => false,
                 ),
-                'business_unit_ids' => array(),
+                'business_unit_ids' => [],
             )
         );
     }

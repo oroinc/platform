@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -17,21 +15,23 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
+
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
-use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
+use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
+use Oro\Bundle\UserBundle\Model\ExtendUser;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -462,6 +462,24 @@ class User extends ExtendUser implements
      * )
      */
     protected $businessUnits;
+
+    /**
+     * @var Organization[]
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
+     * @ORM\JoinTable(name="oro_user_organization",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $organizations;
 
     /**
      * @var EmailOrigin[]
@@ -1438,6 +1456,56 @@ class User extends ExtendUser implements
     {
         if ($this->getBusinessUnits()->contains($businessUnit)) {
             $this->getBusinessUnits()->removeElement($businessUnit);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get User Organizations
+     *
+     * @return ArrayCollection Organization[]
+     */
+    public function getOrganizations()
+    {
+        return $this->organizations;
+    }
+
+    /**
+     * @param ArrayCollection $organizations
+     * @return User
+     */
+    public function setOrganizations($organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+
+    /**
+     * Add Organization to User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function addOrganization(Organization $organization)
+    {
+        $this->organizations[] = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Delete Organization from User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function removeOrganization(Organization $organization)
+    {
+        if ($this->getOrganizations()->contains($organization)) {
+            $this->getOrganizations()->removeElement($organization);
         }
 
         return $this;
