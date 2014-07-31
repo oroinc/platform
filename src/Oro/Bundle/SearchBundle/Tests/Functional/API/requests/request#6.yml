@@ -10,21 +10,21 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: 'search item 1'
+                record_string: item1@mail.com
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: 'search item 2'
+                record_string: item2@mail.com
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_string: 'search item 3'
+                record_string: item3@mail.com
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: 'search item 1'
+                recordTitle: item1@mail.com
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: 'search item 2'
+                recordTitle: item2@mail.com
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: 'search item 3'
+                recordTitle: item3@mail.com
