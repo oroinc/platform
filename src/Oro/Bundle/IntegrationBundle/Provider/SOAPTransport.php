@@ -21,7 +21,7 @@ use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
  */
 abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
-    const ATTEMPTS = 7;
+885    const ATTEMPTS = 7;
 
     use LoggerAwareTrait;
 
@@ -226,7 +226,8 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected function isAttemptNecessary()
     {
         if ($this->shouldAttempt()) {
-            $headers = $this->getLastResponseHeaders();
+            $headers  = $this->getLastResponseHeaders();
+            $response = $this->getLastResponse();
 
             if (!empty($headers) && !$this->isResultOk($headers)) {
                 $statusCode = $this->getHttpStatusCode($headers);
@@ -234,6 +235,8 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
                 if (in_array($statusCode, $this->getHttpStatusesForAttempt())) {
                     return true;
                 }
+            } elseif (!empty($headers) && $this->isResultOk($headers) && strpos('<?xml', $response) !== 0) {
+                return true;
             } elseif (empty($headers)) {
                 return true;
             }
@@ -246,7 +249,11 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      */
     protected function getHttpStatusesForAttempt()
     {
-        return [Codes::HTTP_BAD_GATEWAY, Codes::HTTP_SERVICE_UNAVAILABLE, Codes::HTTP_GATEWAY_TIMEOUT];
+        return [
+            Codes::HTTP_BAD_GATEWAY,
+            Codes::HTTP_SERVICE_UNAVAILABLE,
+            Codes::HTTP_GATEWAY_TIMEOUT,
+        ];
     }
 
     /**
