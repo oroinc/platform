@@ -61,6 +61,13 @@ class Status
      */
     protected $date;
 
+    /**
+     * @var array $data
+     *
+     * @ORM\Column(name="data", type="array", nullable=false)
+     */
+    protected $data;
+
     public function __construct()
     {
         $this->setDate(new \DateTime('now', new \DateTimeZone('UTC')));
@@ -182,5 +189,21 @@ class Status
     public function __sleep()
     {
         return [];
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

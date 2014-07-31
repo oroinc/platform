@@ -38,7 +38,7 @@ define(function (require) {
 
     layout.initPopover = function (container) {
         var $items = container.find('[data-toggle="popover"]');
-        $items.not('[data-close="false"]').each(function(i, el) {
+        $items.not('[data-close="false"]').each(function (i, el) {
             //append close link
             var content = $(el).data('content');
             content += '<i class="icon-remove popover-close"></i>';
@@ -51,7 +51,7 @@ define(function (require) {
             html: true,
             container: false,
             trigger: 'manual'
-        }).on('click.popover', false, function (e) {
+        }).on('click.popover', function (e) {
             $(this).popover('toggle');
             e.preventDefault();
         });
@@ -75,7 +75,7 @@ define(function (require) {
                 $items.popover('hide');
             });
         mediator.once('page:request', function () {
-            $('body').off('click.popover-hide').off('click.popover-prevent').off('focus.popover-hide');
+            $('body').off('.popover-hide .popover-prevent');
         });
     };
 
