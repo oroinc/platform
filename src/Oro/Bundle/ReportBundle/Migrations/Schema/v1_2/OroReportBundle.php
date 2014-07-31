@@ -27,8 +27,11 @@ class OroReportBundle implements Migration
         $table = $schema->getTable('oro_report');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_B48821B632C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }

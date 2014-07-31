@@ -19,7 +19,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture
         $defaultOrganization
             ->setName(self::MAIN_ORGANIZATION)
             ->setEnabled(true);
-
+        $this->addReference('default_organization', $defaultOrganization);
         $manager->persist($defaultOrganization);
 
         // load default business unit
@@ -28,7 +28,6 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture
             ->setName(self::MAIN_BUSINESS_UNIT)
             ->setOrganization($defaultOrganization);
         $this->addReference('default_business_unit', $defaultBusinessUnit);
-
         $manager->persist($defaultBusinessUnit);
 
         $manager->flush();

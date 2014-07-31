@@ -27,8 +27,11 @@ class OroTrackerBundle implements Migration
         $table = $schema->getTable('oro_tracking_website');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_1903889832C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }

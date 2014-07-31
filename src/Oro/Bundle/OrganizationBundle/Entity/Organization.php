@@ -15,7 +15,7 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  * Organization
  *
  * @ORM\Table(name="oro_organization")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={

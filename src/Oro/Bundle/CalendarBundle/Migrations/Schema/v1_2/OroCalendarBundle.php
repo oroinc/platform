@@ -27,8 +27,11 @@ class OroCalendarBundle implements Migration
         $table = $schema->getTable('oro_calendar');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_1D1715132C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }
