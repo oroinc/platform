@@ -6,7 +6,9 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_0\OroOrganizationBundle;
+
+use Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_0\OroOrganizationBundle as OroOrganizationBundleV1_0;
+use Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_2\OroOrganizationBundle as OroOrganizationBundleV1_2;
 
 class OroOrganizationBundleInstaller implements Installation
 {
@@ -15,7 +17,7 @@ class OroOrganizationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -23,9 +25,11 @@ class OroOrganizationBundleInstaller implements Installation
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        OroOrganizationBundle::oroOrganizationTable($schema);
-        OroOrganizationBundle::oroBusinessUnitTable($schema);
+        OroOrganizationBundleV1_0::oroOrganizationTable($schema);
+        OroOrganizationBundleV1_0::oroBusinessUnitTable($schema);
 
-        OroOrganizationBundle::oroBusinessUnitForeignKeys($schema);
+        OroOrganizationBundleV1_0::oroBusinessUnitForeignKeys($schema);
+
+        OroOrganizationBundleV1_2::updateOrganizationTable($schema);
     }
 }

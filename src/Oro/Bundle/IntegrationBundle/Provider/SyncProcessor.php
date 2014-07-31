@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -13,6 +11,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 
 class SyncProcessor
 {
@@ -210,11 +209,16 @@ class SyncProcessor
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
         }
 
-        $exceptions = $jobResult->getFailureExceptions();
-        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
-
-        $status = new Status();
+        $exceptions    = $jobResult->getFailureExceptions();
+        $isSuccess     = $jobResult->isSuccessful() && empty($exceptions);
+        $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+        $status        = new Status();
         $status->setConnector($connector);
+
+        if (is_array($connectorData)) {
+            $status->setData($connectorData);
+        }
+
         if (!$isSuccess) {
             $this->logger->error('Errors were occurred:');
             $exceptions = implode(PHP_EOL, $exceptions);

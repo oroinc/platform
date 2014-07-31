@@ -26,7 +26,7 @@ oro:
         id.label:          Id
         name.label:        Name
         description.label: Description
-        enabled.label:     Enabled
+        enabled.label:     Status
         business_units.label: Bussines units
         form:
             choose_organization: Choose a organization...

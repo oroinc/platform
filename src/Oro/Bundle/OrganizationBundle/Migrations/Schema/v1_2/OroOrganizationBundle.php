@@ -27,13 +27,14 @@ class OroOrganizationBundle implements Migration
     {
         $table = $schema->getTable('oro_organization');
 
-        $table->dropColumn('currency');
-        $table->dropColumn('currency_precision');
-
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('enabled', 'boolean', []);
+
+        $table->getColumn('organization_id')->setOptions(['notnull' => false]);
+
+        $table->addUniqueIndex(['name'], 'UNIQ_BB42B65D5E237E06');
     }
 
     /**
@@ -44,9 +45,12 @@ class OroOrganizationBundle implements Migration
      */
     public static function updateConfigs(Schema $schema, QueryBag $queries)
     {
-        if ($schema->hasTable('oro_entity_config_index_value')
-            && $schema->hasTable('oro_entity_config_field')
-        ) {
+        $table = $schema->getTable('oro_organization');
+
+        $table->dropColumn('currency');
+        $table->dropColumn('currency_precision');
+
+        if ($schema->hasTable('oro_entity_config_index_value') && $schema->hasTable('oro_entity_config_field')) {
             $queries->addPostQuery(
                 'DELETE FROM oro_entity_config_index_value
                  WHERE entity_id IS NULL AND field_id IN(

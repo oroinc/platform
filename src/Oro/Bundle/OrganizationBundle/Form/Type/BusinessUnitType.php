@@ -64,8 +64,9 @@ class BusinessUnitType extends AbstractType
                     'label'    => 'oro.organization.businessunit.organization.label',
                     'class'    => 'OroOrganizationBundle:Organization',
                     'property' => 'name',
-                    'required' => true,
+                    'required' => false,
                     'multiple' => false,
+                    'empty_value' => 'oro.organization.form.choose_organization'
                 )
             )
             ->add(

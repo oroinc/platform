@@ -32,7 +32,6 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -1473,6 +1472,18 @@ class User extends ExtendUser implements
     }
 
     /**
+     * @param ArrayCollection $organizations
+     * @return User
+     */
+    public function setOrganizations($organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+
+    /**
      * Add Organization to User
      *
      * @param  Organization $organization
@@ -1499,7 +1510,6 @@ class User extends ExtendUser implements
 
         return $this;
     }
-
 
     /**
      * @return BusinessUnit

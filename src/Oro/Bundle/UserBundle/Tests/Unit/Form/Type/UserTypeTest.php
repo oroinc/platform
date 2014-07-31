@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
@@ -12,17 +13,14 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
     const OTHER_PROFILE_ROUTE = 'oro_user_update';
     const RULE_BUSINESS_UNIT  = 'oro_business_unit_view';
+    const RULE_ORGANIZATION   = 'oro_organization_view';
     const RULE_GROUP          = 'oro_user_group_view';
     const RULE_ROLE           = 'oro_user_role_view';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityInterface;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityFacade;
 
     protected function setUp()
@@ -30,7 +28,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $this->securityInterface = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContextInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade    = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -63,7 +61,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
 
         $userSubscriber = new UserSubscriber($formFactory, $this->securityInterface);
 
-        $order = 0;
+        $order   = 0;
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->setMethods(array('addEventSubscriber', 'add', 'getFormFactory'))
@@ -100,10 +98,10 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 ->with('groups', 'entity', $arr)
                 ->will($this->returnValue($builder));
         }
-        if ($permissions[self::RULE_BUSINESS_UNIT]) {
+        if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
             $builder->expects($this->at(++$order))
                 ->method('add')
-                ->with('businessUnits', 'oro_business_unit_tree')
+                ->with('organizations', 'oro_organizations_select')
                 ->will($this->returnValue($builder));
         }
         $builder->expects($this->at(++$order))
@@ -149,6 +147,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -157,6 +156,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => false
@@ -165,6 +165,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -173,6 +174,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => false,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
                 ),
                 'isMyProfile' => true
@@ -181,6 +183,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
                 ),
                 'isMyProfile' => true
@@ -189,6 +192,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'permissions' => array(
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => false,
+                    self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
                 ),
                 'isMyProfile' => true
@@ -203,14 +207,14 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
     protected function mockSetDefaultUserFields($builder, &$order = -1)
     {
         $parameters = array(
-            array('username',   'text'),
-            array('email',      'email'),
+            array('username', 'text'),
+            array('email', 'email'),
             array('namePrefix', 'text'),
-            array('firstName',  'text'),
+            array('firstName', 'text'),
             array('middleName', 'text'),
-            array('lastName',   'text'),
+            array('lastName', 'text'),
             array('nameSuffix', 'text'),
-            array('birthday',   'oro_date')
+            array('birthday', 'oro_date')
         );
 
         foreach ($parameters as $param) {
