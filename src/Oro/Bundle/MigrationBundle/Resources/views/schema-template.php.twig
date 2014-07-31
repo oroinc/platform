@@ -6,13 +6,24 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AllMigration implements Migration
+class {{ className }} implements Migration
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     */
+    public function getMigrationVersion()
+    {
+        return '{{ version }}';
+    }
+
+    /**
+     *  @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        /** Tables generation **/
+
     {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
     /** Generate table {{ table.name }} **/
         $table = $schema->createTable('{{ table.name }}');
@@ -20,30 +31,36 @@ class AllMigration implements Migration
     $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
     {% endfor -%}
     {% for index in table.indexes -%}
-    {%- if index.isPrimary -%}
+    {%- if index.isPrimary %}
     $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
     {% elseif index.isUnique %}
     $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
-    {% else -%}
+    {% else %}
     $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
-    {% endif %}
-    {% endfor -%}
+    {% endif -%}
+    {% endfor %}
     /** End of generate table {{ table.name }} **/
 
     {% endfor %}
-
+    /** Foreign keys generation **/
     {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined -%}
     {% if table.ForeignKeys is not empty %}
-    /** Generate foreign keys for table {{ table.name }} **/
+
+        /** Generate foreign keys for table {{ table.name }} **/
         $table = $schema->getTable('{{ table.name }}');
     {% for foreignKey in table.ForeignKeys %}
-    $table->addForeignKeyConstraint($schema->getTable('{{ foreignKey.foreignTableName }}'), {{ _self.dumpArray(foreignKey.localColumns) }}, {{ _self.dumpArray(foreignKey.foreignColumns) }}, {{ _self.dumpOptionsArray(foreignKey.options) }});
+    $table->addForeignKeyConstraint(
+            $schema->getTable('{{ foreignKey.foreignTableName }}'),
+            {{ _self.dumpArray(foreignKey.localColumns) }},
+            {{ _self.dumpArray(foreignKey.foreignColumns) }},
+            {{ _self.dumpOptionsArray(foreignKey.options) }}
+        );
     {% endfor %}
     /** End of generate foreign keys for table {{ table.name }} **/
     {% endif -%}
     {% endfor -%}
     }
-}
+}{% spaceless %}
 
 {% macro dumpColumnOptions(column) %}
 {% spaceless %}
@@ -103,3 +120,4 @@ class AllMigration implements Migration
     {% endif %}
 {% endspaceless %}
 {% endmacro %}
+{% endspaceless %}

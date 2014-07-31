@@ -33,11 +33,13 @@ class SchemaDumperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dumpDataProvider
-     * @param string|null $namespace
      * @param array|null $allowedTables
+     * @param string|null $namespace
      * @param string|null $expectedNamespace
+     * @param string $className
+     * @param string $version
      */
-    public function testDump($allowedTables, $namespace, $expectedNamespace)
+    public function testDump($allowedTables, $namespace, $expectedNamespace, $className, $version)
     {
         $this->twig->expects($this->once())
             ->method('render')
@@ -46,19 +48,21 @@ class SchemaDumperTest extends \PHPUnit_Framework_TestCase
                 [
                     'schema' => $this->schema,
                     'allowedTables' => $allowedTables,
-                    'namespace' => $expectedNamespace
+                    'namespace' => $expectedNamespace,
+                    'className' => $className,
+                    'version' => $version
                 ]
             )
             ->will($this->returnValue('TEST'));
 
-        $this->assertEquals('TEST', $this->schemaDumper->dump($allowedTables, $namespace));
+        $this->assertEquals('TEST', $this->schemaDumper->dump($allowedTables, $namespace, $className, $version));
     }
 
     public function dumpDataProvider()
     {
         return array(
-            array(null, null, null),
-            array(array('test' => true), 'Acme\DemoBundle\Entity', 'Acme\DemoBundle')
+            array(null, null, null, null, null),
+            array(array('test' => true), 'Acme\DemoBundle\Entity', 'Acme\DemoBundle', 'DemoBundleInstaller', 'v1_1')
         );
     }
 }
