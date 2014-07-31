@@ -20,6 +20,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture
             ->setName(self::MAIN_ORGANIZATION)
             ->setCurrency('USD')
             ->setPrecision('000 000.00');
+        $this->addReference('default_organization', $defaultOrganization);
         $manager->persist($defaultOrganization);
 
         // load default business unit

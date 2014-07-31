@@ -13,7 +13,7 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  * Organization
  *
  * @ORM\Table(name="oro_organization")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
  * @Config(
  *      defaultValues={
  *          "security"={

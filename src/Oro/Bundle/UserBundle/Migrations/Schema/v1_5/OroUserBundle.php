@@ -27,22 +27,31 @@ class OroUserBundle implements Migration
         $table = $schema->getTable('oro_access_group');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_FEF9EDB732C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_access_role');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_673F65E732C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_user');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_F82840BC32C8A3DE', []);
-        $table->addForeignKeyConstraint($schema->getTable('oro_organization'), ['organization_id'],
-            ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }
