@@ -132,7 +132,7 @@ class EmailTemplateController extends RestController
      *
      * @param EmailTemplate $emailTemplate  comes from request parameter {id}
      *                                      that transformed to entity by param converter
-     * @param int           $entityId       id of an entity defined by $emailTemplate->getEntityName() class
+     * @param int           $entityId       entity id of class defined by $emailTemplate->getEntityName()
      *
      * @ApiDoc(
      *     description="Get email template subject, type and content",
