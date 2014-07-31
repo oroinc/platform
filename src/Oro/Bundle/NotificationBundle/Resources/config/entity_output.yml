@@ -1,3 +1,0 @@
-Oro\Bundle\NotificationBundle\Entity\EmailNotification:
-    name:                               oro.notification.emailnotification.entity_label
-    description:                        oro.notification.emailnotification.entity_description
