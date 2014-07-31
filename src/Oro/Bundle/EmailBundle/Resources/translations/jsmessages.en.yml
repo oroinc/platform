@@ -1,6 +1,7 @@
 oro:
     email:
         emailtemplate:
+            load_failed: Error occured while loading template.
             variable_title: '{{ variable_label }}. Click to insert variable or drag it.'
             reference_title: '{{ variable_label }}. Click to go to related variables.'
 

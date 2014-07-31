@@ -36,6 +36,8 @@
                     {{ form_row(form.from) }}
                     {{ form_row(form.to) }}
                     {{ form_row(form.subject) }}
+                    {{ form_row(form.template) }}
+                    {{ form_row(form.type) }}
                     {{ form_row(form.body, {'attr': {'class': 'email-body'} }) }}
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
@@ -46,6 +48,37 @@
             </form>
             {{ oro_form_js_validation(form) }}
         </div>
+        <script type="text/javascript">
+            require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator'],
+                    function ($, __, routing, messenger, mediator) {
+                        $(function () {
+                            $('#{{ form.template.vars.id }}').change(function (e) {
+                                var url = routing.generate(
+                                    'oro_api_get_emailtemplate_template',
+                                    {'id': $(this).val(), 'entityId': {{ entity.entityId }}}
+                                );
+
+                                mediator.execute('showLoading');
+
+                                $.ajax(url, {
+                                    success: function (res) {
+                                        $('#{{ form.subject.vars.id }}').val(res.subject);
+                                        $('#{{ form.body.vars.id }}').val(res.body);
+                                        $('#{{ form.type.vars.id }}')
+                                            .find('input[value='+res.type+']')
+                                            .attr('checked', 'checked');
+                                    },
+                                    error: function () {
+                                        messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
+                                    },
+                                    dataType: 'json'
+                                }).always(function () {
+                                    mediator.execute('hideLoading');
+                                });
+                            });
+                        });
+                    });
+        </script>
     {% endif %}
 </div>
 {% endblock %}

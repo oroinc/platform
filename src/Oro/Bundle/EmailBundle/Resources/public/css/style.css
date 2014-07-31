@@ -52,3 +52,9 @@
 .ui-dialog .email-form .form-horizontal .control-group .controls .validation-failed {
     margin-left: 14px;
 }
+.ui-dialog .email-form input[type=radio] {
+    width: auto;
+}
+.ui-dialog .email-form .form-horizontal .control-group {
+    max-width: none;
+}

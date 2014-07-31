@@ -17,7 +17,7 @@ class EmailTemplateSelectType extends AbstractType
     {
         $choices = function (Options $options) {
             if (empty($options['selectedEntity'])) {
-                return array();
+                return [];
             }
 
             return null;
