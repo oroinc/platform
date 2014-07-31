@@ -18,7 +18,7 @@ class SetupStep extends AbstractStep
         $configManager = $this->get('oro_config.global');
         $form->get('company_name')->setData($configManager->get('oro_ui.application_name'));
         $form->get('company_title')->setData($configManager->get('oro_ui.application_title'));
-        $form->get('applicaiton_url')->setData($configManager->get('oro_ui.applicaiton_url'));
+        $form->get('application_url')->setData($configManager->get('oro_ui.application_url'));
 
         return $this->render(
             'OroInstallerBundle:Process/Step:setup.html.twig',
