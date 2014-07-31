@@ -89,6 +89,38 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
     }
 
     /**
+     * Adds any connector's service data to execution context
+     * Than it will be stored in serialized format in integration status entity
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    protected function addStatusData($key, $value)
+    {
+        $context    = $this->getStepExecution()->getExecutionContext();
+        $data       = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+        $data[$key] = $value;
+
+        $context->put(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY, $data);
+    }
+
+    /**
+     * Fetches data which collected to be saved in status
+     *
+     * @param null|string $key
+     * @param mixed       $defaultValue
+     *
+     * @return mixed|null
+     */
+    protected function getStatusData($key = null, $defaultValue = null)
+    {
+        $context = $this->getStepExecution()->getExecutionContext();
+        $data    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+
+        return array_key_exists($key, $data) ? $data[$key] : $defaultValue;
+    }
+
+    /**
      * Return source iterator to read from
      *
      * @return \Iterator
