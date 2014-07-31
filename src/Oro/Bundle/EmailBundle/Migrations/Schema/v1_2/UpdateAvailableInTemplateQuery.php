@@ -40,7 +40,6 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info('Move integration settings from flat separated fields to serialized single field');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
