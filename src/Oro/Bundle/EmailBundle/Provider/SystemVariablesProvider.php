@@ -60,6 +60,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
 
         $this->addApplicationShortName($result, $addValue);
         $this->addApplicationFullName($result, $addValue);
+        $this->addApplicationUrl($result, $addValue);
         $this->addCurrentDateAndTime($result, $addValue);
 
         return $result;
@@ -97,6 +98,23 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
             ];
         }
         $result['appFullName'] = $val;
+    }
+
+    /**
+     * @param array $result
+     * @param bool  $addValue
+     */
+    protected function addApplicationUrl(array &$result, $addValue)
+    {
+        if ($addValue) {
+            $val = $this->configManager->get('oro_ui.application_url');
+        } else {
+            $val = [
+                'type'  => 'string',
+                'label' => $this->translator->trans('oro.email.emailtemplate.app_url')
+            ];
+        }
+        $result['appURL'] = $val;
     }
 
     /**

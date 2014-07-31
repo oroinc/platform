@@ -14,7 +14,8 @@ User interface layouts and controls.
 
 ## Configuration Settings
 
-- oro_ui.application_name - application name to display in header
+- oro_ui.application_url   - application frontend URL
+- oro_ui.application_name  - application name to display in header
 - oro_ui.application_title - application title for name reference in header
 
 ### Hide 'Add to favorites' and 'Minimize to the pinbar' buttons for the start page

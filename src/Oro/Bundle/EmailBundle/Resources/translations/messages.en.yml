@@ -41,6 +41,7 @@ oro:
             user_full_name:      Full name of logged in user
             app_short_name:      Short name of application
             app_full_name:       Full name of application
+            app_url:             Application URL
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time

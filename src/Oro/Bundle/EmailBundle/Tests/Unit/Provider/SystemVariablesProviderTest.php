@@ -62,6 +62,7 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         ['oro_ui.application_name', false, false, 'applicationShortName'],
                         ['oro_ui.application_title', false, false, 'applicationFullName'],
+                        ['oro_ui.application_url', false, false, 'http://localhost/'],
                     ]
                 )
             );
@@ -79,6 +80,7 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'appShortName' => 'applicationShortName',
                 'appFullName'  => 'applicationFullName',
+                'appURL'       => 'http://localhost/',
                 'currentDate'  => 'date',
                 'currentTime'  => 'time',
             ],

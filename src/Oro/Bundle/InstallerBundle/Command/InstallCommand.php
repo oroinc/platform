@@ -25,6 +25,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
+            ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
             ->addOption('company-short-name', null, InputOption::VALUE_OPTIONAL, 'Company short name')
             ->addOption('company-name', null, InputOption::VALUE_OPTIONAL, 'Company name')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
@@ -225,6 +226,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $configManager       = $this->getContainer()->get('oro_config.global');
         $defaultCompanyName  = $configManager->get('oro_ui.application_name');
         $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+        $defaultAppURL       = $configManager->get('oro_ui.application_url');
 
         $passValidator        = function ($value) {
             if (strlen(trim($value)) < 2) {
@@ -245,6 +247,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
+        $applicationURL = isset($options['application-url'])
+            ? $options['application-url']
+            : $dialog->ask(
+                $output,
+                $this->buildQuestion('Application URL', $defaultAppURL)
+            );
         $companyTitle  = isset($options['company-name'])
             ? $options['company-name']
             : $dialog->ask(
@@ -301,6 +309,9 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         }
         if (!empty($companyTitle) && $companyTitle !== $defaultCompanyTitle) {
             $configManager->set('oro_ui.application_title', $companyTitle);
+        }
+        if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
+            $configManager->set('oro_ui.application_url', $applicationURL);
         }
         $configManager->flush();
 
