@@ -23,7 +23,7 @@ class SetupType extends AbstractType
                 'applicaiton_url',
                 'text',
                 array(
-                    'label'    => 'form.setup.appilcation_url',
+                    'label'    => 'form.setup.application_url',
                     'mapped'   => false,
                     'required' => false,
                 )

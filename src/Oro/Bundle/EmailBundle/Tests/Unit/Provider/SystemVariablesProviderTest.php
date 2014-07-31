@@ -48,6 +48,7 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'appFullName'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_full_name'],
                 'currentDate'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_date'],
                 'currentTime'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_time'],
+                'appURL'       => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_url'],
             ],
             $result
         );
