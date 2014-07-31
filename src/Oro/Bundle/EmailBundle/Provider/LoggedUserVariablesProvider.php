@@ -63,12 +63,11 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
         $result = [];
 
         $user = $this->securityFacade->getLoggedUser();
-        if ($user) {
-            $this->addUserName($result, $user, $addValue);
-            $this->addUserFirstName($result, $user, $addValue);
-            $this->addUserLastName($result, $user, $addValue);
-            $this->addUserFullName($result, $user, $addValue);
-        }
+
+        $this->addUserName($result, $user, $addValue);
+        $this->addUserFirstName($result, $user, $addValue);
+        $this->addUserLastName($result, $user, $addValue);
+        $this->addUserFullName($result, $user, $addValue);
 
         return $result;
     }
@@ -90,6 +89,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 ];
             }
             $result['userName'] = $val;
+        } elseif ($addValue) {
+            $result['userName'] = '';
         }
     }
 
@@ -110,6 +111,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 ];
             }
             $result['userFirstName'] = $val;
+        } elseif ($addValue) {
+            $result['userFirstName'] = '';
         }
     }
 
@@ -130,6 +133,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 ];
             }
             $result['userLastName'] = $val;
+        } elseif ($addValue) {
+            $result['userLastName'] = '';
         }
     }
 
@@ -150,6 +155,8 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
                 ];
             }
             $result['userFullName'] = $val;
+        } elseif ($addValue) {
+            $result['userFullName'] = '';
         }
     }
 }

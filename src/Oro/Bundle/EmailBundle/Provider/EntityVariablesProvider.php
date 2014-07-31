@@ -128,7 +128,10 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             ];
 
             if ($metadata->hasAssociation($fieldName)) {
-                $var['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
+                $targetClass = $metadata->getAssociationTargetClass($fieldName);
+                if ($this->entityConfigProvider->hasConfig($targetClass)) {
+                    $var['related_entity_name'] = $targetClass;
+                }
             }
 
             $result[$varName] = $var;
