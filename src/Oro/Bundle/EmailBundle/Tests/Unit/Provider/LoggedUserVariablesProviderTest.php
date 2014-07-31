@@ -53,6 +53,23 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetVariableDefinitionsForNonOroUser()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $result = $this->provider->getVariableDefinitions();
+        $this->assertEquals(
+            [
+                'userName' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.user_name'],
+            ],
+            $result
+        );
+    }
+
     public function testGetVariableDefinitions()
     {
         $user = new User();
@@ -81,7 +98,35 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
-            [],
+            [
+                'userName'      => '',
+                'userFirstName' => '',
+                'userLastName'  => '',
+                'userFullName'  => '',
+            ],
+            $result
+        );
+    }
+
+    public function testGetVariableValuesForNonOroUser()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user->expects($this->once())
+            ->method('getUsername')
+            ->will($this->returnValue('test'));
+
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $result = $this->provider->getVariableValues();
+        $this->assertEquals(
+            [
+                'userName'      => 'test',
+                'userFirstName' => '',
+                'userLastName'  => '',
+                'userFullName'  => '',
+            ],
             $result
         );
     }

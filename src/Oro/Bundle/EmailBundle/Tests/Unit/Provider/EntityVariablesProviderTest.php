@@ -58,6 +58,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         unset($this->provider);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetVariableDefinitionsForOneEntity()
     {
         $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
@@ -123,15 +126,31 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['field1', false],
-                        ['field3', false],
+                        ['field3', true],
                         ['field5', true],
                     ]
                 )
             );
-        $classMetadata->expects($this->once())
+        $classMetadata->expects($this->exactly(2))
             ->method('getAssociationTargetClass')
-            ->with('field5')
-            ->will($this->returnValue('RelatedEntity'));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['field3', 'RelatedEntity3'],
+                        ['field5', 'RelatedEntity5'],
+                    ]
+                )
+            );
+        $this->entityConfigProvider->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['RelatedEntity3', null, false],
+                        ['RelatedEntity5', null, true],
+                    ]
+                )
+            );
 
         $result = $this->provider->getVariableDefinitions(self::TEST_ENTITY_NAME);
         $this->assertEquals(
@@ -141,7 +160,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'field5' => [
                     'type'                => 'string',
                     'label'               => 'field5_label',
-                    'related_entity_name' => 'RelatedEntity'
+                    'related_entity_name' => 'RelatedEntity5'
                 ],
             ],
             $result
