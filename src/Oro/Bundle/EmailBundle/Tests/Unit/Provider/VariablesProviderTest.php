@@ -47,7 +47,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetEntityVariableDefinitions()
+    public function testGetEntityVariableDefinitionsForOneEntity()
     {
         $entityClass = 'TestEntity';
 
@@ -79,6 +79,60 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'var1' => ['type' => 'string', 'label' => 'var1'],
                 'var2' => ['type' => 'string', 'label' => 'var2']
+            ],
+            $result
+        );
+    }
+
+    public function testGetEntityVariableDefinitionsForAllEntities()
+    {
+        $entity1Class = 'TestEntity1';
+        $entity2Class = 'TestEntity2';
+
+        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1->expects($this->once())
+            ->method('getVariableDefinitions')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity1Class => ['var1' => ['type' => 'string', 'label' => 'var1']]]
+                )
+            );
+
+        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2->expects($this->once())
+            ->method('getVariableDefinitions')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity1Class => ['var2' => ['type' => 'string', 'label' => 'var2']]]
+                )
+            );
+
+        $provider3 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider3->expects($this->once())
+            ->method('getVariableDefinitions')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity2Class => ['var1' => ['type' => 'string', 'label' => 'var1']]]
+                )
+            );
+
+        $this->provider->addEntityVariablesProvider($provider1);
+        $this->provider->addEntityVariablesProvider($provider2);
+        $this->provider->addEntityVariablesProvider($provider3);
+
+        $result = $this->provider->getEntityVariableDefinitions();
+        $this->assertEquals(
+            [
+                $entity1Class => [
+                    'var1' => ['type' => 'string', 'label' => 'var1'],
+                    'var2' => ['type' => 'string', 'label' => 'var2'],
+                ],
+                $entity2Class => [
+                    'var1' => ['type' => 'string', 'label' => 'var1'],
+                ],
             ],
             $result
         );
@@ -117,7 +171,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetEntityVariableGetters()
+    public function testGetEntityVariableGettersForOneEntity()
     {
         $entityClass = 'TestEntity';
 
@@ -149,6 +203,60 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'var1' => 'getVar1',
                 'var2' => 'getVar2'
+            ],
+            $result
+        );
+    }
+
+    public function testGetEntityVariableGettersForAllEntities()
+    {
+        $entity1Class = 'TestEntity1';
+        $entity2Class = 'TestEntity2';
+
+        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1->expects($this->once())
+            ->method('getVariableGetters')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity1Class => ['var1' => 'getVar1']]
+                )
+            );
+
+        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2->expects($this->once())
+            ->method('getVariableGetters')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity1Class => ['var2' => 'getVar2']]
+                )
+            );
+
+        $provider3 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider3->expects($this->once())
+            ->method('getVariableGetters')
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entity2Class => ['var1' => 'getVar1']]
+                )
+            );
+
+        $this->provider->addEntityVariablesProvider($provider1);
+        $this->provider->addEntityVariablesProvider($provider2);
+        $this->provider->addEntityVariablesProvider($provider3);
+
+        $result = $this->provider->getEntityVariableGetters();
+        $this->assertEquals(
+            [
+                $entity1Class => [
+                    'var1' => 'getVar1',
+                    'var2' => 'getVar2',
+                ],
+                $entity2Class => [
+                    'var1' => 'getVar1',
+                ],
             ],
             $result
         );

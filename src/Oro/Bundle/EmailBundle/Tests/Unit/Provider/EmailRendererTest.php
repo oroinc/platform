@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class EmailRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,9 +12,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityPolicy;
@@ -50,9 +45,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->securityPolicy));
 
         $this->variablesProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\VariablesProvider')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
 
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
@@ -96,11 +88,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'TestEntity';
 
-        $configIdMock = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
-        $configIdMock
-            ->expects($this->once())->method('getClassName')
-            ->will($this->returnValue($entityClass));
-
         $this->cache
             ->expects($this->once())
             ->method('fetch')
@@ -124,16 +111,14 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $configurableEntities = array($configIdMock);
-        $this->configProvider
-            ->expects($this->once())
-            ->method('getIds')
-            ->will($this->returnValue($configurableEntities));
-
         $this->variablesProvider->expects($this->once())
             ->method('getEntityVariableGetters')
-            ->with($entityClass)
-            ->will($this->returnValue(['field1' => 'getField1', 'field2' => null]));
+            ->with(null)
+            ->will(
+                $this->returnValue(
+                    [$entityClass => ['field1' => 'getField1', 'field2' => null]]
+                )
+            );
 
         $this->getRendererInstance();
     }
@@ -260,7 +245,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             array(
                 $this->loader,
                 array(),
-                $this->configProvider,
                 $this->variablesProvider,
                 $this->cache,
                 $this->cacheKey,

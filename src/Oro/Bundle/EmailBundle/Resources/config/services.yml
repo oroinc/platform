@@ -181,7 +181,6 @@ services:
             - @oro_email.twig.string_loader
             -  # twig environment options
               strict_variables: true
-            - @oro_entity_config.provider.email
             - @oro_email.emailtemplate.variable_provider
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
@@ -217,6 +216,7 @@ services:
             - @translator
             - @oro_entity_config.provider.email
             - @oro_entity_config.provider.entity
+            - @doctrine
         lazy: true
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
@@ -243,14 +243,16 @@ services:
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
-    oro_email.validator.variables_validator:
-        class: Oro\Bundle\EmailBundle\Validator\VariablesValidator
+    oro_email.validator.email_template_syntax:
+        class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
         arguments:
             - @oro_email.email_renderer
-            - @oro_email.emailtemplate.variable_provider
-            - @doctrine.orm.entity_manager
+            - @oro_locale.settings
+            - @oro_config.user
+            - @oro_entity_config.provider.entity
+            - @translator
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.variables_validator }
+            - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%

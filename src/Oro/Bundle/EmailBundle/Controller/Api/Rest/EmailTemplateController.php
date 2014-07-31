@@ -102,31 +102,25 @@ class EmailTemplateController extends RestController
     }
 
     /**
-     * REST GET available variables by entity name
-     *
-     * @param string $entityName
+     * REST GET available variables
      *
      * @ApiDoc(
-     *     description="Get available variables by entity name",
+     *     description="Get available variables",
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @GetRoute(requirements={"entityName"="(.*)"})
-     *
+     * @GetRoute()
      * @return Response
      */
-    public function getAvailableVariablesAction($entityName = null)
+    public function getAvailableVariablesAction()
     {
         /** @var VariablesProvider $provider */
         $provider = $this->get('oro_email.emailtemplate.variable_provider');
 
         $data = [
-            'system' => $provider->getSystemVariableDefinitions()
+            'system' => $provider->getSystemVariableDefinitions(),
+            'entity' => $provider->getEntityVariableDefinitions()
         ];
-        if ($entityName) {
-            $entityName     = str_replace('_', '\\', $entityName);
-            $data['entity'] = $provider->getEntityVariableDefinitions($entityName);
-        }
 
         return $this->handleView(
             $this->view($data, Codes::HTTP_OK)

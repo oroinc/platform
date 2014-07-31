@@ -3,9 +3,7 @@ oro:
         emailtemplate:
             error: Error loading template, please try later.
             variable_title: '{{ variable_label }}. Click to insert variable or drag it.'
-            variables:
-                system: 'System variables'
-                entity: 'Entity variables'
+            reference_title: '{{ variable_label }}. Click to go to related variables.'
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"
