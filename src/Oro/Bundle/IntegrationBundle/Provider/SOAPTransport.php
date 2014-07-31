@@ -21,7 +21,7 @@ use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
  */
 abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
-885    const ATTEMPTS = 7;
+    const ATTEMPTS = 7;
 
     use LoggerAwareTrait;
 
