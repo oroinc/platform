@@ -29,6 +29,11 @@ oro:
             type.label:          Type
             translations.label:  Translations
 
+            # sections for email template variables
+            variables:
+                system: 'System variables'
+                entity: 'Entity variables'
+
             # email template system variables
             user_name:           Username of logged in user
             user_first_name:     First name of logged in user

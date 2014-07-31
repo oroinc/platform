@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
@@ -15,6 +16,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
 
     /** @var EntityVariablesProvider */
     protected $provider;
@@ -35,10 +39,15 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->provider = new EntityVariablesProvider(
             $translator,
             $this->emailConfigProvider,
-            $this->entityConfigProvider
+            $this->entityConfigProvider,
+            $this->doctrine
         );
     }
 
@@ -49,7 +58,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         unset($this->provider);
     }
 
-    public function testGetVariableDefinitions()
+    public function testGetVariableDefinitionsForOneEntity()
     {
         $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
         $field1Config->set('available_in_template', true);
@@ -61,12 +70,27 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5Config->set('available_in_template', true);
 
-        $field1EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $field1EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field1', 'string'));
         $field1EntityConfig->set('label', 'field1_label');
-        $field3EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
+        $field3EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
         $field3EntityConfig->set('label', 'field3_label');
-        $field5EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
+        $field5EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5EntityConfig->set('label', 'field5_label');
+
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($classMetadata));
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($em));
 
         $this->emailConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -81,7 +105,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->entityConfigProvider->expects($this->any())
+        $this->entityConfigProvider->expects($this->exactly(3))
             ->method('getConfig')
             ->will(
                 $this->returnValueMap(
@@ -92,19 +116,143 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+
+        $classMetadata->expects($this->exactly(3))
+            ->method('hasAssociation')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['field1', false],
+                        ['field3', false],
+                        ['field5', true],
+                    ]
+                )
+            );
+        $classMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('field5')
+            ->will($this->returnValue('RelatedEntity'));
 
         $result = $this->provider->getVariableDefinitions(self::TEST_ENTITY_NAME);
         $this->assertEquals(
             [
                 'field1' => ['type' => 'string', 'label' => 'field1_label'],
                 'field3' => ['type' => 'boolean', 'label' => 'field3_label'],
-                'field5' => ['type' => 'string', 'label' => 'field5_label'],
+                'field5' => [
+                    'type'                => 'string',
+                    'label'               => 'field5_label',
+                    'related_entity_name' => 'RelatedEntity'
+                ],
             ],
             $result
         );
     }
 
-    public function testGetVariableGetters()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testGetVariableDefinitionsForAllEntities()
+    {
+        $entity1field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $entity1field1Config->set('available_in_template', true);
+        $entity1field1EntityConfig = new Config(
+            new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field1', 'string')
+        );
+        $entity1field1EntityConfig->set('label', 'field1_label');
+
+        $entity2Class        = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser';
+        $entity2field1Config = new Config(new FieldConfigId('email', $entity2Class, 'email', 'string'));
+        $entity2field1Config->set('available_in_template', true);
+        $entity2field1EntityConfig = new Config(new FieldConfigId('entity', $entity2Class, 'email', 'string'));
+        $entity2field1EntityConfig->set('label', 'email_label');
+
+        $classMetadata1 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetadata2 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->exactly(2))
+            ->method('getClassMetadata')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, $classMetadata1],
+                        [$entity2Class, $classMetadata2],
+                    ]
+                )
+            );
+        $this->doctrine->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, $em],
+                        [$entity2Class, $em],
+                    ]
+                )
+            );
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getIds')
+            ->will(
+                $this->returnValue(
+                    [
+                        new EntityConfigId('entity', self::TEST_ENTITY_NAME),
+                        new EntityConfigId('entity', $entity2Class),
+                    ]
+                )
+            );
+        $this->emailConfigProvider->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, true],
+                        [$entity2Class, null, true],
+                    ]
+                )
+            );
+        $this->emailConfigProvider->expects($this->exactly(2))
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, false, [$entity1field1Config]],
+                        [$entity2Class, false, [$entity2field1Config]],
+                    ]
+                )
+            );
+
+        $this->entityConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, 'field1', $entity1field1EntityConfig],
+                        [$entity2Class, 'email', $entity2field1EntityConfig],
+                    ]
+                )
+            );
+
+        $result = $this->provider->getVariableDefinitions();
+        $this->assertEquals(
+            [
+                self::TEST_ENTITY_NAME => [
+                    'field1' => ['type' => 'string', 'label' => 'field1_label'],
+                ],
+                $entity2Class          => [
+                    'email' => ['type' => 'string', 'label' => 'email_label'],
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function testGetVariableGettersForOneEntity()
     {
         $field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
         $field1Config->set('available_in_template', true);
@@ -116,13 +264,6 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5Config->set('available_in_template', true);
 
-        $field1EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
-        $field1EntityConfig->set('label', 'field1_label');
-        $field3EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field3', 'boolean'));
-        $field3EntityConfig->set('label', 'field3_label');
-        $field5EntityConfig = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
-        $field5EntityConfig->set('label', 'field5_label');
-
         $this->emailConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::TEST_ENTITY_NAME)
@@ -133,18 +274,6 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValue(
                     [$field1Config, $field2Config, $field3Config, $field4Config, $field5Config]
-                )
-            );
-
-        $this->entityConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::TEST_ENTITY_NAME, 'field1', $field1EntityConfig],
-                        [self::TEST_ENTITY_NAME, 'field3', $field3EntityConfig],
-                        [self::TEST_ENTITY_NAME, 'field5', $field5EntityConfig],
-                    ]
                 )
             );
 
@@ -154,6 +283,60 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 'field1' => 'getField1',
                 'field3' => 'isField3',
                 'field5' => null,
+            ],
+            $result
+        );
+    }
+
+    public function testGetVariableGettersForAllEntities()
+    {
+        $entity1field1Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field1', 'string'));
+        $entity1field1Config->set('available_in_template', true);
+
+        $entity2Class        = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser';
+        $entity2field1Config = new Config(new FieldConfigId('email', $entity2Class, 'email', 'string'));
+        $entity2field1Config->set('available_in_template', true);
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getIds')
+            ->will(
+                $this->returnValue(
+                    [
+                        new EntityConfigId('entity', self::TEST_ENTITY_NAME),
+                        new EntityConfigId('entity', $entity2Class),
+                    ]
+                )
+            );
+        $this->emailConfigProvider->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, true],
+                        [$entity2Class, null, true],
+                    ]
+                )
+            );
+        $this->emailConfigProvider->expects($this->exactly(2))
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, false, [$entity1field1Config]],
+                        [$entity2Class, false, [$entity2field1Config]],
+                    ]
+                )
+            );
+
+        $result = $this->provider->getVariableGetters();
+        $this->assertEquals(
+            [
+                self::TEST_ENTITY_NAME => [
+                    'field1' => 'getField1',
+                ],
+                $entity2Class          => [
+                    'email' => 'getEmail',
+                ],
             ],
             $result
         );

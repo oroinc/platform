@@ -467,7 +467,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     /**
      * Get translations
      *
-     * @return ArrayCollection
+     * @return ArrayCollection|EmailTemplateTranslation[]
      */
     public function getTranslations()
     {
