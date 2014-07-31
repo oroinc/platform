@@ -130,28 +130,33 @@ class EmailTemplateController extends RestController
     /**
      * REST GET email template
      *
-     * @param EmailTemplate $emailTemplate
-     * @param int           $entityId
-     *
+     * @param EmailTemplate $emailTemplate  comes from request parameter {id}
+     *                                      that transformed to entity by param converter
+     * @param int           $entityId       id of an entity defined by $emailTemplate->getEntityName() class
      *
      * @ApiDoc(
      *     description="Get email template subject, type and content",
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @GetRoute("/emailtemplates/{id}/{entityId}", requirements={"id" = "\d+","entityId" = "\d+"})
+     * @GetRoute("/emailtemplates/{id}/{entityId}", requirements={"id" = "\d+","entityId" = "^(\s*|\d+)$"})
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
      *
      * @return Response
      */
-    public function getTemplateAction(EmailTemplate $emailTemplate, $entityId)
+    public function getTemplateAction(EmailTemplate $emailTemplate, $entityId = null)
     {
-        $entity = $this->getDoctrine()
-            ->getRepository($emailTemplate->getEntityName())
-            ->find($entityId);
+        $templateParams = [];
+        if ($entityId && $emailTemplate->getEntityName()) {
+            $entity = $this->getDoctrine()
+                ->getRepository($emailTemplate->getEntityName())
+                ->find($entityId);
+
+            $templateParams['entity'] = $entity;
+        }
 
         list($subject, $body) = $this->get('oro_email.email_renderer')
-            ->compileMessage($emailTemplate, ['entity' => $entity]);
+            ->compileMessage($emailTemplate, $templateParams);
 
         $data = [
             'subject' => $subject,

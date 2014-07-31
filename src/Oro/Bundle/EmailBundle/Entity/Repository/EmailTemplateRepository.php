@@ -34,16 +34,23 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Return templates query builder filtered by entity name
      *
-     * @param $entityName
+     * @param string $entityName    entity class
+     * @param bool   $includeSystem if true - system templates will be included in result set
+     *
      * @return QueryBuilder
      */
-    public function getEntityTemplatesQueryBuilder($entityName)
+    public function getEntityTemplatesQueryBuilder($entityName, $includeSystem = false)
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
-            ->orWhere('e.entityName IS NULL')
             ->orderBy('e.name', 'ASC')
             ->setParameter('entityName', $entityName);
+
+        if ($includeSystem) {
+            $qb->orWhere('e.entityName IS NULL');
+        }
+
+        return $qb;
     }
 
     /**

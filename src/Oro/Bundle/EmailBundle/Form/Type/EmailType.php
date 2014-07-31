@@ -77,7 +77,7 @@ class EmailType extends AbstractType
             [
                 'selectedEntity' => $entityClass,
                 'query_builder'  => function (EmailTemplateRepository $templateRepository) use ($entityClass) {
-                    return $templateRepository->getEntityTemplatesQueryBuilder($entityClass);
+                    return $templateRepository->getEntityTemplatesQueryBuilder($entityClass, true);
                 },
             ],
             ['choice_list', 'choices']
