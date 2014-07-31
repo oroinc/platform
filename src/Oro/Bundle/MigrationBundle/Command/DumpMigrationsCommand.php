@@ -111,6 +111,12 @@ class DumpMigrationsCommand extends ContainerAwareCommand
                 function (ClassMetadata $entityMetadata) {
                     if ($entityMetadata->namespace == $this->namespace) {
                         $this->tables[$entityMetadata->getTableName()] = true;
+                        foreach ($entityMetadata->getAssociationMappings() as $associationMappingInfo) {
+                            if (isset($associationMappingInfo['joinTable'])) {
+                                $joinTableName = $associationMappingInfo['joinTable']['name'];
+                                $this->tables[$joinTableName] = true;
+                            }
+                        }
                         return true;
                     }
                     return false;

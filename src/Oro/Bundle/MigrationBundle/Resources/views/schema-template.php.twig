@@ -3,10 +3,13 @@
 namespace {{ namespace }}\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class {{ className }} implements Migration
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
+class {{ className }} implements Installation
 {
     /**
      * {@inheritdoc}
@@ -17,49 +20,70 @@ class {{ className }} implements Migration
     }
 
     /**
-     *  @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
+{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
+        $this->{{ 'create' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'Table' }}($schema);
+{% endfor %}
 
-    {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
-    /** Generate table {{ table.name }} **/
+        /** Foreign keys generation **/
+{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
+{% if table.ForeignKeys is not empty %}
+        $this->{{ 'add' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'ForeignKeys' }}($schema);
+{% endif %}
+{% endfor %}
+    }
+{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
+{% set methodName = 'create' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'Table' %}
+
+    /**
+     * Create {{ table.name }} table
+     *
+     * @param Schema $schema
+     */
+    protected function {{ methodName }}(Schema $schema)
+    {
         $table = $schema->createTable('{{ table.name }}');
-    {% for column in table.columns %}
-    $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
-    {% endfor -%}
-    {% for index in table.indexes -%}
-    {%- if index.isPrimary %}
-    $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
-    {% elseif index.isUnique %}
-    $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
-    {% else %}
-    $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
-    {% endif -%}
-    {% endfor %}
-    /** End of generate table {{ table.name }} **/
+{% for column in table.columns %}
+        $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
+{% endfor %}
+{% for index in table.indexes %}
+{% if index.isPrimary %}
+        $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
+{% elseif index.isUnique %}
+        $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
+{% else %}
+        $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
+{% endif %}
+{% endfor %}
+    }
+{% endfor %}
+{% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined -%}
+{% set methodName = 'add' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'ForeignKeys' %}
+{% if table.ForeignKeys is not empty %}
 
-    {% endfor %}
-    /** Foreign keys generation **/
-    {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined -%}
-    {% if table.ForeignKeys is not empty %}
-
-        /** Generate foreign keys for table {{ table.name }} **/
+    /**
+     * Add {{ table.name }} foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function {{ methodName }}(Schema $schema)
+    {
         $table = $schema->getTable('{{ table.name }}');
-    {% for foreignKey in table.ForeignKeys %}
-    $table->addForeignKeyConstraint(
+{% for foreignKey in table.ForeignKeys %}
+        $table->addForeignKeyConstraint(
             $schema->getTable('{{ foreignKey.foreignTableName }}'),
             {{ _self.dumpArray(foreignKey.localColumns) }},
             {{ _self.dumpArray(foreignKey.foreignColumns) }},
             {{ _self.dumpOptionsArray(foreignKey.options) }}
         );
-    {% endfor %}
-    /** End of generate foreign keys for table {{ table.name }} **/
-    {% endif -%}
-    {% endfor -%}
+{% endfor %}
     }
+{% endif -%}
+{% endfor -%}
 }{% spaceless %}
 
 {% macro dumpColumnOptions(column) %}

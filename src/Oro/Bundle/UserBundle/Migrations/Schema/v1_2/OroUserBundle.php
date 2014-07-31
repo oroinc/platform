@@ -51,7 +51,7 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
 
         //save old avatars to new place
         $em         = $this->container->get('doctrine.orm.entity_manager');
-        $query      = 'SELECT id, image, createdAt FROM oro_user WHERE image != ""';
+        $query      = "SELECT id, image, createdAt FROM oro_user WHERE image != ''";
         $userImages = $em->getConnection()->executeQuery($query)->fetchAll(\PDO::FETCH_ASSOC);
 
         if (!empty($userImages)) {
