@@ -51,6 +51,10 @@ class Configuration implements ConfigurationInterface
                     'value' => 'ORO Business Application Platform',
                     'type'  => 'scalar'
                 ],
+                'application_url' => [
+                    'value' => '',
+                    'type'  => 'scalar'
+                ],
                 'navbar_position' => [
                     'value' => 'top',
                     'type'  => 'scalar'
