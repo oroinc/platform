@@ -4,7 +4,7 @@
             <span class="add-on">{{ label }}</span>
         {% endif %}
         <select id="prependedInput3" class="span2" name="_organization" required="required" >
-            <option value="">{{ 'Choose a organization...'|trans }}</option>
+            <option value="">{{ 'Choose an organization...'|trans }}</option>
             {% for organization in organizations %}
                 <option value="{{ organization.id }}">{{ organization.name }}</option>
             {% endfor %}

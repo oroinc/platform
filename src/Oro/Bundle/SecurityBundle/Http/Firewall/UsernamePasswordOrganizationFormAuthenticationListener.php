@@ -24,6 +24,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePasswordFormAuthenticationListener
 {
+    /**
+     * @var CsrfProviderInterface
+     */
     protected $csrfProvider;
 
     /**

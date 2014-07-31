@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\UserBundle\Entity\User;
-
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticationProvider
 {
@@ -74,7 +74,9 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
     protected function checkUserOrganization(User $user, Organization $organization)
     {
         if (!$user->getOrganizations()->contains($organization)) {
-            throw new BadCredentialsException('This Organization is not valid for this user');
+            throw new BadCredentialsException(
+                sprintf("You don't have access to organization '%s", $organization->getName())
+            );
         }
     }
 }
