@@ -28,8 +28,8 @@ class OroIntegrationBundle implements Migration
     {
         /** Generate table oro_integration_channel **/
         $table = $schema->createTable('oro_integration_channel');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('transport_id', 'integer', ['notnull' => false]);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('transport_id', 'smallint', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('connectors', 'array', ['comment' => '(DC2Type:array)']);
@@ -56,8 +56,8 @@ class OroIntegrationBundle implements Migration
     {
         /** Generate table oro_integration_channel_status **/
         $table = $schema->createTable('oro_integration_channel_status');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('channel_id', 'integer', []);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('channel_id', 'smallint', []);
         $table->addColumn('code', 'string', ['length' => 255]);
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('message', 'text', []);
@@ -85,7 +85,7 @@ class OroIntegrationBundle implements Migration
     {
         /** Generate table oro_integration_transport **/
         $table = $schema->createTable('oro_integration_transport');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_integration_transport **/

@@ -18,7 +18,7 @@ class OroEmbeddedFormBundle implements Migration
         /** Generate table oro_embedded_form **/
         $table = $schema->createTable('oro_embedded_form');
         $table->addColumn('id', 'string', ['length' => 255]);
-        $table->addColumn('channel_id', 'integer', ['notnull' => false]);
+        $table->addColumn('channel_id', 'smallint', ['notnull' => false]);
         $table->addColumn('title', 'text', []);
         $table->addColumn('css', 'text', []);
         $table->addColumn('form_type', 'string', ['length' => 255]);
@@ -31,7 +31,12 @@ class OroEmbeddedFormBundle implements Migration
 
         /** Generate foreign keys for table oro_embedded_form **/
         $table = $schema->getTable('oro_embedded_form');
-        $table->addForeignKeyConstraint($schema->getTable('oro_integration_channel'), ['channel_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_integration_channel'),
+            ['channel_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
         /** End of generate foreign keys for table oro_embedded_form **/
 
         // @codingStandardsIgnoreEnd
