@@ -34,8 +34,7 @@ class OroUserBundle implements Migration
             $schema->getTable('oro_user_status'),
             ['status_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null],
-            'fk_oro_user_status_id'
+            ['onDelete' => null, 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_user_access_group');
@@ -44,8 +43,7 @@ class OroUserBundle implements Migration
             $schema->getTable('oro_access_group'),
             ['group_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_EC003EF3FE54D947'
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_user_access_group_role');
@@ -55,15 +53,13 @@ class OroUserBundle implements Migration
             $schema->getTable('oro_access_group'),
             ['group_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_E7E7E38EFE54D947'
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_role'),
             ['role_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_E7E7E38ED60322AC'
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_user_access_role');
@@ -72,8 +68,7 @@ class OroUserBundle implements Migration
             $schema->getTable('oro_access_role'),
             ['role_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_290571BED60322AC'
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
 
         $table = $schema->getTable('oro_user_email');

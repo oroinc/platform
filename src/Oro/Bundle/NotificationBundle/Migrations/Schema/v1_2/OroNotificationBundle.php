@@ -16,13 +16,12 @@ class OroNotificationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_notification_recip_group');
-        $table->changeColumn('group_id', ['type' => Type::getType('integer')]);
+        $table->getColumn('group_id')->setType(Type::getType('integer'));
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_group'),
             ['group_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null],
-            'FK_14F109F1FE54D947'
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }
