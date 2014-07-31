@@ -79,7 +79,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      */
     protected function addUserName(array &$result, $user, $addValue)
     {
-        if ($user && $user instanceof UserInterface) {
+        if ($user instanceof UserInterface) {
             if ($addValue) {
                 $val = $user->getUsername();
             } else {
@@ -101,7 +101,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      */
     protected function addUserFirstName(array &$result, $user, $addValue)
     {
-        if ($user && $user instanceof FirstNameInterface) {
+        if ($user instanceof FirstNameInterface) {
             if ($addValue) {
                 $val = $user->getFirstName();
             } else {
@@ -123,7 +123,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      */
     protected function addUserLastName(array &$result, $user, $addValue)
     {
-        if ($user && $user instanceof LastNameInterface) {
+        if ($user instanceof LastNameInterface) {
             if ($addValue) {
                 $val = $user->getLastName();
             } else {
@@ -145,7 +145,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      */
     protected function addUserFullName(array &$result, $user, $addValue)
     {
-        if ($user && $user instanceof FullNameInterface) {
+        if ($user instanceof FullNameInterface) {
             if ($addValue) {
                 $val = $this->nameFormatter->format($user);
             } else {
