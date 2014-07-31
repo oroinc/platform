@@ -31,13 +31,34 @@ class SchemaDumperTest extends \PHPUnit_Framework_TestCase
         $this->schemaDumper->acceptSchema($this->schema);
     }
 
-    public function testDump()
+    /**
+     * @dataProvider dumpDataProvider
+     * @param string|null $namespace
+     * @param array|null $allowedTables
+     * @param string|null $expectedNamespace
+     */
+    public function testDump($allowedTables, $namespace, $expectedNamespace)
     {
         $this->twig->expects($this->once())
             ->method('render')
-            ->with(SchemaDumper::SCHEMA_TEMPLATE, ['schema' => $this->schema])
-            ->will($this->returnValue(''));
+            ->with(
+                SchemaDumper::SCHEMA_TEMPLATE,
+                [
+                    'schema' => $this->schema,
+                    'allowedTables' => $allowedTables,
+                    'namespace' => $expectedNamespace
+                ]
+            )
+            ->will($this->returnValue('TEST'));
 
-        $this->schemaDumper->dump();
+        $this->assertEquals('TEST', $this->schemaDumper->dump($allowedTables, $namespace));
+    }
+
+    public function dumpDataProvider()
+    {
+        return array(
+            array(null, null, null),
+            array(array('test' => true), 'Acme\DemoBundle\Entity', 'Acme\DemoBundle')
+        );
     }
 }

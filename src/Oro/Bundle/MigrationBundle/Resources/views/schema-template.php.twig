@@ -1,6 +1,6 @@
 <?php
 
-namespace ;
+namespace {{ namespace }};
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -13,16 +13,16 @@ class AllMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-    {% for table in schema.tables %}
+    {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined %}
     /** Generate table {{ table.name }} **/
         $table = $schema->createTable('{{ table.name }}');
     {% for column in table.columns %}
     $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
     {% endfor -%}
     {% for index in table.indexes -%}
-    {% if index.isPrimary %}
+    {%- if index.isPrimary -%}
     $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
-    {% elseif index.isUnique -%}
+    {% elseif index.isUnique %}
     $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
     {% else -%}
     $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
@@ -32,7 +32,7 @@ class AllMigration implements Migration
 
     {% endfor %}
 
-    {% for table in schema.tables -%}
+    {% for table in schema.tables if allowedTables is empty or allowedTables[table.name] is defined -%}
     {% if table.ForeignKeys is not empty %}
     /** Generate foreign keys for table {{ table.name }} **/
         $table = $schema->getTable('{{ table.name }}');
@@ -40,9 +40,8 @@ class AllMigration implements Migration
     $table->addForeignKeyConstraint($schema->getTable('{{ foreignKey.foreignTableName }}'), {{ _self.dumpArray(foreignKey.localColumns) }}, {{ _self.dumpArray(foreignKey.foreignColumns) }}, {{ _self.dumpOptionsArray(foreignKey.options) }});
     {% endfor %}
     /** End of generate foreign keys for table {{ table.name }} **/
-
     {% endif -%}
-    {% endfor %}
+    {% endfor -%}
     }
 }
 
