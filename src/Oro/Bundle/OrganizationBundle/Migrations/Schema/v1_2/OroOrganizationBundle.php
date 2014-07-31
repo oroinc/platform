@@ -15,6 +15,8 @@ class OroOrganizationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::updateOrganizationTable($schema);
+        self::updateBusinessUnitTable($schema);
+
         self::updateConfigs($schema, $queries);
     }
 
@@ -32,9 +34,19 @@ class OroOrganizationBundle implements Migration
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('enabled', 'boolean', []);
 
-        $table->getColumn('organization_id')->setOptions(['notnull' => false]);
-
         $table->addUniqueIndex(['name'], 'UNIQ_BB42B65D5E237E06');
+    }
+
+    /**
+     * Modify table oro_business_unit
+     *
+     * @param Schema $schema
+     */
+    public static function updateBusinessUnitTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_business_unit');
+
+        $table->getColumn('organization_id')->setOptions(['notnull' => false]);
     }
 
     /**
