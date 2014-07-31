@@ -5,7 +5,6 @@
 #}
 {% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
 
-{% set entity_output = oro_config_entity('Oro\\Bundle\\TagBundle\\Entity\\Tag') %}
 {% set showImage = false %}
 
 {% if entity %}
@@ -13,9 +12,9 @@
 {% endif %}
 
 {% set title = entity.name|default('N/A') %}
-{% set entityType = entity_output.name|trans %}
+{% set entityType = oro_entity_config(indexer_item.entityName, 'entity', 'label')|trans %}
 
 {% set entityInfo = [
-    {'title': 'oro.ui.created_at'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
-    {'title': 'oro.ui.updated_at'|trans, 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.ui.created_at'|trans, 'value': entity.created ? entity.created|oro_format_datetime : 'N/A'},
+    {'title': 'oro.ui.updated_at'|trans, 'value': entity.updated ? entity.updated|oro_format_datetime : 'N/A'},
 ] %}
