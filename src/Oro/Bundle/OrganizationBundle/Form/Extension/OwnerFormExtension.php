@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -22,6 +21,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -629,5 +629,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
             return $this->treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($this->currentUser->getId());
         }
+
+        return [];
     }
 }

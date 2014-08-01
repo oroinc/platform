@@ -26,8 +26,14 @@ class AclCondition
      */
     protected $pathExpressionType;
 
+    /**
+     * @var string
+     */
     protected $organizationField;
 
+    /**
+     * @var int
+     */
     protected $organizationValue;
 
     /**
@@ -35,6 +41,8 @@ class AclCondition
      * @param string $entityField
      * @param mixed  $value
      * @param int    $pathExpressionType
+     * @param string $organizationField
+     * @param int    $organizationValue
      */
     public function __construct(
         $entityAlias,
@@ -48,8 +56,8 @@ class AclCondition
         $this->entityField        = $entityField;
         $this->value              = $value;
         $this->pathExpressionType = $pathExpressionType;
-        $this->organizationField = $organizationField;
-        $this->organizationValue = $organizationValue;
+        $this->organizationField  = $organizationField;
+        $this->organizationValue  = $organizationValue;
     }
 
     /**

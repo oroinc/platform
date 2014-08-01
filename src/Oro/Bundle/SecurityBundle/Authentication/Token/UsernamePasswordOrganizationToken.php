@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UsernamePasswordOrganizationToken extends UsernamePasswordToken
 {

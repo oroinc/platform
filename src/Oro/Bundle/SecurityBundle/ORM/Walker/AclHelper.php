@@ -214,7 +214,7 @@ class AclHelper
      * @param IdentificationVariableDeclaration $declaration
      * @param                                   $key
      * @param                                   $permission
-     * @return JoinAssociationCondition
+     * @return JoinAssociationCondition|null
      */
     protected function processJoinAssociationPathExpression(
         IdentificationVariableDeclaration $declaration,
@@ -272,6 +272,8 @@ class AclHelper
                 $joinConditions
             );
         }
+
+        return null;
     }
 
     /**

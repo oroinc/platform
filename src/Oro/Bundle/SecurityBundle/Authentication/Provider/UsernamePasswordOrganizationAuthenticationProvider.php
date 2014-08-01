@@ -37,6 +37,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      */
     public function authenticate(TokenInterface $token)
     {
+        /**  @var UsernamePasswordOrganizationToken $token */
         $usernamePasswordToken = parent::authenticate($token);
 
         $this->checkUserOrganization($usernamePasswordToken->getUser(), $token->getOrganizationContext());

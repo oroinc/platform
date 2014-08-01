@@ -3,9 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\PathExpression;
+
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -193,7 +195,7 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     protected function getOrganizationId()
     {
@@ -201,6 +203,8 @@ class OwnershipConditionDataBuilder
         if ($token instanceof UsernamePasswordOrganizationToken) {
             return $token->getOrganizationContext()->getId();
         }
+
+        return null;
     }
 
     /**

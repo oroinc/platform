@@ -53,7 +53,7 @@ interface OwnershipDecisionMakerInterface
      * @param  object  $user
      * @param  object  $domainObject
      * @param  boolean $deep Specify whether subordinate business units should be checked. Defaults to false.
-     *                       @param  object                       $organization
+     * @param  object  $organization
      * @return bool
      * @throws InvalidDomainObjectException
      */

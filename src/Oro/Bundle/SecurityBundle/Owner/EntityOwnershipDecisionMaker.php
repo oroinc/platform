@@ -238,6 +238,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * @param  int|string      $userId
      * @param  int|string|null $businessUnitId
      * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  int|null        $organizationId
      * @return bool
      */
     protected function isUserBusinessUnit($userId, $businessUnitId, $deep = false, $organizationId = null)
