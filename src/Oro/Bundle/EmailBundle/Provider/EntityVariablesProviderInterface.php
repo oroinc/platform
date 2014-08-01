@@ -16,6 +16,9 @@ interface EntityVariablesProviderInterface
      *                      'label' => {translated variable name}
      *               If a field represents a relation the following attributes are added:
      *                      'related_entity_name' => {related entity full class name}
+     *               If $entityClass is NULL variables are grouped by entity class:
+     *                  {entity class} => array
+     *                      {variable name} => array of attributes described above
      */
     public function getVariableDefinitions($entityClass = null);
 

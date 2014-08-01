@@ -21,7 +21,10 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getVariableDefinitions')
             ->will(
                 $this->returnValue(
-                    ['var1' => ['type' => 'string', 'label' => 'var1']]
+                    [
+                        'var1' => ['type' => 'string', 'label' => 'var1'],
+                        'var3' => ['type' => 'string', 'label' => 'var3']
+                    ]
                 )
             );
 
@@ -38,10 +41,11 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addSystemVariablesProvider($provider2);
 
         $result = $this->provider->getSystemVariableDefinitions();
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'var1' => ['type' => 'string', 'label' => 'var1'],
-                'var2' => ['type' => 'string', 'label' => 'var2']
+                'var2' => ['type' => 'string', 'label' => 'var2'],
+                'var3' => ['type' => 'string', 'label' => 'var3'],
             ],
             $result
         );
@@ -57,7 +61,10 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->with($entityClass)
             ->will(
                 $this->returnValue(
-                    ['var1' => ['type' => 'string', 'label' => 'var1']]
+                    [
+                        'var1' => ['type' => 'string', 'label' => 'var1'],
+                        'var3' => ['type' => 'string', 'label' => 'var3'],
+                    ]
                 )
             );
 
@@ -75,10 +82,11 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addEntityVariablesProvider($provider2);
 
         $result = $this->provider->getEntityVariableDefinitions($entityClass);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'var1' => ['type' => 'string', 'label' => 'var1'],
-                'var2' => ['type' => 'string', 'label' => 'var2']
+                'var2' => ['type' => 'string', 'label' => 'var2'],
+                'var3' => ['type' => 'string', 'label' => 'var3'],
             ],
             $result
         );
@@ -95,7 +103,12 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->with(null)
             ->will(
                 $this->returnValue(
-                    [$entity1Class => ['var1' => ['type' => 'string', 'label' => 'var1']]]
+                    [
+                        $entity1Class => [
+                            'var1' => ['type' => 'string', 'label' => 'var1'],
+                            'var3' => ['type' => 'string', 'label' => 'var3'],
+                        ]
+                    ]
                 )
             );
 
@@ -124,11 +137,12 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider->addEntityVariablesProvider($provider3);
 
         $result = $this->provider->getEntityVariableDefinitions();
-        $this->assertEquals(
+        $this->assertSame(
             [
                 $entity1Class => [
                     'var1' => ['type' => 'string', 'label' => 'var1'],
                     'var2' => ['type' => 'string', 'label' => 'var2'],
+                    'var3' => ['type' => 'string', 'label' => 'var3'],
                 ],
                 $entity2Class => [
                     'var1' => ['type' => 'string', 'label' => 'var1'],

@@ -28,6 +28,7 @@ class VariablesProvider
 
     /**
      * Gets system variables available in a template
+     * Returned variables are sorted be name.
      *
      * @return array The list of variables in the following format:
      *                  {variable name} => array
@@ -44,12 +45,14 @@ class VariablesProvider
                 $provider->getVariableDefinitions()
             );
         }
+        ksort($result);
 
         return $result;
     }
 
     /**
      * Gets entity related variables available in a template
+     * Returned variables are sorted be name.
      *
      * @param string $entityClass The entity class name. If it is not specified the definitions for all
      *                            entities are returned.
@@ -58,6 +61,11 @@ class VariablesProvider
      *                  {variable name} => array
      *                      'type' => {variable data type}
      *                      'name' => {translated variable name}
+     *               If a field represents a relation the following attributes are added:
+     *                      'related_entity_name' => {related entity full class name}
+     *               If $entityClass is NULL variables are grouped by entity class:
+     *                  {entity class} => array
+     *                      {variable name} => array of attributes described above
      */
     public function getEntityVariableDefinitions($entityClass = null)
     {
@@ -68,6 +76,13 @@ class VariablesProvider
                 $result,
                 $provider->getVariableDefinitions($entityClass)
             );
+        }
+        if ($entityClass) {
+            ksort($result);
+        } else {
+            foreach ($result as &$variables) {
+                ksort($variables);
+            }
         }
 
         return $result;
