@@ -94,20 +94,23 @@ class OrganizationsSelectType extends AbstractType
 
         /** @var PersistentCollection $organizationsData */
         $organizationsData = $view->vars['data']->getOrganizations();
-        $organizationsData = $organizationsData->map(
-            function ($item) {
-                return $item->getId();
-            }
-        )->getValues();
+        if ($organizationsData) {
+            $organizationsData = $organizationsData->map(
+                function ($item) {
+                    return $item->getId();
+                }
+            )->getValues();
+        }
 
         /** @var PersistentCollection $businessUnitData */
         $businessUnitData = $view->vars['data']->getBusinessUnits();
-        $businessUnitData = $businessUnitData->map(
-            function ($item) {
-                return $item->getId();
-            }
-        )->getValues();
-
+        if ($businessUnitData) {
+            $businessUnitData = $businessUnitData->map(
+                function ($item) {
+                    return $item->getId();
+                }
+            )->getValues();
+        }
 
         $view->vars['selected_organizations']  = $organizationsData;
         $view->vars['selected_business_units'] = $businessUnitData;

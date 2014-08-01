@@ -30,8 +30,6 @@ class OroOrganizationBundle implements Migration
         $table = $schema->createTable('oro_organization');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('currency', 'string', ['length' => 3]);
-        $table->addColumn('currency_precision', 'string', ['length' => 10]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_organization **/
     }
