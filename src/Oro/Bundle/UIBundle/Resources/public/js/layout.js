@@ -49,6 +49,7 @@ define(function (require) {
                 $elem = $(this);
                 module = $elem.data('pageComponentModule');
                 options = $elem.data('pageComponentOptions');
+                options._sourceElement = $elem;
                 $elem
                     .removeData('pageComponentModule')
                     .removeData('pageComponentOptions')
