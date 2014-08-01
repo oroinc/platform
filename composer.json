@@ -22,7 +22,7 @@
         "ext-gd": "*",
         "ext-xml": "*",
         "ext-mysql": "*",
-        "symfony/symfony": "v2.3.6",
+        "symfony/symfony": "v2.3.18",
         "doctrine/orm": "2.4.3",
         "doctrine/doctrine-bundle": "1.2.0",
         "doctrine/data-fixtures": "1.0.0",
