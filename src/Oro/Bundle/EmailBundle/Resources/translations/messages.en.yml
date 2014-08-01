@@ -61,7 +61,7 @@ oro:
                         html: "Html"
                         txt:  "Plain text"
                     entityName:
-                        empty: Empty
+                        empty: None
                 page_size:
                     all: "All"
                 view:
