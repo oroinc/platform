@@ -60,7 +60,7 @@
             "symfony/icu": "~1.1",
             "symfony/monolog-bundle": "2.3.0",
             "symfony/swiftmailer-bundle": "2.3.*",
-            "symfony/symfony": "v2.3.18",
+            "symfony/symfony": "2.3.*",
             "twig/extensions": "1.0.1",
             "zendframework/zend-mail": "2.1.*"
         },
