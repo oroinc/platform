@@ -103,14 +103,14 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
                 $username,
                 $password,
                 $this->providerKey,
-                array(),
                 $this->getOrganization(
                     $request->get(
                         $this->options['organization_parameter'],
                         null,
                         true
                     )
-                )
+                ),
+                array()
             )
         );
     }

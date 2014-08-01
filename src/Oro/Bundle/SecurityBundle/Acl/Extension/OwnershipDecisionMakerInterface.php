@@ -40,6 +40,7 @@ interface OwnershipDecisionMakerInterface
      *
      * @param  object                       $user
      * @param  object                       $domainObject
+     * @param  object                       $organization
      * @return bool
      * @throws InvalidDomainObjectException
      */
@@ -52,6 +53,7 @@ interface OwnershipDecisionMakerInterface
      * @param  object  $user
      * @param  object  $domainObject
      * @param  boolean $deep Specify whether subordinate business units should be checked. Defaults to false.
+     *                       @param  object                       $organization
      * @return bool
      * @throws InvalidDomainObjectException
      */
@@ -62,8 +64,9 @@ interface OwnershipDecisionMakerInterface
      *
      * @param  object                       $user
      * @param  object                       $domainObject
+     * @param  object                       $organization
      * @return bool
      * @throws InvalidDomainObjectException
      */
-    public function isAssociatedWithUser( $user, $domainObject, $organization = null);
+    public function isAssociatedWithUser($user, $domainObject, $organization = null);
 }
