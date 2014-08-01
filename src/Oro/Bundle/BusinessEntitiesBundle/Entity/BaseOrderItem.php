@@ -38,7 +38,7 @@ class BaseOrderItem
     /**
      * @var integer
      *
-     * @ORM\Column(name="qty", type="integer", nullable=false)
+     * @ORM\Column(name="qty", type="float", nullable=false)
      */
     protected $qty;
 
