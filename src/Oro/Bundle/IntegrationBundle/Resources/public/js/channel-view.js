@@ -116,6 +116,7 @@ define([
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
+            mediator.trigger('integrationFormReload:before', { formEl: $form, data: data });
             $.post(url, data, function (res, status, jqXHR) {
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
@@ -125,6 +126,7 @@ define([
                     mediator.execute({name: 'updateDebugToolbar', silent: true}, jqXHR);
                     // process UI decorators
                     mediator.execute('afterPageChange');
+                    mediator.trigger('integrationFormReload:after', { formEl: $form, loadedContent: res });
                 }
             }).always(function () {
                 mediator.execute('hideLoading');
