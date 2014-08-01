@@ -8,6 +8,9 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvi
 class EmailRendererTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $loader;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $variablesProvider;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
@@ -158,9 +161,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->method('getContent')
             ->will($this->returnValue($content));
         $emailTemplate->expects($this->once())
-            ->method('getType')
-            ->will($this->returnValue('txt'));
-        $emailTemplate->expects($this->once())
             ->method('getSubject')
             ->will($this->returnValue($subject));
 
@@ -177,7 +177,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $renderer->expects($this->at(0))
             ->method('render')
-            ->with(strip_tags($content), $templateParams);
+            ->with($content, $templateParams);
         $renderer->expects($this->at(1))
             ->method('render')
             ->with($subject, $templateParams);
@@ -220,9 +220,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $emailTemplate->expects($this->once())
             ->method('getContent')
             ->will($this->returnValue($content));
-        $emailTemplate->expects($this->once())
-            ->method('getType')
-            ->will($this->returnValue('html'));
 
         $templateParams = array();
 
@@ -235,7 +232,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EmailRenderer
+     * @return EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
      */
     public function getRendererInstance()
     {

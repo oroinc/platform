@@ -97,13 +97,9 @@ class EmailRenderer extends \Twig_Environment
      */
     public function compileMessage(EmailTemplateInterface $template, array $templateParams = array())
     {
-        // ensure we have no html tags in txt template
-        $content = $template->getContent();
-        $content = $template->getType() == 'txt' ? strip_tags($content) : $content;
-
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
-        $templateRendered = $this->render($content, $templateParams);
+        $templateRendered = $this->render($template->getContent(), $templateParams);
         $subjectRendered  = $this->render($template->getSubject(), $templateParams);
 
         return array($subjectRendered, $templateRendered);
@@ -118,12 +114,6 @@ class EmailRenderer extends \Twig_Environment
      */
     public function compilePreview(EmailTemplate $entity)
     {
-        // ensure we have no html tags in txt template
-        $content = $entity->getContent();
-        $content = $entity->getType() == 'txt' ? strip_tags($content) : $content;
-
-        $templateRendered = $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
-
-        return $templateRendered;
+        return $this->render('{% verbatim %}' . $entity->getContent() . '{% endverbatim %}', []);
     }
 }

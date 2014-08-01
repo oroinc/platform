@@ -54,7 +54,7 @@
                         $(function () {
                             $('#{{ form.template.vars.id }}').change(function (e) {
                                 var url = routing.generate(
-                                    'oro_api_get_emailtemplate_template',
+                                    'oro_api_get_emailtemplate_compiled',
                                     {'id': $(this).val(), 'entityId': {{ entity.entityId }}}
                                 );
 
@@ -66,7 +66,7 @@
                                         $('#{{ form.body.vars.id }}').val(res.body);
                                         $('#{{ form.type.vars.id }}')
                                             .find('input[value='+res.type+']')
-                                            .attr('checked', 'checked');
+                                            .prop('checked', true);
                                     },
                                     error: function () {
                                         messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
