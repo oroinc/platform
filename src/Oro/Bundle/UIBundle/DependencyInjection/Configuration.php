@@ -52,7 +52,7 @@ class Configuration implements ConfigurationInterface
                     'type'  => 'scalar'
                 ],
                 'application_url' => [
-                    'value' => '',
+                    'value' => 'http://localhost/oro/',
                     'type'  => 'scalar'
                 ],
                 'navbar_position' => [
