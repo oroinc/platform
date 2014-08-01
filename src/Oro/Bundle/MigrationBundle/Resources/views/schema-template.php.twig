@@ -49,7 +49,8 @@ class {{ className }} implements Installation
     {
         $table = $schema->createTable('{{ table.name }}');
 {% for column in table.columns %}
-        $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
+{% set columnExtendedOptions = extendedOptions[table.name][column.name] is defined ? extendedOptions[table.name][column.name] : null %}
+        $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column, columnExtendedOptions) }});
 {% endfor %}
 {% for index in table.indexes %}
 {% if index.isPrimary %}
@@ -87,7 +88,7 @@ class {{ className }} implements Installation
 {% endfor -%}
 }{% spaceless %}
 
-{% macro dumpColumnOptions(column) %}
+{% macro dumpColumnOptions(column, columnExtendedOptions) %}
 {% spaceless %}
 {% set options = oro_migration_get_schema_column_options(column) %}
 {% set items = [] %}
@@ -100,6 +101,7 @@ class {{ className }} implements Installation
 {% if options.unsigned is defined %}{% set items = items|merge(["'unsigned' => " ~ _self.dumpBoolean(options.unsigned)]) %}{% endif -%}
 {% if options.autoincrement is defined %}{% set items = items|merge(["'autoincrement' => " ~ _self.dumpBoolean(options.autoincrement)]) %}{% endif -%}
 {% if options.comment is defined %}{% set items = items|merge(["'comment' => " ~ _self.dumpString(options.comment)]) %}{% endif -%}
+{% if columnExtendedOptions is not empty %}{% set items = items|merge(["'oro_options' => " ~ _self.dumpOptionsArray(columnExtendedOptions)]) %}{% endif -%}
 [{{ items|join(', ')|raw }}]
 {% endspaceless %}
 {% endmacro %}
@@ -114,7 +116,9 @@ class {{ className }} implements Installation
         {% set items = items|merge(["'" ~ valueName ~ "' => true"]) %}
     {% elseif value is same as(false) %}
         {% set items = items|merge(["'" ~ valueName ~ "' => false"]) %}
-    {% else  %}
+    {% elseif value is iterable %}
+        {% set items = items|merge(["'" ~ valueName ~ "' => " ~ _self.dumpOptionsArray(value)]) %}
+    {% else %}
         {% set items = items|merge(["'" ~ valueName ~ "' => '" ~ value ~ "'"]) %}
     {% endif %}
 {% endfor %}

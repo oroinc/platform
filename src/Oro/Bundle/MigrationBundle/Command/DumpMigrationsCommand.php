@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,7 +17,12 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     /**
      * @var array
      */
-    protected $tables = [];
+    protected $allowedTables = [];
+
+    /**
+     * @var array
+     */
+    protected $extendedFieldOptions = [];
 
     /**
      * @var string
@@ -32,6 +38,11 @@ class DumpMigrationsCommand extends ContainerAwareCommand
      * @var string
      */
     protected $version;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
 
     /**
      * {@inheritdoc}
@@ -63,12 +74,15 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     {
         $this->version = $input->getOption('migration-version');
         $this->initializeBundleRestrictions($input->getOption('bundle'));
+        $this->initializeMetadataInformation();
+        $doctrine = $this->getContainer()->get('doctrine');
+        /** @var Schema $schema */
+        $schema = $doctrine->getConnection()->getSchemaManager()->createSchema();
 
-        $schema = $this->getSchema();
         if ($input->getOption('plain-sql')) {
             /** @var Connection $connection */
             $connection = $this->getContainer()->get('doctrine')->getConnection();
-            $sqls       = $schema->toSql($connection->getDatabasePlatform());
+            $sqls = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
             }
@@ -95,32 +109,75 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return Schema
-     * @throws \Doctrine\ORM\ORMException
+     * Process metadata information.
      */
-    protected function getSchema()
+    protected function initializeMetadataInformation()
     {
         $doctrine = $this->getContainer()->get('doctrine');
-        if ($this->namespace) {
-            /** @var ClassMetadata[] $allMetadata */
-            $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
-            array_walk(
-                $allMetadata,
-                function (ClassMetadata $entityMetadata) {
+        /** @var ClassMetadata[] $allMetadata */
+        $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        array_walk(
+            $allMetadata,
+            function (ClassMetadata $entityMetadata) {
+                if ($this->namespace) {
                     if ($entityMetadata->namespace == $this->namespace) {
-                        $this->tables[$entityMetadata->getTableName()] = true;
+                        $this->allowedTables[$entityMetadata->getTableName()] = true;
                         foreach ($entityMetadata->getAssociationMappings() as $associationMappingInfo) {
                             if (isset($associationMappingInfo['joinTable'])) {
-                                $joinTableName                = $associationMappingInfo['joinTable']['name'];
-                                $this->tables[$joinTableName] = true;
+                                $joinTableName = $associationMappingInfo['joinTable']['name'];
+                                $this->allowedTables[$joinTableName] = true;
                             }
                         }
+                        $this->initializeExtendedFieldsOptions($entityMetadata);
                     }
+                } else {
+                    $this->initializeExtendedFieldsOptions($entityMetadata);
                 }
-            );
+            }
+        );
+    }
+
+    /**
+     * Initialize extended field options by field.
+     *
+     * @param ClassMetadata $classMetadata
+     */
+    protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata)
+    {
+        $configManager = $this->getConfigManager();
+        $className = $classMetadata->getName();
+        $tableName = $classMetadata->getTableName();
+        foreach ($classMetadata->getFieldNames() as $fieldName) {
+            if ($configManager->hasConfig($className, $fieldName)) {
+                $columnName = $classMetadata->getColumnName($fieldName);
+                $options = $this->getExtendedFieldOptions($className, $fieldName);
+                if (!empty($options['extend']['is_extend'])) {
+                    $this->extendedFieldOptions[$tableName][$columnName] = $options;
+                }
+            }
+        }
+    }
+
+    /**
+     * Get extended field options.
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return array
+     */
+    protected function getExtendedFieldOptions($className, $fieldName)
+    {
+        $configManager = $this->getConfigManager();
+        $config = array();
+        foreach ($configManager->getProviders() as $provider) {
+            $fieldId = $provider->getId($className, $fieldName);
+            $extendedConfig = $configManager->getConfig($fieldId)->all();
+            if (!empty($extendedConfig)) {
+                $config[$provider->getScope()] = $extendedConfig;
+            }
         }
 
-        return $doctrine->getConnection()->getSchemaManager()->createSchema();
+        return $config;
     }
 
     /**
@@ -134,11 +191,24 @@ class DumpMigrationsCommand extends ContainerAwareCommand
 
         $output->writeln(
             $visitor->dump(
-                $this->tables,
+                $this->allowedTables,
                 $this->namespace,
                 $this->className,
-                $this->version
+                $this->version,
+                $this->extendedFieldOptions
             )
         );
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    protected function getConfigManager()
+    {
+        if (!$this->configManager) {
+            $this->configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        }
+
+        return $this->configManager;
     }
 }

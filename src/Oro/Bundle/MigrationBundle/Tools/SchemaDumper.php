@@ -42,13 +42,15 @@ class SchemaDumper extends AbstractVisitor
      * @param string|null $namespace
      * @param string $className
      * @param string $version
+     * @param array|null $extendedOptions
      * @return string
      */
     public function dump(
         array $allowedTables = null,
         $namespace = null,
         $className = self::DEFAULT_CLASS_NAME,
-        $version = self::DEFAULT_VERSION
+        $version = self::DEFAULT_VERSION,
+        array $extendedOptions = null
     ) {
         $content = $this->twig->render(
             self::SCHEMA_TEMPLATE,
@@ -57,7 +59,8 @@ class SchemaDumper extends AbstractVisitor
                 'allowedTables' => $allowedTables,
                 'namespace' => $this->getMigrationNamespace($namespace),
                 'className' => $className,
-                'version' => $version
+                'version' => $version,
+                'extendedOptions' => $extendedOptions
             ]
         );
 
