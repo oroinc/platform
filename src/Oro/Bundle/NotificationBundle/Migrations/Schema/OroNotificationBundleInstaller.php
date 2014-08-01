@@ -169,14 +169,14 @@ class OroNotificationBundleInstaller implements Installation
     {
         $table = $schema->getTable('oro_notification_recip_group');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_notification_recip_list'),
-            ['recipient_list_id'],
+            $schema->getTable('oro_access_group'),
+            ['group_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_access_group'),
-            ['group_id'],
+            $schema->getTable('oro_notification_recip_list'),
+            ['recipient_list_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
@@ -191,14 +191,14 @@ class OroNotificationBundleInstaller implements Installation
     {
         $table = $schema->getTable('oro_notification_recip_user');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_notification_recip_list'),
-            ['recipient_list_id'],
+            $schema->getTable('oro_user'),
+            ['user_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
+            $schema->getTable('oro_notification_recip_list'),
+            ['recipient_list_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );

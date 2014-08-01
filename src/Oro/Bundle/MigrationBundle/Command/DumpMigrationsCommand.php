@@ -102,9 +102,8 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     {
         $doctrine = $this->getContainer()->get('doctrine');
         if ($this->namespace) {
-            $entityManager = $doctrine->getManager();
             /** @var ClassMetadata[] $allMetadata */
-            $allMetadata = $entityManager->getMetadataFactory()->getAllMetadata();
+            $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
             array_walk(
                 $allMetadata,
                 function (ClassMetadata $entityMetadata) {
