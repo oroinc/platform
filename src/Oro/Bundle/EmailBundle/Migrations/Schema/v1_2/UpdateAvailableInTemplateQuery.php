@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Psr\Log\LoggerInterface;
+use Metadata\MetadataFactory;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -10,6 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 /**
  * Sets value of email.available_in_template attribute to TRUE for all fields
  * except a value of this attribute is changed by an user
+ * and has own @ConfigField annotations with email.available_in_template attribute
  */
 class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
 {
@@ -34,6 +38,17 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         'manyToOne' => true,
     ];
 
+    /** @var MetadataFactory */
+    protected $metadataFactory;
+
+    /**
+     * @param MetadataFactory $metadataFactory
+     */
+    public function __construct(MetadataFactory $metadataFactory)
+    {
+        $this->metadataFactory = $metadataFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -56,6 +71,8 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
@@ -63,15 +80,29 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         foreach ($classNames as $className) {
             $fieldConfigs        = $this->loadFieldConfigs($logger, $className);
             $fieldsChangedByUser = $this->loadFieldsChangedByUser($logger, $className);
+            /** @var EntityMetadata $metadata */
+            $metadata = $this->metadataFactory->getMetadataForClass($className);
             foreach ($fieldConfigs as $fieldName => $fieldConfig) {
                 if (isset($fieldsChangedByUser[$fieldName])) {
+                    // skip because the value is changed by an user
                     continue;
                 }
-                if (!isset($allowedTypes[$fieldConfig['type']])) {
+                if (!isset(self::$allowedTypes[$fieldConfig['type']])) {
+                    // skip because this data type should not be available in email templates
                     continue;
+                }
+                if ($metadata && $metadata->configurable && isset($metadata->propertyMetadata[$fieldName])) {
+                    /** @var FieldMetadata $fieldMetadata */
+                    $fieldMetadata = $metadata->propertyMetadata[$fieldName];
+                    if (isset($fieldMetadata->defaultValues['email'])
+                        && array_key_exists('available_in_template', $fieldMetadata->defaultValues['email'])) {
+                        // skip because this field has @ConfigField annotations with email.available_in_template
+                        continue;
+                    }
                 }
                 $data = unserialize($fieldConfig['data']);
                 if (isset($data['email']['available_in_template']) && $data['email']['available_in_template']) {
+                    // skip because the value is already TRUE
                     continue;
                 }
 
