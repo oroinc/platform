@@ -9,7 +9,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type array or Traversable and ArrayAccess, boolean given
+     * @expectedExceptionMessage Expected argument of type "array or Traversable and ArrayAccess", "boolean" given
      */
     public function testValidateExceptionWhenInvalidArgumentType()
     {
@@ -21,7 +21,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
     //@codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
-     * @expectedExceptionMessage Expected argument of type Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress, array given
+     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress", "array" given
      */
     //@codingStandardsIgnoreEnd
     public function testValidateExceptionWhenInvalidArgumentElementType()
