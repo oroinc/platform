@@ -3,7 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use FOS\Rest\Util\Codes;
-use FOS\RestBundle\Controller\Annotations\Get as GetRoute;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
@@ -46,6 +47,10 @@ class EmailTemplateController extends RestController
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="DELETE"
      * )
+     * @Delete(requirements={"id"="\d+"},
+     *      name="oro_api_delete_emailtemplate"
+     * )
+     *
      * @return Response
      */
     public function deleteAction($id)
@@ -79,11 +84,14 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
-     * @GetRoute(requirements={"entityName"="(^[^\d][.]+)"})
+     * @Get("/emailtemplates/list/{entityName}",
+     *      requirements={"entityName"="\w+"},
+     *      name="oro_api_get_emailtemplates"
+     * )
      *
      * @return Response
      */
-    public function getAction($entityName = null)
+    public function cgetAction($entityName = null)
     {
         if (!$entityName) {
             return $this->handleView(
@@ -109,10 +117,13 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @GetRoute()
+     * @Get("/emailtemplates/variables",
+     *      name="oro_api_get_emailtemplate_variables"
+     * )
+     *
      * @return Response
      */
-    public function getAvailableVariablesAction()
+    public function getVariablesAction()
     {
         /** @var VariablesProvider $provider */
         $provider = $this->get('oro_email.emailtemplate.variable_provider');
@@ -139,12 +150,15 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @GetRoute("/emailtemplates/{id}/{entityId}", requirements={"id" = "\d+","entityId" = "^(\s*|\d+)$"})
+     * @Get("/emailtemplates/compiled/{id}/{entityId}",
+     *      requirements={"id"="\d+", "entityId"="\d+"},
+     *      name="oro_api_get_emailtemplate_compiled"
+     * )
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
      *
      * @return Response
      */
-    public function getTemplateAction(EmailTemplate $emailTemplate, $entityId = null)
+    public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];
         if ($entityId && $emailTemplate->getEntityName()) {

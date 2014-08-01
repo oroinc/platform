@@ -17,11 +17,11 @@ class EmailTemplateControllerTest extends WebTestCase
     /**
      * Check that server return rendered template with defined data structure
      */
-    public function testGetEmailTemplate()
+    public function testGetCompiledEmailTemplate()
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_emailtemplate_template', ['id' => 1, 'entityId' => 1])
+            $this->getUrl('oro_api_get_emailtemplate_compiled', ['id' => 1, 'entityId' => 1])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);

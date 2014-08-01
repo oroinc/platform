@@ -6,7 +6,7 @@
                 'use strict';
                 var model, view;
 
-                model = new Model({{ render(path('oro_api_get_emailtemplate_available_variables'))}});
+                model = new Model({{ render(path('oro_api_get_emailtemplate_variables'))}});
                 model.setEntity({{ entityName|json_encode|raw }}, {{ oro_entity_config_value(entityName, 'label')|trans|json_encode|raw }});
 
                 view = new View({

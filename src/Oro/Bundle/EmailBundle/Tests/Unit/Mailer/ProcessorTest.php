@@ -179,7 +179,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($expectedMessageData['subject']);
         $message->expects($this->once())
             ->method('setBody')
-            ->with($expectedMessageData['body'], 'text/plain');
+            ->with(
+                $expectedMessageData['body'],
+                isset($expectedMessageData['type']) ? $expectedMessageData['type'] : 'text/plain'
+            );
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -229,7 +232,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->emailEntityBuilder->expects($this->once())
             ->method('body')
-            ->with($expectedMessageData['body'], false, true)
+            ->with(
+                $expectedMessageData['body'],
+                isset($data['type']) && $data['type'] === 'html' ? true : false,
+                true
+            )
             ->will($this->returnValue($body));
 
         $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
@@ -272,6 +279,22 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'to' => array('to@test.com'),
                     'subject' => 'subject',
                     'body' => 'body'
+                )
+            ),
+            array(
+                array(
+                    'from' => 'from@test.com',
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'type' => 'html'
+                ),
+                array(
+                    'from' => array('from@test.com'),
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'type' => 'text/html'
                 )
             ),
             array(
