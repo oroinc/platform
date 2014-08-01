@@ -46,7 +46,6 @@ class OroTrackerBundle implements Migration, RenameExtensionAwareInterface, Data
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        /** placed here to load in last order */
         $queries->addQuery(
             new MigrateTypesQuery($this->platform, $schema, 'oro_integration_channel', 'id', Type::INTEGER)
         );
