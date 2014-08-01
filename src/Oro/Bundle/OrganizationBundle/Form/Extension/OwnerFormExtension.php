@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -107,14 +108,14 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $oldOwner;
 
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param ManagerRegistry $managerRegistry
+     * @param SecurityContextInterface  $securityContext
+     * @param ManagerRegistry           $managerRegistry
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
-     * @param BusinessUnitManager $businessUnitManager
-     * @param SecurityFacade $securityFacade
-     * @param TranslatorInterface $translator
-     * @param AclVoter $aclVoter
-     * @param OwnerTreeProvider $treeProvider
+     * @param BusinessUnitManager       $businessUnitManager
+     * @param SecurityFacade            $securityFacade
+     * @param TranslatorInterface       $translator
+     * @param AclVoter                  $aclVoter
+     * @param OwnerTreeProvider         $treeProvider
      */
     public function __construct(
         SecurityContextInterface $securityContext,
@@ -149,7 +150,7 @@ class OwnerFormExtension extends AbstractTypeExtension
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      * @throws \LogicException when getOwner method isn't implemented for entity with ownership type
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -259,7 +260,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function postSubmit(FormEvent $event)
     {
-        $form  = $event->getForm();
+        $form = $event->getForm();
         if ($form->getParent() || !$form->has($this->fieldName)) {
             return;
         }
@@ -341,10 +342,10 @@ class OwnerFormExtension extends AbstractTypeExtension
 
     /**
      * @param FormBuilderInterface|FormInterface $builder
-     * @param $dataClass
-     * @param string $permission
-     * @param array $data
-     * @param int $entityId
+     * @param                                    $dataClass
+     * @param string                             $permission
+     * @param array                              $data
+     * @param int                                $entityId
      */
     protected function addUserOwnerField($builder, $dataClass, $permission = "CREATE", $data = null, $entityId = 0)
     {
@@ -396,8 +397,8 @@ class OwnerFormExtension extends AbstractTypeExtension
 
     /**
      * @param FormBuilderInterface $builder
-     * @param User $user
-     * @param string $className
+     * @param User                 $user
+     * @param string               $className
      */
     protected function addBusinessUnitOwnerField($builder, User $user, $className)
     {
@@ -431,9 +432,9 @@ class OwnerFormExtension extends AbstractTypeExtension
                         'mapped' => true,
                         'label' => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
-                        'configs'     => array(
+                        'configs' => array(
                             'is_translated_option' => true,
-                            'is_safe'              => true,
+                            'is_safe' => true,
                         )
                     ),
                     $validation
@@ -527,8 +528,19 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
+     * @return int
+     */
+    protected function getOrganizationContextId()
+    {
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            return $token->getOrganizationContext()->getId();
+        }
+    }
+
+    /**
      * @param FormBuilderInterface $builder
-     * @param User $user
+     * @param User                 $user
      */
     protected function addOrganizationOwnerField(FormBuilderInterface $builder, User $user)
     {
@@ -554,7 +566,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     /**
      * Check is granting user to object in given permission
      *
-     * @param string $permission
+     * @param string        $permission
      * @param object|string $object
      */
     protected function checkIsGranted($permission, $object)
@@ -605,9 +617,15 @@ class OwnerFormExtension extends AbstractTypeExtension
         if (AccessLevel::SYSTEM_LEVEL == $this->accessLevel) {
             return $this->businessUnitManager->getBusinessUnitIds();
         } elseif (AccessLevel::LOCAL_LEVEL == $this->accessLevel) {
-            return $this->treeProvider->getTree()->getUserBusinessUnitIds($this->currentUser->getId());
+            return $this->treeProvider->getTree()->getUserBusinessUnitIds(
+                $this->currentUser->getId(),
+                $this->getOrganizationContextId()
+            );
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
-            return $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds($this->currentUser->getId());
+            return $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
+                $this->currentUser->getId(),
+                $this->getOrganizationContextId()
+            );
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
             return $this->treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($this->currentUser->getId());
         }

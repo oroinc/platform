@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\PathExpression;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -148,10 +149,10 @@ class OwnershipConditionDataBuilder
                 }
             } elseif (AccessLevel::LOCAL_LEVEL === $accessLevel) {
                 if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
-                    $buIds = $tree->getUserBusinessUnitIds($this->getUserId());
+                    $buIds = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
                 } elseif ($metadata->isBusinessUnitOwned()) {
-                    $buIds = $tree->getUserBusinessUnitIds($this->getUserId());
+                    $buIds = $tree->getUserBusinessUnitIds($this->getUserId(), $this->getOrganizationId());
                     $constraint = $this->getCondition($buIds, $metadata);
                 } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
@@ -189,6 +190,17 @@ class OwnershipConditionDataBuilder
         }
 
         return $constraint;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getOrganizationId()
+    {
+        $token = $this->getSecurityContext()->getToken();
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            return $token->getOrganizationContext()->getId();
+        }
     }
 
     /**
@@ -307,10 +319,18 @@ class OwnershipConditionDataBuilder
     protected function getCondition($idOrIds, OwnershipMetadata $metadata, $columnName = null)
     {
         if (!empty($idOrIds)) {
+            $organizationField = null;
+            $organizationValue = null;
+            if ($metadata->getOrganizationColumnName() && $this->getOrganizationId()) {
+                $organizationField = $metadata->getOrganizationFieldName();
+                $organizationValue = $this->getOrganizationId();
+            }
             return array(
                 $this->getColumnName($metadata, $columnName),
                 $idOrIds,
-                $columnName == null ? PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION : PathExpression::TYPE_STATE_FIELD
+                $columnName == null ? PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION : PathExpression::TYPE_STATE_FIELD,
+                $organizationField,
+                $organizationValue
             );
         }
 

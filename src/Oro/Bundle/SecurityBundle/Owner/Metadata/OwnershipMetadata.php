@@ -7,10 +7,10 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
  */
 class OwnershipMetadata implements \Serializable
 {
-    const OWNER_TYPE_NONE          = 0;
-    const OWNER_TYPE_ORGANIZATION  = 1;
+    const OWNER_TYPE_NONE = 0;
+    const OWNER_TYPE_ORGANIZATION = 1;
     const OWNER_TYPE_BUSINESS_UNIT = 2;
-    const OWNER_TYPE_USER          = 3;
+    const OWNER_TYPE_USER = 3;
 
     /**
      * @var integer
@@ -28,15 +28,32 @@ class OwnershipMetadata implements \Serializable
     protected $ownerColumnName;
 
     /**
+     * @var string
+     */
+    protected $organizationFieldName;
+
+    /**
+     * @var string
+     */
+    protected $organizationColumnName;
+
+    /**
      * Constructor
      *
      * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
      * @param string $ownerFieldName
      * @param string $ownerColumnName
+     * @param string $organizationFieldName
+     * @param string $organizationColumnName
      * @throws \InvalidArgumentException
      */
-    public function __construct($ownerType = '', $ownerFieldName = '', $ownerColumnName = '')
-    {
+    public function __construct(
+        $ownerType = '',
+        $ownerFieldName = '',
+        $ownerColumnName = '',
+        $organizationFieldName = '',
+        $organizationColumnName = ''
+    ) {
         switch ($ownerType) {
             case 'ORGANIZATION':
                 $this->ownerType = self::OWNER_TYPE_ORGANIZATION;
@@ -65,6 +82,8 @@ class OwnershipMetadata implements \Serializable
             throw new \InvalidArgumentException('The owner column name must not be empty.');
         }
         $this->ownerColumnName = $ownerColumnName;
+        $this->organizationColumnName = $organizationColumnName;
+        $this->organizationFieldName = $organizationFieldName;
     }
 
     /**
@@ -138,6 +157,22 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getOrganizationColumnName()
+    {
+        return $this->organizationColumnName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrganizationFieldName()
+    {
+        return $this->organizationFieldName;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -146,7 +181,9 @@ class OwnershipMetadata implements \Serializable
             array(
                 $this->ownerType,
                 $this->ownerFieldName,
-                $this->ownerColumnName
+                $this->ownerColumnName,
+                $this->organizationFieldName,
+                $this->organizationColumnName
             )
         );
     }
@@ -159,7 +196,9 @@ class OwnershipMetadata implements \Serializable
         list(
             $this->ownerType,
             $this->ownerFieldName,
-            $this->ownerColumnName
+            $this->ownerColumnName,
+            $this->organizationFieldName,
+            $this->organizationColumnName
             ) = unserialize($serialized);
     }
 
@@ -176,6 +215,8 @@ class OwnershipMetadata implements \Serializable
         $result->ownerType       = $data['ownerType'];
         $result->ownerFieldName  = $data['ownerFieldName'];
         $result->ownerColumnName = $data['ownerColumnName'];
+        $result->organizationColumnName = $data['organizationColumnName'];
+        $result->organizationFieldName = $data['organizationFieldName'];
 
         return $result;
     }

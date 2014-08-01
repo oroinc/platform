@@ -90,9 +90,9 @@ class AclHelper
     /**
      * Check subrequests for acl access level
      *
-     * @param SelectStatement $ast
+     * @param SelectStatement     $ast
      * @param AclConditionStorage $storage
-     * @param $permission
+     * @param                     $permission
      */
     protected function processSubselects(SelectStatement $ast, AclConditionStorage $storage, $permission)
     {
@@ -141,7 +141,7 @@ class AclHelper
      * Check Access levels for subrequest
      *
      * @param Subselect $subSelect
-     * @param $permission
+     * @param           $permission
      * @return SubRequestAclConditionStorage
      */
     protected function processSubselect(Subselect $subSelect, $permission)
@@ -155,7 +155,7 @@ class AclHelper
      * Check request
      *
      * @param Subselect|SelectStatement $select
-     * @param string $permission
+     * @param string                    $permission
      * @return array
      */
     protected function processSelect($select, $permission)
@@ -212,8 +212,8 @@ class AclHelper
      * Process Joins without "on" statement
      *
      * @param IdentificationVariableDeclaration $declaration
-     * @param $key
-     * @param $permission
+     * @param                                   $key
+     * @param                                   $permission
      * @return JoinAssociationCondition
      */
     protected function processJoinAssociationPathExpression(
@@ -241,9 +241,9 @@ class AclHelper
         $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
 
         if ($resultData && is_array($resultData)) {
-            $entityField = $value = $pathExpressionType = null;
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
             }
 
             $joinConditionsColumns = isset($associationMapping['joinColumns'])
@@ -266,6 +266,8 @@ class AclHelper
                 $entityField,
                 $value,
                 $pathExpressionType,
+                $organizationField,
+                $organizationValue,
                 $targetEntity,
                 $joinConditions
             );
@@ -276,8 +278,8 @@ class AclHelper
      * Process where statement
      *
      * @param RangeVariableDeclaration $rangeVariableDeclaration
-     * @param $permission
-     * @param bool $isJoin
+     * @param                          $permission
+     * @param bool                     $isJoin
      * @return null|AclCondition|JoinAclCondition
      */
     protected function processRangeVariableDeclaration(
@@ -292,20 +294,37 @@ class AclHelper
         $resultData = $this->builder->getAclConditionData($entityName, $permission);
 
         if ($resultData === null || !empty($resultData)) {
-            $entityField = $value = $pathExpressionType = null;
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue= null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
             }
             if ($isJoin) {
-                return new JoinAclCondition($entityAlias, $entityField, $value, $pathExpressionType);
+                return new JoinAclCondition(
+                    $entityAlias,
+                    $entityField,
+                    $value,
+                    $pathExpressionType,
+                    $organizationField,
+                    $organizationValue
+                );
             } else {
-                return new AclCondition($entityAlias, $entityField, $value, $pathExpressionType);
+                return new AclCondition(
+                    $entityAlias,
+                    $entityField,
+                    $value,
+                    $pathExpressionType,
+                    $organizationField,
+                    $organizationValue
+                );
             }
         }
 
         return null;
     }
 
+    /**
+     * @param RangeVariableDeclaration $rangeDeclaration
+     */
     protected function addEntityAlias(RangeVariableDeclaration $rangeDeclaration)
     {
         $alias = $rangeDeclaration->aliasIdentificationVariable;

@@ -116,7 +116,7 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return Organization
      * @throws BadCredentialsException
      */

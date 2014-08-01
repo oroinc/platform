@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -67,10 +68,10 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * Constructor
      *
-     * @param ObjectIdAccessor $objectIdAccessor
-     * @param EntityClassResolver $entityClassResolver
-     * @param EntitySecurityMetadataProvider $entityMetadataProvider
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param ObjectIdAccessor                $objectIdAccessor
+     * @param EntityClassResolver             $entityClassResolver
+     * @param EntitySecurityMetadataProvider  $entityMetadataProvider
+     * @param OwnershipMetadataProvider       $metadataProvider
      * @param OwnershipDecisionMakerInterface $decisionMaker
      */
     public function __construct(
@@ -447,24 +448,48 @@ class EntityAclExtension extends AbstractAclExtension
             return true;
         }
 
+        $organization = null;
+        if ($securityToken instanceof UsernamePasswordOrganizationToken) {
+            $organization = $securityToken->getOrganizationContext();
+        }
+
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithUser($securityToken->getUser(), $object);
+            $result = $this->decisionMaker->isAssociatedWithUser(
+                $securityToken->getUser(),
+                $object,
+                $organization
+            );
         } else {
             if ($metadata->isUserOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithUser($securityToken->getUser(), $object);
+                $result = $this->decisionMaker->isAssociatedWithUser(
+                    $securityToken->getUser(),
+                    $object,
+                    $organization
+                );
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit($securityToken->getUser(), $object);
-                } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
                         $securityToken->getUser(),
                         $object,
-                        true
+                        false,
+                        $organization
+                    );
+                } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
+                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                        $securityToken->getOrganizationContext(),
+                        $securityToken->getUser(),
+                        $object,
+                        true,
+                        $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithOrganization($securityToken->getUser(), $object);
+                    $result = $this->decisionMaker->isAssociatedWithOrganization(
+                        $securityToken->getUser(),
+                        $object,
+                        $organization
+                    );
                 }
             }
         }
@@ -523,8 +548,8 @@ class EntityAclExtension extends AbstractAclExtension
      * Checks that the given mask represents only one access level
      *
      * @param string $permission
-     * @param int $mask
-     * @param mixed $object
+     * @param int    $mask
+     * @param mixed  $object
      * @throws InvalidAclMaskException
      */
     protected function validateMaskAccessLevel($permission, $mask, $object)
@@ -552,7 +577,7 @@ class EntityAclExtension extends AbstractAclExtension
      * Gets all valid bitmasks for the given object
      *
      * @param string $permission
-     * @param mixed $object
+     * @param mixed  $object
      * @return int
      */
     protected function getValidMasks($permission, $object)
@@ -634,7 +659,7 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * Gets the constant value defined in the given permission mask builder
      *
-     * @param int $maskBuilderIdentity The permission mask builder identity
+     * @param int    $maskBuilderIdentity The permission mask builder identity
      * @param string $constName
      * @return int
      */

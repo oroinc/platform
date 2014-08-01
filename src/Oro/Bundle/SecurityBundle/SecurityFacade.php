@@ -7,7 +7,9 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SecurityFacade
 {
@@ -192,5 +194,18 @@ class SecurityFacade
     public function hasLoggedUser()
     {
         return ($this->getLoggedUser() !== null);
+    }
+
+    /**
+     * @return bool|Organization
+     */
+    public function getOrganization()
+    {
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            return $token->getOrganizationContext();
+        }
+
+        return false;
     }
 }
