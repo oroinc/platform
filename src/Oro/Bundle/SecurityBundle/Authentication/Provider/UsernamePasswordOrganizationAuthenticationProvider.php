@@ -18,13 +18,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
     protected $providerKey;
 
     /**
-     * Constructor.
-     *
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
-     * @param string                  $providerKey                The provider key
-     * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
-     * @param Boolean                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
+     * {@inheritdoc}
      */
     public function __construct(
         UserProviderInterface $userProvider,
@@ -43,6 +37,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      */
     public function authenticate(TokenInterface $token)
     {
+        /**  @var UsernamePasswordOrganizationToken $token */
         $usernamePasswordToken = parent::authenticate($token);
 
         $this->checkUserOrganization($usernamePasswordToken->getUser(), $token->getOrganizationContext());
@@ -51,8 +46,8 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
             $usernamePasswordToken->getUser(),
             $usernamePasswordToken->getCredentials(),
             $usernamePasswordToken->getProviderKey(),
-            $usernamePasswordToken->getRoles(),
-            $token->getOrganizationContext()
+            $token->getOrganizationContext(),
+            $usernamePasswordToken->getRoles()
         );
 
         return $authenticatedToken;

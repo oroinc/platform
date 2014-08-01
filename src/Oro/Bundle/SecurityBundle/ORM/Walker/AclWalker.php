@@ -44,11 +44,13 @@ class AclWalker extends TreeWalkerAdapter
             $aclCondition = $query->getHint(self::ORO_ACL_CONDITION);
 
             if (!$aclCondition->isEmpty()) {
-                if (!is_null($aclCondition->getWhereConditions()) && count($aclCondition->getWhereConditions())) {
-                    $this->addAclToWhereClause($AST, $aclCondition->getWhereConditions());
+                $whereConditions = $aclCondition->getWhereConditions();
+                if (!is_null($whereConditions) && count($whereConditions)) {
+                    $this->addAclToWhereClause($AST, $whereConditions);
                 }
-                if (!is_null($aclCondition->getJoinConditions()) && count($aclCondition->getJoinConditions())) {
-                    $this->addAclToJoinClause($AST, $aclCondition->getJoinConditions());
+                $joinConditions = $aclCondition->getJoinConditions();
+                if (!is_null($joinConditions) && count($joinConditions)) {
+                    $this->addAclToJoinClause($AST, $joinConditions);
                 }
 
                 $this->processSubRequests($AST, $aclCondition);
@@ -61,7 +63,7 @@ class AclWalker extends TreeWalkerAdapter
     /**
      * process subselects of query
      *
-     * @param SelectStatement $AST
+     * @param SelectStatement     $AST
      * @param AclConditionStorage $aclCondition
      */
     protected function processSubRequests(SelectStatement $AST, AclConditionStorage $aclCondition)
@@ -85,11 +87,13 @@ class AclWalker extends TreeWalkerAdapter
                         ->subselect;
                 }
 
-                if (!is_null($subRequest->getWhereConditions()) && count($subRequest->getWhereConditions())) {
-                    $this->addAclToWhereClause($subselect, $subRequest->getWhereConditions());
+                $whereConditions = $subRequest->getWhereConditions();
+                if (!is_null($whereConditions) && count($whereConditions)) {
+                    $this->addAclToWhereClause($subselect, $whereConditions);
                 }
-                if (!is_null($subRequest->getJoinConditions()) && count($subRequest->getJoinConditions())) {
-                    $this->addAclToJoinClause($subselect, $subRequest->getJoinConditions());
+                $joinConditions = $subRequest->getJoinConditions();
+                if (!is_null($joinConditions) && count($joinConditions)) {
+                    $this->addAclToJoinClause($subselect, $joinConditions);
                 }
             }
         }
@@ -99,7 +103,7 @@ class AclWalker extends TreeWalkerAdapter
      * work with join statements of query
      *
      * @param SelectStatement $AST
-     * @param array $joinConditions
+     * @param array           $joinConditions
      */
     protected function addAclToJoinClause($AST, array $joinConditions)
     {
@@ -117,6 +121,10 @@ class AclWalker extends TreeWalkerAdapter
                 /** @var JoinAclCondition $condition */
                 $conditionalFactor = $this->getConditionalFactor($condition);
                 $aclConditionalFactors = array($conditionalFactor);
+                $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
+                if ($organizationConditionFactor) {
+                    $aclConditionalFactors[] = $organizationConditionFactor;
+                }
                 if ($join->conditionalExpression instanceof ConditionalPrimary) {
                     array_unshift($aclConditionalFactors, $join->conditionalExpression);
                     $join->conditionalExpression = new ConditionalTerm(
@@ -137,9 +145,9 @@ class AclWalker extends TreeWalkerAdapter
     }
 
     /**
-     * Generate Join condition for join wothout "on" statement
+     * Generate Join condition for join without "on" statement
      *
-     * @param Join $join
+     * @param Join                     $join
      * @param JoinAssociationCondition $condition
      * @return Join
      */
@@ -172,6 +180,10 @@ class AclWalker extends TreeWalkerAdapter
             $conditionalFactors[] = $factor;
         }
         $conditionalFactors[] = $this->getConditionalFactor($condition);
+        $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
+        if ($organizationConditionFactor) {
+            $aclConditionalFactors[] = $organizationConditionFactor;
+        }
         $associationDeclaration = new RangeVariableDeclaration(
             $condition->getEntityClass(),
             $condition->getEntityAlias()
@@ -180,14 +192,14 @@ class AclWalker extends TreeWalkerAdapter
         $newJoin = new Join($join->joinType, $associationDeclaration);
         $newJoin->conditionalExpression = new ConditionalTerm($conditionalFactors);
 
-         return $newJoin;
+        return $newJoin;
     }
 
     /**
      * work with "where" statement of query
      *
      * @param SelectStatement $AST
-     * @param array $whereConditions
+     * @param array           $whereConditions
      */
     protected function addAclToWhereClause($AST, array $whereConditions)
     {
@@ -195,6 +207,10 @@ class AclWalker extends TreeWalkerAdapter
 
         foreach ($whereConditions as $whereCondition) {
             $aclConditionalFactors[] = $this->getConditionalFactor($whereCondition);
+            $organizationConditionFactor = $this->getOrganizationCheckCondition($whereCondition);
+            if ($organizationConditionFactor) {
+                $aclConditionalFactors[] = $organizationConditionFactor;
+            }
         }
 
         if (!empty($aclConditionalFactors)) {
@@ -260,6 +276,40 @@ class AclWalker extends TreeWalkerAdapter
 
         return new ComparisonExpression($leftExpression, '=', $rightExpression);
     }
+
+    /**
+     * Generates "organization_id=value" condition
+     *
+     * @param AclCondition $whereCondition
+     * @return ConditionalPrimary|bool
+     */
+    protected function getOrganizationCheckCondition(AclCondition $whereCondition)
+    {
+        if ($whereCondition->getOrganizationField() && $whereCondition->getOrganizationValue() !== null) {
+            $pathExpression = new PathExpression(
+                self::EXPECTED_TYPE,
+                $whereCondition->getEntityAlias(),
+                $whereCondition->getOrganizationField()
+            );
+
+            $pathExpression->type = $whereCondition->getPathExpressionType();
+
+            $leftExpression = new ArithmeticExpression();
+            $leftExpression->simpleArithmeticExpression = $pathExpression;
+            $rightExpression = new ArithmeticExpression();
+            $rightExpression->simpleArithmeticExpression =
+                new Literal(Literal::NUMERIC, (int) $whereCondition->getOrganizationValue());
+
+            $resultCondition = new ConditionalPrimary();
+            $resultCondition->simpleConditionalExpression =
+                new ComparisonExpression($leftExpression, '=', $rightExpression);
+
+            return $resultCondition;
+        }
+
+        return false;
+    }
+
 
     /**
      * generate "in()" expression

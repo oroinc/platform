@@ -4,23 +4,31 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 class UsernamePasswordOrganizationToken extends UsernamePasswordToken
 {
+    /**
+     * @var Organization
+     */
     protected $organizationContext;
 
     /**
-     * @param string $user
-     * @param string $credentials
-     * @param string $providerKey
-     * @param array  $roles
-     * @param        $organizationContext
+     * @param string       $user
+     * @param string       $credentials
+     * @param string       $providerKey
+     * @param array        $roles
+     * @param Organization $organizationContext
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = array(), $organizationContext)
+    public function __construct($user, $credentials, $providerKey, Organization $organizationContext, array $roles = [])
     {
         $this->organizationContext = $organizationContext;
         parent::__construct($user, $credentials, $providerKey, $roles);
     }
 
+    /**
+     * @return Organization
+     */
     public function getOrganizationContext()
     {
         return $this->organizationContext;

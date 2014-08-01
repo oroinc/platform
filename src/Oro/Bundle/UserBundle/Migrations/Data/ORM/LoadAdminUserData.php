@@ -64,6 +64,11 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->getRepository('OroOrganizationBundle:BusinessUnit')
             ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
 
+        $organization = $manager
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->findBy([], ['id' => 'DESC'], 1);
+        $organization = array_pop($organization);
+
         $adminUser = $this->userManager->createUser();
 
         $adminUser
@@ -73,7 +78,9 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->setOwner($businessUnit)
             ->setPlainPassword(md5(uniqid(mt_rand(), true)))
             ->addRole($adminRole)
-            ->addBusinessUnit($businessUnit);
+            ->addBusinessUnit($businessUnit)
+            ->setOrganization($organization)
+            ->addOrganization($organization);
 
         $this->userManager->updateUser($adminUser);
     }

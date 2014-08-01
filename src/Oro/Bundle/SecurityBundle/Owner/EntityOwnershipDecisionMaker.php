@@ -11,6 +11,9 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * This class implements OwnershipDecisionMakerInterface interface and allows to make ownership related
  * decisions using the tree of owners.
@@ -88,30 +91,32 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function isAssociatedWithOrganization($user, $domainObject)
+    public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
-        if ($this->isOrganization($domainObject)) {
-            $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
-            if (empty($userOrganizationIds)) {
-                return false;
-            }
+        $organizationId = $this->getOrganizationId();
 
-            return in_array($this->getObjectId($domainObject), $userOrganizationIds);
+        $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
+        if (empty($userOrganizationIds) || ($organizationId && !in_array($organizationId, $userOrganizationIds))) {
+            return false;
+        }
+
+        $allowedOrganizationIds = $organizationId ? [$organizationId] : $userOrganizationIds;
+
+        if ($this->isOrganization($domainObject)) {
+            return in_array(
+                $this->getObjectId($domainObject),
+                $allowedOrganizationIds
+            );
         }
 
         if ($this->isBusinessUnit($domainObject)) {
-            $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
-            if (empty($userOrganizationIds)) {
-                return false;
-            }
-
             return in_array(
                 $tree->getBusinessUnitOrganizationId($this->getObjectId($domainObject)),
-                $userOrganizationIds
+                $allowedOrganizationIds
             );
         }
 
@@ -131,18 +136,13 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
             return false;
         }
 
-        $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
-        if (empty($userOrganizationIds)) {
-            return false;
-        }
-
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isOrganizationOwned()) {
             return in_array($ownerId, $userOrganizationIds);
         } elseif ($metadata->isBusinessUnitOwned()) {
-            return in_array($tree->getBusinessUnitOrganizationId($ownerId), $userOrganizationIds);
+            return in_array($tree->getBusinessUnitOrganizationId($ownerId), $allowedOrganizationIds);
         } elseif ($metadata->isUserOwned()) {
-            return in_array($tree->getUserOrganizationId($ownerId), $userOrganizationIds);
+            return in_array($tree->getUserOrganizationId($ownerId), $allowedOrganizationIds);
         }
 
         return false;
@@ -151,14 +151,21 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * {@inheritdoc}
      */
-    public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false)
+    public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
         $tree = $this->treeProvider->getTree();
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
+        $organizationId = $this->getObjectId($organization);
+
         if ($this->isBusinessUnit($domainObject)) {
-            return $this->isUserBusinessUnit($this->getObjectId($user), $this->getObjectId($domainObject), $deep);
+            return $this->isUserBusinessUnit(
+                $this->getObjectId($user),
+                $organizationId,
+                $this->getObjectId($domainObject),
+                $deep
+            );
         }
 
         if ($this->isUser($domainObject)) {
@@ -175,7 +182,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isBusinessUnitOwned()) {
-            return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep);
+            return $this->isUserBusinessUnit($this->getObjectId($user), $organizationId, $ownerId, $deep);
         } elseif ($metadata->isUserOwned()) {
             $businessUnitId = $tree->getUserBusinessUnitId($ownerId);
             if ($businessUnitId === null) {
@@ -184,6 +191,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
             return $this->isUserBusinessUnit(
                 $this->getObjectId($user),
+                $organizationId,
                 $tree->getUserBusinessUnitId($ownerId),
                 $deep
             );
@@ -195,8 +203,18 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * {@inheritdoc}
      */
-    public function isAssociatedWithUser($user, $domainObject)
+    public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
+        /**
+         * @var $user User
+         */
+        /**
+         * @var $organization Organization
+         */
+        if ($organization && !$user->getOrganizations()->contains($organization)) {
+            return false;
+        }
+
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
@@ -220,15 +238,16 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * @param  int|string      $userId
      * @param  int|string|null $businessUnitId
      * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  int|null        $organizationId
      * @return bool
      */
-    protected function isUserBusinessUnit($userId, $businessUnitId, $deep = false)
+    protected function isUserBusinessUnit($userId, $businessUnitId, $deep = false, $organizationId = null)
     {
         if ($businessUnitId === null) {
             return false;
         }
 
-        foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId) as $buId) {
+        foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
             if ($businessUnitId === $buId) {
                 return true;
             }
@@ -245,7 +264,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * Check that the given object is a user
      *
-     * @param  object                       $user
+     * @param  object $user
      * @throws InvalidDomainObjectException
      */
     protected function validateUserObject($user)
@@ -263,7 +282,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * Check that the given object is a domain object
      *
-     * @param  object                       $domainObject
+     * @param  object $domainObject
      * @throws InvalidDomainObjectException
      */
     protected function validateObject($domainObject)
@@ -276,7 +295,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * Gets id for the given domain object
      *
-     * @param  object                       $domainObject
+     * @param  object $domainObject
      * @return int|string
      * @throws InvalidDomainObjectException
      */
@@ -289,7 +308,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      * Gets id for the given domain object.
      * Returns null when the given domain object is null
      *
-     * @param  object|null                  $domainObject
+     * @param  object|null $domainObject
      * @return int|string|null
      * @throws InvalidDomainObjectException
      */
@@ -320,7 +339,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * Gets metadata for the given domain object
      *
-     * @param  object            $domainObject
+     * @param  object $domainObject
      * @return OwnershipMetadata
      */
     protected function getObjectMetadata($domainObject)
@@ -331,7 +350,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
     /**
      * Gets owner of the given domain object
      *
-     * @param  object                       $domainObject
+     * @param  object $domainObject
      * @return object
      * @throws InvalidDomainObjectException
      */
@@ -342,5 +361,18 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         } catch (InvalidEntityException $ex) {
             throw new InvalidDomainObjectException($ex->getMessage(), 0, $ex);
         }
+    }
+
+    /**
+     * @param null $organization
+     * @return int|null|string
+     */
+    protected function getOrganizationId($organization = null)
+    {
+        if ($organization) {
+            return $this->getObjectId($organization);
+        }
+
+        return null;
     }
 }

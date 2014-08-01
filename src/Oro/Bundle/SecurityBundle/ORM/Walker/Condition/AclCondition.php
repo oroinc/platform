@@ -27,21 +27,37 @@ class AclCondition
     protected $pathExpressionType;
 
     /**
+     * @var string
+     */
+    protected $organizationField;
+
+    /**
+     * @var int
+     */
+    protected $organizationValue;
+
+    /**
      * @param string $entityAlias
      * @param string $entityField
      * @param mixed  $value
      * @param int    $pathExpressionType
+     * @param string $organizationField
+     * @param int    $organizationValue
      */
     public function __construct(
         $entityAlias,
         $entityField = null,
         $value = null,
-        $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+        $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+        $organizationField = null,
+        $organizationValue = null
     ) {
         $this->entityAlias        = $entityAlias;
         $this->entityField        = $entityField;
         $this->value              = $value;
         $this->pathExpressionType = $pathExpressionType;
+        $this->organizationField  = $organizationField;
+        $this->organizationValue  = $organizationValue;
     }
 
     /**
@@ -106,5 +122,21 @@ class AclCondition
     public function getPathExpressionType()
     {
         return $this->pathExpressionType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrganizationField()
+    {
+        return $this->organizationField;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrganizationValue()
+    {
+        return $this->organizationValue;
     }
 }
