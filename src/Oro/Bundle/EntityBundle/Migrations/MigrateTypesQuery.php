@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Migrations;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\TableDiff;
@@ -11,11 +12,9 @@ use Doctrine\DBAL\Types\Type;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
-class MigrateTypesQuery extends ParametrizedMigrationQuery implements DatabasePlatformAwareInterface
+class MigrateTypesQuery extends ParametrizedMigrationQuery
 {
     /**
      * @var Schema
@@ -45,24 +44,19 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery implements DatabasePl
     /**
      * @var ForeignKeyConstraint[]
      */
-    protected $foreignKeys;
+    protected $foreignKeys = [];
+
 
     /**
-     * {@inheritdoc}
+     * @var AbstractPlatform $platform
+     * @var Schema           $schema
+     * @var string           $tableName
+     * @var string           $columnName
+     * @var string           $type
      */
-    public function setDatabasePlatform(AbstractPlatform $platform)
+    public function __construct(AbstractPlatform $platform, Schema $schema, $tableName, $columnName, $type)
     {
-        $this->platform = $platform;
-    }
-
-    /**
-     * @var Schema $schema
-     * @var string $tableName
-     * @var string $columnName
-     * @var string $type
-     */
-    public function __construct(Schema $schema, $tableName, $columnName, $type)
-    {
+        $this->platform   = $platform;
         $this->schema     = $schema;
         $this->tableName  = $tableName;
         $this->columnName = $columnName;
@@ -94,6 +88,10 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery implements DatabasePl
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
+        if (empty($this->platform)) {
+            throw new \InvalidArgumentException('Platform required');
+        }
+
         if (empty($this->tableName) || empty($this->columnName) || empty($this->schema)) {
             throw new \InvalidArgumentException('Schema, table and column are required');
         }
@@ -108,22 +106,23 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery implements DatabasePl
         foreach ($relatedColumnsData as $relatedColumnData) {
             $relatedTableName = $relatedColumnData['tableName'];
             $foreignKeyName   = $relatedColumnData['constraintName'];
+            $columnName       = $relatedColumnData['columnName'];
             $relatedTable     = $this->schema->getTable($relatedTableName);
-            $column           = $this->getColumn($relatedTableName, $relatedColumnData['columnName'], $this->type);
+            $column           = $this->getColumn($relatedTableName, $columnName, $this->type);
             $foreignKey       = $relatedTable->getForeignKey($foreignKeyName);
 
             $this->foreignKeys[$relatedTableName] = $foreignKey;
 
             $diff                       = new TableDiff($relatedTableName);
+            $diff->changedColumns[]     = new ColumnDiff($columnName, $column);
             $diff->removedForeignKeys[] = $foreignKey;
-            $diff->changedColumns[]     = $column;
             $this->executeQueryFromDiff($diff, $logger, $dryRun);
         }
 
         $column = $this->getColumn($this->tableName, $this->columnName, $this->type);
 
         $diff                   = new TableDiff($this->tableName);
-        $diff->changedColumns[] = $column;
+        $diff->changedColumns[] = new ColumnDiff($this->columnName, $column);
         $this->executeQueryFromDiff($diff, $logger, $dryRun);
 
         foreach ($this->foreignKeys as $relatedTableName => $foreignKey) {
@@ -160,7 +159,7 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery implements DatabasePl
      */
     protected function executeQueryFromDiff($diff, $logger, $dryRun)
     {
-        $query = new SqlMigrationQuery($this->platform->getAlterTableSQL($diff));
+        $query = implode(';', $this->platform->getAlterTableSQL($diff));
         $this->logQuery($logger, $query);
         if (!$dryRun) {
             $this->connection->executeUpdate($query);
