@@ -528,7 +528,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     protected function getOrganizationContextId()
     {
@@ -536,6 +536,8 @@ class OwnerFormExtension extends AbstractTypeExtension
         if ($token instanceof UsernamePasswordOrganizationToken) {
             return $token->getOrganizationContext()->getId();
         }
+
+        return null;
     }
 
     /**
