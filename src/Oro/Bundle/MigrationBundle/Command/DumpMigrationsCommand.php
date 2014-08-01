@@ -5,7 +5,6 @@ namespace Oro\Bundle\MigrationBundle\Command;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,7 +16,7 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     /**
      * @var array
      */
-    protected $tables = array();
+    protected $tables = [];
 
     /**
      * @var string
@@ -69,7 +68,7 @@ class DumpMigrationsCommand extends ContainerAwareCommand
         if ($input->getOption('plain-sql')) {
             /** @var Connection $connection */
             $connection = $this->getContainer()->get('doctrine')->getConnection();
-            $sqls = $schema->toSql($connection->getDatabasePlatform());
+            $sqls       = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
             }
@@ -106,35 +105,27 @@ class DumpMigrationsCommand extends ContainerAwareCommand
             $entityManager = $doctrine->getManager();
             /** @var ClassMetadata[] $allMetadata */
             $allMetadata = $entityManager->getMetadataFactory()->getAllMetadata();
-            $classes = array_filter(
+            array_walk(
                 $allMetadata,
                 function (ClassMetadata $entityMetadata) {
                     if ($entityMetadata->namespace == $this->namespace) {
                         $this->tables[$entityMetadata->getTableName()] = true;
                         foreach ($entityMetadata->getAssociationMappings() as $associationMappingInfo) {
                             if (isset($associationMappingInfo['joinTable'])) {
-                                $joinTableName = $associationMappingInfo['joinTable']['name'];
+                                $joinTableName                = $associationMappingInfo['joinTable']['name'];
                                 $this->tables[$joinTableName] = true;
                             }
                         }
-                        return true;
                     }
-                    return false;
                 }
             );
-
-            $schemaTool = new SchemaTool($entityManager);
-            $schema = $schemaTool->getSchemaFromMetadata($classes);
-        } else {
-            $connection = $doctrine->getConnection();
-            $schema = $connection->getSchemaManager()->createSchema();
         }
 
-        return $schema;
+        return $doctrine->getConnection()->getSchemaManager()->createSchema();
     }
 
     /**
-     * @param Schema $schema
+     * @param Schema          $schema
      * @param OutputInterface $output
      */
     protected function dumpPhpSchema(Schema $schema, OutputInterface $output)
