@@ -7,7 +7,7 @@ define([
 ], function (_, Backbone, Chaplin) {
     'use strict';
 
-    _.extend(Chaplin.mediator, Backbone.Events);
+    Backbone.mediator = _.extend(Chaplin.mediator, Backbone.Events);
 
     /**
      * @export oroui/js/mediator
