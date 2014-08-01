@@ -100,13 +100,25 @@ class {{ className }} implements Installation
 {% if options.unsigned is defined %}{% set items = items|merge(["'unsigned' => " ~ _self.dumpBoolean(options.unsigned)]) %}{% endif -%}
 {% if options.autoincrement is defined %}{% set items = items|merge(["'autoincrement' => " ~ _self.dumpBoolean(options.autoincrement)]) %}{% endif -%}
 {% if options.comment is defined %}{% set items = items|merge(["'comment' => " ~ _self.dumpString(options.comment)]) %}{% endif -%}
-[{% for item in items %}{% if not loop.first %}, {% endif %}{{ item|raw }}{% endfor %}]
+[{{ items|join(', ')|raw }}]
 {% endspaceless %}
 {% endmacro %}
 
 {% macro dumpOptionsArray(arrayValues) %}
 {% spaceless %}
-[{% for valueName, value in arrayValues %}{% if value is null %}'{{ valueName }}' => null, {% elseif value is same as(true) %}'{{ valueName }}' => true, {% elseif value is same as(false) %}'{{ valueName }}' => false, {% else  %}'{{ valueName }}' => '{{value  }}', {% endif %}{% endfor %}]
+{% set items = [] %}
+{% for valueName, value in arrayValues %}
+    {% if value is null %}
+        {% set items = items|merge(["'" ~ valueName ~ "' => null"]) %}
+    {% elseif value is same as(true) %}
+        {% set items = items|merge(["'" ~ valueName ~ "' => true"]) %}
+    {% elseif value is same as(false) %}
+        {% set items = items|merge(["'" ~ valueName ~ "' => false"]) %}
+    {% else  %}
+        {% set items = items|merge(["'" ~ valueName ~ "' => '" ~ value ~ "'"]) %}
+    {% endif %}
+{% endfor %}
+[{{ items|join(', ')|raw }}]
 {% endspaceless %}
 {% endmacro %}
 
