@@ -2,41 +2,46 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
-
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 class Orm extends AbstractEngine
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
-     * @var \Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+     * @var SearchIndexRepository
      */
     protected $searchRepo;
 
     /**
-     * @var \JMS\JobQueueBundle\Entity\Repository\JobRepository
+     * @var JobRepository
      */
     protected $jobRepo;
 
     /**
-     * @var \Oro\Bundle\SearchBundle\Engine\ObjectMapper
+     * @var ObjectMapper
      */
     protected $mapper;
+
+    /**
+     * @var integer
+     */
+    protected $batchSize = 1000;
 
     public function __construct(
         EntityManager $em,
@@ -48,7 +53,7 @@ class Orm extends AbstractEngine
         parent::__construct($em, $dispatcher, $logQueries);
 
         $this->container = $container;
-        $this->mapper = $mapper;
+        $this->mapper    = $mapper;
     }
 
     /**
@@ -62,20 +67,72 @@ class Orm extends AbstractEngine
         $this->clearSearchIndex();
 
         //index data by mapping config
-        $recordsCount = 0;
-        $entities = $this->mapper->getEntities();
-        foreach ($entities as $entityName) {
-            $entityData = $this->em->getRepository($entityName)->findAll();
-            foreach ($entityData as $entity) {
-                if ($this->save($entity, true) !== null) {
-                    $recordsCount++;
-                }
-            }
+        $countInTotal = 0;
+        $entities     = $this->mapper->getEntities();
+
+        while ($entityName = array_shift($entities)) {
+            print(sprintf('  > Reindexation of entity "%s" has been started' . PHP_EOL, $entityName));
+
+            $itemsCount    = $this->reindexSingleEntity($entityName);
+            $countInTotal += $itemsCount;
+
+            print(sprintf('  > For "%s" entity reindexed %u items' . PHP_EOL, $entityName, $itemsCount));
         }
 
-        $this->em->flush();
+        return $countInTotal;
+    }
 
-        return $recordsCount;
+    protected function reindexSingleEntity($entityName)
+    {
+        $countTotal   = 0;
+        $queryBuilder = $this->em->getRepository($entityName)->createQueryBuilder('entity');
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize($this->batchSize);
+
+        $this->em->clear();
+        $this->em->beginTransaction();
+        $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        try {
+            $needsExtraFlush  = true;
+            $allEntitiesCount = $iterator->count();
+
+            foreach ($iterator as $entity) {
+                if (null !== $this->save($entity, true) && 0 === ++$countTotal % $this->batchSize) {
+                    $needsExtraFlush = false;
+                    $this->doFlush($countTotal, $allEntitiesCount);
+                } else {
+                    $needsExtraFlush = true;
+                }
+
+                $this->em->detach($entity);
+            }
+
+            if ($needsExtraFlush && $allEntitiesCount > 0) {
+                $this->doFlush($countTotal, $allEntitiesCount);
+            }
+
+            print('  + Commit changes to database' . PHP_EOL);
+            $this->em->commit();
+        } catch (\Exception $exception) {
+            $this->em->rollback();
+
+            throw $exception;
+        }
+
+        return $countTotal;
+    }
+
+    protected function doFlush($countTotal, $allEntitiesCount)
+    {
+        $this->em->flush();
+        print(sprintf('  | %g%%' . PHP_EOL, $countTotal / $allEntitiesCount * 100));
+    }
+
+    public function setBatchSize($batchSize)
+    {
+        $this->batchSize = $batchSize;
     }
 
     /**
