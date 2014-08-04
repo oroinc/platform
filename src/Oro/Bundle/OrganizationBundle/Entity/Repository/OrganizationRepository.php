@@ -21,6 +21,12 @@ class OrganizationRepository extends EntityRepository
             ->getSingleResult();
     }
 
+    /**
+     * Get organization by id
+     *
+     * @param $id
+     * @return Organization
+     */
     public function getOrganizationById($id)
     {
         return $this->getEntityManager()
