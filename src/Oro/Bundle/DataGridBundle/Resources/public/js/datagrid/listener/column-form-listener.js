@@ -249,15 +249,27 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
      * Builder interface implementation
      *
      * @param {jQuery.Deferred} deferred
-     * @param {jQuery} $gridContainer
-     * @param {String} gridName
+     * @param {Object} options
+     * @param {jQuery} [options.$el] container for the grid
+     * @param {string} [options.gridName] grid name
+     * @param {Object} [options.gridPromise] grid builder's promise
+     * @param {Object} [options.data] data for grid's collection
+     * @param {Object} [options.metadata] configuration for the grid
      */
-    ColumnFormListener.init = function (deferred, $gridContainer, gridName) {
-        var metadata = $gridContainer.data('metadata');
-        var options = metadata.options || {};
-        if (options.columnListener) {
-            new ColumnFormListener(_.extend({ $gridContainer: $gridContainer, gridName: gridName }, options.columnListener));
-            deferred.resolve();
+    ColumnFormListener.init = function (deferred, options) {
+        var listener, gridOptions, listenerOptions;
+        gridOptions = options.metadata.options || {};
+
+        if (gridOptions.columnListener) {
+            listenerOptions = _.extend({
+                $gridContainer: options.$el,
+                gridName: options.gridName
+            }, gridOptions.columnListener);
+
+            listener = new ColumnFormListener(listenerOptions);
+            deferred.resolve(listener);
+        } else {
+            deferred.reject();
         }
     };
 
