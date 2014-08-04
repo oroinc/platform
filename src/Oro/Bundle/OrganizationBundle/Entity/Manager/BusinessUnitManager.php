@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 class BusinessUnitManager
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 

@@ -80,6 +80,14 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
      */
     protected function attemptAuthentication(Request $request)
     {
+        $organization = $this->getOrganization(
+            $request->get(
+                $this->options['organization_parameter'],
+                null,
+                true
+            )
+        );
+
         if (null !== $this->csrfProvider) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
 
@@ -103,13 +111,7 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
                 $username,
                 $password,
                 $this->providerKey,
-                $this->getOrganization(
-                    $request->get(
-                        $this->options['organization_parameter'],
-                        null,
-                        true
-                    )
-                ),
+                $organization,
                 array()
             )
         );

@@ -5,11 +5,13 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class RecordOwnerDataListener
 {
@@ -91,6 +93,10 @@ class RecordOwnerDataListener
                             $entity->setOwner($user);
                     }
                 }
+            }
+            if ($token instanceof UsernamePasswordOrganizationToken && $config->has('organization_field_name')) {
+                $accessor = PropertyAccess::createPropertyAccessor();
+                $accessor->setValue($entity, $config->get('organization_field_name'), $token->getOrganizationContext());
             }
         }
     }

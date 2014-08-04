@@ -32,7 +32,7 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements NotificationEmailInterface
+class Organization extends ExtendOrganization implements NotificationEmailInterface, \Serializable
 {
     /**
      * @var integer
@@ -307,5 +307,37 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Serializes the user.
+     * The serialized data have to contain the fields used by the equals method and the username.
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        $result = serialize(
+            array(
+                $this->name,
+                $this->enabled,
+                $this->id,
+            )
+        );
+        return $result;
+    }
+
+    /**
+     * Unserializes the user
+     *
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->name,
+            $this->enabled,
+            $this->id,
+            ) = unserialize($serialized);
     }
 }

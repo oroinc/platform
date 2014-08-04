@@ -21,6 +21,14 @@ class OrganizationRepository extends EntityRepository
             ->getSingleResult();
     }
 
+    public function getOrganizationById($id)
+    {
+        return $this->getEntityManager()
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.id = :id')
+            ->setParameter('id', $id)
+            ->getSingleResult();
+    }
+
     /**
      * Update all records in given table with organization id
      *

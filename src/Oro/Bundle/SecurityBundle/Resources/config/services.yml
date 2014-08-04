@@ -52,6 +52,9 @@ parameters:
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
+    oro_security.authentication.listener.form:                 Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+    oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+    oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
 
 services:
     oro_security.security_facade:
@@ -374,14 +377,14 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
 
     oro_security.authentication.listener.form:
-        class: Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+        class: %oro_security.authentication.listener.form%
         parent: security.authentication.listener.abstract
         abstract: true
         calls:
             - [setEntityManager, [@doctrine.orm.entity_manager]]
 
     oro_security.authentication.provider.username_password_organization:
-        class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+        class: %oro_security.authentication.provider.username_password_organization.class%
         arguments:
             - null
             - @security.user_checker
@@ -390,3 +393,11 @@ services:
             - %security.authentication.hide_user_not_found%
         abstract: true
         public: false
+
+    oro_security.listener.context_listener:
+        class: %oro_security.listener.context_listener.class%
+        arguments:
+            - @security.context
+            - @oro_organization.organization_manager
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

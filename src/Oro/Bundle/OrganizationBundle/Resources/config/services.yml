@@ -1,6 +1,7 @@
 parameters:
     oro_organization.business_unit.entity.class:               Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
     oro_organization.business_unit.manager.class:              Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
+    oro_organization.organization.manager.class:               Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
     oro_organization.organization.entity.class:                Oro\Bundle\OrganizationBundle\Entity\Organization
 
     oro_organization.business_unit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -36,6 +37,11 @@ services:
 
     oro_organization.business_unit_manager:
         class: %oro_organization.business_unit.manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+
+    oro_organization.organization_manager:
+        class: %oro_organization.organization.manager.class%
         arguments:
             - @doctrine.orm.entity_manager
 
