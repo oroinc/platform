@@ -53,6 +53,9 @@
                     function ($, __, routing, messenger, mediator) {
                         $(function () {
                             $('#{{ form.template.vars.id }}').change(function (e) {
+                                if (!$(this).val()) {
+                                    return;
+                                }
                                 var url = routing.generate(
                                     'oro_api_get_emailtemplate_compiled',
                                     {'id': $(this).val(), 'entityId': {{ entity.entityId }}}

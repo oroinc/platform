@@ -86,6 +86,32 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
         },
 
         /**
+         * Checks if fields has any text
+         *
+         * @returns {boolean}
+         */
+        isEmpty: function () {
+            var result = true;
+            _.each(this.fields, function (el) {
+                if (el.value) {
+                    result = false;
+                }
+            });
+            return result;
+        },
+
+        /**
+         * Sets empty string as a value for all fields
+         */
+        clear: function () {
+            _.each(this.fields, function (el) {
+                if (el.value) {
+                    el.value = '';
+                }
+            });
+        },
+
+        /**
          * Renders section contains entity related variables
          *
          * @private
