@@ -11,7 +11,7 @@ class OrganizationManager
     /**
      * @var EntityManager
      */
-    protected  $em;
+    protected $em;
 
     /**
      * @param EntityManager $em
