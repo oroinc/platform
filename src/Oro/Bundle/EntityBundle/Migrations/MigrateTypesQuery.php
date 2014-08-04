@@ -92,13 +92,13 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery
             throw new \InvalidArgumentException('Platform required');
         }
 
-        if (empty($this->tableName) || empty($this->columnName) || empty($this->schema)) {
-            throw new \InvalidArgumentException('Schema, table and column are required');
-        }
-
         /** Apply only for mysql platform */
         if ($this->platform->getName() !== 'mysql') {
             return;
+        }
+
+        if (empty($this->tableName) || empty($this->columnName) || empty($this->schema)) {
+            throw new \InvalidArgumentException('Schema, table and column are required');
         }
 
         /** already applied */
