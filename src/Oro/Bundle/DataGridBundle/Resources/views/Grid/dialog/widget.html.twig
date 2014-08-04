@@ -1,0 +1,6 @@
+{% extends 'OroDataGridBundle:Grid/widget:widget.html.twig' %}
+
+{% block widget_content %}
+    {% set renderParams = renderParams|merge({'routerEnabled': false}) %}
+    {{ parent() }}
+{% endblock %}

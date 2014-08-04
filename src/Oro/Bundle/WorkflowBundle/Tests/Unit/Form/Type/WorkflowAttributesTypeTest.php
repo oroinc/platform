@@ -308,7 +308,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             'no_workflow_item' => array(
                 'expectedException' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
                 'expectedMessage' =>
-                    'The required option "workflow_item" is  missing.',
+                    'The required option "workflow_item" is missing.',
                 'options' => array(),
             ),
             'unknown_workflow_attribute' => array(
