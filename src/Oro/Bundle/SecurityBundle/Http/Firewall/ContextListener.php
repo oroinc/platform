@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class ContextListener
 {
