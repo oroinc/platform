@@ -102,8 +102,6 @@ define([
         processChange: function ($el) {
             this.memoizeValue($el);
 
-            mediator.execute('showLoading');
-
             var $form = $(this.options.formSelector),
                 data = $form.serializeArray(),
                 url = $form.attr('action'),
@@ -116,21 +114,27 @@ define([
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            mediator.trigger('integrationFormReload:before', { formEl: $form, data: data });
-            $.post(url, data, function (res, status, jqXHR) {
-                var formContent = $(res).find($form.selector);
-                if (formContent.length) {
-                    $form.replaceWith(formContent);
-                    formContent.validate({});
-                    // update wdt
-                    mediator.execute({name: 'updateDebugToolbar', silent: true}, jqXHR);
-                    // process UI decorators
-                    mediator.execute('afterPageChange');
-                    mediator.trigger('integrationFormReload:after', { formEl: $form, loadedContent: res });
-                }
-            }).always(function () {
-                mediator.execute('hideLoading');
-            });
+            debugger;
+            var event = { formEl: $form, data: data, reloadManually: true };
+            mediator.trigger('integrationFormReload:before', event);
+
+            if (event.reloadManually) {
+                mediator.execute('showLoading');
+                $.post(url, data, function (res, status, jqXHR) {
+                    var formContent = $(res).find($form.selector);
+                    if (formContent.length) {
+                        $form.replaceWith(formContent);
+                        formContent.validate({});
+                        // update wdt
+                        mediator.execute({name: 'updateDebugToolbar', silent: true}, jqXHR);
+                        // process UI decorators
+                        mediator.execute('afterPageChange');
+                        mediator.trigger('integrationFormReload:after', { formEl: $form, loadedContent: res });
+                    }
+                }).always(function () {
+                    mediator.execute('hideLoading');
+                });
+            }
         },
 
         /**
