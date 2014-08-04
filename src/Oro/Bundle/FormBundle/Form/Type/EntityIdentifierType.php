@@ -20,9 +20,7 @@ class EntityIdentifierType extends AbstractType
 {
     const NAME = 'oro_entity_identifier';
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /**
@@ -38,10 +36,10 @@ class EntityIdentifierType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->addViewTransformer($this->createEntitiesToIdsTransformer($options));
+        $builder->addViewTransformer($this->createEntitiesToIdsTransformer($options));
         if ($options['multiple']) {
-            $builder->addViewTransformer(new ArrayToStringTransformer($options['values_delimiter'], true))
+            $builder
+                ->addViewTransformer(new ArrayToStringTransformer($options['values_delimiter'], true))
                 ->addEventSubscriber(new FixArrayToStringListener($options['values_delimiter']));
         }
     }

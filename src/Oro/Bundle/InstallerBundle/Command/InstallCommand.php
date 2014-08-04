@@ -25,8 +25,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
-            ->addOption('company-short-name', null, InputOption::VALUE_OPTIONAL, 'Company short name')
-            ->addOption('company-name', null, InputOption::VALUE_OPTIONAL, 'Company name')
+            ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
             ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
@@ -223,40 +222,35 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
-        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
 
-        $passValidator        = function ($value) {
+        $defaultOrganizationName  = $configManager->get('oro_ui.organization_name');
+
+        $passValidator       = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
 
             return $value;
         };
-        $companyNameValidator = function ($value) use (&$defaultCompanyName) {
+
+        $organizationNameValidator = function ($value) use (&$defaultOrganizationName) {
             $len = strlen(trim($value));
-            if ($len === 0 && empty($defaultCompanyName)) {
-                throw new \Exception('The company short name must not be empty');
+            if ($len === 0 && empty($defaultOrganizationName)) {
+                throw new \Exception('The organization name must not be empty');
             }
             if ($len > 15) {
-                throw new \Exception('The company short name must be not more than 15 characters long');
+                throw new \Exception('The organization name must be not more than 15 characters long');
             }
 
             return $value;
         };
 
-        $companyTitle  = isset($options['company-name'])
-            ? $options['company-name']
-            : $dialog->ask(
-                $output,
-                $this->buildQuestion('Company name', $defaultCompanyTitle)
-            );
-        $companyName   = isset($options['company-short-name'])
-            ? $options['company-short-name']
+        $organizationName  = isset($options['organization-name'])
+            ? $options['organization-name']
             : $dialog->askAndValidate(
                 $output,
-                $this->buildQuestion('Company short name', $defaultCompanyName),
-                $companyNameValidator
+                $this->buildQuestion('Organization name', $defaultOrganizationName),
+                $organizationNameValidator
             );
         $userName      = isset($options['user-name'])
             ? $options['user-name']
@@ -295,14 +289,17 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             )
         );
 
-        // update company name and title if specified
-        if (!empty($companyName) && $companyName !== $defaultCompanyName) {
-            $configManager->set('oro_ui.application_name', $companyName);
+        // update organization name
+        if (!empty($organizationName) && $organizationName !== $defaultOrganizationName) {
+            $commandExecutor->runCommand(
+                'oro:organization:update',
+                array(
+                    'organization-name' => 'default',
+                    '--process-isolation' => true,
+                    '--organization-name' => $organizationName,
+                )
+            );
         }
-        if (!empty($companyTitle) && $companyTitle !== $defaultCompanyTitle) {
-            $configManager->set('oro_ui.application_title', $companyTitle);
-        }
-        $configManager->flush();
 
         // load demo fixtures
         if ($demo) {
