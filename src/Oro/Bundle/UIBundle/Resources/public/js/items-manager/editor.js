@@ -36,6 +36,9 @@ define(['jquery', 'jquery-ui'],   function ($) {
             this.errors = $({});
             this.form = this.element.parents('form');
             this.form.on('submit', $.proxy(this._hideErrors, this));
+            if (typeof this.options.namePattern === 'string') {
+                this.options.namePattern = new RegExp(this.options.namePattern);
+            }
 
             this.reset();
             this._on({

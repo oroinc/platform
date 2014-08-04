@@ -8,7 +8,6 @@ define(['jquery', 'underscore', 'oroui/js/mediator'
         collection.on('beforeReset', function (collection, resp) {
             collection.state.totals = resp.options.totals;
         });
-        this.deferred.resolve();
     };
 
     return {
@@ -16,20 +15,19 @@ define(['jquery', 'underscore', 'oroui/js/mediator'
          * Builder interface implementation
          *
          * @param {jQuery.Deferred} deferred
-         * @param {jQuery} $el
-         * @param {String} gridName
+         * @param {Object} options
+         * @param {jQuery} [options.$el] container for the grid
+         * @param {string} [options.gridName] grid name
+         * @param {Object} [options.gridPromise] grid builder's promise
+         * @param {Object} [options.data] data for grid's collection
+         * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, $el, gridName) {
-            var self, onCollectionSet;
-            self = {
-                deferred: deferred,
-                $el: $el,
-                gridName: gridName
-            };
-            onCollectionSet = _.bind(initHandler, self);
-            mediator.once('datagrid_collection_set_after', onCollectionSet);
-            mediator.once('page:request', function () {
-                mediator.off('datagrid_collection_set_after', onCollectionSet);
+        init: function (deferred, options) {
+            options.gridPromise.done(function (grid) {
+                initHandler(grid.collection);
+                deferred.resolve();
+            }).fail(function () {
+                deferred.reject();
             });
         }
     };
