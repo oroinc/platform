@@ -7,6 +7,13 @@
             fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
+    {% set conditionBuilderOptions = {
+        criteriaListSelector: '#' ~ params.criteria_list_id,
+        entityChoiceSelector: '#' ~ params.entity_choice_id,
+        onFieldsUpdate: {
+            toggleCriteria: ['condition-item', 'conditions-group']
+        }
+    } %}
     <div class="condition-builder left-panel-container">
         <div class="panel-placeholder">
             <div>
@@ -26,35 +33,14 @@
                         </ul>
                     </div>
                     <div class="span9">
-                        <div class="condition-builder" id="{{ params.id }}"></div>
+                        <div class="condition-builder" id="{{ params.id }}"
+                             data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
+                             data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        require(['oroquerydesigner/js/condition-builder'], function ($) {
-            var $criteriaList = $('#{{ params.criteria_list_id }}'),
-                $fieldConditionCriteria = $criteriaList.find('[data-criteria=condition-item]'),
-                $groupConditionCriteria = $criteriaList.find('[data-criteria=conditions-group]'),
-                $conditions = $('#{{ params.id }}');
-
-            $('#{{ params.entity_choice_id }}')
-                .on('fieldsloaderupdate', function (e, fields) {
-                    $conditions.conditionBuilder('setValue', []);
-
-                    var isEmptyObject = $.isEmptyObject(fields);
-                    $fieldConditionCriteria
-                        .toggleClass('disabled', isEmptyObject);
-                    $groupConditionCriteria
-                        .toggleClass('disabled', isEmptyObject);
-                });
-
-            $conditions.conditionBuilder({
-                criteriaListSelector: '#{{ params.criteria_list_id }}'
-            });
-        });
-    </script>
 {% endmacro %}
 
 {% macro query_designer_column_list(attr, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
@@ -164,9 +150,12 @@
 
 {% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
+    {% set attr = attr|default({})|merge({
+        'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim,
+        'data-page-component-module': 'oroquerydesigner/js/app/components/column-form',
+        'data-page-component-options': {showItems: showItems}|json_encode
+    }) %}
     <div{{ UI.attributes(attr) }}>
-        {# @todo own formtype for this kind field based on hidden input #}
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {% if ('column' in showItems) %}
         {{ form_row(form.name, {
@@ -226,28 +215,6 @@
         </div>
         {% endif %}
     </div>
-    <script type="text/javascript">
-        require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
-            var $form = $('#{{ attr.id }}'),
-                $fields = $form.find('[data-purpose=column-selector]'),
-                $functions = $form.find('[data-purpose=function-selector]'),
-                $label = $form.find('[data-purpose=label]');
-
-            {% if ('function' in showItems) %}
-            $functions.functionChoice({
-                fieldChoiceSelector: $fields
-            });
-            {% endif %}
-
-            $fields
-                .on('change', function (e) {
-                    if (e.added) {
-                        // update label input on field change
-                        $label.val(e.added.text).trigger('change');
-                    }
-                });
-        });
-    </script>
 {% endmacro %}
 
 {% macro query_designer_grouping_form(form, attr, params) %}
