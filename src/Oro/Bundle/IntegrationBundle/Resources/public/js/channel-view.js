@@ -114,7 +114,6 @@ define([
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            debugger;
             var event = { formEl: $form, data: data, reloadManually: true };
             mediator.trigger('integrationFormReload:before', event);
 
