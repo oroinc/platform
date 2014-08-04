@@ -310,8 +310,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     }
 
     /**
-     * Serializes the user.
-     * The serialized data have to contain the fields used by the equals method and the username.
+     * Serializes organization
      *
      * @return string
      */
@@ -328,7 +327,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     }
 
     /**
-     * Unserializes the user
+     * Unserializes organization
      *
      * @param string $serialized
      */
