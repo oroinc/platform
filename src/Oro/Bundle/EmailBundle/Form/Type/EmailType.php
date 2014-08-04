@@ -36,6 +36,9 @@ class EmailType extends AbstractType
                 'oro_email_template_list',
                 [
                     'required' => false,
+                    'configs' => [
+                        'allowClear' => true
+                    ]
                 ]
             )
             ->add(
