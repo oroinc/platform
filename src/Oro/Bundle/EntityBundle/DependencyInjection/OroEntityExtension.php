@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
-use PDO;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -45,10 +44,10 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             $doctrineConfig = $container->getExtensionConfig('doctrine');
             $doctrineConnectionOptions = array();
             foreach ($doctrineConfig as $config) {
-                if (isset($config['dbal']) && isset($config['dbal']['connections'])) {
+                if (isset($config['dbal']['connections'])) {
                     foreach (array_keys($config['dbal']['connections']) as $connectionName) {
                         $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = array(
-                            PDO::ATTR_EMULATE_PREPARES => true
+                            \PDO::ATTR_EMULATE_PREPARES => true
                         );
                     }
                 }

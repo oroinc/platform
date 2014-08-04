@@ -13,8 +13,6 @@ class OroEmbeddedFormBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
-
         /** Generate table oro_embedded_form **/
         $table = $schema->createTable('oro_embedded_form');
         $table->addColumn('id', 'string', ['length' => 255]);
@@ -38,7 +36,5 @@ class OroEmbeddedFormBundle implements Migration
             ['onDelete' => null, 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_embedded_form **/
-
-        // @codingStandardsIgnoreEnd
     }
 }
