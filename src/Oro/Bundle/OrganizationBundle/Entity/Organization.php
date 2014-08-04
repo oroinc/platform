@@ -32,7 +32,7 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements NotificationEmailInterface
+class Organization extends ExtendOrganization implements NotificationEmailInterface, \Serializable
 {
     /**
      * @var integer
@@ -307,5 +307,36 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Serializes organization
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        $result = serialize(
+            array(
+                $this->name,
+                $this->enabled,
+                $this->id,
+            )
+        );
+        return $result;
+    }
+
+    /**
+     * Unserializes organization
+     *
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->name,
+            $this->enabled,
+            $this->id,
+            ) = unserialize($serialized);
     }
 }

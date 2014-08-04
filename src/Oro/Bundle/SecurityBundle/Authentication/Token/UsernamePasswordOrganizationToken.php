@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UsernamePasswordOrganizationToken extends UsernamePasswordToken
@@ -14,13 +15,18 @@ class UsernamePasswordOrganizationToken extends UsernamePasswordToken
     protected $organizationContext;
 
     /**
+     * @var OrganizationManager
+     */
+    protected $manager;
+
+    /**
      * @param string       $user
      * @param string       $credentials
      * @param string       $providerKey
      * @param array        $roles
      * @param Organization $organizationContext
      */
-    public function __construct($user, $credentials, $providerKey, Organization $organizationContext, array $roles = [])
+    public function __construct($user, $credentials, $providerKey, $organizationContext, array $roles = [])
     {
         $this->organizationContext = $organizationContext;
         parent::__construct($user, $credentials, $providerKey, $roles);
@@ -35,11 +41,21 @@ class UsernamePasswordOrganizationToken extends UsernamePasswordToken
     }
 
     /**
+     * @param Organization $organization
+     */
+    public function setOrganizationContext(Organization $organization)
+    {
+        $this->organizationContext = $organization;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
     {
-        return serialize(array($this->organizationContext, parent::serialize()));
+        $objectSerialize = serialize($this->organizationContext);
+        $string = implode('||', array($objectSerialize, parent::serialize()));
+        return $string;
     }
 
     /**
@@ -47,7 +63,8 @@ class UsernamePasswordOrganizationToken extends UsernamePasswordToken
      */
     public function unserialize($serialized)
     {
-        list($this->organizationContext, $parentStr) = unserialize($serialized);
+        list($organizationData, $parentStr) = explode('||', $serialized);
+        $this->organizationContext = unserialize($organizationData);
         parent::unserialize($parentStr);
     }
 }

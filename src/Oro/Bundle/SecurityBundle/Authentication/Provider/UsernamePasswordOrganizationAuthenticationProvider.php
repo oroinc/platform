@@ -15,10 +15,17 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticationProvider
 {
+    /**
+     * @var string
+     */
     protected $providerKey;
 
     /**
-     * {@inheritdoc}
+     * @param UserProviderInterface   $userProvider
+     * @param UserCheckerInterface    $userChecker
+     * @param string                  $providerKey
+     * @param EncoderFactoryInterface $encoderFactory
+     * @param bool                    $hideUserNotFoundExceptions
      */
     public function __construct(
         UserProviderInterface $userProvider,
