@@ -50,45 +50,6 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
     }
 
     /**
-     * Returns an array of page numbers to use in pagination links.
-     *
-     * @param integer $nb_links The maximum number of page numbers to return
-     *
-     * @return array
-     */
-    public function getLinks($nb_links = null)
-    {
-        if ($nb_links == null) {
-            $nb_links = $this->getMaxPageLinks();
-        }
-        $links = [];
-        $tmp   = $this->page - floor($nb_links / 2);
-        $check = $this->lastPage - $nb_links + 1;
-
-        $limit = 1;
-        if ($check > 0) {
-            $limit = $check;
-        }
-
-        $begin = 1;
-        if ($tmp > 0) {
-            $begin = $tmp > $limit ? $limit : $tmp;
-        }
-
-        $i = (int)$begin;
-        while ($i < $begin + $nb_links && $i <= $this->lastPage) {
-            $links[] = $i++;
-        }
-
-        $this->currentMaxLink = 1;
-        if (count($links)) {
-            $this->currentMaxLink = $links[count($links) - 1];
-        }
-
-        return $links;
-    }
-
-    /**
      * Returns true if the current datasource requires pagination.
      *
      * @return boolean
