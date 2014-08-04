@@ -34,7 +34,8 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
+     * Enable PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT
+     * for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
      *
      * @param ContainerBuilder $container
      */
@@ -42,14 +43,14 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
     {
         $dbDriver = $container->getParameter('database_driver');
         if ($dbDriver == self::POSTGRESQL_DB_DRIVER) {
-            $doctrineConfig = $container->getExtensionConfig('doctrine');
-            $doctrineConnectionOptions = array();
+            $doctrineConfig            = $container->getExtensionConfig('doctrine');
+            $doctrineConnectionOptions = [];
             foreach ($doctrineConfig as $config) {
                 if (isset($config['dbal']) && isset($config['dbal']['connections'])) {
                     foreach (array_keys($config['dbal']['connections']) as $connectionName) {
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = array(
-                            PDO::ATTR_EMULATE_PREPARES => true
-                        );
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
+                            PDO::PGSQL_ATTR_DISABLE_NATIVE_PREPARED_STATEMENT => true
+                        ];
                     }
                 }
             }

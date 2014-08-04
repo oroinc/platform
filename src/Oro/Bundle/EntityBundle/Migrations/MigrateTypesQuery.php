@@ -80,6 +80,10 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
+        if ($this->platform != 'mysql') {
+            return;
+        }
+
         $this->doExecute($logger);
     }
 
