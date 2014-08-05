@@ -134,7 +134,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(1));
 
         $expected = $this->assertSaveData($form, $entity);
-        $expected['savedId'] = 1;
+        $expected['savedData'] = 1;
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -165,7 +165,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(1));
 
         $expected = $this->assertSaveData($form, $entity);
-        $expected['savedId'] = 1;
+        $expected['savedData'] = 1;
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -206,7 +206,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         };
 
         $expected = $this->assertSaveData($form, $entity);
-        $expected['savedId'] = 1;
+        $expected['savedData'] = 1;
 
         $result = $this->handler->handleUpdate(
             $entity,

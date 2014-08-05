@@ -121,7 +121,7 @@ class UpdateHandler
             return array(
                 'form'   => $form->createView(),
                 'entity' => $entity,
-                'savedId' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
+                'savedData' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
                 'isWidgetContext' => (bool) $this->request->get('_wid')
             );
         } else {

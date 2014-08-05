@@ -4,7 +4,10 @@
 {% form_theme form with ['OroIntegrationBundle:Form:fields.html.twig'] %}
 
 {% set entity = form.vars.value %}
-{% set formAction = entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create') %}
+{% set formAction = formAction is defined
+    ? formAction
+    : (entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create'))
+%}
 
 {% if entity.id %}
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}
@@ -109,7 +112,7 @@
         }]) %}
     {% endif %}
 
-    {% if entity.id %}
+    {% if entity.id and isWidgetContext|default(false) is sameas(false) %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Statuses'|trans,
                 'subblocks': [{
