@@ -28,15 +28,15 @@ abstract class WebTestCase extends BaseWebTestCase
 {
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
-    const DB_REINDEX_ANNOTATION = 'dbReindex';
+    const DB_REINDEX_ANNOTATION   = 'dbReindex';
 
     /** Default WSSE credentials */
-    const USER_NAME = 'admin';
+    const USER_NAME     = 'admin';
     const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
     const AUTH_USER = 'admin@example.com';
-    const AUTH_PW = 'admin';
+    const AUTH_PW   = 'admin';
 
     /**
      * @var bool[]
@@ -162,7 +162,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $results = iterator_to_array($finder);
 
         if (count($results)) {
-            $file = current($results);
+            $file  = current($results);
             $class = $file->getBasename('.php');
 
             require_once $file;
@@ -206,6 +206,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @param string $className
      * @param string $annotationName
+     *
      * @return bool
      */
     private static function isClassHasAnnotation($className, $annotationName)
@@ -216,8 +217,9 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * @param string $wsdl
-     * @param array $options
-     * @param bool $force
+     * @param array  $options
+     * @param bool   $force
+     *
      * @return SoapClient
      * @throws \Exception
      */
@@ -264,7 +266,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Builds up the environment to run the given command.
      *
      * @param string $name
-     * @param array $params
+     * @param array  $params
      *
      * @return string
      */
@@ -291,7 +293,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * @param array $classNames
-     * @param bool $force
+     * @param bool  $force
      */
     protected function loadFixtures(array $classNames, $force = false)
     {
@@ -350,6 +352,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Retrieve Doctrine DataFixtures loader.
      *
      * @param array $classNames
+     *
      * @return DataFixturesLoader
      */
     private function getFixtureLoader(array $classNames)
@@ -367,7 +370,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Load a data fixture class.
      *
      * @param DataFixturesLoader $loader
-     * @param string $className
+     * @param string             $className
      */
     private function loadFixtureClass(DataFixturesLoader $loader, $className)
     {
@@ -391,6 +394,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Creates a mock object of a service identified by its id.
      *
      * @param string $id
+     *
      * @return \PHPUnit_Framework_MockObject_MockBuilder
      */
     protected function getServiceMockBuilder($id)
@@ -404,8 +408,9 @@ abstract class WebTestCase extends BaseWebTestCase
      * Generates a URL or path for a specific route based on the given parameters.
      *
      * @param string $name
-     * @param array $parameters
-     * @param bool $absolute
+     * @param array  $parameters
+     * @param bool   $absolute
+     *
      * @return string
      */
     protected function getUrl($name, $parameters = array(), $absolute = false)
@@ -440,6 +445,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Data provider for REST/SOAP API tests
      *
      * @param string $folder
+     *
      * @return array
      */
     public static function getApiRequestsData($folder)
@@ -484,6 +490,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * @param int $length
+     *
      * @return string
      */
     public static function generateRandomString($length = 10)
@@ -504,9 +511,10 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Generate WSSE authorization header
      *
-     * @param string $userName
-     * @param string $userPassword
+     * @param string      $userName
+     * @param string      $userPassword
      * @param string|null $nonce
+     *
      * @return array
      */
     public static function generateWsseAuthHeader(
@@ -539,6 +547,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $userName
      * @param string $userPassword
+     *
      * @return array
      */
     public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
@@ -550,6 +559,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Convert value to array
      *
      * @param mixed $value
+     *
      * @return array
      */
     public static function valueToArray($value)
@@ -561,6 +571,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Convert json to array
      *
      * @param string $json
+     *
      * @return array
      */
     public static function jsonToArray($json)
@@ -572,7 +583,8 @@ abstract class WebTestCase extends BaseWebTestCase
      * Checks json response status code and return content as array
      *
      * @param Response $response
-     * @param int $statusCode
+     * @param int      $statusCode
+     *
      * @return array
      */
     public static function getJsonResponseContent(Response $response, $statusCode)
@@ -585,7 +597,19 @@ abstract class WebTestCase extends BaseWebTestCase
      * Assert response is json and has status code
      *
      * @param Response $response
-     * @param int $statusCode
+     * @param int      $statusCode
+     */
+    public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode)
+    {
+        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertEmpty($response->getContent(), sprintf('HTTP response with code %d must have empty body'));
+    }
+
+    /**
+     * Assert response is json and has status code
+     *
+     * @param Response $response
+     * @param int      $statusCode
      */
     public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode)
     {
@@ -597,7 +621,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Assert response is html and has status code
      *
      * @param Response $response
-     * @param int $statusCode
+     * @param int      $statusCode
      */
     public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode)
     {
@@ -609,7 +633,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Assert response status code equals
      *
      * @param Response $response
-     * @param int $statusCode
+     * @param int      $statusCode
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
     {
@@ -624,7 +648,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * Assert response content type equals
      *
      * @param Response $response
-     * @param string $contentType
+     * @param string   $contentType
      */
     public static function assertResponseContentTypeEquals(Response $response, $contentType)
     {
@@ -637,8 +661,8 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert that intersect of $actual with $expected equals $expected
      *
-     * @param array $expected
-     * @param array $actual
+     * @param array  $expected
+     * @param array  $actual
      * @param string $message
      */
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
