@@ -17,7 +17,7 @@ config:
             exports:
                 - 'moment'
     paths:
-        'backbone/pageable-collection': 'bundles/orodatagrid/lib/backbone-pageable.js'
+        'backbone-pageable-collection': 'bundles/orodatagrid/lib/backbone-pageable.js'
         'backgrid': 'bundles/orodatagrid/lib/backgrid/backgrid.min.js'
 
         'orodatagrid/js/datagrid/action-launcher': 'bundles/orodatagrid/js/datagrid/action-launcher.js'
