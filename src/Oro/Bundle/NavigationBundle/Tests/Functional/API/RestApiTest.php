@@ -156,7 +156,7 @@ class RestApiTest extends WebTestCase
         /** @var $result Response */
         $result = $this->client->getResponse();
 
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 

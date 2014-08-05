@@ -124,7 +124,7 @@ class WidgetTest extends WebTestCase
             'DELETE',
             $this->getUrl('oro_api_delete_sidebarwidgets', array('widgetId' => $position['id']))
         );
-        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // get sidebar widget
         $this->client->request(

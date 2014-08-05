@@ -79,7 +79,7 @@ class WorkflowControllerTest extends WebTestCase
 
         // check is deleting workflow item has been performed successfully
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
 
         $this->entityManager->refresh($entity);
         if ($finalDefinitionHasStartStep) {

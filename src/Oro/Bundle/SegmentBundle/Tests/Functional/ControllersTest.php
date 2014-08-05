@@ -72,7 +72,7 @@ class ControllersTest extends WebTestCase
                 $this->getUrl('oro_api_post_segment_run', array('id' => $id))
             );
             $result = $this->client->getResponse();
-            $this->assertJsonResponseStatusCodeEquals($result, 204);
+            $this->assertResponseStatusCodeEquals($result, 204);
         }
 
         $response = $this->client->requestGrid("oro_segment_grid_{$id}");
@@ -119,7 +119,7 @@ class ControllersTest extends WebTestCase
                 $this->getUrl('oro_api_post_segment_run', array('id' => $id))
             );
             $result = $this->client->getResponse();
-            $this->assertJsonResponseStatusCodeEquals($result, 204);
+            $this->assertResponseStatusCodeEquals($result, 204);
         }
 
         $response = $response = $this->client->requestGrid("oro_segment_grid_{$id}");
@@ -212,7 +212,7 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_segment_update', array('id' => $id)));
 
