@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backgrid', '../formatter/number-formatter'
-    ], function (_, Backgrid, NumberFormatter) {
+define([
+    'underscore',
+    'backgrid',
+    '../formatter/number-formatter'
+], function (_, Backgrid, NumberFormatter) {
     'use strict';
+
+    var NumberCell;
 
     /**
      * Number column cell.
@@ -10,7 +16,7 @@ define(['underscore', 'backgrid', '../formatter/number-formatter'
      * @class   orodatagrid.datagrid.cell.NumberCell
      * @extends Backgrid.NumberCell
      */
-    return Backgrid.NumberCell.extend({
+    NumberCell = Backgrid.NumberCell.extend({
         /** @property {orodatagrid.datagrid.formatter.NumberFormatter} */
         formatterPrototype: NumberFormatter,
 
@@ -22,7 +28,7 @@ define(['underscore', 'backgrid', '../formatter/number-formatter'
          */
         initialize: function (options) {
             _.extend(this, options);
-            Backgrid.Cell.prototype.initialize.apply(this, arguments);
+            NumberCell.__super__.initialize.apply(this, arguments);
             this.formatter = this.createFormatter();
         },
 
@@ -42,7 +48,9 @@ define(['underscore', 'backgrid', '../formatter/number-formatter'
             if (this.column.get("editable")) {
                 e.stopPropagation();
             }
-            return Backgrid.NumberCell.prototype.enterEditMode.apply(this, arguments);
+            return NumberCell.__super__.enterEditMode.apply(this, arguments);
         }
     });
+
+    return NumberCell;
 });

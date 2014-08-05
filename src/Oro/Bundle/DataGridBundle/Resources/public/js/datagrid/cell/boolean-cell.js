@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
-    ], function ($, _, __, Backgrid) {
+define([
+    'backgrid',
+    'orotranslation/js/translator'
+], function (Backgrid, __) {
     'use strict';
+
+    var BooleanCell;
 
     /**
      * Boolean column cell. Added missing behaviour.
@@ -10,7 +15,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
      * @class   orodatagrid.datagrid.cell.BooleanCell
      * @extends Backgrid.BooleanCell
      */
-    return Backgrid.BooleanCell.extend({
+    BooleanCell = Backgrid.BooleanCell.extend({
         /** @property {Boolean} */
         listenRowClick: true,
 
@@ -20,7 +25,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
         render: function () {
             if (this.column.get('editable')) {
                 // render a checkbox for editable cell
-                Backgrid.BooleanCell.prototype.render.apply(this, arguments);
+                BooleanCell.__super__.render.apply(this, arguments);
             } else {
                 // render a yes/no text for non editable cell
                 this.$el.empty();
@@ -36,7 +41,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
          * @inheritDoc
          */
         enterEditMode: function (e) {
-            Backgrid.BooleanCell.prototype.enterEditMode.apply(this, arguments);
+            BooleanCell.__super__.enterEditMode.apply(this, arguments);
             if (this.column.get('editable')) {
                 var $editor = this.currentEditor.$el;
                 $editor.prop('checked', !$editor.prop('checked')).change();
@@ -55,4 +60,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
             }
         }
     });
+
+    return BooleanCell;
 });

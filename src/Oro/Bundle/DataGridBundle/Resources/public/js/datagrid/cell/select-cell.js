@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backgrid'
-    ], function (_, Backgrid) {
+define([
+    'underscore',
+    'backgrid'
+], function (_, Backgrid) {
     'use strict';
+
+    var SelectCell;
 
     /**
      * Select column cell. Added missing behaviour.
@@ -10,7 +15,7 @@ define(['underscore', 'backgrid'
      * @class   orodatagrid.datagrid.cell.SelectCell
      * @extends Backgrid.SelectCell
      */
-    return Backgrid.SelectCell.extend({
+    SelectCell = Backgrid.SelectCell.extend({
         /**
          * @inheritDoc
          */
@@ -21,7 +26,7 @@ define(['underscore', 'backgrid'
                     this.optionValues.push([value, key]);
                 }, this);
             }
-            Backgrid.SelectCell.prototype.initialize.apply(this, arguments);
+            SelectCell.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -31,7 +36,9 @@ define(['underscore', 'backgrid'
             if (this.column.get("editable")) {
                 e.stopPropagation();
             }
-            return Backgrid.StringCell.prototype.enterEditMode.apply(this, arguments);
+            return SelectCell.__super__.enterEditMode.apply(this, arguments);
         }
     });
+
+    return SelectCell;
 });

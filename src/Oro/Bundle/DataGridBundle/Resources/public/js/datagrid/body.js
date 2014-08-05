@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backgrid', './row'
-    ], function (_, Backgrid, Row) {
+define([
+    'underscore',
+    'backgrid',
+    './row'
+], function (_, Backgrid, Row) {
     'use strict';
+
+    var Body;
 
     /**
      * Grid body widget
@@ -13,7 +19,7 @@ define(['underscore', 'backgrid', './row'
      * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
-    return Backgrid.Body.extend({
+    Body = Backgrid.Body.extend({
         /** @property */
         row: Row,
 
@@ -34,7 +40,7 @@ define(['underscore', 'backgrid', './row'
                 this.rowClassName = opts.rowClassName;
             }
 
-            Backgrid.Body.prototype.initialize.apply(this, arguments);
+            Body.__super__.initialize.apply(this, arguments);
 
             this._listenToRowsEvents(this.rows);
         },
@@ -42,8 +48,22 @@ define(['underscore', 'backgrid', './row'
         /**
          * @inheritDoc
          */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.rows, function (row) {
+                row.dispose();
+            });
+            Body.__super__.dispose.call(this);
+        },
+
+        /**
+         * @inheritDoc
+         */
         refresh: function () {
-            Backgrid.Body.prototype.refresh.apply(this, arguments);
+            this._stopListeningToRowsEvents(this.rows);
+            Body.__super__.refresh.apply(this, arguments);
             this._listenToRowsEvents(this.rows);
             return this;
         },
@@ -52,11 +72,22 @@ define(['underscore', 'backgrid', './row'
          * @inheritDoc
          */
         insertRow: function (model, collection, options) {
-            Backgrid.Body.prototype.insertRow.apply(this, arguments);
+            Body.__super__.insertRow.apply(this, arguments);
             var index = collection.indexOf(model);
             if (index < this.rows.length) {
                 this._listenToOneRowEvents(this.rows[index]);
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        removeRow: function (model, collection, options) {
+            var index = collection.indexOf(model);
+            if (index < this.rows.length) {
+                this._stopListeningToOneRowEvents(this.rows[index]);
+            }
+            Body.__super__.removeRow.apply(this, arguments);
         },
 
         /**
@@ -68,6 +99,18 @@ define(['underscore', 'backgrid', './row'
         _listenToRowsEvents: function (rows) {
             _.each(rows, function (row) {
                 this._listenToOneRowEvents(row);
+            }, this);
+        },
+
+        /**
+         * Stop listening  to events of rows list
+         *
+         * @param {Array} rows
+         * @private
+         */
+        _stopListeningToRowsEvents: function (rows) {
+            _.each(rows, function (row) {
+                this._stopListeningToOneRowEvents(row);
             }, this);
         },
 
@@ -84,14 +127,26 @@ define(['underscore', 'backgrid', './row'
         },
 
         /**
+         * Stop listening to events of row
+         *
+         * @param {Backgrid.Row} row
+         * @private
+         */
+        _stopListeningToOneRowEvents: function (row) {
+            this.stopListening(row);
+        },
+
+        /**
          * @inheritDoc
          */
         render: function () {
-            Backgrid.Body.prototype.render.apply(this, arguments);
+            Body.__super__.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);
             }
             return this;
         }
     });
+
+    return Body;
 });

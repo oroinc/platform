@@ -1,7 +1,10 @@
 /*global define*/
-define(['./datetime-cell'
-    ], function (DatagridDateTimeCell) {
+define([
+    './datetime-cell'
+], function (DateTimeCell) {
     'use strict';
+
+    var DateCell;
 
     /**
      * Date column cell
@@ -10,8 +13,10 @@ define(['./datetime-cell'
      * @class   orodatagrid.datagrid.cell.DateCell
      * @extends orodatagrid.datagrid.cell.DateTimeCell
      */
-    return DatagridDateTimeCell.extend({
+    DateCell = DateTimeCell.extend({
         type: 'date',
         className: 'date-cell'
     });
+
+    return DateCell;
 });

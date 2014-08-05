@@ -1,7 +1,15 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
-    ], function (Backbone, Backgrid, FooterRow, FooterCell) {
+define([
+    'underscore',
+    'backbone',
+    'backgrid',
+    './footer/footer-row',
+    './footer/footer-cell'
+], function (_, Backbone, Backgrid, FooterRow, FooterCell) {
     "use strict";
+
+    var Footer;
 
     /**
      * Datagrid footer widget
@@ -10,7 +18,7 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
      * @class   orodatagrid.datagrid.Footer
      * @extends Backgrid.Footer
      */
-    return Backgrid.Footer.extend({
+    Footer = Backgrid.Footer.extend({
         /** @property */
         tagName: "tfoot",
 
@@ -29,6 +37,8 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
          * @inheritDoc
          */
         initialize: function (options) {
+            var state;
+
             this.rows = [];
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
@@ -42,7 +52,7 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
-            var state = options.collection.state || {};
+            state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
                 _.each(state.totals, function (total, rowName) {
@@ -53,12 +63,24 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
                         rowName: rowName
                     });
                 }, this);
-
             }
         },
 
         /**
-         Renders this table footer with a single row of footer cells.
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.rows, function (row) {
+                row.dispose();
+            });
+            Footer.__super__.dispose.call(this);
+        },
+
+        /**
+         * Renders this table footer with a single row of footer cells.
          */
         render: function () {
             if (this.renderable) {
@@ -70,4 +92,6 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
             return this;
         }
     });
+
+    return Footer;
 });

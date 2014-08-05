@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'backgrid'
-    ], function ($, _, Backbone, Backgrid) {
+define([
+    'underscore',
+    'backgrid',
+    './footer-cell'
+], function (_, Backgrid, FooterCell) {
     "use strict";
+
+    var FooterRow;
 
     /**
      * FooterRow is a controller for a row of footer cells.
@@ -10,18 +16,32 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
      * @class orodatagrid.datagrid.footer.FooterRow
      * @extends Backgrid.Row
      */
-    return Backgrid.FooterRow = Backgrid.Row.extend({
+    FooterRow = Backgrid.Row.extend({
+        /** @property */
+        footerCell: FooterCell,
 
         requiredOptions: ["columns", "collection", "footerCell"],
 
         initialize: function (options) {
             this.options = options || {};
-            Backgrid.Row.prototype.initialize.apply(this, arguments);
+            FooterRow.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.cells, function (cell) {
+                cell.dispose();
+            });
+            FooterRow.__super__.dispose.call(this);
         },
 
         makeCell: function (column, options) {
-
-            var FooterCell = column.get("footerCell") || options.footerCell || Backgrid.FooterCell;
+            var FooterCell = column.get("footerCell") || options.footerCell || this.footerCell;
             return new FooterCell({
                 column: column,
                 collection: this.collection,
@@ -29,4 +49,6 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
             });
         }
     });
+
+    return FooterRow;
 });

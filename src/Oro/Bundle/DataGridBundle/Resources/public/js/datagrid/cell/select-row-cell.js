@@ -1,7 +1,12 @@
 /*global define*/
-define(['jquery', 'backbone', 'backgrid'
-    ], function ($, Backbone, Backgrid) {
+define([
+    'jquery',
+    'backbone',
+    'backgrid'
+], function ($, Backbone, Backgrid) {
     "use strict";
+
+    var SelectRowCell;
 
     /**
      * Renders a checkbox for row selection.
@@ -10,7 +15,7 @@ define(['jquery', 'backbone', 'backgrid'
      * @class   orodatagrid.datagrid.cell.SelectRowCell
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    SelectRowCell = Backbone.View.extend({
 
         /** @property */
         className: "select-row-cell",
@@ -87,4 +92,6 @@ define(['jquery', 'backbone', 'backgrid'
             return this;
         }
     });
+
+    return SelectRowCell;
 });
