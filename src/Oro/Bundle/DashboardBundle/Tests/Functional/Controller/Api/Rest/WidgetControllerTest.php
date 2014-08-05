@@ -171,7 +171,7 @@ class WidgetControllerTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
         foreach ($widgets as $key => $widget) {
             $this->em->refresh($widget);
             $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());
