@@ -60,7 +60,10 @@ class RestCalendarEventTest extends WebTestCase
 
     /**
      * @depends testPost
+     *
      * @param int $id
+     *
+     * @return int
      */
     public function testPut($id)
     {
@@ -77,9 +80,8 @@ class RestCalendarEventTest extends WebTestCase
             $request
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 204);
-
-        $this->assertEmpty($result);
+        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $this->assertEmpty($this->client->getResponse()->getContent());
 
         return $id;
     }

@@ -20,6 +20,7 @@ class TrackingDataController extends Controller
     /**
      * @Route("/create", name="oro_tracking_data_create")
      * @param Request $request
+     *
      * @return Response
      */
     public function createAction(Request $request)
