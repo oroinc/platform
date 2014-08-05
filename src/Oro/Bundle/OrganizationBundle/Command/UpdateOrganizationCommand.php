@@ -41,8 +41,8 @@ class UpdateOrganizationCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $organizationName = $input->getArgument('organization-name');
-        $organization   = $this->getOrganizationManager()->getOrganizationByName($organizationName);
-        $options        = $input->getOptions();
+        $organization     = $this->getOrganizationManager()->getOrganizationByName($organizationName);
+        $options          = $input->getOptions();
 
         if (!$organization) {
             throw new \InvalidArgumentException(sprintf('Organization "%s" not found.', $organizationName));
@@ -55,6 +55,10 @@ class UpdateOrganizationCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param Organization $organization
+     * @param array        $options
+     */
     protected function updateOrganization(Organization $organization, $options)
     {
         $properties = ['name', 'description', 'enabled'];

@@ -29,9 +29,13 @@ class OrganizationManager
         return $this->em->getRepository('OroOrganizationBundle:Organization')->getOrganizationById($id);
     }
 
+    /**
+     * @param string $name
+     * @return Organization
+     */
     public function getOrganizationByName($name)
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getOrganizationByName($name);
+        return $this->getOrganizationRepo()->getOrganizationByName($name);
     }
 
     /**
