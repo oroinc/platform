@@ -41,9 +41,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
-    const ALLOW_EDIT = 1;
-    const ALLOW_CHANGE_STATUS = 2;
-    const DISSALOW = 3;
+    const EDIT_MODE_ALLOW = 3;
+    const EDIT_MODE_RESTRICTED = 2;
+    const EDIT_MODE_DISALLOW = 1;
 
     /**
      * @var integer
@@ -148,7 +148,7 @@ class Channel
         $this->synchronizationSettings = ConfigObject::create([]);
         $this->mappingSettings         = ConfigObject::create([]);
         $this->enabled                 = true;
-        $this->editMode                = self::ALLOW_EDIT;
+        $this->editMode                = self::EDIT_MODE_ALLOW;
     }
 
     /**

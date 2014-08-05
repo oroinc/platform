@@ -11,6 +11,7 @@ use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_2\OroIntegrationBundle as 
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3\OroIntegrationBundle as v13;
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_4\OroIntegrationBundle as v14;
 use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_5\OroIntegrationBundle as v15;
+use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_6\OroIntegrationBundle as v16;
 
 class OroIntegrationBundleInstaller implements Installation
 {
@@ -33,6 +34,7 @@ class OroIntegrationBundleInstaller implements Installation
         v12::modifyChannelTable($schema);
         v13::modifyChannelTable($schema);
         v14::modifyChannelTable($schema);
+        v16::modifyChannelTable($schema);
 
         v10::createChannelStatusTable($schema);
         v15::modifyChannelStatusTable($schema);
