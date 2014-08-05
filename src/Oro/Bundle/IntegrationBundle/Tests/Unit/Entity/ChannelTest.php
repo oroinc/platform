@@ -13,6 +13,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_STRING  = 'testString';
     const TEST_BOOLEAN = true;
+    const TEST_INTEGER = 2;
 
     /** @var array */
     protected static $testConnectors = ['customer', 'product'];
@@ -60,6 +61,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'connectors'       => ['connectors', self::$testConnectors, self::$testConnectors],
             'defaultUserOwner' => ['defaultUserOwner', $user, $user],
             'enabled'          => ['enabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
+            'editMode'         => ['editMode', self::TEST_INTEGER, self::TEST_INTEGER]
         ];
     }
 

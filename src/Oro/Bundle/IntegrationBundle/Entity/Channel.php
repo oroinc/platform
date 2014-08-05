@@ -41,6 +41,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
+    const ALLOW_EDIT = 1;
+    const ALLOW_CHANGE_STATUS = 2;
+    const DISSALOW = 3;
+
     /**
      * @var integer
      *
@@ -131,12 +135,20 @@ class Channel
      */
     protected $statuses;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="edit_mode", type="smallint")
+     */
+    protected $editMode;
+
     public function __construct()
     {
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
         $this->mappingSettings         = ConfigObject::create([]);
         $this->enabled                 = true;
+        $this->editMode                = self::ALLOW_EDIT;
     }
 
     /**
@@ -380,5 +392,21 @@ class Channel
     public function getEnabled()
     {
         return $this->enabled;
+    }
+
+    /**
+     * @param int $editMode
+     */
+    public function setEditMode($editMode)
+    {
+        $this->editMode = $editMode;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEditMode()
+    {
+        return $this->editMode;
     }
 }
