@@ -126,10 +126,7 @@ class OwnerTreeProvider
                 $tree->addUserOrganization($user->getId(), $organization->getId());
                 foreach ($user->getBusinessUnits() as $businessUnit) {
                     $organizationId   = $organization->getId();
-                    $buOrganizationId = null;
-                    if ($businessUnit->getOrganization()) {
-                        $buOrganizationId = $businessUnit->getOrganization()->getId();
-                    }
+                    $buOrganizationId = $businessUnit->getOrganization()->getId();
                     if ($organizationId == $buOrganizationId) {
                         $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());
                     }
