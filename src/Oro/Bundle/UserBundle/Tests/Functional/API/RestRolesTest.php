@@ -101,7 +101,7 @@ class RestRolesTest extends WebTestCase
             $request
         );
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',
@@ -125,7 +125,7 @@ class RestRolesTest extends WebTestCase
             $this->getUrl('oro_api_delete_role', array('id' => $roleId))
         );
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',

@@ -68,7 +68,7 @@ class WidgetControllerTest extends WebTestCase
             $data
         );
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->em->refresh($this->widget);
 
@@ -116,7 +116,7 @@ class WidgetControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'DELETE',
@@ -171,7 +171,7 @@ class WidgetControllerTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
         foreach ($widgets as $key => $widget) {
             $this->em->refresh($widget);
             $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());

@@ -144,7 +144,7 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
     }
 
     protected function createSelectTemplate()

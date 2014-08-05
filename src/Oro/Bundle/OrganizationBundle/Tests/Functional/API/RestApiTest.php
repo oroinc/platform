@@ -130,7 +130,7 @@ class RestApiTest extends WebTestCase
             $requestData
         );
 
-        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
+        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // open address by id
         $this->client->request(
@@ -157,7 +157,7 @@ class RestApiTest extends WebTestCase
 
         /** @var $result Response */
         $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',

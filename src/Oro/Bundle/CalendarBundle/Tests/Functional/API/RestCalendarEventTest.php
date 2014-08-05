@@ -80,8 +80,7 @@ class RestCalendarEventTest extends WebTestCase
             $request
         );
 
-        $this->assertResponseStatusCodeEquals($this->client->getResponse(), 204);
-        $this->assertEmpty($this->client->getResponse()->getContent());
+        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         return $id;
     }
