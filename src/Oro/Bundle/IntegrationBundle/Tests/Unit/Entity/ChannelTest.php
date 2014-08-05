@@ -60,6 +60,7 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
             'connectors'       => ['connectors', self::$testConnectors, self::$testConnectors],
             'defaultUserOwner' => ['defaultUserOwner', $user, $user],
             'enabled'          => ['enabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
+            'editMode'         => ['editMode', Integration::EDIT_MODE_ALLOW, Integration::EDIT_MODE_ALLOW]
         ];
     }
 
