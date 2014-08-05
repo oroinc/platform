@@ -602,7 +602,7 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode)
     {
         self::assertResponseStatusCodeEquals($response, $statusCode);
-        self::assertEmpty($response->getContent(), sprintf('HTTP response with code %d must have empty body'));
+        self::assertEmpty($response->getContent(), sprintf('HTTP response with code %d must have empty body', $statusCode));
     }
 
     /**
