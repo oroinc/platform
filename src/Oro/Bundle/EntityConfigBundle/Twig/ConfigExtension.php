@@ -32,10 +32,10 @@ class ConfigExtension extends \Twig_Extension
 
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_entity_config', array($this, 'getClassConfig')),
-            new \Twig_SimpleFunction('oro_entity_config_value', array($this, 'getClassConfigValue')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
+            new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
+        ];
     }
 
     /**
@@ -47,7 +47,7 @@ class ConfigExtension extends \Twig_Extension
     public function getClassConfig($className, $scope = 'entity')
     {
         if (!$this->configManager->hasConfig($className)) {
-            return null === $configCode ? array() : null;
+            return [];
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
