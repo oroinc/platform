@@ -68,7 +68,7 @@ class WidgetControllerTest extends WebTestCase
             $data
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
 
         $this->em->refresh($this->widget);
 
@@ -116,7 +116,7 @@ class WidgetControllerTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'DELETE',

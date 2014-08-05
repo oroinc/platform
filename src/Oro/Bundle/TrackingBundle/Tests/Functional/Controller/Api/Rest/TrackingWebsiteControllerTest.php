@@ -32,6 +32,6 @@ class TrackingWebsiteControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertResponseStatusCodeEquals($result, 204);
     }
 }
