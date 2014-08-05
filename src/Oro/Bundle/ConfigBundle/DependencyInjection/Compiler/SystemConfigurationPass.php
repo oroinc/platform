@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
@@ -52,8 +52,9 @@ class SystemConfigurationPass implements CompilerPassInterface
     {
         $settings = [];
 
-        /** @var Extension $extension */
-        foreach ($container->getExtensions() as $name => $extension) {
+        /** @var ExtensionInterface[] $extensions */
+        $extensions = $container->getExtensions();
+        foreach ($extensions as $name => $extension) {
             $config = $container->getExtensionConfig($name);
             // take last merged configuration from sub-container
             $config = end($config);
