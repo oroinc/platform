@@ -12,29 +12,19 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 class OwnerFormSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldLabel;
 
-    /**
-     * @var boolean
-     */
+    /** @var boolean */
     protected $isAssignGranted;
 
-    /**
-     * @var object|null
-     */
+    /** @var object|null*/
     protected $defaultOwner;
 
     /**
