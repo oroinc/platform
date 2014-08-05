@@ -63,7 +63,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
             'empty'        => [
                 'options'   => [],
                 'exception' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
-                'message'   => 'The required option "chart_name" is  missing.'
+                'message'   => 'The required option "chart_name" is missing.'
             ]
         ];
     }

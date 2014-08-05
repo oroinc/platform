@@ -47,7 +47,7 @@ class ConfigExtension extends \Twig_Extension
     public function getClassConfig($className, $scope = 'entity')
     {
         if (!$this->configManager->hasConfig($className)) {
-            return array();
+            return null === $configCode ? array() : null;
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
