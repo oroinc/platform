@@ -17,7 +17,7 @@
                             </li>
                             {% set searchEntities = [] %}
                             {% for className, alias in entities %}
-                                {% set entityType = oro_entity_config(className, 'entity', 'label')|trans %}
+                                {% set entityType = oro_entity_config_value(className, 'label')|trans %}
                                 {% set searchEntities = searchEntities|merge({(alias) : entityType}) %}
                             {% endfor %}
 

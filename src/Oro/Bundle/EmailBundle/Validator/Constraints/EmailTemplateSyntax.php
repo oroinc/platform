@@ -4,9 +4,9 @@ namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class VariablesConstraint extends Constraint
+class EmailTemplateSyntax extends Constraint
 {
-    public $message = 'Template contains calls to not allowed methods and properties';
+    public $message = 'The template for {{ field }} ({{ locale }}) has syntax error: {{ error }}';
 
     /**
      * {@inheritdoc}
@@ -21,6 +21,6 @@ class VariablesConstraint extends Constraint
      */
     public function validatedBy()
     {
-        return 'oro_email.variables_validator';
+        return 'oro_email.email_template_syntax_validator';
     }
 }

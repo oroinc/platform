@@ -12,9 +12,6 @@ parameters:
 services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @form.factory
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
