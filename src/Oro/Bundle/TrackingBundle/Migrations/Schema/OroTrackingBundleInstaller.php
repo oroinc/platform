@@ -63,7 +63,7 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('website_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('value', 'integer', []);
+        $table->addColumn('value', 'float', ['notnull' => false]);
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);

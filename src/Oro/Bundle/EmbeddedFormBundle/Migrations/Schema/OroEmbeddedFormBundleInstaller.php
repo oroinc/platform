@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -10,8 +13,21 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroEmbeddedFormBundleInstaller implements Installation
+class OroEmbeddedFormBundleInstaller implements Installation, DatabasePlatformAwareInterface
 {
+    /**
+     * @var AbstractPlatform
+     */
+    protected $platform;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDatabasePlatform(AbstractPlatform $platform)
+    {
+        $this->platform = $platform;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +44,9 @@ class OroEmbeddedFormBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroEmbeddedFormTable($schema);
 
-        /** Foreign keys generation **/
+        if ($this->platform->getName() == 'postgresql') {
+            $queries->addPostQuery('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
+        }
     }
 
     /**

@@ -62,8 +62,6 @@ class OroTrackerBundle implements Migration, RenameExtensionAwareInterface, Data
         $queries->addQuery(new MigrateTypesQuery($this->platform, $schema, 'oro_user_status', 'id', Type::INTEGER));
 
         $table = $schema->getTable('oro_tracking_event');
-        $table->changeColumn('value', ['type' => Type::getType('integer'), 'notnull' => true]);
-
         $this->renameExtension->renameColumn(
             $schema,
             $queries,

@@ -52,7 +52,7 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="integer")
+     * @ORM\Column(name="value", type="float", nullable=true)
      */
     protected $value;
 

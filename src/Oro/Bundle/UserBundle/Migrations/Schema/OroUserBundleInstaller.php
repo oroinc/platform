@@ -344,7 +344,7 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', ]
+            ['onDelete' => 'SET NULL']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user_status'),
@@ -366,13 +366,13 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_role'),
             ['role_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
     }
 
@@ -388,13 +388,13 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_group'),
             ['group_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
     }
 
@@ -410,13 +410,13 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_business_unit'),
             ['business_unit_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
     }
 
@@ -432,13 +432,13 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_origin'),
             ['origin_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
     }
 
@@ -454,7 +454,7 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', ]
+            ['onDelete' => 'SET NULL']
         );
     }
 
@@ -470,13 +470,13 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_access_group'),
             ['group_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_role'),
             ['role_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', ]
+            ['onDelete' => 'CASCADE']
         );
     }
 
@@ -492,7 +492,7 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_business_unit'),
             ['business_unit_owner_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', ]
+            ['onDelete' => 'SET NULL']
         );
     }
 
