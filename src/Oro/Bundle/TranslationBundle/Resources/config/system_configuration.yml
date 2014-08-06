@@ -18,3 +18,7 @@ oro_system_configuration:
                                     language_languages:
                                         children:
                                             - oro_translation.available_translations
+
+    api_tree:
+        localization:
+            availableTranslations:  oro_translation.available_translations

@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Oro\Bundle\ConfigBundle\Provider\Provider;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -17,6 +16,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 class SystemConfigurationPass implements CompilerPassInterface
 {
     const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
+    const CONFIG_PROVIDER_TAG_NAME      = 'oro_config.configuration_provider';
 
     /**
      * {@inheritdoc}
@@ -26,17 +26,20 @@ class SystemConfigurationPass implements CompilerPassInterface
         $settings = $this->loadSettings($container);
         $container->getDefinition(self::CONFIG_DEFINITION_BAG_SERVICE)->replaceArgument(0, $settings);
 
-        $processor = new ProcessorDecorator(new Processor(), $this->getDeclaredVariableNames($settings));
-        $config    = $this->loadConfig($container, $processor);
+        $providers      = [];
+        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_PROVIDER_TAG_NAME);
+        foreach ($taggedServices as $id => $attributes) {
+            $providers[$attributes[0]['scope']][] = $id;
+        }
 
-        $taggedServices = $container->findTaggedServiceIds(Provider::TAG_NAME);
-        if ($taggedServices) {
-            $config = $processor->process($config);
-
-            foreach ($taggedServices as $id => $attributes) {
-                $container
-                    ->getDefinition($id)
-                    ->replaceArgument(0, $config);
+        $processor = new ProcessorDecorator(
+            new Processor(),
+            $this->getDeclaredVariableNames($settings)
+        );
+        foreach ($providers as $scope => $ids) {
+            $config = $processor->process($this->loadConfig($container, $processor, $scope));
+            foreach ($ids as $id) {
+                $container->getDefinition($id)->replaceArgument(0, $config);
             }
         }
     }
@@ -77,16 +80,18 @@ class SystemConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder   $container
      * @param ProcessorDecorator $processor
+     * @param string             $scope
      *
      * @return array
      */
-    protected function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor)
+    protected function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor, $scope)
     {
         $config = array();
 
+        $alias        = $scope === 'app' ? 'system' : $scope;
         $configLoader = new CumulativeConfigLoader(
-            'oro_system_configuration',
-            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
+            sprintf('oro_%s_configuration', $alias),
+            new YamlCumulativeFileLoader(sprintf('Resources/config/%s_configuration.yml', $alias))
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {

@@ -1,0 +1,11 @@
+oro_system_configuration:
+
+    api_tree:
+        lookAndFeel:
+            history:
+                maxItems:   oro_navigation.maxItems
+            page:
+                suffix:     oro_navigation.title_suffix
+                delimiter:  oro_navigation.title_delimiter
+            breadcrumbs:
+                menu:       oro_navigation.breadcrumb_menu

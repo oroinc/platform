@@ -78,3 +78,10 @@ oro_system_configuration:
                                             - oro_tracking.piwik_host
                                             - oro_tracking.piwik_token_auth
                                             - oro_tracking.wesite_configuration
+
+    api_tree:
+        tracking:
+            dynamicTrackingEnabled:   oro_tracking.dynamic_tracking_enabled
+            logRotateInterval:        oro_tracking.log_rotate_interval
+            piwikHost:                oro_tracking.piwik_host
+            piwikTokenAuth:           oro_tracking.piwik_token_auth

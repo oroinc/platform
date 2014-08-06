@@ -23,8 +23,7 @@ class SystemConfigurationFormProvider extends Provider
     {
         parent::__construct($config, $securityFacade);
 
-        $this->factory        = $factory;
-        $this->securityFacade = $securityFacade;
+        $this->factory = $factory;
     }
 
     /**

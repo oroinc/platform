@@ -26,3 +26,9 @@ oro_system_configuration:
                                         children:
                                             - oro_notification.email_notification_sender_email
                                             - oro_notification.email_notification_sender_name
+
+    api_tree:
+        notifications:
+            email:
+                senderEmail:  oro_notification.email_notification_sender_email
+                senderName:   oro_notification.email_notification_sender_name

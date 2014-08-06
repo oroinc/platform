@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Fixtures\TestBundle;
 
@@ -50,15 +49,21 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         [
                             'settings' => [
                                 SettingsBuilder::RESOLVED_KEY => true,
-                                'some_field'                  => ['value' => 'some_val'],
-                                'some_another_field'          => ['value' => 'some_another_val'],
+                                'some_field'                  => [
+                                    'value' => 'some_val',
+                                    'scope' => 'app'
+                                ],
+                                'some_another_field'          => [
+                                    'value' => 'some_another_val',
+                                    'scope' => 'app'
+                                ],
                             ]
                         ]
                     ]
                 )
             );
 
-        $bagServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $bagServiceDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $providerServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
@@ -67,8 +72,16 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with(Provider::TAG_NAME)
-            ->will($this->returnValue(['provider_service' => 'some arguments']));
+            ->with(SystemConfigurationPass::CONFIG_PROVIDER_TAG_NAME)
+            ->will(
+                $this->returnValue(
+                    [
+                        'provider_service' => [
+                            ['scope' => 'app']
+                        ]
+                    ]
+                )
+            );
 
         $this->container->expects($this->exactly(2))
             ->method('getDefinition')

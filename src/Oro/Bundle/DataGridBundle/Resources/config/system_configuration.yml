@@ -33,3 +33,8 @@ oro_system_configuration:
                                     grid_settings:
                                         children:
                                             - oro_data_grid.default_per_page
+
+    api_tree:
+        lookAndFeel:
+            grid:
+                defaultPerPage:   oro_data_grid.default_per_page
