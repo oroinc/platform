@@ -25,7 +25,6 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RouteResource("emailtemplate")
