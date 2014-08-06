@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\FormError;

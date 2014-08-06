@@ -1,5 +1,3 @@
-"Change Entity Confirmation": "Change Entity Confirmation"
-"Yes, I Agree": "Yes, I Agree"
 "Confirm action": "Confirm action"
 "Please confirm that you want to refresh this segment.": "Please confirm that you want to refresh this segment."
 "Segment successfully processed.": "Segment successfully processed."
@@ -7,4 +5,4 @@
 
 oro:
     segment:
-        confirm_update: Changing the entity will erase all segment filters and columns. Do you want to continue?
+        change_entity_confirmation: Changing the entity will erase all segment filters and columns. Do you want to continue?
