@@ -46,3 +46,9 @@ oro_system_configuration:
                                 children:
                                     another_branch_second:
                                         children: []
+
+    api_tree:
+        section1:
+            field1: some_field
+            section11:
+                field2: some_another_field

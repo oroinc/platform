@@ -29,3 +29,8 @@ oro_system_configuration:
                                         children:
                                             - oro_attachment.upload_file_mime_types
                                             - oro_attachment.upload_image_mime_types
+
+    api_tree:
+        attachments:
+            uploadFileMimeTypes:   oro_attachment.upload_file_mime_types
+            uploadImageMimeTypes:  oro_attachment.upload_image_mime_types

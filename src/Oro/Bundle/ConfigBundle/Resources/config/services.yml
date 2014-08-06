@@ -13,6 +13,8 @@ parameters:
     oro_config.type.config_checkbox.class:                                       Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
     oro_config.type.parent_scope_checkbox.class:                                 Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox
 
+    oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
+
 services:
     oro_config.config_definition_bag:
         class: %oro_config.config_definition_bag.class%
@@ -50,7 +52,7 @@ services:
             - @form.factory
             - @oro_security.security_facade
         tags:
-            -  { name: oro_config.configuration_provider }
+            -  { name: oro_config.configuration_provider, scope: app }
         lazy: true
 
     oro_config.form.config_subscriber:
@@ -85,3 +87,9 @@ services:
         arguments:
             - @oro_config.global
 
+    oro_config.manager.api:
+        class: %oro_config.manager.api.class%
+        arguments:
+            - @oro_config.provider.system_configuration.form_provider
+            - @oro_config.global
+        lazy: true

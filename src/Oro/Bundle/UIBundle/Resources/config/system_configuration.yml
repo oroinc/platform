@@ -49,3 +49,11 @@ oro_system_configuration:
                                     navbar_settings:
                                         children:
                                             - oro_ui.navbar_position
+
+    api_tree:
+        application:
+            shortName:      oro_ui.application_name
+            fullName:       oro_ui.application_title
+        lookAndFeel:
+            navbar:
+                position:   oro_ui.navbar_position

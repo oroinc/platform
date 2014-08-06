@@ -151,3 +151,17 @@ oro_system_configuration:
                                         children:
                                             - oro_locale.language
                                             - oro_locale.languages
+
+    api_tree:
+        localization:
+            defaultLanguage:          oro_locale.language
+            supportedLanguages:       oro_locale.languages
+            locale:                   oro_locale.locale
+            primaryCountry:           oro_locale.country
+            formatAddressPerCountry:  oro_locale.format_address_by_address_country
+            timezone:                 oro_locale.timezone
+            currency:                 oro_locale.currency
+            firstQuarterStart:        oro_locale.quarter_start
+            mapTemperatureUnit:       oro_locale.temperature_unit
+            mapWindSpeedUnit:         oro_locale.wind_speed_unit
+

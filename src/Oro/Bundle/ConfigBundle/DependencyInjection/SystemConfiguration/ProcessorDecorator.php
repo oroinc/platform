@@ -5,20 +5,22 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessorDecorator
 {
-    const ROOT        = 'oro_system_configuration';
-    const GROUPS_NODE = 'groups';
-    const FIELDS_ROOT = 'fields';
-    const TREE_ROOT   = 'tree';
+    const ROOT          = 'oro_system_configuration';
+    const GROUPS_NODE   = 'groups';
+    const FIELDS_ROOT   = 'fields';
+    const TREE_ROOT     = 'tree';
+    const API_TREE_ROOT = 'api_tree';
 
     /** @var Processor */
     protected $processor;
 
     /** @var string[] */
-    protected $variableNames;
+    protected $variables;
 
     /**
      * @param Processor $processor
@@ -26,8 +28,8 @@ class ProcessorDecorator
      */
     public function __construct(Processor $processor, $variableNames)
     {
-        $this->processor     = $processor;
-        $this->variableNames = $variableNames;
+        $this->processor = $processor;
+        $this->variables = array_combine($variableNames, $variableNames);
     }
 
     /**
@@ -42,17 +44,25 @@ class ProcessorDecorator
         $result = $this->processor->process($this->getConfigurationTree()->buildTree(), $data);
 
         // validate variable names
-        $variables = array_combine($this->variableNames, $this->variableNames);
-        foreach ($result['fields'] as $varName => $varData) {
-            if (!isset($variables[$varName]) && !(isset($varData['ui_only']) && $varData['ui_only'])) {
-                throw new InvalidConfigurationException(
-                    sprintf(
-                        'The system configuration variable "%s" is not declared.'
-                        . ' Please make sure that it is either added by SettingsBuilder'
-                        . ' or marked as "ui_only" in config.',
-                        $varName
-                    )
-                );
+        if (isset($result[self::FIELDS_ROOT])) {
+            foreach ($result[self::FIELDS_ROOT] as $varName => $varData) {
+                if (!isset($this->variables[$varName]) && !(isset($varData['ui_only']) && $varData['ui_only'])) {
+                    throw new InvalidConfigurationException(
+                        sprintf(
+                            'The system configuration variable "%s" is not defined.'
+                            . ' Please make sure that it is either added to bundle configuration settings'
+                            . ' or marked as "ui_only" in config.',
+                            $varName
+                        )
+                    );
+                }
+            }
+        }
+
+        // validate API tree
+        if (isset($result[self::API_TREE_ROOT])) {
+            foreach ($result[self::API_TREE_ROOT] as $key => $data) {
+                $this->validateApiTreeItem(self::ROOT, $key, $data);
             }
         }
 
@@ -77,6 +87,7 @@ class ProcessorDecorator
                 switch ($nodeName) {
                     // merge recursive all nodes in tree
                     case self::TREE_ROOT:
+                    case self::API_TREE_ROOT:
                         $source[self::ROOT][$nodeName] = array_merge_recursive(
                             $source[self::ROOT][$nodeName],
                             $node
@@ -104,7 +115,7 @@ class ProcessorDecorator
     {
         $result = array(
             self::ROOT => array_fill_keys(
-                array(self::GROUPS_NODE, self::FIELDS_ROOT, self::TREE_ROOT),
+                array(self::GROUPS_NODE, self::FIELDS_ROOT, self::TREE_ROOT, self::API_TREE_ROOT),
                 array()
             )
         );
@@ -126,6 +137,7 @@ class ProcessorDecorator
                 ->append($this->getGroupsNode())
                 ->append($this->getFieldsNode())
                 ->append($this->getTreeNode())
+                ->variableNode(self::API_TREE_ROOT)->end()
             ->end();
 
         return $tree;
@@ -200,5 +212,45 @@ class ProcessorDecorator
             ->end();
 
         return $node;
+    }
+
+    /**
+     * @param string $path
+     * @param mixed  $key
+     * @param mixed  $data
+     *
+     * @throws InvalidTypeException
+     * @throws InvalidConfigurationException
+     */
+    protected function validateApiTreeItem($path, $key, $data)
+    {
+        if (!is_string($key)) {
+            throw new InvalidTypeException(
+                sprintf('Array key must be a string, but got "%s". Root node: %s.', gettype($key), $path)
+            );
+        }
+        if (is_array($data)) {
+            $path = $path . '.' . $key;
+            foreach ($data as $subKey => $subData) {
+                $this->validateApiTreeItem($path, $subKey, $subData);
+            }
+        } elseif (!is_string($data)) {
+            throw new InvalidTypeException(
+                sprintf(
+                    'The value of "%s" must be an array or a string, but got "%s".',
+                    $path . '.' . $key,
+                    gettype($data)
+                )
+            );
+        } elseif (!isset($this->variables[$data])) {
+            throw new InvalidConfigurationException(
+                sprintf(
+                    'The system configuration variable "%s" is not defined.'
+                    . ' Please make sure that it is added to bundle configuration settings. Node path: %s.',
+                    $data,
+                    $path . '.' . $key
+                )
+            );
+        }
     }
 }
