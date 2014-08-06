@@ -25,6 +25,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RouteResource("emailtemplate")
@@ -161,13 +162,30 @@ class EmailTemplateController extends RestController
     public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];
+        $entity         = null;
+
         if ($entityId && $emailTemplate->getEntityName()) {
             $entity = $this->getDoctrine()
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
 
-            $templateParams['entity'] = $entity;
         }
+
+        if (is_null($entity)) {
+            return $this->handleView(
+                $this->view(
+                    [
+                        'message' => sprintf(
+                            'entity %s with id=%d not found',
+                            $emailTemplate->getEntityName(),
+                            $entityId
+                        )
+                    ],
+                    Codes::HTTP_NOT_FOUND
+                )
+            );
+        }
+        $templateParams['entity'] = $entity;
 
         list($subject, $body) = $this->get('oro_email.email_renderer')
             ->compileMessage($emailTemplate, $templateParams);
