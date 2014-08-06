@@ -49,15 +49,36 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->from('OroUserBundle:User', 'u')
                     ->select(array('u.id', 'u.username as uName'))
                     ->groupBy('uName'),
-                'expectedDQL' => 'SELECT u.username as uName FROM OroUserBundle:User u GROUP BY uName'
+                'expectedDQL' => 'SELECT u.username as _groupByPart0 FROM OroUserBundle:User u GROUP BY _groupByPart0'
+            ),
+            'function_having_test' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(array('u.id', 'SUBSTRING(u.username, 1, 3) as uName'))
+                    ->groupBy('u.id')
+                    ->having("SUBSTRING(u.username, 1, 3) LIKE 'A%'"),
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 ' .
+                    'FROM OroUserBundle:User u ' .
+                    'GROUP BY _groupByPart0 ' .
+                    "HAVING SUBSTRING(u.username, 1, 3) LIKE 'A%'"
             ),
             'function_group_test' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
                     ->select(array('u.id', 'SUBSTRING(u.username, 1, 3) as uName'))
                     ->groupBy('uName'),
-                'expectedDQL' =>
-                    'SELECT SUBSTRING(u.username, 1, 3) as uName FROM OroUserBundle:User u GROUP BY uName'
+                'expectedDQL' => 'SELECT SUBSTRING(u.username, 1, 3) as _groupByPart0 ' .
+                    'FROM OroUserBundle:User u ' .
+                    'GROUP BY _groupByPart0'
+            ),
+            'complex_group_by' => array(
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(array('u.id', 'SUBSTRING(u.username, 1, 3) as uName'))
+                    ->groupBy('u.id, uName'),
+                'expectedDQL' => 'SELECT u.id as _groupByPart0, SUBSTRING(u.username, 1, 3) as _groupByPart1 ' .
+                    'FROM OroUserBundle:User u ' .
+                    'GROUP BY _groupByPart0, _groupByPart1'
             ),
             'one_table' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -67,9 +88,9 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->andWhere('LOWER(u.username) LIKE :testParameter')
                     ->groupBy('u.id')
                     ->having('u.username = :testParameter'),
-                'expectedDQL' => 'SELECT u.id, u.username as _havingField0 FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
                     . 'WHERE u.id=10 AND LOWER(u.username) LIKE :testParameter '
-                    . 'GROUP BY u.id '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username = :testParameter'
             ),
             'unused_left_join' => array(
@@ -109,11 +130,11 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->groupBy('gr.id')
                     ->having('u.username LIKE :test'),
-                'expectedDQL' => 'SELECT DISTINCT gr.id, u.username as _havingField0 FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT gr.id as _groupByPart0 FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr '
-                    . 'GROUP BY gr.id '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username LIKE :test'
             ),
             'inner_with_2_left_having' => array(
@@ -126,11 +147,11 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('gr.label LIKE :test'),
-                'expectedDQL' => 'SELECT DISTINCT u.id, gr.label as _havingField0 FROM OroUserBundle:User u '
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr '
-                    . 'GROUP BY u.id '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING gr.label LIKE :test'
             ),
             'third_join_in_on' => array(
@@ -156,9 +177,9 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('login = :test'),
-                'expectedDQL' => 'SELECT u.id, u.username as login FROM OroUserBundle:User u '
-                    . 'GROUP BY u.id '
-                    . 'HAVING login = :test'
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING u.username = :test'
             ),
             'having_in' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -166,9 +187,9 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('login IN (?0)'),
-                'expectedDQL' => 'SELECT u.id, u.username as login FROM OroUserBundle:User u '
-                    . 'GROUP BY u.id '
-                    . 'HAVING login IN (?0)'
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING u.username IN (?0)'
             ),
             'having_like' => array(
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -176,8 +197,8 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('login LIKE :test'),
-                'expectedDQL' => 'SELECT u.id, u.username as login FROM OroUserBundle:User u '
-                    . 'GROUP BY u.id '
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username LIKE :test'
             ),
             'having_is_null' => array(
@@ -186,8 +207,8 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('login IS NULL'),
-                'expectedDQL' => 'SELECT u.id, u.username as login FROM OroUserBundle:User u '
-                    . 'GROUP BY u.id '
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username IS NULL'
             ),
             'having_is_not_null' => array(
@@ -196,8 +217,8 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->select(array('u.id', 'u.username as login', 'api.apiKey as aKey'))
                     ->groupBy('u.id')
                     ->having('login IS NOT NULL'),
-                'expectedDQL' => 'SELECT u.id, u.username as login FROM OroUserBundle:User u '
-                    . 'GROUP BY u.id '
+                'expectedDQL' => 'SELECT u.id as _groupByPart0 FROM OroUserBundle:User u '
+                    . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username IS NOT NULL'
             ),
             'having_instead_where' => array(
@@ -242,12 +263,12 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                         ->leftJoin('OroUserBundle:Status', 's', Join::WITH, 's.user = eu')
                         ->groupBy('eu.username')
                         ->where('s.status = :statusName'),
-                'expectedDQL'  => 'SELECT DISTINCT eu.username FROM OroUserBundle:User u '
+                'expectedDQL'  => 'SELECT eu.username as _groupByPart0 FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroUserBundle:Email e WITH e.user = u '
                     . 'LEFT JOIN e.user eu '
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
                     . 'WHERE s.status = :statusName '
-                    . 'GROUP BY eu.username'
+                    . 'GROUP BY _groupByPart0'
             )
         );
     }

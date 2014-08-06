@@ -3,6 +3,7 @@
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
 
 class CountQueryBuilderOptimizer
@@ -60,83 +61,53 @@ class CountQueryBuilderOptimizer
         $qb->setFirstResult(null)
             ->setMaxResults(null)
             ->resetDQLPart('orderBy')
+            ->resetDQLPart('groupBy')
             ->resetDQLPart('select')
             ->resetDQLPart('join')
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
         $fieldsToSelect = array();
-        $usedAliases = array();
         if ($parts['groupBy']) {
             $groupBy = (array) $parts['groupBy'];
-            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases($groupBy));
-            // Add all group by fields to select, otherwise add identifier
-            foreach ($groupBy as $groupByPart) {
-                $fieldsToSelect = array_merge($fieldsToSelect, $this->qbTools->getFields($groupByPart));
+            $groupByFields = $this->getSelectFieldFromGroupBy($groupBy);
+            $usedGroupByAliases = [];
+            for ($i = 0; $i < count($groupByFields); $i++) {
+                $alias = '_groupByPart' . $i;
+                $usedGroupByAliases[] = $alias;
+                $fieldsToSelect[] = $groupByFields[$i] . ' as ' . $alias;
             }
+            $qb->groupBy(implode(', ', $usedGroupByAliases));
         } elseif (!$parts['where'] && $parts['having']) {
-            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
             // If there is no where and group by, but having is present - convert having to where.
             $parts['where'] = $parts['having'];
             $parts['having'] = null;
             $qb->resetDQLPart('having');
-        } else {
-            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
         }
 
         if ($parts['having']) {
-            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases($parts['having']));
-            $parts['having'] = $this->qbTools->fixHavingAliases($parts['having']);
-            $qb->having($parts['having']);
+            $qb->having(
+                $this->qbTools->replaceAliasesWithFields($parts['having'])
+            );
         }
 
         $hasJoins = false;
         if ($parts['join']) {
             $hasJoins = $this->addJoins($qb, $parts);
         }
-
-        // Add group by fields to select fields.
-        foreach ($usedAliases as $alias) {
-            $fieldsToSelect[] = $this->qbTools->getFieldByAlias($alias) . ' as ' . $alias;
-        }
-        if ($parts['having']) {
-            $fieldsToSelect = $this->appendFieldsToSelect(
-                $this->qbTools->getFields($parts['having']),
-                $fieldsToSelect
-            );
+        if (!$parts['groupBy']) {
+            $qb->distinct($hasJoins);
+            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
         }
 
         if ($parts['where']) {
             $qb->where($this->qbTools->replaceAliasesWithFields($parts['where']));
         }
 
-        $qb->select($fieldsToSelect);
-        $qb->distinct($hasJoins);
+        $qb->select(array_unique($fieldsToSelect));
         $this->qbTools->fixUnusedParameters($qb);
 
         return $qb;
-    }
-
-    /**
-     * @param array $fields
-     * @param array $fieldsToSelect
-     * @return array
-     */
-    protected function appendFieldsToSelect($fields, $fieldsToSelect)
-    {
-        $result = $fieldsToSelect;
-        $select = implode(' ,', $fieldsToSelect) . ' ';
-        $idx = 0;
-        $prefix = '_havingField';
-        foreach ($fields as $field) {
-            if (stripos($select, $field . ' ') === false) {
-                $alias = $prefix . $idx;
-                $result[] = $field . ' as ' . $alias;
-                $idx++;
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -224,5 +195,42 @@ class CountQueryBuilderOptimizer
         }
 
         return $fieldName;
+    }
+
+    /**
+     * @param GroupBy[] $groupBy
+     * @return array
+     */
+    protected function getSelectFieldFromGroupBy(array $groupBy)
+    {
+        $expressions = array();
+        foreach ($groupBy as $groupByPart) {
+            foreach ($groupByPart->getParts() as $part) {
+                $expressions = array_merge($this->getSelectFieldFromGroupByPart($part));
+            }
+        }
+
+        return $expressions;
+    }
+
+    /**
+     * @param string $groupByPart
+     * @return array
+     */
+    protected function getSelectFieldFromGroupByPart($groupByPart)
+    {
+        $expressions = array();
+        if (strpos($groupByPart, ',') !== false) {
+            $groupByParts = explode(',', $groupByPart);
+            foreach ($groupByParts as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        } else {
+            $groupByPart = trim($groupByPart);
+            $groupByPart = $this->qbTools->replaceAliasesWithFields($groupByPart);
+            $expressions[] = $groupByPart;
+        }
+
+        return $expressions;
     }
 }

@@ -49,11 +49,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
-        if (!$isComputed) {
-            $restriction = $this->qbTools->replaceAliasesWithFields($restriction);
-        } else {
-            $restriction = $this->qbTools->fixHavingAliases($restriction);
-        }
+        $restriction = $this->qbTools->replaceAliasesWithFields($restriction);
 
         if ($condition === FilterUtility::CONDITION_OR) {
             if ($isComputed) {
