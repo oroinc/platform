@@ -20,9 +20,11 @@ define([
         }
         Backbone.mediator.unsubscribe(null, null, this);
         this.off();
-        this.undelegateEvents();
         this.stopListening();
-        this.$el.removeData();
+        if (this.$el) {
+            this.undelegateEvents();
+            this.$el.removeData();
+        }
 
         properties = ['el', '$el', 'options', 'model', 'collection', 'subviews', 'subviewsByName', '_callbacks'];
         for (_j = 0, _len1 = properties.length; _j < _len1; _j++) {
