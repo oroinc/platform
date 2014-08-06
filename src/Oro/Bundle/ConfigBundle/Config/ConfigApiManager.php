@@ -23,7 +23,7 @@ class ConfigApiManager
     }
 
     /**
-     * Gets the list of all configuration sections' paths
+     * Gets the list of paths for all configuration sections
      * The result is sorted alphabetically
      *
      * @return string[]
