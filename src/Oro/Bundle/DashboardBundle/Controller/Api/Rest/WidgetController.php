@@ -125,6 +125,7 @@ class WidgetController extends FOSRestController implements ClassResourceInterfa
      *      resource=true
      * )
      * @AclAncestor("oro_dashboard_edit")
+     *
      * @return Response
      */
     public function putPositionsAction($dashboardId)
