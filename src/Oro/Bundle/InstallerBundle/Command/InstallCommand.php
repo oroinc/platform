@@ -17,6 +17,9 @@ use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
 {
+    /** @var bool */
+    protected $isInteractive = false;
+
     /**
      * {@inheritdoc}
      */
@@ -55,6 +58,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $forceInstall = $input->getOption('force');
+        $this->isInteractive = $input->isInteractive();
 
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
@@ -158,30 +162,16 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
     /**
      * @param CommandExecutor $commandExecutor
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @return InstallCommand
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @param bool            $dropFullDatabase
      */
-    protected function setupStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    protected function doctrineDropSchema(CommandExecutor $commandExecutor, $dropFullDatabase = false)
     {
-        $output->writeln('<info>Setting up database.</info>');
-
-        /** @var DialogHelper $dialog */
-        $dialog  = $this->getHelperSet()->get('dialog');
-        $options = $input->getOptions();
-
-        $input->setInteractive(false);
-
-        $schemaDropOptions = array(
-            '--force' => true,
+        $schemaDropOptions = [
+            '--force'             => true,
             '--process-isolation' => true,
-        );
+        ];
 
-        if ($input->getOption('drop-database')) {
+        if ($dropFullDatabase) {
             $schemaDropOptions['--full-database'] = true;
         }
 
@@ -190,51 +180,114 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'doctrine:schema:drop',
                 $schemaDropOptions
             )
-            ->runCommand('oro:entity-config:cache:clear', array('--no-warmup' => true))
-            ->runCommand('oro:entity-extend:cache:clear', array('--no-warmup' => true))
+            ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
+            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true])
             ->runCommand(
                 'oro:migration:load',
-                array(
-                    '--force' => true,
+                [
+                    '--force'             => true,
                     '--process-isolation' => true,
-                )
+                ]
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
-                array(
+                [
                     '--process-isolation' => true,
-                )
+                ]
             )
             ->runCommand(
                 'oro:process:configuration:load',
-                array(
+                [
                     '--process-isolation' => true
-                )
+                ]
             )
             ->runCommand(
                 'oro:migration:data:load',
-                array(
+                [
                     '--process-isolation' => true,
-                    '--no-interaction' => true,
-                )
+                    '--no-interaction'    => true,
+                ]
             );
+    }
 
-        $output->writeln('');
-        $output->writeln('<info>Administration setup.</info>');
+    /**
+     * Update administrator with user input
+     *
+     * @param CommandExecutor $commandExecutor
+     * @param array           $options
+     * @param OutputInterface $output
+     */
+    protected function updateUser(CommandExecutor $commandExecutor, array $options, OutputInterface $output)
+    {
+        /** @var DialogHelper $dialog */
+        $dialog  = $this->getHelperSet()->get('dialog');
 
-        /** @var ConfigManager $configManager */
-        $configManager       = $this->getContainer()->get('oro_config.global');
-        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
-        $defaultAppURL       = $configManager->get('oro_ui.application_url');
+        $parameters = [
+            'user-name'     => 'Username',
+            'user-email'    => 'Email',
+            'user-firtname' => 'First name',
+            'user-lastname' => 'Last name',
+        ];
 
-        $passValidator        = function ($value) {
+        $commandParameters = [
+            'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+            '--process-isolation' => true,
+        ];
+
+        foreach ($parameters as $parameterName => $label) {
+            if (isset($options[$parameterName])) {
+                $commandParameters['--' . $parameterName] = $options[$parameterName];
+            } elseif ($this->isInteractive) {
+                $commandParameters['--' . $parameterName] = $dialog->ask($output, $this->buildQuestion($label));
+            }
+        }
+
+        $passValidator = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
 
             return $value;
         };
+
+        if (isset($options['user-password'])) {
+            $commandParameters['--user-password'] = $options['user-password'];
+        } elseif ($this->isInteractive) {
+            $commandParameters['--user-password'] = $dialog->askHiddenResponseAndValidate(
+                $output,
+                $this->buildQuestion('Password'),
+                $passValidator
+            );
+        }
+
+        // update user only if name, email or username changed
+        if (count($commandParameters) > 2) {
+            $commandExecutor->runCommand(
+                'oro:user:update',
+                $commandParameters
+            );
+        }
+    }
+
+    /**
+     * @param array           $options
+     * @param OutputInterface $output
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function updateSystemSettings(array $options, OutputInterface $output)
+    {
+        /** @var DialogHelper $dialog */
+        $dialog  = $this->getHelperSet()->get('dialog');
+
+        /** @var ConfigManager $configManager */
+        $configManager       = $this->getContainer()->get('oro_config.global');
+
+        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
+        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+        $defaultAppURL       = $configManager->get('oro_ui.application_url');
+
         $companyNameValidator = function ($value) use (&$defaultCompanyName) {
             $len = strlen(trim($value));
             if ($len === 0 && empty($defaultCompanyName)) {
@@ -247,61 +300,39 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
-        $applicationURL = isset($options['application-url'])
-            ? $options['application-url']
-            : $dialog->ask(
+        if (isset($options['application-url'])) {
+            $applicationURL = $options['application-url'];
+        } elseif ($this->isInteractive) {
+            $applicationURL = $dialog->ask(
                 $output,
                 $this->buildQuestion('Application URL', $defaultAppURL)
             );
-        $companyTitle  = isset($options['company-name'])
-            ? $options['company-name']
-            : $dialog->ask(
+        } else {
+            $applicationURL = null;
+        }
+
+        if (isset($options['company-name'])) {
+            $companyTitle = $options['company-name'];
+        } elseif ($this->isInteractive) {
+            $companyTitle = $dialog->ask(
                 $output,
                 $this->buildQuestion('Company name', $defaultCompanyTitle)
             );
-        $companyName   = isset($options['company-short-name'])
-            ? $options['company-short-name']
-            : $dialog->askAndValidate(
+        } else {
+            $companyTitle = null;
+        }
+
+        if (isset($options['company-short-name'])) {
+            $companyName = $options['company-short-name'];
+        } elseif ($this->isInteractive) {
+            $companyName = $dialog->askAndValidate(
                 $output,
                 $this->buildQuestion('Company short name', $defaultCompanyName),
                 $companyNameValidator
             );
-        $userName      = isset($options['user-name'])
-            ? $options['user-name']
-            : $dialog->ask($output, $this->buildQuestion('Username'));
-        $userEmail     = isset($options['user-email'])
-            ? $options['user-email']
-            : $dialog->ask($output, $this->buildQuestion('Email'));
-        $userFirstName = isset($options['user-firstname'])
-            ? $options['user-firstname']
-            : $dialog->ask($output, $this->buildQuestion('First name'));
-        $userLastName  = isset($options['user-lastname'])
-            ? $options['user-lastname']
-            : $dialog->ask($output, $this->buildQuestion('Last name'));
-        $userPassword  = isset($options['user-password'])
-            ? $options['user-password']
-            : $dialog->askHiddenResponseAndValidate(
-                $output,
-                $this->buildQuestion('Password'),
-                $passValidator
-            );
-        $demo = isset($options['sample-data'])
-            ? strtolower($options['sample-data']) == 'y'
-            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
-
-        // Update administrator with user input
-        $commandExecutor->runCommand(
-            'oro:user:update',
-            array(
-                'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
-                '--process-isolation' => true,
-                '--user-name' => $userName,
-                '--user-email' => $userEmail,
-                '--user-firstname' => $userFirstName,
-                '--user-lastname' => $userLastName,
-                '--user-password' => $userPassword
-            )
-        );
+        } else {
+            $companyName = null;
+        }
 
         // update company name and title if specified
         if (!empty($companyName) && $companyName !== $defaultCompanyName) {
@@ -313,10 +344,39 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
             $configManager->set('oro_ui.application_url', $applicationURL);
         }
-        $configManager->flush();
 
-        // load demo fixtures
-        if ($demo) {
+        $configManager->flush();
+    }
+
+    /**
+     * @param CommandExecutor $commandExecutor
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return InstallCommand
+     */
+    protected function setupStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('<info>Setting up database.</info>');
+
+        /** @var DialogHelper $dialog */
+        $dialog  = $this->getHelperSet()->get('dialog');
+        $options = $input->getOptions();
+
+        $this->doctrineDropSchema($commandExecutor, $input->getOption('drop-database'));
+
+        $output->writeln('');
+        $output->writeln('<info>Administration setup.</info>');
+
+        $this->updateUser($commandExecutor, $options, $output);
+        $this->updateSystemSettings($options, $output);
+
+        $isDemo = isset($options['sample-data'])
+            ? strtolower($options['sample-data']) == 'y'
+            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
+
+        if ($isDemo) {
+            // load demo fixtures
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
@@ -420,6 +480,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      *
      * @param string      $text
      * @param string|null $defaultValue
+     *
      * @return string
      */
     protected function buildQuestion($text, $defaultValue = null)
