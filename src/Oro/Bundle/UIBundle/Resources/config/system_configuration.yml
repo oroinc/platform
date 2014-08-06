@@ -17,6 +17,11 @@ oro_system_configuration:
             options:
                 label: 'Short Name'
 
+        oro_ui.application_url:
+            type: text
+            options:
+                label: 'Application URL'
+
         oro_ui.application_title:
             type: text
             options:
@@ -43,6 +48,7 @@ oro_system_configuration:
                                         children:
                                             - oro_ui.application_name
                                             - oro_ui.application_title
+                                            - oro_ui.application_url
 
                             look_and_feel:
                                 children:

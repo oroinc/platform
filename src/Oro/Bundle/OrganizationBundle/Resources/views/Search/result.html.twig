@@ -4,4 +4,4 @@
 
 {% set recordUrl = indexer_item.recordUrl %}
 {% set title = entity.name|default('N/A') %}
-{% set entityType = oro_entity_config(indexer_item.entityName, 'entity', 'label')|trans %}
+{% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}

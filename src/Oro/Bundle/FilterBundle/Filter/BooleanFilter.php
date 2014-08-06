@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
-class BooleanFilter extends ChoiceFilter
+class BooleanFilter extends AbstractFilter
 {
     /**
      * {@inheritdoc}
@@ -40,12 +42,36 @@ class BooleanFilter extends ChoiceFilter
             $this->buildComparisonExpr(
                 $ds,
                 $data['value'],
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                null
+                $this->get(FilterUtility::DATA_NAME_KEY)
             )
         );
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata()
+    {
+        $formView  = $this->getForm()->createView();
+        $fieldView = $formView->children['value'];
+
+        $choices = array_map(
+            function (ChoiceView $choice) {
+                return [
+                    'label' => $choice->label,
+                    'value' => $choice->value
+                ];
+            },
+            $fieldView->vars['choices']
+        );
+
+
+        $metadata            = parent::getMetadata();
+        $metadata['choices'] = $choices;
+
+        return $metadata;
     }
 
     /**
@@ -73,14 +99,12 @@ class BooleanFilter extends ChoiceFilter
      * @param FilterDatasourceAdapterInterface $ds
      * @param int                              $comparisonType 0 to compare with false, 1 to compare with true
      * @param string                           $fieldName
-     * @param string                           $parameterName  Not used in this type of a filter
      * @return string
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,
-        $fieldName,
-        $parameterName
+        $fieldName
     ) {
         switch ($comparisonType) {
             case BooleanFilterType::TYPE_YES:
