@@ -44,7 +44,7 @@ class ProcessorDecorator
         // validate variable names
         $variables = array_combine($this->variableNames, $this->variableNames);
         foreach ($result['fields'] as $varName => $varData) {
-            if (!isset($variables[$varName]) && !(isset($varData['ui_only']) && $varData['ui_only'])) {
+            if (!isset($variables[$varName]) && empty($varData['ui_only'])) {
                 throw new InvalidConfigurationException(
                     sprintf(
                         'The system configuration variable "%s" is not declared.'
