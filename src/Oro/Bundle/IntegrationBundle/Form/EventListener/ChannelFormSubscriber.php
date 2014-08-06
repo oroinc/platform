@@ -299,7 +299,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (IntegrationFormUtils::wasSyncedAtLeastOnce($integration)) {
+        if ($integration->getEditMode() != Integration::EDIT_MODE_ALLOW) {
             // disable type field
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
         }
