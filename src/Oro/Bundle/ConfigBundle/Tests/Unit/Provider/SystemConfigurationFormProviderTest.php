@@ -178,7 +178,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     {
         $config = Yaml::parse(file_get_contents($path));
 
-        $processor = new ProcessorDecorator(new Processor());
+        $processor = new ProcessorDecorator(new Processor(), ['some_field', 'some_another_field']);
 
         return $processor->process($config);
     }

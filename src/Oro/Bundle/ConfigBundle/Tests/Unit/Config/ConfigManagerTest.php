@@ -280,7 +280,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $config = Yaml::parse(file_get_contents($configPath));
 
-        $processor = new ProcessorDecorator(new Processor());
+        $processor = new ProcessorDecorator(new Processor(), ['some_field', 'some_another_field']);
         $config = $processor->process($config);
 
         $subscriber    = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ProcessorDecorator
 {
@@ -16,22 +17,44 @@ class ProcessorDecorator
     /** @var Processor */
     protected $processor;
 
+    /** @var string[] */
+    protected $variableNames;
+
     /**
      * @param Processor $processor
+     * @param string[]  $variableNames
      */
-    public function __construct(Processor $processor)
+    public function __construct(Processor $processor, $variableNames)
     {
-        $this->processor = $processor;
+        $this->processor     = $processor;
+        $this->variableNames = $variableNames;
     }
 
     /**
      * @param array $data
      *
      * @return array
+     *
+     * @throws InvalidConfigurationException
      */
     public function process(array $data)
     {
         $result = $this->processor->process($this->getConfigurationTree()->buildTree(), $data);
+
+        // validate variable names
+        $variables = array_combine($this->variableNames, $this->variableNames);
+        foreach ($result['fields'] as $varName => $varData) {
+            if (!isset($variables[$varName]) && empty($varData['ui_only'])) {
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'The system configuration variable "%s" is not declared.'
+                        . ' Please make sure that it is either added by SettingsBuilder'
+                        . ' or marked as "ui_only" in config.',
+                        $varName
+                    )
+                );
+            }
+        }
 
         return $result;
     }
@@ -144,10 +167,11 @@ class ProcessorDecorator
                 ->children()
                     ->scalarNode('type')->isRequired()->end()
                     ->arrayNode('options')
-                            ->prototype('variable')->end()
+                        ->prototype('variable')->end()
                     ->end()
                     ->scalarNode('acl_resource')->end()
                     ->integerNode('priority')->end()
+                    ->booleanNode('ui_only')->end()
                 ->end()
             ->end();
 

@@ -50,6 +50,7 @@ oro_system_configuration:
                 required: false
 
         oro_tracking.wesite_configuration:
+            ui_only: true
             type: oro_link_type # @todo BAP-4696 use template
             priority: 0
             options:
