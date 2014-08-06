@@ -46,6 +46,8 @@ class SegmentController extends Controller
      */
     public function viewAction(Segment $entity)
     {
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+
         $segmentGroup = $this->get('oro_entity_config.provider.entity')
             ->getConfig($entity->getEntity())
             ->get('plural_label');

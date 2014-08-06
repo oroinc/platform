@@ -26,6 +26,8 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+
         $reportGroup = $this->get('oro_entity_config.provider.entity')
             ->getConfig($entity->getEntity())
             ->get('plural_label');
