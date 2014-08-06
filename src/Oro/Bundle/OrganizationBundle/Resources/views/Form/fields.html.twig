@@ -15,6 +15,46 @@
     {% endif %}
 {% endblock %}
 
+{% block oro_business_unit_by_organization_widget %}
+    {% spaceless %}
+        {#{{ dump(form.vars.value.id ) }}#}
+
+        {{ form_row(form.organization) }}
+        {{ form_row(form.owner) }}
+
+        <script type="text/javascript">
+            require(['jquery', 'routing', 'orotranslation/js/translator'],
+            function($, routing, __) {
+                'use strict';
+                $(function() {
+                    $(document).on('change', 'form select.oro_bu_by_org_select_org', function (e) {
+                        var el = $(this),
+                            selected_org = el.find('option:selected').attr('value').replace(/\\/g,'_'),
+                            query =  routing.generate.apply(routing, ['oro_business_unit_search', {id: selected_org}]),
+                            bu = $('form select.oro_bu_by_org_select_bu'),
+                            msg = __('oro.business_unit.form.choose_business_user');
+
+                        $(bu).prev('span').text('loading...');
+
+                        $.getJSON(query, function(response) {
+                            var items = [];
+
+                            $.each( response, function(key, val) {
+                                items.push("<option value='" + val.id + "'>" + val.name + "</option>");
+                            });
+
+                            $(bu).empty().append(items.join(''));
+                            $(bu).prev('span').text(msg);
+                        });
+
+                        return false;
+                    });
+                });
+            });
+        </script>
+    {% endspaceless %}
+{% endblock %}
+
 {% block oro_organizations_select_widget %}
     {% spaceless %}
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}

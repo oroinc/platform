@@ -31,6 +31,5 @@ class OroOrganizationBundleInstaller implements Installation
         OroOrganizationBundleV1_0::oroBusinessUnitForeignKeys($schema);
 
         OroOrganizationBundleV1_2::updateOrganizationTable($schema);
-        OroOrganizationBundleV1_2::updateBusinessUnitTable($schema);
     }
 }

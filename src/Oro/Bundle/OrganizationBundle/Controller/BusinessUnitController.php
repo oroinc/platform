@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/business_unit")
@@ -53,6 +54,28 @@ class BusinessUnitController extends Controller
             'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
+
+    /**
+     * @Route("/search/{id}", name="oro_business_unit_search", requirements={"id"="\d+"})
+     * Acl(
+     *      id="oro_business_unit_view",
+     *      type="action",
+     *      class="OroOrganizationBundle:BusinessUnit",
+     *      permission="VIEW"
+     * )
+     */
+    public function searchAction($selectedOrganizationid)
+    {
+        $businessUnits = [];
+        if ($selectedOrganizationid) {
+            $businessUnits = $this->get('oro_organization.business_unit_manager')
+                ->getBusinessUnitRepo()
+                ->getOrganizationBusinessUnitsTree($selectedOrganizationid);
+        }
+
+        return new Response(json_encode($businessUnits));
+    }
+
 
     /**
      * Edit business_unit form

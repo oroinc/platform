@@ -4,11 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Doctrine\ORM\EntityRepository;
 
 class BusinessUnitType extends AbstractType
 {
@@ -22,6 +18,14 @@ class BusinessUnitType extends AbstractType
                 'text',
                 array(
                     'label'    => 'oro.organization.businessunit.name.label',
+                    'required' => true,
+                )
+            )
+            ->add(
+                'business_unit_by_organization',
+                'oro_business_unit_by_organization',
+                array(
+                    'label'    => false,
                     'required' => true,
                 )
             )
@@ -57,18 +61,18 @@ class BusinessUnitType extends AbstractType
                     'required' => false,
                 )
             )
-            ->add(
+            /*->add(
                 'organization',
                 'entity',
                 array(
                     'label'    => 'oro.organization.businessunit.organization.label',
                     'class'    => 'OroOrganizationBundle:Organization',
                     'property' => 'name',
-                    'required' => false,
+                    'required' => true,
                     'multiple' => false,
                     'empty_value' => 'oro.organization.form.choose_organization'
                 )
-            )
+            )*/
             ->add(
                 'appendUsers',
                 'oro_entity_identifier',
@@ -95,7 +99,8 @@ class BusinessUnitType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+                'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                //'ownership_disabled' => true
             )
         );
     }

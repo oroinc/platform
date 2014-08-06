@@ -1,5 +1,6 @@
 parameters:
     oro_organization.form.type.business_unit.class:                   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
+    oro_organization.form.type.business_unit_by_organization.class:   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitByOrganizationType
     oro_organization.form.handler.business_unit.class:                Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
 
     oro_organization.form.type.business_unit_tree_type.class:         Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
@@ -29,6 +30,11 @@ services:
         class: %oro_organization.form.type.business_unit.class%
         tags:
             - { name: form.type, alias: oro_business_unit }
+
+    oro_organization.form.type.business_unit_by_organization:
+        class: %oro_organization.form.type.business_unit_by_organization.class%
+        tags:
+            - { name: form.type, alias: oro_business_unit_by_organization }
 
     oro_organization.form.handler.business_unit:
         class: %oro_organization.form.handler.business_unit.class%

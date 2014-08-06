@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\EventListener;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;

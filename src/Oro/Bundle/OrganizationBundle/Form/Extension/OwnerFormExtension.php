@@ -169,20 +169,9 @@ class OwnerFormExtension extends AbstractTypeExtension
             $defaultOwner = $this->getCurrentOrganization();
         }
 
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            array($this, 'preSetData')
-        );
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            array($this, 'preSubmit')
-        );
-
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            array($this, 'postSubmit')
-        );
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'preSubmit'));
+        $builder->addEventListener(FormEvents::POST_SUBMIT, array($this, 'postSubmit'));
 
         /**
          * Adding subscriber to hide owner field for update pages if assign permission is not granted

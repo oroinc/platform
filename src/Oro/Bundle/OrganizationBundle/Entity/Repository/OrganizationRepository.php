@@ -50,6 +50,22 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
+     * Returns array of enabled organizations
+     *
+     * @return array
+     */
+    public function getEnabledOrganizationsArray()
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('o')
+            ->from('OroOrganizationBundle:Organization', 'o')
+            ->where('o.enabled = 1')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
      * Update all records in given table with organization id
      *
      * @param string  $tableName table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group

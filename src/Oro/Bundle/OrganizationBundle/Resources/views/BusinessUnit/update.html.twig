@@ -67,7 +67,7 @@
                 form_widget(form.appendUsers, {'id': 'businessUnitAppendUsers'}),
                 form_widget(form.removeUsers, {'id': 'businessUnitRemoveUsers'}),
                 form_row(form.name),
-                form_row(form.organization),
+                form_widget(form.business_unit_by_organization),
                 form_row(form.phone),
                 form_row(form.website),
                 form_row(form.email),
@@ -75,15 +75,16 @@
             ]
         }]
     }] %}
+    {#form_row(form.organization),#}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'oro.organization.businessunit.users.label'|trans,
-        'subblocks': [{
-            'title' : null,
-            'useSpan': false,
-            'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]
-        }]
-    }] ) %}
+    {#{% set dataBlocks = dataBlocks|merge([{#}
+        {#'title' : 'oro.organization.businessunit.users.label'|trans,#}
+        {#'subblocks': [{#}
+            {#'title' : null,#}
+            {#'useSpan': false,#}
+            {#'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]#}
+        {#}]#}
+    {#}] ) %}#}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,
