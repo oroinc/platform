@@ -160,6 +160,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider messageDataProvider
      * @param array $data
      * @param array $expectedMessageData
+     * 
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testProcess($data, $expectedMessageData)
     {
