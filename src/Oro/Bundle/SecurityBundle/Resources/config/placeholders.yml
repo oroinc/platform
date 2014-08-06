@@ -12,4 +12,4 @@ items:
     selector:
         template: OroSecurityBundle:Organization:selector.html.twig
     org_name:
-        template: OroSecurityBundle:Organization:name.html.twig
+        action: OroSecurityBundle:AclPermission:currentOrganizationName
