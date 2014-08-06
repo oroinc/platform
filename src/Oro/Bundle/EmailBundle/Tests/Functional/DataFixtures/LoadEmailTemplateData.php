@@ -48,7 +48,5 @@ class LoadEmailTemplateData extends AbstractFixture implements ContainerAwareInt
         $manager->persist($emailTemplate1);
         $manager->persist($emailTemplate2);
         $manager->flush();
-
-        $this->addReference('oro_email:', $event);
     }
 }

@@ -161,21 +161,18 @@ class EmailTemplateController extends RestController
     public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];
-        $entity         = null;
 
         if ($entityId && $emailTemplate->getEntityName()) {
             $entity = $this->getDoctrine()
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
-
-        }
-
-        if ($entity) {
-            $templateParams['entity'] = $entity;
+            if ($entity) {
+                $templateParams['entity'] = $entity;
+            }
         }
 
         // no entity found, but entity name defined for template
-        if ($emailTemplate->getEntityName() && !$entity) {
+        if ($emailTemplate->getEntityName() && !isset($templateParams['entity'])) {
             return $this->handleView(
                 $this->view(
                     [
