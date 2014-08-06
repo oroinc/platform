@@ -48,6 +48,11 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $inVoteExtension = null;
 
         $permissionMap->expects($this->exactly(2))
+            ->method('contains')
+            ->with('test')
+            ->will($this->returnValue(true));
+
+        $permissionMap->expects($this->exactly(2))
             ->method('getMasks')
             ->will(
                 $this->returnCallback(
@@ -72,9 +77,9 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($voter->getObject());
         $this->assertNull($voter->getAclExtension());
 
-        $this->assertTrue($token === $inVoteToken);
-        $this->assertTrue($object === $inVoteObject);
-        $this->assertTrue($extension === $inVoteExtension);
+        $this->assertSame($token, $inVoteToken);
+        $this->assertSame($object, $inVoteObject);
+        $this->assertSame($extension, $inVoteExtension);
 
         // call the vote method one more time to ensure that OneShotIsGrantedObserver was removed from the voter
         $voter->vote($token, $object, array('test'));
