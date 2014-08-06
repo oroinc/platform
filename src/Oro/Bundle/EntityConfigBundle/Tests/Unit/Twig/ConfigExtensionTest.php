@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 
@@ -35,13 +36,19 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(1, $functions);
+        $this->assertCount(2, $functions);
 
         /** @var \Twig_SimpleFunction $function */
-        $function = current($functions);
+        $function = $functions[0];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_entity_config', $function->getName());
         $this->assertEquals(array($this->twigExtension, 'getClassConfig'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[1];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_entity_config_value', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getClassConfigValue'), $function->getCallable());
     }
 
     public function testGetName()
@@ -112,6 +119,67 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedScope' => 'test',
                 'inputScope' => 'test',
             ),
+        );
+    }
+
+    public function testGetClassConfigValueNoConfig()
+    {
+        $className = 'Test\Entity';
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(false));
+        $this->configManager->expects($this->never())
+            ->method('getConfig');
+
+        $this->assertNull($this->twigExtension->getClassConfigValue($className, 'test'));
+    }
+
+    public function testGetClassConfigValue()
+    {
+        $className = 'Test\Entity';
+        $configEntityScope = new Config(new EntityConfigId('entity', $className));
+        $configEntityScope->set('test', 'entity_val');
+        $configAnotherScope = new Config(new EntityConfigId('another', $className));
+        $configAnotherScope->set('test', 'another_val');
+
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+        $this->configManager->expects($this->any())
+            ->method('getConfig')
+            ->with($this->isInstanceOf('Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId'))
+            ->will(
+                $this->returnCallback(
+                    function (EntityConfigId $configId) use ($className, $configEntityScope, $configAnotherScope) {
+                        self::assertEquals($className, $configId->getClassName());
+                        switch ($configId->getScope()) {
+                            case 'entity':
+                                return $configEntityScope;
+                            case 'another':
+                                return $configAnotherScope;
+                            default:
+                                return null;
+                        }
+                    }
+                )
+            );
+
+        // test default scope
+        $this->assertEquals(
+            'entity_val',
+            $this->twigExtension->getClassConfigValue($className, 'test')
+        );
+        // test with specified scope
+        $this->assertEquals(
+            'another_val',
+            $this->twigExtension->getClassConfigValue($className, 'test', 'another')
+        );
+        // test undefined attribute
+        $this->assertNull(
+            $this->twigExtension->getClassConfigValue($className, 'undefined')
         );
     }
 }

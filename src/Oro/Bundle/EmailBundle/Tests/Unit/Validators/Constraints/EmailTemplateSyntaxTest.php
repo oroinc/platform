@@ -4,16 +4,16 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-use Oro\Bundle\EmailBundle\Validator\Constraints\VariablesConstraint;
+use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
 
-class VariableConstraintTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateSyntaxTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var VariablesConstraint */
+    /** @var EmailTemplateSyntax */
     protected $constraint;
 
     protected function setUp()
     {
-        $this->constraint = new VariablesConstraint();
+        $this->constraint = new EmailTemplateSyntax();
     }
 
     protected function tearDown()
@@ -23,7 +23,7 @@ class VariableConstraintTest extends \PHPUnit_Framework_TestCase
 
     public function testConfiguration()
     {
-        $this->assertEquals('oro_email.variables_validator', $this->constraint->validatedBy());
+        $this->assertEquals('oro_email.email_template_syntax_validator', $this->constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }
 }
