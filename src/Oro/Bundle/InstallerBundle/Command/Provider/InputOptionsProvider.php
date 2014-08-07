@@ -35,9 +35,10 @@ class InputOptionsProvider
      */
     public function get($name, $question, $default = null, $askMethod = 'ask', $additionalAskArgs = [])
     {
-        $hasOption = $this->input->hasOption($name);
+        $value = $this->input->getOption($name);
+        $hasOptionValue = !empty($value);
 
-        if (false === $hasOption && $this->input->isInteractive()) {
+        if (false === $hasOptionValue && $this->input->isInteractive()) {
             return call_user_func_array(
                 [$this->dialog, $askMethod],
                 array_merge(
@@ -45,11 +46,11 @@ class InputOptionsProvider
                     $additionalAskArgs
                 )
             );
-        } elseif ($hasOption) {
-            return $this->input->getOption($name);
+        } elseif (false === $hasOptionValue) {
+            $value = $default;
         }
 
-        return $default;
+        return $value;
     }
 
     /**

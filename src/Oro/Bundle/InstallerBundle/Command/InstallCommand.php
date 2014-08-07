@@ -213,19 +213,27 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         };
 
         $parameters = [
-            'user-name'     => [
-                'label' => 'Username',
+            'user-name'      => [
+                'label'                  => 'Username',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
             ],
-            'user-email'    => [
-                'label' => 'Email',
+            'user-email'     => [
+                'label'                  => 'Email',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
             ],
             'user-firstname' => [
-                'label' => 'First name',
+                'label'                  => 'First name',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
             ],
-            'user-lastname' => [
-                'label' => 'Last name',
+            'user-lastname'  => [
+                'label'                  => 'Last name',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
             ],
-            'user-password' => [
+            'user-password'  => [
                 'label'                  => 'Password',
                 'askMethod'              => 'askHiddenResponseAndValidate',
                 'additionalAskArguments' => [$passValidator],
@@ -233,13 +241,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         ];
 
         foreach ($parameters as $parameterName => $paramData) {
-            $askMethod           = empty($paramData['askMethod']) ? 'ask' : $paramData['askMethod'];
-            $additionalArguments = empty($paramData['additionalAskArguments']) ?
-                [] :
-                $paramData['additionalAskArguments'];
-
-            $commandParameters['--' . $parameterName] = $this->inputOptionsProvider
-                ->get($parameterName, $paramData['label'], null, $askMethod, $additionalArguments);
+            $commandParameters['--' . $parameterName] = $this->inputOptionsProvider->get(
+                $parameterName,
+                $paramData['label'],
+                null,
+                $paramData['askMethod'],
+                $paramData['additionalAskArguments']
+            );
         }
 
         // update user only if name, email or username changed
@@ -375,16 +383,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
     /**
      * @param CommandExecutor $commandExecutor
-     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return InstallCommand
      */
-    protected function finalStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    protected function finalStep(CommandExecutor $commandExecutor, OutputInterface $output)
     {
         $output->writeln('<info>Preparing application.</info>');
-
-        $input->setInteractive(false);
 
         $commandExecutor
             ->runCommand(
