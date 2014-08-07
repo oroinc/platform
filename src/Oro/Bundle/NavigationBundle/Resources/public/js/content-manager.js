@@ -384,6 +384,9 @@ define([
             if (refPath == null) {
                 refPath = current.path;
             }
+            if (refPath.indexOf('/') !== 0) {
+                refPath = '/' + refPath;
+            }
             comparePath = fetchPath(url);
             return refPath === comparePath;
         },
