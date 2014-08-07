@@ -23,12 +23,12 @@ class ReindexCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting reindex task' . PHP_EOL);
+        $output->writeln('Starting reindex task');
 
-        /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\Orm */
+        /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\AbstractEngine */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
         $recordsCount = $searchEngine->reindex();
 
-        $output->writeln(sprintf('Total indexed items: %u' . PHP_EOL, $recordsCount));
+        $output->writeln(sprintf('Total indexed items: %u', $recordsCount));
     }
 }

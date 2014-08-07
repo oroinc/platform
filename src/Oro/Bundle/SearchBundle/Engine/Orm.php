@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
@@ -59,45 +60,48 @@ class Orm extends AbstractEngine
         $this->clearSearchIndex();
 
         //index data by mapping config
-        $countInTotal = 0;
+        $recordsCount = 0;
         $entities     = $this->mapper->getEntities();
 
         while ($entityName = array_shift($entities)) {
             $itemsCount    = $this->reindexSingleEntity($entityName);
-            $countInTotal += $itemsCount;
+            $recordsCount += $itemsCount;
         }
 
-        return $countInTotal;
+        return $recordsCount;
     }
 
+    /**
+     * @param string $entityName
+     * @return int
+     */
     protected function reindexSingleEntity($entityName)
     {
-        $countTotal   = 0;
+        $itemsCount   = 0;
         $queryBuilder = $this->em->getRepository($entityName)->createQueryBuilder('entity');
 
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
-        $allEntitiesCount = $iterator->count();
 
         foreach ($iterator as $entity) {
             if (null !== $this->save($entity, true)) {
-                $countTotal++;
-            }
-
-            if (0 == $countTotal % self::BATCH_SIZE) {
-                $this->em->flush();
-                $this->em->clear();
+                $itemsCount++;
             }
 
             $this->em->detach($entity);
+
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $this->em->flush();
+                $this->em->clear();
+            }
         }
 
-        if ($countTotal % self::BATCH_SIZE > 0 && $allEntitiesCount > 0) {
+        if ($itemsCount % self::BATCH_SIZE > 0) {
             $this->em->flush();
             $this->em->clear();
         }
 
-        return $countTotal;
+        return $itemsCount;
     }
 
     /**
