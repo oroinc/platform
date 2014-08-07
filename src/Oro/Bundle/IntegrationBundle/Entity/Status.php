@@ -64,7 +64,7 @@ class Status
     /**
      * @var array $data
      *
-     * @ORM\Column(name="data", type="array", nullable=false)
+     * @ORM\Column(name="data", type="json_array", nullable=true)
      */
     protected $data;
 
