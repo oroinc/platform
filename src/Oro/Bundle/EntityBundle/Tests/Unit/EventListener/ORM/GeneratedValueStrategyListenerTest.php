@@ -44,7 +44,7 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener = new GeneratedValueStrategyListener(OroEntityExtension::POSTGRESQL_DB_DRIVER);
     }
 
-    public function testPlattformNotMatch()
+    public function testPlatformNotMatch()
     {
         $listener = new GeneratedValueStrategyListener('not_postgres');
 
