@@ -31,7 +31,7 @@ oro:
         enabled.label:     Status
         business_units.label: Bussines units
         form:
-            choose_organization: Choose a organization...
+            choose_organization: Choose an organization...
 
         businessunit:
             email.label:         Email

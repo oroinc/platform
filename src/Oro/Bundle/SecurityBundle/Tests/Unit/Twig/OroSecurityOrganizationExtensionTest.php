@@ -20,7 +20,7 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
     protected $securityContext;
 
     /**
-     * Set up test environment
+     * {@inheritdoc}
      */
     protected function setUp()
     {
@@ -28,6 +28,9 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->twigExtension    = new OroSecurityOrganizationExtension($this->securityContext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->securityContext);
@@ -38,7 +41,6 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('oro_security_organization_extension', $this->twigExtension->getName());
     }
-
 
     public function testGetFunctions()
     {

@@ -2,21 +2,27 @@
 {% set organizations       = get_enabled_organizations() %}
 
 {% if organizations|length > 1 %}
-<ul id="organization_selector" class="nav pull-left">
-    <li class="dropdown">
-        <a data-toggle="dropdown" class="dropdown-toggle" href="javascript: void(0);" title="{{ 'oro.organization.form.choose_organization'|trans }}">
-            <i class="icon-sort-down"></i>
-        </a>
-        <ul aria-labelledby="dropdownMenu" role="menu" class="dropdown-menu">
-            {% for organization in organizations %}
-                {% if curr_organization.getId() != organization.id %}
-                    <li><a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="organization-switcher no-hash"><span class="title">{{ organization.name }}</span></a></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </li>
-</ul>
-<script type="text/javascript">
-    require(['orosecurity/js/init-organization-selector'])
-</script>
+    <ul id="organization_selector" class="nav pull-left">
+        <li class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="javascript: void(0);"
+               title="{{ 'oro.organization.form.choose_organization'|trans }}">
+                <i class="icon-sort-down"></i>
+            </a>
+            <ul aria-labelledby="dropdownMenu" role="menu" class="dropdown-menu">
+                {% for organization in organizations %}
+                    {% if curr_organization.getId() != organization.id %}
+                        <li>
+                            <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
+                               class="organization-switcher no-hash">
+                                <span class="title">{{ organization.name }}</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    <script type="text/javascript">
+        require(['orosecurity/js/init-organization-selector'])
+    </script>
 {% endif %}

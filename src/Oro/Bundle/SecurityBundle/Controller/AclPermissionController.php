@@ -48,18 +48,15 @@ class AclPermissionController extends Controller
      */
     public function switchOrganizationAction(Organization $organization)
     {
-        if ($organization == null || !$organization->isEnabled()) {
-            throw $this->createNotFoundException(
-                $this->get('translator')->trans('oro.security.organization.not_found')
-            );
-        }
-
         $token         = $this->container->get('security.context')->getToken();
         $organizations = $token->getUser()->getOrganizations();
 
-        if (!$organizations->contains($organization)) {
+        if (!$organization->isEnabled() || !$organizations->contains($organization)) {
             throw new AccessDeniedException(
-                $this->get('translator')->trans('oro.security.organization.access_denied')
+                $this->get('translator')->trans(
+                    'oro.security.organization.access_denied',
+                    array('%organization_name%' => $organization->getName())
+                )
             );
         }
 
@@ -68,7 +65,7 @@ class AclPermissionController extends Controller
             'success',
             $this->get('translator')->trans(
                 'oro.security.organization.selected',
-                array('name' => $organization->getName())
+                array('%organization_name%' => $organization->getName())
             )
         );
 

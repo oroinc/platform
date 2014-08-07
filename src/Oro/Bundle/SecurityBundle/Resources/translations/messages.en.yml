@@ -15,6 +15,5 @@ oro:
             SYSTEM: System
             NONE: None
         organization:
-            selected:  The organization name has been successfully selected
-            not_found: The organization does not exist
-            access_denied: Access denied to the organization
+            selected:  You have been successfully switched to organization "%organization_name%"
+            access_denied: You don't have access to organization "%organization_name%"

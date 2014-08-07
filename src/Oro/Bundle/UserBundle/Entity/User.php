@@ -464,7 +464,7 @@ class User extends ExtendUser implements
     protected $businessUnits;
 
     /**
-     * @var Organization[]
+     * @var ArrayCollection Organization[]
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_organization",
@@ -1471,7 +1471,7 @@ class User extends ExtendUser implements
     {
         if ($onlyActive) {
             return $this->organizations->filter(
-                function ($organization) {
+                function (Organization $organization) {
                     return $organization->isEnabled() === true;
                 }
             );

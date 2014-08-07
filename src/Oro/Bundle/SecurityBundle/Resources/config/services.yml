@@ -324,7 +324,6 @@ services:
         tags:
             - { name: twig.extension }
 
-
     oro_security.encoder.mcrypt:
         class: %oro_security.encoder.mcrypt.class%
         arguments: [ %kernel.secret% ]

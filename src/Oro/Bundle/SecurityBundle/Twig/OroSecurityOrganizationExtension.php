@@ -15,7 +15,7 @@ class OroSecurityOrganizationExtension extends \Twig_Extension
     /**
      * Constructor
      *
-     * @param SecurityContextInterface $container
+     * @param SecurityContextInterface $securityContext
      */
     public function __construct(SecurityContextInterface $securityContext)
     {
