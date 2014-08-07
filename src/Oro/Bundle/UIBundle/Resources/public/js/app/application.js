@@ -1,8 +1,9 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'chaplin'
-], function (Chaplin) {
+    'chaplin',
+    'oroui/js/mediator'
+], function (Chaplin, mediator) {
     'use strict';
 
     var Application;
@@ -10,22 +11,22 @@ define([
     Application = Chaplin.Application.extend({
         initialize: function (options) {
             this.options = options || {};
-            Chaplin.mediator.setHandler('retrieveOption', this.retrieveOption, this);
-            Chaplin.mediator.setHandler('retrievePath', this.retrievePath, this);
-            Chaplin.mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
-            Chaplin.mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
+            mediator.setHandler('retrieveOption', this.retrieveOption, this);
+            mediator.setHandler('retrievePath', this.retrievePath, this);
+            mediator.setHandler('combineFullUrl', this.combineFullUrl, this);
+            mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
 
             // stub handlers, should be defined in some modules
-            Chaplin.mediator.setHandler('showLoading', function () {});
-            Chaplin.mediator.setHandler('hideLoading', function () {});
-            Chaplin.mediator.setHandler('redirectTo', function () {});
-            Chaplin.mediator.setHandler('refreshPage', function () {});
+            mediator.setHandler('showLoading', function () {});
+            mediator.setHandler('hideLoading', function () {});
+            mediator.setHandler('redirectTo', function () {});
+            mediator.setHandler('refreshPage', function () {});
 
             Application.__super__.initialize.apply(this, arguments);
         },
 
         /**
-         * Returns application's  initialization option by its name
+         * Returns application's initialization option by its name
          *
          * @param prop name of property
          * @returns {*}
@@ -35,12 +36,13 @@ define([
         },
 
         /**
+         * Removes root prefix and returns meaningful part of path
          *
          * @param {string} path
          * @returns {string}
          */
         retrievePath: function (path) {
-            return path.replace(this.router.removeRoot, '');
+            return path.replace(this.router.removeRoot, '').replace(/^\//i, '');
         },
 
         /**
@@ -62,8 +64,8 @@ define([
 
         /**
          *
-         * @param {string} path
-         * @param {string} query
+         * @param {(string|Object)} path
+         * @param {string=} query
          * @returns {string}
          */
         combineFullUrl: function (path, query) {

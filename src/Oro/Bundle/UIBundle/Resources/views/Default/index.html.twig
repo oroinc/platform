@@ -206,7 +206,8 @@
     with {
         'data': {
             'scripts': block('head_script'),
-            'content': block('page_container')
+            'content': block('page_container'),
+            'breadcrumb': block('breadcrumb')|trim
         }
     }
 %}
