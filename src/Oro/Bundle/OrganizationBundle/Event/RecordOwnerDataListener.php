@@ -96,7 +96,14 @@ class RecordOwnerDataListener
             }
             if ($token instanceof UsernamePasswordOrganizationToken && $config->has('organization_field_name')) {
                 $accessor = PropertyAccess::createPropertyAccessor();
-                $accessor->setValue($entity, $config->get('organization_field_name'), $token->getOrganizationContext());
+                $fieldName = $config->get('organization_field_name');
+                if (!$accessor->getValue($entity, $fieldName)) {
+                    $accessor->setValue(
+                        $entity,
+                        $fieldName,
+                        $token->getOrganizationContext()
+                    );
+                }
             }
         }
     }

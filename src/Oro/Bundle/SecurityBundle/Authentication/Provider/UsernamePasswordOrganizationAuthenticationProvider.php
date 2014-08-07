@@ -77,7 +77,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
     {
         if (!$user->getOrganizations()->contains($organization)) {
             throw new BadCredentialsException(
-                sprintf("You don't have access to organization '%s", $organization->getName())
+                sprintf("You don't have access to organization '%s'", $organization->getName())
             );
         }
     }

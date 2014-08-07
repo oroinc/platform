@@ -36,6 +36,20 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
+     * Get organization by name
+     *
+     * @param string $name
+     * @return Organization
+     */
+    public function getOrganizationByName($name)
+    {
+        return $this->getEntityManager()
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.name = :name')
+            ->setParameter('name', $name)
+            ->getSingleResult();
+    }
+
+    /**
      * Update all records in given table with organization id
      *
      * @param string  $tableName table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
