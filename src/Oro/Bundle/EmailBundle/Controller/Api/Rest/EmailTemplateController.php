@@ -151,7 +151,7 @@ class EmailTemplateController extends RestController
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
      * @Get("/emailtemplates/compiled/{id}/{entityId}",
-     *      requirements={"id"="\d+", "entityId"="\d+"},
+     *      requirements={"id"="\d+", "entityId"="\d*"},
      *      name="oro_api_get_emailtemplate_compiled"
      * )
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
@@ -161,12 +161,30 @@ class EmailTemplateController extends RestController
     public function getCompiledAction(EmailTemplate $emailTemplate, $entityId = null)
     {
         $templateParams = [];
+
         if ($entityId && $emailTemplate->getEntityName()) {
             $entity = $this->getDoctrine()
                 ->getRepository($emailTemplate->getEntityName())
                 ->find($entityId);
+            if ($entity) {
+                $templateParams['entity'] = $entity;
+            }
+        }
 
-            $templateParams['entity'] = $entity;
+        // no entity found, but entity name defined for template
+        if ($emailTemplate->getEntityName() && !isset($templateParams['entity'])) {
+            return $this->handleView(
+                $this->view(
+                    [
+                        'message' => sprintf(
+                            'entity %s with id=%d not found',
+                            $emailTemplate->getEntityName(),
+                            $entityId
+                        )
+                    ],
+                    Codes::HTTP_NOT_FOUND
+                )
+            );
         }
 
         list($subject, $body) = $this->get('oro_email.email_renderer')
