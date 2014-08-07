@@ -72,10 +72,10 @@ class CountQueryBuilderOptimizer
             $groupBy = (array) $parts['groupBy'];
             $groupByFields = $this->getSelectFieldFromGroupBy($groupBy);
             $usedGroupByAliases = [];
-            for ($i = 0; $i < count($groupByFields); $i++) {
-                $alias = '_groupByPart' . $i;
+            foreach ($groupByFields as $key => $groupByField) {
+                $alias = '_groupByPart' . $key;
                 $usedGroupByAliases[] = $alias;
-                $fieldsToSelect[] = $groupByFields[$i] . ' as ' . $alias;
+                $fieldsToSelect[] = $groupByField . ' as ' . $alias;
             }
             $qb->groupBy(implode(', ', $usedGroupByAliases));
         } elseif (!$parts['where'] && $parts['having']) {
@@ -206,7 +206,7 @@ class CountQueryBuilderOptimizer
         $expressions = array();
         foreach ($groupBy as $groupByPart) {
             foreach ($groupByPart->getParts() as $part) {
-                $expressions = array_merge($this->getSelectFieldFromGroupByPart($part));
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
             }
         }
 
