@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\LessThan;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
@@ -62,7 +63,10 @@ class OroMoneyType extends AbstractType
             array(
                 'currency'        => $currencyCode,
                 'currency_symbol' => $currencySymbol,
-                'grouping'        => (bool)$this->numberFormatter->getAttribute(\NumberFormatter::GROUPING_USED)
+                'grouping'        => (bool)$this->numberFormatter->getAttribute(\NumberFormatter::GROUPING_USED),
+                'constraints'     => array(
+                    new LessThan(array('value' => pow(10, 15)))
+                )
             )
         );
     }
