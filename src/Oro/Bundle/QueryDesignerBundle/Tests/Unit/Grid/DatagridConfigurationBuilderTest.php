@@ -63,7 +63,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'from'    => [
                         ['table' => $en, 'alias' => 't1']
                     ],
-                    'groupBy' => 't1.column1'
+                    'groupBy' => 'c1'
                 ],
                 'query_config' => [
                     'table_aliases'  => [
