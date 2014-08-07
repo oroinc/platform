@@ -60,7 +60,9 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->inputOptionsProvider = new InputOptionsProvider($output, $input, $this->getHelperSet()->get('dialog'));
-        $this->validate($input);
+        if (false === $input->isInteractive()) {
+            $this->validate($input);
+        }
 
         $forceInstall = $input->getOption('force');
 
@@ -140,10 +142,9 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     {
         $requiredParams   = ['user-name', 'user-email', 'user-firstname', 'user-lastname', 'user-password'];
         $emptyParams      = [];
-        $isNonInteractive = false === $input->isInteractive();
 
         foreach ($requiredParams as $param) {
-            if ($isNonInteractive && null === $this->inputOptionsProvider->get($param, null)) {
+            if (null === $input->getOption($param)) {
                 $emptyParams[] = '--' . $param;
             }
         }
