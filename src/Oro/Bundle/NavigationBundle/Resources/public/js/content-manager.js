@@ -315,7 +315,7 @@ define([
          * @param {string=} hash
          */
         saveState: function (key, value, hash) {
-            var url, query;
+            var route, query;
             if (value !== null) {
                 current.state[key] = value;
             } else {
@@ -344,8 +344,8 @@ define([
             query = Chaplin.utils.queryParams.stringify(query);
             current.query = query;
 
-            url = contentManager.currentUrl();
-            mediator.execute('redirectTo', {url: url}, {silent: true, replace: true});
+            route = _.pick(current, ['path', 'query']);
+            mediator.execute('changeURL', route, {replace: true});
             mediator.trigger('pagestate:change');
         },
 
