@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration\Loader;
 
 use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -65,16 +65,16 @@ class MigrationsLoader
     protected $excludeBundles;
 
     /**
-     * @param KernelInterface    $kernel
-     * @param Connection         $connection
-     * @param ContainerInterface $container
-     * @param EventDispatcher    $eventDispatcher
+     * @param KernelInterface           $kernel
+     * @param Connection                $connection
+     * @param ContainerInterface        $container
+     * @param EventDispatcherInterface  $eventDispatcher
      */
     public function __construct(
         KernelInterface $kernel,
         Connection $connection,
         ContainerInterface $container,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->kernel          = $kernel;
         $this->connection      = $connection;
