@@ -2,25 +2,23 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Psr\Log\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionsProvider;
+use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
 {
-    /** @var InputOptionsProvider */
-    protected $inputOptionsProvider;
+    /** @var InputOptionProvider */
+    protected $inputOptionProvider;
 
     /**
      * {@inheritdoc}
@@ -59,7 +57,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->inputOptionsProvider = new InputOptionsProvider($output, $input, $this->getHelperSet()->get('dialog'));
+        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('dialog'));
         if (false === $input->isInteractive()) {
             $this->validate($input);
         }
@@ -104,7 +102,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'cache:clear',
                 array(
                     '--no-optional-warmers' => true,
-                    '--process-isolation' => true
+                    '--process-isolation'   => true
                 )
             );
         }
@@ -136,12 +134,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     /**
      * @param InputInterface $input
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function validate(InputInterface $input)
     {
-        $requiredParams   = ['user-name', 'user-email', 'user-firstname', 'user-lastname', 'user-password'];
-        $emptyParams      = [];
+        $requiredParams = ['user-email', 'user-firstname', 'user-lastname', 'user-password'];
+        $emptyParams    = [];
 
         foreach ($requiredParams as $param) {
             if (null === $input->getOption($param)) {
@@ -150,7 +148,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         }
 
         if (!empty($emptyParams)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf(
                     "The %s arguments are required in non-interactive mode",
                     implode(', ', $emptyParams)
@@ -224,18 +222,34 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
-     * Update administrator with user input
+     * Update the administrator user
      *
      * @param CommandExecutor $commandExecutor
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $commandParameters = [
-            'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
-            '--process-isolation' => true,
-        ];
+        $emailValidator = function ($value) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception('The email must be specified');
+            }
 
-        $passValidator = function ($value) {
+            return $value;
+        };
+        $firstNameValidator = function ($value) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception('The first name must be specified');
+            }
+
+            return $value;
+        };
+        $lastNameValidator = function ($value) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception('The last name must be specified');
+            }
+
+            return $value;
+        };
+        $passwordValidator = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
@@ -243,7 +257,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
-        $parameters = [
+        $options = [
             'user-name'      => [
                 'label'                  => 'Username',
                 'askMethod'              => 'ask',
@@ -252,59 +266,60 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ],
             'user-email'     => [
                 'label'                  => 'Email',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
+                'askMethod'              => 'askAndValidate',
+                'additionalAskArguments' => [$emailValidator],
                 'defaultValue'           => null,
             ],
             'user-firstname' => [
                 'label'                  => 'First name',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
+                'askMethod'              => 'askAndValidate',
+                'additionalAskArguments' => [$firstNameValidator],
                 'defaultValue'           => null,
             ],
             'user-lastname'  => [
                 'label'                  => 'Last name',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
+                'askMethod'              => 'askAndValidate',
+                'additionalAskArguments' => [$lastNameValidator],
                 'defaultValue'           => null,
             ],
             'user-password'  => [
                 'label'                  => 'Password',
                 'askMethod'              => 'askHiddenResponseAndValidate',
-                'additionalAskArguments' => [$passValidator],
+                'additionalAskArguments' => [$passwordValidator],
                 'defaultValue'           => null,
             ],
         ];
 
-        foreach ($parameters as $parameterName => $paramData) {
-            $commandParameters['--' . $parameterName] = $this->inputOptionsProvider->get(
-                $parameterName,
-                $paramData['label'],
-                $paramData['defaultValue'],
-                $paramData['askMethod'],
-                $paramData['additionalAskArguments']
+        $commandParameters = [];
+        foreach ($options as $optionName => $optionData) {
+            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
+                $optionName,
+                $optionData['label'],
+                $optionData['defaultValue'],
+                $optionData['askMethod'],
+                $optionData['additionalAskArguments']
             );
         }
 
-        // update user only if name, email or username changed
-        if (count($commandParameters) > 2) {
-            $commandExecutor->runCommand(
-                'oro:user:update',
+        $commandExecutor->runCommand(
+            'oro:user:update',
+            array_merge(
+                ['--process-isolation' => true],
                 $commandParameters
-            );
-        }
+            )
+        );
     }
 
     /**
-     * Update app url, company name and short name
+     * Update system settings such as app url, company name and short name
      */
     protected function updateSystemSettings()
     {
         /** @var ConfigManager $configManager */
-        $configManager       = $this->getContainer()->get('oro_config.global');
+        $configManager = $this->getContainer()->get('oro_config.global');
 
-        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-        $companyNameValidator = function ($value) use (&$defaultCompanyName) {
+        $defaultCompanyName        = $configManager->get('oro_ui.application_name');
+        $companyShortNameValidator = function ($value) use (&$defaultCompanyName) {
             $len = strlen(trim($value));
             if ($len === 0 && empty($defaultCompanyName)) {
                 throw new \Exception('The company short name must not be empty');
@@ -316,42 +331,41 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
-        $parameters = [
+        $options = [
             'application-url'    => [
                 'label'                  => 'Application URL',
                 'config_key'             => 'oro_ui.application_url',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
-                'defaultValue'           => null,
             ],
             'company-name'       => [
                 'label'                  => 'Company name',
                 'config_key'             => 'oro_ui.application_title',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
-                'defaultValue'           => null,
             ],
             'company-short-name' => [
                 'label'                  => 'Company short name',
                 'config_key'             => 'oro_ui.application_name',
                 'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$companyNameValidator],
-                'defaultValue'           => null,
+                'additionalAskArguments' => [$companyShortNameValidator],
             ],
         ];
 
-        foreach ($parameters as $paramName => $paramData) {
-            $value = $this->inputOptionsProvider->get(
-                $paramName,
-                $paramData['label'],
-                $paramData['defaultValue'],
-                $paramData['askMethod'],
-                $paramData['additionalAskArguments']
+        foreach ($options as $optionName => $optionData) {
+            $configKey    = $optionData['config_key'];
+            $defaultValue = $configManager->get($configKey);
+
+            $value = $this->inputOptionProvider->get(
+                $optionName,
+                $optionData['label'],
+                $defaultValue,
+                $optionData['askMethod'],
+                $optionData['additionalAskArguments']
             );
 
-            $configKey = $paramData['config_key'];
             // update setting if it's not empty and not equal to default value
-            if (!empty($value) && $value !== $configManager->get($configKey)) {
+            if (!empty($value) && $value !== $defaultValue) {
                 $configManager->set($configKey, $value);
             }
         }
@@ -377,40 +391,46 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 '--process-isolation' => true,
             ]
         )
-        ->runCommand(
-            'oro:workflow:definitions:load',
-            [
-                '--process-isolation' => true,
-            ]
-        )
-        ->runCommand(
-            'oro:process:configuration:load',
-            [
-                '--process-isolation' => true
-            ]
-        )
-        ->runCommand(
-            'oro:migration:data:load',
-            [
-                '--process-isolation' => true,
-                '--no-interaction'    => true,
-            ]
-        );
+            ->runCommand(
+                'oro:workflow:definitions:load',
+                [
+                    '--process-isolation' => true,
+                ]
+            )
+            ->runCommand(
+                'oro:process:configuration:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
+                'oro:migration:data:load',
+                [
+                    '--process-isolation' => true,
+                    '--no-interaction'    => true,
+                ]
+            );
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
 
-        $this->updateUser($commandExecutor, $input, $output);
-        $this->updateSystemSettings($input, $output);
+        $this->updateSystemSettings();
+        $this->updateUser($commandExecutor);
 
-        $isDemo = $this->inputOptionsProvider->get('sample-data', 'Load sample data (y/n)', null, 'askConfirmation');
+        $isDemo = $this->inputOptionProvider->get(
+            'sample-data',
+            'Load sample data (y/n)',
+            false,
+            'askConfirmation',
+            [false]
+        );
         if ($isDemo) {
             // load demo fixtures
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
                     '--process-isolation' => true,
-                    '--fixtures-type' => 'demo'
+                    '--fixtures-type'     => 'demo'
                 )
             );
         }
@@ -440,7 +460,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->runCommand(
                 'fos:js-routing:dump',
                 array(
-                    '--target' => 'web/js/routes.js',
+                    '--target'            => 'web/js/routes.js',
                     '--process-isolation' => true,
                 )
             )
@@ -466,7 +486,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->runCommand(
                 'oro:requirejs:build',
                 array(
-                    '--ignore-errors' => true,
+                    '--ignore-errors'     => true,
                     '--process-isolation' => true,
                 )
             );
@@ -496,8 +516,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      */
     protected function updateInstalledFlag($installed)
     {
-        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params = $dumper->parse();
+        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params                        = $dumper->parse();
         $params['system']['installed'] = $installed;
         $dumper->dump($params);
     }

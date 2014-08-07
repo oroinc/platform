@@ -6,7 +6,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InputOptionsProvider
+class InputOptionProvider
 {
     /** @var OutputInterface */
     protected $output;
@@ -25,18 +25,31 @@ class InputOptionsProvider
     }
 
     /**
-     * @param string      $name
-     * @param string      $question
-     * @param string|null $default
-     * @param string      $askMethod
-     * @param array       $additionalAskArgs
+     * Gets a value of the specified option. If needed an user can be asked to enter the value
      *
-     * @return string
+     * @param string      $name              The option name
+     * @param string      $question          The ask question message
+     * @param string|null $default           The default option value
+     * @param string      $askMethod         The name of method in DialogHelper class is used to ask user
+     *                                       to enter option value
+     * @param array       $additionalAskArgs The additional arguments for the $askMethod
+     *
+     * @return mixed boolean for askConfirmation, string for others
      */
     public function get($name, $question, $default = null, $askMethod = 'ask', $additionalAskArgs = [])
     {
-        $value = $this->input->getOption($name);
+        $value          = $this->input->getOption($name);
         $hasOptionValue = !empty($value);
+
+        // special case for askConfirmation
+        if ($hasOptionValue && $askMethod === 'askConfirmation') {
+            if (in_array(strtolower($value[0]), ['y', 'n'])) {
+                $value = strtolower($value[0]) === 'y';
+            } else {
+                $value          = null;
+                $hasOptionValue = false;
+            }
+        }
 
         if (false === $hasOptionValue && $this->input->isInteractive()) {
             $value = call_user_func_array(
