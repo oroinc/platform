@@ -46,7 +46,7 @@ class OrganizationExtension extends \Twig_Extension
 
     public function getLoginOrganizations(\Twig_Environment $environment, $fieldName, $label, $showLabels)
     {
-        $organizations = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->findAll();
+        $organizations = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->getEnabled();
         return $environment->loadTemplate(self::ORGANIZATION_INPUT_TEMPLATE)->render(
             [
                 'organizations' => $organizations,
