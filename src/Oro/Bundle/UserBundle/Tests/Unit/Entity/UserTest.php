@@ -509,18 +509,22 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testOrganizations()
     {
         $user  = new User;
+        $disabledOrganization = new Organization();
         $organization = new Organization();
+        $organization->setEnabled(true);
 
         $user->setOrganizations(new ArrayCollection(array($organization)));
-
         $this->assertContains($organization, $user->getOrganizations());
 
         $user->removeOrganization($organization);
-
         $this->assertNotContains($organization, $user->getOrganizations());
 
         $user->addOrganization($organization);
-
         $this->assertContains($organization, $user->getOrganizations());
+
+        $user->addOrganization($disabledOrganization);
+        $result = $user->getOrganizations(true);
+        $this->assertTrue($result->count() == 1);
+        $this->assertSame($result->first(), $organization);
     }
 }

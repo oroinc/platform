@@ -1464,10 +1464,18 @@ class User extends ExtendUser implements
     /**
      * Get User Organizations
      *
+     * @param  bool $onlyActive Returns enabled organizations only
      * @return ArrayCollection Organization[]
      */
-    public function getOrganizations()
+    public function getOrganizations($onlyActive = false)
     {
+        if ($onlyActive) {
+            return $this->organizations->filter(
+                function ($organization) {
+                    return $organization->isEnabled() === true;
+                }
+            );
+        }
         return $this->organizations;
     }
 

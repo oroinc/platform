@@ -14,3 +14,7 @@ oro:
             GLOBAL: Organization
             SYSTEM: System
             NONE: None
+        organization:
+            selected:  The organization name has been successfully selected
+            not_found: The organization does not exist
+            access_denied: Access denied to the organization
