@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionsProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionsProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
