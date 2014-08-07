@@ -59,6 +59,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->inputOptionsProvider = new InputOptionsProvider($output, $input, $this->getHelperSet()->get('dialog'));
+        $this->inputOptionsProvider->validate();
+
         $forceInstall = $input->getOption('force');
 
         $commandExecutor = new CommandExecutor(
