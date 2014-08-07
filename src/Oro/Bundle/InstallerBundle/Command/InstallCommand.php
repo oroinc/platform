@@ -113,8 +113,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this
             ->checkStep($output)
             ->prepareStep($commandExecutor, $input->getOption('drop-database'))
-            ->loadDataStep($commandExecutor, $input, $output)
-            ->finalStep($commandExecutor, $input, $output);
+            ->loadDataStep($commandExecutor, $output)
+            ->finalStep($commandExecutor, $output);
 
         $output->writeln('');
         $output->writeln(
@@ -378,12 +378,11 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
     /**
      * @param CommandExecutor $commandExecutor
-     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return InstallCommand
      */
-    protected function loadDataStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    protected function loadDataStep(CommandExecutor $commandExecutor, OutputInterface $output)
     {
         $output->writeln('<info>Setting up database.</info>');
 
