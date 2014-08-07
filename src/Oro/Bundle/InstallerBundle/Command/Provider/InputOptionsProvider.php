@@ -40,13 +40,17 @@ class InputOptionsProvider
         $hasOptionValue = !empty($value);
 
         if (false === $hasOptionValue && $this->input->isInteractive()) {
-            return call_user_func_array(
+            $value = call_user_func_array(
                 [$this->dialog, $askMethod],
                 array_merge(
                     [$this->output, $this->buildQuestion($question, $default)],
                     $additionalAskArgs
                 )
             );
+
+            if (empty($value)) {
+                $value = $default;
+            }
         } elseif (false === $hasOptionValue) {
             $value = $default;
         }
