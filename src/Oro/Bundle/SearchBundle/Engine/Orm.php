@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class Orm extends AbstractEngine
 {
+    const BATCH_SIZE = 1000;
+
     /**
      * @var ContainerInterface
      */
@@ -29,19 +31,9 @@ class Orm extends AbstractEngine
     protected $searchRepo;
 
     /**
-     * @var JobRepository
-     */
-    protected $jobRepo;
-
-    /**
      * @var ObjectMapper
      */
     protected $mapper;
-
-    /**
-     * @var integer
-     */
-    protected $batchSize = 1000;
 
     public function __construct(
         EntityManager $em,
@@ -71,12 +63,8 @@ class Orm extends AbstractEngine
         $entities     = $this->mapper->getEntities();
 
         while ($entityName = array_shift($entities)) {
-            print(sprintf('  > Reindexation of entity "%s" has been started' . PHP_EOL, $entityName));
-
             $itemsCount    = $this->reindexSingleEntity($entityName);
             $countInTotal += $itemsCount;
-
-            print(sprintf('  > For "%s" entity reindexed %u items' . PHP_EOL, $entityName, $itemsCount));
         }
 
         return $countInTotal;
@@ -88,51 +76,28 @@ class Orm extends AbstractEngine
         $queryBuilder = $this->em->getRepository($entityName)->createQueryBuilder('entity');
 
         $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize($this->batchSize);
+        $iterator->setBufferSize(self::BATCH_SIZE);
+        $allEntitiesCount = $iterator->count();
 
-        $this->em->clear();
-        $this->em->beginTransaction();
-        $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
-
-        try {
-            $needsExtraFlush  = true;
-            $allEntitiesCount = $iterator->count();
-
-            foreach ($iterator as $entity) {
-                if (null !== $this->save($entity, true) && 0 === ++$countTotal % $this->batchSize) {
-                    $needsExtraFlush = false;
-                    $this->doFlush($countTotal, $allEntitiesCount);
-                } else {
-                    $needsExtraFlush = true;
-                }
-
-                $this->em->detach($entity);
+        foreach ($iterator as $entity) {
+            if (null !== $this->save($entity, true)) {
+                $countTotal++;
             }
 
-            if ($needsExtraFlush && $allEntitiesCount > 0) {
-                $this->doFlush($countTotal, $allEntitiesCount);
+            if (0 == $countTotal % self::BATCH_SIZE) {
+                $this->em->flush();
+                $this->em->clear();
             }
 
-            print('  + Commit changes to database' . PHP_EOL);
-            $this->em->commit();
-        } catch (\Exception $exception) {
-            $this->em->rollback();
+            $this->em->detach($entity);
+        }
 
-            throw $exception;
+        if ($countTotal % self::BATCH_SIZE > 0 && $allEntitiesCount > 0) {
+            $this->em->flush();
+            $this->em->clear();
         }
 
         return $countTotal;
-    }
-
-    protected function doFlush($countTotal, $allEntitiesCount)
-    {
-        $this->em->flush();
-        print(sprintf('  | %g%%' . PHP_EOL, $countTotal / $allEntitiesCount * 100));
-    }
-
-    public function setBatchSize($batchSize)
-    {
-        $this->batchSize = $batchSize;
     }
 
     /**
@@ -333,20 +298,6 @@ class Orm extends AbstractEngine
         }
 
         return $this->searchRepo;
-    }
-
-    /**
-     * Get job repository
-     *
-     * @return \JMS\JobQueueBundle\Entity\Repository\JobRepository
-     */
-    protected function getJobRepo()
-    {
-        if (!is_object($this->jobRepo)) {
-            $this->jobRepo = $this->em->getRepository('JMSJobQueueBundle:Job');
-        }
-
-        return $this->jobRepo;
     }
 
     /**

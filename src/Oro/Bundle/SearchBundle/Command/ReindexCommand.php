@@ -18,27 +18,15 @@ class ReindexCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:search:reindex')
-             ->setDescription('Rebuild search index')
-             ->addOption(
-                 'batch-size',
-                 null,
-                 InputArgument::OPTIONAL,
-                 'How many records should be processed in one batch'
-             );
+             ->setDescription('Rebuild search index');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $batchSize = $input->getOption('batch-size');
         $output->writeln('Starting reindex task' . PHP_EOL);
 
         /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\Orm */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
-
-        if ($batchSize) {
-            $searchEngine->setBatchSize($batchSize);
-        }
-
         $recordsCount = $searchEngine->reindex();
 
         $output->writeln(sprintf('Total indexed items: %u' . PHP_EOL, $recordsCount));
