@@ -15,13 +15,6 @@
             maxRetries: 3,
             retryDelay: 30000
         }));
-
-        /*mediator.on('datagrid_collection_set_after', function(obj) {
-            sync.keepRelevant(obj.collection);
-            mediator.once('page:request', function() {
-                sync.stopTracking(obj.collection);
-            });
-        });*/
     });
 </script>
 {% endif %}

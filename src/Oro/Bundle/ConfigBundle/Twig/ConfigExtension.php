@@ -2,20 +2,22 @@
 
 namespace Oro\Bundle\ConfigBundle\Twig;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as GlobalConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class ConfigExtension extends \Twig_Extension
 {
     /** @var ConfigManager */
     protected $cm;
 
-    /** array **/
-    protected $entityOutput;
+    /** ConfigManager **/
+    protected $entityConfigManager;
 
-    public function __construct(ConfigManager $cm, $entityOutput = array())
+    public function __construct(GlobalConfigManager $cm, ConfigManager $entityConfigManager)
     {
-        $this->cm           = $cm;
-        $this->entityOutput = $entityOutput;
+        $this->cm                  = $cm;
+        $this->entityConfigManager = $entityConfigManager;
     }
 
     /**
@@ -50,19 +52,30 @@ class ConfigExtension extends \Twig_Extension
      *
      * @param  string $class FQCN of the entity
      *
+     * @deprecated since 1.3 will be removed in 1.5 use "oro_entity_config" instead
+     *
      * @return array
      */
     public function getEntityOutput($class)
     {
-        $default = explode('\\', $class);
+        $default = [
+            'icon_class'  => '',
+            'name'        => 'N/A',
+            'description' => 'No description'
+        ];
 
-        return isset($this->entityOutput[$class])
-            ? $this->entityOutput[$class]
-            : array(
-                'icon_class'  => '',
-                'name'        => end($default),
-                'description' => 'No description'
-            );
+        if (!$this->entityConfigManager->hasConfig($class)) {
+            return $default;
+        }
+
+        $entityConfig = new EntityConfigId('entity', $class);
+        $configs      = $this->entityConfigManager->getConfig($entityConfig);
+
+        return [
+            'icon_class'  => $configs->get('icon'),
+            'name'        => $configs->get('label'),
+            'description' => $configs->get('description'),
+        ];
     }
 
     /**

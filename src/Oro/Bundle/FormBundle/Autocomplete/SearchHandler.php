@@ -125,8 +125,8 @@ class SearchHandler implements SearchHandlerInterface
 
         $page    = (int)$page > 0 ? (int)$page : 1;
         $perPage = (int)$perPage > 0 ? (int)$perPage : 10;
-        $perPage += 1;
         $firstResult = ($page - 1) * $perPage;
+        $perPage += 1;
 
         if ($searchById) {
             $items = [

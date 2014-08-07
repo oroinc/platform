@@ -35,6 +35,7 @@ form:
             port:         Port
     setup:
         email:            Email
+        application_url:  Application URL
         company_name:     Company short name
         company_title:    Company name
         username:         Username
