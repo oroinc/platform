@@ -20,6 +20,15 @@ class SetupType extends AbstractType
     {
         $builder
             ->add(
+                'application_url',
+                'text',
+                array(
+                    'label'    => 'form.setup.application_url',
+                    'mapped'   => false,
+                    'required' => false,
+                )
+            )
+            ->add(
                 'organization_name',
                 'text',
                 array(

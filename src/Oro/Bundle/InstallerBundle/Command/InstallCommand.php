@@ -26,6 +26,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
             ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
+            ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
             ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
@@ -222,7 +223,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
-
+        $defaultAppURL            = $configManager->get('oro_ui.application_url');
         $defaultOrganizationName  = $configManager->get('oro_ui.organization_name');
 
         $passValidator       = function ($value) {
@@ -232,7 +233,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
             return $value;
         };
-
         $organizationNameValidator = function ($value) use (&$defaultOrganizationName) {
             $len = strlen(trim($value));
             if ($len === 0 && empty($defaultOrganizationName)) {
@@ -252,6 +252,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 $this->buildQuestion('Organization name', $defaultOrganizationName),
                 $organizationNameValidator
             );
+
+        $applicationURL = isset($options['application-url'])
+            ? $options['application-url']
+            : $dialog->ask(
+                $output,
+                $this->buildQuestion('Application URL', $defaultAppURL)
+            );
+
         $userName      = isset($options['user-name'])
             ? $options['user-name']
             : $dialog->ask($output, $this->buildQuestion('Username'));
@@ -300,6 +308,11 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 )
             );
         }
+
+        if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
+            $configManager->set('oro_ui.application_url', $applicationURL);
+        }
+        $configManager->flush();
 
         // load demo fixtures
         if ($demo) {

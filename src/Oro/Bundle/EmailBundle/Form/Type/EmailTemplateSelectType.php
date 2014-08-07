@@ -17,10 +17,20 @@ class EmailTemplateSelectType extends AbstractType
     {
         $choices = function (Options $options) {
             if (empty($options['selectedEntity'])) {
-                return array();
+                return [];
             }
 
             return null;
+        };
+
+        $defaultConfigs = array(
+            'placeholder' => 'oro.email.form.choose_template',
+        );
+
+        // this normalizer allows to add/override config options outside.
+        $that              = $this;
+        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
+            return array_merge($defaultConfigs, $configs);
         };
 
         $resolver->setDefaults(
@@ -31,12 +41,15 @@ class EmailTemplateSelectType extends AbstractType
                 'depends_on_parent_field' => 'entityName',
                 'selectedEntity'          => null,
                 'choices'                 => $choices,
-                'configs' => array(
-                    'placeholder' => 'oro.email.form.choose_template',
-                ),
+                'configs'                 => $defaultConfigs,
                 'empty_value'             => '',
                 'empty_data'              => null,
                 'required'                => true
+            )
+        );
+        $resolver->setNormalizers(
+            array(
+                'configs' => $configsNormalizer
             )
         );
     }

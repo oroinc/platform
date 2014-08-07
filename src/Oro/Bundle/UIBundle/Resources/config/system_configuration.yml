@@ -4,6 +4,21 @@ oro_system_configuration:
             title: oro.ui.system_configuration.groups.navbar_settings.title
 
     fields:
+        oro_ui.application_name:
+            type: text
+            options:
+                label: 'Short Name'
+
+        oro_ui.application_url:
+            type: text
+            options:
+                label: 'Application URL'
+
+        oro_ui.application_title:
+            type: text
+            options:
+                label: 'Full Name'
+
         oro_ui.navbar_position:
             type: choice
             options:
@@ -18,6 +33,14 @@ oro_system_configuration:
                 children:
                     general_setup:
                         children:
+                            application_settings:
+                                priority: 260
+                                children:
+                                    application_name_settings:
+                                        children:
+#                                            - oro_ui.application_name
+#                                            - oro_ui.application_title
+                                            - oro_ui.application_url
                             look_and_feel:
                                 children:
                                     navbar_settings:
