@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionsProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -108,6 +109,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         $this
             ->checkStep($output)
+            ->prepareStep($commandExecutor, $input->getOption('drop-database'))
             ->setupStep($commandExecutor, $input, $output)
             ->finalStep($commandExecutor, $input, $output);
 
@@ -161,10 +163,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
+     * Drop schema, load migrations, load workflow definitions and processes configuration
+     *
      * @param CommandExecutor $commandExecutor
      * @param bool            $dropFullDatabase
+     *
+     * @return InstallCommand
      */
-    protected function doctrineDropSchema(CommandExecutor $commandExecutor, $dropFullDatabase = false)
+    protected function prepareStep(CommandExecutor $commandExecutor, $dropFullDatabase = false)
     {
         $schemaDropOptions = [
             '--force'             => true,
@@ -208,39 +214,28 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                     '--no-interaction'    => true,
                 ]
             );
+
+        return $this;
     }
 
     /**
      * Update administrator with user input
      *
      * @param CommandExecutor $commandExecutor
-     * @param array           $options
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function updateUser(CommandExecutor $commandExecutor, array $options, OutputInterface $output)
+    protected function updateUser(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
     {
         /** @var DialogHelper $dialog */
         $dialog  = $this->getHelperSet()->get('dialog');
 
-        $parameters = [
-            'user-name'     => 'Username',
-            'user-email'    => 'Email',
-            'user-firtname' => 'First name',
-            'user-lastname' => 'Last name',
-        ];
+        $inputOptionsProvider = new InputOptionsProvider($output, $input, $dialog);
 
         $commandParameters = [
             'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             '--process-isolation' => true,
         ];
-
-        foreach ($parameters as $parameterName => $label) {
-            if (isset($options[$parameterName])) {
-                $commandParameters['--' . $parameterName] = $options[$parameterName];
-            } elseif ($this->isInteractive) {
-                $commandParameters['--' . $parameterName] = $dialog->ask($output, $this->buildQuestion($label));
-            }
-        }
 
         $passValidator = function ($value) {
             if (strlen(trim($value)) < 2) {
@@ -250,14 +245,34 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
-        if (isset($options['user-password'])) {
-            $commandParameters['--user-password'] = $options['user-password'];
-        } elseif ($this->isInteractive) {
-            $commandParameters['--user-password'] = $dialog->askHiddenResponseAndValidate(
-                $output,
-                $this->buildQuestion('Password'),
-                $passValidator
-            );
+        $parameters = [
+            'user-name'     => [
+                'label' => 'Username',
+            ],
+            'user-email'    => [
+                'label' => 'Email',
+            ],
+            'user-firtname' => [
+                'label' => 'First name',
+            ],
+            'user-lastname' => [
+                'label' => 'Last name',
+            ],
+            'user-password' => [
+                'label'                  => 'Password',
+                'askMethod'              => 'askHiddenResponseAndValidate',
+                'additionalAskArguments' => [$passValidator],
+            ],
+        ];
+
+        foreach ($parameters as $parameterName => $paramData) {
+            $askMethod           = empty($paramData['askMethod']) ? 'ask' : $paramData['askMethod'];
+            $additionalArguments = empty($paramData['additionalAskArguments']) ?
+                [] :
+                $paramData['additionalAskArguments'];
+
+            $commandParameters['--' . $parameterName] = $inputOptionsProvider
+                ->get($parameterName, $paramData['label'], null, $askMethod, $additionalArguments);
         }
 
         // update user only if name, email or username changed
@@ -270,24 +285,20 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
-     * @param array           $options
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function updateSystemSettings(array $options, OutputInterface $output)
+    protected function updateSystemSettings(InputInterface $input, OutputInterface $output)
     {
         /** @var DialogHelper $dialog */
         $dialog  = $this->getHelperSet()->get('dialog');
+
+        $inputOptionsProvider = new InputOptionsProvider($output, $input, $dialog);
 
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
 
         $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
-        $defaultAppURL       = $configManager->get('oro_ui.application_url');
-
         $companyNameValidator = function ($value) use (&$defaultCompanyName) {
             $len = strlen(trim($value));
             if ($len === 0 && empty($defaultCompanyName)) {
@@ -300,49 +311,41 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             return $value;
         };
 
-        if (isset($options['application-url'])) {
-            $applicationURL = $options['application-url'];
-        } elseif ($this->isInteractive) {
-            $applicationURL = $dialog->ask(
-                $output,
-                $this->buildQuestion('Application URL', $defaultAppURL)
-            );
-        } else {
-            $applicationURL = null;
-        }
+        $parameters = [
+            'application-url'    => [
+                'label'                  => 'Application URL',
+                'config_key'             => 'oro_ui.application_url',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
+            ],
+            'company-name'       => [
+                'label'                  => 'Company name',
+                'config_key'             => 'oro_ui.application_title',
+                'askMethod'              => 'ask',
+                'additionalAskArguments' => [],
+            ],
+            'company-short-name' => [
+                'label'                  => 'Company short name',
+                'config_key'             => 'oro_ui.application_name',
+                'askMethod'              => 'askAndValidate',
+                'additionalAskArguments' => [$companyNameValidator],
+            ],
+        ];
 
-        if (isset($options['company-name'])) {
-            $companyTitle = $options['company-name'];
-        } elseif ($this->isInteractive) {
-            $companyTitle = $dialog->ask(
-                $output,
-                $this->buildQuestion('Company name', $defaultCompanyTitle)
+        foreach ($parameters as $paramName => $paramData) {
+            $value = $inputOptionsProvider->get(
+                $paramName,
+                $paramData['label'],
+                null,
+                $paramData['askMethod'],
+                $paramData['additionalAskArguments']
             );
-        } else {
-            $companyTitle = null;
-        }
 
-        if (isset($options['company-short-name'])) {
-            $companyName = $options['company-short-name'];
-        } elseif ($this->isInteractive) {
-            $companyName = $dialog->askAndValidate(
-                $output,
-                $this->buildQuestion('Company short name', $defaultCompanyName),
-                $companyNameValidator
-            );
-        } else {
-            $companyName = null;
-        }
-
-        // update company name and title if specified
-        if (!empty($companyName) && $companyName !== $defaultCompanyName) {
-            $configManager->set('oro_ui.application_name', $companyName);
-        }
-        if (!empty($companyTitle) && $companyTitle !== $defaultCompanyTitle) {
-            $configManager->set('oro_ui.application_title', $companyTitle);
-        }
-        if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
-            $configManager->set('oro_ui.application_url', $applicationURL);
+            $configKey = $paramData['config_key'];
+            // update setting if it's not empty and not equal to default value
+            if (!empty($value) && $value !== $configManager->get($configKey)) {
+                $configManager->set($configKey, $value);
+            }
         }
 
         $configManager->flush();
@@ -363,13 +366,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $dialog  = $this->getHelperSet()->get('dialog');
         $options = $input->getOptions();
 
-        $this->doctrineDropSchema($commandExecutor, $input->getOption('drop-database'));
+        $this->prepareStep($commandExecutor, $input->getOption('drop-database'));
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
 
-        $this->updateUser($commandExecutor, $options, $output);
-        $this->updateSystemSettings($options, $output);
+        $this->updateUser($commandExecutor, $input, $output);
+        $this->updateSystemSettings($input, $output);
 
         $isDemo = isset($options['sample-data'])
             ? strtolower($options['sample-data']) == 'y'
@@ -395,6 +398,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      * @param CommandExecutor $commandExecutor
      * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return InstallCommand
      */
     protected function finalStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
@@ -473,21 +477,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $params = $dumper->parse();
         $params['system']['installed'] = $installed;
         $dumper->dump($params);
-    }
-
-    /**
-     * Returns a string represents a question for console dialog helper
-     *
-     * @param string      $text
-     * @param string|null $defaultValue
-     *
-     * @return string
-     */
-    protected function buildQuestion($text, $defaultValue = null)
-    {
-        return empty($defaultValue)
-            ? sprintf('<question>%s:</question> ', $text)
-            : sprintf('<question>%s (%s):</question> ', $text, $defaultValue);
     }
 
     /**
