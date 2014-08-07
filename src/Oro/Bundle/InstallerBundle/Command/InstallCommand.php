@@ -219,26 +219,31 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'label'                  => 'Username',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             ],
             'user-email'     => [
                 'label'                  => 'Email',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => null,
             ],
             'user-firstname' => [
                 'label'                  => 'First name',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => null,
             ],
             'user-lastname'  => [
                 'label'                  => 'Last name',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => null,
             ],
             'user-password'  => [
                 'label'                  => 'Password',
                 'askMethod'              => 'askHiddenResponseAndValidate',
                 'additionalAskArguments' => [$passValidator],
+                'defaultValue'           => null,
             ],
         ];
 
@@ -246,7 +251,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             $commandParameters['--' . $parameterName] = $this->inputOptionsProvider->get(
                 $parameterName,
                 $paramData['label'],
-                null,
+                $paramData['defaultValue'],
                 $paramData['askMethod'],
                 $paramData['additionalAskArguments']
             );
@@ -288,18 +293,21 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'config_key'             => 'oro_ui.application_url',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => null,
             ],
             'company-name'       => [
                 'label'                  => 'Company name',
                 'config_key'             => 'oro_ui.application_title',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
+                'defaultValue'           => null,
             ],
             'company-short-name' => [
                 'label'                  => 'Company short name',
                 'config_key'             => 'oro_ui.application_name',
                 'askMethod'              => 'askAndValidate',
                 'additionalAskArguments' => [$companyNameValidator],
+                'defaultValue'           => null,
             ],
         ];
 
@@ -307,7 +315,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             $value = $this->inputOptionsProvider->get(
                 $paramName,
                 $paramData['label'],
-                null,
+                $paramData['defaultValue'],
                 $paramData['askMethod'],
                 $paramData['additionalAskArguments']
             );
