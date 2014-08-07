@@ -18,8 +18,8 @@ use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
 {
-    /** @var bool */
-    protected $isInteractive = false;
+    /** @var InputOptionsProvider */
+    protected $inputOptionsProvider;
 
     /**
      * {@inheritdoc}
@@ -58,8 +58,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->inputOptionsProvider = new InputOptionsProvider($output, $input, $this->getHelperSet()->get('dialog'));
         $forceInstall = $input->getOption('force');
-        $this->isInteractive = $input->isInteractive();
 
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
@@ -110,7 +110,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this
             ->checkStep($output)
             ->prepareStep($commandExecutor, $input->getOption('drop-database'))
-            ->setupStep($commandExecutor, $input, $output)
+            ->loadDataStep($commandExecutor, $input, $output)
             ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
@@ -163,7 +163,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
-     * Drop schema, load migrations, load workflow definitions and processes configuration
+     * Drop schema, clear entity config and extend caches
      *
      * @param CommandExecutor $commandExecutor
      * @param bool            $dropFullDatabase
@@ -187,33 +187,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 $schemaDropOptions
             )
             ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true])
-            ->runCommand(
-                'oro:migration:load',
-                [
-                    '--force'             => true,
-                    '--process-isolation' => true,
-                ]
-            )
-            ->runCommand(
-                'oro:workflow:definitions:load',
-                [
-                    '--process-isolation' => true,
-                ]
-            )
-            ->runCommand(
-                'oro:process:configuration:load',
-                [
-                    '--process-isolation' => true
-                ]
-            )
-            ->runCommand(
-                'oro:migration:data:load',
-                [
-                    '--process-isolation' => true,
-                    '--no-interaction'    => true,
-                ]
-            );
+            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
 
         return $this;
     }
@@ -222,16 +196,9 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      * Update administrator with user input
      *
      * @param CommandExecutor $commandExecutor
-     * @param InputInterface  $input
-     * @param OutputInterface $output
      */
-    protected function updateUser(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    protected function updateUser(CommandExecutor $commandExecutor)
     {
-        /** @var DialogHelper $dialog */
-        $dialog  = $this->getHelperSet()->get('dialog');
-
-        $inputOptionsProvider = new InputOptionsProvider($output, $input, $dialog);
-
         $commandParameters = [
             'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             '--process-isolation' => true,
@@ -252,7 +219,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             'user-email'    => [
                 'label' => 'Email',
             ],
-            'user-firtname' => [
+            'user-firstname' => [
                 'label' => 'First name',
             ],
             'user-lastname' => [
@@ -271,7 +238,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 [] :
                 $paramData['additionalAskArguments'];
 
-            $commandParameters['--' . $parameterName] = $inputOptionsProvider
+            $commandParameters['--' . $parameterName] = $this->inputOptionsProvider
                 ->get($parameterName, $paramData['label'], null, $askMethod, $additionalArguments);
         }
 
@@ -285,16 +252,10 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * Update app url, company name and short name
      */
-    protected function updateSystemSettings(InputInterface $input, OutputInterface $output)
+    protected function updateSystemSettings()
     {
-        /** @var DialogHelper $dialog */
-        $dialog  = $this->getHelperSet()->get('dialog');
-
-        $inputOptionsProvider = new InputOptionsProvider($output, $input, $dialog);
-
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
 
@@ -333,7 +294,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         ];
 
         foreach ($parameters as $paramName => $paramData) {
-            $value = $inputOptionsProvider->get(
+            $value = $this->inputOptionsProvider->get(
                 $paramName,
                 $paramData['label'],
                 null,
@@ -358,15 +319,36 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      *
      * @return InstallCommand
      */
-    protected function setupStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
+    protected function loadDataStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Setting up database.</info>');
 
-        /** @var DialogHelper $dialog */
-        $dialog  = $this->getHelperSet()->get('dialog');
-        $options = $input->getOptions();
-
-        $this->prepareStep($commandExecutor, $input->getOption('drop-database'));
+        $commandExecutor->runCommand(
+            'oro:migration:load',
+            [
+                '--force'             => true,
+                '--process-isolation' => true,
+            ]
+        )
+        ->runCommand(
+            'oro:workflow:definitions:load',
+            [
+                '--process-isolation' => true,
+            ]
+        )
+        ->runCommand(
+            'oro:process:configuration:load',
+            [
+                '--process-isolation' => true
+            ]
+        )
+        ->runCommand(
+            'oro:migration:data:load',
+            [
+                '--process-isolation' => true,
+                '--no-interaction'    => true,
+            ]
+        );
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
@@ -374,10 +356,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $this->updateUser($commandExecutor, $input, $output);
         $this->updateSystemSettings($input, $output);
 
-        $isDemo = isset($options['sample-data'])
-            ? strtolower($options['sample-data']) == 'y'
-            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
-
+        $isDemo = $this->inputOptionsProvider->get('sample-data', 'Load sample data (y/n)', null, 'askConfirmation');
         if ($isDemo) {
             // load demo fixtures
             $commandExecutor->runCommand(

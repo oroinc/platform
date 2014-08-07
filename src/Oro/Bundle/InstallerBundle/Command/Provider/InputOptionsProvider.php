@@ -41,7 +41,7 @@ class InputOptionsProvider
             return call_user_func_array(
                 [$this->dialog, $askMethod],
                 array_merge(
-                    [$this->output, $this->buildQuestion($question)],
+                    [$this->output, $this->buildQuestion($question, $default)],
                     $additionalAskArgs
                 )
             );
