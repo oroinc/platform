@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Psr\Log\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,7 +60,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->inputOptionsProvider = new InputOptionsProvider($output, $input, $this->getHelperSet()->get('dialog'));
-        $this->inputOptionsProvider->validate();
+        $this->validate($input);
 
         $forceInstall = $input->getOption('force');
 
@@ -126,6 +127,33 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             $output->writeln(
                 '<info>To run application in <comment>prod</comment> mode, ' .
                 'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+            );
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     *
+     * @throws InvalidArgumentException
+     */
+    public function validate(InputInterface $input)
+    {
+        $requiredParams   = ['user-name', 'user-email', 'user-firstname', 'user-lastname', 'user-password'];
+        $emptyParams      = [];
+        $isNonInteractive = false === $input->isInteractive();
+
+        foreach ($requiredParams as $param) {
+            if ($isNonInteractive && null === $this->inputOptionsProvider->get($param, null)) {
+                $emptyParams[] = '--' . $param;
+            }
+        }
+
+        if (!empty($emptyParams)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    "The %s arguments are required in non-interactive mode",
+                    implode(', ', $emptyParams)
+                )
             );
         }
     }

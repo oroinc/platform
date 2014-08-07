@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
-use Psr\Log\InvalidArgumentException;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,28 +55,6 @@ class InputOptionsProvider
         }
 
         return $value;
-    }
-
-    public function validate()
-    {
-        $requiredParams = ['user-name', 'user-email'];
-        $emptyParams = [];
-        $isNonInteractive = false === $this->input->isInteractive();
-
-        foreach ($requiredParams as $param) {
-            if ($isNonInteractive && null === $this->get($param, null)) {
-                $emptyParams[] = '--' . $param;
-            }
-        }
-
-        if (!empty($emptyParams)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    "The %s arguments are required in non-interactive mode",
-                    implode(', ', $emptyParams)
-                )
-            );
-        }
     }
 
     /**
