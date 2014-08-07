@@ -6,7 +6,7 @@ use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InputOptionsProvider implements InputOptionsProviderInterface
+class InputOptionsProvider
 {
     /** @var OutputInterface */
     protected $output;
@@ -25,7 +25,13 @@ class InputOptionsProvider implements InputOptionsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string      $name
+     * @param string      $question
+     * @param string|null $default
+     * @param string      $askMethod
+     * @param array       $additionalAskArgs
+     *
+     * @return string
      */
     public function get($name, $question, $default = null, $askMethod = 'ask', $additionalAskArgs = [])
     {
