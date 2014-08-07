@@ -47,7 +47,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        $plainDataWithFrontendHeader = $skipNullValues ? $this->removeEmptyColumns($importedRecord) : $importedRecord;
+        $plainDataWithFrontendHeader = $this->removeEmptyColumns($importedRecord, $skipNullValues);
 
         $frontendHeader = array_keys($plainDataWithFrontendHeader);
         $frontendToBackendHeader = $this->convertHeaderToBackend($frontendHeader);
@@ -86,17 +86,32 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
 
     /**
      * @param array $data
+     * @param bool $skipNullValues
      * @return array
      */
-    protected function removeEmptyColumns(array $data)
+    protected function removeEmptyColumns(array $data, $skipNullValues)
     {
-        foreach ($data as $key => $value) {
-            if ($value === null || $value === '') {
-                unset($data[$key]);
-            }
-        }
+        $data = array_map(
+            function ($value) {
+                if ($value == '') {
+                    return null;
+                }
 
-        return $data;
+                return $value;
+            },
+            $data
+        );
+
+        return array_filter(
+            $data,
+            function ($value) use ($skipNullValues) {
+                if (is_null($value) && $skipNullValues) {
+                    return false;
+                }
+
+                return true;
+            }
+        );
     }
 
     /**
