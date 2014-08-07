@@ -304,7 +304,10 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $commandExecutor->runCommand(
             'oro:user:update',
             array_merge(
-                ['--process-isolation' => true],
+                [
+                    'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+                    '--process-isolation' => true
+                ],
                 $commandParameters
             )
         );
