@@ -33,10 +33,10 @@ class OwnerUserGridListener
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter = null
     ) {
-        $this->em = $em;
-        $this->aclVoter = $aclVoter;
+        $this->em                  = $em;
+        $this->aclVoter            = $aclVoter;
         $this->securityContextLink = $securityContextLink;
-        $this->treeProvider = $treeProvider;
+        $this->treeProvider        = $treeProvider;
     }
 
     /**
@@ -58,7 +58,7 @@ class OwnerUserGridListener
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permission, $object);
+        $this->getSecurityContext()->isGranted($permission, $object);
         $user = $this->getSecurityContext()->getToken()->getUser();
         $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
         $accessLevel = $observer->getAccessLevel();
