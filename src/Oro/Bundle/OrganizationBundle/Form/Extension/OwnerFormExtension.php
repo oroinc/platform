@@ -247,10 +247,10 @@ class OwnerFormExtension extends AbstractTypeExtension
             return;
         }
 
-        $newOwnerId = $entity->getOwner()->getId();
+        $newOwner = $entity->getOwner();
         //validate only if owner was changed or then we are on create page
         if (is_null($event->getData()->getId())
-            || ($this->oldOwner && $newOwnerId && $this->oldOwner !== $newOwnerId)
+            || ($this->oldOwner && $newOwner->getId() && $this->oldOwner !== $newOwner->getId())
         ) {
             $metadata = $this->getMetadata($form->getNormData());
             if ($metadata) {
@@ -258,12 +258,13 @@ class OwnerFormExtension extends AbstractTypeExtension
                 if ($metadata->isUserOwned()) {
                     $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
                         $this->getCurrentUser(),
-                        $newOwnerId,
+                        $newOwner,
                         $this->accessLevel,
-                        $this->treeProvider
+                        $this->treeProvider,
+                        $this->securityContext->getToken()->getOrganizationContext()
                     );
                 } elseif ($metadata->isBusinessUnitOwned()) {
-                    $isCorrect = in_array($newOwnerId, $this->getBusinessUnitIds());
+                    $isCorrect = in_array($newOwner->getId(), $this->getBusinessUnitIds());
                 }
 
                 if (!$isCorrect) {
