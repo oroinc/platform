@@ -266,6 +266,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -282,6 +285,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -409,6 +415,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -464,7 +473,7 @@ class User extends ExtendUser implements
     protected $businessUnits;
 
     /**
-     * @var Organization[]
+     * @var ArrayCollection Organization[]
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_organization",
@@ -1464,10 +1473,18 @@ class User extends ExtendUser implements
     /**
      * Get User Organizations
      *
+     * @param  bool $onlyActive Returns enabled organizations only
      * @return ArrayCollection Organization[]
      */
-    public function getOrganizations()
+    public function getOrganizations($onlyActive = false)
     {
+        if ($onlyActive) {
+            return $this->organizations->filter(
+                function (Organization $organization) {
+                    return $organization->isEnabled() === true;
+                }
+            );
+        }
         return $this->organizations;
     }
 

@@ -389,8 +389,8 @@ class MigrationsLoader
             $reflClass  = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
             if (isset($files['migrations'][$sourceFile])) {
-                $migration = new $className;
-                if ($migration instanceof Migration) {
+                if (is_subclass_of($className, 'Oro\Bundle\MigrationBundle\Migration\Migration')) {
+                    $migration = new $className;
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('A migration script must contains only one class.');
                     }
@@ -400,8 +400,8 @@ class MigrationsLoader
                     $migrations[$sourceFile] = $migration;
                 }
             } elseif (isset($files['installers'][$sourceFile])) {
-                $installer = new $className;
-                if ($installer instanceof Installation) {
+                if (is_subclass_of($className, 'Oro\Bundle\MigrationBundle\Migration\Installation')) {
+                    $installer = new $className;
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('An installation  script must contains only one class.');
                     }

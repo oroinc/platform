@@ -236,10 +236,10 @@ class OwnerFormExtension extends AbstractTypeExtension
             return;
         }
 
-        $newOwnerId = $entity->getOwner()->getId();
+        $newOwner = $entity->getOwner();
         //validate only if owner was changed or then we are on create page
         if (is_null($event->getData()->getId())
-            || ($this->oldOwner && $newOwnerId && $this->oldOwner !== $newOwnerId)
+            || ($this->oldOwner && $newOwner->getId() && $this->oldOwner !== $newOwner->getId())
         ) {
             $metadata = $this->getMetadata($form->getNormData());
             if ($metadata) {
@@ -247,12 +247,13 @@ class OwnerFormExtension extends AbstractTypeExtension
                 if ($metadata->isUserOwned()) {
                     $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
                         $this->getCurrentUser(),
-                        $newOwnerId,
+                        $newOwner,
                         $this->accessLevel,
-                        $this->treeProvider
+                        $this->treeProvider,
+                        $this->securityContext->getToken()->getOrganizationContext()
                     );
                 } elseif ($metadata->isBusinessUnitOwned()) {
-                    $isCorrect = in_array($newOwnerId, $this->getBusinessUnitIds());
+                    $isCorrect = in_array($newOwner->getId(), $this->getBusinessUnitIds());
                 }
 
                 if (!$isCorrect) {
@@ -320,24 +321,29 @@ class OwnerFormExtension extends AbstractTypeExtension
             $formBuilder = $builder instanceof FormInterface ? $builder->getConfig() : $builder;
             $isRequired = $formBuilder->getOption('required');
 
+            $options = array(
+                'required'           => true,
+                'constraints'        => $isRequired ? array(new NotBlank()) : array(),
+                'autocomplete_alias' => 'acl_users',
+                'configs'            => [
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'extra_config'            => 'acl_user_autocomplete',
+                    'permission'              => $permission,
+                    'entity_name'             => str_replace('\\', '_', $dataClass),
+                    'entity_id'               => $entityId
+                ]
+            );
+
+            if (null !== $data) {
+                $options['data'] = $data;
+            }
+
             $builder->add(
                 $this->fieldName,
                 'oro_user_acl_select',
-                array(
-                    'required' => true,
-                    'constraints' => $isRequired ? array(new NotBlank()) : array(),
-                    'autocomplete_alias' => 'acl_users',
-                    'data' => $data,
-                    'configs' => [
-                        'placeholder' => 'oro.user.form.choose_user',
-                        'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                        'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
-                        'extra_config' => 'acl_user_autocomplete',
-                        'permission' => $permission,
-                        'entity_name' => str_replace('\\', '_', $dataClass),
-                        'entity_id' => $entityId
-                    ]
-                )
+                $options
             );
         }
     }
@@ -391,11 +397,12 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value' => $this->translator->trans($emptyValueLabel),
-                        'mapped' => true,
-                        'label' => $this->fieldLabel,
+                        'empty_value'       => $this->translator->trans($emptyValueLabel),
+                        'mapped'            => true,
+                        'label'             => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
-                        'configs' => array(
+                        'configs'           => array(
+
                             'is_translated_option' => true,
                             'is_safe' => true,
                         )

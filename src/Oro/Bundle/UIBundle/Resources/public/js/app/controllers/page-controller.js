@@ -69,14 +69,10 @@ define([
                 options: options
             };
 
-            if (!route.previous || options.silent) {
-                // - page just loaded from server, does not require update
-                // - page was updated locally and url is changed, no request required
-
-                if (!route.previous) {
-                    // if this first time dispatch, trigger event 'page:afterChange'
-                    this.onPageUpdated(this.model, null, {actionArgs: args});
-                }
+            if (!route.previous) {
+                // page just loaded from server, does not require update
+                // just trigger event 'page:afterChange'
+                this.onPageUpdated(this.model, null, {actionArgs: args});
                 return;
             }
 

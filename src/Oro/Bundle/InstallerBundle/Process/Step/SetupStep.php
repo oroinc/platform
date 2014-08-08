@@ -16,7 +16,9 @@ class SetupStep extends AbstractStep
 
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_config.global');
+
         $form->get('organization_name')->setData($configManager->get('oro_ui.organization_name'));
+        $form->get('application_url')->setData($configManager->get('oro_ui.application_url'));
 
         return $this->render(
             'OroInstallerBundle:Process/Step:setup.html.twig',
@@ -51,6 +53,7 @@ class SetupStep extends AbstractStep
 
             $this->get('oro_user.manager')->updateUser($adminUser);
 
+            /** @var ConfigManager $configManager */
             $configManager           = $this->get('oro_config.global');
             $defaultOrganizationName = $configManager->get('oro_ui.organization_name');
             $organizationName        = $form->get('organization_name')->getData();
@@ -61,6 +64,13 @@ class SetupStep extends AbstractStep
 
                 $organizationManager->updateOrganization($organization);
             }
+
+            $defaultAppURL       = $configManager->get('oro_ui.application_url');
+            $applicationURL      = $form->get('application_url')->getData();
+            if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
+                $configManager->set('oro_ui.application_url', $applicationURL);
+            }
+            $configManager->flush();
 
             return $this->complete();
         }

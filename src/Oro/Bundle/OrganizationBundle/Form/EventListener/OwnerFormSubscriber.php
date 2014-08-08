@@ -65,11 +65,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     public function postSetData(FormEvent $event)
     {
         $form = $event->getForm();
-        if ($form->getParent()) {
-            return;
-        }
-
-        if (!$form->has($this->fieldName)) {
+        if ($form->getParent() || !$form->has($this->fieldName)) {
             return;
         }
 

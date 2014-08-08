@@ -22,9 +22,9 @@
 {% endblock %}
 
 {% block oro_email_emailtemplate_translatation_widget %}
-    <div class="a2lix_translations tabbable">
+    <div class="emailtemplate-translatation oro-tabs tabbable">
 
-        <ul class="a2lix_translationsLocales nav nav-tabs">
+        <ul class="nav nav-tabs">
             {% for translationsLocales in form %}
                 {% set isDefaultLocale = ('defaultLocale' == translationsLocales.vars.name) %}
 
@@ -32,7 +32,7 @@
                     {% set locale = translationsFields.vars.name %}
 
                     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-                        <a href="javascript:void(0);" data-target=".a2lix_translationsFields-{{ locale }}" data-toggle="tab">
+                        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab">
                             {{ translationsLocales.parent.vars.labels[locale]|capitalize }} {% if isDefaultLocale %}[Default]{% endif %}
                         </a>
                     </li>
@@ -40,12 +40,12 @@
             {% endfor %}
         </ul>
 
-        <div class="a2lix_translationsFields tab-content">
+        <div class="tab-content">
             {% for translationsLocales in form %}
                 {% for translationsFields in translationsLocales %}
                     {% set locale = translationsFields.vars.name %}
 
-                    <div class="a2lix_translationsFields-{{ locale }} tab-pane {% if (app.request.locale == locale) %}active{% endif %}">
+                    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane {% if (app.request.locale == locale) %}active{% endif %}">
                         {{ form_widget(translationsFields) }}
                     </div>
                 {% endfor %}

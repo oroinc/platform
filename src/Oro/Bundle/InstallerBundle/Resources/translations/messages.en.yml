@@ -36,12 +36,14 @@ form:
     setup:
         email:             Email
         organization_name: Organization name
+        application_url:   Application URL
         username:          Username
         firstname:         First name
         lastname:          Last name
         password:          Password
         password_re:       Re-enter password
         load_fixtures:     Load Sample Data
+
 
 process:
     step:
