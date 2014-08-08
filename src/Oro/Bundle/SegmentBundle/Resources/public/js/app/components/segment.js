@@ -2,7 +2,7 @@
 /*jslint nomen: true*/
 define(function (require) {
     'use strict';
-    var defaults, $storage, messageBus,
+    var defaults, $storage, messageBus, entityFieldsUtil,
         $ = require('jquery'),
         _ = require('underscore'),
         Backbone = require('backbone'),
@@ -11,7 +11,8 @@ define(function (require) {
         LoadingMask = require('oroui/js/loading-mask'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation');
+        DeleteConfirmation = require('oroui/js/delete-confirmation'),
+        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
     require('oroentity/js/field-choice');
     require('oroentity/js/fields-loader');
     require('orosegment/js/segment-choice');
@@ -49,6 +50,25 @@ define(function (require) {
         entities: [],
         metadata: {}
     };
+
+    entityFieldsUtil = new EntityFieldsUtil();
+
+    /**
+     * Renders HTML entity's field
+     *
+     * @param {string} value
+     * @param {Function} template
+     * @returns {string}
+     */
+    function formatChoice(value, template) {
+        var data;
+        if (value) {
+            try {
+                data = entityFieldsUtil.pathToEntityChain(value);
+            } catch (e) {}
+        }
+        return data ? template(data) : value;
+    }
 
     /**
      * Loads data from the input
@@ -130,6 +150,9 @@ define(function (require) {
             })
             .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
             .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
+            .on('fieldsloaderupdate', function (e, data) {
+                entityFieldsUtil.init($(e.target).val(), data);
+            })
             .on('fieldsloadercomplete', function () {
                 var data = {};
                 messageBus.trigger('resetData', data);
@@ -138,6 +161,7 @@ define(function (require) {
 
         if (!_.isEmpty(options.fieldsData)) {
             $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
+            entityFieldsUtil.init($entityChoice.val(), $entityChoice.data('fields'));
         }
     }
 
@@ -170,7 +194,7 @@ define(function (require) {
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
+                data.name = formatChoice(data.name, template);
                 return tmpl(data);
             },
             deleteHandler: _.bind(deleteHandler, null, collection)
@@ -241,7 +265,7 @@ define(function (require) {
                 var item, itemFunc,
                     func = data.func;
 
-                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
+                data.name = formatChoice(data.name, template);
                 if (func && func.name) {
                     item = metadata[func.group_type][func.group_name];
                     if (item) {
