@@ -3,6 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Doctrine\DBAL\DBALException;
+
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
@@ -13,8 +17,6 @@ use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
 
 class QueryValidator extends ConstraintValidator
 {
