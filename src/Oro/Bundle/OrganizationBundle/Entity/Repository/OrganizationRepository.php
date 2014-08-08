@@ -52,17 +52,19 @@ class OrganizationRepository extends EntityRepository
     /**
      * Returns array of enabled organizations
      *
+     * @param bool $asArray
      * @return array
      */
-    public function getEnabledOrganizationsArray()
+    public function getEnabled($asArray = false)
     {
-        return $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('o')
-            ->from('OroOrganizationBundle:Organization', 'o')
-            ->where('o.enabled = 1')
-            ->getQuery()
-            ->getArrayResult();
+        $organizationsQuery = $this->getEntityManager()
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1');
+
+        if ($asArray) {
+            return $organizationsQuery->getArrayResult();
+        }
+
+        return $organizationsQuery->getResult();
     }
 
     /**

@@ -22,6 +22,18 @@ class BusinessUnitType extends AbstractType
                 )
             )
             ->add(
+                'organization',
+                'entity',
+                array(
+                     'label'    => 'oro.organization.businessunit.organization.label',
+                     'class'    => 'OroOrganizationBundle:Organization',
+                     'property' => 'name',
+                     'required' => false,
+                     'multiple' => false,
+                     'empty_value' => 'oro.organization.form.choose_organization'
+                )
+            )
+            ->add(
                 'business_unit_by_organization',
                 'oro_business_unit_by_organization',
                 array(
@@ -61,18 +73,6 @@ class BusinessUnitType extends AbstractType
                     'required' => false,
                 )
             )
-            /*->add(
-                'organization',
-                'entity',
-                array(
-                    'label'    => 'oro.organization.businessunit.organization.label',
-                    'class'    => 'OroOrganizationBundle:Organization',
-                    'property' => 'name',
-                    'required' => true,
-                    'multiple' => false,
-                    'empty_value' => 'oro.organization.form.choose_organization'
-                )
-            )*/
             ->add(
                 'appendUsers',
                 'oro_entity_identifier',
@@ -100,7 +100,7 @@ class BusinessUnitType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-                //'ownership_disabled' => true
+                'ownership_disabled' => true
             )
         );
     }

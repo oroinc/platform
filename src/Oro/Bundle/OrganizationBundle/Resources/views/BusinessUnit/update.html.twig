@@ -75,16 +75,15 @@
             ]
         }]
     }] %}
-    {#form_row(form.organization),#}
 
-    {#{% set dataBlocks = dataBlocks|merge([{#}
-        {#'title' : 'oro.organization.businessunit.users.label'|trans,#}
-        {#'subblocks': [{#}
-            {#'title' : null,#}
-            {#'useSpan': false,#}
-            {#'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]#}
-        {#}]#}
-    {#}] ) %}#}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.organization.businessunit.users.label'|trans,
+        'subblocks': [{
+            'title' : null,
+            'useSpan': false,
+            'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]
+        }]
+    }] ) %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,

@@ -31,11 +31,12 @@ class BusinessUnitManager
      * Get Business Units tree
      *
      * @param User $entity
+     * @param null $organizationId
      * @return array
      */
-    public function getBusinessUnitsTree(User $entity = null)
+    public function getBusinessUnitsTree(User $entity = null, $organizationId = null)
     {
-        return $this->getBusinessUnitRepo()->getBusinessUnitsTree($entity);
+        return $this->getBusinessUnitRepo()->getBusinessUnitsTree($entity, $organizationId);
     }
 
     /**

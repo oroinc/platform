@@ -56,7 +56,11 @@ class BusinessUnitController extends Controller
     }
 
     /**
-     * @Route("/search/{id}", name="oro_business_unit_search", requirements={"id"="\d+"})
+     * @Route(
+     *      "/search/{organizationId}",
+     *      name="oro_business_unit_search",
+     *      requirements={"organizationId"="\d+"}
+     * )
      * Acl(
      *      id="oro_business_unit_view",
      *      type="action",
@@ -64,18 +68,17 @@ class BusinessUnitController extends Controller
      *      permission="VIEW"
      * )
      */
-    public function searchAction($selectedOrganizationid)
+    public function searchAction($organizationId)
     {
         $businessUnits = [];
-        if ($selectedOrganizationid) {
+        if ($organizationId) {
             $businessUnits = $this->get('oro_organization.business_unit_manager')
                 ->getBusinessUnitRepo()
-                ->getOrganizationBusinessUnitsTree($selectedOrganizationid);
+                ->getOrganizationBusinessUnitsTree($organizationId);
         }
 
         return new Response(json_encode($businessUnits));
     }
-
 
     /**
      * Edit business_unit form

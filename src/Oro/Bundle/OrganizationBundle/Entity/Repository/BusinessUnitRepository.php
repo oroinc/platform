@@ -12,10 +12,13 @@ class BusinessUnitRepository extends EntityRepository
     /**
      * Build business units tree for user page
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $organizationId
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getBusinessUnitsTree(User $user = null)
+    public function getBusinessUnitsTree(User $user = null, $organizationId = null)
     {
         $businessUnits = $this->createQueryBuilder('businessUnit')->select(
             array(
@@ -37,6 +40,12 @@ class BusinessUnitRepository extends EntityRepository
                 $businessUnits->setParameter(':userUnits', $units);
             }
         }
+
+        if ($organizationId) {
+            $businessUnits->where('organization = :organizationId');
+            $businessUnits->setParameter(':organizationId', $organizationId);
+        }
+
         $businessUnits = $businessUnits->getQuery()->getArrayResult();
         $children      = array();
         foreach ($businessUnits as &$businessUnit) {
@@ -69,9 +78,9 @@ class BusinessUnitRepository extends EntityRepository
         $tree          = [];
         $businessUnits = $this->getBusinessUnitsTree();
 
-        $organizations  = $this->_em
+        $organizations = $this->_em
             ->getRepository('OroOrganizationBundle:Organization')
-            ->getEnabledOrganizationsArray();
+            ->getEnabled(true);
         foreach ($organizations as $organizationItem) {
             $tree[$organizationItem['id']] = [
                 'id'       => $organizationItem['id'],
