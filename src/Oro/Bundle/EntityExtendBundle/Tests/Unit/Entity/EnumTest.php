@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\EntityExtendBundle\Entity\Enum;
 use Oro\Bundle\EntityExtendBundle\Tests\Util\ReflectionUtil;
 

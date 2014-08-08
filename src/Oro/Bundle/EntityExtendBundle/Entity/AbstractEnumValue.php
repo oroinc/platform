@@ -185,6 +185,6 @@ abstract class AbstractEnumValue
      */
     public function __toString()
     {
-        return (string)$this->getCode();
+        return $this->code;
     }
 }

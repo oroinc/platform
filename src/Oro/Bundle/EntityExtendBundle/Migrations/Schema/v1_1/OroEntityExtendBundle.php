@@ -55,7 +55,6 @@ class OroEntityExtendBundle implements Migration
         /** End of generate table oro_enum_trans **/
 
         /** Generate foreign keys for table oro_enum_trans **/
-        $table = $schema->getTable('oro_enum_trans');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_enum'),
             ['object_id'],

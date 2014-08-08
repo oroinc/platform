@@ -106,7 +106,7 @@ class Enum implements Translatable
      */
     public function isPublic()
     {
-        return (bool)$this->public;
+        return $this->public;
     }
 
     /**
@@ -161,6 +161,6 @@ class Enum implements Translatable
      */
     public function __toString()
     {
-        return (string) $this->getName();
+        return $this->name;
     }
 }

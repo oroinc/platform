@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0\RenameExtendTablesAndColumns;
 use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1\OroEntityExtendBundle as OroEntityExtendBundle11;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
