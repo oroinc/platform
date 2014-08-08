@@ -10,6 +10,7 @@ oro_system_configuration:
 
     fields:
         oro_data_grid.default_per_page:
+            data_type: integer
             type: choice
             options:
                 label:    'Items per Page by Default'
@@ -35,6 +36,5 @@ oro_system_configuration:
                                             - oro_data_grid.default_per_page
 
     api_tree:
-        lookAndFeel:
-            grid:
-                defaultPerPage:   oro_data_grid.default_per_page
+        look-and-feel:
+            oro_data_grid.default_per_page: ~

@@ -5,17 +5,21 @@ oro_system_configuration:
             title:  oro.attachment.config.attachment.label
         attachment_mime_types_settings:
             title:  oro.attachment.config.mime_types.label
+
     fields:
         oro_attachment.upload_file_mime_types:
+            data_type: string
             type: textarea
             options:
                 label:   oro.attachment.config.upload_file_mime_types.label
                 tooltip: oro.attachment.form.tooltip.file_mime_types
         oro_attachment.upload_image_mime_types:
+            data_type: string
             type: textarea
             options:
                 label: oro.attachment.config.upload_image_mime_types.label
                 tooltip: oro.attachment.form.tooltip.image_mime_types
+
     tree:
         system_configuration:
             platform:
@@ -32,5 +36,5 @@ oro_system_configuration:
 
     api_tree:
         attachments:
-            uploadFileMimeTypes:   oro_attachment.upload_file_mime_types
-            uploadImageMimeTypes:  oro_attachment.upload_image_mime_types
+            oro_attachment.upload_file_mime_types: ~
+            oro_attachment.upload_image_mime_types: ~

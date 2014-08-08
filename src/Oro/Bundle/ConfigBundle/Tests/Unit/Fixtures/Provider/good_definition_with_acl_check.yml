@@ -1,11 +1,13 @@
 oro_system_configuration:
     fields:
         some_field:
+            data_type: string
             type: text
             options: []
             acl_resource: 'ALLOWED'
 
         some_another_field:
+            data_type: string
             type: choice
             acl_resource: 'DENIED'
 

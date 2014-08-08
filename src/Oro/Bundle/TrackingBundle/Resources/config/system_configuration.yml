@@ -9,6 +9,7 @@ oro_system_configuration:
 
     fields:
         oro_tracking.dynamic_tracking_enabled:
+            data_type: boolean
             type: oro_config_checkbox
             priority: 50
             options:
@@ -17,6 +18,7 @@ oro_system_configuration:
                 required: true
 
         oro_tracking.log_rotate_interval:
+            data_type: integer
             type: choice
             priority: 40
             options:
@@ -34,6 +36,7 @@ oro_system_configuration:
                     5:  '5 minutes'
 
         oro_tracking.piwik_host:
+            data_type: string
             type: text
             priority: 20
             options:
@@ -42,6 +45,7 @@ oro_system_configuration:
                 required: false
 
         oro_tracking.piwik_token_auth:
+            data_type: string
             type: text
             priority: 10
             options:
@@ -81,7 +85,7 @@ oro_system_configuration:
 
     api_tree:
         tracking:
-            dynamicTrackingEnabled:   oro_tracking.dynamic_tracking_enabled
-            logRotateInterval:        oro_tracking.log_rotate_interval
-            piwikHost:                oro_tracking.piwik_host
-            piwikTokenAuth:           oro_tracking.piwik_token_auth
+            oro_tracking.dynamic_tracking_enabled: ~
+            oro_tracking.log_rotate_interval: ~
+            oro_tracking.piwik_host: ~
+            oro_tracking.piwik_token_auth: ~

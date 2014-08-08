@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
 class ConfigApiManager
@@ -42,49 +43,39 @@ class ConfigApiManager
     /**
      * Gets all configuration data of the specified section
      *
-     * @param string $path The path to API section. For example: lookAndFeel/grid
+     * @param string $path The path to API section. For example: look-and-feel/grid
      *
      * @return array
      */
     public function getData($path)
     {
-        $data = $this->configProvider->getApiTree($path);
-        $this->prepareData($data);
+        $variables = $this->configProvider->getApiTree($path)->getVariables(true);
+        $result    = [];
+        foreach ($variables as $variable) {
+            $var          = $variable->toArray();
+            $var['value'] = $this->configManager->get($variable->getKey());
+            $result[]     = $var;
+        }
 
-        return $data;
+        return $result;
     }
 
     /**
      * Extracts paths of all sections in the given configuration tree
      *
-     * @param array  $result
-     * @param array  $tree
-     * @param string $parentPath
+     * @param array             $result
+     * @param SectionDefinition $tree
+     * @param string            $parentPath
      */
-    protected function extractSectionPaths(array &$result, array $tree, $parentPath)
+    protected function extractSectionPaths(array &$result, SectionDefinition $tree, $parentPath)
     {
-        foreach ($tree as $key => $val) {
-            if (is_array($val)) {
-                $path = empty($parentPath) ? $key : $parentPath . '/' . $key;
-                $result[] = $path;
-                $this->extractSectionPaths($result, $val, $path);
-            }
-        }
-    }
-
-    /**
-     * Replaces variable references by values
-     *
-     * @param array $data
-     */
-    protected function prepareData(array &$data)
-    {
-        foreach ($data as &$val) {
-            if (is_array($val)) {
-                $this->prepareData($val);
-            } else {
-                $val = $this->configManager->get($val);
-            }
+        $subSections = $tree->getSubSections();
+        foreach ($subSections as $subSection) {
+            $path     = empty($parentPath)
+                ? $subSection->getName()
+                : $parentPath . '/' . $subSection->getName();
+            $result[] = $path;
+            $this->extractSectionPaths($result, $subSection, $path);
         }
     }
 }

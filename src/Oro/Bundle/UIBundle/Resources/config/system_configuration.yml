@@ -13,21 +13,25 @@ oro_system_configuration:
 
     fields:
         oro_ui.application_name:
+            data_type: string
             type: text
             options:
                 label: 'Short Name'
 
         oro_ui.application_url:
+            data_type: string
             type: text
             options:
                 label: 'Application URL'
 
         oro_ui.application_title:
+            data_type: string
             type: text
             options:
                 label: 'Full Name'
 
         oro_ui.navbar_position:
+            data_type: string
             type: choice
             options:
                 label: 'Position'
@@ -58,9 +62,8 @@ oro_system_configuration:
 
     api_tree:
         application:
-            shortName:      oro_ui.application_name
-            fullName:       oro_ui.application_title
-            url:            oro_ui.application_url
-        lookAndFeel:
-            navbar:
-                position:   oro_ui.navbar_position
+            oro_ui.application_name: ~
+            oro_ui.application_title: ~
+            oro_ui.application_url: ~
+        look-and-feel:
+            oro_ui.navbar_position: ~

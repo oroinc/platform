@@ -1,6 +1,8 @@
 <?php
 namespace ConfigBundle\Tests\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -48,7 +50,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     {
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
 
-        $this->assertSame(
+        $this->assertEquals(
             $expectedTree,
             $provider->getApiTree($path)
         );
@@ -70,21 +72,27 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
      */
     public function getApiTreeProvider()
     {
+        $root = new SectionDefinition('');
+        $section1 = new SectionDefinition('section1');
+        $root->addSubSection($section1);
+        $section1->addVariable(new VariableDefinition('some_field', 'string'));
+        $section1->addVariable(new VariableDefinition('some_api_only_field', 'integer'));
+        $section11 = new SectionDefinition('section11');
+        $section1->addSubSection($section11);
+        $section11->addVariable(new VariableDefinition('some_another_field', 'string'));
+
         return [
+            'root section' => [
+                null,
+                $root
+            ],
             'top section' => [
                 'section1',
-                [
-                    'field1' => 'some_field',
-                    'section11' => [
-                        'field2' => 'some_another_field'
-                    ]
-                ]
+                $section1
             ],
             'sub section' => [
                 'section1/section11',
-                [
-                    'field2' => 'some_another_field'
-                ]
+                $section11
             ],
         ];
     }
@@ -141,6 +149,13 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
                 'method'    => 'getSubtree',
                 'arguments' => array('NOT_EXISTING_ONE')
             ),
+            'bad field definition - no data_type'      => array(
+                'filename'  => 'bad_field_without_data_type.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The "data_type" is required except "ui_only" is defined. {"options":[]}',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
             'bad field definition'                     => array(
                 'filename'  => 'bad_field_definition.yml',
                 'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
@@ -152,6 +167,22 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
                 'filename'  => 'bad_group_definition.yml',
                 'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
                 'message'   => 'Group "NOT_EXITED_GROUP" is not defined.',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
+            'bad - undefined field in api_tree'        => array(
+                'filename'  => 'bad_undefined_field_in_api_tree.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                    . ' but it is not defined in "fields" section.',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
+            'bad - ui_only field in api_tree'          => array(
+                'filename'  => 'bad_ui_only_field_in_api_tree.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                    . ' but "data_type" is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
@@ -232,7 +263,10 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     {
         $config = Yaml::parse(file_get_contents($path));
 
-        $processor = new ProcessorDecorator(new Processor(), ['some_field', 'some_another_field']);
+        $processor = new ProcessorDecorator(
+            new Processor(),
+            ['some_field', 'some_another_field', 'some_ui_only_field', 'some_api_only_field']
+        );
 
         return $processor->process($config);
     }
