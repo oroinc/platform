@@ -5,11 +5,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
+use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
-    const TEST_GRID_NAME       = 'test';
+    const TEST_GRID_NAME = 'test';
 
     /** @var ConfigurationProvider */
     protected $provider;
@@ -30,11 +31,17 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->provider = new ConfigurationProvider(
+        $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $this->doctrine,
-            $this->configManager
+            $this->doctrine
+        );
+
+        $builder->setConfigManager($this->configManager);
+
+        $this->provider = new ConfigurationProvider(
+            $builder,
+            $this->doctrine
         );
     }
 

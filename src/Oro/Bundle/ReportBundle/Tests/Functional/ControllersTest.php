@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -68,7 +69,7 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $response = $this->client->requestGrid(
-            "oro_report_table_{$id}",
+            Report::GRID_PREFIX . $id,
             array()
         );
 
@@ -115,7 +116,7 @@ class ControllersTest extends WebTestCase
         $this->assertContains("Report saved", $crawler->html());
 
         $response = $this->client->requestGrid(
-            "oro_report_table_{$id}",
+            Report::GRID_PREFIX . $id,
             array()
         );
 
@@ -156,7 +157,7 @@ class ControllersTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_datagrid_export_action',
-                array('gridName' =>"oro_report_table_{$id}", "format" => 'csv')
+                array('gridName' => Report::GRID_PREFIX . $id, 'format' => 'csv')
             )
         );
         $content = ob_get_contents();
@@ -168,7 +169,7 @@ class ControllersTest extends WebTestCase
         $this->assertResponseContentTypeEquals($result, 'text/csv; charset=UTF-8');
         $this->assertEquals('binary', $result->headers->get('Content-Transfer-Encoding'));
         $this->assertStringStartsWith(
-            'attachment; filename="datagrid_oro_report_table_' . $id,
+            'attachment; filename="datagrid_' . Report::GRID_PREFIX . $id,
             $result->headers->get('Content-Disposition')
         );
 

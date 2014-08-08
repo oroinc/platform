@@ -18,7 +18,8 @@ class EmptyNoFiltersNoJoinsCasesTest extends OrmQueryConverterTest
     {
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode([]));
-        $this->createDatagridConfigurationBuilder($model);
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
     }
 
     /**
@@ -29,7 +30,8 @@ class EmptyNoFiltersNoJoinsCasesTest extends OrmQueryConverterTest
     {
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode(['columns' => []]));
-        $this->createDatagridConfigurationBuilder($model);
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
     }
 
     public function testNoFilters()

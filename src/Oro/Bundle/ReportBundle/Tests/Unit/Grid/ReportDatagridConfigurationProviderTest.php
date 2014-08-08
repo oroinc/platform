@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -50,17 +52,23 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->target = new ReportDatagridConfigurationProvider(
+        $builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
             $this->virtualFieldProvider,
-            $this->doctrine,
-            $this->configManager
+            $this->doctrine
+        );
+
+        $builder->setConfigManager($this->configManager);
+
+        $this->target = new ReportDatagridConfigurationProvider(
+            $builder,
+            $this->doctrine
         );
     }
 
     public function testIsApplicable()
     {
-        $this->assertTrue($this->target->isApplicable('oro_report_table_1'));
+        $this->assertTrue($this->target->isApplicable(Report::GRID_PREFIX . '1'));
         $this->assertFalse($this->target->isApplicable('oro_not_report_table_1'));
         $this->assertFalse($this->target->isApplicable('1_oro_report_table_1'));
     }
@@ -74,37 +82,37 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     public function testGetConfigurationDoesNotAddActionIfNoRouteConfigured()
     {
-        $gridName = 'oro_report_table_1';
-        $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
+        $gridName = Report::GRID_PREFIX . '1';
+        $entity   = 'Oro\Bundle\AddressBundle\Entity\Address';
         $this->prepareMetadata($entity);
-        $this->prepareRepository($entity, array('columns' => array('column' => array('name'=>'street'))));
+        $this->prepareRepository($entity, ['columns' => ['column' => ['name' => 'street']]]);
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
     }
 
     public function testGetConfigurationDoesNotAddActionIfDefinitionHaveGroupingNotByIdentifier()
     {
-        $gridName = 'oro_report_table_1';
-        $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
+        $gridName = Report::GRID_PREFIX . '1';
+        $entity   = 'Oro\Bundle\AddressBundle\Entity\Address';
 
-        $definition = array(
-            'columns' => array('column' => array('name'=>'street')),
-            'grouping_columns' => array(
-                array('name'=>'street', "oro_report_form[grouping][columnNames]" => "street")
-            )
-        );
+        $definition = [
+            'columns'          => ['column' => ['name' => 'street']],
+            'grouping_columns' => [
+                ['name' => 'street', "oro_report_form[grouping][columnNames]" => "street"]
+            ]
+        ];
 
         $metadata = $this->prepareMetadata($entity);
 
         //only stub
         $metadata->expects($this->any())
             ->method('getIdentifier')
-            ->will($this->returnValue(array('id')));
+            ->will($this->returnValue(['id']));
 
         $this->prepareRepository($entity, $definition);
 
         $expectedViewRoute = 'oro_sample_view';
-        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+        $entityMetadata    = $this->getEntityMetadata($expectedViewRoute);
 
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
@@ -117,33 +125,33 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     public function testGetConfigurationDoesNotAddActionIfDefinitionHaveAggregationFunction()
     {
-        $gridName = 'oro_report_table_1';
-        $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
+        $gridName = Report::GRID_PREFIX . '1';
+        $entity   = 'Oro\Bundle\AddressBundle\Entity\Address';
 
-        $definition = array(
-            'columns' => array(
-                'column' => array(
+        $definition = [
+            'columns' => [
+                'column' => [
                     'name' => 'street',
-                    "func" => array(
+                    "func" => [
                         "name"       => "Sum",
                         "group_type" => "aggregates",
                         "group_name" => "number",
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
 
         $metadata = $this->prepareMetadata($entity);
 
         //only stub
         $metadata->expects($this->any())
             ->method('getIdentifier')
-            ->will($this->returnValue(array('id')));
+            ->will($this->returnValue(['id']));
 
         $this->prepareRepository($entity, $definition);
 
         $expectedViewRoute = 'oro_sample_view';
-        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+        $entityMetadata    = $this->getEntityMetadata($expectedViewRoute);
 
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
@@ -156,35 +164,35 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     public function testGetConfigurationAddAction()
     {
-        $gridName = 'oro_report_table_1';
+        $gridName = Report::GRID_PREFIX . '1';
 
         $expectedIdName = 'test_id';
 
         $entity = 'Oro\Bundle\AddressBundle\Entity\Address';
 
         $expectedViewRoute = 'oro_sample_view';
-        $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
+        $entityMetadata    = $this->getEntityMetadata($expectedViewRoute);
 
         $metadata = $this->prepareMetadata($entity);
         $metadata->expects($this->once())
             ->method('getIdentifier')
-            ->will($this->returnValue(array($expectedIdName)));
+            ->will($this->returnValue([$expectedIdName]));
 
-        $definition = array(
-            'columns' => array(
-                'column' => array(
+        $definition = [
+            'columns'          => [
+                'column' => [
                     'name' => 'street',
-                    "func" => array(
+                    "func" => [
                         "name"       => "Sum",
                         "group_type" => "aggregates",
                         "group_name" => "number",
-                    )
-                )
-            ),
-            'grouping_columns' => array(
-                array('name'=>$expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName)
-            )
-        );
+                    ]
+                ]
+            ],
+            'grouping_columns' => [
+                ['name' => $expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName]
+            ]
+        ];
 
         $this->prepareRepository($entity, $definition);
         $this->configManager->expects($this->once())
@@ -196,17 +204,17 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $actualProperties = $configuration->offsetGetByPath('[properties]');
         $this->assertArrayHasKey('view_link', $actualProperties);
 
-        $expectedProperties = array(
+        $expectedProperties = [
             $expectedIdName => null,
-            'view_link'      => array(
+            'view_link'     => [
                 'type'   => 'url',
                 'route'  => $expectedViewRoute,
-                'params' => array($expectedIdName)
-            )
-        );
+                'params' => [$expectedIdName]
+            ]
+        ];
         $this->assertEquals($expectedProperties, $actualProperties);
 
-        $selectParts = $configuration->offsetGetByPath('[source][query][select]');
+        $selectParts           = $configuration->offsetGetByPath('[source][query][select]');
         $selectIdentifierExist = false;
         foreach ($selectParts as $selectPart) {
             if (strpos($selectPart, ".{$expectedIdName}") !== -1) {
@@ -215,16 +223,16 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         }
         $this->assertTrue($selectIdentifierExist);
 
-        $expectedActions = array(
-            'view' => array(
+        $expectedActions = [
+            'view' => [
                 'type'         => 'navigate',
                 'label'        => 'View',
                 'acl_resource' => 'VIEW;entity:Oro\Bundle\AddressBundle\Entity\Address',
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',
                 'rowAction'    => true
-            )
-        );
+            ]
+        ];
         $this->assertEquals($expectedActions, $configuration->offsetGetByPath('[actions]'));
     }
 
@@ -260,7 +268,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      */
     protected function prepareRepository($className, array $definition)
     {
-        $report = $this->getMock('Oro\Bundle\ReportBundle\Entity\Report');
+        $report     = $this->getMock('Oro\Bundle\ReportBundle\Entity\Report');
         $definition = json_encode($definition);
 
         //only stub because of calls time depend on DatagridConfigurationBuilder realisation

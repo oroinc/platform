@@ -8,6 +8,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
 /**
  * Segment
@@ -39,8 +40,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class Segment extends AbstractQueryDesigner
+class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    const GRID_PREFIX = 'oro_segment_grid_';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
@@ -121,6 +124,14 @@ class Segment extends AbstractQueryDesigner
      * )
      */
     protected $updatedAt;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
+    }
 
     /**
      * Get id

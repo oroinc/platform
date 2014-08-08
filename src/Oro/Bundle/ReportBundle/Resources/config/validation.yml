@@ -1,4 +1,6 @@
 Oro\Bundle\ReportBundle\Entity\Report:
+    constraints:
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint: ~
     properties:
         name:
             - NotBlank:     ~

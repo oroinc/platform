@@ -2,52 +2,31 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\ReportBundle\Entity\Report;
 
 class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
 {
-    /**
-     * @var AbstractQueryDesigner
-     */
-    protected $source;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
     /**
      * @var ConfigManager
      */
     protected $configManager;
 
     /**
-     * @param string                        $gridName
-     * @param AbstractQueryDesigner         $source
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
-     * @param ConfigManager                 $configManager
+     * @param ConfigManager $configManager
      */
-    public function __construct(
-        $gridName,
-        AbstractQueryDesigner $source,
-        FunctionProviderInterface $functionProvider,
-        VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine,
-        ConfigManager $configManager
-    ) {
-        parent::__construct($gridName, $source, $functionProvider, $virtualFieldProvider, $doctrine);
-
-        $this->source = $source;
-        $this->doctrine = $doctrine;
+    public function setConfigManager(ConfigManager $configManager)
+    {
         $this->configManager = $configManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplicable($gridName)
+    {
+        return (strpos($gridName, Report::GRID_PREFIX) === 0);
     }
 
     /**
@@ -83,29 +62,29 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             return $configuration;
         }
 
-        $viewAction = array(
-            'view' => array(
+        $viewAction = [
+            'view' => [
                 'type'         => 'navigate',
                 'label'        => 'View',
                 'acl_resource' => 'VIEW;entity:' . $className,
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',
                 'rowAction'    => true
-            )
-        );
+            ]
+        ];
 
-        $properties = array(
+        $properties = [
             $primaryKey => null,
-            'view_link' => array(
+            'view_link' => [
                 'type'   => 'url',
                 'route'  => $metadata->routeView,
-                'params' => array($primaryKey)
-            )
-        );
+                'params' => [$primaryKey]
+            ]
+        ];
 
         $configuration->offsetAddToArrayByPath(
             '[source][query][select]',
-            array("{$entityAlias}.{$primaryKey}")
+            ["{$entityAlias}.{$primaryKey}"]
         );
         $configuration->offsetAddToArrayByPath('[properties]', $properties);
         $configuration->offsetAddToArrayByPath('[actions]', $viewAction);

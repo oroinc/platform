@@ -38,7 +38,7 @@ class ReportController extends Controller
 
         $reportType = $entity->getType()->getName();
         if ($reportType === ReportType::TYPE_TABLE) {
-            $gridName = sprintf('oro_report_table_%d', $entity->getId());
+            $gridName = $entity::GRID_PREFIX . $entity->getId();
 
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
