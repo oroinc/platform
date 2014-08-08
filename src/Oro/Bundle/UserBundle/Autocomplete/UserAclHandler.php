@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -104,12 +106,13 @@ class UserAclHandler implements SearchHandlerInterface
             if ($searchById) {
                 $results[] = $this->em->getRepository('OroUserBundle:User')->find($query);
             } else {
-                $user         = $this->getSecurityContext()->getToken()->getUser();
+                $user = $this->getSecurityContext()->getToken()->getUser();
+                $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
                 $queryBuilder = $this->getSearchQueryBuilder($search);
-                $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
                 if ((boolean) $excludeCurrentUser) {
                     $this->excludeUser($queryBuilder, $user);
                 }
+                $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user, $organization);
                 $results = $queryBuilder->getQuery()->getResult();
             }
 
@@ -247,23 +250,31 @@ class UserAclHandler implements SearchHandlerInterface
     /**
      * Add ACL Check condition to the Query Builder
      *
-     * @param QueryBuilder  $queryBuilder
-     * @param               $accessLevel
-     * @param UserInterface $user
+     * @param QueryBuilder $queryBuilder
+     * @param string       $accessLevel
+     * @param User         $user
+     * @param Organization $organization
      */
-    protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, UserInterface $user)
+    protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
     {
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {
             $queryBuilder->andWhere($queryBuilder->expr()->in('users.id', [$user->getId()]));
+        } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
+            $queryBuilder->join('users.organizations', 'org')
+                ->andWhere($queryBuilder->expr()->in('org.id', [$organization->getId()]));
         } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
-                $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
+                $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds(
+                    $user->getId(),
+                    $organization->getId()
+                );
             } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
-                $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds($user->getId());
-            } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-                $resultBuIds = $this->treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($user->getId());
+                $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
+                    $user->getId(),
+                    $organization->getId()
+                );
             }
-            $queryBuilder->join('users.owner', 'bu')
+            $queryBuilder->join('users.businessUnits', 'bu')
                 ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
         }
     }
@@ -279,7 +290,7 @@ class UserAclHandler implements SearchHandlerInterface
     /**
      * Adds a condition excluding user from the list
      *
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param UserInterface $user
      */
     protected function excludeUser(QueryBuilder $queryBuilder, UserInterface $user)
