@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Form\FormFactoryInterface;
@@ -143,6 +144,7 @@ class SegmentFilter extends EntityFilter
 
         /** @var Segment $segment */
         $segment = $data['value'];
+        /** @var Query $query */
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
             $query = $this->dynamicSegmentQueryBuilderLink->getService()->build($segment);
         } else {

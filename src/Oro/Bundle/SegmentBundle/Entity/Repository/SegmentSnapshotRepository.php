@@ -152,8 +152,17 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
+        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
+        $idField = $entityMetadata->getSingleIdentifierFieldName();
+        $idFieldType = $entityMetadata->getTypeOfField($idField);
+        if ($idFieldType == 'integer') {
+            $fieldToSelect = 'CAST(snp.entityId as int)';
+        } else {
+            $fieldToSelect = 'snp.entityId';
+        }
+
         $qb = $this->createQueryBuilder('snp')
-            ->select('snp.entityId')
+            ->select($fieldToSelect)
             ->where('snp.segment = :segment')
             ->setParameter('segment', $segment);
 
