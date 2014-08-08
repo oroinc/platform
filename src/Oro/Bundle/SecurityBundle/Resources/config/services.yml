@@ -41,6 +41,7 @@ parameters:
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
+    oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
@@ -313,6 +314,13 @@ services:
         class: %oro_security.twig.security_extension%
         arguments:
             - @oro_security.security_facade
+        tags:
+            - { name: twig.extension }
+
+    oro_security.twig.security_organization_extension:
+        class: %oro_security.twig.security_organization_extension%
+        arguments:
+            - @security.context
         tags:
             - { name: twig.extension }
 

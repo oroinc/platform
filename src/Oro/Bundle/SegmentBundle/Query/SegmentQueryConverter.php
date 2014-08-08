@@ -135,7 +135,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($tableAlias, $fieldName)
+    protected function addGroupByColumn($columnAlias)
     {
         // do nothing, grouping is not allowed
     }

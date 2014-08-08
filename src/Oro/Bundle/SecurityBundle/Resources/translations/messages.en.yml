@@ -14,3 +14,6 @@ oro:
             GLOBAL: Organization
             SYSTEM: System
             NONE: None
+        organization:
+            selected:  You have been successfully switched to organization "%organization_name%"
+            access_denied: You don't have access to organization "%organization_name%"

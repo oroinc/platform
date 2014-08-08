@@ -72,7 +72,7 @@ class RestUsersTest extends WebTestCase
             $request
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         //open user by id
         $this->client->request(
@@ -163,7 +163,7 @@ class RestUsersTest extends WebTestCase
             $this->getUrl('oro_api_delete_user', array('id' => $userId))
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request(
             'GET',

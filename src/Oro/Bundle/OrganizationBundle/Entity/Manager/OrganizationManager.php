@@ -5,12 +5,11 @@ namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 
 class OrganizationManager
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
     /**
@@ -28,5 +27,34 @@ class OrganizationManager
     public function getOrganizationById($id)
     {
         return $this->em->getRepository('OroOrganizationBundle:Organization')->getOrganizationById($id);
+    }
+
+    /**
+     * @param string $name
+     * @return Organization
+     */
+    public function getOrganizationByName($name)
+    {
+        return $this->getOrganizationRepo()->getOrganizationByName($name);
+    }
+
+    /**
+     * @return OrganizationRepository
+     */
+    public function getOrganizationRepo()
+    {
+        return $this->em->getRepository('OroOrganizationBundle:Organization');
+    }
+
+    /**
+     * @param Organization $organization
+     * @param bool         $flush
+     */
+    public function updateOrganization(Organization $organization, $flush = true)
+    {
+        $this->em->persist($organization);
+        if ($flush) {
+            $this->em->flush();
+        }
     }
 }

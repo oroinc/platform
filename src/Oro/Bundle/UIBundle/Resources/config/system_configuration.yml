@@ -1,13 +1,5 @@
 oro_system_configuration:
     groups:
-        application_settings:
-            icon:        icon-desktop
-            title:       'Application Settings'
-            page_reload: true
-
-        application_name_settings:
-            title: 'Name'
-
         navbar_settings:
             title: oro.ui.system_configuration.groups.navbar_settings.title
 
@@ -16,6 +8,11 @@ oro_system_configuration:
             type: text
             options:
                 label: 'Short Name'
+
+        oro_ui.application_url:
+            type: text
+            options:
+                label: 'Application URL'
 
         oro_ui.application_title:
             type: text
@@ -41,9 +38,9 @@ oro_system_configuration:
                                 children:
                                     application_name_settings:
                                         children:
-                                            - oro_ui.application_name
-                                            - oro_ui.application_title
-
+#                                            - oro_ui.application_name
+#                                            - oro_ui.application_title
+                                            - oro_ui.application_url
                             look_and_feel:
                                 children:
                                     navbar_settings:

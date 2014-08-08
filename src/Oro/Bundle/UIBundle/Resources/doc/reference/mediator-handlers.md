@@ -11,6 +11,7 @@ Handler Name | Description
 `retrievePath` | removes root prefix from passed path and returns meaningful part of path
 `combineRouteUrl` | accepts path and query parts and combines url
 `combineFullUrl` | accepts path and query parts and combines full url (with root prefix)
+`changeURL` | accepts route and options for `Backbone.history.navigate`, allows to change url without dispatching new route
 
 See [`oroui/js/app/application`](../../public/js/app/application.js) module for details.
 

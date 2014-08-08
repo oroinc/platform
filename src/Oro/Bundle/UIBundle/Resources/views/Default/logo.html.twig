@@ -1,10 +1,11 @@
+<div>
 {% if isDesktopVersion() %}
 <h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
     <a href="{{ path('oro_default') }}" title="{{ oro_config_value('oro_ui.application_title') }}">
         {% if oro_theme_logo() %}
             <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
         {% else %}
-            {{ oro_config_value('oro_ui.application_name') }}
+            {% placeholder organization_name %}
         {% endif %}
     </a>
 </h1>
@@ -17,8 +18,11 @@
         {% if oro_theme_logo() %}
             <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
         {% else %}
-            {{ oro_config_value('oro_ui.application_name') }}
+            {% placeholder organization_name %}
         {% endif %}
     </a>
 </h1>
 {% endif %}
+
+</div>
+{% placeholder organization_selector %}

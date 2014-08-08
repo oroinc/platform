@@ -21,6 +21,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
@@ -29,6 +30,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -37,74 +39,46 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnerFormExtension extends AbstractTypeExtension
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     protected $securityContext;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
 
-    /**
-     * @var BusinessUnitManager
-     */
+    /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldLabel = 'Owner';
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isAssignGranted;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $accessLevel;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $currentUser;
 
-    /**
-     * @var AclVoter
-     */
+    /** @var AclVoter */
     protected $aclVoter;
 
-    /**
-     * @var OwnerTreeProvider
-     */
+    /** @var OwnerTreeProvider */
     protected $treeProvider;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $oldOwner;
 
     /**
@@ -358,24 +332,29 @@ class OwnerFormExtension extends AbstractTypeExtension
             $formBuilder = $builder instanceof FormInterface ? $builder->getConfig() : $builder;
             $isRequired = $formBuilder->getOption('required');
 
+            $options = array(
+                'required'           => true,
+                'constraints'        => $isRequired ? array(new NotBlank()) : array(),
+                'autocomplete_alias' => 'acl_users',
+                'configs'            => [
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'extra_config'            => 'acl_user_autocomplete',
+                    'permission'              => $permission,
+                    'entity_name'             => str_replace('\\', '_', $dataClass),
+                    'entity_id'               => $entityId
+                ]
+            );
+
+            if (null !== $data) {
+                $options['data'] = $data;
+            }
+
             $builder->add(
                 $this->fieldName,
                 'oro_user_acl_select',
-                array(
-                    'required' => true,
-                    'constraints' => $isRequired ? array(new NotBlank()) : array(),
-                    'autocomplete_alias' => 'acl_users',
-                    'data' => $data,
-                    'configs' => [
-                        'placeholder' => 'oro.user.form.choose_user',
-                        'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                        'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
-                        'extra_config' => 'acl_user_autocomplete',
-                        'permission' => $permission,
-                        'entity_name' => str_replace('\\', '_', $dataClass),
-                        'entity_id' => $entityId
-                    ]
-                )
+                $options
             );
         }
     }
@@ -429,11 +408,12 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value' => $this->translator->trans($emptyValueLabel),
-                        'mapped' => true,
-                        'label' => $this->fieldLabel,
+                        'empty_value'       => $this->translator->trans($emptyValueLabel),
+                        'mapped'            => true,
+                        'label'             => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
-                        'configs' => array(
+                        'configs'           => array(
+
                             'is_translated_option' => true,
                             'is_safe' => true,
                         )
