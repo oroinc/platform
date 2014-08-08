@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
 
 class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
@@ -27,27 +29,24 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSections()
     {
+        $apiTree     = new SectionDefinition('');
+        $testSection = new SectionDefinition('test_section');
+        $apiTree->addSubSection($testSection);
+        $testSection->addVariable(new VariableDefinition('acme.item1', 'string'));
+        $fooSection = new SectionDefinition('foo');
+        $testSection->addSubSection($fooSection);
+        $fooSection->addVariable(new VariableDefinition('acme.item2', 'string'));
+        $barSection = new SectionDefinition('bar');
+        $testSection->addSubSection($barSection);
+        $barSection->addVariable(new VariableDefinition('acme.item2', 'string'));
+        $section2 = new SectionDefinition('section2');
+        $apiTree->addSubSection($section2);
+        $section2->addVariable(new VariableDefinition('acme.item3', 'string'));
+
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
             ->with(null)
-            ->will(
-                $this->returnValue(
-                    [
-                        'test_section' => [
-                            'item1' => 'acme.item1',
-                            'foo'   => [
-                                'item2' => 'acme.item2'
-                            ],
-                            'bar'   => [
-                                'item2' => 'acme.item2'
-                            ],
-                        ],
-                        'section2'     => [
-                            'item3' => 'acme.item3',
-                        ]
-                    ]
-                )
-            );
+            ->will($this->returnValue($apiTree));
         $this->assertSame(
             [
                 'section2',
@@ -63,22 +62,20 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
     {
         $path = 'section1/section11';
 
+        $apiTree = new SectionDefinition('section11');
+        $apiTree->addVariable(new VariableDefinition('acme.item1', 'string'));
+        $subSection1 = new SectionDefinition('sub_section1');
+        $apiTree->addSubSection($subSection1);
+        $subSection1->addVariable(new VariableDefinition('acme.item2', 'integer'));
+        $subSection11 = new SectionDefinition('sub_section11');
+        $subSection1->addSubSection($subSection11);
+        $subSection11->addVariable(new VariableDefinition('acme.item2', 'integer'));
+        $subSection11->addVariable(new VariableDefinition('acme.item3', 'array'));
+
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
             ->with($path)
-            ->will(
-                $this->returnValue(
-                    [
-                        'item1'        => 'acme.item1',
-                        'sub_section1' => [
-                            'item2'         => 'acme.item2',
-                            'sub_section11' => [
-                                'item3' => 'acme.item3'
-                            ]
-                        ]
-                    ]
-                )
-            );
+            ->will($this->returnValue($apiTree));
         $this->configManager->expects($this->any())
             ->method('get')
             ->will(
@@ -93,13 +90,9 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [
-                'item1'        => 'val1',
-                'sub_section1' => [
-                    'item2'         => 123,
-                    'sub_section11' => [
-                        'item3' => ['val1' => 1, 'val2' => true]
-                    ]
-                ]
+                ['key' => 'acme.item1', 'type' => 'string', 'value' => 'val1'],
+                ['key' => 'acme.item2', 'type' => 'integer', 'value' => 123],
+                ['key' => 'acme.item3', 'type' => 'array', 'value' => ['val1' => 1, 'val2' => true]],
             ],
             $this->manager->getData($path)
         );

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Provider;
 
 use Symfony\Component\Form\FormInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
 interface ProviderInterface
@@ -11,9 +12,9 @@ interface ProviderInterface
     /**
      * Returns a tree is used to build API data
      *
-     * @param string|null $path The path to API section. For example: lookAndFeel/grid
+     * @param string|null $path The path to API section. For example: look-and-feel/grid
      *
-     * @return array
+     * @return SectionDefinition|null
      */
     public function getApiTree($path = null);
 

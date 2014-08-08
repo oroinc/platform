@@ -1,0 +1,9 @@
+oro_system_configuration:
+    fields:
+        some_field:
+            ui_only: true
+            type: text
+
+    api_tree:
+        section1:
+            some_field: ~

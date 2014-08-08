@@ -4,6 +4,7 @@ oro_system_configuration:
             title:       'Sidebar settings'
     fields:
         oro_sidebar.sidebar_left_active:
+            data_type: boolean
             type: choice
             options:
                 label: 'Enable left sidebar'
@@ -11,6 +12,7 @@ oro_system_configuration:
                     - No
                     - Yes
         oro_sidebar.sidebar_right_active:
+            data_type: boolean
             type: choice
             options:
                 label: 'Enable right sidebar'
@@ -31,7 +33,6 @@ oro_system_configuration:
                                             - oro_sidebar.sidebar_right_active
 
     api_tree:
-        lookAndFeel:
-            sidebar:
-                left:   oro_sidebar.sidebar_left_active
-                right:  oro_sidebar.sidebar_right_active
+        look-and-feel:
+            oro_sidebar.sidebar_left_active: ~
+            oro_sidebar.sidebar_right_active: ~

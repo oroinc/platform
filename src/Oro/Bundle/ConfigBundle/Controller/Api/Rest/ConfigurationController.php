@@ -51,11 +51,11 @@ class ConfigurationController extends FOSRestController
     /**
      * Get all configuration data of the specified section
      *
-     * @param string $path The configuration section path. For example: lookAndFeel/grid
+     * @param string $path The configuration section path. For example: look-and-feel/grid
      *
      * @Get("/configuration/{path}",
      *      name="oro_api_get_configuration",
-     *      requirements={"path"="\w+(\/\w+)*"}
+     *      requirements={"path"="[\w-]+(\/[\w-])*"}
      * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",

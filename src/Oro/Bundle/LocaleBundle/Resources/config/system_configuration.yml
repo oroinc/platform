@@ -16,6 +16,7 @@ oro_system_configuration:
 
     fields:
         oro_locale.locale:
+            data_type: string
             type: oro_locale
             priority: 70
             options:
@@ -26,6 +27,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.country:
+            data_type: string
             type: oro_locale_country
             priority: 60
             options:
@@ -36,6 +38,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.format_address_by_address_country:
+            data_type: boolean
             type: oro_config_checkbox
             priority: 50
             options:
@@ -44,6 +47,7 @@ oro_system_configuration:
                 required: true
 
         oro_locale.language:
+            data_type: string
             type: oro_language
             priority: 40
             options:
@@ -54,6 +58,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.languages:
+            data_type: array
             type: oro_language
             priority: 35
             options:
@@ -65,6 +70,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.timezone:
+            data_type: string
             type: oro_locale_timezone
             priority: 30
             options:
@@ -75,6 +81,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.currency:
+            data_type: string
             type: oro_currency
             priority: 20
             options:
@@ -85,6 +92,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.quarter_start:
+            data_type: array
             type: oro_quarter
             priority: 30
             options:
@@ -95,6 +103,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.temperature_unit:
+            data_type: string
             type: choice
             priority: 20
             options:
@@ -108,6 +117,7 @@ oro_system_configuration:
                     celsius: 'Celsius'
 
         oro_locale.wind_speed_unit:
+            data_type: string
             type: choice
             priority: 10
             options:
@@ -154,14 +164,14 @@ oro_system_configuration:
 
     api_tree:
         localization:
-            defaultLanguage:          oro_locale.language
-            supportedLanguages:       oro_locale.languages
-            locale:                   oro_locale.locale
-            primaryCountry:           oro_locale.country
-            formatAddressPerCountry:  oro_locale.format_address_by_address_country
-            timezone:                 oro_locale.timezone
-            currency:                 oro_locale.currency
-            firstQuarterStart:        oro_locale.quarter_start
-            mapTemperatureUnit:       oro_locale.temperature_unit
-            mapWindSpeedUnit:         oro_locale.wind_speed_unit
+            oro_locale.language: ~
+            oro_locale.languages: ~
+            oro_locale.locale: ~
+            oro_locale.country: ~
+            oro_locale.format_address_by_address_country: ~
+            oro_locale.timezone: ~
+            oro_locale.currency: ~
+            oro_locale.quarter_start: ~
+            oro_locale.temperature_unit: ~
+            oro_locale.wind_speed_unit: ~
 
