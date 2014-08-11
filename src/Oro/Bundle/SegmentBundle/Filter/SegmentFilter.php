@@ -121,9 +121,15 @@ class SegmentFilter extends EntityFilter
                         'property'      => 'name',
                         'required'      => true,
                         'query_builder' => function (EntityRepository $repo) use ($entityName) {
-                            return $repo->createQueryBuilder('s')
-                                ->where('s.entity = :entity')
-                                ->setParameter('entity', $entityName);
+                            $qb = $repo->createQueryBuilder('s');
+
+                            if ($entityName) {
+                                $qb
+                                    ->where('s.entity = :entity')
+                                    ->setParameter('entity', $entityName);
+                            }
+
+                            return $qb;
                         }
                     ]
                 ]
@@ -159,5 +165,7 @@ class SegmentFilter extends EntityFilter
         foreach ($params as $param) {
             $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
         }
+
+        return true;
     }
 }
