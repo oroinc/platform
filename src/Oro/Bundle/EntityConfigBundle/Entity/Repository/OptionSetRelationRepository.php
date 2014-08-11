@@ -3,8 +3,12 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSetRelationRepository extends EntityRepository
 {
     /**

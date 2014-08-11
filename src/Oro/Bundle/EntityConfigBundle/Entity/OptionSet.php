@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 
 /**
+ * @deprecated since 1.4. Will be removed in 2.0
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRepository")
  * @ORM\Table(name="oro_entity_config_optionset")
  * @ORM\HasLifecycleCallbacks

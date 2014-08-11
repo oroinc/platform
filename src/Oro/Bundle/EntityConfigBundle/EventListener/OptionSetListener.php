@@ -13,6 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 /**
+ * @deprecated since 1.4. Will be removed in 2.0
+ *
  * Class OptionSetListener
  * @package Oro\Bundle\EntityConfigBundle\EventListener
  *

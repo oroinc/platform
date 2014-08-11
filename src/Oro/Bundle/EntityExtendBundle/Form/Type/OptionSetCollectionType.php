@@ -16,6 +16,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSetCollectionType extends AbstractType
 {
     /**
