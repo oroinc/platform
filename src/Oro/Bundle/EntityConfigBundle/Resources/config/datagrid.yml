@@ -5,7 +5,7 @@ datagrid:
             entityHint: entity
             toolbarOptions:
                 pageSize:
-                    default_per_page: 50
+                    default_per_page: 100
         source:
             acl_resource: oro_entityconfig_manage
             type: orm
