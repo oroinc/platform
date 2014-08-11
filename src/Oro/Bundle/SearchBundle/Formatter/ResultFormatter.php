@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Formatter;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class ResultFormatter

@@ -23,23 +23,23 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager    = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+        $this->mapper           = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()->getMock();
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
+        $indexer                = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $configManager          = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+        $translator             = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->provider = new SearchProvider(
+        $this->provider         = new SearchProvider(
             $this->entityManager,
             $this->mapper,
             $this->securityProvider,
@@ -58,16 +58,21 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetResults()
     {
-        $taggingMock = $this->getMock('Oro\Bundle\TagBundle\Entity\Tagging');
-        $taggingMock->expects($this->exactly(2))->method('getEntityName')
-            ->will($this->returnValue(self::TEST_ENTITY_NAME));
-
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(['getResult'])
             ->getMockForAbstractClass();
         $query->expects($this->once())->method('getResult')
-            ->will($this->returnValue(array($taggingMock)));
+            ->will(
+                $this->returnValue(
+                    [
+                        [
+                            'entityName' => self::TEST_ENTITY_NAME,
+                            'recordId'   => self::TEST_ID,
+                        ]
+                    ]
+                )
+            );
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()->getMock();
@@ -77,7 +82,7 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())->method('where')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(3))->method('addGroupBy')
+        $qb->expects($this->exactly(2))->method('addGroupBy')
             ->will($this->returnSelf());
         $qb->expects($this->once())->method('setParameter')
             ->will($this->returnSelf());

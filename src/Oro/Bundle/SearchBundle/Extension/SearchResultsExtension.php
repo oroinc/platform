@@ -66,29 +66,39 @@ class SearchResultsExtension extends AbstractExtension
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows = $result->offsetGetByPath('[data]');
-        $rows = is_array($rows) ? $rows : array();
+        $rows = is_array($rows) ? $rows : [];
 
         $rows = array_map(
             function (ResultRecordInterface $record) {
-                return $record->getRootEntity();
+                if ($rootEntity = $record->getRootEntity()) {
+                    return $rootEntity;
+                }
+
+                $entityName = $record->getValue('entityName');
+                $recordId   = $record->getValue('recordId');
+                if ($entityName && $recordId) {
+                    return new ResultItem($this->em, $entityName, $recordId);
+                }
+
+                return null;
             },
             $rows
         );
 
-        $entities   = $this->resultFormatter->getResultEntities($rows);
+        $entities = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
+        /** @var ResultItem $row */
         foreach ($rows as $row) {
-            $entity     = null;
             $entityName = $row->getEntityName();
             $entityId   = $row->getRecordId();
-            if (isset($entities[$entityName][$entityId])) {
-                $entity = $entities[$entityName][$entityId];
-            } else {
+            if (!isset($entities[$entityName][$entityId])) {
                 continue;
             }
 
-            $item         = new ResultItem(
+            $entity = $entities[$entityName][$entityId];
+
+            $item = new ResultItem(
                 $this->em,
                 $entityName,
                 $entityId,
@@ -97,6 +107,7 @@ class SearchResultsExtension extends AbstractExtension
                 null,
                 $this->mapper->getEntityConfig($entityName)
             );
+
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
 
             $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));

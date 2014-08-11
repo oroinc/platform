@@ -60,29 +60,30 @@ class SearchProvider extends ResultStatisticsProvider
     public function getResults($tagId)
     {
         $queryBuilder = $this->em->createQueryBuilder()
-            ->select('t')
+            ->select('t.entityName', 't.recordId')
             ->from('Oro\Bundle\TagBundle\Entity\Tagging', 't')
             ->where('t.tag = :tag')
             ->setParameter('tag', $tagId)
             ->addGroupBy('t.entityName')
-            ->addGroupBy('t.recordId')
-            ->addGroupBy('t.id');
+            ->addGroupBy('t.recordId');
+
         $this->securityProvider->applyAcl($queryBuilder, 't');
 
         $originResults = $queryBuilder->getQuery()
             ->getResult();
 
-        $results = array();
+        $results = [];
         /** @var Tagging $item */
         foreach ($originResults as $item) {
-            $results[] = new Item(
+            $entityName = $item['entityName'];
+            $results[]  = new Item(
                 $this->em,
-                $item->getEntityName(),
-                $item->getRecordId(),
+                $entityName,
+                $item['recordId'],
                 null,
                 null,
                 null,
-                $this->mapper->getEntityConfig($item->getEntityName())
+                $this->mapper->getEntityConfig($entityName)
             );
         }
 

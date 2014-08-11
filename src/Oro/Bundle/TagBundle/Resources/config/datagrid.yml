@@ -94,16 +94,11 @@ datagrid:
             type: orm
             query:
                 select:
-                    - tt
-                    - t
+                    - tt.entityName
+                    - tt.recordId
                 from:
                     - { table: OroTagBundle:Tagging, alias: tt }
-                join:
-                    left:
-                        tagging:
-                            join: tt.tag
-                            alias: t
-                groupBy: tt.entityName, tt.recordId, tt.id, t.id
+                groupBy: tt.entityName, tt.recordId
                 where:
                     and:
                         - tt.tag = :tag
