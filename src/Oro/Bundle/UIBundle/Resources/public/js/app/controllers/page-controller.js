@@ -69,14 +69,10 @@ define([
                 options: options
             };
 
-            if (!route.previous || options.silent) {
-                // - page just loaded from server, does not require update
-                // - page was updated locally and url is changed, no request required
-
-                if (!route.previous) {
-                    // if this first time dispatch, trigger event 'page:afterChange'
-                    this.onPageUpdated(this.model, null, {actionArgs: args});
-                }
+            if (!route.previous) {
+                // page just loaded from server, does not require update
+                // just trigger event 'page:afterChange'
+                this.onPageUpdated(this.model, null, {actionArgs: args});
                 return;
             }
 
@@ -171,13 +167,28 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
+            var initialization, self;
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
                 return;
             }
-            //@todo develop approach to postpone 'page:afterChange' event
-            // until all inline scripts on a page have not finished changes
-            _.delay(_.bind(this.publishEvent, this), 50, 'page:afterChange');
+
+            self = this;
+
+            // init components
+            initialization = mediator.execute('layout:init', document.body);
+            initialization.done(function (components) {
+                // attach created components to controller, to get them disposed together
+                _.each(components, function (component) {
+                    if (typeof component.dispose === 'function') {
+                        self['component-' + component.cid] = component;
+                    }
+                });
+
+                _.defer(function () {
+                    self.publishEvent('page:afterChange');
+                });
+            });
         },
 
         /**

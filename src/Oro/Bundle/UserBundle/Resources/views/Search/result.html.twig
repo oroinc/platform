@@ -5,7 +5,6 @@
 #}
 {% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
 
-{% set entity_output = oro_config_entity('Oro\\Bundle\\UserBundle\\Entity\\User') %}
 {% set showImage = true %}
 
 {% set recordUrl = indexer_item.recordUrl %}
@@ -24,7 +23,7 @@
 {% endif %}
 
 {% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
-{% set entityType = entity_output.name|trans %}
+{% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
 
 {% set entityInfo = [
     {'title': 'oro.ui.created_at'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},

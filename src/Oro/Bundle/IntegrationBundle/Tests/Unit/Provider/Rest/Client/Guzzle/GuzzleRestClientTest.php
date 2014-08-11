@@ -314,7 +314,10 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException(
             'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException',
-            "Unsuccessful response\n[status code] $statusCode\n[reason phrase] $reasonPhrase\n[url] $url"
+            "Unsuccessful response" . PHP_EOL .
+            "[status code] $statusCode" . PHP_EOL .
+            "[reason phrase] $reasonPhrase" . PHP_EOL .
+            "[url] $url"
         );
 
         $getter = 'get' . strtoupper($format);

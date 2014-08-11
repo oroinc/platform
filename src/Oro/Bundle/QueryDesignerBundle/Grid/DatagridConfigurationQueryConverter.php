@@ -258,13 +258,9 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($tableAlias, $fieldName)
+    protected function addGroupByColumn($columnAlias)
     {
-        $this->groupingColumns[] = sprintf(
-            '%s.%s',
-            $tableAlias,
-            $fieldName
-        );
+        $this->groupingColumns[] = $columnAlias;
     }
 
     /**

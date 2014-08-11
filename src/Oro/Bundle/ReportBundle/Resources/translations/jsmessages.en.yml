@@ -1,5 +1,3 @@
-"Change Entity Confirmation": "Change Entity Confirmation"
-
 oro:
     report:
-        confirm_update: Changing the entity will erase all report filters and columns. Do you want to continue?
+        change_entity_confirmation: Changing the entity will erase all report filters and columns. Do you want to continue?

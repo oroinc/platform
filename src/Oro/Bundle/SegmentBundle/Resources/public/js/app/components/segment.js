@@ -2,14 +2,19 @@
 /*jslint nomen: true*/
 define(function (require) {
     'use strict';
-    var defaults, $storage,
+    var defaults, $storage, messageBus, entityFieldsUtil,
         $ = require('jquery'),
         _ = require('underscore'),
         Backbone = require('backbone'),
+        mediator = require('oroui/js/mediator'),
+        __ = require('orotranslation/js/translator'),
+        LoadingMask = require('oroui/js/loading-mask'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation');
+        DeleteConfirmation = require('oroui/js/delete-confirmation'),
+        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
     require('oroentity/js/field-choice');
+    require('oroentity/js/fields-loader');
     require('orosegment/js/segment-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
@@ -18,6 +23,12 @@ define(function (require) {
     defaults = {
         entityChoice: '',
         valueSource: '',
+        fieldsLoader: {
+            loadingMaskParent: '',
+            routingParams: {},
+            fieldsData: [],
+            confirmMessage: ''
+        },
         filters: {
             criteriaList: '',
             conditionBuilder: ''
@@ -39,6 +50,25 @@ define(function (require) {
         entities: [],
         metadata: {}
     };
+
+    entityFieldsUtil = new EntityFieldsUtil();
+
+    /**
+     * Renders HTML entity's field
+     *
+     * @param {string} value
+     * @param {Function} template
+     * @returns {string}
+     */
+    function formatChoice(value, template) {
+        var data;
+        if (value) {
+            try {
+                data = entityFieldsUtil.pathToEntityChain(value);
+            } catch (e) {}
+        }
+        return data ? template(data) : value;
+    }
 
     /**
      * Loads data from the input
@@ -85,10 +115,67 @@ define(function (require) {
         confirm.open();
     }
 
-    function initGrouping(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, template;
+    function initFieldsLoader(options) {
+        var confirm, loadingMask, $entityChoice;
 
+        loadingMask = new LoadingMask();
+        $(options.loadingMaskParent).append(loadingMask.render().$el);
+
+        confirm = new DeleteConfirmation({
+            title: __('Change Entity Confirmation'),
+            okText: __('Yes, I Agree'),
+            content: __(options.confirmMessage)
+        });
+
+        $entityChoice = $(options.entityChoice);
+        $entityChoice
+            .fieldsLoader({
+                router: 'oro_api_querydesigner_fields_entity',
+                routingParams: options.routingParams,
+                confirm: confirm,
+                requireConfirm: function () {
+                    var data = $storage.val();
+                    if (!data) {
+                        return false;
+                    }
+                    try {
+                        data = JSON.parse(data);
+                    } catch (e) {
+                        return false;
+                    }
+                    return _.some(data, function (value) {
+                        return !_.isEmpty(value);
+                    });
+                }
+            })
+            .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+            .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
+            .on('fieldsloaderupdate', function (e, data) {
+                entityFieldsUtil.init($(e.target).val(), data);
+            })
+            .on('fieldsloadercomplete', function () {
+                var data = {};
+                messageBus.trigger('resetData', data);
+                save(data);
+            });
+
+        if (!_.isEmpty(options.fieldsData)) {
+            $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
+            entityFieldsUtil.init($entityChoice.val(), $entityChoice.data('fields'));
+        }
+    }
+
+    function initGrouping(options, metadata, fieldChoiceOptions) {
+        var $itemContainer, $editor, $fieldChoice, collection, template;
+
+        $itemContainer = $(options.itemContainer);
         $editor = $(options.form);
+
+        if (_.isEmpty($itemContainer) || _.isEmpty($editor)) {
+            // there's no grouping
+            return;
+        }
+
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
         $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, metadata.grouping, {select2: {}}));
 
@@ -103,21 +190,34 @@ define(function (require) {
 
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
-        $(options.itemContainer).itemsManagerTable({
+        $itemContainer.itemsManagerTable({
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
+                data.name = formatChoice(data.name, template);
                 return tmpl(data);
             },
             deleteHandler: _.bind(deleteHandler, null, collection)
         });
+
+        messageBus.on('resetData', function (data) {
+            data.grouping_columns = [];
+            $itemContainer.itemsManagerTable('reset');
+            $editor.itemsManagerEditor('reset');
+        });
     }
 
     function initColumn(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, template, sortingLabels;
+        var $itemContainer, $editor, $fieldChoice, collection, template, sortingLabels;
 
+        $itemContainer = $(options.itemContainer);
         $editor = $(options.form);
+
+        if (_.isEmpty($itemContainer) || _.isEmpty($editor)) {
+            // there's no columns
+            return;
+        }
+
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
         $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, {select2: {}}));
 
@@ -158,14 +258,14 @@ define(function (require) {
 
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
-        $(options.itemContainer).itemsManagerTable({
+        $itemContainer.itemsManagerTable({
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
                 var item, itemFunc,
                     func = data.func;
 
-                data.name = $fieldChoice.fieldChoice('formatChoice', data.name, template);
+                data.name = formatChoice(data.name, template);
                 if (func && func.name) {
                     item = metadata[func.group_type][func.group_name];
                     if (item) {
@@ -185,26 +285,43 @@ define(function (require) {
             },
             deleteHandler: _.bind(deleteHandler, null, collection)
         });
+
+        messageBus.on('resetData', function (data) {
+            data.columns = [];
+            $itemContainer.itemsManagerTable('reset');
+            $editor.itemsManagerEditor('reset');
+        });
     }
 
     function configureFilters(options, metadata, fieldChoiceOptions, segmentChoiceOptions) {
-        var $fieldCondition, $segmentCondition, $builder;
-
-        // mixin extra options to condition-builder's field choice
-        $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
-        $.extend(true, $fieldCondition.data('options'), {
-            fieldChoice: fieldChoiceOptions,
-            filters: metadata.filters,
-            hierarchy: metadata.hierarchy
-        });
-
-        $segmentCondition = $(options.criteriaList).find('[data-criteria=condition-segment]');
-        $.extend(true, $segmentCondition.data('options'), {
-            segmentChoice: segmentChoiceOptions,
-            filters: metadata.filters
-        });
+        var $fieldCondition, $segmentCondition, $builder, $criteria;
 
         $builder = $(options.conditionBuilder);
+        $criteria = $(options.criteriaList);
+
+        if (_.isEmpty($builder) || _.isEmpty($criteria)) {
+            // there's no filter
+            return;
+        }
+
+        // mixin extra options to condition-builder's field choice
+        $fieldCondition = $criteria.find('[data-criteria=condition-item]');
+        if (!_.isEmpty($fieldCondition)) {
+            $.extend(true, $fieldCondition.data('options'), {
+                fieldChoice: fieldChoiceOptions,
+                filters: metadata.filters,
+                hierarchy: metadata.hierarchy
+            });
+        }
+
+        $segmentCondition = $criteria.find('[data-criteria=condition-segment]');
+        if (!_.isEmpty($segmentCondition)) {
+            $.extend(true, $segmentCondition.data('options'), {
+                segmentChoice: segmentChoiceOptions,
+                filters: metadata.filters
+            });
+        }
+
         $builder.conditionBuilder({
             criteriaListSelector: options.criteriaList
         });
@@ -212,50 +329,38 @@ define(function (require) {
         $builder.on('changed', function () {
             save($builder.conditionBuilder('getValue'), 'filters');
         });
+
+        messageBus.on('resetData', function (data) {
+            data.filters = [];
+            $builder.conditionBuilder('setValue', data.filters);
+        });
     }
 
     return function (options) {
-        var fieldChoiceOptions, segmentChoiceOptions;;
+        var fieldChoiceOptions, segmentChoiceOptions, gridFieldChoiceOptions;
+
         options = $.extend(true, {}, defaults, options);
 
         $storage = $(options.valueSource);
-
-        var $groupingContainer = $(options.grouping.itemContainer),
-            $groupingForm      = $(options.grouping.form),
-            isGrouping         = !(_.isEmpty($groupingContainer) && _.isEmpty($groupingForm));
+        messageBus = $.extend({}, Backbone.Events);
+        mediator.once('page:request', function () {
+            messageBus.off();
+        });
 
         // common extra options for all choice inputs
         fieldChoiceOptions   = getFieldChoiceOptions(options);
+        gridFieldChoiceOptions = _.defaults(options.gridFieldChoiceOptions || {}, fieldChoiceOptions);
         segmentChoiceOptions = _.extend(_.clone(fieldChoiceOptions), {
             select2: {
                 formatSelectionTemplate: $(options.select2SegmentChoiceTemplate).text()
             }
         });
 
-        if (isGrouping) {
-            initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
-        }
-
-        var gridFieldChoiceOptions = _.extend(_.clone(fieldChoiceOptions), options.gridFieldChoiceOptions);
+        initFieldsLoader(options.fieldsLoader);
+        initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
         initColumn(options.column, options.metadata, gridFieldChoiceOptions);
         configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
 
-        $(options.entityChoice)
-            .on('fieldsloadercomplete', function () {
-                var data = {columns: [], filters: []};
-                if (isGrouping) {
-                    data.grouping_columns = [];
-                }
-                save(data);
-
-                if (isGrouping) {
-                    $groupingContainer.itemsManagerTable('reset');
-                    $groupingForm.itemsManagerEditor('reset');
-                }
-                $(options.column.itemContainer).itemsManagerTable('reset');
-                $(options.column.form).itemsManagerEditor('reset');
-                $(options.filters.conditionBuilder).conditionBuilder('setValue', data.filters);
-            });
-
+        options._sourceElement.remove();
     };
 });

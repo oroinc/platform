@@ -95,12 +95,12 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $gridName = Report::GRID_PREFIX . '1';
         $entity   = 'Oro\Bundle\AddressBundle\Entity\Address';
 
-        $definition = [
-            'columns'          => ['column' => ['name' => 'street']],
-            'grouping_columns' => [
-                ['name' => 'street', "oro_report_form[grouping][columnNames]" => "street"]
-            ]
-        ];
+        $definition = array(
+            'columns' => array('column' => array('name'=>'street')),
+            'grouping_columns' => array(
+                array('name'=>'street')
+            )
+        );
 
         $metadata = $this->prepareMetadata($entity);
 
@@ -178,14 +178,24 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getIdentifier')
             ->will($this->returnValue([$expectedIdName]));
 
+<<<<<<< HEAD
         $definition = [
             'columns'          => [
                 'column' => [
+=======
+        $definition = array(
+            'columns' => array(
+                array(
+                    'name' => $expectedIdName
+                ),
+                array(
+>>>>>>> master
                     'name' => 'street',
                     "func" => [
                         "name"       => "Sum",
                         "group_type" => "aggregates",
                         "group_name" => "number",
+<<<<<<< HEAD
                     ]
                 ]
             ],
@@ -193,6 +203,15 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
                 ['name' => $expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName]
             ]
         ];
+=======
+                    )
+                )
+            ),
+            'grouping_columns' => array(
+                array('name'=>$expectedIdName)
+            )
+        );
+>>>>>>> master
 
         $this->prepareRepository($entity, $definition);
         $this->configManager->expects($this->once())

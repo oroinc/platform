@@ -2,39 +2,37 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
-
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 class Orm extends AbstractEngine
 {
+    const BATCH_SIZE = 1000;
+
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
-     * @var \Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+     * @var SearchIndexRepository
      */
     protected $searchRepo;
 
     /**
-     * @var \JMS\JobQueueBundle\Entity\Repository\JobRepository
-     */
-    protected $jobRepo;
-
-    /**
-     * @var \Oro\Bundle\SearchBundle\Engine\ObjectMapper
+     * @var ObjectMapper
      */
     protected $mapper;
 
@@ -48,7 +46,7 @@ class Orm extends AbstractEngine
         parent::__construct($em, $dispatcher, $logQueries);
 
         $this->container = $container;
-        $this->mapper = $mapper;
+        $this->mapper    = $mapper;
     }
 
     /**
@@ -63,19 +61,45 @@ class Orm extends AbstractEngine
 
         //index data by mapping config
         $recordsCount = 0;
-        $entities = $this->mapper->getEntities();
-        foreach ($entities as $entityName) {
-            $entityData = $this->em->getRepository($entityName)->findAll();
-            foreach ($entityData as $entity) {
-                if ($this->save($entity, true) !== null) {
-                    $recordsCount++;
-                }
+        $entities     = $this->mapper->getEntities();
+
+        while ($entityName = array_shift($entities)) {
+            $itemsCount    = $this->reindexSingleEntity($entityName);
+            $recordsCount += $itemsCount;
+        }
+
+        return $recordsCount;
+    }
+
+    /**
+     * @param string $entityName
+     * @return int
+     */
+    protected function reindexSingleEntity($entityName)
+    {
+        $itemsCount   = 0;
+        $queryBuilder = $this->em->getRepository($entityName)->createQueryBuilder('entity');
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(self::BATCH_SIZE);
+
+        foreach ($iterator as $entity) {
+            if (null !== $this->save($entity, true)) {
+                $itemsCount++;
+            }
+
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $this->em->flush();
+                $this->em->clear();
             }
         }
 
-        $this->em->flush();
+        if ($itemsCount % self::BATCH_SIZE > 0) {
+            $this->em->flush();
+            $this->em->clear();
+        }
 
-        return $recordsCount;
+        return $itemsCount;
     }
 
     /**
@@ -276,20 +300,6 @@ class Orm extends AbstractEngine
         }
 
         return $this->searchRepo;
-    }
-
-    /**
-     * Get job repository
-     *
-     * @return \JMS\JobQueueBundle\Entity\Repository\JobRepository
-     */
-    protected function getJobRepo()
-    {
-        if (!is_object($this->jobRepo)) {
-            $this->jobRepo = $this->em->getRepository('JMSJobQueueBundle:Job');
-        }
-
-        return $this->jobRepo;
     }
 
     /**

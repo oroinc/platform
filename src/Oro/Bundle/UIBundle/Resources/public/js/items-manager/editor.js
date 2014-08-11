@@ -1,6 +1,9 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'jquery-ui'],   function ($) {
+define([
+    'jquery',
+    'jquery-ui'
+], function ($) {
     'use strict';
 
     function setValue($elem, value) {
@@ -36,6 +39,9 @@ define(['jquery', 'jquery-ui'],   function ($) {
             this.errors = $({});
             this.form = this.element.parents('form');
             this.form.on('submit', $.proxy(this._hideErrors, this));
+            if (typeof this.options.namePattern === 'string') {
+                this.options.namePattern = new RegExp(this.options.namePattern);
+            }
 
             this.reset();
             this._on({
@@ -173,7 +179,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _elementsMap: function () {
-            var elementsMap = {},
+            var mapped,
+                elementsMap = {},
                 $container = this.element,
                 pattern = this.options.namePattern;
 
@@ -185,8 +192,12 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 }
             });
 
+            mapped = $.map(elementsMap, function ($elem) {
+                return $elem[0];
+            });
+
             // collect elements using name pattern
-            $.each(this._elements(), function () {
+            $.each(this._elements().not(mapped), function () {
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);

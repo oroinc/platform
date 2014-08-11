@@ -207,7 +207,7 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_report_update', array('id' => $id)));
 
