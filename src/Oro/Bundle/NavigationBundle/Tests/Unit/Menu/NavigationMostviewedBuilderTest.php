@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,9 +41,10 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuild()
     {
-        $type = 'mostviewed';
-        $maxItems = 20;
-        $userId = 1;
+        $organization   = new Organization();
+        $type           = 'mostviewed';
+        $maxItems       = 20;
+        $userId         = 1;
 
         $user = $this->getMockBuilder('stdClass')
             ->setMethods(array('getId'))
@@ -51,10 +53,18 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($userId));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
         $token->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
 
         $this->securityContext->expects($this->atLeastOnce())
             ->method('getToken')
@@ -74,6 +84,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getNavigationItems')
             ->with(
                 $userId,
+                $organization,
                 $type,
                 array(
                     'maxItems' => $maxItems,

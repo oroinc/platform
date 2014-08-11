@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
-use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
+
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * NavigationItem Repository
@@ -22,13 +24,15 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
      *      'dir'  => 'ASC'|'DESC'
      *  )
      * )
+     *
      * @param \Oro\Bundle\UserBundle\Entity\User $user
+     * @param Organization                       $organization
      * @param string                             $type
      * @param array                              $options
      *
      * @return array
      */
-    public function getNavigationItems($user, $type = null, $options = array())
+    public function getNavigationItems($user, $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->add(

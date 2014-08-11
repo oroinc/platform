@@ -19,7 +19,11 @@ class PinbarPostPersist
         if ($entity instanceof PinbarTab) {
             /** @var $repo \Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository */
             $repo = $entityManager->getRepository(ClassUtils::getClass($entity));
-            $repo->incrementTabsPositions($entity->getItem()->getUser(), $entity->getItem()->getId());
+            $repo->incrementTabsPositions(
+                $entity->getItem()->getUser(),
+                $entity->getItem()->getId(),
+                $entity->getItem()->getOrganization()
+            );
         }
     }
 }

@@ -11,15 +11,9 @@ use Doctrine\ORM\Query\Expr;
 class NavigationItemRepository extends EntityRepository implements NavigationRepositoryInterface
 {
     /**
-     * Find all navigation items for specified user
-     *
-     * @param \Oro\Bundle\UserBundle\Entity\User $user
-     * @param string                             $type
-     * @param array                              $options
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getNavigationItems($user, $type, $options = array())
+    public function getNavigationItems($user, $organization, $type, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();
 
@@ -39,11 +33,12 @@ class NavigationItemRepository extends EntityRepository implements NavigationRep
             'where',
             $qb->expr()->andx(
                 $qb->expr()->eq('ni.user', ':user'),
-                $qb->expr()->eq('ni.type', ':type')
+                $qb->expr()->eq('ni.type', ':type'),
+                $qb->expr()->eq('ni.organization', ':organization')
             )
         )
         ->add('orderBy', new Expr\OrderBy('ni.position', 'ASC'))
-        ->setParameters(array('user' => $user, 'type' => $type));
+        ->setParameters(array('user' => $user, 'type' => $type, 'organization' => $organization));
 
         return $qb->getQuery()->getArrayResult();
     }
