@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 $dropdown = $input.wrap('<div class="dropdown datefilter">').parent(),
                 tabSuffix = '-' + this.cid + '-' + name,
                 widgetOptions = _.extend({onSelect: function (date) {
-                    $input.val(date);
+                    $input.val(date).trigger('change');
                 }}, this.dateWidgetOptions);
 
             var tabs = [];
