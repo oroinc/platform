@@ -278,15 +278,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @private
          */
         _isDateVariable: function (value) {
-            var dateVars = this.dateWidgetOptions.dateVars;
-            for (var i in dateVars.value) {
-                if (dateVars.value.hasOwnProperty(i) &&
-                    (dateVars.value[i] === value || '{{' + i + '}}' === value)) {
-                    return true;
-                }
-            }
-
-            return false;
+            var result, dateVars;
+            dateVars = this.dateWidgetOptions.dateVars;
+            result = _.some(dateVars.value, function (displayValue, index) {
+                var rawValue = '{{' + index + '}}';
+                return rawValue === value.substr(0, rawValue.length) ||
+                    displayValue === value.substr(0, displayValue.length);
+            });
+            return result;
         },
 
         /**
