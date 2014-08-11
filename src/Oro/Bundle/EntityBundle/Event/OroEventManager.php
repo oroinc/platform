@@ -5,45 +5,102 @@ namespace Oro\Bundle\EntityBundle\Event;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 
 use Doctrine\Common\EventArgs;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroEventManager extends ContainerAwareEventManager
 {
     /**
-     * @var bool
+     * @var array
      */
-    protected $enabled = true;
+    protected $disabledListenerRegexps = array();
 
-    public function enable()
+    /**
+     * @var array
+     */
+    protected $disabledListeners = array();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
     {
-        $this->enabled = true;
+        $needExtraProcessing = $this->hasDisabledListeners() && $this->hasListeners($eventName);
+
+        if ($needExtraProcessing) {
+            $this->preDispatch($eventName);
+        }
+
+        parent::dispatchEvent($eventName, $eventArgs);
+
+        if ($needExtraProcessing) {
+            $this->postDispatch($eventName);
+        }
     }
 
-    public function disable()
+    /**
+     * @param string $classNameRegexp
+     */
+    public function disableListeners($classNameRegexp = '.*')
     {
-        $this->enabled = false;
+        $this->disabledListenerRegexps[] = $classNameRegexp;
+    }
+
+    public function resetDisabledListeners()
+    {
+        $this->disabledListenerRegexps = array();
     }
 
     /**
      * @return bool
      */
-    public function isEnabled()
+    public function hasDisabledListeners()
     {
-        return $this->enabled;
+        return !empty($this->disabledListenerRegexps);
     }
 
     /**
-     * Dispatch events only when manager is enabled
-     *
-     * @param string $eventName
-     * @param EventArgs $eventArgs
-     * @return null
+     * @param object $listener
+     * @return bool
      */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    protected function isListenerEnabled($listener)
     {
-        if (!$this->enabled) {
+        $listenerClass = get_class($listener);
+
+        foreach ($this->disabledListenerRegexps as $regexp) {
+            if (preg_match('~' . $regexp . '~', $listenerClass)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $event
+     */
+    protected function preDispatch($event)
+    {
+        foreach ($this->getListeners($event) as $listener) {
+            if (!$this->isListenerEnabled($listener)) {
+                $this->disabledListeners[$event][] = $listener;
+                $this->removeEventListener($event, $listener);
+            }
+        }
+    }
+
+    /**
+     * @param string $event
+     */
+    protected function postDispatch($event)
+    {
+        if (empty($this->disabledListeners[$event])) {
             return;
         }
 
-        parent::dispatchEvent($eventName, $eventArgs);
+        foreach ($this->disabledListeners[$event] as $listener) {
+            $this->addEventListener($event, $listener);
+        }
+
+        unset($this->disabledListeners[$event]);
     }
 }

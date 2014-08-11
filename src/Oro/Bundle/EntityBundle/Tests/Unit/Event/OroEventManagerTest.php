@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
+use Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener;
 
 class OroEventManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,13 +19,13 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new OroEventManager($container);
     }
 
-    public function testEnableDisable()
+    public function testDisableAndReset()
     {
-        $this->assertTrue($this->manager->isEnabled());
-        $this->manager->disable();
-        $this->assertFalse($this->manager->isEnabled());
-        $this->manager->enable();
-        $this->assertTrue($this->manager->isEnabled());
+        $this->assertFalse($this->manager->hasDisabledListeners());
+        $this->manager->disableListeners();
+        $this->assertTrue($this->manager->hasDisabledListeners());
+        $this->manager->resetDisabledListeners();
+        $this->assertFalse($this->manager->hasDisabledListeners());
     }
 
     /**
@@ -34,12 +35,22 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
     public function testDispatchEvent($isEnabled)
     {
         $eventName = 'postFlush';
-        $listener = $this->getMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
-        $listener->expects($isEnabled ? $this->once() : $this->never())->method($eventName);
 
-        $isEnabled ? $this->manager->enable() : $this->manager->disable();
-        $this->manager->addEventListener(array($eventName), $listener);
+        $affectedListener = new StubEventListener();
+        $this->assertFalse($affectedListener->isFlushed);
+
+        $notAffectedListener = $this->getMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
+        $notAffectedListener->expects($this->once())->method($eventName);
+
+        $this->manager->addEventListener(array($eventName), $affectedListener);    // class name Oro\Bundle\*
+        $this->manager->addEventListener(array($eventName), $notAffectedListener); // class name Mock_*
+
+        if (!$isEnabled) {
+            $this->manager->disableListeners('^Oro');
+        }
         $this->manager->dispatchEvent($eventName);
+
+        $this->assertEquals($isEnabled, $affectedListener->isFlushed);
     }
 
     /**
