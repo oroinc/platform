@@ -263,6 +263,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -279,6 +282,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -406,6 +412,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )

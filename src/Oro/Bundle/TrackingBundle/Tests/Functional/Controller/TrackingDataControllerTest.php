@@ -52,7 +52,7 @@ class TrackingDataControllerTest extends WebTestCase
                 [
                     'param'    => 'value',
                     'name'     => 'name',
-                    'value'    => 'value',
+                    'value'    => 123.4,
                     'user'     => 'user',
                     'url'      => 'example.com',
                     'loggedAt' => '2014-07-18T15:00:00+0300'

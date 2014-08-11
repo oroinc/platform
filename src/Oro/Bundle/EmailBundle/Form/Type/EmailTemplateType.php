@@ -39,15 +39,6 @@ class EmailTemplateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'entityName',
-            'oro_entity_choice',
-            array(
-                'label'    => 'oro.email.emailtemplate.entity_name.label',
-                'required' => true
-            )
-        );
-
-        $builder->add(
             'name',
             'text',
             array(
@@ -55,7 +46,6 @@ class EmailTemplateType extends AbstractType
                 'required' => true
             )
         );
-
         $builder->add(
             'type',
             'choice',
@@ -68,6 +58,18 @@ class EmailTemplateType extends AbstractType
                     'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
                 ),
                 'required' => true
+            )
+        );
+        $builder->add(
+            'entityName',
+            'oro_entity_choice',
+            array(
+                'label'    => 'oro.email.emailtemplate.entity_name.label',
+                'tooltip'  => 'oro.email.emailtemplate.entity_name.tooltip',
+                'required' => false,
+                'configs'  => [
+                    'allowClear' => true
+                ]
             )
         );
 

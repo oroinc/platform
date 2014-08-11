@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\InstallerBundle\Tests\Functional;
+namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 
