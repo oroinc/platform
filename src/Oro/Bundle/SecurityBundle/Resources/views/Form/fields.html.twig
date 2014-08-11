@@ -7,12 +7,11 @@
     >
         <div class="access_level_value_link">
             <a href="javascript:void(0);">
-                {% if level_label %}
-                    {% set label = 'oro.security.access-level.' ~ level_label %}
-                    {{ label|trans({}, translation_domain) }}
-                {% else %}
-                    {{ 'oro.security.access-level.NONE'|trans({}, translation_domain) }}
-                {% endif %}
+                {% set label = level_label is not defined or level_label is empty ?
+                    'oro.security.access-level.NONE' :
+                    'oro.security.access-level.' ~ level_label
+                %}
+                {{ label|trans({}, translation_domain) }}
             </a>
             {% set type = type|default('hidden') %}
             {{ block('form_widget_simple') }}
