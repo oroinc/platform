@@ -6,8 +6,8 @@ define(['jquery', 'underscore', 'backgrid'
     /**
      * Cell for grid, contains actions
      *
-     * @export  orodatagrid/js/datagrid/cell/action-cell
-     * @class   orodatagrid.datagrid.cell.ActionCell
+     * @export  oro/datagrid/cell/action-cell
+     * @class   oro.datagrid.cell.ActionCell
      * @extends Backgrid.Cell
      */
     return Backgrid.Cell.extend({

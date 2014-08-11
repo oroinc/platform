@@ -2,7 +2,7 @@
 /*global define*/
 define([
     'backgrid',
-    '../formatter/cell-formatter'
+    'orodatagrid/js/datagrid/formatter/cell-formatter'
 ], function (Backgrid, CellFormatter) {
     'use strict';
 
@@ -11,8 +11,8 @@ define([
     /**
      * String column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/string-cell
-     * @class   orodatagrid.datagrid.cell.StringCell
+     * @export  oro/datagrid/cell/string-cell
+     * @class   oro.datagrid.cell.StringCell
      * @extends Backgrid.StringCell
      */
     StringCell = Backgrid.StringCell.extend({

@@ -3,7 +3,7 @@
 define([
     'underscore',
     'backgrid',
-    '../formatter/number-formatter'
+    'orodatagrid/js/datagrid/formatter/number-formatter'
 ], function (_, Backgrid, NumberFormatter) {
     'use strict';
 
@@ -12,8 +12,8 @@ define([
     /**
      * Number column cell.
      *
-     * @export  orodatagrid/js/datagrid/cell/number-cell
-     * @class   orodatagrid.datagrid.cell.NumberCell
+     * @export  oro/datagrid/cell/number-cell
+     * @class   oro.datagrid.cell.NumberCell
      * @extends Backgrid.NumberCell
      */
     NumberCell = Backgrid.NumberCell.extend({

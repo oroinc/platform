@@ -11,8 +11,8 @@ define([
     /**
      * Boolean column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/boolean-cell
-     * @class   orodatagrid.datagrid.cell.BooleanCell
+     * @export  oro/datagrid/cell/boolean-cell
+     * @class   oro.datagrid.cell.BooleanCell
      * @extends Backgrid.BooleanCell
      */
     BooleanCell = Backgrid.BooleanCell.extend({

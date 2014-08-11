@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-header-cell'
+define(['underscore', 'backgrid', 'oro/datagrid/cell/action-cell', '../header-cell/action-header-cell'
     ], function (_, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
 

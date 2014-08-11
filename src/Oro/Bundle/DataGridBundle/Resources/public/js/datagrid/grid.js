@@ -14,7 +14,7 @@ define(function (require) {
         GridFooter = require('./footer'),
         Toolbar = require('./toolbar'),
         ActionColumn = require('./column/action-column'),
-        SelectRowCell = require('./cell/select-row-cell'),
+        SelectRowCell = require('oro/datagrid/cell/select-row-cell'),
         SelectAllHeaderCell = require('./header-cell/select-all-header-cell'),
         RefreshCollectionAction = require('./action/refresh-collection-action'),
         ResetCollectionAction = require('./action/reset-collection-action'),

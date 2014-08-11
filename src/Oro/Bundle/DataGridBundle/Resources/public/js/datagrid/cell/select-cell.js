@@ -11,8 +11,8 @@ define([
     /**
      * Select column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/select-cell
-     * @class   orodatagrid.datagrid.cell.SelectCell
+     * @export  oro/datagrid/cell/select-cell
+     * @class   oro.datagrid.cell.SelectCell
      * @extends Backgrid.SelectCell
      */
     SelectCell = Backgrid.SelectCell.extend({

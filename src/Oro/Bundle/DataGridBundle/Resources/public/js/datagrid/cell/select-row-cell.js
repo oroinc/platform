@@ -11,8 +11,8 @@ define([
     /**
      * Renders a checkbox for row selection.
      *
-     * @export  orodatagrid/js/datagrid/cell/select-row-cell
-     * @class   orodatagrid.datagrid.cell.SelectRowCell
+     * @export  oro/datagrid/cell/select-row-cell
+     * @class   oro.datagrid.cell.SelectRowCell
      * @extends Backbone.View
      */
     SelectRowCell = Backbone.View.extend({

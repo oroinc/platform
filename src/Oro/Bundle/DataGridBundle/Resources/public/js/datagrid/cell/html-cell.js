@@ -9,9 +9,9 @@ define([
     /**
      * Html column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/html-cell
-     * @class   orodatagrid.datagrid.cell.HtmlCell
-     * @extends orodatagrid.datagrid.cell.StringCell
+     * @export  oro/datagrid/cell/html-cell
+     * @class   oro.datagrid.cell.HtmlCell
+     * @extends oro.datagrid.cell.StringCell
      */
     HtmlCell = StringCell.extend({
         /**
