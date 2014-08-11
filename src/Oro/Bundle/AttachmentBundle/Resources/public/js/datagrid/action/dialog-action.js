@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define*/
 define([
     'underscore',
@@ -6,9 +7,10 @@ define([
     'oroui/js/mediator',
     'oro/datagrid/action/model-action',
     'oro/dialog-widget'
-],
-function (_, __, messenger, mediator, ModelAction, DialogWidget) {
+], function (_, __, messenger, mediator, ModelAction, DialogWidget) {
     'use strict';
+
+    var DialogAction;
 
     /**
      * Dialog action
@@ -17,7 +19,7 @@ function (_, __, messenger, mediator, ModelAction, DialogWidget) {
      * @class   oro.datagrid.action.DialogAction
      * @extends oro.datagrid.action.ModelAction
      */
-    return ModelAction.extend({
+    DialogAction = ModelAction.extend({
         useDirectLauncherLink: false,
         widgetDefault: {
             type: 'dialog',
@@ -45,13 +47,15 @@ function (_, __, messenger, mediator, ModelAction, DialogWidget) {
          * @throws {TypeError} If model is undefined
          */
         initialize: function (options) {
-            ModelAction.prototype.initialize.apply(this, arguments);
+            var widget, messages;
 
-            var widget = this.widget
+            DialogAction.__super__.initialize.apply(this, arguments);
+
+            widget = this.widget
                 ? _.extend(this.widgetDefault, this.widget)
                 : this.widgetDefault;
 
-            var messages = this.messages
+            messages = this.messages
                 ? _.extend(this.messagesDefault, this.messages)
                 : this.messagesDefault;
 
@@ -65,22 +69,25 @@ function (_, __, messenger, mediator, ModelAction, DialogWidget) {
         run: function () {
             if (!this.itemEditDialog) {
                 this.itemEditDialog = new DialogWidget({
-                    'url': this.getLink(),
-                    'title': this.launcherOptions['widget']['options']['dialogOptions']['title'],
-                    'regionEnabled': false,
-                    'incrementalPosition': false,
-                    'dialogOptions': {
-                        'modal': true,
-                        'resizable': false,
-                        'width': this.launcherOptions['widget']['options']['dialogOptions']['width'],
-                        'close': _.bind(function () {
+                    url: this.getLink(),
+                    title: this.launcherOptions.widget.options.dialogOptions.title,
+                    regionEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        modal: true,
+                        resizable: false,
+                        width: this.launcherOptions.widget.options.dialogOptions.width,
+                        close: _.bind(function () {
                             delete this.itemEditDialog;
                         }, this)
                     }
                 });
+                this.subviews.push(this.itemEditDialog);
 
                 this.itemEditDialog.render();
             }
         }
     });
+
+    return DialogAction;
 });

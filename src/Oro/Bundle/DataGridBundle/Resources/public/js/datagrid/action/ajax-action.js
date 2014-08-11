@@ -1,6 +1,10 @@
 /*global define*/
-define(['./model-action'], function (ModelAction) {
+define([
+    './model-action'
+], function (ModelAction) {
     'use strict';
+
+    var AjaxAction;
 
     /**
      * Ajax action, triggers REST AJAX request
@@ -9,5 +13,7 @@ define(['./model-action'], function (ModelAction) {
      * @class   oro.datagrid.action.AjaxAction
      * @extends oro.datagrid.action.ModelAction
      */
-    return ModelAction.extend();
+    AjaxAction = ModelAction.extend();
+
+    return AjaxAction;
 });

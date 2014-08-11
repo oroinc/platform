@@ -1,7 +1,11 @@
 /*global define*/
-define(['oro/datagrid/action/model-action', 'oroworkflow/js/activation-handler'],
-function (ModelAction, ActivationHandler) {
+define([
+    'oro/datagrid/action/model-action',
+    'oroworkflow/js/activation-handler'
+], function (ModelAction, ActivationHandler) {
     'use strict';
+
+    var WorkflowActivateAction;
 
     /**
      * Activate AJAX action, triggers confirmation dialog and activate workflow definition
@@ -10,22 +14,24 @@ function (ModelAction, ActivationHandler) {
      * @class   oro.datagrid.action.WorkflowActivateAction
      * @extends oro.datagrid.action.ModelAction
      */
-    return ModelAction.extend({
+    WorkflowActivateAction = ModelAction.extend({
         execute: function () {
             var datagrid = this.datagrid;
 
-            this.on('activation_start', function() {
+            this.on('activation_start', function () {
                 datagrid.showLoading();
             });
-            this.on('activation_success', function() {
+            this.on('activation_success', function () {
                 datagrid.hideLoading();
                 datagrid.collection.fetch({reset: true});
             });
-            this.on('activation_error', function(xhr) {
+            this.on('activation_error', function (xhr) {
                 datagrid.hideLoading();
             });
 
             ActivationHandler.call(this, this.getLink());
         }
     });
+
+    return WorkflowActivateAction;
 });

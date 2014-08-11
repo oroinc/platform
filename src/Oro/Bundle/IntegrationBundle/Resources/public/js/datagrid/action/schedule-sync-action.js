@@ -1,16 +1,22 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['oro/datagrid/action/ajax-action', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function (AjaxAction, __, messenger) {
+define([
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'oro/datagrid/action/ajax-action'
+], function (__, messenger, AjaxAction) {
     'use strict';
+
+    var ScheduleSyncAction;
 
     /**
      * Schedule channel sync action, triggers AJAX request
      *
-     * @export  oro/datagrid/action/ajax-action
-     * @class   oro.datagrid.action.AjaxAction
-     * @extends oro.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/schedule-sync-action
+     * @class   oro.datagrid.action.ScheduleSyncAction
+     * @extends oro.datagrid.action.AjaxAction
      */
-    return AjaxAction.extend({
+    ScheduleSyncAction = AjaxAction.extend({
         _onAjaxSuccess: function (data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
@@ -27,4 +33,6 @@ define(['oro/datagrid/action/ajax-action', 'orotranslation/js/translator', 'orou
             }
         }
     });
+
+    return ScheduleSyncAction;
 });
