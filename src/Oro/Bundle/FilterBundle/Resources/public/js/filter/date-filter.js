@@ -280,7 +280,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         _isDateVariable: function (value) {
             var dateVars = this.dateWidgetOptions.dateVars;
             for (var i in dateVars.value) {
-                if (dateVars.value.hasOwnProperty(i) && dateVars.value[i] == value) {
+                if (dateVars.value.hasOwnProperty(i) &&
+                    (dateVars.value[i] === value || '{{' + i + '}}' === value)) {
                     return true;
                 }
             }
@@ -508,11 +509,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @protected
          */
         _formatDate: function (value, fromFormat, toFormat) {
-            var fromValue = $.datepicker.parseDate(fromFormat, value);
+            var fromValue;
+            if (this._isDateVariable(value)) {
+                return value;
+            }
+            fromValue = $.datepicker.parseDate(fromFormat, value);
             if (!fromValue) {
                 fromValue = $.datepicker.parseDate(toFormat, value);
                 if (!fromValue) {
-                    return value;
+                    return '';
                 }
             }
             return $.datepicker.formatDate(toFormat, fromValue);
