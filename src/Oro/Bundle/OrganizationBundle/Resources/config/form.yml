@@ -28,15 +28,19 @@ services:
 
     oro_organization.form.type.business_unit:
         class: %oro_organization.form.type.business_unit.class%
+        arguments:
+            - @oro_organization.business_unit_manager
+            - @oro_organization.organization_manager
         tags:
             - { name: form.type, alias: oro_business_unit }
 
-    oro_organization.form.type.business_unit_by_organization:
-        class: %oro_organization.form.type.business_unit_by_organization.class%
-        arguments:
-            - @oro_organization.business_unit_manager
-        tags:
-            - { name: form.type, alias: oro_business_unit_by_organization }
+#    oro_organization.form.type.business_unit_by_organization:
+#        class: %oro_organization.form.type.business_unit_by_organization.class%
+#        arguments:
+#            - @oro_organization.business_unit_manager
+#            - @oro_organization.organization_manager
+#        tags:
+#            - { name: form.type, alias: oro_business_unit_by_organization }
 
     oro_organization.form.handler.business_unit:
         class: %oro_organization.form.handler.business_unit.class%

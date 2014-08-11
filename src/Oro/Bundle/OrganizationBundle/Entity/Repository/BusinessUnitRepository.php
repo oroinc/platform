@@ -42,7 +42,7 @@ class BusinessUnitRepository extends EntityRepository
         }
 
         if ($organizationId) {
-            $businessUnits->where('organization = :organizationId');
+            $businessUnits->where('businessUnit.organization = :organizationId');
             $businessUnits->setParameter(':organizationId', $organizationId);
         }
 
@@ -90,6 +90,9 @@ class BusinessUnitRepository extends EntityRepository
         }
 
         foreach ($businessUnits as $businessUnit) {
+            if ($businessUnit['organization'] == null) {
+                continue;
+            }
             $tree[$businessUnit['organization']]['children'][] = $businessUnit;
         }
 

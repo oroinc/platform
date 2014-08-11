@@ -67,7 +67,10 @@
                 form_widget(form.appendUsers, {'id': 'businessUnitAppendUsers'}),
                 form_widget(form.removeUsers, {'id': 'businessUnitRemoveUsers'}),
                 form_row(form.name),
-                form_widget(form.business_unit_by_organization),
+
+                form_row(form.organization),
+                form_row(form.businessUnit),
+
                 form_row(form.phone),
                 form_row(form.website),
                 form_row(form.email),
@@ -76,19 +79,96 @@
         }]
     }] %}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title' : 'oro.organization.businessunit.users.label'|trans,
-        'subblocks': [{
-            'title' : null,
-            'useSpan': false,
-            'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]
-        }]
-    }] ) %}
+    {#form_widget(form.oro_business_unit_by_organization),#}
+
+    {#{% set dataBlocks = dataBlocks|merge([{#}
+        {#'title' : 'oro.organization.businessunit.users.label'|trans,#}
+        {#'subblocks': [{#}
+            {#'title' : null,#}
+            {#'useSpan': false,#}
+            {#'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]#}
+        {#}]#}
+    {#}] ) %}#}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,
         'dataBlocks': dataBlocks
     } %}
+
+    <script type="text/javascript">
+        //require(['oroorganization/js/bu-by-org']);
+        require(['jquery', 'routing', 'orotranslation/js/translator'],
+        function($, routing, __) {
+            'use strict';
+            $(function() {
+                $(document).on('change', 'form select.oro_bu_by_org_select_org', function (e) {
+                    var el = $(this),
+                        selected_org = el.find('option:selected').attr('value').replace(/\\/g,'_'),
+                        query = routing.generate.apply(
+                                routing,
+                                [
+                                    'oro_business_unit_search',
+                                    {
+                                        organizationId: selected_org
+                                    }
+                                ]
+                        ),
+                        bu = $('form select.oro_bu_by_org_select_bu'),
+                        noneOption = __('oro.business_unit.form.none_business_user'),
+                        currentBusinessUnit = parseInt({{ form.vars.value.id|default(0) }}),
+                        items = [],
+                        strRepeat = function (input, multiplier) {
+                            var result = '';
+                            while (true) {
+                                if (multiplier & 1) {
+                                    result += input;
+                                }
+                                multiplier >>= 1;
+                                if (multiplier) {
+                                    input += input;
+                                } else {
+                                    break;
+                                }
+                            }
+                            return result;
+                        },
+                        fillOptions = function (option, level, enabled) {
+                            var blanks = strRepeat("&nbsp;&nbsp;&nbsp;", level++);
+                            $.each(option, function(key, val) {
+                                items.push(
+                                    "<option " +
+                                        "value='" + val.id + "'" +
+                                        (val.id == currentBusinessUnit || enabled == false
+                                            ? "disabled='disabled'"
+                                            : ''
+                                        ) +
+                                    ">" +
+                                        blanks + ' ' + val.name +
+                                    "</option>"
+                                );
+                                if (val.children) {
+                                    fillOptions(
+                                        val.children,
+                                        level++,
+                                        !(val.id == currentBusinessUnit || enabled == false)
+                                    );
+                                }
+                            });
+                        };
+
+                    $(bu).prev('span').text('loading...');
+                    $.getJSON(query, function (response) {
+                        items.push("<option value>" + noneOption + "</option>");
+                        fillOptions(response, 0, true);
+                        $(bu).empty().append(items.join(''));
+                        $(bu).prev('span').text(noneOption);
+                    });
+
+                    return false;
+                });
+            });
+        });
+    </script>
 
     {{ parent() }}
 {% endblock content_data %}

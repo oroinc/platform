@@ -15,85 +15,85 @@
     {% endif %}
 {% endblock %}
 
-{% block oro_business_unit_by_organization_widget %}
-    {% spaceless %}
-        {{ form_row(form.organization) }}
-        {{ form_row(form.owner) }}
-        <script type="text/javascript">
-            require(['jquery', 'routing', 'orotranslation/js/translator'],
-            function($, routing, __) {
-                'use strict';
-                $(function() {
-                    $(document).on('change', 'form select.oro_bu_by_org_select_org', function (e) {
-                        var el = $(this),
-                            selected_org = el.find('option:selected').attr('value').replace(/\\/g,'_'),
-                            query = routing.generate.apply(
-                                    routing,
-                                    [
-                                        'oro_business_unit_search',
-                                        {
-                                            organizationId: selected_org
-                                        }
-                                    ]
-                            ),
-                            bu = $('form select.oro_bu_by_org_select_bu'),
-                            noneOption = __('oro.business_unit.form.none_business_user'),
-                            currentBusinessUnit = parseInt({{ form.vars.value.id  }}),
-                            items = [],
-                            strRepeat = function (input, multiplier) {
-                                var result = '';
-                                while (true) {
-                                    if (multiplier & 1) {
-                                        result += input;
-                                    }
-                                    multiplier >>= 1;
-                                    if (multiplier) {
-                                        input += input;
-                                    } else {
-                                        break;
-                                    }
-                                }
-                                return result;
-                            },
-                            fillOptions = function (option, level, enabled) {
-                                var blanks = strRepeat("&nbsp;&nbsp;&nbsp;", level++);
-                                $.each(option, function(key, val) {
-                                    items.push(
-                                        "<option " +
-                                            "value='" + val.id + "'" +
-                                            (val.id == currentBusinessUnit || enabled == false
-                                                ? "disabled='disabled'"
-                                                : ''
-                                            ) +
-                                        ">" +
-                                            blanks + ' ' + val.name +
-                                        "</option>"
-                                    );
-                                    if (val.children) {
-                                        fillOptions(
-                                            val.children,
-                                            level++,
-                                            !(val.id == currentBusinessUnit || enabled == false)
-                                        );
-                                    }
-                                });
-                            };
+{#{% block oro_business_unit_by_organization_widget %}#}
+    {#{% spaceless %}#}
+        {#{{ form_row(form.organization) }}#}
+        {#{{ form_row(form.businessUnit) }}#}
+        {#<script type="text/javascript">#}
+            {#require(['jquery', 'routing', 'orotranslation/js/translator'],#}
+            {#function($, routing, __) {#}
+                {#'use strict';#}
+                {#$(function() {#}
+                    {#$(document).on('change', 'form select.oro_bu_by_org_select_org', function (e) {#}
+                        {#var el = $(this),#}
+                            {#selected_org = el.find('option:selected').attr('value').replace(/\\/g,'_'),#}
+                            {#query = routing.generate.apply(#}
+                                    {#routing,#}
+                                    {#[#}
+                                        {#'oro_business_unit_search',#}
+                                        {#{#}
+                                            {#organizationId: selected_org#}
+                                        {#}#}
+                                    {#]#}
+                            {#),#}
+                            {#bu = $('form select.oro_bu_by_org_select_bu'),#}
+                            {#noneOption = __('oro.business_unit.form.none_business_user'),#}
+                            {#currentBusinessUnit = 0, //parseInt(&#123;&#35;{ form.vars.value.id  }&#35;&#125;),#}
+                            {#items = [],#}
+                            {#strRepeat = function (input, multiplier) {#}
+                                {#var result = '';#}
+                                {#while (true) {#}
+                                    {#if (multiplier & 1) {#}
+                                        {#result += input;#}
+                                    {#}#}
+                                    {#multiplier >>= 1;#}
+                                    {#if (multiplier) {#}
+                                        {#input += input;#}
+                                    {#} else {#}
+                                        {#break;#}
+                                    {#}#}
+                                {#}#}
+                                {#return result;#}
+                            {#},#}
+                            {#fillOptions = function (option, level, enabled) {#}
+                                {#var blanks = strRepeat("&nbsp;&nbsp;&nbsp;", level++);#}
+                                {#$.each(option, function(key, val) {#}
+                                    {#items.push(#}
+                                        {#"<option " +#}
+                                            {#"value='" + val.id + "'" +#}
+                                            {#(val.id == currentBusinessUnit || enabled == false#}
+                                                {#? "disabled='disabled'"#}
+                                                {#: ''#}
+                                            {#) +#}
+                                        {#">" +#}
+                                            {#blanks + ' ' + val.name +#}
+                                        {#"</option>"#}
+                                    {#);#}
+                                    {#if (val.children) {#}
+                                        {#fillOptions(#}
+                                            {#val.children,#}
+                                            {#level++,#}
+                                            {#!(val.id == currentBusinessUnit || enabled == false)#}
+                                        {#);#}
+                                    {#}#}
+                                {#});#}
+                            {#};#}
 
-                        $(bu).prev('span').text('loading...');
-                        $.getJSON(query, function (response) {
-                            items.push("<option value>" + noneOption + "</option>");
-                            fillOptions(response, 0, true);
-                            $(bu).empty().append(items.join(''));
-                            $(bu).prev('span').text(noneOption);
-                        });
+                        {#$(bu).prev('span').text('loading...');#}
+                        {#$.getJSON(query, function (response) {#}
+                            {#items.push("<option value>" + noneOption + "</option>");#}
+                            {#fillOptions(response, 0, true);#}
+                            {#$(bu).empty().append(items.join(''));#}
+                            {#$(bu).prev('span').text(noneOption);#}
+                        {#});#}
 
-                        return false;
-                    });
-                });
-            });
-        </script>
-    {% endspaceless %}
-{% endblock %}
+                        {#return false;#}
+                    {#});#}
+                {#});#}
+            {#});#}
+        {#</script>#}
+    {#{% endspaceless %}#}
+{#{% endblock %}#}
 
 {% block oro_organizations_select_widget %}
     {% spaceless %}
