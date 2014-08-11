@@ -124,7 +124,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             }
         }
 
-
         $result = parent::vote($token, $object, $attributes);
 
         //check organization context
