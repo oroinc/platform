@@ -98,14 +98,14 @@ class ResponseHistoryListener
         // disable Doctrine events for history item processing
         $eventManager = $this->entityManager->getEventManager();
         if ($eventManager instanceof OroEventManager) {
-            $eventManager->disable();
+            $eventManager->disableListeners('^Oro');
         }
 
         $this->entityManager->persist($historyItem);
         $this->entityManager->flush($historyItem);
 
         if ($eventManager instanceof OroEventManager) {
-            $eventManager->enable();
+            $eventManager->clearDisabledListeners();
         }
 
         return true;
