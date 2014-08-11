@@ -9,9 +9,9 @@
             <a href="javascript:void(0);">
                 {% if level_label %}
                     {% set label = 'oro.security.access-level.' ~ level_label %}
-                    {% trans from translation_domain %} {{ label }} {% endtrans %}
+                    {{ label|trans({}, translation_domain) }}
                 {% else %}
-                    {% trans from translation_domain %} oro.security.access-level.NONE {% endtrans %}
+                    {{ 'oro.security.access-level.NONE'|trans({}, translation_domain) }}
                 {% endif %}
             </a>
             {% set type = type|default('hidden') %}

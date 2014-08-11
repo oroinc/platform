@@ -24,7 +24,8 @@ class AclPermissionController extends Controller
             ->getAccessLevels($oid);
         $translator = $this->get('translator');
         foreach ($levels as $id => $label) {
-            $levels[$id] = $translator->trans('oro.security.access-level.' . $label);
+            $translationLabel = 'oro.security.access-level.' . $label;
+            $levels[$id] = $translator->trans($translationLabel);
         }
 
         return new JsonResponse(
