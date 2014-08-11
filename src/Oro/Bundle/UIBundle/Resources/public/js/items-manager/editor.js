@@ -1,6 +1,9 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'jquery-ui'],   function ($) {
+define([
+    'jquery',
+    'jquery-ui'
+], function ($) {
     'use strict';
 
     function setValue($elem, value) {
@@ -176,7 +179,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _elementsMap: function () {
-            var elementsMap = {},
+            var mapped,
+                elementsMap = {},
                 $container = this.element,
                 pattern = this.options.namePattern;
 
@@ -188,8 +192,12 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 }
             });
 
+            mapped = $.map(elementsMap, function ($elem) {
+                return $elem[0];
+            });
+
             // collect elements using name pattern
-            $.each(this._elements(), function () {
+            $.each(this._elements().not(mapped), function () {
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);

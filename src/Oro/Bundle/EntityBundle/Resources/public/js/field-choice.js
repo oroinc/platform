@@ -149,7 +149,13 @@ define(function (require) {
         },
 
         formatChoice: function (value, template) {
-            return value ? template(this.util.pathToEntityChain(value)) : '';
+            var data;
+            if (value) {
+                try {
+                    data = this.util.pathToEntityChain(value);
+                } catch (e) {}
+            }
+            return data ? template(data) : value;
         },
 
         splitFieldId: function (fieldId) {
