@@ -549,9 +549,19 @@ abstract class AbstractQueryConverter
     {
         if (isset($this->definition['grouping_columns'])) {
             foreach ($this->definition['grouping_columns'] as $column) {
-                $this->addGroupByColumn(
-                    $this->columnAliases[$this->buildColumnAliasKey($column)]
-                );
+                $columnAliasKey = $this->buildColumnAliasKey($column);
+                $columnAlias    = isset($this->columnAliases[$columnAliasKey])
+                    ? $this->columnAliases[$columnAliasKey]
+                    : null;
+                if (empty($columnAlias)) {
+                    throw new InvalidConfigurationException(
+                        sprintf(
+                            'The grouping column "%s" must be declared in SELECT clause.',
+                            $column['name']
+                        )
+                    );
+                }
+                $this->addGroupByColumn($columnAlias);
             }
         }
     }

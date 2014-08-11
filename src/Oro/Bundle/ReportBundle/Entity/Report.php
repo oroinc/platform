@@ -251,7 +251,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Get this report definition in YAML format
+     * Get this report definition in JSON format
      *
      * @return string
      */
@@ -261,7 +261,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Set this report definition in YAML format
+     * Set this report definition in JSON format
      *
      * @param string $definition
      * @return Report
