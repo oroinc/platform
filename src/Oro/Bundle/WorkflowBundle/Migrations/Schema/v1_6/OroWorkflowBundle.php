@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_1;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroWorkflowBundle implements Migration, RenameExtensionAwareInterface
 {
@@ -28,11 +29,12 @@ class OroWorkflowBundle implements Migration, RenameExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->renameExtension->renameTable(
+        $this->renameExtension->renameColumn(
             $schema,
             $queries,
-            'oro_workflow_entity_acl_identity',
-            'oro_workflow_entity_acl_ident'
+            $schema->getTable('oro_workflow_step'),
+            'final',
+            'is_final'
         );
     }
 }
