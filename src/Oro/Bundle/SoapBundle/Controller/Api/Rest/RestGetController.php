@@ -65,7 +65,9 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $paramFetcher = $this->container->get('fos_rest.request.param_fetcher');
         $paramFetcher->setController([$this, $methodName]);
 
-        return array_keys($paramFetcher->all());
+        $skipParameters = ['limit', 'page'];
+
+        return array_diff(array_keys($paramFetcher->all()), $skipParameters);
     }
 
     /**
