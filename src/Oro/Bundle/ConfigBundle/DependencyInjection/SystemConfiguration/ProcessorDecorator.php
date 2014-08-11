@@ -61,8 +61,8 @@ class ProcessorDecorator
 
         // validate API tree
         if (isset($result[self::API_TREE_ROOT])) {
-            foreach ($result[self::API_TREE_ROOT] as $key => $data) {
-                $this->validateApiTreeItem(self::ROOT, $key, $data);
+            foreach ($result[self::API_TREE_ROOT] as $key => &$data) {
+                $this->validateApiTreeItem(self::ROOT, $key, $data, $result[self::FIELDS_ROOT]);
             }
         }
 
@@ -177,13 +177,23 @@ class ProcessorDecorator
         $node = $builder->root(self::FIELDS_ROOT)
             ->prototype('array')
                 ->children()
-                    ->scalarNode('type')->isRequired()->end()
+                    ->scalarNode('data_type')->end()
+                    ->scalarNode('type')->end()
                     ->arrayNode('options')
                         ->prototype('variable')->end()
                     ->end()
                     ->scalarNode('acl_resource')->end()
                     ->integerNode('priority')->end()
                     ->booleanNode('ui_only')->end()
+                ->end()
+                ->validate()
+                    // 'data_type' be specified for all fields except 'ui_only' ones
+                    ->ifTrue(
+                        function ($v) {
+                            return empty($v['data_type']) && empty($v['ui_only']);
+                        }
+                    )
+                    ->thenInvalid('The "data_type" is required except "ui_only" is defined. %s')
                 ->end()
             ->end();
 
@@ -218,39 +228,62 @@ class ProcessorDecorator
      * @param string $path
      * @param mixed  $key
      * @param mixed  $data
+     * @param mixed  $fields
      *
      * @throws InvalidTypeException
      * @throws InvalidConfigurationException
      */
-    protected function validateApiTreeItem($path, $key, $data)
+    protected function validateApiTreeItem($path, $key, &$data, $fields)
     {
         if (!is_string($key)) {
             throw new InvalidTypeException(
                 sprintf('Array key must be a string, but got "%s". Root node: %s.', gettype($key), $path)
             );
         }
-        if (is_array($data)) {
-            $path = $path . '.' . $key;
-            foreach ($data as $subKey => $subData) {
-                $this->validateApiTreeItem($path, $subKey, $subData);
+        if (isset($this->variables[$key])) {
+            // process variable
+            if (null === $data) {
+                $data = [];
             }
-        } elseif (!is_string($data)) {
-            throw new InvalidTypeException(
-                sprintf(
-                    'The value of "%s" must be an array or a string, but got "%s".',
-                    $path . '.' . $key,
-                    gettype($data)
-                )
-            );
-        } elseif (!isset($this->variables[$data])) {
-            throw new InvalidConfigurationException(
-                sprintf(
-                    'The system configuration variable "%s" is not defined.'
-                    . ' Please make sure that it is added to bundle configuration settings. Node path: %s.',
-                    $data,
-                    $path . '.' . $key
-                )
-            );
+            if (!isset($fields[$key]) && !array_key_exists($key, $fields)) {
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'The field "%s" is used in "%s", but it is not defined in "%s" section.',
+                        $key,
+                        $path . '.' . $key,
+                        self::FIELDS_ROOT
+                    )
+                );
+            }
+            if (!isset($fields[$key]['data_type'])) {
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'The field "%s" is used in "%s", but "data_type" is not defined in "%s" section.',
+                        $key,
+                        $path . '.' . $key,
+                        self::FIELDS_ROOT
+                    )
+                );
+            }
+            $data = array_merge($data, ['type' => $fields[$key]['data_type']]);
+        } else {
+            // process section
+            if (!is_array($data)) {
+                throw new InvalidTypeException(
+                    sprintf(
+                        'A section node "%s" must be an array, but got "%s".',
+                        $path . '.' . $key,
+                        gettype($data)
+                    )
+                );
+            }
+
+            $path = $path . '.' . $key;
+            foreach ($data as $subKey => &$subData) {
+                $this->validateApiTreeItem($path, $subKey, $subData, $fields);
+            }
+
+            $data = array_merge($data, ['section' => true]);
         }
     }
 }

@@ -7,10 +7,12 @@ oro_system_configuration:
             title:  'General contact'
     fields:
         oro_notification.email_notification_sender_email:
+            data_type: string
             type: email
             options:
                 label: 'Sender email'
         oro_notification.email_notification_sender_name:
+            data_type: string
             type: text
             options:
                 label: 'Sender name'
@@ -29,6 +31,5 @@ oro_system_configuration:
 
     api_tree:
         notifications:
-            email:
-                senderEmail:  oro_notification.email_notification_sender_email
-                senderName:   oro_notification.email_notification_sender_name
+            oro_notification.email_notification_sender_email: ~
+            oro_notification.email_notification_sender_name: ~

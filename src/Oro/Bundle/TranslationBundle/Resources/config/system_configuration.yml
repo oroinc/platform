@@ -1,6 +1,7 @@
 oro_system_configuration:
     fields:
         oro_translation.available_translations:
+            data_type: array
             type:  oro_translation_available_translations
             options:
                 label:      'Available translations'
@@ -21,4 +22,4 @@ oro_system_configuration:
 
     api_tree:
         localization:
-            availableTranslations:  oro_translation.available_translations
+            oro_translation.available_translations: ~

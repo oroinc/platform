@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
@@ -41,15 +43,20 @@ abstract class Provider implements ProviderInterface
     {
         $sections = empty($path) ? [] : explode('/', $path);
         array_unshift($sections, ProcessorDecorator::API_TREE_ROOT);
-        $tree = &$this->config;
+        $tree            = & $this->config;
+        $rootSectionName = null;
         foreach ($sections as $section) {
             if (!isset($tree[$section])) {
                 throw new ItemNotFoundException(sprintf('Config API section "%s" is not defined.', $path));
             }
-            $tree = &$tree[$section];
+            $tree            = & $tree[$section];
+            $rootSectionName = $section;
         }
 
-        return $tree;
+        return $this->buildApiTree(
+            $rootSectionName === ProcessorDecorator::API_TREE_ROOT ? '' : $rootSectionName,
+            $tree
+        );
     }
 
     /**
@@ -160,5 +167,32 @@ abstract class Provider implements ProviderInterface
     protected function checkIsGranted($resourceName)
     {
         return $this->securityFacade->isGranted($resourceName);
+    }
+
+    /**
+     * @param string $sectionName
+     * @param array  $tree
+     *
+     * @return SectionDefinition
+     */
+    protected function buildApiTree($sectionName, array $tree)
+    {
+        $section = new SectionDefinition($sectionName);
+        foreach ($tree as $key => $val) {
+            if ($key === 'section') {
+                continue;
+            }
+            if (!empty($val['section'])) {
+                $section->addSubSection(
+                    $this->buildApiTree($key, $val)
+                );
+            } else {
+                $section->addVariable(
+                    new VariableDefinition($key, $val['type'])
+                );
+            }
+        }
+
+        return $section;
     }
 }

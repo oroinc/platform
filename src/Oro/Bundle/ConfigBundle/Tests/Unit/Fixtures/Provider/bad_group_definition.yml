@@ -1,10 +1,12 @@
 oro_system_configuration:
     fields:
         some_field:
+            data_type: string
             type: text
             options: []
 
         some_another_field:
+            data_type: string
             type: choice
 
     groups:

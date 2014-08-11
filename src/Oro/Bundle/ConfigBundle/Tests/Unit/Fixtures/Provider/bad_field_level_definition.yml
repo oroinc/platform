@@ -1,6 +1,7 @@
 oro_system_configuration:
     fields:
         some_field:
+            data_type: string
             type: text
             options: []
 
