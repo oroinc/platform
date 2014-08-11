@@ -46,6 +46,17 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.column;
+            HeaderCell.__super__.dispose.apply(this, arguments);
+        },
+
+        /**
          * There is no need to reset cell direction because of multiple sorting
          *
          * @private
