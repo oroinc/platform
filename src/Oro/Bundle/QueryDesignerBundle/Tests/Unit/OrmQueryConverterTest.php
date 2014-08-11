@@ -132,12 +132,15 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         $functionProvider = null,
         $virtualFieldProvider = null
     ) {
-        return new DatagridConfigurationBuilder(
-            'test_grid',
-            $model,
+        $builder = new DatagridConfigurationBuilder(
             $functionProvider ? : $this->getFunctionProvider(),
             $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
             $doctrine ? : $this->getDoctrine()
         );
+
+        $builder->setGridName('test_grid');
+        $builder->setSource($model);
+
+        return $builder;
     }
 }

@@ -13,12 +13,15 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 
     public function testConfiguration()
     {
-        $segment  = $this->getSegment();
-        $doctrine = $this->getDoctrine([self::TEST_ENTITY => []], [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]);
+        $segment       = $this->getSegment();
+        $doctrine      = $this->getDoctrine(
+            [self::TEST_ENTITY => []],
+            [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
+        );
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
+        $entityMetadata            = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()->getMock();
         $entityMetadata->routeView = 'route';
 
@@ -27,14 +30,15 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
             ->with($segment->getEntity())
             ->will($this->returnValue($entityMetadata));
 
-        $builder  = new SegmentDatagridConfigurationBuilder(
-            self::TEST_GRID_NAME,
-            $segment,
+        $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
-            $configManager
+            $doctrine
         );
+
+        $builder->setGridName(self::TEST_GRID_NAME);
+        $builder->setSource($segment);
+        $builder->setConfigManager($configManager);
 
         $result   = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition('route');
@@ -48,19 +52,23 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
      */
     public function testNoRouteConfiguration()
     {
-        $segment  = $this->getSegment();
-        $doctrine = $this->getDoctrine([self::TEST_ENTITY => []], [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]);
+        $segment       = $this->getSegment();
+        $doctrine      = $this->getDoctrine(
+            [self::TEST_ENTITY => []],
+            [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
+        );
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $builder  = new SegmentDatagridConfigurationBuilder(
-            self::TEST_GRID_NAME,
-            $segment,
+        $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
-            $configManager
+            $doctrine
         );
+
+        $builder->setConfigManager($configManager);
+        $builder->setGridName(self::TEST_GRID_NAME);
+        $builder->setSource($segment);
 
         $result   = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition();
@@ -92,7 +100,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                     'column_aliases' => ['userName' => 'c1',]
                 ],
                 'type'         => 'orm',
-                'hints' => [
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
@@ -104,27 +112,30 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         ];
 
         if (!empty($route)) {
-            $definition = array_merge($definition, [
-                'properties' => [
-                    'id' => null,
-                    'view_link' => [
-                        'type' => 'url',
-                        'route' => 'route',
-                        'params' => ['id']
-                    ]
-                ],
-                'actions'    => [
-                    'view' => [
-                        'type'         => 'navigate',
-                        'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
-                        'label'        => 'View',
-                        'icon'         => 'eye-open',
-                        'link'         => 'view_link',
-                        'rowAction'    => true,
+            $definition                              = array_merge(
+                $definition,
+                [
+                    'properties' => [
+                        'id'        => null,
+                        'view_link' => [
+                            'type'   => 'url',
+                            'route'  => 'route',
+                            'params' => ['id']
+                        ]
                     ],
-                ],
-            ]);
-            $definition['source']['query']['select'] = ['t1.userName as c1', 't1.'.self::TEST_IDENTIFIER_NAME];
+                    'actions'    => [
+                        'view' => [
+                            'type'         => 'navigate',
+                            'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
+                            'label'        => 'View',
+                            'icon'         => 'eye-open',
+                            'link'         => 'view_link',
+                            'rowAction'    => true,
+                        ],
+                    ],
+                ]
+            );
+            $definition['source']['query']['select'] = ['t1.userName as c1', 't1.' . self::TEST_IDENTIFIER_NAME];
         }
 
         return $definition;
