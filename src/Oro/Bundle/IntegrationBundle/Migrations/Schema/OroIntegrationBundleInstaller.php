@@ -3,16 +3,10 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
-<<<<<<< HEAD
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-=======
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_0\OroIntegrationBundle as v10;
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_2\OroIntegrationBundle as v12;
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_3\OroIntegrationBundle as v13;
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_4\OroIntegrationBundle as v14;
-use Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_5\OroIntegrationBundle as v15;
->>>>>>> master
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -82,11 +76,11 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('message', 'text', []);
         $table->addColumn('date', 'datetime', []);
+        $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
     }
 
-<<<<<<< HEAD
     /**
      * Create oro_integration_transport table
      *
@@ -142,9 +136,5 @@ class OroIntegrationBundleInstaller implements Installation
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
-=======
-        v10::createChannelStatusTable($schema);
-        v15::modifyChannelStatusTable($schema);
->>>>>>> master
     }
 }

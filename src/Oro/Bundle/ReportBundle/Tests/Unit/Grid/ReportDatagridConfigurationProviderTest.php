@@ -178,32 +178,17 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
             ->method('getIdentifier')
             ->will($this->returnValue([$expectedIdName]));
 
-<<<<<<< HEAD
-        $definition = [
-            'columns'          => [
-                'column' => [
-=======
         $definition = array(
             'columns' => array(
                 array(
                     'name' => $expectedIdName
                 ),
                 array(
->>>>>>> master
                     'name' => 'street',
-                    "func" => [
+                    "func" => array(
                         "name"       => "Sum",
                         "group_type" => "aggregates",
                         "group_name" => "number",
-<<<<<<< HEAD
-                    ]
-                ]
-            ],
-            'grouping_columns' => [
-                ['name' => $expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName]
-            ]
-        ];
-=======
                     )
                 )
             ),
@@ -211,7 +196,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
                 array('name'=>$expectedIdName)
             )
         );
->>>>>>> master
 
         $this->prepareRepository($entity, $definition);
         $this->configManager->expects($this->once())
