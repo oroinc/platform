@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Event;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 
 use Doctrine\Common\EventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroEventManager extends ContainerAwareEventManager
 {
@@ -45,6 +44,9 @@ class OroEventManager extends ContainerAwareEventManager
         $this->disabledListenerRegexps[] = $classNameRegexp;
     }
 
+    /**
+     * Clear all rules for disabling listeners
+     */
     public function clearDisabledListeners()
     {
         $this->disabledListenerRegexps = array();
