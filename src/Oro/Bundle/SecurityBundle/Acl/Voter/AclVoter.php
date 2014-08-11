@@ -190,8 +190,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     {
         $object = $this->object;
         $token = $this->securityToken;
-        $className = ClassUtils::getClass($object);
-        $config = $this->configProvider->getConfig($className);
 
         if ($token instanceof UsernamePasswordOrganizationToken
             && $result === self::ACCESS_GRANTED
@@ -200,6 +198,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
+            $className = ClassUtils::getClass($object);
+            $config = $this->configProvider->getConfig($className);
+
             if ($config && $config->has('organization_field_name')) {
                 $accessor = PropertyAccess::createPropertyAccessor();
                 $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
