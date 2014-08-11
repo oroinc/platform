@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 
 class ApiEntityManager
 {
@@ -31,9 +32,9 @@ class ApiEntityManager
      */
     public function __construct($class, ObjectManager $om)
     {
-        $this->om = $om;
+        $this->om       = $om;
         $this->metadata = $this->om->getClassMetadata($class);
-        $this->class = $this->metadata->getName();
+        $this->class    = $this->metadata->getName();
     }
 
     /**
@@ -89,7 +90,7 @@ class ApiEntityManager
     /**
      * Return related repository
      *
-     * @return ObjectRepository
+     * @return EntityRepository
      */
     public function getRepository()
     {
@@ -111,22 +112,35 @@ class ApiEntityManager
      *
      * In case when limit and offset set to null QueryBuilder instance will be returned.
      *
-     * @param  int          $limit
-     * @param  int          $page
-     * @param  array|null   $orderBy
+     * @param int        $limit
+     * @param int        $page
+     * @param array      $criteria
+     * @param array|null $orderBy
+     *
      * @return \Traversable
      */
-    public function getList($limit = 10, $page = 1, $orderBy = null)
+    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
         $page = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
-        return $this->getRepository()->findBy(
-            [],
-            $this->getOrderBy($orderBy),
-            $limit,
-            $this->getOffset($page, $limit)
-        );
+        if ($criteria instanceof Criteria) {
+            $criteria
+                ->setMaxResults($limit)
+                ->orderBy($this->getOrderBy($orderBy))
+                ->setFirstResult($this->getOffset($page, $limit));
+
+            return $this->getRepository()
+                ->matching($criteria)
+                ->toArray();
+        } else {
+            return $this->getRepository()->findBy(
+                $criteria,
+                $this->getOrderBy($orderBy),
+                $limit,
+                $this->getOffset($page, $limit)
+            );
+        }
     }
 
     /**

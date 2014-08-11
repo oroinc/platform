@@ -9,6 +9,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ConfigurationControllerTest extends WebTestCase
 {
+    protected function setUp()
+    {
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+    }
+
     /**
      * @return array
      */
