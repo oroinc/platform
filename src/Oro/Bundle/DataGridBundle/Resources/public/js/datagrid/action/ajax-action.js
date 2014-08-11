@@ -5,9 +5,9 @@ define(['./model-action'], function (ModelAction) {
     /**
      * Ajax action, triggers REST AJAX request
      *
-     * @export  orodatagrid/js/datagrid/action/ajax-action
-     * @class   orodatagrid.datagrid.action.AjaxAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/ajax-action
+     * @class   oro.datagrid.action.AjaxAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return ModelAction.extend();
 });

@@ -6,9 +6,9 @@ define(['jquery', 'underscore', './abstract-action'
     /**
      * Allows to export grid data
      *
-     * @export  orodatagrid/js/datagrid/action/export-action
-     * @class   orodatagrid.datagrid.action.ExportAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/export-action
+     * @class   oro.datagrid.action.ExportAction
+     * @extends oro.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
 

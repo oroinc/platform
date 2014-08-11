@@ -68,7 +68,7 @@ define(['jquery', 'underscore', 'backgrid'
         /**
          * Handle action run
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          */
         onActionRun: function(action) {
             this.$('.dropdown.open').removeClass('open');

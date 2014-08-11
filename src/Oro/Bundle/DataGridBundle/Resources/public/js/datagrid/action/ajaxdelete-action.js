@@ -6,9 +6,9 @@ define(['./model-action', 'oroui/js/delete-confirmation'
     /**
      * Ajax delete action, triggers REST AJAX request
      *
-     * @export  orodatagrid/js/datagrid/action/ajaxdelete-action
-     * @class   orodatagrid.datagrid.action.AjaxdeleteAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/ajaxdelete-action
+     * @class   oro.datagrid.action.AjaxdeleteAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return ModelAction.extend({
         confirmation: true,

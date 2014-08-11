@@ -12,9 +12,9 @@ define([
     /**
      * Navigate action. Changes window location to url, from getLink method
      *
-     * @export  orodatagrid/js/datagrid/action/navigate-action
-     * @class   orodatagrid.datagrid.action.NavigateAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/navigate-action
+     * @class   oro.datagrid.action.NavigateAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return ModelAction.extend({
 

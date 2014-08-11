@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oroui/js/messenger'],
+define(['underscore', 'orotranslation/js/translator', 'oro/datagrid/action/mass-action', 'oroui/js/messenger'],
     /**
      * @param {underscore} _
      * @param {orotranslation/js/translator} __
@@ -15,7 +15,7 @@ define(['underscore', 'orotranslation/js/translator', 'orodatagrid/js/datagrid/a
          *
          * @export  oroentitymerge/js/datagrid/action/merge-mass-action
          * @class   oroentitymerge.datagrid.action.MergeMassAction
-         * @extends orodatagrid.datagrid.action.MassAction
+         * @extends oro.datagrid.action.MassAction
          */
         return MassAction.extend({
 

@@ -6,9 +6,9 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/delete-confirmat
     /**
      * Delete mass action class.
      *
-     * @export  orodatagrid/js/datagrid/action/delete-mass-action
-     * @class   orodatagrid.datagrid.action.DeleteMassAction
-     * @extends orodatagrid.datagrid.action.MassAction
+     * @export  oro/datagrid/action/delete-mass-action
+     * @class   oro.datagrid.action.DeleteMassAction
+     * @extends oro.datagrid.action.MassAction
      */
     return MassAction.extend({
         /** @property {Function} */

@@ -6,9 +6,9 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
     /**
      * Basic mass action class.
      *
-     * @export  orodatagrid/js/datagrid/action/mass-action
-     * @class   orodatagrid.datagrid.action.MassAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/mass-action
+     * @class   oro.datagrid.action.MassAction
+     * @extends oro.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
         /** @property {Object} */

@@ -6,9 +6,9 @@ define(['underscore', './abstract-action'
     /**
      * Basic model action class.
      *
-     * @export  orodatagrid/js/datagrid/action/model-action
-     * @class   orodatagrid.datagrid.action.ModelAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/model-action
+     * @class   oro.datagrid.action.ModelAction
+     * @extends oro.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
         /** @property {Backbone.Model} */

@@ -4,7 +4,7 @@ define([
     'orotranslation/js/translator',
     'oroui/js/messenger',
     'oroui/js/mediator',
-    'orodatagrid/js/datagrid/action/model-action',
+    'oro/datagrid/action/model-action',
     'oro/dialog-widget'
 ],
 function (_, __, messenger, mediator, ModelAction, DialogWidget) {
@@ -13,9 +13,9 @@ function (_, __, messenger, mediator, ModelAction, DialogWidget) {
     /**
      * Dialog action
      *
-     * @export  oroattachment/js/datagrid/action/dialog-action
-     * @class   oroattachment.datagrid.action.DialogAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/dialog-action
+     * @class   oro.datagrid.action.DialogAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return ModelAction.extend({
         useDirectLauncherLink: false,

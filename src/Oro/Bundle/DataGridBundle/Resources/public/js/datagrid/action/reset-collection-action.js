@@ -6,9 +6,9 @@ define(['./abstract-action'
     /**
      * Resets collection to initial state
      *
-     * @export  orodatagrid/js/datagrid/action/reset-collection-action
-     * @class   orodatagrid.datagrid.action.ResetCollectionAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/reset-collection-action
+     * @class   oro.datagrid.action.ResetCollectionAction
+     * @extends oro.datagrid.action.AbstractAction
      */
     return AbstractAction.extend({
 

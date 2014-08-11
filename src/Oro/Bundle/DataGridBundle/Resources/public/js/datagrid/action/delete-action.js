@@ -11,9 +11,9 @@ define([
     /**
      * Delete action with confirm dialog, triggers REST DELETE request
      *
-     * @export  orodatagrid/js/datagrid/action/delete-action
-     * @class   orodatagrid.datagrid.action.DeleteAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/delete-action
+     * @class   oro.datagrid.action.DeleteAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return ModelAction.extend({
 

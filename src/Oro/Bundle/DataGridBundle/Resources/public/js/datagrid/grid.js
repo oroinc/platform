@@ -16,9 +16,9 @@ define(function (require) {
         ActionColumn = require('./column/action-column'),
         SelectRowCell = require('oro/datagrid/cell/select-row-cell'),
         SelectAllHeaderCell = require('./header-cell/select-all-header-cell'),
-        RefreshCollectionAction = require('./action/refresh-collection-action'),
-        ResetCollectionAction = require('./action/reset-collection-action'),
-        ExportAction = require('./action/export-action');
+        RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
+        ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
+        ExportAction = require('oro/datagrid/action/export-action');
 
     /**
      * Basic grid class.
@@ -111,9 +111,9 @@ define(function (require) {
          * @param {String} [options.rowClassName] CSS class for row
          * @param {Object} [options.toolbarOptions] Options for toolbar
          * @param {Object} [options.exportOptions] Options for export
-         * @param {Array<orodatagrid.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
-         * @param {Array<orodatagrid.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
-         * @param {orodatagrid.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
+         * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
+         * @param {Array<oro.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
+         * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
          * @throws {TypeError} If mandatory options are undefined
          */
         initialize: function (options) {
@@ -290,7 +290,7 @@ define(function (require) {
         /**
          * Get action that refreshes grid's collection
          *
-         * @return orodatagrid.datagrid.action.RefreshCollectionAction
+         * @return {oro.datagrid.action.RefreshCollectionAction}
          */
         getRefreshAction: function () {
             var grid = this;
@@ -322,7 +322,7 @@ define(function (require) {
         /**
          * Get action that resets grid's collection
          *
-         * @return orodatagrid.datagrid.action.ResetCollectionAction
+         * @return {oro.datagrid.action.ResetCollectionAction}
          */
         getResetAction: function () {
             var grid = this;
@@ -354,7 +354,7 @@ define(function (require) {
         /**
          * Get action that exports grid's data
          *
-         * @return orodatagrid.datagrid.action.ExportAction
+         * @return {oro.datagrid.action.ExportAction}
          */
         getExportAction: function () {
             var grid = this;

@@ -2,7 +2,7 @@
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'routing',
         'orotranslation/js/translator', 'oroui/js/mediator',
-        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
+        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', 'orodatagrid/js/datagrid/action-launcher'
     ], function ($, _, Backbone, routing, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 
@@ -13,8 +13,8 @@ define(['jquery', 'underscore', 'backbone', 'routing',
      *  - "preExecute" before action is executed
      *  - "postExecute" after action is executed
      *
-     * @export  orodatagrid/js/datagrid/action/abstract-action
-     * @class   orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/abstract-action
+     * @class   oro.datagrid.action.AbstractAction
      * @extends Backbone.View
      */
     return Backbone.View.extend({

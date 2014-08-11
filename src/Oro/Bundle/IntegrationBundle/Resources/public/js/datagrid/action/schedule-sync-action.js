@@ -1,14 +1,14 @@
 /*global define*/
-define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/translator', 'oroui/js/messenger'
+define(['oro/datagrid/action/ajax-action', 'orotranslation/js/translator', 'oroui/js/messenger'
     ], function (AjaxAction, __, messenger) {
     'use strict';
 
     /**
      * Schedule channel sync action, triggers AJAX request
      *
-     * @export  orodatagrid/js/datagrid/action/ajax-action
-     * @class   orodatagrid.datagrid.action.AjaxAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/ajax-action
+     * @class   oro.datagrid.action.AjaxAction
+     * @extends oro.datagrid.action.ModelAction
      */
     return AjaxAction.extend({
         _onAjaxSuccess: function (data) {
