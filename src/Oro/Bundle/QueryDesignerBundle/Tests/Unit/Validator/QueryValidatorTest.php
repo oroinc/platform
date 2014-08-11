@@ -1,5 +1,7 @@
 <?php
 
+namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
+
 use Doctrine\DBAL\DBALException;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
