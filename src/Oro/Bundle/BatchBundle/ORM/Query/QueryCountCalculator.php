@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
@@ -56,6 +57,11 @@ class QueryCountCalculator
     public function getCount(Query $query)
     {
         if ($this->useWalker($query)) {
+            // cheap way to test whether query is distinct
+            if (stripos($query->getDQL(), 'DISTINCT') === false) {
+                $query->setHint(CountWalker::HINT_DISTINCT, false);
+            }
+
             $paginator = new Paginator($query);
             $paginator->setUseOutputWalkers(false);
             $result = $paginator->count();
@@ -139,7 +145,7 @@ class QueryCountCalculator
     private function useWalker(Query $query)
     {
         if (null === $this->shouldUseWalker) {
-            $this->shouldUseWalker = !$query->contains('GROUP BY') && null === $query->getMaxResults();
+            return !$query->contains('GROUP BY') && null === $query->getMaxResults();
         }
 
         return $this->shouldUseWalker;
