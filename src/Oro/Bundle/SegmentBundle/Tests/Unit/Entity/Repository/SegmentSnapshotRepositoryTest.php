@@ -64,9 +64,32 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
         $this->repository->removeBySegment($segment);
     }
 
-    public function testGetIdentifiersSelectQueryBuilder()
+    /**
+     * @param string $type
+     * @param string $expected
+     *
+     * @dataProvider identifierDataProvider
+     */
+    public function testGetIdentifiersSelectQueryBuilder($type, $expected)
     {
         $segment = $this->getSegment();
+
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $metadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('field'));
+
+        $metadata->expects($this->once())
+            ->method('getTypeOfField')
+            ->with($this->equalTo('field'))
+            ->will($this->returnValue($type));
+
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metadata));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -76,7 +99,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('from')->with(self::ENTITY_NAME, 'snp')
             ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(2))->method('select')->with('snp.entityId')
+        $queryBuilder->expects($this->at(2))->method('select')->with($expected)
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('where')->with('snp.segment = :segment')
             ->will($this->returnSelf());
@@ -88,6 +111,17 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
         $result = $this->repository->getIdentifiersSelectQueryBuilder($segment);
         $this->assertSame($queryBuilder, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function identifierDataProvider()
+    {
+        return [
+            ['integer', 'CAST(snp.entityId as int)'],
+            ['string', 'snp.entityId'],
+        ];
     }
 
     public function testRemoveByEntity()
@@ -107,7 +141,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
     protected function createEntities($count = 1)
     {
-        $entities = array();
+        $entities = [];
         for ($i = 0; $i < $count; $i++) {
             $entity = new StubEntity();
             $entity->setId($i);
@@ -119,16 +153,16 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
     protected function mockGetSnapshotDeleteQueryBuilderByEntitiesFunction(array $entities, $callCount = 1)
     {
-        $result = array();
+        $result = [];
         /** @var StubEntity $entity */
         foreach ($entities as $entity) {
-            $result[] = array(
+            $result[] = [
                 'entity' => get_class($entity),
                 'id'     => $entity->getId()
-            );
+            ];
         }
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()->setMethods(array('getResult', 'execute'))
+            ->disableOriginalConstructor()->setMethods(['getResult', 'execute'])
             ->getMockForAbstractClass();
         $query->expects($this->exactly($callCount))
             ->method('getResult')
@@ -136,12 +170,12 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('delete', 'select', 'from', 'orWhere', 'setParameter', 'getQuery', 'expr'))
+            ->setMethods(['delete', 'select', 'from', 'orWhere', 'setParameter', 'getQuery', 'expr'])
             ->getMock();
 
         $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
             ->disableOriginalConstructor()
-            ->setMethods(array('in', 'andX'))
+            ->setMethods(['in', 'andX'])
             ->getMock();
         $expr->expects($this->exactly($callCount))
             ->method('andX')
@@ -182,13 +216,13 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
-            ->setMethods(array('getIdentifierValues'))
+            ->setMethods(['getIdentifierValues'])
             ->getMock();
         $metadata->expects($this->exactly($callCount))
             ->method('getIdentifierValues')
             ->will($this->returnCallback(
                 function (StubEntity $currentEntity) {
-                    return array($currentEntity->getId());
+                    return [$currentEntity->getId()];
                 }
             ));
 

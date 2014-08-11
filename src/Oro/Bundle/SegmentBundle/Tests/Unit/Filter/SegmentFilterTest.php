@@ -115,6 +115,11 @@ class SegmentFilterTest extends OrmTestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->entityNameProvider   = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
+        $this->entityNameProvider
+            ->expects($this->any())
+            ->method('getEntityName')
+            ->will($this->returnValue('Namespace\Entity'));
+
         $this->entityConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
