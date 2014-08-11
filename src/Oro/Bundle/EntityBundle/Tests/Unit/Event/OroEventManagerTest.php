@@ -8,15 +8,19 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener;
 class OroEventManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $container;
+
+    /**
      * @var OroEventManager
      */
     protected $manager;
 
     protected function setUp()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $this->manager = new OroEventManager($container);
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->manager   = new OroEventManager($this->container);
     }
 
     public function testDisableAndReset()
@@ -42,7 +46,11 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
         $notAffectedListener = $this->getMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
         $notAffectedListener->expects($this->once())->method($eventName);
 
-        $this->manager->addEventListener(array($eventName), $affectedListener);    // class name Oro\Bundle\*
+        $listenerService = 'test.listener.service';
+        $this->container->expects($this->once())->method('get')->with($listenerService)
+            ->will($this->returnValue($affectedListener));
+
+        $this->manager->addEventListener(array($eventName), $listenerService);     // class name Oro\Bundle\*
         $this->manager->addEventListener(array($eventName), $notAffectedListener); // class name Mock_*
 
         if (!$isEnabled) {
