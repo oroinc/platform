@@ -8,7 +8,7 @@ function(_, Backbone) {
      * Oro extension of Bootstrap Modal wrapper for use with Backbone.
      *
      * @export  oroui/js/modal
-     * @class   oro.Modal
+     * @class   oroui.Modal
      * @extends Backbone.BootstrapModal
      */
     return Backbone.BootstrapModal.extend({

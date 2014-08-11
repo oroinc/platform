@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define([
+    'jquery',
+    'underscore',
+    'backbone'
+], function ($, _, Backbone) {
     'use strict';
+
+    var ActionLauncher;
 
     /**
      * Action launcher implemented as simple link or a set of links. Click on a link triggers action run
@@ -13,7 +19,7 @@ define(['jquery', 'underscore', 'backbone'
      * @class   orodatagrid.datagrid.ActionLauncher
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    ActionLauncher = Backbone.View.extend({
         /** @property */
         enabled: true,
 
@@ -51,7 +57,7 @@ define(['jquery', 'underscore', 'backbone'
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
-        template:_.template(
+        template: _.template(
             '<% if (links) { %><div class="btn-group"><% } %>' +
             '<<%= tagName %>' +
                 '<% if (tagName == "a") { %> href="<%= link %>"<% } %>' +
@@ -117,59 +123,73 @@ define(['jquery', 'underscore', 'backbone'
          * @param {Array} [options.links]
          * @throws {TypeError} If mandatory option is undefined
          */
-        initialize: function(options) {
-            options = options || {};
-            if (!options.action) {
+        initialize: function (options) {
+            var opts, linkSelector;
+            opts = options || {};
+
+            if (!opts.action) {
                 throw new TypeError("'action' is required");
             }
 
-            if (options.template) {
-                this.template = options.template;
+            if (opts.template) {
+                this.template = opts.template;
             }
 
-            if (options.label) {
-                this.label = options.label;
+            if (opts.label) {
+                this.label = opts.label;
             }
 
-            if (options.title) {
-                this.title = options.title;
+            if (opts.title) {
+                this.title = opts.title;
             }
 
-            if (options.icon) {
-                this.icon = options.icon;
+            if (opts.icon) {
+                this.icon = opts.icon;
             }
 
-            if (options.link) {
-                this.link = options.link;
+            if (opts.link) {
+                this.link = opts.link;
             }
 
-            if (options.iconClassName) {
-                this.iconClassName = options.iconClassName;
+            if (opts.iconClassName) {
+                this.iconClassName = opts.iconClassName;
             }
 
-            if (options.className) {
-                this.className = options.className;
+            if (opts.className) {
+                this.className = opts.className;
             }
 
-            if (_.has(options, 'runAction')) {
-                this.runAction = options.runAction;
+            if (_.has(opts, 'runAction')) {
+                this.runAction = opts.runAction;
             }
 
-            if (_.has(options, 'onClickReturnValue')) {
-                this.onClickReturnValue = options.onClickReturnValue;
+            if (_.has(opts, 'onClickReturnValue')) {
+                this.onClickReturnValue = opts.onClickReturnValue;
             }
 
             this.events = {};
-            var linkSelector = '';
-            if (_.has(options, 'links')) {
+            linkSelector = '';
+            if (_.has(opts, 'links')) {
                 this.events['click .dropdown-toggle'] = 'onToggle';
                 this.links = options.links;
                 linkSelector = ' .dropdown-menu a';
             }
             this.events['click' + linkSelector] = 'onClick';
 
-            this.action = options.action;
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            this.action = opts.action;
+            ActionLauncher.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.action;
+            delete this.runAction;
+            ActionLauncher.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -178,10 +198,11 @@ define(['jquery', 'underscore', 'backbone'
          * @return {*}
          */
         render: function () {
+            var $el, label;
             this.$el.empty();
 
-            var label = this.label || this.action.label;
-            var $el = $(this.template({
+            label = this.label || this.action.label;
+            $el = $(this.template({
                 label: this.label || this.action.label,
                 icon: this.icon,
                 title: this.title || label,
@@ -206,15 +227,16 @@ define(['jquery', 'underscore', 'backbone'
          * @protected
          * @return {Boolean}
          */
-        onClick: function(e) {
+        onClick: function (e) {
+            var $link, key;
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
             this.trigger('click', this, e.currentTarget);
             if (this.runAction) {
                 if (this.links) {
-                    var $link = $(e.currentTarget);
-                    var key = $link.data('key');
+                    $link = $(e.currentTarget);
+                    key = $link.data('key');
                     if (!_.isUndefined(key)) {
                         this.action.actionKey = key;
                         $link.closest('.btn-group').toggleClass('open');
@@ -228,7 +250,7 @@ define(['jquery', 'underscore', 'backbone'
             return this.onClickReturnValue;
         },
 
-        onToggle: function(e) {
+        onToggle: function (e) {
             var $link = $(e.currentTarget);
             if (!$link.closest('.btn-group').hasClass('open')) {
                 this.trigger('expand', this);
@@ -240,7 +262,7 @@ define(['jquery', 'underscore', 'backbone'
          *
          * @return {*}
          */
-        disable: function() {
+        disable: function () {
             this.enabled = false;
             this.$el.addClass('disabled');
             return this;
@@ -251,10 +273,12 @@ define(['jquery', 'underscore', 'backbone'
          *
          * @return {*}
          */
-        enable: function() {
+        enable: function () {
             this.enabled = true;
             this.$el.removeClass('disabled');
             return this;
         }
     });
+
+    return ActionLauncher;
 });

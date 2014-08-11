@@ -55,6 +55,8 @@ define([
             _.each(this.rows, function (row) {
                 row.dispose();
             });
+            delete this.rows;
+            delete this.columns;
             Body.__super__.dispose.call(this);
         },
 

@@ -44,6 +44,8 @@ define([
             _.each(this.cells, function (cell) {
                 cell.dispose();
             });
+            delete this.cells;
+            delete this.columns;
             Row.__super__.dispose.call(this);
         },
 

@@ -76,6 +76,8 @@ define([
             _.each(this.rows, function (row) {
                 row.dispose();
             });
+            delete this.rows;
+            delete this.columns;
             Footer.__super__.dispose.call(this);
         },
 

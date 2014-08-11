@@ -1,10 +1,11 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
+    'underscore',
     'backbone',
     'backgrid',
     './header-cell/header-cell'
-], function (Backbone, Backgrid, HeaderCell) {
+], function (_, Backbone, Backgrid, HeaderCell) {
     "use strict";
 
     var Header;
@@ -49,6 +50,22 @@ define([
             });
 
             this.subviews = [this.row];
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.row.cells, function (cell) {
+                cell.dispose();
+            });
+            delete this.row.cells;
+            delete this.row;
+            delete this.columns;
+            Header.__super__.dispose.apply(this, arguments);
         }
     });
 

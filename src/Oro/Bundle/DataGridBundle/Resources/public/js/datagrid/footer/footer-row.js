@@ -37,6 +37,8 @@ define([
             _.each(this.cells, function (cell) {
                 cell.dispose();
             });
+            delete this.cells;
+            delete this.columns;
             FooterRow.__super__.dispose.call(this);
         },
 
