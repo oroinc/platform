@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Triggers when filter is updated
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
         _onFilterUpdated: function (filter) {
@@ -124,7 +124,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Triggers when filter is disabled
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
         _onFilterDisabled: function (filter) {
@@ -170,7 +170,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Enable filter
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
         enableFilter: function(filter) {
@@ -180,7 +180,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Disable filter
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
         disableFilter: function (filter) {

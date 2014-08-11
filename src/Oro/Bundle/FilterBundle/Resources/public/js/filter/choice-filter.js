@@ -1,17 +1,24 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', './text-filter'
-    ], function ($, _, __, tools, TextFilter) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    './text-filter'
+], function ($, _, __, tools, TextFilter) {
     'use strict';
+
+    var ChoiceFilter;
 
     /**
      * Choice filter: filter type as option + filter value as string
      *
-     * @export  orofilter/js/filter/choice-filter
-     * @class   orofilter.filter.ChoiceFilter
-     * @extends orofilter.filter.TextFilter
+     * @export  oro/filter/choice-filter
+     * @class   oro.filter.ChoiceFilter
+     * @extends oro.filter.TextFilter
      */
-    return TextFilter.extend({
+    ChoiceFilter = TextFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -50,7 +57,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
          *
          * @param {Object} options
          */
-        initialize: function(options) {
+        initialize: function (options) {
             options = _.pick(options || {}, 'choices');
             _.extend(this, options);
 
@@ -73,7 +80,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 };
             }
 
-            TextFilter.prototype.initialize.apply(this, arguments);
+            ChoiceFilter.__super__.initialize.apply(this, arguments);
         },
 
         render: function () {
@@ -113,13 +120,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             if (!this._criteriaRenderd) {
                 this._renderCriteria();
             }
-            TextFilter.prototype._showCriteria.apply(this, arguments);
+            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
+        _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = this._getChoiceOption(value.type);
 
@@ -141,14 +148,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
          * @returns {{value: string, label: string}}
          * @private
          */
-        _getChoiceOption: function(valueType) {
+        _getChoiceOption: function (valueType) {
             return _.findWhere(this.choices, {value: valueType.toString()});
         },
 
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             this._setInputValue(this.criteriaValueSelectors.value, value.value);
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
             return this;
@@ -158,7 +165,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value),
                 type: this._getInputValue(this.criteriaValueSelectors.type)
@@ -168,7 +175,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         /**
          * @inheritDoc
          */
-        _triggerUpdate: function(newValue, oldValue) {
+        _triggerUpdate: function (newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
@@ -177,10 +184,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         /**
          * @inheritDoc
          */
-        _onValueUpdated: function(newValue, oldValue) {
+        _onValueUpdated: function (newValue, oldValue) {
             // synchronize choice selector with new value
             var menu = this.$('.choice-filter .dropdown-menu');
-            menu.find('li a').each(function() {
+            menu.find('li a').each(function () {
                 var item = $(this);
                 if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
                     item.parent().removeClass('active');
@@ -190,7 +197,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                 }
             });
 
-            TextFilter.prototype._onValueUpdated.apply(this, arguments);
+            ChoiceFilter.__super__._onValueUpdated.apply(this, arguments);
         }
     });
+
+    return ChoiceFilter;
 });

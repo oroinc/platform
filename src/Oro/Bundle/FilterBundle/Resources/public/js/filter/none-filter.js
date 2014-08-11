@@ -1,7 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter'
-    ], function ($, _, __, AbstractFilter) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './abstract-filter'
+], function ($, _, __, AbstractFilter) {
     'use strict';
+
+    var NoneFilter;
 
     /**
      * None filter: an empty filter implements 'null object' pattern
@@ -9,11 +16,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
      * Triggers events:
      *  - "disable" when filter is disabled
      *
-     * @export  orofilter/js/filter/none-filter
-     * @class   orofilter.filter.NoneFilter
-     * @extends orofilter.filter.AbstractFilter
+     * @export  oro/filter/none-filter
+     * @class   oro.filter.NoneFilter
+     * @extends oro.filter.AbstractFilter
      */
-    return AbstractFilter.extend({
+    NoneFilter = AbstractFilter.extend({
         wrappable: true,
 
         wrapperTemplate: '',
@@ -70,7 +77,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             _.extend(this, options);
 
             this.label = 'None';
-            AbstractFilter.prototype.initialize.apply(this, arguments);
+            NoneFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -88,7 +95,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @param {Event} e
          * @protected
          */
-        _onClickCriteriaSelector: function(e) {
+        _onClickCriteriaSelector: function (e) {
             e.stopPropagation();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
@@ -103,7 +110,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @private
          */
-        _onClickCloseCriteria: function() {
+        _onClickCloseCriteria: function () {
             this._hideCriteria();
             this._updateDOMValue();
         },
@@ -113,7 +120,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function(e) {
+        _onClickDisableFilter: function (e) {
             e.preventDefault();
             this.disable();
         },
@@ -124,7 +131,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @param {Event} e
          * @protected
          */
-        _onClickOutsideCriteria: function(e) {
+        _onClickOutsideCriteria: function (e) {
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
@@ -155,9 +162,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @return {*}
          */
-        remove: function() {
+        remove: function () {
             $('body').off('click', this._clickOutsideCriteriaCallback);
-            AbstractFilter.prototype.remove.call(this);
+            NoneFilter.__super__.remove.call(this);
             return this;
         },
 
@@ -166,10 +173,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _showCriteria: function() {
+        _showCriteria: function () {
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
-            setTimeout(_.bind(function() {
+            setTimeout(_.bind(function () {
                 this.popupCriteriaShowed = true;
             }, this), 100);
         },
@@ -179,10 +186,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _hideCriteria: function() {
+        _hideCriteria: function () {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
-            setTimeout(_.bind(function() {
+            setTimeout(_.bind(function () {
                 this.popupCriteriaShowed = false;
             }, this), 100);
         },
@@ -190,14 +197,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             return this;
         },
 
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             return {};
         },
 
@@ -207,7 +214,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @return {String}
          * @protected
          */
-        _getPopupHint: function() {
+        _getPopupHint: function () {
             return this.popupHint ? this.popupHint: this.popupHint;
         },
 
@@ -217,8 +224,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @return {String}
          * @protected
          */
-        _getCriteriaHint: function() {
+        _getCriteriaHint: function () {
             return this.criteriaHint ? this.criteriaHint: this.placeholder;
         }
     });
+
+    return NoneFilter;
 });

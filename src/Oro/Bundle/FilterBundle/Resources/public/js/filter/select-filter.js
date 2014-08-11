@@ -1,16 +1,24 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter', '../multiselect-decorator'
-    ], function ($, _, __, AbstractFilter, MultiselectDecorator) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './abstract-filter',
+    'orofilter/js/multiselect-decorator'
+], function ($, _, __, AbstractFilter, MultiselectDecorator) {
     'use strict';
+
+    var SelectFilter;
 
     /**
      * Select filter: filter value as select option
      *
-     * @export  orofilter/js/filter/select-filter
-     * @class   orofilter.filter.SelectFilter
-     * @extends orofilter.filter.AbstractFilter
+     * @export  oro/filter/select-filter
+     * @class   oro.filter.SelectFilter
+     * @extends oro.filter.AbstractFilter
      */
-    return AbstractFilter.extend({
+    SelectFilter = AbstractFilter.extend({
         /**
          * Filter selector template
          *
@@ -116,7 +124,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                 this.choices = [];
             }
             // temp code to keep backward compatible
-            this.choices = _.map(this.choices, function(option, i) {
+            this.choices = _.map(this.choices, function (option, i) {
                 return _.isString(option) ? {value: i, label: option} : option;
             });
 
@@ -127,7 +135,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                 };
             }
 
-            AbstractFilter.prototype.initialize.apply(this, arguments);
+            SelectFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -164,12 +172,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _initializeSelectWidget: function() {
+        _initializeSelectWidget: function () {
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
                     noneSelectedText: this.placeholder,
-                    selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
+                    selectedText: _.bind(function (numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
@@ -177,16 +185,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                         at: 'left bottom',
                         of: this.$(this.containerSelector)
                     },
-                    open: _.bind(function() {
+                    open: _.bind(function () {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
                     }, this),
-                    close: _.bind(function() {
+                    close: _.bind(function () {
                         this._setButtonPressed(this.$(this.containerSelector), false);
-                        setTimeout(_.bind(function() {
+                        setTimeout(_.bind(function () {
                             this.selectDropdownOpened = false;
                         }, this), 100);
                     }, this)
@@ -208,7 +216,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _clearChoicesStyle: function() {
+        _clearChoicesStyle: function () {
             var labels = this.selectWidget.getWidget().find('label');
             labels.removeClass('ui-state-hover');
             if (_.isEmpty(this.value.value)) {
@@ -222,13 +230,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @param {Array} checkedItems
          * @protected
          */
-        _getSelectedText: function(checkedItems) {
+        _getSelectedText: function (checkedItems) {
             if (_.isEmpty(checkedItems)) {
                 return this.placeholder;
             }
 
             var elements = [];
-            _.each(checkedItems, function(element) {
+            _.each(checkedItems, function (element) {
                 var title = element.getAttribute('title');
                 if (title) {
                     elements.push(title);
@@ -242,7 +250,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @return {String}
          */
-        _getCriteriaHint: function() {
+        _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var choice = _.find(this.choices, function (c) {
                 return (c.value == value.value);
@@ -255,7 +263,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _setDropdownWidth: function() {
+        _setDropdownWidth: function () {
             if (!this.minimumWidth) {
                 this.minimumWidth = this.selectWidget.getMinimumDropdownWidth() + 22;
             }
@@ -272,13 +280,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @param {Event} e
          * @protected
          */
-        _onClickFilterArea: function(e) {
+        _onClickFilterArea: function (e) {
             if (!this.selectDropdownOpened) {
-                setTimeout(_.bind(function() {
+                setTimeout(_.bind(function () {
                     this.selectWidget.multiselect('open');
                 }, this), 50);
             } else {
-                setTimeout(_.bind(function() {
+                setTimeout(_.bind(function () {
                     this.selectWidget.multiselect('close');
                 }, this), 50);
             }
@@ -291,7 +299,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @protected
          */
-        _onSelectChange: function() {
+        _onSelectChange: function () {
             // set value
             this.applyValue();
             // update dropdown
@@ -303,7 +311,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function(e) {
+        _onClickDisableFilter: function (e) {
             e.preventDefault();
             this.disable();
         },
@@ -311,8 +319,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         /**
          * @inheritDoc
          */
-        _onValueUpdated: function(newValue, oldValue) {
-            AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
+        _onValueUpdated: function (newValue, oldValue) {
+            SelectFilter.__super__._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
             this.$(this.buttonSelector)
                 .toggleClass('filter-default-value', this.isEmpty());
@@ -321,7 +329,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             this._setInputValue(this.inputSelector, value.value);
             return this;
         },
@@ -329,10 +337,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             return {
                 value: this._getInputValue(this.inputSelector)
             };
         }
     });
+
+    return SelectFilter;
 });

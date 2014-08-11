@@ -1,18 +1,25 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter',
-        'orolocale/js/locale-settings', '../datevariables-widget'
-    ], function ($, _, __, ChoiceFilter, localeSettings) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './choice-filter',
+    'orolocale/js/locale-settings',
+    'orofilter/js/datevariables-widget'
+], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
+
+    var DateFilter;
 
     /**
      * Date filter: filter type as option + interval begin and end dates
      *
-     * @export  orofilter/js/filter/date-filter
-     * @class   orofilter.filter.DateFilter
-     * @extends orofilter.filter.ChoiceFilter
+     * @export  oro/filter/date-filter
+     * @class   oro.filter.DateFilter
+     * @extends oro.filter.ChoiceFilter
      */
-    return ChoiceFilter.extend({
+    DateFilter = ChoiceFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -166,7 +173,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 };
             }
 
-            ChoiceFilter.prototype.initialize.apply(this, arguments);
+            DateFilter.__super__.initialize.apply(this, arguments);
         },
 
         onChangeFilterType: function (e) {
@@ -561,7 +568,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @inheritDoc
          */
         _hideCriteria: function () {
-            ChoiceFilter.prototype._hideCriteria.apply(this, arguments);
+            DateFilter.__super__._hideCriteria.apply(this, arguments);
         },
 
         _getSelectedChoiceLabel: function (property, value) {
@@ -576,4 +583,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             return selectedChoiceLabel;
         }
     });
+
+    return DateFilter;
 });
