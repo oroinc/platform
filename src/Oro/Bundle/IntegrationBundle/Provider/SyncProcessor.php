@@ -255,6 +255,9 @@ class SyncProcessor
             $this->doctrineRegistry
                 ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
+            if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
+                $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
+            }
         }
 
         return $isSuccess;
