@@ -24,7 +24,7 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->manager->hasDisabledListeners());
         $this->manager->disableListeners();
         $this->assertTrue($this->manager->hasDisabledListeners());
-        $this->manager->resetDisabledListeners();
+        $this->manager->clearDisabledListeners();
         $this->assertFalse($this->manager->hasDisabledListeners());
     }
 

@@ -45,7 +45,7 @@ class OroEventManager extends ContainerAwareEventManager
         $this->disabledListenerRegexps[] = $classNameRegexp;
     }
 
-    public function resetDisabledListeners()
+    public function clearDisabledListeners()
     {
         $this->disabledListenerRegexps = array();
     }

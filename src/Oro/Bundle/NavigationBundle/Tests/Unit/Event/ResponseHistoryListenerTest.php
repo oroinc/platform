@@ -289,7 +289,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('flush')
             ->with($this->item);
         $eventManager->expects($shouldBeDisabled ? $this->once() : $this->never())
-            ->method('resetDisabledListeners');
+            ->method('clearDisabledListeners');
 
         return $this->em;
     }

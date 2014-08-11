@@ -105,7 +105,7 @@ class ResponseHistoryListener
         $this->entityManager->flush($historyItem);
 
         if ($eventManager instanceof OroEventManager) {
-            $eventManager->resetDisabledListeners();
+            $eventManager->clearDisabledListeners();
         }
 
         return true;
