@@ -308,7 +308,7 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                #
+                # @deprecated since 1.4, will be removed in 2.0
                 # OptionSet form type fields
                 #
                 set_expanded:
@@ -340,3 +340,35 @@ oro_entity_config:
                             subblock:       properties
                             type:           oro_entity_option_set
                             tooltip:        oro.entity_extend.field.option_set.option.tooltip
+
+                # Enum form type fields
+                #
+                set_enum_expanded:
+                    options:
+                        allowed_type:       [enum]
+                        create_only:        true
+                    form:
+                        type:               oro_entity_extend_choice
+                        options:
+                            required:       false
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            label:          'Expanded'
+                            attr:
+                                class:      is-option-set-expanded
+                            block:          general
+                            subblock:       properties
+
+                set_enum_options:
+                    options:
+                        allowed_type:       [enum]
+                        auditable:          false
+                    form:
+                        type:               oro_entity_enum_collection
+                        options:
+                            required:       false
+                            label:          'Options'
+                            block:          general
+                            subblock:       properties
+                            type:           oro_entity_enum_value
+                            tooltip:        oro.entity_extend.field.enum.option.tooltip

@@ -23,7 +23,8 @@ oro:
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many
-                optionSet:          Option set
+                optionSet:          Option set (deprecated)
+                enum:               Option set (enum)
 
                 ref-one:            System relation
                 ref-many:           System relation

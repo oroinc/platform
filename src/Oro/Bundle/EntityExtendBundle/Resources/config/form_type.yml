@@ -12,6 +12,10 @@ parameters:
     oro_entity_extend.type.multiple_association_choice.class:   Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType
 
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
+
+    oro_entity_extend.type.enum.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\EnumType
+    oro_entity_extend.type.enum_collection.class:               Oro\Bundle\EntityExtendBundle\Form\Type\EnumCollectionType
+
 services:
     oro_entity_extend.type.entity:
         class:                                                  %oro_entity_extend.type.entity.class%
@@ -84,3 +88,15 @@ services:
             - @oro_entity_config.provider.entity
         tags:
             - { name: form.type, alias: oro_entity_extend_unique_key_collection_type }
+
+    oro_entity_extend.type.enum:
+        class: %oro_entity_extend.type.enum.class%
+        tags:
+            - { name: form.type, alias: oro_entity_enum_value }
+
+    oro_entity_extend.type.enum_collection:
+        class: %oro_entity_extend.type.enum_collection.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_enum_collection }

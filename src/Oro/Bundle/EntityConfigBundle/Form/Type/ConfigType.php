@@ -110,6 +110,7 @@ class ConfigType extends AbstractType
             }
         }
 
+        /** @deprecated since 1.4, will be removed */
         if ($fieldType == 'optionSet') {
             $data['extend']['set_options'] = $this->configManager->getEntityManager()
                 ->getRepository(OptionSet::ENTITY_NAME)

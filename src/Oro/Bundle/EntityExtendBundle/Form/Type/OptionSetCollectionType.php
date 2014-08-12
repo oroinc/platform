@@ -11,7 +11,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
@@ -36,34 +35,7 @@ class OptionSetCollectionType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //$builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'preSetData']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function preSetData(FormEvent $event)
-    {
-        $form = $event->getForm()->getRoot();
-        $data = $form->getData();
-        if (null === $data || isset($data['extend']['set_options'])) {
-            return;
-        }
-
-        /** @var FieldConfigId $fieldConfigId */
-        $fieldConfigId = $event->getForm()->getConfig()->getOption('config_id');
-
-        $configModel   = $this->configManager->getConfigFieldModel(
-            $fieldConfigId->getClassName(),
-            $fieldConfigId->getFieldName()
-        );
-
-        $data['extend']['set_options'] =
-            $this->configManager->getEntityManager()->getRepository(OptionSet::ENTITY_NAME)
-                ->findBy(['field' => $configModel->getId()], ['priority' => 'ASC']);
-
-        $form->setData($data);
     }
 
     /**

@@ -41,7 +41,8 @@ class FieldType extends AbstractType
             'oneToMany',
             'manyToOne',
             'manyToMany',
-            'optionSet'
+            'optionSet',
+            'enum',
         ]
     ];
 
