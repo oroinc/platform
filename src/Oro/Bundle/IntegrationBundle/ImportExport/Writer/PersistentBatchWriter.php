@@ -65,6 +65,7 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
             $this->em->clear();
         } catch (\Exception $exception) {
             $this->em->rollback();
+            $this->ensureEntityManagerReady();
 
             $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
 
