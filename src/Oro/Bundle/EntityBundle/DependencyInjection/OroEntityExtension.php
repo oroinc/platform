@@ -46,8 +46,14 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             foreach ($doctrineConfig as $config) {
                 if (isset($config['dbal']['connections'])) {
                     foreach (array_keys($config['dbal']['connections']) as $connectionName) {
+                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
                         $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = array(
                             \PDO::ATTR_EMULATE_PREPARES => true
+                        );
+                        // Add support of "oid" and "name" Db types for EnterpriseDB
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = array(
+                            'oid' => 'integer',
+                            'name' => 'string'
                         );
                     }
                 }
