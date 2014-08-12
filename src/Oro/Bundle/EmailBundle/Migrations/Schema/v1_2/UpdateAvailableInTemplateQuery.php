@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_3;
 
 use Psr\Log\LoggerInterface;
 
@@ -154,8 +154,8 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
             . ' FROM oro_entity_config ec'
             . ' INNER JOIN oro_entity_config_field fc ON fc.entity_id = ec.id'
             . ' WHERE ec.class_name = :class';
-        $params = ['class' => $className, 'scope' => 'email'];
-        $types  = ['class' => 'string', 'scope' => 'string'];
+        $params = ['class' => $className];
+        $types  = ['class' => 'string'];
         $this->logQuery($logger, $sql, $params, $types);
 
         $result = [];
