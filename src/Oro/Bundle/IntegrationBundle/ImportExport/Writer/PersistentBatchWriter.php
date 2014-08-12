@@ -43,6 +43,7 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
         $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
         $this->contextRegistry = $contextRegistry;
+        $this->ensureEntityManagerReady();
     }
 
     /**
@@ -50,8 +51,6 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
      */
     public function write(array $items)
     {
-        $this->ensureEntityManagerReady();
-
         try {
             $this->em->beginTransaction();
 
