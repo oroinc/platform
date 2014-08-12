@@ -12,6 +12,20 @@ class DatabaseType extends AbstractType
     {
         $builder
             ->add(
+                'oro_installer_database_driver',
+                'choice',
+                array(
+                    'label'       => 'form.configuration.database.driver',
+                    'choices'       => array(
+                        'pdo_mysql' => 'MySQL',
+                        'pdo_pgsql' => 'PostgreSQL',
+                    ),
+                    'constraints' => array(
+                        new Assert\NotBlank(),
+                    ),
+                )
+            )
+            ->add(
                 'oro_installer_database_host',
                 'text',
                 array(

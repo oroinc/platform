@@ -1,3 +1,11 @@
+CHANGELOG for 1.4.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.0 versions.
+
+* 1.4.0 (2014-xx-xx)
+ * Minimum PHP version: PHP 5.4.9
+ * PostgreSQL support
+
 CHANGELOG for 1.3.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.3.0 versions.
