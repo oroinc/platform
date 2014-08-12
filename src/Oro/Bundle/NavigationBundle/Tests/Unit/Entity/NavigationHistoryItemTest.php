@@ -27,7 +27,6 @@ class NavigationHistoryItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values['user'], $item->getUser());
         $this->assertEquals($values['organization'], $item->getOrganization());
 
-
         $dateTime = new \DateTime();
         $item->setVisitedAt($dateTime);
         $this->assertEquals($dateTime, $item->getVisitedAt());
