@@ -72,7 +72,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         // @codingStandardsIgnoreStart
         $this->assertEquals(
             "SELECT e, " .
-            "CONCAT('', CASE WHEN a.hasOwner = 1 THEN (" .
+            "CONCAT('', CASE WHEN a.hasOwner = true THEN (" .
                 "CASE WHEN a.owner1 IS NOT NULL THEN CONCAT(a.firstName, CONCAT(a.lastName, '')) ELSE '' END" .
             ") ELSE a.email END) as fromEmailExpression " .
             "FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1",
