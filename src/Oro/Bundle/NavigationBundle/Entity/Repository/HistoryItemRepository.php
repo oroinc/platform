@@ -34,9 +34,12 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
             ->add('from', new Expr\From('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem', 'ni'))
             ->add(
                 'where',
-                $qb->expr()->eq('ni.user', ':user')
+                $qb->expr()->andx(
+                    $qb->expr()->eq('ni.user', ':user'),
+                    $qb->expr()->eq('ni.organization', ':organization')
+                )
             )
-            ->setParameters(array('user' => $user));
+            ->setParameters(array('user' => $user, 'organization' => $organization));
 
         $orderBy = array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISITED_AT));
         if (isset($options['orderBy'])) {

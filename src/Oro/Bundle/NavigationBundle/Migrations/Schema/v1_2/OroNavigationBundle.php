@@ -33,5 +33,15 @@ class OroNavigationBundle implements Migration
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
+
+        $table = $schema->getTable('oro_navigation_history');
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['organization_id'], 'IDX_B20613B932C8A3DE', []);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
     }
 }

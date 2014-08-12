@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Entity;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 
@@ -9,6 +10,7 @@ class NavigationHistoryItemTest extends \PHPUnit_Framework_TestCase
 {
     public function testNavigationHistoryItemEntity()
     {
+        $organization = new Organization();
         $user = new User();
         $user->setEmail('some@email.com');
 
@@ -16,12 +18,14 @@ class NavigationHistoryItemTest extends \PHPUnit_Framework_TestCase
             'title' => 'Some Title',
             'url'   => 'Some Url',
             'user'  => $user,
+            'organization' => $organization
         );
 
         $item = new NavigationHistoryItem($values);
         $this->assertEquals($values['title'], $item->getTitle());
         $this->assertEquals($values['url'], $item->getUrl());
         $this->assertEquals($values['user'], $item->getUser());
+        $this->assertEquals($values['organization'], $item->getOrganization());
 
         $dateTime = new \DateTime();
         $item->setVisitedAt($dateTime);
