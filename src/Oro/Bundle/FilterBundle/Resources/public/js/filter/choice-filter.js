@@ -58,8 +58,8 @@ define([
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'choices');
-            _.extend(this, options);
+            var opts = _.pick(options || {}, 'choices');
+            _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
@@ -67,7 +67,7 @@ define([
             }
             // temp code to keep backward compatible
             if ($.isPlainObject(this.choices)) {
-                this.choices = _.map(this.choices, function(option, i) {
+                this.choices = _.map(this.choices, function (option, i) {
                     return {value: i.toString(), label: option};
                 });
             }
@@ -81,6 +81,18 @@ define([
             }
 
             ChoiceFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.choices;
+            delete this.emptyValue;
+            ChoiceFilter.__super__.dispose.call(this);
         },
 
         render: function () {
@@ -100,7 +112,7 @@ define([
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
+                var foundChoice = _.find(this.choices, function (choice) {
                     return (choice.value == value.type);
                 });
                 selectedChoiceLabel = foundChoice.label;

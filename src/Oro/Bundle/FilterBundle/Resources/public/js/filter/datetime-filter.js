@@ -65,6 +65,13 @@ define([
         /**
          * @inheritDoc
          */
+        _destroyDateWidget: function (name) {
+            this.dateWidgets[name].datetimepicker('destroy');
+        },
+
+        /**
+         * @inheritDoc
+         */
         _formatDisplayValue: function (value) {
             var dateFromFormat = this.dateWidgetOptions.altFormat;
             var dateToFormat = this.dateWidgetOptions.dateFormat;

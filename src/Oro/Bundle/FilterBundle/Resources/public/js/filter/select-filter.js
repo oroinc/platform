@@ -116,8 +116,8 @@ define([
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'choices');
-            _.extend(this, options);
+            var opts = _.pick(options || {}, 'choices');
+            _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
@@ -136,6 +136,19 @@ define([
             }
 
             SelectFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.choices;
+            this.selectWidget.dispose();
+            delete this.selectWidget;
+            SelectFilter.__super__.dispose.call(this);
         },
 
         /**

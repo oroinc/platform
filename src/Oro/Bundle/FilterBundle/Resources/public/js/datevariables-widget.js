@@ -1,7 +1,12 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout', 'jquery-ui'],
-    function ($, _, __, layout) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/layout',
+    'jquery-ui'
+], function ($, _, __, layout) {
     'use strict';
 
     /**
@@ -26,6 +31,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
 
         _create: function () {
             this.render();
+        },
+
+        _destroy: function () {
+            this.widget().find('.ui-datevariables-div a.ui_date_variable').off();
         },
 
         setPart: function (part) {

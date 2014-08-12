@@ -25,13 +25,23 @@ define([
          *      a string name of formatter (e.g. "integer", "decimal")
          */
         initialize: function (options) {
-            options = options || {};
             // init formatter options if it was not initialized so far
             if (_.isUndefined(this.formatterOptions)) {
                 this.formatterOptions = {};
             }
             this.formatter = new NumberFormatter(this.formatterOptions);
             NumberFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.formatter;
+            NumberFilter.__super__.dispose.call(this);
         },
 
         /**

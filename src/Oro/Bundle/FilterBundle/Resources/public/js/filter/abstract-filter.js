@@ -112,9 +112,9 @@ define([
          * @param {Boolean} [options.enabled]
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
+            var opts = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme');
-            _.extend(this, options);
+            _.extend(this, opts);
 
             this._defineTemplate();
 
@@ -128,6 +128,18 @@ define([
             this.value = _.clone(this.emptyValue);
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.value;
+            delete this.emptyValue;
+            AbstractFilter.__super__.dispose.call(this);
         },
 
         /**

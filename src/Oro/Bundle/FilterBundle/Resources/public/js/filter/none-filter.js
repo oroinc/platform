@@ -73,8 +73,8 @@ define([
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'popupHint');
-            _.extend(this, options);
+            var opts = _.pick(options || {}, 'popupHint');
+            _.extend(this, opts);
 
             this.label = 'None';
             NoneFilter.__super__.initialize.apply(this, arguments);
@@ -155,17 +155,6 @@ define([
 
         _wrap: function ($filter) {
             this.$el.append($filter);
-        },
-
-        /**
-         * Unsubscribe from click on body event
-         *
-         * @return {*}
-         */
-        remove: function () {
-            $('body').off('click', this._clickOutsideCriteriaCallback);
-            NoneFilter.__super__.remove.call(this);
-            return this;
         },
 
         /**

@@ -201,17 +201,6 @@ define([
         },
 
         /**
-         * Unsubscribe from click on body event
-         *
-         * @return {*}
-         */
-        remove: function () {
-            $('body').off('click', this._clickOutsideCriteriaCallback);
-            TextFilter.__super__.remove.call(this);
-            return this;
-        },
-
-        /**
          * Show criteria popup
          *
          * @protected

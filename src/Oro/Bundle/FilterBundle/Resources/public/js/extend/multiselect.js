@@ -1,6 +1,11 @@
 /*global define*/
 /*jslint nomen:true, browser:true*/
-define(['jquery', 'oroui/js/dropdown-mask', 'jquery-ui', 'jquery.multiselect'], function ($, mask) {
+define([
+    'jquery',
+    'oroui/js/dropdown-mask',
+    'jquery-ui',
+    'jquery.multiselect'
+], function ($, mask) {
     'use strict';
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {

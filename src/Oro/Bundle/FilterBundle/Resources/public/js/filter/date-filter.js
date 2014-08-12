@@ -86,16 +86,6 @@ define([
         externalWidgetOptions: {},
 
         /**
-         * References to date widgets
-         *
-         * @property
-         */
-        dateWidgets: {
-            start: null,
-            end: null
-        },
-
-        /**
          * Date filter type values
          *
          * @property
@@ -173,7 +163,31 @@ define([
                 };
             }
 
+            this.dateWidgets = {};
+
             DateFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.dateParts;
+            delete this.emptyPart;
+            delete this.emptyValue;
+            _.each(this.dateWidgets, function ($elem, name) {
+                if (name.slice(-5) === '_vars') {
+                    this._destroyDateVariablesWidget(name);
+                } else {
+                    this._destroyDateWidget(name);
+                }
+                delete this.dateWidgets[name];
+            }, this);
+            delete this.dateWidgets;
+            DateFilter.__super__.dispose.call(this);
         },
 
         onChangeFilterType: function (e) {
@@ -358,6 +372,16 @@ define([
         },
 
         /**
+         * Removes date widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateWidget: function (name) {
+            this.dateWidgets[name].datepicker('destroy');
+        },
+
+        /**
          * Initialize date variables widget
          *
          * @param {String} widgetSelector
@@ -373,6 +397,17 @@ define([
 
             return widget;
         },
+
+        /**
+         * Removes date variables widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateVariablesWidget: function (name) {
+            this.dateWidgets[name].dateVariables('destroy');
+        },
+
 
         /**
          * @inheritDoc
