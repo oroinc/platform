@@ -104,13 +104,17 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [
             'columns'          => [
                 [
+                    'name'    => 'id',
+                    'label'   => 'Id',
+                ],
+                [
                     'name'    => 'userName',
                     'label'   => 'User name',
                     'func'    => null,
                     'sorting' => 'ASC'
                 ]
             ],
-            'grouping_columns' => [['name' => 'userName', '' => 'userName']],
+            'grouping_columns' => [['name' => 'id']],
             'filters'          => [
                 [
                     'columnName' => 'address+AcmeBundle:Address::zip',

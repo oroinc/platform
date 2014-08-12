@@ -90,7 +90,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $definition = array(
             'columns' => array('column' => array('name'=>'street')),
             'grouping_columns' => array(
-                array('name'=>'street', "oro_report_form[grouping][columnNames]" => "street")
+                array('name'=>'street')
             )
         );
 
@@ -172,7 +172,10 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
         $definition = array(
             'columns' => array(
-                'column' => array(
+                array(
+                    'name' => $expectedIdName
+                ),
+                array(
                     'name' => 'street',
                     "func" => array(
                         "name"       => "Sum",
@@ -182,7 +185,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
                 )
             ),
             'grouping_columns' => array(
-                array('name'=>$expectedIdName, "oro_report_form[grouping][columnNames]" => $expectedIdName)
+                array('name'=>$expectedIdName)
             )
         );
 

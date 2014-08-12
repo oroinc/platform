@@ -104,9 +104,8 @@ class WidgetController extends Controller
                 $formOptions = $transition->getFormOptions();
                 $attributes = array_keys($formOptions['attribute_fields']);
 
-                $existingAttributes = $workflowItem->getData()->getValues();
                 $formAttributes = $workflowItem->getData()->getValues($attributes);
-                foreach ($existingAttributes + $formAttributes as $value) {
+                foreach ($formAttributes as $value) {
                     // Need to persist all new entities to allow serialization
                     // and correct passing to API start method of all input data.
                     // Form validation already performed, so all these entities are valid
@@ -124,7 +123,7 @@ class WidgetController extends Controller
                 /** @var WorkflowAwareSerializer $serializer */
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
+                $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
                 $saved = true;
             }
         }

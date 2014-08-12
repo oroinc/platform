@@ -63,7 +63,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'from'    => [
                         ['table' => $en, 'alias' => 't1']
                     ],
-                    'groupBy' => 't1.column1'
+                    'groupBy' => 'c1'
                 ],
                 'query_config' => [
                     'table_aliases'  => [
@@ -107,6 +107,53 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The grouping column "column2" must be declared in SELECT clause.
+     */
+    public function testInvalidGrouping()
+    {
+        $en               = 'Acme\Entity\TestEntity';
+        $definition       = [
+            'columns'          => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
+                [
+                    'name'    => 'column2',
+                    'label'   => 'lbl2',
+                    'sorting' => '',
+                    'func'    => [
+                        'name'       => 'Count',
+                        'group_name' => 'string',
+                        'group_type' => 'aggregates'
+                    ]
+                ]
+            ],
+            'filters'          => [],
+            'grouping_columns' => [['name' => 'column2']],
+        ];
+        $doctrine         = $this->getDoctrine(
+            [
+                $en => ['column1' => 'string'],
+                $en => ['column2' => 'string']
+            ]
+        );
+        $functionProvider = $this->getFunctionProvider(
+            [
+                [
+                    'Count',
+                    'string',
+                    'aggregates',
+                    ['name' => 'Count', 'return_type' => 'integer', 'expr' => 'COUNT($column)']
+                ]
+            ]
+        );
+
+        $model = new QueryDesignerModel();
+        $model->setEntity($en);
+        $model->setDefinition(json_encode($definition));
+        $this->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider);
     }
 
     /**
