@@ -28,7 +28,7 @@ class OroEntityExtendBundle implements Migration
         $table = $schema->createTable('oro_enum');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('code', 'string', ['length' => 21]);
-        $table->addColumn('public', 'boolean', ['default' => '0']);
+        $table->addColumn('is_public', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['code'], 'oro_enum_uq');
         /** End of generate table oro_enum **/

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
@@ -11,6 +12,8 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -269,6 +272,148 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'is_extend' => true
                         ]
                     ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCreateEnum()
+    {
+        $schema    = $this->getExtendSchema();
+        $queryBag  = new QueryBag();
+        $extension = $this->getExtendExtension();
+
+        $enumTable = $schema->createTable('oro_enum');
+        $enumTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $enumTable->addColumn('code', 'string', ['length' => 21]);
+        $enumTable->addColumn('is_public', 'boolean', []);
+        $enumTable->setPrimaryKey(['id']);
+
+        $extension->createEnum(
+            $schema,
+            $queryBag,
+            'test_status'
+        );
+
+        $queries = $queryBag->getPostQueries();
+        $this->assertCount(1, $queries);
+        $this->assertInstanceOf(
+            'Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery',
+            $queries[0]
+        );
+        /** @var ParametrizedSqlMigrationQuery $query */
+        $query = $queries[0];
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(['getDatabasePlatform'])
+            ->getMock();
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue(new MySqlPlatform()));
+        $query->setConnection($connection);
+        $this->assertEquals(
+            [
+                'INSERT INTO oro_enum (code, is_public) VALUES (:code, :is_public)',
+                'Parameters:',
+                '[code] = test_status',
+                '[is_public] = 0',
+            ],
+            $query->getDescription()
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE oro_enum (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(21) NOT NULL,'
+                . ' is_public TINYINT(1) NOT NULL, PRIMARY KEY(id))',
+                sprintf(
+                    'CREATE TABLE %stest_status (code VARCHAR(32) NOT NULL, enum_id INT NOT NULL,'
+                    . ' name VARCHAR(255) NOT NULL, priority INT NOT NULL, is_default TINYINT(1) NOT NULL,'
+                    . ' UNIQUE INDEX UNIQ_CFE263BE17628E5577153098 (enum_id, code),'
+                    . ' INDEX IDX_CFE263BE17628E55 (enum_id),'
+                    . ' PRIMARY KEY(code))',
+                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
+                ),
+                sprintf(
+                    'ALTER TABLE %stest_status ADD CONSTRAINT FK_CFE263BE17628E55'
+                    . ' FOREIGN KEY (enum_id) REFERENCES oro_enum (id) ON DELETE CASCADE',
+                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
+                ),
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
+                    'configs' => [
+                        'entity'     => [
+                            'label'        => 'oro.entityextend.test_status.entity_label',
+                            'plural_label' => 'oro.entityextend.test_status.entity_plural_label',
+                            'description'  => 'oro.entityextend.test_status.entity_description',
+                        ],
+                        'extend'     => [
+                            'owner'     => ExtendScope::OWNER_SYSTEM,
+                            'is_extend' => true,
+                            'table'     => 'oro_enum_test_status',
+                            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        ],
+                        'grouping'   => [
+                            'groups' => ['enum', 'dictionary']
+                        ],
+                        'dictionary' => [
+                            'virtual_fields' => ['code', 'name']
+                        ],
+                    ],
+                    'fields'  => [
+                        'code'     => [
+                            'type'    => 'string',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.code.label',
+                                    'description' => 'oro.entityextend.enumvalue.code.description',
+                                ]
+                            ]
+                        ],
+                        'enum'     => [
+                            'type'    => 'integer',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.enum.label',
+                                    'description' => 'oro.entityextend.enumvalue.enum.description',
+                                ]
+                            ]
+                        ],
+                        'name'     => [
+                            'type'    => 'string',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.name.label',
+                                    'description' => 'oro.entityextend.enumvalue.name.description',
+                                ]
+                            ]
+                        ],
+                        'priority' => [
+                            'type'    => 'integer',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.priority.label',
+                                    'description' => 'oro.entityextend.enumvalue.priority.description',
+                                ]
+                            ]
+                        ],
+                        'default'  => [
+                            'type'    => 'boolean',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.default.label',
+                                    'description' => 'oro.entityextend.enumvalue.default.description',
+                                ]
+                            ]
+                        ],
+                    ]
                 ],
             ]
         );

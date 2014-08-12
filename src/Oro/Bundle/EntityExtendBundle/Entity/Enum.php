@@ -49,7 +49,7 @@ class Enum
     /**
      * @var boolean
      *
-     * @ORM\Column(name="public", type="boolean", options={"default"=false})
+     * @ORM\Column(name="is_public", type="boolean")
      */
     protected $public = false;
 

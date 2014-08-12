@@ -40,16 +40,16 @@ abstract class AbstractEnumValue
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="priority", type="integer")
      */
-    private $priority;
+    private $priority = 0;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(name="is_default", type="boolean")
      */
-    private $default;
+    private $default = false;
 
     /**
      * @Gedmo\Locale

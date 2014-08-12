@@ -139,9 +139,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
         // add a record to oro_enum table
         $queries->addQuery(
             new ParametrizedSqlMigrationQuery(
-                'INSERT INTO oro_enum (code, public) VALUES (:code, :public)',
-                ['code' => $enumCode, 'public' => $isPublic],
-                ['code' => Type::STRING, 'public' => Type::BOOLEAN]
+                'INSERT INTO oro_enum (code, is_public) VALUES (:code, :is_public)',
+                ['code' => $enumCode, 'is_public' => $isPublic],
+                ['code' => Type::STRING, 'is_public' => Type::BOOLEAN]
             )
         );
 
@@ -191,8 +191,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'integer',
             [
                 'oro_options' => [
-                    ExtendOptionsManager::TYPE_OPTION => 'ref-one',
-                    'entity'                          => [
+                    ExtendOptionsManager::FIELD_NAME_OPTION => 'enum',
+                    ExtendOptionsManager::TYPE_OPTION       => 'ref-one',
+                    'entity'                                => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'enum'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'enum')
                     ]
@@ -225,11 +226,12 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ]
         );
         $table->addColumn(
-            'default',
+            'is_default',
             'boolean',
             [
                 'oro_options' => [
-                    'entity' => [
+                    ExtendOptionsManager::FIELD_NAME_OPTION => 'default',
+                    'entity'                                => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                     ]
