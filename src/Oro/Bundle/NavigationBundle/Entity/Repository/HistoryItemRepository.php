@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
-use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
+
+use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * NavigationItem Repository
@@ -14,21 +16,9 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
     const DEFAULT_SORT_ORDER = 'DESC';
 
     /**
-     * Find all history items for specified user
-     * $options['orderBy'], if passed, must be an array with following structure:
-     * array(
-     *  array(
-     *      'field'   => $field_name,
-     *      'dir'  => 'ASC'|'DESC'
-     *  )
-     * )
-     * @param \Oro\Bundle\UserBundle\Entity\User $user
-     * @param string                             $type
-     * @param array                              $options
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getNavigationItems($user, $type = null, $options = array())
+    public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->add(
