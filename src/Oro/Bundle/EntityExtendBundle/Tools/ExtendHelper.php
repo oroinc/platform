@@ -101,7 +101,7 @@ class ExtendHelper
         }
 
         if (!$fieldName) {
-            return sprintf('oro.entityextend.%s.entity_%s', $enumCode, $propertyName);
+            return sprintf('oro.entityextend.enums.%s.entity_%s', $enumCode, $propertyName);
         }
 
         return sprintf('oro.entityextend.enumvalue.%s.%s', $fieldName, $propertyName);

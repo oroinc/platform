@@ -350,9 +350,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
                     'configs' => [
                         'entity'     => [
-                            'label'        => 'oro.entityextend.test_status.entity_label',
-                            'plural_label' => 'oro.entityextend.test_status.entity_plural_label',
-                            'description'  => 'oro.entityextend.test_status.entity_description',
+                            'label'        => 'oro.entityextend.enums.test_status.entity_label',
+                            'plural_label' => 'oro.entityextend.enums.test_status.entity_plural_label',
+                            'description'  => 'oro.entityextend.enums.test_status.entity_description',
                         ],
                         'extend'     => [
                             'owner'     => ExtendScope::OWNER_SYSTEM,
