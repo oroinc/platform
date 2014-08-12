@@ -5,6 +5,8 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * NavigationItem Repository
  */
@@ -13,7 +15,7 @@ class NavigationItemRepository extends EntityRepository implements NavigationRep
     /**
      * {@inheritdoc}
      */
-    public function getNavigationItems($user, $organization, $type, $options = array())
+    public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();
 

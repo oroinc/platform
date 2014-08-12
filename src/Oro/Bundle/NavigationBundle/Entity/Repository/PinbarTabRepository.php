@@ -5,6 +5,9 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
  * PinbarTab Repository
  */
@@ -13,7 +16,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
     /**
      * {@inheritdoc}
      */
-    public function getNavigationItems($user, $organization, $type, $options = array())
+    public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->_em->createQueryBuilder();
 
@@ -49,13 +52,13 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
     /**
      * Increment positions of Pinbar tabs for specified user
      *
-     * @param  \Oro\Bundle\UserBundle\Entity\User                $user
-     * @param  int                                               $navigationItemId
-     * @param \Oro\Bundle\OrganizationBundle\Entity\Organization $organization
+     * @param User|integer $user
+     * @param int          $navigationItemId
+     * @param Organization $organization
      *
      * @return mixed
      */
-    public function incrementTabsPositions($user, $navigationItemId, $organization)
+    public function incrementTabsPositions($user, $navigationItemId, Organization $organization)
     {
         $updateQuery = $this->_em->createQuery(
             'UPDATE Oro\Bundle\NavigationBundle\Entity\NavigationItem p '

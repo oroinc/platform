@@ -25,7 +25,7 @@ class OroNavigationBundle implements Migration
     public static function addOrganization(Schema $schema)
     {
         $table = $schema->getTable('oro_navigation_item');
-        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_323B025832C8A3DE', []);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
