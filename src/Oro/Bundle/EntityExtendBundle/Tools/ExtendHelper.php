@@ -69,6 +69,19 @@ class ExtendHelper
     }
 
     /**
+     * Returns a string that can be used as a class name for the entity
+     * represents values of the given enum.
+     *
+     * @param string $enumCode
+     *
+     * @return string
+     */
+    public static function buildEnumValueShortClassName($enumCode)
+    {
+        return 'EnumValue' . Inflector::classify($enumCode);
+    }
+
+    /**
      * Checks if an entity is a custom one
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
      * created automatically in Symfony cache

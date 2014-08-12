@@ -14,6 +14,10 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
@@ -64,7 +68,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Schema $schema
      * @param string $entityName
      * @param array  $options
+     *
      * @return Table
+     *
      * @throws \InvalidArgumentException
      */
     public function createCustomEntityTable(
@@ -102,6 +108,63 @@ class ExtendExtension implements NameGeneratorAwareInterface
         // add a primary key
         $table->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey([self::AUTO_GENERATED_ID_COLUMN_NAME]);
+
+        return $table;
+    }
+
+    /**
+     * Creates new enum entity.
+     * This method adds all necessary entities and data to register new enum type.
+     * It includes:
+     *  - add a record to oro_enum table
+     *  - create a table that is used to store enum values for the given enum.
+     *
+     * @param Schema   $schema
+     * @param QueryBag $queries
+     * @param string   $enumCode
+     * @param string   $enumName
+     * @param bool     $isPublic Indicates whether this enum can be used by any entity or
+     *                           it is designed to use in one entity only
+     *
+     * @return Table A table that is used to store enum values
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function createEnum(
+        Schema $schema,
+        QueryBag $queries,
+        $enumCode,
+        $enumName,
+        $isPublic = false
+    ) {
+        // add a record to oro_enum table
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                'INSERT INTO oro_enum (code, name, public) VALUES (:code, :name, :public)',
+                [
+                    'code'   => $enumCode,
+                    'name'   => $enumName,
+                    'public' => $isPublic
+                ],
+                [
+                    'code'   => Type::STRING,
+                    'name'   => Type::STRING,
+                    'public' => Type::BOOLEAN
+                ]
+            )
+        );
+
+        // create a table to store enum values
+        $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
+        $className = ExtendConfigDumper::ENTITY . ExtendHelper::buildEnumValueShortClassName($enumCode);
+        $table     = $schema->createTable($tableName);
+
+        $options = new OroOptions();
+        $options->setAuxiliary(ExtendOptionsManager::ENTITY_CLASS_OPTION, $className);
+        $options->set('extend', 'owner', ExtendScope::OWNER_SYSTEM);
+        $options->set('extend', 'is_extend', true);
+        $options->set('extend', 'inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $table->addOption(OroOptions::KEY, $options);
 
         return $table;
     }
@@ -312,7 +375,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Table|string $targetTable      A Table object or table name
      * @param string       $targetColumnName A column name is used to show related entity
      * @param array        $options
-     * @throws \RuntimeException
      */
     public function addManyToOneRelation(
         Schema $schema,

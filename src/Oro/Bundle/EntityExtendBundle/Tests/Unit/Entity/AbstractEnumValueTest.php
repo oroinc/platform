@@ -12,7 +12,7 @@ class AbstractEnumValueTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->enum = new Enum();
+        $this->enum = new Enum('test');
     }
 
     public function testConstructor()
@@ -49,7 +49,7 @@ class AbstractEnumValueTest extends \PHPUnit_Framework_TestCase
     {
         $enumValue = new TestEnumValue('test', 'Test', $this->enum);
 
-        $enum1 = new Enum();
+        $enum1 = new Enum('test1');
         $this->assertEquals($enumValue, $enumValue->setEnum($enum1));
         $this->assertSame($enum1, $enumValue->getEnum());
     }

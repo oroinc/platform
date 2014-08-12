@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Util\Inflector;
+
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
     const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
+    const ENUM_TABLE_PREFIX                = 'oro_enum_';
     const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
     const CUSTOM_INDEX_PREFIX              = 'oro_idx_';
     const RELATION_COLUMN_SUFFIX           = '_id';
@@ -23,6 +26,16 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     public function getMaxCustomEntityNameSize()
     {
         return $this->getMaxIdentifierSize() - strlen(self::CUSTOM_TABLE_PREFIX);
+    }
+
+    /**
+     * Gets the max size of an enum code
+     *
+     * @return int
+     */
+    public function getMaxEnumCodeSize()
+    {
+        return $this->getMaxIdentifierSize() - strlen(self::ENUM_TABLE_PREFIX);
     }
 
     /**
@@ -130,7 +143,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             throw new \InvalidArgumentException(
                 sprintf(
                     'Entity name length must be less or equal %d characters. Class: %s.',
-                    $this->getMaxIdentifierSize() - strlen(self::CUSTOM_TABLE_PREFIX),
+                    $this->getMaxCustomEntityNameSize(),
                     $entityClassName
                 )
             );
@@ -161,6 +174,28 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             $prefix,
             false
         );
+    }
+
+    /**
+     * Builds a table name for an enum entity
+     *
+     * @param string $enumCode
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function generateEnumTableName($enumCode)
+    {
+        if (strlen($enumCode) > $this->getMaxEnumCodeSize()) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'The enum code length must be less or equal %d characters. Code: %s.',
+                    $this->getMaxEnumCodeSize(),
+                    $enumCode
+                )
+            );
+        }
+
+        return self::ENUM_TABLE_PREFIX . Inflector::tableize($enumCode);
     }
 
     /**

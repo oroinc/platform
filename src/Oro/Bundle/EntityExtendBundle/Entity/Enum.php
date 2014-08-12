@@ -11,7 +11,7 @@ use Gedmo\Translatable\Translatable;
 /**
  * @ORM\Table(name="oro_enum",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(name="oro_enum_uq", columns={"name"})
+ *          @ORM\UniqueConstraint(name="oro_enum_uq", columns={"code"})
  *      }
  * )
  * @ORM\Entity()
@@ -27,6 +27,13 @@ class Enum implements Translatable
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=21)
+     */
+    protected $code;
 
     /**
      * @var string
@@ -56,8 +63,12 @@ class Enum implements Translatable
      */
     protected $translations;
 
-    public function __construct()
+    /**
+     * @param string $code The enum code
+     */
+    public function __construct($code)
     {
+        $this->code         = $code;
         $this->translations = new ArrayCollection();
     }
 
@@ -67,6 +78,14 @@ class Enum implements Translatable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 
     /**

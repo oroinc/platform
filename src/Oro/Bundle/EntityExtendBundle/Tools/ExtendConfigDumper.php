@@ -331,6 +331,8 @@ class ExtendConfigDumper
             }
             $schema['parent']  = $parentClassName;
             $schema['inherit'] = get_parent_class($parentClassName);
+        } elseif ($extendConfig->has('inherit')) {
+            $schema['inherit'] = $extendConfig->get('inherit');
         }
 
         $extendConfig->set('schema', $schema);

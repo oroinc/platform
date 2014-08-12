@@ -96,6 +96,13 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # the parent class name. Usually you do not need to specify this attribute because
+                # for regular extend and custom entities it is calculated automatically.
+                # An example of entity where this attribute is used is EnumValue
+                inherit:
+                    options:
+                        auditable:          false
+
                 schema:
                     options:
                         auditable:          false

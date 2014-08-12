@@ -36,6 +36,19 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertGeneration('empty_custom.txt', $schema);
     }
 
+    public function testEmptyCustomWithInherit()
+    {
+        $schema = [
+            'type'      => 'Custom',
+            'property'  => [],
+            'relation'  => [],
+            'default'   => [],
+            'addremove' => [],
+            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor'
+        ];
+        $this->assertGeneration('empty_custom_with_inherit.txt', $schema);
+    }
+
     public function testEmptyExtend()
     {
         $schema = [
@@ -72,6 +85,19 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             'addremove' => []
         ];
         $this->assertGeneration('empty_extend_with_parent_constructor.txt', $schema);
+    }
+
+    public function testExtendWithParentConstructorWithArgs()
+    {
+        $schema = [
+            'type'      => 'Extend',
+            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs',
+            'property'  => [],
+            'relation'  => [],
+            'default'   => [],
+            'addremove' => []
+        ];
+        $this->assertGeneration('extend_with_parent_constructor_with_args.txt', $schema);
     }
 
     public function testProperties()

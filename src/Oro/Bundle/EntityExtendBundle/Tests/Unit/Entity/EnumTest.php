@@ -14,13 +14,18 @@ class EnumTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->enum = new Enum();
+        $this->enum = new Enum('test');
     }
 
     public function testGetId()
     {
         ReflectionUtil::setId($this->enum, 123);
         $this->assertEquals(123, $this->enum->getId());
+    }
+
+    public function testGetCode()
+    {
+        $this->assertEquals('test', $this->enum->getCode());
     }
 
     public function testPublicGetterAndSetter()
