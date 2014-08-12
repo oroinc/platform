@@ -7,8 +7,20 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
 class SchemaDumperExtension extends \Twig_Extension
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
     /**
      * @var AbstractPlatform
      */
@@ -20,6 +32,25 @@ class SchemaDumperExtension extends \Twig_Extension
     protected $defaultColumn;
 
     /**
+     * @var array
+     */
+    protected $defaultColumnOptions = [];
+
+    /**
+     * @var array
+     */
+    protected $optionNames = [
+        'default',
+        'notnull',
+        'length',
+        'precision',
+        'scale',
+        'fixed',
+        'unsigned',
+        'autoincrement'
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function getName()
@@ -28,13 +59,11 @@ class SchemaDumperExtension extends \Twig_Extension
     }
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry $managerRegistry
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $doctrine->getConnection();
-        $this->platform = $connection->getDatabasePlatform();
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -53,32 +82,20 @@ class SchemaDumperExtension extends \Twig_Extension
      */
     public function getColumnOptions(Column $column)
     {
-        if (!$this->defaultColumn) {
-            $this->defaultColumn = new Column('_template_', Type::getType(Type::STRING));
-        }
-
-        $optionNames = [
-            'default',
-            'notnull',
-            'length',
-            'precision',
-            'scale',
-            'fixed',
-            'unsigned',
-            'autoincrement'
-        ];
-
+        $defaultOptions = $this->getDefaultOptions();
+        $platform = $this->getPlatform();
         $options = [];
-        foreach ($optionNames as $optionName) {
-            $defaultValue = $this->getColumnOption($this->defaultColumn, $optionName);
+
+        foreach ($this->optionNames as $optionName) {
             $value = $this->getColumnOption($column, $optionName);
-            if ($value !== $defaultValue) {
+            if ($value !== $defaultOptions[$optionName]) {
                 $options[$optionName] = $value;
             }
         }
+
         $comment = $column->getComment();
-        if ($this->platform && $this->platform->isCommentedDoctrineType($column->getType())) {
-            $comment .= $this->platform->getDoctrineTypeComment($column->getType());
+        if ($platform && $platform->isCommentedDoctrineType($column->getType())) {
+            $comment .= $platform->getDoctrineTypeComment($column->getType());
         }
         if (!empty($comment)) {
             $options['comment'] = $comment;
@@ -97,5 +114,34 @@ class SchemaDumperExtension extends \Twig_Extension
         $method = "get" . $optionName;
 
         return $column->$method();
+    }
+
+    /**
+     * @return AbstractPlatform
+     */
+    protected function getPlatform()
+    {
+        if (!$this->platform) {
+            $this->platform = $this->managerRegistry->getConnection()->getDatabasePlatform();
+        }
+
+        return $this->platform;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultOptions()
+    {
+        if (!$this->defaultColumn) {
+            $this->defaultColumn = new Column('_template_', Type::getType(Type::STRING));
+        }
+        if (!$this->defaultColumnOptions) {
+            foreach ($this->optionNames as $optionName) {
+                $this->defaultColumnOptions[$optionName] = $this->getColumnOption($this->defaultColumn, $optionName);
+            }
+        }
+
+        return $this->defaultColumnOptions;
     }
 }

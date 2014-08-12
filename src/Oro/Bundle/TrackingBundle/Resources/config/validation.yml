@@ -22,7 +22,7 @@ Oro\Bundle\TrackingBundle\Entity\TrackingEvent:
             - NotBlank: ~
             - Length:
                 max: 255
-        user:
+        userIdentifier:
             - NotBlank: ~
             - Length:
                 max: 255

@@ -308,25 +308,6 @@ class QueryBuilderTools
     }
 
     /**
-     * Workaround for http://www.doctrine-project.org/jira/browse/DDC-1858
-     *
-     * @param string|object $having
-     * @return mixed|string
-     */
-    public function fixHavingAliases($having)
-    {
-        $having = (string) $having;
-        foreach ($this->fieldAliases as $alias => $field) {
-            $having = preg_replace('/(?<![\w:])(' . $alias . '\s*LIKE)/', $field . ' LIKE', $having);
-            $having = preg_replace('/(?<![\w:])(' . $alias . '\s*NOT\s+LIKE)/', $field . ' NOT LIKE', $having);
-            $having = preg_replace('/(?<![\w:])(' . $alias . '\s*IS\s+NULL)/', $field . ' IS NULL', $having);
-            $having = preg_replace('/(?<![\w:])(' . $alias . '\s*IS\s+NOT\s+NULL)/', $field . ' IS NOT NULL', $having);
-        }
-
-        return $having;
-    }
-
-    /**
      * Get field mentioned in condition.
      *
      * @param string $condition
