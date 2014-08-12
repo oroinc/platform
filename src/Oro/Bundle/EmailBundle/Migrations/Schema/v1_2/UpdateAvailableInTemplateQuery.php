@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_3;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
 use Psr\Log\LoggerInterface;
 
