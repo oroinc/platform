@@ -1,18 +1,17 @@
 parameters:
-    oro_organization.form.type.business_unit.class:                   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
-    oro_organization.form.type.business_unit_by_organization.class:   Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitByOrganizationType
-    oro_organization.form.handler.business_unit.class:                Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
+    oro_organization.form.type.business_unit.class:                  Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
+    oro_organization.form.handler.business_unit.class:               Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
 
-    oro_organization.form.type.business_unit_tree_type.class:         Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
-    oro_organization.form.type.business_unit_tree_select_type.class:  Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
-    oro_organization.form.type.business_unit.api.class:               Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
+    oro_organization.form.type.business_unit_tree_type.class:        Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
+    oro_organization.form.type.business_unit_tree_select_type.class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
+    oro_organization.form.type.business_unit.api.class:              Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
 
-    oro_organization.form.type.organization_select.class:             Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
-    oro_organization.form.type.organizations_select.class:            Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
+    oro_organization.form.type.organization_select.class:            Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
+    oro_organization.form.type.organizations_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
 
-    oro_organization.form.type.ownership_type.class:                  Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
+    oro_organization.form.type.ownership_type.class:                 Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
 
-    oro_organization.form.extension.owner.class:                      Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
+    oro_organization.form.extension.owner.class:                     Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
 
 services:
     #
@@ -33,14 +32,6 @@ services:
             - @oro_organization.organization_manager
         tags:
             - { name: form.type, alias: oro_business_unit }
-
-#    oro_organization.form.type.business_unit_by_organization:
-#        class: %oro_organization.form.type.business_unit_by_organization.class%
-#        arguments:
-#            - @oro_organization.business_unit_manager
-#            - @oro_organization.organization_manager
-#        tags:
-#            - { name: form.type, alias: oro_business_unit_by_organization }
 
     oro_organization.form.handler.business_unit:
         class: %oro_organization.form.handler.business_unit.class%

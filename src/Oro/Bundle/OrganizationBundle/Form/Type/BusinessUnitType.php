@@ -47,15 +47,6 @@ class BusinessUnitType extends AbstractType
                     'required' => true,
                 )
             )
-//            ->add(
-//                'oro_business_unit_by_organization',
-//                'oro_business_unit_by_organization',
-//                array(
-//                    'label'    => false,
-//                    'required' => true,
-//                    'mapped'   => false,
-//                )
-//            )
             ->add(
                 'organization',
                 'entity',
@@ -64,7 +55,7 @@ class BusinessUnitType extends AbstractType
                     'property'    => 'name',
                     'label'       => 'oro.organization.businessunit.organization.label',
                     'empty_value' => 'oro.organization.form.choose_organization',
-                    'required'    => true,
+                    'required'    => false,
                     'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
                     'attr'        => [
                         'class' => 'oro_bu_by_org_select_org'
@@ -78,8 +69,8 @@ class BusinessUnitType extends AbstractType
                 [
                     'label'         => 'oro.organization.businessunit.parent.label',
                     'empty_value'   => 'oro.business_unit.form.none_business_user',
-                    'required'      => false,
                     'property_path' => 'owner',
+                    'required'      => false,
                     'choices'       => [],
                     'attr'          => [
                         'class' => 'oro_bu_by_org_select_bu'
@@ -140,7 +131,7 @@ class BusinessUnitType extends AbstractType
             );
 
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPreSetData']);
-        //$builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSetData']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
     }
 
     /**
@@ -150,6 +141,87 @@ class BusinessUnitType extends AbstractType
     {
         if (!$form->get('organization')->getData()) {
             $view->children['organization']->vars['disabled'] = false;
+            $view->children['organization']->vars['required'] = true;
+        } else {
+            $selectedOrganizationId = $form->get('organization')->getData()->getId();
+            $businessUnitTreeIds    = $this->businessUnitManager->getBusinessUnitRepo()
+                ->getOrganizationBusinessUnitsTree($selectedOrganizationId);
+
+            $view->vars['business_unit_tree_ids'] = $businessUnitTreeIds;
+            $view->vars['selected_organization']  = $selectedOrganizationId;
+            $view->vars['selected_business_unit'] = $form->get('businessUnit')->getData()
+                ? $form->get('businessUnit')->getData()->getId()
+                : null;
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onPreSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+
+        /** @ var Organization|null $selectedOrganization */
+        $selectedOrganization   = null;
+        $selectedOrganizationId = $selectedBusinessUnitId = null;
+
+        if (isset($data['organization']) && $data['organization'] !== null) {
+            $selectedOrganizationId = $data['organization'];
+            $this->organizationManager->getOrganizationRepo()->find($selectedOrganizationId);
+        } /*else {
+            $formData = $event->getForm()->getData();
+            if ($formData->getOrganization()) {
+                $selectedOrganization   = $formData->getOrganization();
+                $selectedOrganizationId = $selectedOrganization->getId();
+            }
+        }*/
+
+        if (isset($data['businessUnit']) && $data['businessUnit'] !== null) {
+            $selectedBusinessUnitId = $data['businessUnit'];
+        }
+
+        if ($selectedOrganizationId && $selectedBusinessUnitId) {
+            if (!$event->getForm()->getData()->getId()) {
+                $event->getForm()->remove('organization');
+                $event->getForm()->add(
+                    'organization',
+                    'entity',
+                    [
+                        'class'       => 'OroOrganizationBundle:Organization',
+                        'property'    => 'name',
+                        'label'       => 'oro.organization.businessunit.organization.label',
+                        'empty_value' => 'oro.organization.form.choose_organization',
+                        'required'    => true,
+                        'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
+                        'attr'        => [
+                            'class' => 'oro_bu_by_org_select_org'
+                        ],
+                        'data'        => $selectedOrganization
+                    ]
+                );
+            }
+
+            $event->getForm()->remove('businessUnit');
+            $event->getForm()->add(
+                'businessUnit',
+                'oro_business_unit_tree',
+                [
+                    'label'         => 'oro.organization.businessunit.parent.label',
+                    'empty_value'   => 'oro.business_unit.form.none_business_user',
+                    'required'      => false,
+                    'property_path' => 'owner',
+                    'choices'       => $selectedOrganizationId
+                            ? $this->getBusinessUnitChoices(
+                                $this->businessUnitManager->getBusinessUnitsTree(null, $selectedOrganizationId)
+                            )
+                            : [],
+                    'attr'          => [
+                        'class' => 'oro_bu_by_org_select_bu'
+                    ],
+                    'data'          => $this->businessUnitManager->getUserRepo()->find($selectedBusinessUnitId),
+                ]
+            );
         }
     }
 
@@ -170,11 +242,6 @@ class BusinessUnitType extends AbstractType
                 $selectedOrganizationId = $selectedOrganization->getId();
             }
 
-            /** @var BusinessUnit|null $selectedBusinessUnit */
-            $selectedBusinessUnit = $data->getOwner()
-                ? $data->getOwner()
-                : null;
-
             if ($selectedOrganization) {
                 $event->getForm()->remove('businessUnit');
                 $event->getForm()->add(
@@ -185,20 +252,14 @@ class BusinessUnitType extends AbstractType
                         'empty_value'   => 'oro.business_unit.form.none_business_user',
                         'required'      => false,
                         'property_path' => 'owner',
-                        /*'query_builder' => function (EntityRepository $er) use ($selectedOrganization) {
-                            return $er->createQueryBuilder('b')
-                                ->where('b.organization = '. $selectedOrganization->getId());
-                        },*/
                         'choices'       => $selectedOrganizationId
                                 ? $this->getBusinessUnitChoices(
                                     $this->businessUnitManager->getBusinessUnitsTree(null, $selectedOrganizationId)
                                 )
                                 : [],
-                        //'choices' => [],
                         'attr'          => [
                             'class' => 'oro_bu_by_org_select_bu'
                         ],
-                        //'data'          => $selectedBusinessUnit
                     ]
                 );
             }
@@ -209,8 +270,11 @@ class BusinessUnitType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-                'ownership_disabled' => true
+                'data_class'              => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                'ownership_disabled'      => true,
+                'business_unit_tree_ids'  => [],
+                'selected_organizations'  => [],
+                'selected_business_units' => [],
             )
         );
     }
