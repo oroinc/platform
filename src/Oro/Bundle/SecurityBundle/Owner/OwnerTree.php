@@ -355,9 +355,8 @@ class OwnerTree
      *
      * @param int|string      $userId
      * @param int|string|null $owningBusinessUnitId
-     * @param int|string|null $owningOrganizationId
      */
-    public function addUser($userId, $owningBusinessUnitId, $owningOrganizationId)
+    public function addUser($userId, $owningBusinessUnitId)
     {
         $this->userOwningBusinessUnitId[$userId] = $owningBusinessUnitId;
 

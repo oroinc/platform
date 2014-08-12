@@ -39,8 +39,6 @@ class AclHelperTest extends OrmTestCase
      */
     public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception)
     {
-        $this->markTestSkipped('feature/OEE-26_organizations');
-
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
         )
@@ -99,12 +97,16 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [1, 2, 3],
-                        PathExpression::TYPE_STATE_FIELD
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
                         'user',
                         [1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ]
                 ],
                 'resultHelper1',
@@ -118,7 +120,9 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
                         'user',
                         [1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ]
                 ],
                 'resultHelper2',
@@ -131,22 +135,30 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
-                        PathExpression::TYPE_STATE_FIELD
+                        PathExpression::TYPE_STATE_FIELD,
+                        'organization',
+                        1
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
                         'user',
                         [10],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
                         'article',
                         [100],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
                         'user',
                         [150],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ]
                 ],
                 'resultHelper3',
@@ -163,12 +175,16 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
                         'user',
                         [10],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
-                        PathExpression::TYPE_STATE_FIELD
+                        PathExpression::TYPE_STATE_FIELD,
+                        'organization',
+                        1
                     ],
                 ],
                 'resultHelper4',
