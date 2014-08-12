@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Psr\Log\LoggerInterface;
+
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 

@@ -21,6 +21,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSelectType extends AbstractType
 {
     const NAME   = 'oro_option_select';

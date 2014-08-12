@@ -88,8 +88,6 @@ class Orm extends AbstractEngine
                 $itemsCount++;
             }
 
-            $this->em->detach($entity);
-
             if (0 == $itemsCount % self::BATCH_SIZE) {
                 $this->em->flush();
                 $this->em->clear();

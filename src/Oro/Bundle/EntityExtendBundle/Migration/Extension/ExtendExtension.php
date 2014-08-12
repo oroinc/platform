@@ -176,6 +176,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Table|string $table A Table object or table name
      * @param string       $optionSetName
      * @param array        $options
+     *
+     * @deprecated since 1.4. Will be removed in 2.0
      */
     public function addOptionSet(
         Schema $schema,

@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSetRepository extends EntityRepository
 {
     /**
