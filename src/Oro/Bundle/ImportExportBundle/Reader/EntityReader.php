@@ -71,22 +71,22 @@ class EntityReader extends IteratorBasedReader
     public function setSourceEntityName($entityName)
     {
         /** @var QueryBuilder $qb */
-        $qb = $this->registry->getRepository($entityName)->createQueryBuilder('o');
+        $queryBuilder = $this->registry->getRepository($entityName)->createQueryBuilder('o');
 
-        $metadata = $qb->getEntityManager()->getClassMetadata($entityName);
+        $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
             // can't join with *-to-many relations because they affects query pagination
             if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
                 $alias = '_' . $fieldName;
-                $qb->addSelect($alias);
-                $qb->leftJoin('o.' . $fieldName, $alias);
+                $queryBuilder->addSelect($alias);
+                $queryBuilder->leftJoin('o.' . $fieldName, $alias);
             }
         }
 
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
-            $qb->orderBy('o.' . $fieldName, 'ASC');
+            $queryBuilder->orderBy('o.' . $fieldName, 'ASC');
         }
 
-        $this->setSourceQueryBuilder($qb);
+        $this->setSourceQueryBuilder($queryBuilder);
     }
 }

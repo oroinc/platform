@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
