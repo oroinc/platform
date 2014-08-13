@@ -378,7 +378,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ],
                         'enum'     => [
-                            'type'    => 'integer',
+                            'type'    => 'ref-one',
                             'configs' => [
                                 'entity' => [
                                     'label'       => 'oro.entityextend.enumvalue.enum.label',

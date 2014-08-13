@@ -80,7 +80,9 @@ class ExtendTable extends TableWithNameGenerator
         $column = parent::addColumn($columnName, $typeName, $options);
 
         if (null !== $oroOptions) {
-            $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
+            if (empty($oroOptions[ExtendOptionsManager::TYPE_OPTION])) {
+                $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
+            }
             $column->setOptions([OroOptions::KEY => $oroOptions]);
         }
 
