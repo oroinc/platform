@@ -283,63 +283,21 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateEnum()
     {
         $schema    = $this->getExtendSchema();
-        $queryBag  = new QueryBag();
         $extension = $this->getExtendExtension();
-
-        $enumTable = $schema->createTable('oro_enum');
-        $enumTable->addColumn('id', 'integer', ['autoincrement' => true]);
-        $enumTable->addColumn('code', 'string', ['length' => 21]);
-        $enumTable->addColumn('is_public', 'boolean', []);
-        $enumTable->setPrimaryKey(['id']);
 
         $extension->createEnum(
             $schema,
-            $queryBag,
-            'test_status'
-        );
-
-        $queries = $queryBag->getPostQueries();
-        $this->assertCount(1, $queries);
-        $this->assertInstanceOf(
-            'Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery',
-            $queries[0]
-        );
-        /** @var ParametrizedSqlMigrationQuery $query */
-        $query = $queries[0];
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->setMethods(['getDatabasePlatform'])
-            ->getMock();
-        $connection->expects($this->any())
-            ->method('getDatabasePlatform')
-            ->will($this->returnValue(new MySqlPlatform()));
-        $query->setConnection($connection);
-        $this->assertEquals(
-            [
-                'INSERT INTO oro_enum (code, is_public) VALUES (:code, :is_public)',
-                'Parameters:',
-                '[code] = test_status',
-                '[is_public] = 0',
-            ],
-            $query->getDescription()
+            'test_status',
+            true
         );
 
         $this->assertSchemaSql(
             $schema,
             [
-                'CREATE TABLE oro_enum (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(21) NOT NULL,'
-                . ' is_public TINYINT(1) NOT NULL, PRIMARY KEY(id))',
                 sprintf(
-                    'CREATE TABLE %stest_status (code VARCHAR(32) NOT NULL, enum_id INT NOT NULL,'
+                    'CREATE TABLE %stest_status (code VARCHAR(32) NOT NULL,'
                     . ' name VARCHAR(255) NOT NULL, priority INT NOT NULL, is_default TINYINT(1) NOT NULL,'
-                    . ' UNIQUE INDEX UNIQ_CFE263BE17628E5577153098 (enum_id, code),'
-                    . ' INDEX IDX_CFE263BE17628E55 (enum_id),'
                     . ' PRIMARY KEY(code))',
-                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
-                ),
-                sprintf(
-                    'ALTER TABLE %stest_status ADD CONSTRAINT FK_CFE263BE17628E55'
-                    . ' FOREIGN KEY (enum_id) REFERENCES oro_enum (id) ON DELETE CASCADE',
                     ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
                 ),
             ]
@@ -364,6 +322,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'grouping'   => [
                             'groups' => ['enum', 'dictionary']
                         ],
+                        'enum'       => [
+                            'code'   => 'test_status',
+                            'public' => true,
+                        ],
                         'dictionary' => [
                             'virtual_fields' => ['code', 'name']
                         ],
@@ -375,15 +337,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'entity' => [
                                     'label'       => 'oro.entityextend.enumvalue.code.label',
                                     'description' => 'oro.entityextend.enumvalue.code.description',
-                                ]
-                            ]
-                        ],
-                        'enum'     => [
-                            'type'    => 'ref-one',
-                            'configs' => [
-                                'entity' => [
-                                    'label'       => 'oro.entityextend.enumvalue.enum.label',
-                                    'description' => 'oro.entityextend.enumvalue.enum.description',
                                 ]
                             ]
                         ],

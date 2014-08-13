@@ -30,14 +30,6 @@ abstract class AbstractEnumValue
     private $name;
 
     /**
-     * @var Enum
-     *
-     * @ORM\ManyToOne(targetEntity="Enum")
-     * @ORM\JoinColumn(name="enum_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     */
-    private $enum;
-
-    /**
      * @var integer
      *
      * @ORM\Column(name="priority", type="integer")
@@ -59,15 +51,13 @@ abstract class AbstractEnumValue
     /**
      * @param string  $code
      * @param string  $name
-     * @param Enum    $enum
      * @param int     $priority
      * @param boolean $default
      */
-    public function __construct($code, $name, Enum $enum, $priority = 0, $default = false)
+    public function __construct($code, $name, $priority = 0, $default = false)
     {
         $this->code     = $code;
         $this->name     = $name;
-        $this->enum     = $enum;
         $this->priority = $priority;
         $this->default  = $default;
     }
@@ -98,26 +88,6 @@ abstract class AbstractEnumValue
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return Enum
-     */
-    public function getEnum()
-    {
-        return $this->enum;
-    }
-
-    /**
-     * @param Enum $enum
-     *
-     * @return AbstractEnumValue
-     */
-    public function setEnum(Enum $enum)
-    {
-        $this->enum = $enum;
-
-        return $this;
     }
 
     /**

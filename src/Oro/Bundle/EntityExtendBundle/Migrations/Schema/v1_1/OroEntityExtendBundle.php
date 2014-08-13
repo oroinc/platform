@@ -13,25 +13,7 @@ class OroEntityExtendBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::oroEnumTable($schema);
         self::oroEnumValueTransTable($schema);
-    }
-
-    /**
-     * Generate table oro_enum
-     *
-     * @param Schema $schema
-     */
-    public static function oroEnumTable(Schema $schema)
-    {
-        /** Generate table oro_enum **/
-        $table = $schema->createTable('oro_enum');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('code', 'string', ['length' => 21]);
-        $table->addColumn('is_public', 'boolean', []);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['code'], 'oro_enum_uq');
-        /** End of generate table oro_enum **/
     }
 
     /**

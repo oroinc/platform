@@ -113,16 +113,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
-     * Creates new enum entity.
-     * This method adds all necessary entities and data to register new enum type.
-     * It includes:
-     *  - add a record to oro_enum table
-     *  - create a table that is used to store enum values for the given enum.
+     * Creates a table that is used to store enum values for the enum with the given code.
      *
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     * @param string   $enumCode
-     * @param bool     $isPublic Indicates whether this enum can be used by any entity or
+     * @param Schema $schema
+     * @param string $enumCode
+     * @param bool   $isPublic   Indicates whether this enum can be used by any entity or
      *                           it is designed to use in one entity only
      *
      * @return Table A table that is used to store enum values
@@ -133,20 +128,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     public function createEnum(
         Schema $schema,
-        QueryBag $queries,
         $enumCode,
         $isPublic = false
     ) {
-        // add a record to oro_enum table
-        $queries->addQuery(
-            new ParametrizedSqlMigrationQuery(
-                'INSERT INTO oro_enum (code, is_public) VALUES (:code, :is_public)',
-                ['code' => $enumCode, 'is_public' => $isPublic],
-                ['code' => Type::STRING, 'is_public' => Type::BOOLEAN]
-            )
-        );
-
-        // create a table to store enum values
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $className = ExtendConfigDumper::ENTITY . ExtendHelper::buildEnumValueShortClassName($enumCode);
         $table     = $schema->createTable($tableName);
@@ -164,10 +148,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'owner'     => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
                     'table'     => $tableName,
-                    'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue',
+                    'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
                 ],
                 'grouping'                                => [
                     'groups' => ['enum', 'dictionary']
+                ],
+                'enum'                                    => [
+                    'code'   => $enumCode,
+                    'public' => $isPublic
                 ],
                 'dictionary'                              => [
                     'virtual_fields' => ['code', 'name']
@@ -184,20 +172,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'code'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'code')
-                    ]
-                ]
-            ]
-        );
-        $table->addColumn(
-            'enum_id',
-            'integer',
-            [
-                'oro_options' => [
-                    ExtendOptionsManager::FIELD_NAME_OPTION => 'enum',
-                    ExtendOptionsManager::TYPE_OPTION       => 'ref-one',
-                    'entity'                                => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'enum'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'enum')
                     ]
                 ]
             ]
@@ -241,20 +215,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ]
         );
         $table->setPrimaryKey(['code']);
-        $table->addUniqueIndex(
-            ['enum_id', 'code'],
-            $this->nameGenerator->generateIndexName($table->getName(), ['enum_id', 'code'], true)
-        );
-        $table->addIndex(
-            ['enum_id'],
-            $this->nameGenerator->generateIndexName($table->getName(), ['enum_id'])
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_enum'),
-            ['enum_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
 
         return $table;
     }
