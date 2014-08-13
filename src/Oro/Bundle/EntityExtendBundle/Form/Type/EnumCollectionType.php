@@ -54,8 +54,8 @@ class EnumCollectionType extends AbstractType
             return;
         }
 
-        // TODO: implement when we'll have EnumValue
         return;
+        // TODO: this should be done in dumper and/or generator extensions
 
         $em           = $this->configManager->getEntityManager();
         $optionValues = $oldOptions = $configModel->getOptions()->getValues();

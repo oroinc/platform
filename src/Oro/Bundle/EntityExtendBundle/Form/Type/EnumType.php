@@ -7,7 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EnumType extends AbstractType
 {
@@ -45,27 +44,19 @@ class EnumType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
+    /**
+     * Validate label for each option on post submit
+     *
+     * @param FormEvent $event
+     */
     public function postSubmit(FormEvent $event)
     {
         $data = $event->getData();
-        if (is_null($data->getLabel())) {
+        if (empty($data['label'])) {
             $event->getForm()->get('label')->addError(
                 new FormError('This value should not be blank.')
             );
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                // TODO: replace with real class or remove
-                'data_class' => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue',
-            ]
-        );
     }
 
     /**
