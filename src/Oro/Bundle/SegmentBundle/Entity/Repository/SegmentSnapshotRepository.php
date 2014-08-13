@@ -106,13 +106,13 @@ class SegmentSnapshotRepository extends EntityRepository
                     ->setParameter('className' . $key, $className);
             }
 
-            $deleteParams[$className]['entityIds'][] = $entityId;
+            $deleteParams[$className]['entityIds'][] = (string)$entityId;
         }
 
         $segments = $segmentQB->getQuery()->getResult();
 
         foreach ($segments as $segment) {
-            $deleteParams[$segment['entity']]['segmentIds'][] = $segment['id'];
+            $deleteParams[$segment['entity']]['segmentIds'][] = (string)$segment['id'];
         }
 
         return $this->getDeleteQueryBuilderByParameters($deleteParams);
@@ -152,8 +152,17 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
+        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
+        $idField = $entityMetadata->getSingleIdentifierFieldName();
+        $idFieldType = $entityMetadata->getTypeOfField($idField);
+        if ($idFieldType == 'integer') {
+            $fieldToSelect = 'CAST(snp.entityId as int)';
+        } else {
+            $fieldToSelect = 'snp.entityId';
+        }
+
         $qb = $this->createQueryBuilder('snp')
-            ->select('snp.entityId')
+            ->select($fieldToSelect)
             ->where('snp.segment = :segment')
             ->setParameter('segment', $segment);
 

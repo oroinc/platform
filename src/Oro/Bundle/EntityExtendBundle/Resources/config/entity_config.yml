@@ -96,6 +96,19 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # the table name for custom entity. This is optional attribute.
+                # If it is not specified the table name is generated automatically.
+                table:
+                    options:
+                        auditable:          false
+
+                # the parent class name. Usually you do not need to specify this attribute because
+                # for regular extend and custom entities it is calculated automatically.
+                # An example of entity where this attribute is used is EnumValue
+                inherit:
+                    options:
+                        auditable:          false
+
                 schema:
                     options:
                         auditable:          false
@@ -121,12 +134,12 @@ oro_entity_config:
                     name:                   'Manage unique keys'
                     route:                  'oro_entityextend_entity_unique_key'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Create field'
                     route:                  'oro_entityextend_field_create'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Update schema'
                     route:                  'oro_entityextend_update'

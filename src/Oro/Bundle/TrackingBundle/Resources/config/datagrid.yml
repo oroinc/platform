@@ -119,7 +119,7 @@ datagrid:
                     - e.id
                     - e.name
                     - e.value
-                    - e.user
+                    - e.userIdentifier
                     - e.url
                     - e.title
                     - e.code
@@ -131,8 +131,8 @@ datagrid:
                 label: oro.tracking.trackingevent.name.label
             value:
                 label: oro.tracking.trackingevent.value.label
-            user:
-                label: oro.tracking.trackingevent.user.label
+            userIdentifier:
+                label: oro.tracking.trackingevent.userIdentifier.label
             url:
                 type: twig
                 label: oro.tracking.trackingevent.url.label
@@ -149,8 +149,8 @@ datagrid:
                     data_name: e.name
                 value:
                     data_name: e.value
-                user:
-                    data_name: e.user
+                userIdentifier:
+                    data_name: e.userIdentifier
                 code:
                     data_name: e.code
                 loggedAt:
@@ -165,9 +165,9 @@ datagrid:
                 value:
                     type:      string
                     data_name: e.value
-                user:
+                userIdentifier:
                     type:      string
-                    data_name: e.user
+                    data_name: e.userIdentifier
                 code:
                     type:      string
                     data_name: e.code

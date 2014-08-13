@@ -138,11 +138,12 @@ class GridTest extends Selenium2TestCase
             $columnOrder = $dateArray;
         }
         $sortedColumnOrder = $columnOrder;
-        natcasesort($sortedColumnOrder);
+        sort($sortedColumnOrder);
         $sortedColumnOrder = array_reverse($sortedColumnOrder);
 
-        $this->assertTrue(
-            $columnOrder === $sortedColumnOrder,
+        $this->assertEquals(
+            $sortedColumnOrder,
+            $columnOrder,
             print_r(array('expected' => $sortedColumnOrder, 'actual' => $columnOrder), true)
         );
         //change page size to 10 and refresh grid
