@@ -29,7 +29,6 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
             parent::up($schema, $queries);
         }
 
-        OroEntityExtendBundle11::oroEnumTable($schema);
         OroEntityExtendBundle11::oroEnumValueTransTable($schema);
     }
 }

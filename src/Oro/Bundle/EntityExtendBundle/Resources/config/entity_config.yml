@@ -385,3 +385,16 @@ oro_entity_config:
                             subblock:       properties
                             type:           oro_entity_enum_value
                             tooltip:        oro.entity_extend.field.enum.option.tooltip
+
+    enum:
+        entity:
+            items:
+                # the unique identifier of this enum
+                code: # string
+                    options: []
+                # indicates whether this enum is public or not
+                # public enums can be used in any extendable entity, it means that you can
+                # create a field of this enum type in any entity
+                # private enums cannot be reused
+                public: # boolean
+                    options: []
