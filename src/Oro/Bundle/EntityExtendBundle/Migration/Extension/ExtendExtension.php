@@ -8,12 +8,16 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
@@ -64,7 +68,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Schema $schema
      * @param string $entityName
      * @param array  $options
+     *
      * @return Table
+     *
      * @throws \InvalidArgumentException
      */
     public function createCustomEntityTable(
@@ -102,6 +108,153 @@ class ExtendExtension implements NameGeneratorAwareInterface
         // add a primary key
         $table->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey([self::AUTO_GENERATED_ID_COLUMN_NAME]);
+
+        return $table;
+    }
+
+    /**
+     * Creates new enum entity.
+     * This method adds all necessary entities and data to register new enum type.
+     * It includes:
+     *  - add a record to oro_enum table
+     *  - create a table that is used to store enum values for the given enum.
+     *
+     * @param Schema   $schema
+     * @param QueryBag $queries
+     * @param string   $enumCode
+     * @param bool     $isPublic Indicates whether this enum can be used by any entity or
+     *                           it is designed to use in one entity only
+     *
+     * @return Table A table that is used to store enum values
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function createEnum(
+        Schema $schema,
+        QueryBag $queries,
+        $enumCode,
+        $isPublic = false
+    ) {
+        // add a record to oro_enum table
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                'INSERT INTO oro_enum (code, is_public) VALUES (:code, :is_public)',
+                ['code' => $enumCode, 'is_public' => $isPublic],
+                ['code' => Type::STRING, 'is_public' => Type::BOOLEAN]
+            )
+        );
+
+        // create a table to store enum values
+        $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
+        $className = ExtendConfigDumper::ENTITY . ExtendHelper::buildEnumValueShortClassName($enumCode);
+        $table     = $schema->createTable($tableName);
+        $table->addOption(
+            OroOptions::KEY,
+            [
+                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_READONLY,
+                ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
+                'entity'                                  => [
+                    'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                    'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+                    'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode)
+                ],
+                'extend'                                  => [
+                    'owner'     => ExtendScope::OWNER_SYSTEM,
+                    'is_extend' => true,
+                    'table'     => $tableName,
+                    'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue',
+                ],
+                'grouping'                                => [
+                    'groups' => ['enum', 'dictionary']
+                ],
+                'dictionary'                              => [
+                    'virtual_fields' => ['code', 'name']
+                ]
+            ]
+        );
+
+        $table->addColumn(
+            'code',
+            'string',
+            [
+                'length'      => 32,
+                'oro_options' => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'code'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'code')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'enum_id',
+            'integer',
+            [
+                'oro_options' => [
+                    ExtendOptionsManager::FIELD_NAME_OPTION => 'enum',
+                    ExtendOptionsManager::TYPE_OPTION       => 'ref-one',
+                    'entity'                                => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'enum'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'enum')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'name',
+            'string',
+            [
+                'length'      => 255,
+                'oro_options' => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'priority',
+            'integer',
+            [
+                'oro_options' => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'is_default',
+            'boolean',
+            [
+                'oro_options' => [
+                    ExtendOptionsManager::FIELD_NAME_OPTION => 'default',
+                    'entity'                                => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
+                    ]
+                ]
+            ]
+        );
+        $table->setPrimaryKey(['code']);
+        $table->addUniqueIndex(
+            ['enum_id', 'code'],
+            $this->nameGenerator->generateIndexName($table->getName(), ['enum_id', 'code'], true)
+        );
+        $table->addIndex(
+            ['enum_id'],
+            $this->nameGenerator->generateIndexName($table->getName(), ['enum_id'])
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_enum'),
+            ['enum_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
 
         return $table;
     }
@@ -314,7 +467,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Table|string $targetTable      A Table object or table name
      * @param string       $targetColumnName A column name is used to show related entity
      * @param array        $options
-     * @throws \RuntimeException
      */
     public function addManyToOneRelation(
         Schema $schema,

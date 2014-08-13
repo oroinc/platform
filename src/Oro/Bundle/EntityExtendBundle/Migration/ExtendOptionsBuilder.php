@@ -53,9 +53,6 @@ class ExtendOptionsBuilder
 
         $tableMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
-        if (!isset($this->result[$entityClassName])) {
-            $this->result[$entityClassName] = [];
-        }
         if (!empty($options)) {
             $this->result[$entityClassName]['configs'] = $options;
         }
@@ -81,19 +78,16 @@ class ExtendOptionsBuilder
 
         $newColumnName = $this->getAndRemoveOption($options, ExtendOptionsManager::NEW_NAME_OPTION);
         if ($newColumnName) {
-            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS])) {
-                $this->result[ExtendConfigProcessor::RENAME_CONFIGS] = [];
-            }
-            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName])) {
-                $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName] = [];
-            }
             $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName][$columnName] = $newColumnName;
             if (empty($options)) {
                 return;
             };
         }
 
-        $fieldName  = $this->getFieldName($tableName, $columnName);
+        $fieldName = $this->getAndRemoveOption($options, ExtendOptionsManager::FIELD_NAME_OPTION);
+        if (!$fieldName) {
+            $fieldName  = $this->getFieldName($tableName, $columnName);
+        }
         $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
         $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
@@ -135,12 +129,6 @@ class ExtendOptionsBuilder
             );
         }
 
-        if (!isset($this->result[$entityClassName])) {
-            $this->result[$entityClassName] = [];
-        }
-        if (!isset($this->result[$entityClassName]['fields'])) {
-            $this->result[$entityClassName]['fields'] = [];
-        }
         $this->result[$entityClassName]['fields'][$fieldName] = [];
         if (!empty($options)) {
             $this->result[$entityClassName]['fields'][$fieldName]['configs'] = $options;
@@ -165,12 +153,6 @@ class ExtendOptionsBuilder
             return;
         }
 
-        if (!isset($this->result[$configType])) {
-            $this->result[$configType] = [];
-        }
-        if (!isset($this->result[$configType][$entityClassName])) {
-            $this->result[$configType][$entityClassName] = [];
-        }
         $this->result[$configType][$entityClassName]['configs'] = $options;
     }
 
@@ -189,15 +171,6 @@ class ExtendOptionsBuilder
 
         $fieldName = $this->getFieldName($tableName, $columnName);
 
-        if (!isset($this->result[$configType])) {
-            $this->result[$configType] = [];
-        }
-        if (!isset($this->result[$configType][$entityClassName])) {
-            $this->result[$configType][$entityClassName] = [];
-        }
-        if (!isset($this->result[$configType][$entityClassName]['fields'])) {
-            $this->result[$configType][$entityClassName]['fields'] = [];
-        }
         $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
     }
 

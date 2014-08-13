@@ -217,12 +217,14 @@ class ExtendConfigDumper
             } else {
                 $properties[$fieldName] = $fieldConfig->getId()->getFieldName();
 
-                $doctrine[$entityName]['fields'][$fieldName]['code']      = $fieldName;
-                $doctrine[$entityName]['fields'][$fieldName]['type']      = $fieldType;
-                $doctrine[$entityName]['fields'][$fieldName]['nullable']  = true;
-                $doctrine[$entityName]['fields'][$fieldName]['length']    = $fieldConfig->get('length');
-                $doctrine[$entityName]['fields'][$fieldName]['precision'] = $fieldConfig->get('precision');
-                $doctrine[$entityName]['fields'][$fieldName]['scale']     = $fieldConfig->get('scale');
+                $doctrine[$entityName]['fields'][$fieldName] = [
+                    'code'      => $fieldName,
+                    'type'      => $fieldType,
+                    'nullable'  => true,
+                    'length'    => $fieldConfig->get('length'),
+                    'precision' => $fieldConfig->get('precision'),
+                    'scale'     => $fieldConfig->get('scale'),
+                ];
             }
         }
 
@@ -240,6 +242,7 @@ class ExtendConfigDumper
      * @param array|null      $aliases
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function checkSchema(ConfigInterface $extendConfig, $aliases)
     {
@@ -256,11 +259,14 @@ class ExtendConfigDumper
             }
             $doctrine[$entityName] = [
                 'type'   => 'entity',
-                'table'  => $tableName,
-                'fields' => [
-                    'id' => ['type' => 'integer', 'id' => true, 'generator' => ['strategy' => 'AUTO']]
-                ],
+                'table'  => $tableName
             ];
+            // add 'id' field only for Custom entity without inheritance
+            if (!$extendConfig->has('inherit')) {
+                $doctrine[$entityName]['fields'] = [
+                    'id' => ['type' => 'integer', 'id' => true, 'generator' => ['strategy' => 'AUTO']]
+                ];
+            }
         } else {
             $type                  = 'Extend';
             $entityName            = $extendConfig->get('extend_class');
@@ -331,6 +337,8 @@ class ExtendConfigDumper
             }
             $schema['parent']  = $parentClassName;
             $schema['inherit'] = get_parent_class($parentClassName);
+        } elseif ($extendConfig->has('inherit')) {
+            $schema['inherit'] = $extendConfig->get('inherit');
         }
 
         $extendConfig->set('schema', $schema);

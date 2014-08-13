@@ -14,7 +14,6 @@ class OroEntityExtendBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::oroEnumTable($schema);
-        self::oroEnumTransTable($schema);
         self::oroEnumValueTransTable($schema);
     }
 
@@ -28,40 +27,11 @@ class OroEntityExtendBundle implements Migration
         /** Generate table oro_enum **/
         $table = $schema->createTable('oro_enum');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('public', 'boolean', ['default' => '0']);
+        $table->addColumn('code', 'string', ['length' => 21]);
+        $table->addColumn('is_public', 'boolean', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['name'], 'oro_enum_uq');
+        $table->addUniqueIndex(['code'], 'oro_enum_uq');
         /** End of generate table oro_enum **/
-    }
-
-    /**
-     * Generate table oro_enum_trans
-     *
-     * @param Schema $schema
-     */
-    public static function oroEnumTransTable(Schema $schema)
-    {
-        /** Generate table oro_enum_trans **/
-        $table = $schema->createTable('oro_enum_trans');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('object_id', 'integer', ['notnull' => false]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('field', 'string', ['length' => 32]);
-        $table->addColumn('content', 'text', ['notnull' => false]);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['object_id'], 'IDX_86BF251D232D562B', []);
-        $table->addIndex(['locale', 'object_id', 'field'], 'oro_enum_trans_idx', []);
-        /** End of generate table oro_enum_trans **/
-
-        /** Generate foreign keys for table oro_enum_trans **/
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_enum'),
-            ['object_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null, ]
-        );
-        /** End of generate foreign keys for table oro_enum_trans **/
     }
 
     /**

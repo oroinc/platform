@@ -47,7 +47,6 @@ services:
 
     oro_entity_extend.entity_generator.extension:
         class: %oro_entity_extend.entity_generator.extension.class%
-        arguments:
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
