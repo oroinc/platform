@@ -115,8 +115,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
                     $value = array(
                         'id' => $value->getId(),
                         'name' => $value->getName(),
-                        'currency' => $value->getCurrency(),
-                        'precision' => $value->getPrecision(),
                     );
                 }
                 break;

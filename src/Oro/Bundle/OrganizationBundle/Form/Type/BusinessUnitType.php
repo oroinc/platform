@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -13,6 +9,11 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class BusinessUnitType extends AbstractType
 {
@@ -160,29 +161,21 @@ class BusinessUnitType extends AbstractType
      */
     public function onPreSubmit(FormEvent $event)
     {
+        $selectedOrganizationId = null;
+        $selectedBusinessUnitId = null;
+
         $data = $event->getData();
-
-        /** @ var Organization|null $selectedOrganization */
-        $selectedOrganization   = null;
-        $selectedOrganizationId = $selectedBusinessUnitId = null;
-
         if (isset($data['organization']) && $data['organization'] !== null) {
             $selectedOrganizationId = $data['organization'];
             $this->organizationManager->getOrganizationRepo()->find($selectedOrganizationId);
-        } /*else {
-            $formData = $event->getForm()->getData();
-            if ($formData->getOrganization()) {
-                $selectedOrganization   = $formData->getOrganization();
-                $selectedOrganizationId = $selectedOrganization->getId();
-            }
-        }*/
+        }
 
         if (isset($data['businessUnit']) && $data['businessUnit'] !== null) {
             $selectedBusinessUnitId = $data['businessUnit'];
         }
 
         if ($selectedOrganizationId && $selectedBusinessUnitId) {
-            if (!$event->getForm()->getData()->getId()) {
+            /*if (!$event->getForm()->getData()->getId()) {
                 $event->getForm()->remove('organization');
                 $event->getForm()->add(
                     'organization',
@@ -200,7 +193,7 @@ class BusinessUnitType extends AbstractType
                         'data'        => $selectedOrganization
                     ]
                 );
-            }
+            }*/
 
             $event->getForm()->remove('businessUnit');
             $event->getForm()->add(

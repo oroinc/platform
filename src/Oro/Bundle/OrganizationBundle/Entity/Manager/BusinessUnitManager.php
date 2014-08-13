@@ -31,7 +31,7 @@ class BusinessUnitManager
      * Get Business Units tree
      *
      * @param User $entity
-     * @param null $organizationId
+     * @param int|null $organizationId
      * @return array
      */
     public function getBusinessUnitsTree(User $entity = null, $organizationId = null)
