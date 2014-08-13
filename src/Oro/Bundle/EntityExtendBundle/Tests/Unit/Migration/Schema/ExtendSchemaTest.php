@@ -91,6 +91,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             $this->nameGenerator
         );
 
+        $table2 = $schema->createTable('table2');
+        $table2->addColumn('id', 'integer', ['autoincrement' => true]);
+
         $table1 = $schema->createTable('table1');
         $table1->addColumn('column1', 'string', ['length' => 100]);
         $configurableColumn1 = $table1->addColumn(
@@ -114,6 +117,21 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         );
+        $table1->addColumn(
+            'ref_column1',
+            'integer',
+            [
+                'oro_options' => [
+                    ExtendOptionsManager::TYPE_OPTION => 'ref-one'
+                ]
+            ]
+        );
+        $table1->addForeignKeyConstraint(
+            $table2,
+            ['ref_column1'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
 
         $table1->addOption('comment', 'test');
 
@@ -136,11 +154,16 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertSchemaSql(
             $schema,
             [
+                'CREATE TABLE table2 (id INT AUTO_INCREMENT NOT NULL)',
                 'CREATE TABLE table1 ('
+                . 'ref_column1 INT NOT NULL, '
                 . 'column1 VARCHAR(100) NOT NULL, '
                 . 'configurable_column1 VARCHAR(100) NOT NULL, '
-                . 'extend_column1 VARCHAR(100) DEFAULT NULL) '
-                . 'COMMENT = \'test\' '
+                . 'extend_column1 VARCHAR(100) DEFAULT NULL, '
+                . 'INDEX idx_table1_ref_column1 (ref_column1)) '
+                . 'COMMENT = \'test\' ',
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_ref_column1 '
+                . 'FOREIGN KEY (ref_column1) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
         $this->assertExtendOptions(
@@ -164,6 +187,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                                 'extend'   => ['extend' => true, 'is_extend' => true, 'owner' => 'Custom'],
                                 'datagrid' => ['is_visible' => false]
                             ]
+                        ],
+                        'ref_column1'          => [
+                            'type' => 'ref-one'
                         ]
                     ]
                 ]

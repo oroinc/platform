@@ -69,6 +69,45 @@ class ExtendHelper
     }
 
     /**
+     * Returns a string that can be used as a class name for the entity
+     * represents values of the given enum.
+     *
+     * @param string $enumCode
+     *
+     * @return string
+     */
+    public static function buildEnumValueShortClassName($enumCode)
+    {
+        return 'EnumValue' . Inflector::classify($enumCode);
+    }
+
+    /**
+     * Returns a translation key (placeholder) for entities responsible to store enum values
+     *
+     * @param string $propertyName property key: label, description, plural_label, etc.
+     * @param string $enumCode
+     * @param string $fieldName
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function getEnumTranslationKey($propertyName, $enumCode, $fieldName = null)
+    {
+        if (empty($propertyName)) {
+            throw new \InvalidArgumentException('$propertyName must not be empty');
+        }
+        if (empty($enumCode)) {
+            throw new \InvalidArgumentException('$enumCode must not be empty');
+        }
+
+        if (!$fieldName) {
+            return sprintf('oro.entityextend.enums.%s.entity_%s', $enumCode, $propertyName);
+        }
+
+        return sprintf('oro.entityextend.enumvalue.%s.%s', $fieldName, $propertyName);
+    }
+
+    /**
      * Checks if an entity is a custom one
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
      * created automatically in Symfony cache

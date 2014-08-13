@@ -8,16 +8,18 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * The base class for all entities represent values for a particular enum
+ *
+ * @ORM\MappedSuperclass
  */
 abstract class AbstractEnumValue
 {
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=32)
+     * @ORM\Column(name="code", type="string", length=32)
      * @ORM\Id
      */
-    protected $code;
+    private $code;
 
     /**
      * @var string
@@ -25,34 +27,34 @@ abstract class AbstractEnumValue
      * @ORM\Column(name="name", type="string", length=255)
      * @Gedmo\Translatable
      */
-    protected $name;
+    private $name;
 
     /**
      * @var Enum
      *
      * @ORM\ManyToOne(targetEntity="Enum")
-     * @ORM\JoinColumn(name="enum_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="enum_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    protected $enum;
+    private $enum;
 
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="priority", type="integer")
      */
-    protected $priority;
+    private $priority = 0;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(name="is_default", type="boolean")
      */
-    protected $default;
+    private $default = false;
 
     /**
      * @Gedmo\Locale
      */
-    protected $locale;
+    private $locale;
 
     /**
      * @param string  $code

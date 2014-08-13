@@ -3,21 +3,32 @@
 namespace Oro\Bundle\EntityExtendBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
-use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(name="oro_enum",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(name="oro_enum_uq", columns={"name"})
+ *          @ORM\UniqueConstraint(name="oro_enum_uq", columns={"code"})
  *      }
  * )
  * @ORM\Entity()
- * @Gedmo\TranslationEntity(class="Oro\Bundle\EntityExtendBundle\Entity\EnumTranslation")
+ * @Config(
+ *      mode="readonly",
+ *      defaultValues={
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
  */
-class Enum implements Translatable
+class Enum
 {
     /**
      * @var integer
@@ -31,34 +42,23 @@ class Enum implements Translatable
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="code", type="string", length=21)
      */
-    protected $name;
+    protected $code;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="public", type="boolean", options={"default"=false})
+     * @ORM\Column(name="is_public", type="boolean")
      */
     protected $public = false;
 
     /**
-     * @Gedmo\Locale
+     * @param string $code The enum code
      */
-    protected $locale;
-
-    /**
-     * @ORM\OneToMany(
-     *     targetEntity="Oro\Bundle\EntityExtendBundle\Entity\EnumTranslation",
-     *     mappedBy="object",
-     *     cascade={"persist", "remove"}
-     * )
-     */
-    protected $translations;
-
-    public function __construct()
+    public function __construct($code)
     {
-        $this->translations = new ArrayCollection();
+        $this->code = $code;
     }
 
     /**
@@ -70,23 +70,11 @@ class Enum implements Translatable
     }
 
     /**
-     * @param string $name
-     *
-     * @return Enum
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
-    public function getName()
+    public function getCode()
     {
-        return $this->name;
+        return $this->code;
     }
 
     /**
@@ -110,57 +98,12 @@ class Enum implements Translatable
     }
 
     /**
-     * @param mixed $locale
-     *
-     * @return Enum
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
-     * @param ArrayCollection $translations
-     *
-     * @return Enum
-     */
-    public function setTranslations($translations)
-    {
-        /** @var EnumTranslation $translation */
-        foreach ($translations as $translation) {
-            $translation->setObject($this);
-        }
-
-        $this->translations = $translations;
-
-        return $this;
-    }
-
-    /**
-     * @return ArrayCollection|EnumTranslation[]
-     */
-    public function getTranslations()
-    {
-        return $this->translations;
-    }
-
-    /**
      * Get a human-readable representation of this object.
      *
      * @return string
      */
     public function __toString()
     {
-        return $this->name;
+        return $this->code;
     }
 }
