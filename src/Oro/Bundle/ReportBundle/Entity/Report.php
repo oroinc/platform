@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
 /**
  * @ORM\Entity()
@@ -39,8 +40,10 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  *      }
  * )
  */
-class Report extends AbstractQueryDesigner
+class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    const GRID_PREFIX = 'oro_report_table_';
+
     /**
      * @var integer
      *
@@ -135,6 +138,14 @@ class Report extends AbstractQueryDesigner
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
+    }
 
     /**
      * Get id
@@ -262,9 +273,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Get this report definition in YAML format
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDefinition()
     {
@@ -272,10 +281,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Set this report definition in YAML format
-     *
-     * @param string $definition
-     * @return Report
+     * {@inheritdoc}
      */
     public function setDefinition($definition)
     {

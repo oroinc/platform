@@ -31,6 +31,8 @@ class AclConfigurationPass implements CompilerPassInterface
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
     const ENTITY_CLASS_RESOLVER = 'oro_entity.orm.entity_class_resolver';
 
+    const OWNERSHIP_CONFIG_PROVIDER = 'oro_entity_config.provider.ownership';
+
     /**
      * {@inheritDoc}
      */
@@ -135,6 +137,12 @@ class AclConfigurationPass implements CompilerPassInterface
                         array(new Reference(self::ACL_EXTENSION_SELECTOR))
                     );
                 }
+
+                //set owner config provider in voter
+                $voterDef->addMethodCall(
+                    'setConfigProvider',
+                    array(new Reference(self::OWNERSHIP_CONFIG_PROVIDER))
+                );
             }
             // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider
             if ($container->hasDefinition(self::NEW_ACL_PROVIDER)) {

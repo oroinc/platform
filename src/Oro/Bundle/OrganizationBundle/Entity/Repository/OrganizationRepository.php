@@ -85,4 +85,16 @@ class OrganizationRepository extends EntityRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Returns enabled organizations
+     *
+     * @return Organization[]
+     */
+    public function getEnabled()
+    {
+        return $this->getEntityManager()
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1')
+            ->getResult();
+    }
 }

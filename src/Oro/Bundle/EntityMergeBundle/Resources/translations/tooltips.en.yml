@@ -1,5 +1,5 @@
 oro:
     entity_merge:
         form:
-            strategy_tooltip:  “Replace” strategy allows to value of selected field. With “Append” strategy selected value will be appended to master record value.
+            strategy_tooltip: “Replace” strategy will use the selected value as the new value of the selected field. “Append” strategy will сombine selected values and set them as new value.
             master_record_tooltip: Field values from all records will be merged to Master Record, all other records will be deleted.

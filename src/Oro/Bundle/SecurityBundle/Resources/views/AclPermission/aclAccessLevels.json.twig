@@ -1,0 +1,10 @@
+{% set translatedLevels = {} %}
+{% for id, level in levels %}
+    {% if level is empty %}
+        {% set level = 'NONE' %}
+    {% endif %}
+    {% set label = 'oro.security.access-level.' ~ level %}
+    {% set translatedLevels = translatedLevels|merge({(id) : label|trans}) %}
+{% endfor %}
+
+{{ translatedLevels|json_encode()|raw }}

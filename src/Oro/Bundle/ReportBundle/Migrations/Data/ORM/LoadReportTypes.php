@@ -15,7 +15,7 @@ class LoadReportTypes extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $tableReport = new ReportType('TABLE');
+        $tableReport = new ReportType(ReportType::TYPE_TABLE);
         $tableReport->setLabel('oro.report.type.table');
 
         $manager->persist($tableReport);
