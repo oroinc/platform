@@ -153,7 +153,9 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $this->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider);
+        $this
+            ->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider)
+            ->getConfiguration();
     }
 
     /**

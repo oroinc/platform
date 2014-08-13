@@ -63,7 +63,7 @@ class WorkflowStep
     /**
      * @var boolean
      *
-     * @ORM\Column(name="final", type="boolean")
+     * @ORM\Column(name="is_final", type="boolean")
      */
     protected $final = false;
 
