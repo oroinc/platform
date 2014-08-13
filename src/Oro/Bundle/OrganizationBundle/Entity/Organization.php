@@ -94,7 +94,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     /**
      * @var \Datetime $created
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -108,7 +108,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     /**
      * @var \Datetime $updated
      *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -122,7 +122,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     /**
      * @var boolean
      *
-     * @ORM\Column(name="enabled", type="boolean")
+     * @ORM\Column(name="enabled", type="boolean", options={"default"="true"})
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
