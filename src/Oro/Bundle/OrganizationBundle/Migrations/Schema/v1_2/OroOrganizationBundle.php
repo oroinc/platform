@@ -30,9 +30,9 @@ class OroOrganizationBundle implements Migration
         $table = $schema->getTable('oro_organization');
 
         $table->addColumn('description', 'text', ['notnull' => false]);
-        $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
-        $table->addColumn('enabled', 'boolean', []);
+        $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('enabled', 'boolean', ['default' => '1']);
 
         $table->addUniqueIndex(['name'], 'UNIQ_BB42B65D5E237E06');
     }
