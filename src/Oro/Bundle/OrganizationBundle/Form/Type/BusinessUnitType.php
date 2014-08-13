@@ -37,6 +37,9 @@ class BusinessUnitType extends AbstractType
         $this->organizationManager = $organizationManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -175,26 +178,6 @@ class BusinessUnitType extends AbstractType
         }
 
         if ($selectedOrganizationId && $selectedBusinessUnitId) {
-            /*if (!$event->getForm()->getData()->getId()) {
-                $event->getForm()->remove('organization');
-                $event->getForm()->add(
-                    'organization',
-                    'entity',
-                    [
-                        'class'       => 'OroOrganizationBundle:Organization',
-                        'property'    => 'name',
-                        'label'       => 'oro.organization.businessunit.organization.label',
-                        'empty_value' => 'oro.organization.form.choose_organization',
-                        'required'    => true,
-                        'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
-                        'attr'        => [
-                            'class' => 'oro_bu_by_org_select_org'
-                        ],
-                        'data'        => $selectedOrganization
-                    ]
-                );
-            }*/
-
             $event->getForm()->remove('businessUnit');
             $event->getForm()->add(
                 'businessUnit',
@@ -259,6 +242,9 @@ class BusinessUnitType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -272,6 +258,9 @@ class BusinessUnitType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::FORM_NAME;

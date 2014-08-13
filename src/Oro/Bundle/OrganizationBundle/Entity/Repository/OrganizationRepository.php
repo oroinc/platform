@@ -53,7 +53,7 @@ class OrganizationRepository extends EntityRepository
      * Returns enabled organizations
      *
      * @param bool $asArray
-     * @return array
+     * @return Organization[]|array
      */
     public function getEnabled($asArray = false)
     {
