@@ -51,24 +51,11 @@ oro:
         unique_keys: Unique Keys
 
     entityextend:
-        enum:
-            entity_label:           Option Set
-            entity_plural_label:    Option Sets
-            entity_description:     Represents a list of all option sets
-            id.label:               Id
-            id.description:         The option set identifier
-            code.label:             Code
-            code.description:       The option set code. Each option set should have unique code
-            public.label:           Is Public
-            public.description:     Determines if this option set is system wide and can be used in any entity
-
         enumvalue:
             code.label:             Code
-            code.description:       The option code
+            code.description:       The unique identifier of the option
             name.label:             Name
             name.description:       The option name
-            enum.label:             Option Set
-            enum.description:       A reference to the option set this option is belong to
             priority.label:         Priority
             priority.description:   A number is used to sort options
             default.label:          Is Default
