@@ -25,5 +25,6 @@ class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
     public function load(ObjectManager $manager)
     {
         $this->update($manager, 'OroNavigationBundle:NavigationItem');
+        $this->update($manager, 'OroNavigationBundle:NavigationHistoryItem');
     }
 }
