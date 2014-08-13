@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
@@ -38,6 +40,11 @@ class ResponseHistoryListener
      */
     protected $titleService = null;
 
+    /**
+     * @var Organization
+     */
+    protected $organization;
+
     public function __construct(
         ItemFactory $navigationItemFactory,
         SecurityContextInterface $securityContext,
@@ -47,6 +54,12 @@ class ResponseHistoryListener
         $this->navItemFactory = $navigationItemFactory;
         $this->user = !$securityContext->getToken() ||  is_string($securityContext->getToken()->getUser())
                       ? null : $securityContext->getToken()->getUser();
+
+        $token = $securityContext->getToken() ? $securityContext->getToken() : null;
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            $this->organization = $securityContext->getToken()->getOrganizationContext();
+        }
+
         $this->entityManager = $entityManager;
         $this->titleService = $titleService;
     }
@@ -75,6 +88,7 @@ class ResponseHistoryListener
         $postArray = array(
             'url'  => $request->getRequestUri(),
             'user' => $this->user,
+            'organization' => $this->organization
         );
 
         /** @var $historyItem  NavigationHistoryItem */
