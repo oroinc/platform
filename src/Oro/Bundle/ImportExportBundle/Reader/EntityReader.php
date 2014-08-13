@@ -74,10 +74,13 @@ class EntityReader extends IteratorBasedReader
         $qb = $this->registry->getRepository($entityName)->createQueryBuilder('o');
 
         $metadata = $qb->getEntityManager()->getClassMetadata($entityName);
-        foreach ($metadata->getAssociationMappings() as $assocMapping) {
-            $alias = '_' . $assocMapping['fieldName'];
-            $qb->addSelect($alias);
-            $qb->leftJoin('o.' . $assocMapping['fieldName'], $alias);
+        foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
+            // can't join with *-to-many relations because they affects query pagination
+            if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
+                $alias = '_' . $fieldName;
+                $qb->addSelect($alias);
+                $qb->leftJoin('o.' . $fieldName, $alias);
+            }
         }
 
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
