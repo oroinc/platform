@@ -55,10 +55,6 @@
     {% endspaceless %}
 {% endblock %}
 
-{% block oro_entity_enum_collection_widget %}
-    {{ oro_entity_option_set_collection_widget() }}
-{% endblock %}
-
 {% macro oro_item_collection_validate_default_js(context) %}
     {% set form = context.form %}
     {% set id = context.id %}
