@@ -4,14 +4,17 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-class OroEntityExtension extends Extension
+class OroEntityExtension extends Extension implements PrependExtensionInterface
 {
+    const POSTGRESQL_DB_DRIVER = 'pdo_pgsql';
+
     /**
      * {@inheritdoc}
      */
@@ -27,6 +30,36 @@ class OroEntityExtension extends Extension
         $loader->load('orm.yml');
         $loader->load('form_type.yml');
         $loader->load('services.yml');
+    }
+
+    /**
+     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
+     *
+     * @param ContainerBuilder $container
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $dbDriver = $container->getParameter('database_driver');
+        if ($dbDriver == self::POSTGRESQL_DB_DRIVER) {
+            $doctrineConfig = $container->getExtensionConfig('doctrine');
+            $doctrineConnectionOptions = array();
+            foreach ($doctrineConfig as $config) {
+                if (isset($config['dbal']['connections'])) {
+                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
+                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = array(
+                            \PDO::ATTR_EMULATE_PREPARES => true
+                        );
+                        // Add support of "oid" and "name" Db types for EnterpriseDB
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = array(
+                            'oid' => 'integer',
+                            'name' => 'string'
+                        );
+                    }
+                }
+            }
+            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
+        }
     }
 
     /**

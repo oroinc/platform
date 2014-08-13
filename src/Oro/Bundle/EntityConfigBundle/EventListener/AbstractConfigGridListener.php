@@ -390,7 +390,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
                 if (isset($item['grid']['query'])) {
                     $query->andWhere($alias . '.value ' . $item['grid']['query']['operator'] . ' :' . $alias);
-                    $query->setParameter($alias, $item['grid']['query']['value']);
+                    $query->setParameter($alias, (string)$item['grid']['query']['value']);
                 }
 
                 $query->leftJoin(

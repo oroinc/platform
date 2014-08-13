@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_2;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Psr\Log\LoggerInterface;
+
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
@@ -153,8 +154,8 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
             . ' FROM oro_entity_config ec'
             . ' INNER JOIN oro_entity_config_field fc ON fc.entity_id = ec.id'
             . ' WHERE ec.class_name = :class';
-        $params = ['class' => $className, 'scope' => 'email'];
-        $types  = ['class' => 'string', 'scope' => 'string'];
+        $params = ['class' => $className];
+        $types  = ['class' => 'string'];
         $this->logQuery($logger, $sql, $params, $types);
 
         $result = [];

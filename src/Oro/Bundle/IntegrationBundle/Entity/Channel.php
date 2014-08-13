@@ -45,7 +45,7 @@ class Channel
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
