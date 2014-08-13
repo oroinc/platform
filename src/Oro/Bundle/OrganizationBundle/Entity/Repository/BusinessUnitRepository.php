@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -106,13 +107,21 @@ class BusinessUnitRepository extends EntityRepository
     /**
      * Get business units ids
      *
+     * @param int|null $organizationId
      * @return array
      */
-    public function getBusinessUnitIds()
+    public function getBusinessUnitIds($organizationId = null)
     {
         $result        = [];
-        $businessUnits = $this->createQueryBuilder('businessUnit')
-            ->select('businessUnit.id')
+        /** @var QueryBuilder $businessUnitsQB */
+        $businessUnitsQB = $this->createQueryBuilder('businessUnit');
+        $businessUnitsQB->select('businessUnit.id');
+        if ($organizationId != null) {
+            $businessUnitsQB
+                ->where('businessUnit.organization = :organizationId')
+                ->setParameter(':organizationId', $organizationId);
+        }
+        $businessUnits = $businessUnitsQB
             ->getQuery()
             ->getArrayResult();
 
