@@ -170,7 +170,6 @@ class BusinessUnitType extends AbstractType
         $data = $event->getData();
         if (isset($data['organization']) && $data['organization'] !== null) {
             $selectedOrganizationId = $data['organization'];
-            $this->organizationManager->getOrganizationRepo()->find($selectedOrganizationId);
         }
 
         if (isset($data['businessUnit']) && $data['businessUnit'] !== null) {
@@ -196,6 +195,29 @@ class BusinessUnitType extends AbstractType
                         'class' => 'oro_bu_by_org_select_bu'
                     ],
                     'data'          => $this->businessUnitManager->getUserRepo()->find($selectedBusinessUnitId),
+                ]
+            );
+        }
+
+        if (!$event->getForm()->getData()->getId()) {
+            /** @var Organization $selectedOrganization */
+            $selectedOrganization = $this->organizationManager->getOrganizationRepo()->find($selectedOrganizationId);
+            $event->getForm()->remove('organization');
+            $event->getForm()->add(
+                'organization',
+                'entity',
+                [
+                    'class'       => 'OroOrganizationBundle:Organization',
+                    'property'    => 'name',
+                    'label'       => 'oro.organization.businessunit.organization.label',
+                    'empty_value' => 'oro.organization.form.choose_organization',
+                    'required'    => true,
+                    'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
+                    'attr'        => [
+                        'class' => 'oro_bu_by_org_select_org'
+                    ],
+                    'data'        => $selectedOrganization,
+                    'disabled' => false,
                 ]
             );
         }

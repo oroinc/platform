@@ -122,7 +122,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     /**
      * @var boolean
      *
-     * @ORM\Column(name="enabled", type="boolean", options={"default"="true"})
+     * @ORM\Column(name="enabled", type="boolean", options={"default"="1"})
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
