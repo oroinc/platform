@@ -9,6 +9,7 @@ parameters:
     oro_segment.query.static_segment.query_builder.class:    Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder
     oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
     oro_segment.entity_name_provider.class:                  Oro\Bundle\SegmentBundle\Provider\EntityNameProvider
+    oro_segment.grid.datagrid_configuration_builder.class:   Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
 
 services:
     oro_segment.entity_provider:
@@ -34,10 +35,8 @@ services:
     oro_segment.datagrid.configuration.provider:
         class: %oro_segment.datagrid.configuration.provider.class%
         arguments:
-            - @oro_query_designer.query_designer.manager
-            - @oro_query_designer.virtual_field_provider
+            - @oro_segment.grid.datagrid_configuration_builder
             - @doctrine
-            - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.configuration.provider }
 
@@ -85,3 +84,7 @@ services:
 
     oro_segment.entity_name_provider:
         class: %oro_segment.entity_name_provider.class%
+
+    oro_segment.grid.datagrid_configuration_builder:
+        class: %oro_segment.grid.datagrid_configuration_builder.class%
+        parent: oro_report.grid.base_configuration_builder

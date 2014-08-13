@@ -46,4 +46,12 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
 
         return $foundProvider->getConfiguration($gridName);
     }
+
+    /**
+     * @return ConfigurationProviderInterface[]
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
 }
