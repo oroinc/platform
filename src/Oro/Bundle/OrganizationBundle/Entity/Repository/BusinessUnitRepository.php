@@ -12,10 +12,13 @@ class BusinessUnitRepository extends EntityRepository
     /**
      * Build business units tree for user page
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $organizationId
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getBusinessUnitsTree(User $user = null)
+    public function getBusinessUnitsTree(User $user = null, $organizationId = null)
     {
         $businessUnits = $this->createQueryBuilder('businessUnit')->select(
             array(
@@ -37,6 +40,12 @@ class BusinessUnitRepository extends EntityRepository
                 $businessUnits->setParameter(':userUnits', $units);
             }
         }
+
+        if ($organizationId) {
+            $businessUnits->where('businessUnit.organization = :organizationId');
+            $businessUnits->setParameter(':organizationId', $organizationId);
+        }
+
         $businessUnits = $businessUnits->getQuery()->getArrayResult();
         $children      = array();
         foreach ($businessUnits as &$businessUnit) {
@@ -58,22 +67,21 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
-     * Build business units tree by organization
+     * Returns business units tree by organization
+     * Or returns business units tree for given organization.
      *
+     * @param int|null $organizationId
      * @return array
      */
-    public function getOrganizationBusinessUnitsTree()
+    public function getOrganizationBusinessUnitsTree($organizationId = null)
     {
         $tree          = [];
         $businessUnits = $this->getBusinessUnitsTree();
 
-        $organizationsQuery  = $this->_em->getRepository('OroOrganizationBundle:Organization')
-            ->createQueryBuilder('organization')
-            ->select(['organization.id', 'organization.name'])
-            ->getQuery();
-        $organizationsResult = $organizationsQuery->getArrayResult();
-
-        foreach ($organizationsResult as $organizationItem) {
+        $organizations = $this->_em
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->getEnabled(true);
+        foreach ($organizations as $organizationItem) {
             $tree[$organizationItem['id']] = [
                 'id'       => $organizationItem['id'],
                 'name'     => $organizationItem['name'],
@@ -82,7 +90,14 @@ class BusinessUnitRepository extends EntityRepository
         }
 
         foreach ($businessUnits as $businessUnit) {
+            if ($businessUnit['organization'] == null) {
+                continue;
+            }
             $tree[$businessUnit['organization']]['children'][] = $businessUnit;
+        }
+
+        if ($organizationId && isset($tree[$organizationId])) {
+            return $tree[$organizationId]['children'];
         }
 
         return $tree;

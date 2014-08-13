@@ -123,6 +123,6 @@ class OrganizationsSelectType extends AbstractType
      */
     protected function getOrganizationOptions()
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->findAll();
+        return $this->em->getRepository('OroOrganizationBundle:Organization')->getEnabled();
     }
 }

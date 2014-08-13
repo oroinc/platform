@@ -50,6 +50,24 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
+     * Returns enabled organizations
+     *
+     * @param bool $asArray
+     * @return Organization[]|array
+     */
+    public function getEnabled($asArray = false)
+    {
+        $organizationsQuery = $this->getEntityManager()
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1');
+
+        if ($asArray) {
+            return $organizationsQuery->getArrayResult();
+        }
+
+        return $organizationsQuery->getResult();
+    }
+
+    /**
      * Update all records in given table with organization id
      *
      * @param string  $tableName table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
@@ -66,17 +84,5 @@ class OrganizationRepository extends EntityRepository
             ->setParameter('id', $id)
             ->getQuery()
             ->execute();
-    }
-
-    /**
-     * Returns enabled organizations
-     *
-     * @return Organization[]
-     */
-    public function getEnabled()
-    {
-        return $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1')
-            ->getResult();
     }
 }
