@@ -36,13 +36,13 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $added   = $this->request->get('added');
             $removed = $this->request->get('removed');
 
-            if ($added) {
+            if (!empty($added)) {
                 $added = explode(',', $added);
             } else {
                 $added = [0];
             }
 
-            if ($removed) {
+            if (!empty($removed)) {
                 $removed = explode(',', $removed);
             } else {
                 $removed = [0];
@@ -138,7 +138,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfigProvider = $this->configManager->getProvider('entity');
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
-            $label  = $entityConfig->get('label') ? : $fieldName;
+            $label  = $entityConfig->get('label') ?: $fieldName;
             $field  = $this->createFieldArrayDefinition($fieldName, $label, $fieldConfig, $isGridFieldName);
             $select = $alias . '.' . $fieldName;
         }
@@ -154,8 +154,8 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $entityConfig = $this->configManager->getProvider('extend')->getConfig(
             $this->relationConfig->getId()->getClassName()
         );
-        $relations = $entityConfig->get('relation');
-        $relation  = $relations[$this->relationConfig->get('relation_key')];
+        $relations    = $entityConfig->get('relation');
+        $relation     = $relations[$this->relationConfig->get('relation_key')];
 
         $fieldName = $relation['target_field_id']->getFieldName();
 

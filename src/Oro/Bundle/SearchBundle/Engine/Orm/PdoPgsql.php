@@ -5,12 +5,11 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
 {
-    public $columns = array();
+    public $columns = [];
     public $needle;
     public $mode;
 
@@ -52,12 +51,15 @@ class PdoPgsql extends BaseDriver
      */
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
-        $stringQuery = '';
+        $stringQuery = '(TsvectorTsquery(textField.value, :non_value' . $index . ')) = TRUE';
+
         if ($useFieldName) {
-            $stringQuery = ' AND textField.field = :field' .$index;
+            $stringQuery .= ' AND textField.field = :field' . $index;
         }
 
-        return '(TsvectorTsquery(textField.value, :value' .$index. ')) = TRUE' . $stringQuery;
+        $stringQuery .= ' AND TsRank(textField.value, :value' . $index . ') > ' . Query::FINITY;
+
+        return $stringQuery;
     }
 
     /**
@@ -70,7 +72,13 @@ class PdoPgsql extends BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
-        return $this->createContainsStringQuery($index, $useFieldName);
+        $stringQuery = '(TsvectorTsquery(textField.value, :value' . $index . ')) = TRUE';
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND textField.field = :field' . $index;
+        }
+
+        return $stringQuery;
     }
 
     /**
@@ -83,18 +91,24 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $searchArray = explode(' ', $fieldValue);
-        foreach ($searchArray as $index => $string) {
-            $searchArray[$index] = $string . ':*';
+        $notContains = $searchCondition != Query::OPERATOR_CONTAINS;
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
         }
 
-        if ($searchCondition != Query::OPERATOR_CONTAINS) {
-            foreach ($searchArray as $index => $string) {
-                $searchArray[$index] = '!' . $string;
+        if ($notContains) {
+            foreach ($searchArray as $key => $string) {
+                $searchArray[$key] = '!' . $string;
             }
         }
 
         $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+
+        if (!$notContains) {
+            $qb->setParameter('non_value' . $index, implode(' | ', $searchArray));
+        }
     }
 
     /**
@@ -106,11 +120,11 @@ class PdoPgsql extends BaseDriver
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
         $qb->select(
-            array(
-                 'search as item',
-                 'textField',
-                 'TsRank(textField.value, :value' .$index. ') AS rankField'
-            )
+            [
+                'search as item',
+                'textField',
+                'TsRank(textField.value, :value' . $index . ') AS rankField'
+            ]
         );
         $qb->orderBy('rankField', 'DESC');
     }
