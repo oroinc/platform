@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -152,6 +153,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $table->addOption(
             OroOptions::KEY,
             [
+                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_READONLY,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
                 'entity'                                  => [
                     'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),

@@ -134,12 +134,12 @@ oro_entity_config:
                     name:                   'Manage unique keys'
                     route:                  'oro_entityextend_entity_unique_key'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Create field'
                     route:                  'oro_entityextend_field_create'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Update schema'
                     route:                  'oro_entityextend_update'

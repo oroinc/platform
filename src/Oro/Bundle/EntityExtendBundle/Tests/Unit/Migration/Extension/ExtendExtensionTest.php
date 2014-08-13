@@ -348,6 +348,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $schema,
             [
                 ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
+                    'mode'    => 'readonly',
                     'configs' => [
                         'entity'     => [
                             'label'        => 'oro.entityextend.enums.test_status.entity_label',
