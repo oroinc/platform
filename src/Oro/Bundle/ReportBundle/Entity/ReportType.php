@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ReportType
 {
+    const TYPE_TABLE = 'TABLE';
+
     /**
      * @var string
      *
