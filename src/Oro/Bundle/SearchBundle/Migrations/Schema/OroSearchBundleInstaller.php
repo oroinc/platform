@@ -180,7 +180,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->setPrimaryKey(['id']);
 
         if ($this->platform->getName() === DatabasePlatformInterface::DATABASE_MYSQL) {
-            $table->addOption('engine' , PdoMysql::ENGINE_MYISAM);
+            $table->addOption('engine', PdoMysql::ENGINE_MYISAM);
         }
     }
 
