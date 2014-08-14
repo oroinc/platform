@@ -23,6 +23,7 @@ datagrid:
                         ),
                         CONCAT(' - ', u.email)
                       ) as author
+                    - o.name as organization
                 from:
                     - { table: OroDataAuditBundle:Audit, alias: a }
                 join:
@@ -30,6 +31,12 @@ datagrid:
                         user:
                             join: a.user
                             alias: u
+                        organization:
+                            join: a.organization
+                            alias: o
+                where:
+                    and:
+                        - o.id = @oro_security.security_facade->getOrganizationId
 
         columns:
             action:
@@ -52,6 +59,8 @@ datagrid:
                 frontend_type: html
             author:
                 label: Author
+            organization:
+                label: Organization
             loggedAt:
                 label: Logged at
                 frontend_type: datetime
@@ -73,6 +82,8 @@ datagrid:
                     data_name: a.data
                 author:
                     data_name: author
+                organization:
+                    data_name: organization
                 loggedAt:
                     data_name: a.loggedAt
             default:
