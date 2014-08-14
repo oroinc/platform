@@ -9,7 +9,7 @@ use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\OroEntityExtension;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class GeneratedValueStrategyListener
 {
@@ -31,7 +31,7 @@ class GeneratedValueStrategyListener
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        if ($this->databaseDriver !== OroEntityExtension::POSTGRESQL_DB_DRIVER) {
+        if ($this->databaseDriver !== DatabaseDriverInterface::DRIVER_POSTGRESQL) {
             return;
         }
 

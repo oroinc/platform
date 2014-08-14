@@ -19,6 +19,7 @@ parameters:
     oro_search.extension.orm_pager.class:               Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
     oro_search.extension.pager.search.pager.class:      Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
 
+    oro_search.event_listener.orm.fulltext_index_listener.class: Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
 services:
     oro_search.index:
         class:                        %oro_search.index.class%
@@ -125,3 +126,10 @@ services:
             - @oro_search.fulltext_index_manager
         tags:
             - { name: kernel.event_listener, event: console.terminate }
+
+    oro_search.event_listener.orm.fulltext_index_listener:
+        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        arguments:
+            - %database_driver%
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }

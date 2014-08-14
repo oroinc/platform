@@ -25,6 +25,7 @@
         "symfony/symfony": "2.3.*",
         "doctrine/orm": "2.4.3",
         "doctrine/doctrine-bundle": "1.2.0",
+        "doctrine/dbal": "2.4.x-dev",
         "doctrine/data-fixtures": "1.0.0",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
         "twig/extensions": "1.0.1",
@@ -64,7 +65,9 @@
         "nesbot/Carbon": "1.8.*",
         "monolog/monolog": "1.7.*",
         "ocramius/proxy-manager": "0.4.*",
-        "knplabs/knp-gaufrette-bundle": "0.1.*"
+        "knplabs/knp-gaufrette-bundle": "0.1.*",
+        "rhumsaa/uuid": "~2.7",
+        "oro/doctrine-extensions": "1.0.x-dev"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
