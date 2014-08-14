@@ -128,7 +128,22 @@ This command supports some additional options:
  - **bundles** - A list of bundles to load data from. If option is not set, migrations will be taken from all bundles;
  - **exclude** - A list of bundle names which migrations should be skipped.
 
-Also there is **oro:migration:dump** command to help in creation migration files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
+Also there is **oro:migration:dump** command to help in creation installation files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
+
+This command supports some additional options:
+
+ - **plain-sql** - Out schema as plain sql queries
+ - **bundle** - Bundle name for which migration wll be generated
+ - **migration-version** - Migration version number. This option will set the value returned by `getMigrationVersion` method of generated installation file.
+  
+Good practice for bundle is to have installation file for current version and migration files for migrating from previous versions to current.
+
+Next algorithm may be used for new versions of your bundle:
+
+ - Create new migration
+ - Apply it with **oro:migration:load**
+ - Generate fresh installation file with **oro:migration:dump**
+ - If required - add migration extensions calls to generated installation.
 
 Examples of database structure migrations
 -----------------------------------------

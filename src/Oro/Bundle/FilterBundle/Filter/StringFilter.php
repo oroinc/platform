@@ -53,11 +53,14 @@ class StringFilter extends AbstractFilter
      */
     protected function parseData($data)
     {
-        if (!is_array($data) || !array_key_exists('value', $data) || empty($data['value'])) {
+        $type = isset($data['type']) ? $data['type'] : null;
+        if ($type !== FilterUtility::TYPE_EMPTY
+            && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
+        ) {
             return false;
         }
 
-        $data['type']  = isset($data['type']) ? $data['type'] : null;
+        $data['type'] = $type;
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;

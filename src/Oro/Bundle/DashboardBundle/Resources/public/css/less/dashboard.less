@@ -17,6 +17,9 @@
 }
 
 .dashboard-container-wrapper {
+  .page-title {
+    border-bottom: 1px solid #F2F2F2;
+  }
   .responsive-section {
     background: @dashboardBackgroundColor;
     padding-top: 13px;
@@ -188,6 +191,37 @@
   }
 }
 
+.dashboard-container{
+  .responsive-cell{
+    .box-type1{
+      border: 1px solid #ccc;
+      .calendar-events{
+        margin: 0 0 10px 10px;
+      }
+    }
+  }
+}
+.responsive-cell .box-type1{
+  .dashboard-widget-content{
+    .tab-container{
+      .nav-tabs > li{
+        &:first-child a{
+          border-left: 0 !important;
+        }
+        &.active a{
+          border-left: 0 !important;
+        }
+
+      }
+    }
+    .tab-content{
+      .no-data{
+        background-color: #fff;
+      }
+    }
+  }
+}
+
 .launchpad-widget-content > div {
   height: 190px;
   border: 1px solid #b6b6b6;
@@ -342,38 +376,41 @@
     list-style: none;
   }
 }
-.recent-emails-widget-content{
-  .tab-container .nav-tabs{
-    margin-bottom: 0px;
-    border-bottom: 1px solid #ddd;
-    & > li{
-      float: left;
-      & > a{
-        color: #555555;
-        background-color: #fafafa;
-        border: 1px solid #ddd;
-        border-left: 0;
-        border-radius: 0px;
-        margin-right: 0px;
-        padding: 8px 12px;
-        line-height: 20px;
-      }
-     &.active > a,
-     &.active > a:hover,
-     &.active > a:focus{
-       border: 1px solid #ddd;
-       border-bottom-color: #fff;
-       -webkit-box-shadow: none;
-       -moz-box-shadow: none;
-       box-shadow: none;
-       color: #444444;
-       background: #fff;
-       text-decoration: none;
-     }
-     &:first-child > a,
-     &first-child > a:hover,
-     &:first-child > a:focus{
-        border-left: 1px solid #ddd;
+.dashboard-widget-content{
+  .tab-container{
+    position: relative;
+    .nav-tabs{
+      margin-bottom: 0px;
+      border-bottom: 1px solid #ddd;
+      & > li{
+        float: left;
+        & > a{
+          color: #555555;
+          background-color: #fafafa;
+          border: 1px solid #ddd;
+          border-left: 0;
+          border-radius: 0px;
+          margin-right: 0px;
+          padding: 8px 12px;
+          line-height: 20px;
+        }
+       &.active > a,
+       &.active > a:hover,
+       &.active > a:focus{
+         border: 1px solid #ddd;
+         border-bottom-color: #fff;
+         -webkit-box-shadow: none;
+         -moz-box-shadow: none;
+         box-shadow: none;
+         color: #444444;
+         background: #fff;
+         text-decoration: none;
+       }
+       &:first-child > a,
+       &first-child > a:hover,
+       &:first-child > a:focus{
+          border-left: 1px solid #ddd;
+        }
       }
     }
   }

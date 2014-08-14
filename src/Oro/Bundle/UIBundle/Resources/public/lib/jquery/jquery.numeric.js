@@ -1,10 +1,10 @@
 /*
  *
- * Copyright (c) 2006-2011 Sam Collett (http://www.texotela.co.uk)
+ * Copyright (c) 2006-2014 Sam Collett (http://www.texotela.co.uk)
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
  * 
- * Version 1.3.1
+ * Version 1.4
  * Demo: http://www.texotela.co.uk/code/jquery/numeric/
  *
  */
@@ -77,9 +77,9 @@ $.fn.numeric.keypress = function(e)
 	{
 	  var value = $(this).val();
 		/* '-' only allowed at start and if negative numbers allowed */
-		if(value.indexOf("-") !== 0 && negative && key == 45 && (value.length === 0 || parseInt($.fn.getSelectionStart(this), 10) === 0)) { return true; }
+		if($.inArray('-', value.split('')) !== 0 && negative && key == 45 && (value.length === 0 || parseInt($.fn.getSelectionStart(this), 10) === 0)) { return true; }
 		/* only one decimal separator allowed */
-		if(decimal && key == decimal.charCodeAt(0) && value.indexOf(decimal) != -1)
+		if(decimal && key == decimal.charCodeAt(0) && $.inArray(decimal, value.split('')) != -1)
 		{
 			allow = false;
 		}
@@ -120,7 +120,7 @@ $.fn.numeric.keypress = function(e)
 		// if key pressed is the decimal and it is not already in the field
 		if(decimal && key == decimal.charCodeAt(0))
 		{
-			if(value.indexOf(decimal) == -1)
+			if($.inArray(decimal, value.split('')) == -1)
 			{
 				allow = true;
 			}
@@ -144,6 +144,7 @@ $.fn.numeric.keyup = function(e)
 	{
 		// get carat (cursor) position
 		var carat = $.fn.getSelectionStart(this);
+		var selectionEnd = $.fn.getSelectionEnd(this);
 		// get decimal character and determine if negatives are allowed
 		var decimal = $.data(this, "numeric.decimal");
 		var negative = $.data(this, "numeric.negative");
@@ -152,16 +153,20 @@ $.fn.numeric.keyup = function(e)
 		if(decimal !== "" && decimal !== null)
 		{
 			// find decimal point
-			var dot = val.indexOf(decimal);
+			var dot = $.inArray(decimal, val.split(''));
 			// if dot at start, add 0 before
 			if(dot === 0)
 			{
 				this.value = "0" + val;
+				carat++;
+            			selectionEnd++;
 			}
 			// if dot at position 1, check if there is a - symbol before it
 			if(dot == 1 && val.charAt(0) == "-")
 			{
 				this.value = "-0" + val.substring(1);
+				carat++;
+            			selectionEnd++;
 			}
 			val = this.value;
 		}
@@ -202,7 +207,7 @@ $.fn.numeric.keyup = function(e)
 			}
 		}
 		// remove extra decimal characters
-		var firstDecimal = val.indexOf(decimal);
+		var firstDecimal = $.inArray(decimal, val.split(''));
 		if(firstDecimal > 0)
 		{
 			for(var k = length - 1; k > firstDecimal; k--)
@@ -217,7 +222,7 @@ $.fn.numeric.keyup = function(e)
 		}
 		// set the value and prevent the cursor moving to the end
 		this.value = val;
-		$.fn.setSelection(this, carat);
+		$.fn.setSelection(this, [carat, selectionEnd]);
 	}
 };
 
@@ -244,14 +249,41 @@ $.fn.removeNumeric = function()
 // Based on code from http://javascript.nwbox.com/cursor_position/ (Diego Perini <dperini@nwbox.com>)
 $.fn.getSelectionStart = function(o)
 {
-	if (o.createTextRange)
+	if(o.type === "number"){
+		return undefined;
+	}
+	else if (o.createTextRange)
 	{
-		var r = document.selection.createRange().duplicate();
-		r.moveEnd('character', o.value.length);
-		if (r.text === '') { return o.value.length; }
+		var r;
+        if(typeof document.selection == "undefined") {
+            //On IE < 9 && IE >= 11 : "document.selection" is deprecated and you should use "document.getSelection()"
+            //https://github.com/SamWM/jQuery-Plugins/issues/62
+            r = document.getSelection();
+        } else {
+            r = document.selection.createRange().duplicate();
+            r.moveEnd('character', o.value.length);
+        }
+		if (r.text == '') return o.value.length;
+
 		return o.value.lastIndexOf(r.text);
-	} else { return o.selectionStart; }
+	} else {
+        try { return o.selectionStart; }
+        catch(e) { return 0; }
+    }
 };
+
+// Based on code from http://javascript.nwbox.com/cursor_position/ (Diego Perini <dperini@nwbox.com>)
+$.fn.getSelectionEnd = function(o)
+{
+	if(o.type === "number"){
+		return undefined;
+	}
+	else if (o.createTextRange) {
+		var r = document.selection.createRange().duplicate()
+		r.moveStart('character', -o.value.length)
+		return r.text.length
+	} else return o.selectionEnd
+}
 
 // set the selection, o is the object (input), p is the position ([start, end] or just start)
 $.fn.setSelection = function(o, p)
@@ -261,7 +293,10 @@ $.fn.setSelection = function(o, p)
 	// only set if p is an array of length 2
 	if(p && p.constructor == Array && p.length == 2)
 	{
-		if (o.createTextRange)
+		if(o.type === "number") {
+			o.focus();
+		}
+		else if (o.createTextRange)
 		{
 			var r = o.createTextRange();
 			r.collapse(true);
@@ -269,11 +304,16 @@ $.fn.setSelection = function(o, p)
 			r.moveEnd('character', p[1]);
 			r.select();
 		}
-		else if(o.setSelectionRange)
-		{
-			o.focus();
-			o.setSelectionRange(p[0], p[1]);
-		}
+		else {
+            o.focus();
+            try{
+                if(o.setSelectionRange)
+                {
+                    o.setSelectionRange(p[0], p[1]);
+                }
+            } catch(e) {
+            }
+        }
 	}
 };
 

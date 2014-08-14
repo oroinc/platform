@@ -12,7 +12,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class SegmentController extends Controller
@@ -46,11 +45,13 @@ class SegmentController extends Controller
      */
     public function viewAction(Segment $entity)
     {
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+
         $segmentGroup = $this->get('oro_entity_config.provider.entity')
             ->getConfig($entity->getEntity())
             ->get('plural_label');
 
-        $gridName = ConfigurationProvider::GRID_PREFIX . $entity->getId();
+        $gridName = $entity::GRID_PREFIX . $entity->getId();
         if (!$this->get('oro_segment.datagrid.configuration.provider')->isConfigurationValid($gridName)) {
             // unset grid name if invalid
             $gridName = false;
