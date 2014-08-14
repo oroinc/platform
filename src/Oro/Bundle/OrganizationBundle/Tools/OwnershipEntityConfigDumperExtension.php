@@ -4,11 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -61,11 +64,25 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
+            $ownerType = $targetEntityConfig->get('owner_type');
             $this->createOwnerRelation(
-                $this->getOwnerTargetEntity($targetEntityConfig->get('owner_type')),
+                $this->getOwnerTargetEntity($ownerType),
                 $targetEntityConfig->getId()->getClassName(),
                 $targetEntityConfig->get('owner_field_name')
             );
+
+            if (in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])) {
+                $targetEntityConfig->set('organization_field_name', 'organization');
+                $targetEntityConfig->set('organization_column_name', 'organization_id');
+
+                $this->configManager->persist($targetEntityConfig);
+
+                $this->createOwnerRelation(
+                    $this->getOwnerTargetEntity(OwnershipType::OWNER_TYPE_ORGANIZATION),
+                    $targetEntityConfig->getId()->getClassName(),
+                    'organization'
+                );
+            }
         }
     }
 
