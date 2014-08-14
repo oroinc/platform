@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
@@ -93,7 +94,7 @@ class MigrateTypesQuery extends ParametrizedMigrationQuery
         }
 
         /** Apply only for mysql platform */
-        if ($this->platform->getName() !== 'mysql') {
+        if ($this->platform->getName() !== DatabasePlatformInterface::DATABASE_MYSQL) {
             return;
         }
 
