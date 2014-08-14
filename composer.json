@@ -25,7 +25,7 @@
         "symfony/symfony": "2.3.*",
         "doctrine/orm": "2.4.3",
         "doctrine/doctrine-bundle": "1.2.0",
-        "doctrine/dbal": "2.4.4x-dev",
+        "doctrine/dbal": "2.4.x-dev",
         "doctrine/data-fixtures": "1.0.0",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
         "twig/extensions": "1.0.1",
