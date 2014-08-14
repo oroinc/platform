@@ -25,12 +25,10 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
 
     public function setUp()
     {
-        $this->markTestSkipped('feature/OEE-26_organizations');
-
-        $this->configManager             = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->relationBuilder           = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
+        $this->relationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider =
@@ -47,7 +45,8 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
 
     public function testSupportsPostUpdate()
     {
-        $this->configManager->expects($this->never())
+        $this->configManager
+            ->expects($this->never())
             ->method('getProvider');
 
         $this->assertFalse(
@@ -91,11 +90,11 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         );
     }
 
-    /**
-     * @dataProvider preUpdateProvider
-     */
-    public function testPreUpdate($ownerType, $getOwnerClassMethodName)
+    public function testPreUpdateWithOrganizationOwner()
     {
+        $ownerType = 'ORGANIZATION';
+        $getOwnerClassMethodName = 'getOrganizationClass';
+
         $config1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config1->set('owner_type', $ownerType);
         $config1->set('owner_field_name', 'owner_field');
@@ -155,12 +154,124 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $this->extension->preUpdate($extendConfigs);
     }
 
+    /**
+     * @dataProvider preUpdateProvider
+     */
+    public function testPreUpdate($ownerType, $getOwnerClassMethodName, $getOrganizationClassMethodName)
+    {
+        $config1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
+        $config1->set('owner_type', $ownerType);
+        $config1->set('owner_field_name', 'owner_field');
+
+        $config2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
+        $config2->set('owner_type', $ownerType);
+        $config3 = new Config(new EntityConfigId('ownership', 'Test\Entity3'));
+
+        $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
+        $extendConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
+
+        $this->setTargetEntityConfigsExpectations([$config1, $config2, $config3], [$extendConfig1]);
+
+        $this->ownershipMetadataProvider->expects($this->at(0))
+            ->method($getOwnerClassMethodName)
+            ->will($this->returnValue('Test\Owner'));
+
+        $this->ownershipMetadataProvider->expects($this->at(1))
+            ->method($getOrganizationClassMethodName)
+            ->will($this->returnValue('Test\Organization'));
+
+        $this->relationBuilder->expects($this->at(0))
+            ->method('addFieldConfig')
+            ->with(
+                'Test\Entity1',
+                'owner_field',
+                'manyToOne',
+                [
+                    'extend'    => [
+                        'owner'         => ExtendScope::OWNER_SYSTEM,
+                        'state'         => ExtendScope::STATE_NEW,
+                        'extend'        => true,
+                        'target_entity' => 'Test\Owner',
+                        'target_field'  => 'id',
+                        'relation_key'  => 'manyToOne|Test\Entity1|Test\Owner|owner_field',
+                    ],
+                    'entity'    => [
+                        'label'       => 'oro.custom_entity.owner.label',
+                        'description' => 'oro.custom_entity.owner.description',
+                    ],
+                    'view'      => [
+                        'is_displayable' => false
+                    ],
+                    'form'      => [
+                        'is_enabled' => false
+                    ],
+                    'dataaudit' => [
+                        'auditable' => true
+                    ]
+                ]
+            );
+
+        $this->relationBuilder->expects($this->at(1))
+            ->method('addManyToOneRelation')
+            ->with(
+                'Test\Owner',
+                'Test\Entity1',
+                'owner_field',
+                'manyToOne|Test\Entity1|Test\Owner|owner_field'
+            );
+
+        $this->relationBuilder->expects($this->at(2))
+            ->method('addFieldConfig')
+            ->with(
+                'Test\Entity1',
+                'organization',
+                'manyToOne',
+                [
+                    'extend'    => [
+                        'owner'         => ExtendScope::OWNER_SYSTEM,
+                        'state'         => ExtendScope::STATE_NEW,
+                        'extend'        => true,
+                        'target_entity' => 'Test\Organization',
+                        'target_field'  => 'id',
+                        'relation_key'  => 'manyToOne|Test\Entity1|Test\Organization|organization',
+                    ],
+                    'entity'    => [
+                        'label'       => 'oro.custom_entity.owner.label',
+                        'description' => 'oro.custom_entity.owner.description',
+                    ],
+                    'view'      => [
+                        'is_displayable' => false
+                    ],
+                    'form'      => [
+                        'is_enabled' => false
+                    ],
+                    'dataaudit' => [
+                        'auditable' => true
+                    ]
+                ]
+            );
+
+        $this->relationBuilder->expects($this->at(3))
+            ->method('addManyToOneRelation')
+            ->with(
+                'Test\Organization',
+                'Test\Entity1',
+                'organization',
+                'manyToOne|Test\Entity1|Test\Organization|organization'
+            );
+
+        $this->relationBuilder->expects($this->exactly(2))->method('addFieldConfig');
+        $this->relationBuilder->expects($this->exactly(2))->method('addManyToOneRelation');
+
+        $extendConfigs = [];
+        $this->extension->preUpdate($extendConfigs);
+    }
+
     public function preUpdateProvider()
     {
         return [
-            ['USER', 'getUserClass'],
-            ['BUSINESS_UNIT', 'getBusinessUnitClass'],
-            ['ORGANIZATION', 'getOrganizationClass'],
+            ['USER', 'getUserClass', 'getOrganizationClass'],
+            ['BUSINESS_UNIT', 'getBusinessUnitClass', 'getOrganizationClass'],
         ];
     }
 
