@@ -31,7 +31,7 @@ class Item
     protected $integerValue;
 
     /**
-     * @var decimal $decimalValue
+     * @var float $decimalValue
      *
      * @ORM\Column(name="decimalValue", type="decimal", scale=2, nullable=true)
      */
@@ -52,7 +52,7 @@ class Item
     protected $booleanValue;
 
     /**
-     * @var blob $blobValue
+     * @var string $blobValue
      *
      * @ORM\Column(name="blobValue", type="blob", nullable=true)
      */
@@ -66,14 +66,14 @@ class Item
     protected $arrayValue;
 
     /**
-     * @var datetime $arrayValue
+     * @var \DateTime $arrayValue
      *
      * @ORM\Column(name="datetimeValue", type="datetime", nullable=true)
      */
     protected $datetimeValue;
 
     /**
-     * @var guid $arrayValue
+     * @var string $arrayValue
      *
      * @ORM\Column(name="guidValue", type="guid", nullable=true)
      */
@@ -87,7 +87,7 @@ class Item
     protected $objectValue;
 
     /**
-     * @var Value
+     * @var ItemValue
      *
      * @ORM\OneToMany(targetEntity="ItemValue", mappedBy="entity", cascade={"persist", "remove"})
      */

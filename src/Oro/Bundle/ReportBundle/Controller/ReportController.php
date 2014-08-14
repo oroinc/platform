@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -25,7 +26,8 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
-        $reportType = strtolower($entity->getType()->getName());
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+
         $reportGroup = $this->get('oro_entity_config.provider.entity')
             ->getConfig($entity->getEntity())
             ->get('plural_label');
@@ -34,8 +36,9 @@ class ReportController extends Controller
             'reportGroup' => $reportGroup
         ];
 
-        if ($reportType === 'table') {
-            $gridName = sprintf('oro_report_table_%d', $entity->getId());
+        $reportType = $entity->getType()->getName();
+        if ($reportType === ReportType::TYPE_TABLE) {
+            $gridName = $entity::GRID_PREFIX . $entity->getId();
 
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
@@ -63,7 +66,7 @@ class ReportController extends Controller
         }
 
         return $this->render(
-            sprintf('OroReportBundle:Report:%s/view.html.twig', $reportType),
+            sprintf('OroReportBundle:Report:%s/view.html.twig', strtolower($reportType)),
             $parameters
         );
     }

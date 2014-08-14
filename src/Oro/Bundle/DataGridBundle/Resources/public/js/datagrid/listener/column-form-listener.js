@@ -262,7 +262,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
 
         if (gridOptions.columnListener) {
             listenerOptions = _.extend({
-                $gridContainer: options.$el,
+                $gridContainer: options._sourceElement,
                 gridName: options.gridName
             }, gridOptions.columnListener);
 
