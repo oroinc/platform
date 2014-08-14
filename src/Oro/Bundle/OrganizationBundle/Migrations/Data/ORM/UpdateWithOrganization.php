@@ -27,7 +27,7 @@ abstract class UpdateWithOrganization extends AbstractFixture implements Contain
     {
         $manager->getRepository('OroOrganizationBundle:Organization')->updateWithOrganization(
             $tableName,
-            $this->getReference('default_organization')->getId()
+            $manager->getRepository('OroOrganizationBundle:Organization')->getFirst()->getId()
         );
     }
 }

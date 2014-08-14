@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 
 class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
@@ -18,8 +23,6 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped('feature/OEE-26_organizations');
-
         $this->buRepo = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -132,9 +135,21 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 
         $user->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(isset($parameterts['id'])? $parameterts['id'] : 1));
+            ->will($this->returnValue(isset($parameterts['id']) ? $parameterts['id'] : 1));
 
-        $result = $this->businessUnitManager->canUserBeSetAsOwner($user, 1, $accessLevel, $treeProvider);
+        $organizationContext = new Organization();
+        $organizationContext->setId(1);
+        $newUser = new User();
+        $newUser->setId(1);
+        $newUser->setOrganizations(new ArrayCollection([$organizationContext]));
+
+        $result = $this->businessUnitManager->canUserBeSetAsOwner(
+            $user,
+            $newUser,
+            $accessLevel,
+            $treeProvider,
+            $organizationContext
+        );
         $this->assertEquals($expected, $result);
     }
 
@@ -148,8 +163,8 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
             [AccessLevel::LOCAL_LEVEL, false, ['userBU' => [2, 3], 'ownerId' => 1]],
             [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [1, 2], 'ownerId' => 2]],
             [AccessLevel::DEEP_LEVEL, false, ['userBU' => [1], 'userSubBU' => [2], 'ownerId' => 3]],
-            [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 1]],
-            [AccessLevel::GLOBAL_LEVEL, false, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 4]],
+            [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3]]],
+            [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 4]],
         ];
     }
 }

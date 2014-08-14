@@ -480,7 +480,6 @@ class EntityAclExtension extends AbstractAclExtension
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
-                        $securityToken->getOrganizationContext(),
                         $securityToken->getUser(),
                         $object,
                         true,

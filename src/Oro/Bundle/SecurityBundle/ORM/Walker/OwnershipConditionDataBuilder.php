@@ -158,21 +158,21 @@ class OwnershipConditionDataBuilder
                     $constraint = $this->getCondition($buIds, $metadata);
                 } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
-                    $this->fillBusinessUnitUserIds($this->getUserId(), $userIds);
+                    $this->fillBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                 if ($this->metadataProvider->getBusinessUnitClass() === $targetEntityClassName) {
                     $buIds = [];
-                    $this->fillSubordinateBusinessUnitIds($this->getUserId(), $buIds);
+                    $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata, 'id');
                 } elseif ($metadata->isBusinessUnitOwned()) {
                     $buIds = [];
-                    $this->fillSubordinateBusinessUnitIds($this->getUserId(), $buIds);
+                    $this->fillSubordinateBusinessUnitIds($this->getUserId(), $this->getOrganizationId(), $buIds);
                     $constraint = $this->getCondition($buIds, $metadata);
                 } elseif ($metadata->isUserOwned()) {
                     $userIds = [];
-                    $this->fillSubordinateBusinessUnitUserIds($this->getUserId(), $userIds);
+                    $this->fillSubordinateBusinessUnitUserIds($this->getUserId(), $this->getOrganizationId(), $userIds);
                     $constraint = $this->getCondition($userIds, $metadata);
                 }
             } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
@@ -230,11 +230,12 @@ class OwnershipConditionDataBuilder
      * Adds all business unit ids within all subordinate business units the given user is associated
      *
      * @param int|string $userId
+     * @param int|string $organizationId
      * @param array      $result [output]
      */
-    protected function fillSubordinateBusinessUnitIds($userId, array &$result)
+    protected function fillSubordinateBusinessUnitIds($userId, $organizationId, array &$result)
     {
-        $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId);
+        $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
         $result = array_merge($buIds, []);
         foreach ($buIds as $buId) {
             $diff = array_diff($this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId), $result);
@@ -248,11 +249,12 @@ class OwnershipConditionDataBuilder
      * Adds all user ids within all business units the given user is associated
      *
      * @param int|string $userId
+     * @param int|string $organizationId
      * @param array      $result [output]
      */
-    protected function fillBusinessUnitUserIds($userId, array &$result)
+    protected function fillBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
-        foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId) as $buId) {
+        foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
             $userIds = $this->treeProvider->getTree()->getBusinessUnitUserIds($buId);
             if (!empty($userIds)) {
                 $result = array_merge($result, $userIds);
@@ -264,12 +266,13 @@ class OwnershipConditionDataBuilder
      * Adds all user ids within all subordinate business units the given user is associated
      *
      * @param int|string $userId
+     * @param int|string $organizationId
      * @param array      $result [output]
      */
-    protected function fillSubordinateBusinessUnitUserIds($userId, array &$result)
+    protected function fillSubordinateBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
         $buIds = [];
-        $this->fillSubordinateBusinessUnitIds($userId, $buIds);
+        $this->fillSubordinateBusinessUnitIds($userId, $organizationId, $buIds);
         foreach ($buIds as $buId) {
             $userIds = $this->treeProvider->getTree()->getBusinessUnitUserIds($buId);
             if (!empty($userIds)) {

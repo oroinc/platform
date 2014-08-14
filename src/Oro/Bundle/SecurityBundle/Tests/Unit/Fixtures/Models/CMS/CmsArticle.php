@@ -41,6 +41,12 @@ class CmsArticle
      */
     public $version;
 
+    /**
+     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @JoinColumn(name="organization", referencedColumnName="id")
+     */
+    public $organization;
+
     public function setAuthor(CmsUser $author)
     {
         $this->user = $author;
@@ -50,5 +56,21 @@ class CmsArticle
     {
         $this->comments[] = $comment;
         $comment->setArticle($this);
+    }
+
+    /**
+     * @param mixed $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }
