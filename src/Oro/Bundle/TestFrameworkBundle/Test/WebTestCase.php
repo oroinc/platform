@@ -35,8 +35,9 @@ abstract class WebTestCase extends BaseWebTestCase
     const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
-    const AUTH_USER = 'admin@example.com';
-    const AUTH_PW   = 'admin';
+    const AUTH_USER         = 'admin@example.com';
+    const AUTH_PW           = 'admin';
+    const AUTH_ORGANIZATION = 1;
 
     /**
      * @var bool[]
@@ -495,7 +496,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function generateRandomString($length = 10)
     {
-        $random= "";
+        $random = "";
         srand((double) microtime() * 1000000);
         $char_list = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $char_list .= "abcdefghijklmnopqrstuvwxyz";
@@ -547,12 +548,20 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $userName
      * @param string $userPassword
+     * @param int    $userOrganization
      *
      * @return array
      */
-    public static function generateBasicAuthHeader($userName = self::AUTH_USER, $userPassword = self::AUTH_PW)
-    {
-        return array('PHP_AUTH_USER' => $userName, 'PHP_AUTH_PW' => $userPassword);
+    public static function generateBasicAuthHeader(
+        $userName = self::AUTH_USER,
+        $userPassword = self::AUTH_PW,
+        $userOrganization = self::AUTH_ORGANIZATION
+    ) {
+        return array(
+            'PHP_AUTH_USER' => $userName,
+            'PHP_AUTH_PW' => $userPassword,
+            'PHP_AUTH_ORGANIZATION' => $userOrganization
+        );
     }
 
     /**
