@@ -1,0 +1,4 @@
+oro:
+    email:
+        emailtemplate:
+            entity_name.tooltip:  Choose an entity this template is related to or keep it empty if this template is not related to any entity.

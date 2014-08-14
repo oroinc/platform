@@ -35,8 +35,8 @@ class BaseOrmRelationDatagridListener
      */
     public function __construct($paramName, $isEditMode = true)
     {
-        $this->paramName     = $paramName;
-        $this->isEditMode    = $isEditMode;
+        $this->paramName  = $paramName;
+        $this->isEditMode = $isEditMode;
     }
 
     /**
@@ -55,7 +55,7 @@ class BaseOrmRelationDatagridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datagrid = $event->getDatagrid();
+        $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         $parameters = $datagrid->getParameters();
         if ($datasource instanceof OrmDatasource) {
@@ -63,23 +63,29 @@ class BaseOrmRelationDatagridListener
             $queryBuilder = $datasource->getQueryBuilder();
 
             $additionalParams = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+
+            $dataIn  = [0];
+            $dataOut = [0];
+
             if (isset($additionalParams[self::GRID_PARAM_DATA_IN])) {
-                $dataIn = $additionalParams[self::GRID_PARAM_DATA_IN];
-            } else {
-                $dataIn = [0];
+                $filteredParams = array_filter($additionalParams[self::GRID_PARAM_DATA_IN]);
+                if (!empty($filteredParams)) {
+                    $dataIn = $additionalParams[self::GRID_PARAM_DATA_IN];
+                }
             }
 
             if (isset($additionalParams[self::GRID_PARAM_DATA_NOT_IN])) {
-                $dataOut = $additionalParams[self::GRID_PARAM_DATA_NOT_IN];
-            } else {
-                $dataOut = [0];
+                $filteredParams = array_filter($additionalParams[self::GRID_PARAM_DATA_NOT_IN]);
+                if (!empty($filteredParams)) {
+                    $dataOut = $additionalParams[self::GRID_PARAM_DATA_NOT_IN];
+                }
             }
 
-            $queryParameters = array(
+            $queryParameters = [
                 $this->paramName => $parameters->get($this->paramName),
                 'data_in'        => $dataIn,
                 'data_not_in'    => $dataOut,
-            );
+            ];
 
             if (!$this->isEditMode) {
                 unset($queryParameters['data_in'], $queryParameters['data_not_in']);

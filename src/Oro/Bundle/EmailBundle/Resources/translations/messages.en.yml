@@ -21,12 +21,30 @@ oro:
             is_system.label:     Is system
             is_editable.label:   Is editable
             name.label:          Template name
+            owner.label:         Owner
             parent.label:        Parent
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
             type.label:          Type
             translations.label:  Translations
+
+            # sections for email template variables
+            variables:
+                system: 'System variables'
+                entity: 'Entity variables'
+
+            # email template system variables
+            user_name:           Username of logged in user
+            user_first_name:     First name of logged in user
+            user_last_name:      Last name of logged in user
+            user_full_name:      Full name of logged in user
+            app_short_name:      Short name of application
+            app_full_name:       Full name of application
+            app_url:             Application URL
+            current_datetime:    Current date & time
+            current_date:        Current date
+            current_time:        Current time
 
         menu:
             emailtemplate_list.description: List of email templates
@@ -42,6 +60,8 @@ oro:
                     type:
                         html: "Html"
                         txt:  "Plain text"
+                    entityName:
+                        empty: None
                 page_size:
                     all: "All"
                 view:
@@ -87,4 +107,3 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
-"Click to insert variable or drag it.": "Click to insert variable or drag it."

@@ -19,24 +19,15 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $platform;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $managerRegistry;
+
     protected function setUp()
     {
-        $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
-            ->disableOriginalConstructor()
-            ->setMethods(['isCommentedDoctrineType'])
-            ->getMockForAbstractClass();
-
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->returnValue($this->platform));
-
-        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $managerRegistry->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        $this->extension = new SchemaDumperExtension($managerRegistry);
+        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->extension = new SchemaDumperExtension($this->managerRegistry);
     }
 
     public function testGetName()
@@ -51,6 +42,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStringColumnOptions()
     {
+        $this->assertPlatform();
         $this->platform->expects($this->once())
             ->method('isCommentedDoctrineType')
             ->will($this->returnValue(false));
@@ -64,6 +56,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIntegerColumnOptions()
     {
+        $this->assertPlatform();
         $this->platform->expects($this->once())
             ->method('isCommentedDoctrineType')
             ->will($this->returnValue(true));
@@ -78,5 +71,21 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result['autoincrement']);
         $this->assertFalse($result['notnull']);
         $this->assertEquals('(DC2Type:integer)', $result['comment']);
+    }
+
+    protected function assertPlatform()
+    {
+        $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
+            ->disableOriginalConstructor()
+            ->setMethods(['isCommentedDoctrineType'])
+            ->getMockForAbstractClass();
+
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->will($this->returnValue($this->platform));
+        $this->managerRegistry->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection));
     }
 }

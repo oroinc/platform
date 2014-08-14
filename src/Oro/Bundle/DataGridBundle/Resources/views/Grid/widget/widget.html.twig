@@ -1,5 +1,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
+{% block widget_content %}
 <div class="widget-content">
     <script type="text/javascript">
         require(['oroui/js/mediator', 'oroui/js/widget-manager'],
@@ -26,3 +27,4 @@
 
     {{ dataGrid.renderGrid(gridName, params, renderParams) }}
 </div>
+{% endblock %}

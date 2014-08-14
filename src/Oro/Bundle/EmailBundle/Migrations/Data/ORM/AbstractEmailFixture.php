@@ -6,21 +6,36 @@ use Symfony\Component\Finder\Finder;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\UserBundle\Entity\User;
 
-abstract class AbstractEmailFixture extends AbstractFixture
+abstract class AbstractEmailFixture extends AbstractFixture implements DependentFixtureInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
+        ];
+    }
+
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
+        $adminUser = $this->getAdminUser($manager);
+
         $emailTemplates = $this->getEmailTemplatesList($this->getEmailsDir());
 
         foreach ($emailTemplates as $fileName => $file) {
             $template = file_get_contents($file['path']);
             $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
+            $emailTemplate->setOwner($adminUser);
             $manager->persist($emailTemplate);
         }
 
@@ -60,6 +75,35 @@ abstract class AbstractEmailFixture extends AbstractFixture
         }
 
         return $templates;
+    }
+
+    /**
+     * Get administrator user
+     *
+     * @param ObjectManager $manager
+     *
+     * @return User
+     *
+     * @throws \RuntimeException
+     */
+    protected function getAdminUser(ObjectManager $manager)
+    {
+        $repository = $manager->getRepository('OroUserBundle:Role');
+        $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
+
+        if (!$role) {
+            throw new \RuntimeException('Administrator role should exist.');
+        }
+
+        $user = $repository->getFirstMatchedUser($role);
+
+        if (!$user) {
+            throw new \RuntimeException(
+                'Administrator user should exist to load email templates.'
+            );
+        }
+
+        return $user;
     }
 
     /**

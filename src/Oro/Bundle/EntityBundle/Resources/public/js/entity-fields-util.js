@@ -88,17 +88,17 @@ define(['underscore'], function (_) {
                 return chain;
             }
 
-            $.each(path.split('+'), function (i, item) {
-                var filedName, entityName, pos;
+            _.each(path.split('+'), function (item, i) {
+                var fieldName, entityName, pos;
 
                 if (i === 0) {
                     // first item is always just a field name
-                    filedName = item;
+                    fieldName = item;
                 } else {
                     pos = item.indexOf('::');
                     if (pos !== -1) {
                         entityName = item.slice(0, pos);
-                        filedName = item.slice(pos + 2);
+                        fieldName = item.slice(pos + 2);
                     } else {
                         entityName = item;
                     }
@@ -109,10 +109,10 @@ define(['underscore'], function (_) {
                     chain[i].entity = data[entityName];
                 }
 
-                if (filedName) {
+                if (fieldName) {
                     item = {
                         // take field from entity of previous chain part
-                        field: chain[i].entity.fieldsIndex[filedName]
+                        field: chain[i].entity.fieldsIndex[fieldName]
                     };
                     chain.push(item);
                     item.path = self.entityChainToPath(chain);
@@ -164,7 +164,7 @@ define(['underscore'], function (_) {
             var path;
             end = end || chain.length;
 
-            chain = $.map(chain.slice(1, end), function (item) {
+            chain = _.map(chain.slice(1, end), function (item) {
                 var result = item.field.name;
                 if (item.entity) {
                     result += '+' + item.entity.name;
@@ -206,7 +206,7 @@ define(['underscore'], function (_) {
         /**
          * Converts Field Path to Property Path
          *
-         * Filed Path:
+         * Field Path:
          *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          * Returns Property Path:
          *      account.contacts.firstName
@@ -214,10 +214,9 @@ define(['underscore'], function (_) {
          * @param {string} path
          * @returns {string}
          */
-        getPropertyPathByPath: function(path)
-        {
+        getPropertyPathByPath: function (path) {
             var propertyPathParts = [];
-            $.each(path.split('+'), function (i, item) {
+            _.each(path.split('+'), function (item, i) {
                 var part;
                 if (i === 0) {
                     // first item is always just a field name
@@ -241,26 +240,27 @@ define(['underscore'], function (_) {
          *
          * Property Path:
          *      account.contacts.firstName
-         * Returns Filed Path:
+         * Returns Field Path:
          *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          *
          * @param {string} pathData
          * @returns {string}
          */
-        getPathByPropertyPath: function(pathData) {
+        getPathByPropertyPath: function (pathData) {
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
             }
 
             var entityData = this.data[this.entity];
-            var fieldIdParts = $.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
+            var fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
                 var fieldPartId = fieldName;
 
                 var fieldsData = null;
                 if (entityData.hasOwnProperty('fieldsIndex')) {
                     fieldsData = entityData.fieldsIndex;
-                } else if (entityData.hasOwnProperty('related_entity')
-                    && entityData.related_entity.hasOwnProperty('fieldsIndex')
+                } else if (
+                    entityData.hasOwnProperty('related_entity') &&
+                        entityData.related_entity.hasOwnProperty('fieldsIndex')
                 ) {
                     fieldsData = entityData.related_entity.fieldsIndex;
                 }

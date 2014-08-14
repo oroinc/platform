@@ -94,7 +94,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
                     }
                 });
                 this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.trigger('layout.init', el);
+                    mediator.execute('layout:init', el);
                 });
                 this.widget.render();
             } else {

@@ -37,6 +37,9 @@ class Query
     const TYPE_DECIMAL = 'decimal';
 
     const INFINITY = 10000000;
+    const FINITY   = 0.000001;
+
+    const DELIMITER = ' ';
 
     /**
      * @var array
@@ -98,7 +101,7 @@ class Query
         if ($queryType) {
             $this->createQuery($queryType);
         }
-        $this->options = array();
+        $this->options = [];
         $this->maxResults = 0;
         $this->from = false;
     }
@@ -128,7 +131,7 @@ class Query
      */
     public function setMappingConfig($mappingConfig)
     {
-        $fields = array();
+        $fields = [];
         foreach ($mappingConfig as $entity => $config) {
             foreach ($config['fields'] as $field) {
                 if (isset($field['relation_fields'])) {
@@ -176,12 +179,12 @@ class Query
     public function from($entities)
     {
         if (!is_array($entities)) {
-            $entities = array($entities);
+            $entities = [$entities];
         }
         $this->from = $entities;
 
         foreach ($this->from as $index => $fromValue) {
-            $this->from[$index] = $this->clearString($fromValue);
+            $this->from[$index] = self::clearString($fromValue);
         }
 
         return $this;
@@ -231,21 +234,17 @@ class Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
-        //if ($fieldName!='*' && !$this->checkFieldInConfig($fieldName)) {
-        //    throw new \InvalidArgumentException('Field ' . $fieldName . ' does not exists in config');
-        //}
-
         if ($fieldType == self::TYPE_TEXT) {
-            $fieldValue = $this->clearString($fieldValue);
+            $fieldValue = self::clearString($fieldValue);
         }
 
-        $this->options[] = array(
+        $this->options[] = [
             'fieldName'  => $fieldName,
             'condition'  => $condition,
             'fieldValue' => $fieldValue,
             'fieldType'  => $fieldType,
             'type'       => $keyWord
-        );
+        ];
 
         return $this;
     }
@@ -387,11 +386,26 @@ class Query
     /**
      * Get order by direction
      *
-     * @return type
+     * @return string
      */
     public function getOrderDirection()
     {
         return $this->orderDirection;
+    }
+
+    /**
+     * Clear string
+     *
+     * @param  string $inputString
+     * @return string
+     */
+    public static function clearString($inputString)
+    {
+        $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
+
+        return trim(
+            preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $clearedString))
+        );
     }
 
     private function mapTargetFields($fields, $field, $entity)
@@ -418,18 +432,5 @@ class Query
         }
 
         return $fields;
-    }
-
-    /**
-     * Clear string
-     *
-     * @param  string $inputString
-     * @return string
-     */
-    private function clearString($inputString)
-    {
-        $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
-        $clearedString = trim(preg_replace('/ +/', ' ', mb_ereg_replace('[^\w:*]', ' ', $clearedString)));
-        return $clearedString;
     }
 }

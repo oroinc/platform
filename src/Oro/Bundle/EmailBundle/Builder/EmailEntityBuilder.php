@@ -173,7 +173,7 @@ class EmailEntityBuilder
      * @param string $content The body content
      * @param bool $isHtml Indicate whether the body content is HTML or TEXT
      * @param bool $persistent Indicate whether this email body can be removed by the email cache manager or not
-     *                         Set false for external email, and false for system email, for example sent by BAP
+     *                         Set false for external email, and true for system email, for example sent by BAP
      * @return EmailBody
      */
     public function body($content, $isHtml, $persistent = false)

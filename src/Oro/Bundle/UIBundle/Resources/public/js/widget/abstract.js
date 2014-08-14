@@ -590,7 +590,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
                 this.actions = {};
                 this.setElement($(content).filter('.widget-content:first'));
                 this._show();
-                mediator.trigger('layout.init', this.widget);
+                mediator.execute('layout:init', this.widget);
                 mediator.trigger('widget:contentLoad', this.widget);
             } catch (error) {
                 console.warn(error);

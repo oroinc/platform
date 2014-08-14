@@ -1,3 +1,7 @@
+oro:
+    workflow:
+        change_entity_confirmation: "Are you sure you want to change entity?"
+
 "Gray button": "Gray button"
 "Navy blue button": "Navy blue button"
 "Blue button": "Blue button"
@@ -28,9 +32,6 @@
 "Related entity must be selected to add transition.": "Related entity must be selected to add transition."
 "At least one step should be added to add transition.": "At least one step should be added to add transition."
 "Could not perform transition": "Could not perform transition"
-"Change Entity Confirmation": "Change Entity Confirmation"
-"Yes, I Agree": "Yes, I Agree"
-"Are you sure you want to change entity?": "Are you sure you want to change entity?"
 "Add": "Add"
 "Update": "Update"
 "Step saved.": "Step saved."

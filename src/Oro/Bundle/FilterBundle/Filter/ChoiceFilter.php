@@ -3,8 +3,10 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
 class ChoiceFilter extends AbstractFilter
@@ -27,19 +29,55 @@ class ChoiceFilter extends AbstractFilter
             return false;
         }
 
-        $parameterName = $ds->generateParameterName($this->getName());
-
-        $this->applyFilterToClause(
-            $ds,
-            $this->buildComparisonExpr(
+        $isNullValueSelected = $this->checkNullValue($data);
+        if ($isNullValueSelected) {
+            if (empty($data['value'])) {
+                // apply only null value filter
+                $this->applyFilterToClause(
+                    $ds,
+                    $this->buildNullValueExpr(
+                        $ds,
+                        $data['type'],
+                        $this->get(FilterUtility::DATA_NAME_KEY)
+                    )
+                );
+            } else {
+                // apply both comparison and null value filters
+                $parameterName = $ds->generateParameterName($this->getName());
+                $this->applyFilterToClause(
+                    $ds,
+                    $this->buildCombinedExpr(
+                        $ds,
+                        $data['type'],
+                        $this->buildComparisonExpr(
+                            $ds,
+                            $data['type'],
+                            $this->get(FilterUtility::DATA_NAME_KEY),
+                            $parameterName
+                        ),
+                        $this->buildNullValueExpr(
+                            $ds,
+                            $data['type'],
+                            $this->get(FilterUtility::DATA_NAME_KEY)
+                        )
+                    )
+                );
+                $ds->setParameter($parameterName, $data['value']);
+            }
+        } else {
+            // apply only comparison filter
+            $parameterName = $ds->generateParameterName($this->getName());
+            $this->applyFilterToClause(
                 $ds,
-                $data['type'],
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                $parameterName
-            )
-        );
-
-        $ds->setParameter($parameterName, $data['value']);
+                $this->buildComparisonExpr(
+                    $ds,
+                    $data['type'],
+                    $this->get(FilterUtility::DATA_NAME_KEY),
+                    $parameterName
+                )
+            );
+            $ds->setParameter($parameterName, $data['value']);
+        }
 
         return true;
     }
@@ -111,7 +149,8 @@ class ChoiceFilter extends AbstractFilter
      * @param int                              $comparisonType
      * @param string                           $fieldName
      * @param string                           $parameterName
-     * @return string
+     *
+     * @return mixed
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
@@ -125,5 +164,77 @@ class ChoiceFilter extends AbstractFilter
             default:
                 return $ds->expr()->in($fieldName, $parameterName, true);
         }
+    }
+
+    /**
+     * Build an expression used to filter data by null value
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType
+     * @param string                           $fieldName
+     *
+     * @return mixed
+     */
+    protected function buildNullValueExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName
+    ) {
+        switch ($comparisonType) {
+            case ChoiceFilterType::TYPE_NOT_CONTAINS:
+                return $ds->expr()->isNotNull($fieldName);
+            default:
+                return $ds->expr()->isNull($fieldName);
+        }
+    }
+
+    /**
+     * Build an expression contains both comparison and null value expressions
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType
+     * @param mixed                            $comparisonExpr
+     * @param mixed                            $nullValueExpr
+     *
+     * @return mixed
+     */
+    protected function buildCombinedExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $comparisonExpr,
+        $nullValueExpr
+    ) {
+        switch ($comparisonType) {
+            case ChoiceFilterType::TYPE_NOT_CONTAINS:
+                return $ds->expr()->andX($comparisonExpr, $nullValueExpr);
+            default:
+                return $ds->expr()->orX($comparisonExpr, $nullValueExpr);
+        }
+    }
+
+    /**
+     * Check if null value option is selected and if so remove it from $data array
+     *
+     * @param array $data
+     *
+     * @return bool TRUE if null value is selected; otherwise, FALSE
+     */
+    protected function checkNullValue(array &$data)
+    {
+        $nullValue          = $this->getOr('null_value');
+        $isNullValueSelected = false;
+        if ($nullValue) {
+            $values = $data['value'];
+            foreach ($values as $key => $value) {
+                if ($value === $nullValue) {
+                    unset($values[$key]);
+                    $data['value']        = $values;
+                    $isNullValueSelected = true;
+                    break;
+                }
+            }
+        }
+
+        return $isNullValueSelected;
     }
 }

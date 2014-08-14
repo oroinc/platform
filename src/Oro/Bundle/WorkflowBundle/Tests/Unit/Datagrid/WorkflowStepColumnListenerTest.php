@@ -170,6 +170,20 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                 'hasConfig' => true,
                 'isShowStep' => false,
             ),
+            'has group by' => array(
+                'config' => array(
+                    'source' => array(
+                        'query' => array(
+                            'from' => array(array('table' => self::ENTITY, 'alias' => self::ALIAS)),
+                            'groupBy' => self::ALIAS . '.id'
+                        )
+                    ),
+                    'columns' => array()
+                ),
+                'hasWorkflow' => true,
+                'hasConfig' => true,
+                'isShowStep' => true,
+            ),
         );
     }
 

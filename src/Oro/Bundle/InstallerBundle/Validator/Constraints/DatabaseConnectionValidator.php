@@ -17,7 +17,7 @@ class DatabaseConnectionValidator extends ConstraintValidator
             'dbname'   => $value['oro_installer_database_name'],
             'user'     => $value['oro_installer_database_user'],
             'password' => $value['oro_installer_database_password'],
-            'driver'   => 'pdo_mysql',
+            'driver'   => $value['oro_installer_database_driver'],
             'charset'  => 'UTF8',
         );
 

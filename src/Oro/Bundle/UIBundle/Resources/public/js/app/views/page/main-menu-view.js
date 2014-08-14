@@ -4,9 +4,8 @@ define([
     './../base/page-region-view',
     'underscore',
     'jquery',
-    'oroui/js/mediator',
-    'oroui/js/tools'
-], function (PageRegionView, _, $, mediator, tools) {
+    'oroui/js/mediator'
+], function (PageRegionView, _, $, mediator) {
     'use strict';
 
     var PageMainMenuView;
@@ -27,10 +26,9 @@ define([
         },
 
         render: function () {
-            var data = this.getTemplateData(),
-                currentRoute = (data && !_.isUndefined(data.currentRoute))
-                    ? data.currentRoute
-                    : tools.currentRoute;
+            var data, currentRoute;
+            data = this.getTemplateData();
+            currentRoute = this.getCurrentRoute(data);
 
             if (data) {
                 if (!_.isUndefined(data.mainMenu)) {
@@ -41,13 +39,20 @@ define([
                 this.initRouteMatches();
             }
 
-            if (!_.isUndefined(currentRoute)) {
-                this.toggleActiveMenuItem(currentRoute);
-                tools.currentRoute = currentRoute;
-            }
+            this.toggleActiveMenuItem(currentRoute);
 
             mediator.trigger('mainMenuUpdated', this);
             this.$el.trigger('mainMenuUpdated');
+        },
+
+        /**
+         * Defines current route name
+         * @param {Object=} data
+         * @returns {string}
+         */
+        getCurrentRoute: function (data) {
+            return (data && data.currentRoute) ||
+                mediator.execute('retrieveOption', 'startRouteName');
         },
 
         /**

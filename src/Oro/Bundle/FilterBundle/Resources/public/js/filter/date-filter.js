@@ -278,14 +278,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @private
          */
         _isDateVariable: function (value) {
-            var dateVars = this.dateWidgetOptions.dateVars;
-            for (var i in dateVars.value) {
-                if (dateVars.value.hasOwnProperty(i) && dateVars.value[i] == value) {
-                    return true;
-                }
-            }
-
-            return false;
+            var result, dateVars;
+            dateVars = this.dateWidgetOptions.dateVars;
+            result = _.some(dateVars.value, function (displayValue, index) {
+                var rawValue = '{{' + index + '}}';
+                return rawValue === value.substr(0, rawValue.length) ||
+                    displayValue === value.substr(0, displayValue.length);
+            });
+            return result;
         },
 
         /**
@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 $dropdown = $input.wrap('<div class="dropdown datefilter">').parent(),
                 tabSuffix = '-' + this.cid + '-' + name,
                 widgetOptions = _.extend({onSelect: function (date) {
-                    $input.val(date);
+                    $input.val(date).trigger('change');
                 }}, this.dateWidgetOptions);
 
             var tabs = [];
@@ -508,11 +508,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @protected
          */
         _formatDate: function (value, fromFormat, toFormat) {
-            var fromValue = $.datepicker.parseDate(fromFormat, value);
+            var fromValue;
+            if (this._isDateVariable(value)) {
+                return value;
+            }
+            fromValue = $.datepicker.parseDate(fromFormat, value);
             if (!fromValue) {
                 fromValue = $.datepicker.parseDate(toFormat, value);
                 if (!fromValue) {
-                    return value;
+                    return '';
                 }
             }
             return $.datepicker.formatDate(toFormat, fromValue);
