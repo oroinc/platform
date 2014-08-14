@@ -13,6 +13,22 @@
   }
 }
 .form-signin {
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+    select.login_custom {
+      height: 34px;
+      width: 228px !important;
+      border-left-color: #ccc;
+      z-index: 1;
+      position: relative;
+      -webkit-margin-start: -3px;
+      text-indent: 6px;
+    }
+    span.login_custom {
+      position:relative;
+      z-index: 2;
+    }
+  }
+
   margin: 0 auto;
   max-width: 410px;
   padding: 0;
