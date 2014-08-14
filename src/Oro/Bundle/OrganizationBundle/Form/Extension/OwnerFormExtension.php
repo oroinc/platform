@@ -586,12 +586,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getBusinessUnitIds()
     {
         if (AccessLevel::SYSTEM_LEVEL == $this->accessLevel) {
-            return $this->businessUnitManager->getBusinessUnitIds();
-            /**
-             * TODO:
-             * investigate this issue
-             */
-            //return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationContextId());
+            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationContextId());
         } elseif (AccessLevel::LOCAL_LEVEL == $this->accessLevel) {
             return $this->treeProvider->getTree()->getUserBusinessUnitIds(
                 $this->currentUser->getId(),
