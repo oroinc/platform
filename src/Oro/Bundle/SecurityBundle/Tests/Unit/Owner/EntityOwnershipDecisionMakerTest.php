@@ -69,8 +69,6 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped('feature/OEE-26_organizations');
-
         $this->tree = new OwnerTree();
 
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
@@ -173,8 +171,13 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUser('user41', 'bu41');
         $this->tree->addUser('user411', 'bu411');
 
-        $this->tree->addUserBusinessUnit('user4', 'bu3');
-        $this->tree->addUserBusinessUnit('user4', 'bu4');
+        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu3');
+        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
+
+        $this->tree->addUserOrganization('user4', 'org4');
+        $this->tree->addUserOrganization('user3', 'org3');
+        $this->tree->addUserOrganization('user31', 'org3');
+        $this->tree->addUserOrganization('user411', 'org4');
     }
 
     public function testIsOrganization()
@@ -297,11 +300,11 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user1, $this->org1));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $this->org2));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $this->org3));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user31, $this->org3));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->org3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $this->org3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user31, $this->org3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->org3));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->org4));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->org4));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->org4));
     }
 
     public function testIsAssociatedWithOrganizationForUserObject()
@@ -311,11 +314,11 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user1, $this->user1));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $this->user2));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $this->user3));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $this->user31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $this->user31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user31, $this->user31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user4));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user3));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $this->user411));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user411, $this->user411));
     }
@@ -340,9 +343,9 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj2));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj4));
     }
 
@@ -369,11 +372,11 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj2));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj31));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj4));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj41));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
@@ -401,11 +404,11 @@ class EntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user2, $obj2));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
-        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj31));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj3));
+        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user3, $obj31));
         $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
-        $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj31));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj3));
+        $this->assertFalse($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj31));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj4));
         $this->assertTrue($this->decisionMaker->isAssociatedWithOrganization($this->user4, $obj411));
     }

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
-class User
-{
-    private $id;
+use Oro\Bundle\UserBundle\Entity\User as ParentUser;
 
-    private $owner;
+class User extends ParentUser
+{
+    protected $owner;
 
     public function __construct($id = 0, $owner = null)
     {

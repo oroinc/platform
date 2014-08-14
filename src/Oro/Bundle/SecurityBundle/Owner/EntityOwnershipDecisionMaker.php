@@ -97,7 +97,10 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
-        $organizationId = $this->getOrganizationId();
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getOrganizationId($organization);
+        }
 
         $userOrganizationIds = $tree->getUserOrganizationIds($this->getObjectId($user));
         if (empty($userOrganizationIds) || ($organizationId && !in_array($organizationId, $userOrganizationIds))) {
@@ -157,14 +160,17 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
-        $organizationId = $this->getObjectId($organization);
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getObjectId($organization);
+        }
 
         if ($this->isBusinessUnit($domainObject)) {
             return $this->isUserBusinessUnit(
                 $this->getObjectId($user),
-                $organizationId,
                 $this->getObjectId($domainObject),
-                $deep
+                $deep,
+                $organizationId
             );
         }
 
@@ -182,7 +188,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isBusinessUnitOwned()) {
-            return $this->isUserBusinessUnit($this->getObjectId($user), $organizationId, $ownerId, $deep);
+            return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
         } elseif ($metadata->isUserOwned()) {
             $businessUnitId = $tree->getUserBusinessUnitId($ownerId);
             if ($businessUnitId === null) {
@@ -191,9 +197,9 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
             return $this->isUserBusinessUnit(
                 $this->getObjectId($user),
-                $organizationId,
                 $tree->getUserBusinessUnitId($ownerId),
-                $deep
+                $deep,
+                $organizationId
             );
         }
 

@@ -263,7 +263,7 @@ class OwnerTree
      * @param  int|string  $organizationId
      * @return array  of int|string
      */
-    public function getUserSubordinateBusinessUnitIds($userId, $organizationId)
+    public function getUserSubordinateBusinessUnitIds($userId, $organizationId = null)
     {
         $buIds = $this->getUserBusinessUnitIds($userId, $organizationId);
         $resultBuIds = array_merge($buIds, []);
@@ -355,9 +355,8 @@ class OwnerTree
      *
      * @param int|string      $userId
      * @param int|string|null $owningBusinessUnitId
-     * @param int|string|null $owningOrganizationId
      */
-    public function addUser($userId, $owningBusinessUnitId, $owningOrganizationId)
+    public function addUser($userId, $owningBusinessUnitId)
     {
         $this->userOwningBusinessUnitId[$userId] = $owningBusinessUnitId;
 

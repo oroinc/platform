@@ -121,7 +121,7 @@ class OwnerTreeProvider
         foreach ($users as $user) {
             /** @var \Oro\Bundle\UserBundle\Entity\User $user */
             $owner = $user->getOwner();
-            $tree->addUser($user->getId(), $owner ? $owner->getId() : null, $user->getOrganization()->getId());
+            $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
             foreach ($user->getOrganizations() as $organization) {
                 $tree->addUserOrganization($user->getId(), $organization->getId());
                 foreach ($user->getBusinessUnits() as $businessUnit) {
