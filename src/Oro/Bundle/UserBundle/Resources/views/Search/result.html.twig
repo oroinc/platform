@@ -23,7 +23,7 @@
 {% endif %}
 
 {% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
-{% set entityType = oro_entity_config(indexer_item.entityName, 'entity', 'label')|trans %}
+{% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
 
 {% set entityInfo = [
     {'title': 'oro.ui.created_at'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},

@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
 
 class OroEmailBundle extends Bundle
 {
@@ -47,6 +48,7 @@ class OroEmailBundle extends Bundle
         $this->addDoctrineOrmMappingsPass($container);
         $container->addCompilerPass(new EmailBodyLoaderPass());
         $container->addCompilerPass(new EmailSynchronizerPass());
+        $container->addCompilerPass(new EmailTemplateVariablesPass());
     }
 
     /**

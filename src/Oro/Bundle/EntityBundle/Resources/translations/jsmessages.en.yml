@@ -5,3 +5,5 @@ oro:
             relations:        Relatated entities
         form:
             choose_entity_field:    Choose a field...
+
+"Change Entity Confirmation": "Change Entity Confirmation"

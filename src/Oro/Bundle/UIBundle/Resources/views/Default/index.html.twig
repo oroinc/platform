@@ -34,7 +34,7 @@
                 </script>
                 {% endblock %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
+                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}

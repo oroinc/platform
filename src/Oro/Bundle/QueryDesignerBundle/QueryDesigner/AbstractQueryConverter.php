@@ -549,16 +549,19 @@ abstract class AbstractQueryConverter
     {
         if (isset($this->definition['grouping_columns'])) {
             foreach ($this->definition['grouping_columns'] as $column) {
-                $columnName = $column['name'];
-
-                if (isset($this->virtualColumnExpressions[$columnName])) {
-                    list($tableAlias, $fieldName) = explode('.', $this->virtualColumnExpressions[$columnName]);
-                } else {
-                    $fieldName  = $this->getFieldName($columnName);
-                    $tableAlias = $this->getTableAliasForColumn($columnName);
+                $columnAliasKey = $this->buildColumnAliasKey($column);
+                $columnAlias    = isset($this->columnAliases[$columnAliasKey])
+                    ? $this->columnAliases[$columnAliasKey]
+                    : null;
+                if (empty($columnAlias)) {
+                    throw new InvalidConfigurationException(
+                        sprintf(
+                            'The grouping column "%s" must be declared in SELECT clause.',
+                            $column['name']
+                        )
+                    );
                 }
-
-                $this->addGroupByColumn($tableAlias, $fieldName);
+                $this->addGroupByColumn($columnAlias);
             }
         }
     }
@@ -566,10 +569,9 @@ abstract class AbstractQueryConverter
     /**
      * Performs conversion of a single column of GROUP BY statement
      *
-     * @param string $tableAlias
-     * @param string $fieldName
+     * @param string $columnAlias
      */
-    abstract protected function addGroupByColumn($tableAlias, $fieldName);
+    abstract protected function addGroupByColumn($columnAlias);
 
     /**
      * Performs conversion of ORDER BY statement

@@ -30,7 +30,10 @@ parameters:
     oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
 
     # Providers
-    oro_email.provider.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
+    oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
+    oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
+    oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
+    oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
@@ -42,7 +45,7 @@ parameters:
     oro_email.helper.datagrid.emails.class:           Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper
     oro_email.datagrid_query_factory.class:           Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
-    oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesGridHelper
+    oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper
 
     # Datagrid event listeners
     oro_email.listener.datagrid.email.class:        Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener
@@ -178,10 +181,9 @@ services:
             - @oro_email.twig.string_loader
             -  # twig environment options
               strict_variables: true
-            - @oro_entity_config.provider.email
+            - @oro_email.emailtemplate.variable_provider
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
-            - @security.context
             - @oro_email.twig.email_sandbox
         lazy: true
 
@@ -205,21 +207,52 @@ services:
             - @oro_email.twig.email_security_policy
             - true # use sandbox globally in instance
 
-    oro_email.provider.variable_provider:
-        class: %oro_email.provider.variable_provider.class%
-        arguments:
-            - @security.context
-            - @oro_entity_config.provider.email
-        lazy: true
+    oro_email.emailtemplate.variable_provider:
+        class: %oro_email.emailtemplate.variable_provider.class%
 
-    oro_email.validator.variables_validator:
-        class: Oro\Bundle\EmailBundle\Validator\VariablesValidator
+    oro_email.emailtemplate.variable_provider.entity:
+        class: %oro_email.emailtemplate.variable_provider.entity.class%
+        arguments:
+            - @translator
+            - @oro_entity_config.provider.email
+            - @oro_entity_config.provider.entity
+            - @doctrine
+        lazy: true
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    oro_email.emailtemplate.variable_provider.system:
+        class: %oro_email.emailtemplate.variable_provider.system.class%
+        lazy: true
+        arguments:
+            - @translator
+            - @oro_config.global
+            - @oro_locale.formatter.date_time
+        lazy: true
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: system }
+
+    oro_email.emailtemplate.variable_provider.user:
+        class: %oro_email.emailtemplate.variable_provider.user.class%
+        lazy: true
+        arguments:
+            - @translator
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+        lazy: true
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: system }
+
+    oro_email.validator.email_template_syntax:
+        class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
         arguments:
             - @oro_email.email_renderer
-            - @security.context
-            - @doctrine.orm.entity_manager
+            - @oro_locale.settings
+            - @oro_config.user
+            - @oro_entity_config.provider.entity
+            - @translator
         tags:
-            - { name: validator.constraint_validator, alias: oro_email.variables_validator }
+            - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%
@@ -234,6 +267,9 @@ services:
 
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
+        arguments:
+            - @oro_entity.entity_provider
+            - @translator
 
     oro_email.mailer.processor:
         class: %oro_email.mailer.processor.class%

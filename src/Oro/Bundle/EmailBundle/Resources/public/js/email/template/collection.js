@@ -9,7 +9,7 @@ define(['backbone', 'routing', './model'
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
-        route: 'oro_api_get_emailtemplate',
+        route: 'oro_api_get_emailtemplates',
         url: null,
         model: EmailTemplateModel,
 

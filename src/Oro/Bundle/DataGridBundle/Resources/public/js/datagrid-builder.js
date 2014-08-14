@@ -15,8 +15,7 @@ define(function (require) {
     var mapCellModuleName = require('./map-cell-module-name');
     var gridContentManager = require('./content-manager');
 
-    var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
-        gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
+    var gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
 
         helpers = {
             cellType: function (type) {
@@ -33,24 +32,28 @@ define(function (require) {
              * Builder interface implementation
              *
              * @param {jQuery.Deferred} deferred
-             * @param {jQuery} $el
-             * @param {String} gridName
+             * @param {Object} options
+             * @param {jQuery} [options.$el] container for the grid
+             * @param {string} [options.gridName] grid name
+             * @param {Object} [options.gridPromise] grid builder's promise
+             * @param {Object} [options.data] data for grid's collection
+             * @param {Object} [options.metadata] configuration for the grid
              */
-            init: function (deferred, $el, gridName) {
+            init: function (deferred, options) {
                 var self = {
                     deferred: deferred,
-                    $el: $el,
-                    gridName: gridName,
+                    $el: options.$el,
+                    gridName: options.gridName,
+                    data: options.data,
+                    metadata: _.defaults(options.metadata, {
+                        columns: [],
+                        options: {},
+                        state: {},
+                        rowActions: {},
+                        massActions: {}
+                    }),
                     modules: {}
                 };
-
-                self.metadata = _.extend({
-                    columns: [],
-                    options: {},
-                    state: {},
-                    rowActions: {},
-                    massActions: {}
-                }, self.$el.data('metadata'));
 
                 gridBuilder.collectModules.call(self);
 
@@ -92,19 +95,15 @@ define(function (require) {
                 if (!collection) {
                     // otherwise, create collection from metadata
                     collectionOptions = gridBuilder.combineCollectionOptions.call(this);
-                    collection = new PageableCollection(this.$el.data('data'), collectionOptions);
+                    collection = new PageableCollection(this.data, collectionOptions);
                 }
-
-                mediator.trigger('datagrid_collection_set_after', collection, this.$el);
 
                 // create grid
                 options = gridBuilder.combineGridOptions.call(this);
                 mediator.trigger('datagrid_create_before', options, collection);
                 grid = new Grid(_.extend({collection: collection}, options));
-                mediator.trigger('datagrid_create_after', grid);
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
-                this.$el.data('datagrid', grid);
                 mediator.trigger('datagrid:rendered');
 
                 if (options.routerEnabled !== false) {
@@ -116,7 +115,7 @@ define(function (require) {
                 options = gridBuilder.combineGridViewsOptions.call(this);
                 $(gridGridViewsSelector).append((new GridViewsView(_.extend({collection: collection}, options))).render().$el);
 
-                this.deferred.resolve();
+                this.deferred.resolve(grid);
             },
 
             /**
@@ -208,42 +207,38 @@ define(function (require) {
      * @param {array} builders
      * @param {string} selector
      */
-    return function (builders, selector) {
-        var $el = $(selector).filter(gridSelector);
+    return function (options) {
+        var deferred, promises;
 
-        builders.push(gridBuilder);
+        deferred = $.Deferred();
+        promises = [deferred.promise()];
 
-        $el.each(function (i, el) {
-            var $el, gridName, fragment, promises;
+        options.$el = $(document.createDocumentFragment());
+        options.gridName = options.metadata.options.gridName;
+        options.gridPromise = promises[0];
 
-            $el = $(el);
-            gridName = (($el.data('metadata') || {}).options || {}).gridName;
-            if (!gridName) {
-                return;
+        function runBuilder(deferred, builder) {
+            if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
+                deferred.reject();
+                throw new TypeError('Builder does not have init method');
             }
+            _.defer(_.bind(builder.init, builder), deferred, options);
+        }
 
-            var $placeHolder = $('<div/>');
-            $el.before($placeHolder);
-            fragment = document.createDocumentFragment();
-            fragment.appendChild($el[0]);
-            promises = [];
+        // run grid builders
+        runBuilder(deferred, gridBuilder);
 
-            _.each(builders, function (builder) {
-                var deferred;
-                if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
-                    throw new TypeError('Builder does not have init method');
-                }
-                deferred = $.Deferred();
-                setTimeout(function () {
-                    builder.init(deferred, $el, gridName);
-                }, 0);
-                promises.push(deferred.promise());
-            });
-
-            $.when.apply($, promises).done(function () {
-                $el.attr('data-rendered', true);
-                $placeHolder.replaceWith($el);
-            });
+        // run other builders
+        _.each(options.builders, function (module) {
+            var deferred = $.Deferred();
+            promises.push(deferred.promise());
+            require([module], _.partial(runBuilder, deferred));
         });
+
+        $.when.apply($, promises).always(function () {
+            $(options.el).html(options.$el.children());
+        });
+
+        return promises;
     };
 });

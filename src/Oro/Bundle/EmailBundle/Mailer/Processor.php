@@ -81,7 +81,7 @@ class Processor
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setSubject($model->getSubject());
-        $message->setBody($model->getBody(), 'text/plain');
+        $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
         $messageId = $message->generateId();
 
@@ -102,7 +102,7 @@ class Processor
         );
 
         $email->addFolder($origin->getFolder(EmailFolder::SENT));
-        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
+        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
 
         // persist the email and all related entities such as folders, email addresses etc.

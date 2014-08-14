@@ -3,7 +3,9 @@ parameters:
     oro_report.datagrid.configuration.provider.class:  Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider
     oro_report.listener.navigation_listener.class:     Oro\Bundle\ReportBundle\EventListener\NavigationListener
     oro_report.report_manager.class:                   Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
+    oro_report.grid.base_configuration_builder.class:  Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder
 
+    oro_report.grid.datagrid_configuration_builder.class: Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder
 services:
     oro_report.entity_provider:
         alias: oro_entity.entity_provider
@@ -11,10 +13,8 @@ services:
     oro_report.datagrid.configuration.provider:
         class: %oro_report.datagrid.configuration.provider.class%
         arguments:
-            - @oro_query_designer.query_designer.manager
-            - @oro_query_designer.virtual_field_provider
+            - @oro_report.grid.datagrid_configuration_builder
             - @doctrine
-            - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.configuration.provider }
 
@@ -31,3 +31,13 @@ services:
         class: %oro_report.report_manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+
+    oro_report.grid.base_configuration_builder:
+        class: %oro_report.grid.base_configuration_builder.class%
+        parent: oro_query_designer.grid.datagrid_configuration_builder
+        calls:
+            - [setConfigManager, [@oro_entity_config.config_manager]]
+
+    oro_report.grid.datagrid_configuration_builder:
+        class: %oro_report.grid.datagrid_configuration_builder.class%
+        parent: oro_report.grid.base_configuration_builder

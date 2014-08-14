@@ -2,87 +2,134 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 class VariablesProvider
 {
-    /** @var ConfigProvider  */
-    protected $configProvider;
+    /** @var SystemVariablesProviderInterface[] */
+    protected $systemVariablesProviders = [];
 
-    /** @var SecurityContextInterface  */
-    protected $securityContext;
+    /** @var EntityVariablesProviderInterface[] */
+    protected $entityVariablesProviders = [];
 
-    public function __construct(SecurityContextInterface $securityContext, ConfigProvider $provider)
+    /**
+     * @param SystemVariablesProviderInterface $provider
+     */
+    public function addSystemVariablesProvider(SystemVariablesProviderInterface $provider)
     {
-        $this->securityContext = $securityContext;
-        $this->configProvider = $provider;
+        $this->systemVariablesProviders[] = $provider;
     }
 
     /**
-     * Return available in template variables
-     *
-     * @param string $entityName
-     * @return array
+     * @param EntityVariablesProviderInterface $provider
      */
-    public function getTemplateVariables($entityName)
+    public function addEntityVariablesProvider(EntityVariablesProviderInterface $provider)
     {
-        $userClassName = $this->getUser() ? ClassUtils::getClass($this->getUser()) : false;
-        $allowedData = [];
+        $this->entityVariablesProviders[] = $provider;
+    }
 
-        $ids = $this->configProvider->getIds();
-        foreach ($ids as $entityConfigId) {
-            // export variables of asked entity and current user entity class
-            $className = $entityConfigId->getClassName();
-            if ($className == $entityName || $className == $userClassName) {
-                $fields = $this->configProvider->filter(
-                    function (ConfigInterface $config) {
-                        return $config->is('available_in_template');
-                    },
-                    $className
-                );
+    /**
+     * Gets system variables available in a template
+     * Returned variables are sorted be name.
+     *
+     * @return array The list of variables in the following format:
+     *                  {variable name} => array
+     *                      'type' => {variable data type}
+     *                      'name' => {translated variable name}
+     */
+    public function getSystemVariableDefinitions()
+    {
+        $result = [];
 
-                $fields = array_values(
-                    array_map(
-                        function (ConfigInterface $field) {
-                            return Inflector::camelize($field->getId()->getFieldName());
-                        },
-                        $fields
-                    )
-                );
+        foreach ($this->systemVariablesProviders as $provider) {
+            $result = array_merge(
+                $result,
+                $provider->getVariableDefinitions()
+            );
+        }
+        ksort($result);
 
-                switch ($className) {
-                    case $entityName:
-                        $allowedData['entity'] = $fields;
-                        break;
-                    case $userClassName:
-                        $allowedData['user'] = $fields;
-                        break;
-                }
+        return $result;
+    }
 
-                if ($entityName == $userClassName) {
-                    $allowedData['user'] = $allowedData['entity'];
-                }
+    /**
+     * Gets entity related variables available in a template
+     * Returned variables are sorted be name.
+     *
+     * @param string $entityClass The entity class name. If it is not specified the definitions for all
+     *                            entities are returned.
+     *
+     * @return array The list of variables in the following format:
+     *                  {variable name} => array
+     *                      'type' => {variable data type}
+     *                      'name' => {translated variable name}
+     *               If a field represents a relation the following attributes are added:
+     *                      'related_entity_name' => {related entity full class name}
+     *               If $entityClass is NULL variables are grouped by entity class:
+     *                  {entity class} => array
+     *                      {variable name} => array of attributes described above
+     */
+    public function getEntityVariableDefinitions($entityClass = null)
+    {
+        $result = [];
+
+        foreach ($this->entityVariablesProviders as $provider) {
+            $result = array_merge_recursive(
+                $result,
+                $provider->getVariableDefinitions($entityClass)
+            );
+        }
+        if ($entityClass) {
+            ksort($result);
+        } else {
+            foreach ($result as &$variables) {
+                ksort($variables);
             }
         }
 
-        return $allowedData;
+        return $result;
     }
 
     /**
-     * Return current user
+     * Gets values of system variables available in a template
      *
-     * @return UserInterface|bool
+     * @return array The list of values
+     *                  key   = {variable name}
+     *                  value = {variable value}
      */
-    private function getUser()
+    public function getSystemVariableValues()
     {
-        return $this->securityContext->getToken() && !is_string($this->securityContext->getToken()->getUser())
-            ? $this->securityContext->getToken()->getUser() : false;
+        $result = [];
+
+        foreach ($this->systemVariablesProviders as $provider) {
+            $result = array_merge(
+                $result,
+                $provider->getVariableValues()
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets getters of entity related variables available in a template
+     *
+     * @param string $entityClass The entity class name. If it is not specified the definitions for all
+     *                            entities are returned.
+     *
+     * @return string[] The list of getter names
+     *                      key = {variable name}
+     *                      value = {method name} // can be NULL if entity field is public
+     */
+    public function getEntityVariableGetters($entityClass = null)
+    {
+        $result = [];
+
+        foreach ($this->entityVariablesProviders as $provider) {
+            $result = array_merge_recursive(
+                $result,
+                $provider->getVariableGetters($entityClass)
+            );
+        }
+
+        return $result;
     }
 }

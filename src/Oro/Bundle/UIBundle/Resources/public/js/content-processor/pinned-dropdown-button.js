@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define, localStorage*/
 define(['./dropdown-button'], function ($) {
     'use strict';
@@ -40,7 +41,9 @@ define(['./dropdown-button'], function ($) {
          * @private
          */
         _mainButtons: function ($buttons) {
-            var index = localStorage.getItem(this.keyPreffix + this.options.groupKey) || 0;
+            var index, key;
+            key = this._getStorageKey();
+            index = key ? localStorage.getItem(key) || 0 : 0;
             return $($buttons.get(index)) || this._superApply(arguments);
         },
 
@@ -51,7 +54,20 @@ define(['./dropdown-button'], function ($) {
          * @private
          */
         _onButtonClick: function (e) {
-            localStorage.setItem(this.keyPreffix + this.options.groupKey, $(e.target).data('button-index') || 0);
+            var key = this._getStorageKey();
+            if (key) {
+                localStorage.setItem(key, $(e.target).data('button-index') || 0);
+            }
+        },
+
+        /**
+         * Defines storage key
+         *
+         * @returns {string}
+         * @private
+         */
+        _getStorageKey: function () {
+            return this.options.groupKey ? this.keyPreffix + this.options.groupKey : '';
         }
     });
 

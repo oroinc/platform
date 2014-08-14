@@ -1,3 +1,15 @@
+CHANGELOG for 1.3.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.3.1 versions.
+
+* 1.3.1 (2014-08-14)
+ * Minimum PHP version: PHP 5.4.9
+ * PostgreSQL support
+ * Fixed issue: Not entire set of entities is exported
+ * Fixed issue: Page crashes when big value is typed into the pagination control
+ * Fixed issue: Error 500 on Schema update
+ * Other minor issues
+
 CHANGELOG for 1.3.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.3.0 versions.

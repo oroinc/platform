@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'backbone', 'backbone/bootstrap-modal'],
+define(['underscore', 'backbone', 'backbone-bootstrap-modal'],
 function(_, Backbone) {
     'use strict';
 

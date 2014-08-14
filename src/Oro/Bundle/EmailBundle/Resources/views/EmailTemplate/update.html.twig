@@ -88,9 +88,9 @@
             'subblocks': [{
                 'title': '',
                 'data': [
-                    form_row(form.entityName),
+                    form_row(form.name),
                     form_row(form.type),
-                    form_row(form.name)
+                    form_row(form.entityName)
                 ]
             }]
         },
@@ -104,7 +104,7 @@
                 ]
             },
             {
-                'title': 'Available variables'|trans,
+                'title': '',
                 'data': [
                     _emailMacros.renderAvailableVariablesWidget(form.vars.value.entityName, form.entityName.vars.id)
                 ]

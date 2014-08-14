@@ -9,23 +9,22 @@
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
     {% set datagrid = oro_datagrid_build(name, params) %}
     {% set metaData = oro_datagrid_metadata(datagrid, params) %}
+    {% if renderParams.routerEnabled is defined %}
+        {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
+        {% set metadataOptions = metadataOptions|merge({'routerEnabled': renderParams.routerEnabled}) %}
+        {% set metaData = metaData|merge({'options': metadataOptions}) %}
+    {% endif %}
     {% set data     = oro_datagrid_data(datagrid) %}
-    {% set gridId   = 'grid-' ~ name  %}
-    {% set gridSelector = gridId ~ '-' ~ random() %}
+    {% set gridId   = 'grid-' ~ name ~ '-' ~ random() %}
+    {% set options  = {
+        el: '#' ~ gridId,
+        builders: metaData.requireJSModules,
+        metadata: metaData,
+        data: data
+    } %}
 
     <div id="{{ gridId }}"
-         data-grid-selector="{{ gridSelector }}"
-         data-type="datagrid"
-         data-data="{{ data|json_encode|raw|escape }}"
-         {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
-         data-metadata="{{ metaData|json_encode|raw|escape }}"></div>
-    <script type="text/javascript">
-        require(['jquery', 'orodatagrid/js/datagrid-builder'].concat({{ metaData.requireJSModules|json_encode|raw }}),
-        function ($, datagridBuilder) {
-            var builders = _.toArray(arguments).slice(2);
-            $(function () {
-                datagridBuilder(builders, '[data-grid-selector="{{ gridSelector }}"]');
-            });
-        });
-    </script>
+         data-page-component-module="orodatagrid/js/datagrid-builder"
+         data-page-component-options="{{ options|json_encode }}"
+         {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
 {% endmacro %}

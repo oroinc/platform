@@ -72,13 +72,12 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                         $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                     }
                 } else {
-                    $logger      = new OutputLogger($output, true, null, '  ', true);
+                    $logger      = new OutputLogger($output, true, null, '  ');
                     $queryLogger = new OutputLogger(
                         $output,
                         true,
                         $input->getOption('show-queries') ? null : OutputInterface::VERBOSITY_QUIET,
-                        '    ',
-                        true
+                        '    '
                     );
                     $executor    = $this->getMigrationExecutor($input);
                     $executor->setLogger($logger);

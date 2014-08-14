@@ -244,7 +244,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                     }
                 });
                 this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.trigger('layout.init', el);
+                    mediator.execute('layout:init', el);
                 });
                 this.widget.render();
             } else {

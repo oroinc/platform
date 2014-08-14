@@ -16,7 +16,7 @@ class OroWorkflowBundle implements Migration, RenameExtensionAwareInterface
     protected $renameExtension;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setRenameExtension(RenameExtension $renameExtension)
     {
@@ -24,7 +24,7 @@ class OroWorkflowBundle implements Migration, RenameExtensionAwareInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

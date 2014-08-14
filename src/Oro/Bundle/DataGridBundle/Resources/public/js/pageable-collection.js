@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tools'
+define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
     ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
