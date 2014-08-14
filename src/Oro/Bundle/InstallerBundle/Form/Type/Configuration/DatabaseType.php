@@ -6,6 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+
 class DatabaseType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -17,8 +19,8 @@ class DatabaseType extends AbstractType
                 array(
                     'label'       => 'form.configuration.database.driver',
                     'choices'       => array(
-                        'pdo_mysql' => 'MySQL',
-                        'pdo_pgsql' => 'PostgreSQL',
+                        DatabaseDriverInterface::DRIVER_MYSQL      => 'MySQL',
+                        DatabaseDriverInterface::DRIVER_POSTGRESQL => 'PostgreSQL',
                     ),
                     'constraints' => array(
                         new Assert\NotBlank(),

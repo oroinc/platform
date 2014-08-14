@@ -8,13 +8,12 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class OroEntityExtension extends Extension implements PrependExtensionInterface
 {
-    const POSTGRESQL_DB_DRIVER = 'pdo_pgsql';
-
     /**
      * {@inheritdoc}
      */
@@ -40,7 +39,7 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container)
     {
         $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver == self::POSTGRESQL_DB_DRIVER) {
+        if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
             $doctrineConfig = $container->getExtensionConfig('doctrine');
             $doctrineConnectionOptions = array();
             foreach ($doctrineConfig as $config) {
