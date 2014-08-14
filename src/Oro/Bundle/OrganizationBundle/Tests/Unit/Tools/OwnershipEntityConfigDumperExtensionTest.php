@@ -90,7 +90,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         );
     }
 
-    public function testPreUpdateWithOrganizationOwner()
+    public function testPreUpdateWithOrganizationOwnershipType()
     {
         $ownerType = 'ORGANIZATION';
         $getOwnerClassMethodName = 'getOrganizationClass';
@@ -156,6 +156,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
 
     /**
      * @dataProvider preUpdateProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testPreUpdate($ownerType, $getOwnerClassMethodName, $getOrganizationClassMethodName)
     {
