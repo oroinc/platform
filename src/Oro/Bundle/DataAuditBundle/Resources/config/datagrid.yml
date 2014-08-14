@@ -37,7 +37,6 @@ datagrid:
                 where:
                     and:
                         - o.id = @oro_security.security_facade->getOrganizationId
-
         columns:
             action:
                 label: Action
@@ -64,7 +63,6 @@ datagrid:
             loggedAt:
                 label: Logged at
                 frontend_type: datetime
-
         properties: ~
         sorters:
             columns:
@@ -82,13 +80,10 @@ datagrid:
                     data_name: a.data
                 author:
                     data_name: author
-                organization:
-                    data_name: organization
                 loggedAt:
                     data_name: a.loggedAt
             default:
                 loggedAt: DESC
-
         filters:
             columns:
                 action:
