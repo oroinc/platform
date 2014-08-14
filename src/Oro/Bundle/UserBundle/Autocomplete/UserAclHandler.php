@@ -102,7 +102,7 @@ class UserAclHandler implements SearchHandlerInterface
         if ($isGranted) {
             $results = [];
             if ($searchById) {
-                $results[] = $this->em->getRepository('OroUserBundle:User')->find($query);
+                $results[] = $this->em->getRepository('OroUserBundle:User')->find((int)$query);
             } else {
                 $user         = $this->getSecurityContext()->getToken()->getUser();
                 $queryBuilder = $this->getSearchQueryBuilder($search);

@@ -61,13 +61,15 @@ class SearchAdvancedController extends FOSRestController
      *
      *  !in Used for search records where field not in the specified set of data
      *
+     *  replace spaces with _ underscore for fulltext search
+     *
      * Examples:
      *
      *  from demo_product where name ~ samsung and double price > 100
      *
      *  integer count != 10
      *
-     *  all_text !~ "test string"
+     *  all_text !~ test_string
      *
      *  from (demo_products, demo_categories) where description ~ test order_by name offset 5 max_results 10
      *

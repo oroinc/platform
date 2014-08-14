@@ -49,7 +49,7 @@ class Channel
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
@@ -138,7 +138,7 @@ class Channel
     /**
      * @var integer
      *
-     * @ORM\Column(name="edit_mode", type="smallint")
+     * @ORM\Column(name="edit_mode", type="integer", nullable=false)
      */
     protected $editMode;
 
