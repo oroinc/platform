@@ -170,13 +170,12 @@ define(function (require) {
             }
 
             // removes select2 plugin from elements
-            // for now it's unnecessary, select2 cleans up after itself
-            /*$container.find('.select2').each(function () {
+            $container.find('.select2-container').each(function () {
                 var $this = $(this);
                 if ($this.data('select2')) {
                     $this.select2('destroy');
                 }
-            });*/
+            });
         },
 
         onPageRendered: function (cb) {

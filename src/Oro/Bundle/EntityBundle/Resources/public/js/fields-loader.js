@@ -1,7 +1,13 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/tools', 'jquery-ui'
-    ], function ($, routing, __, messenger, tools) {
+define([
+    'jquery',
+    'routing',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'oroui/js/tools',
+    'jquery-ui'
+], function ($, routing, __, messenger, tools) {
     'use strict';
 
     /**

@@ -35,17 +35,17 @@ define([
             if (this.disposed) {
                 return;
             }
-            Backbone.mediator.unsubscribe(null, null, this);
-            this.off();
-            this.stopListening();
-            if (this.$el) {
-                this.undelegateEvents();
-                this.$el.removeData();
-            }
             delete this.$content;
-            delete this.$el;
-            delete this.el;
+            Modal.__super__.dispose.call(this);
         },
+
+        /**
+         * Updates content of modal dialog
+         */
+        setContent: function (content) {
+            this.options.content = content;
+            this.$el.find('.modal-body').html(content);
+        }
     });
 
     return Modal;

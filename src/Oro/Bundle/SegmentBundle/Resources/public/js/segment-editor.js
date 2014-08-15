@@ -2,11 +2,10 @@
 /*jslint nomen: true*/
 define(function (require) {
     'use strict';
-    var defaults, $storage, messageBus, entityFieldsUtil,
+    var SegmentEditor,
         $ = require('jquery'),
         _ = require('underscore'),
         Backbone = require('backbone'),
-        mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
         LoadingMask = require('oroui/js/loading-mask'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
@@ -20,347 +19,466 @@ define(function (require) {
     require('oroui/js/items-manager/table');
     require('oroquerydesigner/js/condition-builder');
 
-    defaults = {
-        entityChoice: '',
-        valueSource: '',
-        fieldsLoader: {
-            loadingMaskParent: '',
-            routingParams: {},
-            fieldsData: [],
-            confirmMessage: ''
+    SegmentEditor = Backbone.View.extend({
+        defaults: {
+            entityChoice: '',
+            valueSource: '',
+            fieldsLoader: {
+                loadingMaskParent: '',
+                routingParams: {},
+                fieldsData: [],
+                confirmMessage: ''
+            },
+            filters: {
+                criteriaList: '',
+                conditionBuilder: ''
+            },
+            grouping: {
+                editor: {},
+                form: '',
+                itemContainer: '',
+                itemTemplate: ''
+            },
+            column: {
+                editor: {},
+                form: '',
+                itemContainer: '',
+                itemTemplate: ''
+            },
+            select2FieldChoiceTemplate: '',
+            select2SegmentChoiceTemplate: '',
+            entities: [],
+            metadata: {}
         },
-        filters: {
-            criteriaList: '',
-            conditionBuilder: ''
-        },
-        grouping: {
-            editor: {},
-            form: '',
-            itemContainer: '',
-            itemTemplate: ''
-        },
-        column: {
-            editor: {},
-            form: '',
-            itemContainer: '',
-            itemTemplate: ''
-        },
-        select2FieldChoiceTemplate: '',
-        select2SegmentChoiceTemplate: '',
-        entities: [],
-        metadata: {}
-    };
 
-    entityFieldsUtil = new EntityFieldsUtil();
+        initialize: function (options) {
+            this.processOptions(options);
+            this.$storage = $(this.options.valueSource);
 
-    /**
-     * Renders HTML entity's field
-     *
-     * @param {string} value
-     * @param {Function} template
-     * @returns {string}
-     */
-    function formatChoice(value, template) {
-        var data;
-        if (value) {
-            try {
-                data = entityFieldsUtil.pathToEntityChain(value);
-            } catch (e) {}
-        }
-        return data ? template(data) : value;
-    }
+            this.initEntityFieldsUtil();
+            this.initFieldsLoader();
+            this.initGrouping();
+            this.initColumn();
+            this.configureFilters();
 
-    /**
-     * Loads data from the input
-     *
-     * @param {string=} key name of data branch
-     */
-    function load(key) {
-        var json = $storage.val(),
-            data = (json && JSON.parse(json)) || {};
-        return key ? data[key] : data;
-    }
-
-    /**
-     * Saves data to the input
-     *
-     * @param {Object} value data from certain control
-     * @param {string=} key name of data branch
-     */
-    function save(value, key) {
-        var data = load();
-        if (key) {
-            data[key] = value;
-        } else {
-            data = key;
-        }
-        $storage.val(JSON.stringify(data));
-    }
-
-    function getFieldChoiceOptions(options) {
-        return {
-            select2: {
-                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
+            if (this.$entityChoice) {
+                this.trigger('fieldsLoaded',
+                    this.$entityChoice.val(), this.$entityChoice.fieldsLoader('getFieldsData'));
             }
-        };
-    }
 
-    function deleteHandler(collection, model, data) {
-        var confirm = new DeleteConfirmation({
-            content: data.message
-        });
-        confirm.on('ok', function () {
-            collection.remove(model);
-        });
-        confirm.open();
-    }
+            SegmentEditor.__super__.initialize.call(this, options);
+        },
 
-    function initFieldsLoader(options) {
-        var confirm, loadingMask, $entityChoice;
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
 
-        loadingMask = new LoadingMask();
-        $(options.loadingMaskParent).append(loadingMask.render().$el);
+            this.trigger('dispose:before');
+            delete this.options;
+            delete this.$storage;
+            SegmentEditor.__super__.dispose.call(this);
+        },
 
-        confirm = new DeleteConfirmation({
-            title: __('Change Entity Confirmation'),
-            okText: __('Yes, I Agree'),
-            content: __(options.confirmMessage)
-        });
+        /**
+         * Renders HTML entity's field
+         *
+         * @param {string} value
+         * @param {Function} template
+         * @returns {string}
+         */
+        formatChoice: function (value, template) {
+            var data;
+            if (value) {
+                try {
+                    data = this.entityFieldsUtil.pathToEntityChain(value);
+                } catch (e) {}
+            }
+            return data ? template(data) : value;
+        },
 
-        $entityChoice = $(options.entityChoice);
-        $entityChoice
-            .fieldsLoader({
-                router: 'oro_api_querydesigner_fields_entity',
-                routingParams: options.routingParams,
-                confirm: confirm,
-                requireConfirm: function () {
-                    var data = $storage.val();
-                    if (!data) {
-                        return false;
-                    }
-                    try {
-                        data = JSON.parse(data);
-                    } catch (e) {
-                        return false;
-                    }
-                    return _.some(data, function (value) {
-                        return !_.isEmpty(value);
-                    });
+        /**
+         * Loads data from the input
+         *
+         * @param {string=} key name of data branch
+         */
+        load: function (key) {
+            var data = {},
+                json = this.$storage.val();
+            if (json) {
+                try {
+                    data = JSON.parse(json);
+                } catch (e) {
+                    return undefined;
                 }
-            })
-            .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
-            .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
-            .on('fieldsloaderupdate', function (e, data) {
-                entityFieldsUtil.init($(e.target).val(), data);
-            })
-            .on('fieldsloadercomplete', function () {
-                var data = {};
-                messageBus.trigger('resetData', data);
-                save(data);
+            }
+            return key ? data[key] : data;
+        },
+
+        /**
+         * Saves data to the input
+         *
+         * @param {Object} value data from certain control
+         * @param {string=} key name of data branch
+         */
+        save: function (value, key) {
+            var data = this.load();
+            if (key) {
+                data[key] = value;
+            } else {
+                data = key;
+            }
+            this.$storage.val(JSON.stringify(data));
+        },
+
+        /**
+         * Combines options
+         *
+         * @param {Object} options
+         */
+        processOptions: function (options) {
+            this.options = {};
+            $.extend(true, this.options, this.defaults, options);
+
+            // common extra options for all choice inputs
+            this.options.fieldChoiceOptions = {
+                select2: {
+                    formatSelectionTemplate: $(this.options.select2FieldChoiceTemplate).text()
+                }
+            };
+
+            // options column's filed choice input
+            if (!this.options.columnFieldChoiceOptions) {
+                this.options.columnFieldChoiceOptions = {};
+            }
+            _.defaults(this.options.columnFieldChoiceOptions, this.options.fieldChoiceOptions);
+
+            // options for segment choice
+            this.options.segmentChoiceOptions = {};
+            $.extend(true, this.options.segmentChoiceOptions, this.options.fieldChoiceOptions, {
+                select2: {
+                    formatSelectionTemplate: $(this.options.select2SegmentChoiceTemplate).text()
+                }
+            });
+        },
+
+        /**
+         * Initializes EntityFieldsUtil
+         */
+        initEntityFieldsUtil: function () {
+            this.entityFieldsUtil = new EntityFieldsUtil();
+            this.on('fieldsLoaded', this.entityFieldsUtil.init, this.entityFieldsUtil);
+            this.once('dispose:before', function () {
+                delete this.entityFieldsUtil;
+            });
+        },
+
+        /**
+         * Initializes FieldsLoader on entityChoice element
+         */
+        initFieldsLoader: function () {
+            var self, options, confirm, loadingMask, $entityChoice;
+
+            self = this;
+            options = this.options.fieldsLoader;
+
+            loadingMask = new LoadingMask();
+            $(options.loadingMaskParent).append(loadingMask.render().$el);
+
+            confirm = new DeleteConfirmation({
+                title: __('Change Entity Confirmation'),
+                okText: __('Yes, I Agree'),
+                content: __(options.confirmMessage)
             });
 
-        if (!_.isEmpty(options.fieldsData)) {
-            $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
-            entityFieldsUtil.init($entityChoice.val(), $entityChoice.data('fields'));
-        }
-    }
-
-    function initGrouping(options, metadata, fieldChoiceOptions) {
-        var $itemContainer, $editor, $fieldChoice, collection, template;
-
-        $itemContainer = $(options.itemContainer);
-        $editor = $(options.form);
-
-        if (_.isEmpty($itemContainer) || _.isEmpty($editor)) {
-            // there's no grouping
-            return;
-        }
-
-        $fieldChoice = $editor.find('[data-purpose=column-selector]');
-        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, metadata.grouping, {select2: {}}));
-
-        collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
-        collection.on('add remove sort change', function () {
-            save(collection.toJSON(), 'grouping_columns');
-        });
-
-        $editor.itemsManagerEditor($.extend(options.editor, {
-            collection: collection
-        }));
-
-        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-
-        $itemContainer.itemsManagerTable({
-            collection: collection,
-            itemTemplate: $(options.itemTemplate).html(),
-            itemRender: function (tmpl, data) {
-                data.name = formatChoice(data.name, template);
-                return tmpl(data);
-            },
-            deleteHandler: _.bind(deleteHandler, null, collection)
-        });
-
-        messageBus.on('resetData', function (data) {
-            data.grouping_columns = [];
-            $itemContainer.itemsManagerTable('reset');
-            $editor.itemsManagerEditor('reset');
-        });
-    }
-
-    function initColumn(options, metadata, fieldChoiceOptions) {
-        var $itemContainer, $editor, $fieldChoice, collection, template, sortingLabels;
-
-        $itemContainer = $(options.itemContainer);
-        $editor = $(options.form);
-
-        if (_.isEmpty($itemContainer) || _.isEmpty($editor)) {
-            // there's no columns
-            return;
-        }
-
-        $fieldChoice = $editor.find('[data-purpose=column-selector]');
-        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, {select2: {}}));
-
-        $editor.find('[data-purpose=function-selector]').functionChoice({
-            converters: metadata.converters,
-            aggregates: metadata.aggregates
-        });
-
-        collection = new (Backbone.Collection)(load('columns'), {model: ColumnModel});
-        collection.on('add remove sort change', function () {
-            save(collection.toJSON(), 'columns');
-        });
-
-        $editor.itemsManagerEditor($.extend(options.editor, {
-            collection: collection,
-            setter: function ($el, name, value) {
-                if (name === 'func') {
-                    value = value.name;
-                }
-                return value;
-            },
-            getter: function ($el, name, value) {
-                if (name === 'func') {
-                    value = value && {
-                        name: value,
-                        group_type: $el.find(":selected").data('group_type'),
-                        group_name: $el.find(":selected").data('group_name')
-                    };
-                }
-                return value;
-            }
-        }));
-
-        sortingLabels = {};
-        $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
-            sortingLabels[this.value] = $(this).text();
-        });
-
-        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-
-        $itemContainer.itemsManagerTable({
-            collection: collection,
-            itemTemplate: $(options.itemTemplate).html(),
-            itemRender: function (tmpl, data) {
-                var item, itemFunc,
-                    func = data.func;
-
-                data.name = formatChoice(data.name, template);
-                if (func && func.name) {
-                    item = metadata[func.group_type][func.group_name];
-                    if (item) {
-                        itemFunc = _.findWhere(item.functions, {name: func.name});
-                        if (itemFunc) {
-                            data.func = itemFunc.label;
+            $entityChoice = this.$entityChoice = $(options.entityChoice);
+            $entityChoice
+                .fieldsLoader({
+                    router: 'oro_api_querydesigner_fields_entity',
+                    routingParams: options.routingParams,
+                    confirm: confirm,
+                    requireConfirm: function () {
+                        var data = self.load();
+                        if (!data) {
+                            return false;
                         }
+                        return _.some(data, function (value) {
+                            return !_.isEmpty(value);
+                        });
                     }
-                } else {
-                    data.func = '';
-                }
-                if (data.sorting && sortingLabels[data.sorting]) {
-                    data.sorting = sortingLabels[data.sorting];
-                }
+                })
+                .on('fieldsloaderstart', _.bind(loadingMask.show, loadingMask))
+                .on('fieldsloadercomplete', _.bind(loadingMask.hide, loadingMask))
+                .on('fieldsloaderupdate', function (e, data) {
+                    self.trigger('fieldsLoaded', $(e.target).val(), data);
+                })
+                .on('fieldsloadercomplete', function () {
+                    var data = {};
+                    self.trigger('resetData', data);
+                    self.save(data);
+                });
 
-                return tmpl(data);
-            },
-            deleteHandler: _.bind(deleteHandler, null, collection)
-        });
-
-        messageBus.on('resetData', function (data) {
-            data.columns = [];
-            $itemContainer.itemsManagerTable('reset');
-            $editor.itemsManagerEditor('reset');
-        });
-    }
-
-    function configureFilters(options, metadata, fieldChoiceOptions, segmentChoiceOptions) {
-        var $fieldCondition, $segmentCondition, $builder, $criteria;
-
-        $builder = $(options.conditionBuilder);
-        $criteria = $(options.criteriaList);
-
-        if (_.isEmpty($builder) || _.isEmpty($criteria)) {
-            // there's no filter
-            return;
-        }
-
-        // mixin extra options to condition-builder's field choice
-        $fieldCondition = $criteria.find('[data-criteria=condition-item]');
-        if (!_.isEmpty($fieldCondition)) {
-            $.extend(true, $fieldCondition.data('options'), {
-                fieldChoice: fieldChoiceOptions,
-                filters: metadata.filters,
-                hierarchy: metadata.hierarchy
-            });
-        }
-
-        $segmentCondition = $criteria.find('[data-criteria=condition-segment]');
-        if (!_.isEmpty($segmentCondition)) {
-            $.extend(true, $segmentCondition.data('options'), {
-                segmentChoice: segmentChoiceOptions,
-                filters: metadata.filters
-            });
-        }
-
-        $builder.conditionBuilder({
-            criteriaListSelector: options.criteriaList
-        });
-        $builder.conditionBuilder('setValue', load('filters'));
-        $builder.on('changed', function () {
-            save($builder.conditionBuilder('getValue'), 'filters');
-        });
-
-        messageBus.on('resetData', function (data) {
-            data.filters = [];
-            $builder.conditionBuilder('setValue', data.filters);
-        });
-    }
-
-    return function (options) {
-        var fieldChoiceOptions, segmentChoiceOptions, gridFieldChoiceOptions;
-
-        options = $.extend(true, {}, defaults, options);
-
-        $storage = $(options.valueSource);
-        messageBus = $.extend({}, Backbone.Events);
-        mediator.once('page:request', function () {
-            messageBus.off();
-        });
-
-        // common extra options for all choice inputs
-        fieldChoiceOptions   = getFieldChoiceOptions(options);
-        gridFieldChoiceOptions = _.defaults(options.gridFieldChoiceOptions || {}, fieldChoiceOptions);
-        segmentChoiceOptions = _.extend(_.clone(fieldChoiceOptions), {
-            select2: {
-                formatSelectionTemplate: $(options.select2SegmentChoiceTemplate).text()
+            if (!_.isEmpty(options.fieldsData)) {
+                $entityChoice.fieldsLoader('setFieldsData', JSON.parse(options.fieldsData));
             }
-        });
 
-        initFieldsLoader(options.fieldsLoader);
-        initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
-        initColumn(options.column, options.metadata, gridFieldChoiceOptions);
-        configureFilters(options.filters, options.metadata, fieldChoiceOptions, segmentChoiceOptions);
+            this.once('dispose:before', function () {
+                loadingMask.dispose();
+                confirm.dispose();
+                delete this.$entityChoice;
+            }, this);
+        },
 
-        options._sourceElement.remove();
-    };
+        /**
+         * Initializes Fields Grouping component
+         */
+        initGrouping: function () {
+            var self, options, fieldChoiceOptions, confirm,
+                $table, $editor, $fieldChoice, collection, template;
+
+            self = this;
+            options = this.options.grouping;
+
+            $table = $(options.itemContainer);
+            $editor = $(options.form);
+
+            if (_.isEmpty($table) || _.isEmpty($editor)) {
+                // there's no grouping
+                return;
+            }
+
+            // setup FieldChoice of Items Manager Editor
+            fieldChoiceOptions = _.extend({}, this.options.fieldChoiceOptions, this.options.metadata.grouping, {select2: {}});
+            $fieldChoice = $editor.find('[data-purpose=column-selector]');
+            $fieldChoice.fieldChoice(fieldChoiceOptions);
+            this.on('fieldsLoaded', function (entity, data) {
+                $fieldChoice.fieldChoice('updateData', entity, data);
+            });
+
+            // prepare collection for Items Manager
+            collection = new (Backbone.Collection)(this.load('grouping_columns'), {model: GroupingModel});
+            this.listenTo(collection, 'add remove sort change', function () {
+                this.save(collection.toJSON(), 'grouping_columns');
+            });
+
+            // setup confirmation dialog for delete item
+            confirm = new DeleteConfirmation({content: ''});
+            confirm.on('ok', function () {
+                collection.remove(this.model);
+            });
+            confirm.on('hidden', function () {
+                delete this.model;
+            });
+
+            // setup Items Manager's editor
+            $editor.itemsManagerEditor($.extend(options.editor, {
+                collection: collection
+            }));
+
+            // setup Items Manager's table
+            template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
+            $table.itemsManagerTable({
+                collection: collection,
+                itemTemplate: $(options.itemTemplate).html(),
+                itemRender: function (tmpl, data) {
+                    data.name = self.formatChoice(data.name, template);
+                    return tmpl(data);
+                },
+                deleteHandler: function (model, data) {
+                    confirm.setContent(data.message);
+                    confirm.model = model;
+                    confirm.open();
+                }
+            });
+
+            this.on('resetData', function (data) {
+                data.grouping_columns = [];
+                $table.itemsManagerTable('reset');
+                $editor.itemsManagerEditor('reset');
+            });
+
+            this.once('dispose:before', function () {
+                confirm.dispose();
+                collection.dispose();
+                $editor.itemsManagerEditor('destroy');
+                $table.itemsManagerTable('destroy');
+            }, this);
+        },
+
+        /**
+         * Initializes Columns component
+         */
+        initColumn: function () {
+            var self, options, metadata, fieldChoiceOptions, confirm,
+                $table, $editor, $fieldChoice, collection, template, sortingLabels;
+
+            self = this;
+            options = this.options.column;
+            metadata = this.options.metadata;
+
+            $table = $(options.itemContainer);
+            $editor = $(options.form);
+
+            if (_.isEmpty($table) || _.isEmpty($editor)) {
+                // there's no columns
+                return;
+            }
+
+            // setup FieldChoice of Items Manager Editor
+            fieldChoiceOptions = _.extend({}, this.options.columnFieldChoiceOptions, {select2: {}});
+            $fieldChoice = $editor.find('[data-purpose=column-selector]');
+            $fieldChoice.fieldChoice(fieldChoiceOptions);
+            this.on('fieldsLoaded', function (entity, data) {
+                $fieldChoice.fieldChoice('updateData', entity, data);
+            });
+
+            // prepare collection for Items Manager
+            collection = new (Backbone.Collection)(this.load('columns'), {model: ColumnModel});
+            this.listenTo(collection, 'add remove sort change', function () {
+                this.save(collection.toJSON(), 'columns');
+            });
+
+            // setup confirmation dialog for delete item
+            confirm = new DeleteConfirmation({content: ''});
+            confirm.on('ok', function () {
+                collection.remove(this.model);
+            });
+            confirm.on('hidden', function () {
+                delete this.model;
+            });
+
+            // setup Items Manager's editor
+            $editor.find('[data-purpose=function-selector]').functionChoice({
+                converters: metadata.converters,
+                aggregates: metadata.aggregates
+            });
+            $editor.itemsManagerEditor($.extend(options.editor, {
+                collection: collection,
+                setter: function ($el, name, value) {
+                    if (name === 'func') {
+                        value = value.name;
+                    }
+                    return value;
+                },
+                getter: function ($el, name, value) {
+                    if (name === 'func') {
+                        value = value && {
+                            name: value,
+                            group_type: $el.find(':selected').data('group_type'),
+                            group_name: $el.find(':selected').data('group_name')
+                        };
+                    }
+                    return value;
+                }
+            }));
+
+            sortingLabels = {};
+            $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
+                sortingLabels[this.value] = $(this).text();
+            });
+
+            template = _.template(this.options.columnFieldChoiceOptions.select2.formatSelectionTemplate);
+            $table.itemsManagerTable({
+                collection: collection,
+                itemTemplate: $(options.itemTemplate).html(),
+                itemRender: function (tmpl, data) {
+                    var item, itemFunc,
+                        func = data.func;
+
+                    data.name = self.formatChoice(data.name, template);
+                    if (func && func.name) {
+                        item = metadata[func.group_type][func.group_name];
+                        if (item) {
+                            itemFunc = _.findWhere(item.functions, {name: func.name});
+                            if (itemFunc) {
+                                data.func = itemFunc.label;
+                            }
+                        }
+                    } else {
+                        data.func = '';
+                    }
+                    if (data.sorting && sortingLabels[data.sorting]) {
+                        data.sorting = sortingLabels[data.sorting];
+                    }
+
+                    return tmpl(data);
+                },
+                deleteHandler: function (model, data) {
+                    confirm.setContent(data.message);
+                    confirm.model = model;
+                    confirm.open();
+                }
+            });
+
+            this.on('resetData', function (data) {
+                data.columns = [];
+                $table.itemsManagerTable('reset');
+                $editor.itemsManagerEditor('reset');
+            });
+
+            this.once('dispose:before', function () {
+                confirm.dispose();
+                collection.dispose();
+                $editor.itemsManagerEditor('destroy');
+                $table.itemsManagerTable('destroy');
+            }, this);
+        },
+
+        configureFilters: function () {
+            var self, options, metadata,
+                $fieldCondition, $segmentCondition, $builder, $criteria;
+
+            self = this;
+            options = this.options.filters;
+            metadata = this.options.metadata;
+
+            $builder = $(options.conditionBuilder);
+            $criteria = $(options.criteriaList);
+
+            if (_.isEmpty($builder) || _.isEmpty($criteria)) {
+                // there's no filter
+                return;
+            }
+
+            // mixin extra options to condition-builder's field choice
+            $fieldCondition = $criteria.find('[data-criteria=condition-item]');
+            if (!_.isEmpty($fieldCondition)) {
+                $.extend(true, $fieldCondition.data('options'), {
+                    fieldChoice: this.options.fieldChoiceOptions,
+                    filters: metadata.filters,
+                    hierarchy: metadata.hierarchy
+                });
+            }
+
+            $segmentCondition = $criteria.find('[data-criteria=condition-segment]');
+            if (!_.isEmpty($segmentCondition)) {
+                $.extend(true, $segmentCondition.data('options'), {
+                    segmentChoice: this.options.segmentChoiceOptions,
+                    filters: metadata.filters
+                });
+            }
+
+            $builder.conditionBuilder({
+                criteriaListSelector: options.criteriaList
+            });
+            $builder.conditionBuilder('setValue', this.load('filters'));
+            $builder.on('changed', function () {
+                self.save($builder.conditionBuilder('getValue'), 'filters');
+            });
+
+            this.on('resetData', function (data) {
+                data.filters = [];
+                $builder.conditionBuilder('setValue', data.filters);
+            });
+
+            this.once('dispose:before', function () {
+                $builder.conditionBuilder('destroy');
+            }, this);
+        }
+    });
+
+    return SegmentEditor;
 });
