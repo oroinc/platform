@@ -1,17 +1,23 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
-    ], function (Backbone, _, __, GridViewsCollection) {
+define([
+    'backbone',
+    'underscore',
+    'orotranslation/js/translator',
+    './collection'
+], function (Backbone, _, __, GridViewsCollection) {
     'use strict';
-    var $ = Backbone.$;
+    var $, GridViewsView;
+    $ = Backbone.$;
 
     /**
      * Datagrid views widget
      *
-     * @export  orodatagrid/js/datagrid/grid-view
-     * @class   orodatagrid.datagrid.GridViews
+     * @export  orodatagrid/js/datagrid/grid-views/view
+     * @class   orodatagrid.datagrid.GridViewsView
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    GridViewsView = Backbone.View.extend({
         /** @property */
         events: {
             "click a": "onChange"
@@ -69,7 +75,19 @@ define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
             options.views = options.views || [];
             this.viewsCollection = new this.viewsCollection(options.views);
 
-            Backbone.View.prototype.initialize.call(this, options);
+            GridViewsView.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.viewsCollection.dispose();
+            delete this.viewsCollection;
+            GridViewsView.__super__.dispose.call(this);
         },
 
         /**
@@ -116,10 +134,11 @@ define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
          * @returns {*}
          */
         changeView: function (gridView) {
-            var view = this.viewsCollection.get(gridView);
+            var view, viewState;
+            view = this.viewsCollection.get(gridView);
 
             if (view) {
-                var viewState = _.extend({}, this.collection.initialState, view.toGridState());
+                viewState = _.extend({}, this.collection.initialState, view.toGridState());
                 this.collection.updateState(viewState);
                 this.collection.fetch({reset: true});
             }
@@ -128,30 +147,27 @@ define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
         },
 
         render: function () {
+            var currentView, currentViewLabel, html;
             this.$el.empty();
 
             if (this.choices.length > 0) {
-                var currentView = _.filter(
-                    this.choices,
-                    _.bind(function (item) {
-                        return item.value == this.collection.state.gridView;
-                    }, this)
-                );
+                currentView = _.filter(this.choices, function (item) {
+                    return item.value == this.collection.state.gridView;
+                }, this);
 
-                var currentViewLabel = currentView.length ? _.first(currentView).label : __('Please select view');
+                currentViewLabel = currentView.length ? _.first(currentView).label : __('Please select view');
+                html = this.template({
+                    disabled: !this.enabled,
+                    choices: this.choices,
+                    current: currentViewLabel
+                });
 
-                this.$el.append(
-                    $(
-                        this.template({
-                            disabled: !this.enabled,
-                            choices: this.choices,
-                            current: currentViewLabel
-                        })
-                    )
-                );
+                this.$el.append(html);
             }
 
             return this;
         }
     });
+
+    return GridViewsView;
 });

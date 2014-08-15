@@ -13,7 +13,7 @@ define([
             return;
         }
 
-        _ref = this.subviews || [];
+        _ref = _.toArray(this.subviews);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             subview = _ref[_i];
             subview.dispose();
