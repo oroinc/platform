@@ -31,8 +31,6 @@ class UpdateRoleOwnerQuery extends ParametrizedMigrationQuery
     /**
      * @param LoggerInterface $logger
      * @param bool            $dryRun
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
@@ -42,7 +40,7 @@ class UpdateRoleOwnerQuery extends ParametrizedMigrationQuery
 
         unset($data['ownership']);
 
-        $query  = 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id';
+        $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
         $params = ['data' => $data, 'id' => $classConfig['id']];
         $types  = ['data' => 'array', 'id' => 'integer'];
         $this->logQuery($logger, $query, $params, $types);
