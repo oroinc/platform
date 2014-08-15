@@ -3,17 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 
 class EnumCollectionType extends AbstractType
 {
@@ -28,74 +22,6 @@ class EnumCollectionType extends AbstractType
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager  = $configManager;
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function postSubmitData(FormEvent $event)
-    {
-        $form = $event->getForm();
-        $data = $event->getData();
-
-        /** @var FieldConfigModel $configModel */
-        $configModel = $form->getRoot()->getConfig()->getOptions()['config_model'];
-
-        if (empty($data)) {
-            return;
-        }
-
-        return;
-        // TODO: this should be done in dumper and/or generator extensions
-
-        $em           = $this->configManager->getEntityManager();
-        $optionValues = $oldOptions = $configModel->getOptions()->getValues();
-        array_walk_recursive(
-            $oldOptions,
-            function (&$oldOption) {
-                $oldOption = $oldOption->getId();
-            }
-        );
-
-        $newOptions   = [];
-        foreach ($data as $option) {
-            if (is_array($option)) {
-                $optionSet = new OptionSet();
-                $optionSet->setField($configModel);
-                $optionSet->setData(
-                    $option['id'],
-                    $option['priority'],
-                    $option['label'],
-                    (bool)$option['default']
-                );
-            } elseif (!$option->getId()) {
-                $optionSet = $option;
-                $optionSet->setField($configModel);
-            } else {
-                $optionSet = $option;
-            }
-
-            if ($optionSet->getLabel() != null) {
-                $newOptions[] = $optionSet->getId();
-            }
-            if (!in_array($optionSet, $optionValues) && $optionSet->getLabel() != null) {
-                $em->persist($optionSet);
-            }
-        }
-
-        $delOptions = array_diff($oldOptions, $newOptions);
-        foreach (array_keys($delOptions) as $key) {
-            $em->remove($configModel->getOptions()->getValues()[$key]);
-        }
     }
 
     /**

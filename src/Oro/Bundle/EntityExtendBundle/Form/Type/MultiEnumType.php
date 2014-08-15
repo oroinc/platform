@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 
-class EnumType extends AbstractEnumType
+class MultiEnumType extends AbstractEnumType
 {
     /**
      * {@inheritdoc}
@@ -15,7 +15,7 @@ class EnumType extends AbstractEnumType
 
         $builder->add(
             'is_default',
-            'radio',
+            'checkbox',
             [
                 'label' => 'Default',
                 'required' => false,
@@ -28,6 +28,7 @@ class EnumType extends AbstractEnumType
      */
     public function getName()
     {
-        return 'oro_entity_enum_value';
+        return 'oro_entity_multienum_value';
     }
 }
+

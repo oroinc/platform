@@ -1,4 +1,5 @@
 {% block oro_entity_enum_value_widget %}
+    {% set parentId = form.parent.vars.id %}
     <div class="email-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.label) }}
@@ -13,17 +14,18 @@
         {{ form_errors(form.label) }}
     </div>
     {{ form_rest(form) }}
+
     <script type="text/javascript">
         require(['jquery', 'jquery-ui'],
                 function($){
-                    $('#oro_entity_config_type_extend_set_enum_options_collection').sortable({
+                    $('#{{ parentId }}_collection').sortable({
                         cursor: 'move',
                         delay : 100,
                         handle: '.handle',
                         containment: "parent",
                         stop  : function () {
                             var index = 1;
-                            $('#oro_entity_config_type_extend_set_enum_options_collection input.priority').each(function(i, el){
+                            $('#{{ parentId }}_collection input.priority').each(function(i, el){
                                 $(el).val(index++);
                             })
                         }
@@ -32,10 +34,13 @@
     </script>
 {% endblock %}
 
+{% block oro_entity_multienum_value_widget %}
+    {{ block('oro_entity_enum_value_widget') }}
+{% endblock %}
+
 {% block oro_entity_enum_collection_widget %}
     {% spaceless %}
         {% import 'OroFormBundle:Form:fields.html.twig' as _form %}
-        {% import 'OroEntityConfigBundle:Include:fields.html.twig' as _entityConfigFields %}
         {% set prototypeHtml = _form.oro_collection_item_prototype(form) %}
 
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
@@ -52,6 +57,45 @@
             </div>
             <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
         </div>
-        {{ _entityConfigFields.oro_item_collection_validate_default_js(_context, 'oro_entity_config_type_extend_set_enum_expanded') }}
+
+        {{ _self.oro_item_collection_validate_default_js(_context) }}
     {% endspaceless %}
 {% endblock %}
+
+{% macro oro_item_collection_validate_default_js(context) %}
+    {% set form                 = context.form %}
+    {% set id                   = context.id %}
+    {% set show_form_when_empty = context.show_form_when_empty %}
+    {% set has_default          = form.vars.prototype.is_default is defined %}
+    {% set isMultiple           = form.vars.name == 'multi_enum_options' %}
+
+    {% if has_default or show_form_when_empty %}
+        <script type="text/javascript">
+            require(['jquery'],
+                    function($){
+                        $(function() {
+                            var container = $('#{{ id }}');
+
+                            {% if has_default and isMultiple == false %}
+                            container.on('click', '[name$="[is_default]"]', function() {
+                                container.find('[name$="[is_default]"]').each(function (idx, el) {
+                                    el.checked = false;
+                                });
+                                this.checked = true;
+                            });
+                            {% endif %}
+
+                            var reindex_values = function() {
+                                var index = 1;
+                                $('#{{ id }} input.priority').each(function(i, el){
+                                    $(el).val(index++);
+                                })
+                            };
+
+                            $(document).ready(reindex_values);
+                            $(document).on('click', 'a.add-list-item', reindex_values);
+                        });
+                    });
+        </script>
+    {% endif %}
+{% endmacro %}

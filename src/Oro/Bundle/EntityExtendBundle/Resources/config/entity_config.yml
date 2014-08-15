@@ -356,23 +356,25 @@ oro_entity_config:
 
                 # Enum form type fields
                 #
-                set_enum_expanded:
+                is_public:
                     options:
-                        allowed_type:       [enum]
-                        create_only:        true
+                        allowed_type:       [enum, multiEnum]
+                        default_value:      false
+                        auditable:          false
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
+                            expanded:       true
                             required:       false
                             choices:        ['No', 'Yes']
                             empty_value:    false
-                            label:          'Expanded'
+                            label:          'Public'
                             attr:
-                                class:      is-option-set-expanded
+                                class:      is-enum-public
                             block:          general
                             subblock:       properties
 
-                set_enum_options:
+                enum_options:
                     options:
                         allowed_type:       [enum]
                         auditable:          false
@@ -384,6 +386,20 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
                             type:           oro_entity_enum_value
+                            tooltip:        oro.entity_extend.field.enum.option.tooltip
+
+                multi_enum_options:
+                    options:
+                        allowed_type:       [multiEnum]
+                        auditable:          false
+                    form:
+                        type:               oro_entity_enum_collection
+                        options:
+                            required:       false
+                            label:          'Options'
+                            block:          general
+                            subblock:       properties
+                            type:           oro_entity_multienum_value
                             tooltip:        oro.entity_extend.field.enum.option.tooltip
 
     enum:
