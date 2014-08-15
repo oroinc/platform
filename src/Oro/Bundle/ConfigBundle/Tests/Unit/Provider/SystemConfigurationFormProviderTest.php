@@ -1,6 +1,8 @@
 <?php
 namespace ConfigBundle\Tests\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -9,10 +11,10 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
-use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
 {
@@ -31,7 +33,8 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             ->getFormFactory();
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     protected function tearDown()
@@ -40,11 +43,65 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         unset($this->securityFacade);
     }
 
+    /**
+     * @dataProvider getApiTreeProvider
+     */
+    public function testGetApiTree($path, $expectedTree)
+    {
+        $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
+
+        $this->assertEquals(
+            $expectedTree,
+            $provider->getApiTree($path)
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException
+     * @expectedExceptionMessage Config API section "undefined.sub_section" is not defined.
+     */
+    public function testGetApiTreeForUndefinedSection()
+    {
+        $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
+
+        $provider->getApiTree('undefined.sub_section');
+    }
+
+    /**
+     * @return array
+     */
+    public function getApiTreeProvider()
+    {
+        $root = new SectionDefinition('');
+        $section1 = new SectionDefinition('section1');
+        $root->addSubSection($section1);
+        $section1->addVariable(new VariableDefinition('some_field', 'string'));
+        $section1->addVariable(new VariableDefinition('some_api_only_field', 'integer'));
+        $section11 = new SectionDefinition('section11');
+        $section1->addSubSection($section11);
+        $section11->addVariable(new VariableDefinition('some_another_field', 'string'));
+
+        return [
+            'root section' => [
+                null,
+                $root
+            ],
+            'top section' => [
+                'section1',
+                $section1
+            ],
+            'sub section' => [
+                'section1/section11',
+                $section11
+            ],
+        ];
+    }
+
     public function testTreeProcessing()
     {
         // check good_definition.yml for further details
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
-        $form = $provider->getForm('third_group');
+        $form     = $provider->getForm('third_group');
         $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
 
         // test that fields were added
@@ -58,9 +115,9 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     /**
      * @dataProvider exceptionDataProvider
      */
-    public function testExceptions($filename, $message, $method, $arguments)
+    public function testExceptions($filename, $exception, $message, $method, $arguments)
     {
-        $this->setExpectedException('\Exception', $message);
+        $this->setExpectedException($exception, $message);
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/' . $filename);
         call_user_func_array(array($provider, $method), $arguments);
     }
@@ -71,33 +128,61 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     public function exceptionDataProvider()
     {
         return array(
-            'tree does not defined should trigger error' => array(
+            'tree is not defined should trigger error' => array(
                 'filename'  => 'tree_does_not_defined.yml',
-                'message'   => 'Tree "system_configuration" does not defined',
+                'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
+                'message'   => 'Tree "system_configuration" is not defined.',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
-            'fields definition on bad tree level'        => array(
+            'fields definition on bad tree level'      => array(
                 'filename'  => 'bad_field_level_definition.yml',
+                'exception' => '\Exception',
                 'message'   => 'Field "some_field" will not be ever rendered. Please check nesting level',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
-            'trying to get not existing subtree'         => array(
+            'trying to get not existing subtree'       => array(
                 'filename'  => 'good_definition.yml',
+                'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
                 'message'   => 'Subtree "NOT_EXISTING_ONE" not found',
                 'method'    => 'getSubtree',
                 'arguments' => array('NOT_EXISTING_ONE')
             ),
-            'bad field definition'                       => array(
-                'filename'  => 'bad_field_definition.yml',
-                'message'   => 'Field "NOT_EXISTED_FIELD" does not defined',
+            'bad field definition - no data_type'      => array(
+                'filename'  => 'bad_field_without_data_type.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The "data_type" is required except "ui_only" is defined. {"options":[]}',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
-            'bad group definition'                       => array(
+            'bad field definition'                     => array(
+                'filename'  => 'bad_field_definition.yml',
+                'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
+                'message'   => 'Field "NOT_EXISTED_FIELD" is not defined.',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
+            'bad group definition'                     => array(
                 'filename'  => 'bad_group_definition.yml',
-                'message'   => 'Group "NOT_EXITED_GROUP" does not defined',
+                'exception' => '\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException',
+                'message'   => 'Group "NOT_EXITED_GROUP" is not defined.',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
+            'bad - undefined field in api_tree'        => array(
+                'filename'  => 'bad_undefined_field_in_api_tree.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                    . ' but it is not defined in "fields" section.',
+                'method'    => 'getTree',
+                'arguments' => array()
+            ),
+            'bad - ui_only field in api_tree'          => array(
+                'filename'  => 'bad_ui_only_field_in_api_tree.yml',
+                'exception' => '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'message'   => 'The field "some_field" is used in "oro_system_configuration.section1.some_field",'
+                    . ' but "data_type" is not defined in "fields" section.',
                 'method'    => 'getTree',
                 'arguments' => array()
             ),
@@ -146,13 +231,13 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     public function activeGroupsDataProvider()
     {
         return array(
-            'check auto choosing both groups' => array(
+            'check auto choosing both groups'  => array(
                 null,
                 null,
                 'horizontal tab name' => 'first_group',
                 'vertical tab name'   => 'third_group'
             ),
-            'check auto choosing sub group' => array(
+            'check auto choosing sub group'    => array(
                 'first_group',
                 null,
                 'horizontal tab name' => 'first_group',
@@ -178,7 +263,10 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     {
         $config = Yaml::parse(file_get_contents($path));
 
-        $processor = new ProcessorDecorator(new Processor());
+        $processor = new ProcessorDecorator(
+            new Processor(),
+            ['some_field', 'some_another_field', 'some_ui_only_field', 'some_api_only_field']
+        );
 
         return $processor->process($config);
     }
@@ -190,7 +278,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
      */
     protected function getProviderWithConfigLoaded($configPath)
     {
-        $config = $this->getConfig($configPath);
+        $config   = $this->getConfig($configPath);
         $provider = new SystemConfigurationFormProvider($config, $this->factory, $this->securityFacade);
 
         return $provider;

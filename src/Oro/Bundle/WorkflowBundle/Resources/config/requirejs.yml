@@ -33,4 +33,4 @@ config:
         'oroworkflow/js/workflow-management/transition-definition/model':      'bundles/oroworkflow/js/workflow-management/transition-definition/model.js'
         'oroworkflow/js/workflow-management/transition-definition/collection': 'bundles/oroworkflow/js/workflow-management/transition-definition/collection.js'
 
-        'orodatagrid/js/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'
+        'oro/datagrid/action/workflow-activate-action':             'bundles/oroworkflow/js/datagrid/action/workflow-activate-action.js'
