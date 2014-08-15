@@ -10,9 +10,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Role Entity
@@ -22,13 +20,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "ownership"={
- *              "owner_type"="BUSINESS_UNIT",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
@@ -78,21 +69,6 @@ class Role extends BaseRole
      * @JMS\Expose
      */
     protected $label;
-
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
-
-    /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $organization;
 
     /**
      * Populate the role field
@@ -178,25 +154,6 @@ class Role extends BaseRole
     }
 
     /**
-     * @return BusinessUnit
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * @param BusinessUnit $owningBusinessUnit
-     * @return Role
-     */
-    public function setOwner($owningBusinessUnit)
-    {
-        $this->owner = $owningBusinessUnit;
-
-        return $this;
-    }
-
-    /**
      * Pre persist event listener
      *
      * @ORM\PrePersist
@@ -244,28 +201,5 @@ class Role extends BaseRole
         $this->setRole($roleValue);
 
         return true;
-    }
-
-    /**
-     * Set organization
-     *
-     * @param Organization $organization
-     * @return Role
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Get organization
-     *
-     * @return Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
     }
 }
