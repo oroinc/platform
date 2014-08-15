@@ -17,6 +17,54 @@ class OroUserBundle implements Migration
         self::addOrganizationFields($schema);
         self::oroUserOrganizationTable($schema);
         self::oroUserOrganizationForeignKeys($schema);
+        self::removeRoleOwner($schema, $queries);
+    }
+
+    public static function removeRoleOwner(Schema $schema, QueryBag $queries)
+    {
+        $table = $schema->getTable('oro_access_role');
+        if ($table->hasColumn('business_unit_owner_id')) {
+            $queries->addQuery(
+                new UpdateRoleOwnerQuery()
+            );
+
+
+            if ($table->hasForeignKey('FK_673F65E759294170')) {
+                $table->removeForeignKey('FK_673F65E759294170');
+            }
+            if ($table->hasIndex('IDX_F82840BC59294170')) {
+                $table->dropIndex('IDX_F82840BC59294170');
+            }
+
+            $table->dropColumn('business_unit_owner_id');
+
+            if ($schema->hasTable('oro_entity_config_index_value') && $schema->hasTable('oro_entity_config_field')) {
+                $queries->addPostQuery(
+                    'DELETE FROM oro_entity_config_index_value
+                     WHERE entity_id IS NULL AND field_id IN(
+                       SELECT oecf.id FROM oro_entity_config_field AS oecf
+                       WHERE
+                        (oecf.field_name = \'owner\')
+                        AND
+                        oecf.entity_id = (
+                          SELECT oec.id
+                          FROM oro_entity_config AS oec
+                          WHERE oec.class_name = \'Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role\'
+                        )
+                     );
+                     DELETE FROM oro_entity_config_field
+                       WHERE
+                        field_name IN (\'owner\')
+                        AND
+                        entity_id IN (
+                          SELECT id
+                          FROM oro_entity_config
+                          WHERE class_name = \'Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role\'
+                        );
+                        '
+                );
+            }
+        }
     }
 
     /**
@@ -70,16 +118,6 @@ class OroUserBundle implements Migration
         $table = $schema->getTable('oro_access_group');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_FEF9EDB732C8A3DE', []);
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_organization'),
-            ['organization_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
-
-        $table = $schema->getTable('oro_access_role');
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['organization_id'], 'IDX_673F65E732C8A3DE', []);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],

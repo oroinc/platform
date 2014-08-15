@@ -45,18 +45,6 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         return $this->role;
     }
 
-    public function testOwners()
-    {
-        $entity = $this->getRole();
-        $businessUnit = new BusinessUnit();
-
-        $this->assertEmpty($entity->getOwner());
-
-        $entity->setOwner($businessUnit);
-
-        $this->assertEquals($businessUnit, $entity->getOwner());
-    }
-
     /**
      * Test prePersist role that to generate new value of "role" field
      */
@@ -125,15 +113,5 @@ class RoleTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($em));
 
         return $event;
-    }
-
-    public function testOrganization()
-    {
-        $entity         = $this->getRole();
-        $organization   = new Organization();
-
-        $this->assertNull($entity->getOrganization());
-        $entity->setOrganization($organization);
-        $this->assertSame($organization, $entity->getOrganization());
     }
 }

@@ -119,7 +119,7 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevel($mask, $permission = null)
+    public function getAccessLevel($mask, $permission = null, $object = null)
     {
         return $mask === 0
             ? AccessLevel::NONE_LEVEL
