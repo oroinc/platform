@@ -1,16 +1,23 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/filter/abstract-filter'
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oro/filter/abstract-filter'
 ], function ($, _, __, AbstractFilter) {
     'use strict';
+
+    var SegmentFilter;
 
     /**
      * Segment filter
      *
      * @export  orosegment/js/filter/segment-filter
      * @class   orosegment.filter.SegmentFilter
-     * @extends orofilter.filter.AbstractFilter
+     * @extends oro.filter.AbstractFilter
      */
-    return AbstractFilter.extend({
+    SegmentFilter = AbstractFilter.extend({
         /**
          * Filter selector template
          *
@@ -90,7 +97,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             this._setInputValue(this.inputSelector, value.value);
             return this;
         },
@@ -98,17 +105,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/fi
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             return {
                 value: this._getInputValue(this.inputSelector)
             };
         },
 
-        getValue: function() {
+        getValue: function () {
             return {
                 type: null,
                 value: this.value.value
-            }
+            };
         }
     });
+
+    return SegmentFilter;
 });

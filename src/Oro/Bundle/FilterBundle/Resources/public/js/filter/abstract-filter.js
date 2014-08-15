@@ -1,16 +1,23 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
-    ], function ($, _, Backbone, tools) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'oroui/js/tools'
+], function ($, _, Backbone, tools) {
     'use strict';
+
+    var AbstractFilter;
 
     /**
      * Basic grid filter
      *
-     * @export  orofilter/js/filter/abstract-filter
-     * @class   orofilter.filter.AbstractFilter
+     * @export  oro/filter/abstract-filter
+     * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    AbstractFilter = Backbone.View.extend({
         /**
          * Template for filter criteria
          *
@@ -104,10 +111,10 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param {Object} options
          * @param {Boolean} [options.enabled]
          */
-        initialize: function(options) {
-            options = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
+        initialize: function (options) {
+            var opts = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme');
-            _.extend(this, options);
+            _.extend(this, opts);
 
             this._defineTemplate();
 
@@ -120,7 +127,19 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
             // init raw value of filter
             this.value = _.clone(this.emptyValue);
 
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            AbstractFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.value;
+            delete this.emptyValue;
+            AbstractFilter.__super__.dispose.call(this);
         },
 
         /**
@@ -128,7 +147,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {*}
          */
-        enable: function() {
+        enable: function () {
             if (!this.enabled) {
                 this.enabled = true;
                 this.show();
@@ -142,7 +161,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {*}
          */
-        disable: function() {
+        disable: function () {
             if (this.enabled) {
                 this.enabled = false;
                 this.hide();
@@ -157,7 +176,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {*}
          */
-        show: function() {
+        show: function () {
             this.$el.css('display', 'inline-block');
             return this;
         },
@@ -167,7 +186,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {*}
          */
-        hide: function() {
+        hide: function () {
             this.$el.hide();
             return this;
         },
@@ -177,7 +196,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {*}
          */
-        reset: function() {
+        reset: function () {
             this.setValue(this.emptyValue);
             return this;
         },
@@ -187,7 +206,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {Object}
          */
-        getValue: function() {
+        getValue: function () {
             return tools.deepClone(this.value);
         },
 
@@ -197,7 +216,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param value
          * @return {*}
          */
-        setValue: function(value) {
+        setValue: function (value) {
             if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
                 this.value = tools.deepClone(value);
@@ -215,7 +234,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {*}
          * @protected
          */
-        _formatRawValue: function(value) {
+        _formatRawValue: function (value) {
             return value;
         },
 
@@ -226,7 +245,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {*}
          * @protected
          */
-        _formatDisplayValue: function(value) {
+        _formatDisplayValue: function (value) {
             return value;
         },
 
@@ -237,7 +256,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param {*} oldValue
          * @protected
          */
-        _onValueUpdated: function(newValue, oldValue) {
+        _onValueUpdated: function (newValue, oldValue) {
             this._triggerUpdate(newValue, oldValue);
         },
 
@@ -259,7 +278,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param {*} oldValue
          * @protected
          */
-        _triggerUpdate: function(newValue, oldValue) {
+        _triggerUpdate: function (newValue, oldValue) {
             this.trigger('update');
         },
 
@@ -268,7 +287,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {Boolean}
          */
-        isEmpty: function() {
+        isEmpty: function () {
             return tools.isEqualsLoosely(this.getValue(), this.emptyValue);
         },
 
@@ -280,7 +299,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {Boolean}
          */
-        isEmptyValue: function() {
+        isEmptyValue: function () {
             if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
                 return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
@@ -294,12 +313,12 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {*}
          * @protected
          */
-        _getInputValue: function(input) {
+        _getInputValue: function (input) {
             var result = undefined;
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function() {
+                    $input.each(function () {
                         if ($(this).is(':checked')) {
                             result = $(this).val();
                         }
@@ -320,11 +339,11 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @protected
          * @return {*}
          */
-        _setInputValue: function(input, value) {
+        _setInputValue: function (input, value) {
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function() {
+                    $input.each(function () {
                         var $input = $(this);
                         if ($input.attr('value') == value) {
                             $input.attr('checked', true);
@@ -347,7 +366,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {*}
          * @protected
          */
-        _updateDOMValue: function() {
+        _updateDOMValue: function () {
             return this._writeDOMValue(this._getDisplayValue());
         },
 
@@ -356,7 +375,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          *
          * @return {String}
          */
-        _getCriteriaHint: function() {
+        _getCriteriaHint: function () {
             return '';
         },
 
@@ -366,7 +385,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {*}
          * @protected
          */
-        _getDisplayValue: function() {
+        _getDisplayValue: function () {
             var value = (arguments.length > 0) ? arguments[0] : this.getValue();
             return this._formatDisplayValue(value);
         },
@@ -379,7 +398,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @protected
          * @return {*}
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             throw new Error("Method _writeDOMValue is abstract and must be implemented");
             //this._setInputValue(inputValueSelector, value.value);
             //return this
@@ -391,7 +410,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @return {Object}
          * @protected
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             throw new Error("Method _readDOMValue is abstract and must be implemented");
             //return { value: this._getInputValue(this.inputValueSelector) }
         },
@@ -403,7 +422,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param {Boolean} status
          * @protected
          */
-        _setButtonPressed: function(element, status) {
+        _setButtonPressed: function (element, status) {
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
             } else {
@@ -417,7 +436,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
          * @param {Event} e
          * @private
          */
-        _preventEnterProcessing: function(e) {
+        _preventEnterProcessing: function (e) {
             if (e.keyCode == 13) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -449,4 +468,6 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/tools'
             return _.template(src);
         }
     });
+
+    return AbstractFilter;
 });
