@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class OrganizationBasicAuthenticationListener
 {

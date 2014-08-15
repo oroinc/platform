@@ -558,8 +558,8 @@ abstract class WebTestCase extends BaseWebTestCase
         $userOrganization = self::AUTH_ORGANIZATION
     ) {
         return array(
-            'PHP_AUTH_USER' => $userName,
-            'PHP_AUTH_PW' => $userPassword,
+            'PHP_AUTH_USER'         => $userName,
+            'PHP_AUTH_PW'           => $userPassword,
             'PHP_AUTH_ORGANIZATION' => $userOrganization
         );
     }
