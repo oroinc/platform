@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['./abstract-listener'
-    ], function (AbstractListener) {
+define([
+    'underscore',
+    './abstract-listener'
+], function (_, AbstractListener) {
     'use strict';
+
+    var CallbackListener;
 
     /**
      * Listener with custom callback to execute
@@ -10,7 +15,7 @@ define(['./abstract-listener'
      * @class   orodatagrid.datagrid.listener.CallbackListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    return AbstractListener.extend({
+    CallbackListener = AbstractListener.extend({
         /** @param {Call} */
         processCallback: null,
 
@@ -19,14 +24,14 @@ define(['./abstract-listener'
          *
          * @param {Object} options
          */
-        initialize: function(options) {
+        initialize: function (options) {
             if (!_.has(options, 'processCallback')) {
                 throw new Error('Process callback is not specified');
             }
 
             this.processCallback = options.processCallback;
 
-            AbstractListener.prototype.initialize.apply(this, arguments);
+            CallbackListener.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -36,8 +41,10 @@ define(['./abstract-listener'
          * @param {Backbone.Model} model
          * @protected
          */
-        _processValue: function(value, model) {
+        _processValue: function (value, model) {
             this.processCallback(value, model, this);
         }
     });
+
+    return CallbackListener;
 });
