@@ -314,7 +314,7 @@ class NavigationItem implements NavigationItemInterface
      * Set organization
      *
      * @param Organization $organization
-     * @return Tag
+     * @return NavigationItem
      */
     public function setOrganization(Organization $organization = null)
     {

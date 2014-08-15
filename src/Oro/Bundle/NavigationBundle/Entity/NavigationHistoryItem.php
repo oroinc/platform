@@ -252,7 +252,7 @@ class NavigationHistoryItem implements NavigationItemInterface
      * Set organization
      *
      * @param Organization $organization
-     * @return Tag
+     * @return NavigationHistoryItem
      */
     public function setOrganization(Organization $organization = null)
     {
