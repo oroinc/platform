@@ -5,6 +5,8 @@ namespace Oro\Bundle\SidebarBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Exclude;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * Widget
  *
@@ -71,6 +73,14 @@ class Widget
      * @ORM\Column(name="state", type="string", nullable=false, length=22)
      */
     protected $state;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Get id
@@ -202,5 +212,28 @@ class Widget
         $this->state = $state;
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Widget
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

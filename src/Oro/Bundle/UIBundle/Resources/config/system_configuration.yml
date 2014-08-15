@@ -13,11 +13,12 @@ oro_system_configuration:
 
     fields:
         oro_ui.application_url:
+            data_type: string
             type: text
             options:
                 label: 'Application URL'
-
         oro_ui.navbar_position:
+            data_type: string
             type: choice
             options:
                 label: 'Position'
@@ -42,3 +43,9 @@ oro_system_configuration:
                                     navbar_settings:
                                         children:
                                             - oro_ui.navbar_position
+
+    api_tree:
+        application:
+            oro_ui.application_url: ~
+        look-and-feel:
+            oro_ui.navbar_position: ~

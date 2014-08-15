@@ -1,0 +1,3 @@
+oro_config_api:
+    resource: "@OroConfigBundle/Controller/Api/Rest/ConfigurationController.php"
+    type:     rest

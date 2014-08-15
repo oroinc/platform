@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'backgrid'
-    ], function ($, _, Backbone, Backgrid) {
+define([
+    'underscore',
+    'backbone',
+    'backgrid'
+], function (_, Backbone, Backgrid) {
     "use strict";
+
+    var FooterCell;
 
     /**
      * Datagrid footer cell
@@ -10,7 +16,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
      * @class orodatagrid.datagrid.footer.FooterCell
      * @extends Backbone.View
      */
-    return Backgrid.FooterCell = Backbone.View.extend({
+    FooterCell = Backbone.View.extend({
         /** @property */
         tagName: "th",
 
@@ -40,25 +46,27 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-            var columnName = this.column.get('name'),
-                state      = this.collection.state || {},
-                totals     = state.totals || {};
+            var columnName, columnTotals, state, totals;
 
-            if (_.isUndefined(totals[this.options.rowName])){
+            this.$el.empty();
+            columnName = this.column.get('name');
+            state      = this.collection.state || {};
+            totals     = state.totals || {};
+
+            if (_.isUndefined(totals[this.options.rowName])) {
                 this.$el.hide();
                 return;
             }
             if (!_.isUndefined(totals[this.options.rowName]) && _.has(totals[this.options.rowName].columns, columnName)) {
                 this.$el.show();
-                var columnTotals = totals[this.options.rowName].columns[columnName];
+                columnTotals = totals[this.options.rowName].columns[columnName];
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }
-                this.$el.append($(this.template({
+                this.$el.append(this.template({
                     label: columnTotals.label,
                     total: columnTotals.total
-                })));
+                }));
             }
 
             if (!_.isUndefined(this.column.attributes.cell.prototype.className)) {
@@ -72,4 +80,6 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
             return this;
         }
     });
+
+    return FooterCell;
 });

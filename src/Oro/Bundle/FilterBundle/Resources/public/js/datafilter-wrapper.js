@@ -1,11 +1,16 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'underscore'], function ($, _) {
+define([
+    'jquery',
+    'underscore'
+], function ($, _) {
     'use strict';
 
-    return {
+    var dataFilterWrapper;
+
+    dataFilterWrapper = {
         /**
-         * @property {Boolean}
+         * @property {boolean}
          */
         popupCriteriaShowed: false,
 
@@ -29,23 +34,51 @@ define(['jquery', 'underscore'], function ($, _) {
 
             this._appendFilter($filter);
 
-            this._clickOutsideCriteriaCallback = _.bind(function(e) {
+            $('body').on('click' + this._eventNamespace(), _.bind(function (e) {
                 if (this.popupCriteriaShowed) {
                     this._onClickOutsideCriteria(e);
                 }
-            }, this);
+            }, this));
 
-            $('body').on('click', this._clickOutsideCriteriaCallback);
-
-            this.$el.on('keyup', '.dropdown-menu.filter-criteria', _.bind(function (e) {
+            // will be automatically unbound in backbone view's undelegateEvents() method
+            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', _.bind(function (e) {
                 if (e.keyCode === 27) {
                     this._hideCriteria();
                 }
             }, this));
         },
 
+        /**
+         * Removes trace of wrapper from the view
+         *  - unbind event listener from body element
+         *  - removes properties which belongs to wrapper
+         *  - call original dispose method
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $('body').off(this._eventNamespace());
+            _.each(_.keys(dataFilterWrapper), function (prop) {
+                delete this[prop];
+            }, this);
+            this.constructor.__super__.dispose.call(this);
+        },
+
+        /**
+         * Returns event's name space
+         *
+         * @returns {string}
+         * @protected
+         */
+        _eventNamespace: function () {
+            return '.delegateEvents' + this.cid;
+        },
+
         _appendFilter: function ($filter) {
             this.$(this.criteriaSelector).append($filter);
         }
     };
+
+    return dataFilterWrapper;
 });
