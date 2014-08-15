@@ -62,6 +62,7 @@ Field declaration have required property `type`.
 `tooltip` - show additional info about field
 `acl_resource` - determines acl resource to check permissions to change config field value(optional)
 `priority` - sort order for displaying(optional)
+`ui_only` - indicates whether a field is used only on UI and do not related to any variable (optional, defaults to false)
 
 Also `options` available property here, it's just a proxy to form type definition
 
