@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OroEntitySelectOrCreateInlineType extends AbstractType
@@ -15,16 +16,23 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     const NAME = 'oro_entity_create_or_select_inline';
 
     /**
-     * @var \Oro\Bundle\SecurityBundle\SecurityFacade
+     * @var SecurityFacade
      */
     protected $securityFacade;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @var ConfigManager
      */
-    public function __construct(SecurityFacade $securityFacade)
+    protected $configManager;
+
+    /**
+     * @param SecurityFacade $securityFacade
+     * @param ConfigManager  $configManager
+     */
+    public function __construct(SecurityFacade $securityFacade, ConfigManager $configManager)
     {
         $this->securityFacade = $securityFacade;
+        $this->configManager  = $configManager;
     }
 
     /**
@@ -56,27 +64,22 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(
-            array(
-                'grid_name'
-            )
-        );
-
         $resolver->setDefaults(
-            array(
-                'existing_entity_grid_id' => 'id',
-                'create_enabled' => true,
-                'create_acl' => null,
-                'create_form_route' => null,
-                'create_form_route_parameters' => array()
-            )
+            [
+                'existing_entity_grid_id'      => 'id',
+                'create_enabled'               => true,
+                'create_acl'                   => null,
+                'create_form_route'            => null,
+                'create_form_route_parameters' => [],
+                'grid_name'                    => null
+            ]
         );
 
         $resolver->setNormalizers(
-            array(
-                'create_enabled' => function (Options $options, $createEnabled) {
+            [
+                'create_enabled'    => function (Options $options, $createEnabled) {
                     $createRouteName = $options->get('create_form_route');
-                    $createEnabled = $createEnabled && !empty($createRouteName);
+                    $createEnabled   = $createEnabled && !empty($createRouteName);
                     if ($createEnabled) {
                         $aclName = $options->get('create_acl');
                         if (empty($aclName)) {
@@ -88,8 +91,26 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                     }
 
                     return $createEnabled;
-                }
-            )
+                },
+                'grid_name'         => function (Options $options, $gridName) {
+                    if (!empty($gridName)) {
+                        return $gridName;
+                    }
+
+                    $formConfig = $this->configManager->getProvider('form')->getConfig($options->get('entity_class'));
+
+                    return $formConfig->get('grid_name', false, $gridName);
+                },
+                'create_form_route' => function (Options $options, $createFormRoute) {
+                    if (!empty($createFormRoute)) {
+                        return $createFormRoute;
+                    }
+
+                    $formConfig = $this->configManager->getProvider('form')->getConfig($options->get('entity_class'));
+
+                    return $formConfig->get('create_form_route', false, $createFormRoute);
+                },
+            ]
         );
     }
 
@@ -98,10 +119,10 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['grid_name'] = $options['grid_name'];
-        $view->vars['existing_entity_grid_id'] = $options['existing_entity_grid_id'];
-        $view->vars['create_enabled'] = $options['create_enabled'];
-        $view->vars['create_form_route'] = $options['create_form_route'];
+        $view->vars['grid_name']                    = $options['grid_name'];
+        $view->vars['existing_entity_grid_id']      = $options['existing_entity_grid_id'];
+        $view->vars['create_enabled']               = $options['create_enabled'];
+        $view->vars['create_form_route']            = $options['create_form_route'];
         $view->vars['create_form_route_parameters'] = $options['create_form_route_parameters'];
     }
 }

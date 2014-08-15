@@ -17,7 +17,7 @@ class UserSelectTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->type = new UserSelectType();
+        $this->type = new UserSelectType('Oro\Bundle\UserBundle\Entity\User');
     }
 
     public function testSetDefaultOptions()

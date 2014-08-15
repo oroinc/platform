@@ -7,20 +7,32 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class UserSelectType extends AbstractType
 {
     /**
+     * @var string
+     */
+    protected $className;
+
+    /**
+     * @param string $className
+     */
+    public function __construct($className)
+    {
+        $this->className = $className;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'configs' => array(
-                    'placeholder' => 'oro.user.form.choose_user',
-                    'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
+            [
+                'configs'      => [
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
                     'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig'
-                ),
-                'autocomplete_alias' => 'users',
-                'grid_name' => 'users-select-grid'
-            )
+                ],
+                'entity_class' => $this->className
+            ]
         );
     }
 
