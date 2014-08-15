@@ -121,15 +121,15 @@ datagrid:
             type: orm
             query:
                 select:
-                    - log.loggedAt
+                    - log
                     - >
+                      CONCAT(
                         CONCAT(
-                            CONCAT(
-                                CONCAT(u.firstName, ' '),
-                                CONCAT(u.lastName, ' ')
-                            ),
-                            CONCAT(' - ', u.email)
-                        ) as author
+                            CONCAT(u.firstName, ' '),
+                            CONCAT(u.lastName, ' ')
+                        ),
+                        CONCAT(' - ', u.email)
+                      ) as author
                 from:
                     - { table: OroEntityConfigBundle:ConfigLog, alias: log }
                 join:
