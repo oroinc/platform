@@ -55,7 +55,6 @@ Example:
 ```
 Acme\DemoBundle\Entity\Product:
     alias: demo_product                                      # Alias for 'from' keyword in advanced search
-    flexible_manager: demo_product_manager                   # Indexed for search by parameter in mapping config.
     search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
     label: Demo products                                     # Label for entity to identify entity in search results
     route:
@@ -94,11 +93,6 @@ Acme\DemoBundle\Entity\Product:
                     target_type: text
                     target_fields: [all_data]
 ```
-
-**Note:** If entity has flexible attributes, they can be indexed for search by parameter flexible_manager in mapping config.
-Value of this parameter is the service name for flexible entity. In search index will be indexed all the attributes
-with parameter **searchable** set to true. All text fields data will be store in **all_text** virtual field.
-Additionally, all the fields will be stored in fieldName virtual fields.
 
 [Query builder](Resources/doc/query_builder.md)
 
