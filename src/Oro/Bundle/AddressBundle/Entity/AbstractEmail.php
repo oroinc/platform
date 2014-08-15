@@ -146,19 +146,15 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
     {
         $class = ClassUtils::getClass($this);
 
+        /** @var AbstractAddress $other */
         if (!$other instanceof $class) {
             return false;
-        }
-
-        /** @var AbstractAddress $other */
-        if ($this->getId() && $other->getId()) {
+        } elseif ($this->getId() && $other->getId()) {
             return $this->getId() == $other->getId();
-        }
-
-        if ($this->getId() || $other->getId()) {
+        } elseif ($this->getId() || $other->getId()) {
             return false;
+        } else {
+            return $this == $other;
         }
-
-        return $this == $other;
     }
 }

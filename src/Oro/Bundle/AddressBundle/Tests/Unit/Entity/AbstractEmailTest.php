@@ -79,16 +79,16 @@ class AbstractEmailTest extends \PHPUnit_Framework_TestCase
      */
     public function isEqualDataProvider()
     {
-        $email = $this->createEmail();
+        $emailEmpty   = $this->createEmail();
+        $emailAddress = $this->createEmail('a@a.a');
 
         return array(
-            array($email, $email, true),
-            array($this->createEmail('a@a.a', 100), $this->createEmail('b@b.b', 100), true),
-            array($this->createEmail('a@a.a'), $this->createEmail('a@a.a'), true),
-            array($this->createEmail('a@a.a'), $this->createEmail('b@b.b'), false),
-            array($this->createEmail(), $this->createEmail(), true),
-            array($this->createEmail(100), $this->createEmail(), false),
-            array($this->createEmail(), null, false),
+            'both empty'           => array($emailEmpty, $emailEmpty, true),
+            'one empty one unset'  => array($emailEmpty, null, false),
+            'one empty'            => array($this->createEmail(100), $emailEmpty, false),
+            'both with same id'    => array($this->createEmail('a@a.a', 100), $this->createEmail('b@b.b', 100), true),
+            'equals not empty'     => array($emailAddress, $emailAddress, true),
+            'not equals not empty' => array($emailAddress, $this->createEmail('b@b.b'), false),
         );
     }
 
@@ -100,6 +100,7 @@ class AbstractEmailTest extends \PHPUnit_Framework_TestCase
     protected function createEmail($email = null, $id = null)
     {
         $arguments = array();
+
         if ($email) {
             $arguments[] = $email;
         }

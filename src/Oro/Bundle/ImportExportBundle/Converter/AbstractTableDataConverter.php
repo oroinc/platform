@@ -253,11 +253,13 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     protected function filterEmptyArrays(array $data)
     {
         $hasValue = false;
+
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 $value = $this->filterEmptyArrays($value);
                 $data[$key] = $value;
             }
+
             if (array() === $value) {
                 unset($data[$key]);
             } elseif (null !== $value) {

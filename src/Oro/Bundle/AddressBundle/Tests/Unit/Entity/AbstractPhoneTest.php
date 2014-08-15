@@ -79,16 +79,16 @@ class AbstractPhoneTest extends \PHPUnit_Framework_TestCase
      */
     public function isEqualDataProvider()
     {
-        $email = $this->createPhone();
+        $phoneEmpty  = $this->createPhone();
+        $phoneSimple = $this->createPhone('123');
 
         return array(
-            array($email, $email, true),
-            array($this->createPhone('123', 100), $this->createPhone('789', 100), true),
-            array($this->createPhone('123'), $this->createPhone('123'), true),
-            array($this->createPhone('123'), $this->createPhone('789'), false),
-            array($this->createPhone(), $this->createPhone(), true),
-            array($this->createPhone(100), $this->createPhone(), false),
-            array($this->createPhone(), null, false),
+            'both empty'           => array($phoneEmpty, $phoneEmpty, true),
+            'one empty'            => array($this->createPhone(100), $phoneEmpty, false),
+            'one empty one unset'  => array($phoneEmpty, null, false),
+            'both with same id'    => array($this->createPhone('123', 100), $this->createPhone('789', 100), true),
+            'equals not empty'     => array($phoneSimple, $phoneSimple, true),
+            'not equals not empty' => array($phoneSimple, $this->createPhone('789'), false),
         );
     }
 
@@ -101,6 +101,7 @@ class AbstractPhoneTest extends \PHPUnit_Framework_TestCase
     protected function createPhone($phone = null, $id = null)
     {
         $arguments = array();
+
         if ($phone) {
             $arguments[] = $phone;
         }
