@@ -4,6 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
@@ -24,17 +26,28 @@ class Manager
     protected $entityManager;
 
     /**
+     * @var SecurityContextInterface
+     */
+    protected $securityContext;
+
+    /**
      * Constructor
      *
-     * @param Factory $factory
-     * @param EntityManager $entityManager
-     * @param AclHelper $aclHelper
+     * @param Factory                  $factory
+     * @param EntityManager            $entityManager
+     * @param AclHelper                $aclHelper
+     * @param SecurityContextInterface $securityContext
      */
-    public function __construct(Factory $factory, EntityManager $entityManager, AclHelper $aclHelper)
-    {
-        $this->factory = $factory;
-        $this->entityManager = $entityManager;
-        $this->aclHelper = $aclHelper;
+    public function __construct(
+        Factory $factory,
+        EntityManager $entityManager,
+        AclHelper $aclHelper,
+        SecurityContextInterface $securityContext
+    ) {
+        $this->factory         = $factory;
+        $this->entityManager   = $entityManager;
+        $this->aclHelper       = $aclHelper;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -136,7 +149,9 @@ class Manager
     public function createDashboardModel()
     {
         $dashboard = new Dashboard();
-
+        $dashboard->setOrganization(
+            $this->securityContext->getToken()->getOrganizationContext()
+        );
         return $this->getDashboardModel($dashboard);
     }
 
@@ -219,7 +234,9 @@ class Manager
     public function findDefaultDashboard()
     {
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
-            ->findDefaultDashboard();
+            ->findDefaultDashboard(
+                $this->securityContext->getToken()->getOrganizationContext()
+            );
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);
@@ -235,6 +252,8 @@ class Manager
     public function findAllowedDashboards($permission = 'VIEW')
     {
         $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
+        $qb->where('dashboard.organization = :organization')
+            ->setParameter('organization', $this->securityContext->getToken()->getOrganizationContext());
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 

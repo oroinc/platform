@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,6 +41,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
      * @var Manager
      */
     protected $manager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
 
     protected function setUp()
     {
@@ -79,10 +85,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
         $this->manager = new Manager(
             $this->factory,
             $this->entityManager,
-            $this->aclHelper
+            $this->aclHelper,
+            $this->securityContext
         );
     }
 
@@ -252,7 +261,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateDashboardModel()
     {
+        $organization   = new Organization();
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -260,6 +276,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('createDashboardModel')
             ->with($this->isInstanceOf('Oro\Bundle\DashboardBundle\Entity\Dashboard'))
             ->will($this->returnValue($dashboardModel));
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
 
         $this->assertEquals($dashboardModel, $this->manager->createDashboardModel());
     }
@@ -526,13 +550,29 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindDefaultDashboard()
     {
+        $organization = new Organization();
         $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $this->dashboardRepository->expects($this->once())
             ->method('findDefaultDashboard')
+            ->with($organization)
             ->will($this->returnValue($dashboardEntity));
 
         $this->factory->expects($this->once())
@@ -548,6 +588,21 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindDefaultDashboardEmpty()
     {
+        $organization = new Organization();
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $this->dashboardRepository->expects($this->once())
             ->method('findDefaultDashboard')
             ->will($this->returnValue(null));
@@ -559,6 +614,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindAllowedDashboards()
     {
+        $organization = new Organization();
         $permission = 'EDIT';
         $expectedEntities = array($this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'));
         $expectedModels = array(
@@ -584,6 +640,30 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->with('dashboard')
             ->will($this->returnValue($queryBuilder));
+
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('dashboard.organization = :organization')
+            ->will($this->returnValue($queryBuilder));
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('organization', new Organization())
+            ->will($this->returnValue($queryBuilder));
+
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
 
         $this->aclHelper->expects($this->once())
             ->method('apply')
