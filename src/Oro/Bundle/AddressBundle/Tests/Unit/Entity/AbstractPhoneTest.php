@@ -63,15 +63,55 @@ class AbstractPhoneTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider isEqualDataProvider
+     *
+     * @param AbstractPhone $first
+     * @param mixed $second
+     * @param bool $expectedResult
+     */
+    public function testIsEqual(AbstractPhone $first, $second, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, $first->isEqual($second));
+    }
+
+    /**
+     * @return array
+     */
+    public function isEqualDataProvider()
+    {
+        $email = $this->createPhone();
+
+        return array(
+            array($email, $email, true),
+            array($this->createPhone('123', 100), $this->createPhone('789', 100), true),
+            array($this->createPhone('123'), $this->createPhone('123'), true),
+            array($this->createPhone('123'), $this->createPhone('789'), false),
+            array($this->createPhone(), $this->createPhone(), true),
+            array($this->createPhone(100), $this->createPhone(), false),
+            array($this->createPhone(), null, false),
+        );
+    }
+
+
+    /**
      * @param string|null $phone
+     * @param int $id
      * @return AbstractPhone|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createPhone($phone = null)
+    protected function createPhone($phone = null, $id = null)
     {
         $arguments = array();
         if ($phone) {
             $arguments[] = $phone;
         }
-        return $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractPhone', $arguments);
+
+        /** @var AbstractPhone $phone */
+        $phone = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractPhone', $arguments);
+
+        if ($id) {
+            $phone->setId($id);
+        }
+
+        return $phone;
     }
 }

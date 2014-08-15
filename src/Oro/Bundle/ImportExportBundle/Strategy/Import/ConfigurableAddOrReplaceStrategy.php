@@ -74,8 +74,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = array();
-        $itemData = $this->context->getValue('itemData');
-        $entity = $this->processEntity($entity, true, true, $itemData);
+        $entity = $this->beforeProcessEntity($entity);
+        $entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'));
+        $entity = $this->afterProcessEntity($entity);
         $entity = $this->validateAndUpdateContext($entity);
 
         return $entity;
@@ -335,5 +336,23 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         $entityName = ClassUtils::getClass($entity);
         $identifierName = $this->getEntityIdentifierFieldName($entityName);
         $this->fieldHelper->setObjectValue($entity, $identifierName, null);
+    }
+
+    /**
+     * @param object $entity
+     * @return object
+     */
+    protected function beforeProcessEntity($entity)
+    {
+        return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @return object
+     */
+    protected function afterProcessEntity($entity)
+    {
+        return $entity;
     }
 }

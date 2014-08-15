@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -135,5 +136,29 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
     public function isEmpty()
     {
         return empty($this->email);
+    }
+
+    /**
+     * @param mixed $other
+     * @return bool
+     */
+    public function isEqual($other)
+    {
+        $class = ClassUtils::getClass($this);
+
+        if (!$other instanceof $class) {
+            return false;
+        }
+
+        /** @var AbstractAddress $other */
+        if ($this->getId() && $other->getId()) {
+            return $this->getId() == $other->getId();
+        }
+
+        if ($this->getId() || $other->getId()) {
+            return false;
+        }
+
+        return $this == $other;
     }
 }
