@@ -45,6 +45,8 @@ class EntityProcessor
         // TODO: Update extended entity cache after schema update
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
         'cache:clear'                     => [],
+        // this is necessary due to doctrine can only access new enum value entity after generation
+        'oro:entity-extend:update-enum'   => [],
     ];
 
     /**
