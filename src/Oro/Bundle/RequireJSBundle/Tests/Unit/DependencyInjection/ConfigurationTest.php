@@ -83,7 +83,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'build' => array(
                         'optimize' => 'uglify2',
                         'paths' => array(),
-                    )
+                    ),
+                    'cache_impl' => null,
                 )
             ),
             array(
@@ -102,7 +103,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'preserveLicenseComments' => true,
                         'useSourceUrl' => false,
                         'paths' => array(),
-                    )
+                    ),
+                    'cache_impl' => 'oro_requirejs.cache',
                 ),
                 array(
                     'config' => array(
@@ -121,6 +123,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'useSourceUrl' => false,
                         'paths' => array(),
                     ),
+                    'cache_impl' => 'oro_requirejs.cache',
                 )
             ),
         );

@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('scriptType')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
+                ->scalarNode('cache_impl')->defaultNull()->end()
                 ->scalarNode('web_root')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('js_engine')->defaultValue('node')->end()
                 ->scalarNode('build_path')->defaultValue('js/app.min.js')->end()

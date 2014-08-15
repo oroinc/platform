@@ -21,6 +21,4 @@ services:
             - @service_container
             - @templating
             - OroRequireJSBundle::require_config.js.twig
-        calls:
-            - [ setCache, [ @oro_requirejs.cache ] ]
         lazy: true
