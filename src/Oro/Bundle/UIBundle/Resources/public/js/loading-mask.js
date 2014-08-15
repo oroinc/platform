@@ -13,7 +13,7 @@ define([
      * Loading mask widget
      *
      * @export oroui/js/loading-mask
-     * @name   oro.LoadingMask
+     * @name   oroui.LoadingMask
      */
     LoadingMaskView = BaseView.extend({
 

@@ -241,7 +241,12 @@ abstract class BaseDriver
         if (count($query->getOptions())) {
             foreach ($query->getOptions() as $index => $searchCondition) {
                 if ($searchCondition['fieldType'] == Query::TYPE_TEXT) {
-                    $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
+                    if ($searchCondition['fieldValue'] === '') {
+                        $whereExpr[] = 'textField.field = :field' . $index;
+                        $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+                    } else {
+                        $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
+                    }
                 } else {
                     $whereExpr[] = $this->addNonTextField($qb, $index, $searchCondition);
                 }

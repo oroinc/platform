@@ -1,16 +1,22 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'backbone', 'backgrid'
-    ], function ($, Backbone, Backgrid) {
+define([
+    'jquery',
+    'backbone',
+    'backgrid'
+], function ($, Backbone, Backgrid) {
     "use strict";
+
+    var SelectRowCell;
 
     /**
      * Renders a checkbox for row selection.
      *
-     * @export  orodatagrid/js/datagrid/cell/select-row-cell
-     * @class   orodatagrid.datagrid.cell.SelectRowCell
+     * @export  oro/datagrid/cell/select-row-cell
+     * @class   oro.datagrid.cell.SelectRowCell
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    SelectRowCell = Backbone.View.extend({
 
         /** @property */
         className: "select-row-cell",
@@ -41,26 +47,30 @@ define(['jquery', 'backbone', 'backgrid'
             }
 
             this.listenTo(this.model, "backgrid:select", function (model, checked) {
-                this.$el.find(":checkbox").prop("checked", checked).change();
+                this.$checkbox.prop("checked", checked).change();
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.column;
+            delete this.$checkbox;
+            SelectRowCell.__super__.dispose.apply(this, arguments);
         },
 
         /**
          * Focuses the checkbox.
          */
         enterEditMode: function (e) {
-            var $checkbox = this.$el.find(":checkbox").focus();
-            if ($checkbox[0] !== e.target) {
-                $checkbox.prop("checked", !$checkbox.prop("checked")).change();
+            if (this.$checkbox[0] !== e.target) {
+                this.$checkbox.prop("checked", !this.$checkbox.prop("checked")).change();
             }
             e.stopPropagation();
-        },
-
-        /**
-         * Unfocuses the checkbox.
-         */
-        exitEditMode: function () {
-            this.$el.find(":checkbox").blur();
         },
 
         /**
@@ -79,12 +89,14 @@ define(['jquery', 'backbone', 'backgrid'
             // work around with trigger event to get current state of model (selected or not)
             var state = {selected: false};
             this.$el.empty().append('<input tabindex="-1" type="checkbox" />');
+            this.$checkbox = this.$(':checkbox');
             this.model.trigger('backgrid:isSelected', this.model, state);
             if (state.selected) {
-                this.$el.find(':checkbox').prop('checked', 'checked');
+                this.$checkbox.prop('checked', 'checked');
             }
-            this.delegateEvents();
             return this;
         }
     });
+
+    return SelectRowCell;
 });

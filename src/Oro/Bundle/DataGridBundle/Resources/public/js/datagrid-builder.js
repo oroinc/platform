@@ -111,10 +111,6 @@ define(function (require) {
                     gridContentManager.trace(collection);
                 }
 
-                // create grid view
-                options = gridBuilder.combineGridViewsOptions.call(this);
-                $(gridGridViewsSelector).append((new GridViewsView(_.extend({collection: collection}, options))).render().$el);
-
                 this.deferred.resolve(grid);
             },
 
@@ -185,6 +181,50 @@ define(function (require) {
                     exportOptions: metadata.options.export || {},
                     routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
                 };
+            }
+        },
+
+        gridViewsBuilder = {
+            /**
+             * Runs grid views builder
+             * Builder interface implementation
+             *
+             * @param {jQuery.Deferred} deferred
+             * @param {Object} options
+             * @param {jQuery} [options.$el] container for the grid
+             * @param {string} [options.gridName] grid name
+             * @param {Object} [options.gridPromise] grid builder's promise
+             * @param {Object} [options.data] data for grid's collection
+             * @param {Object} [options.metadata] configuration for the grid
+             */
+            init: function (deferred, options) {
+                var self = {
+                    metadata: _.defaults(options.metadata, {
+                        gridViews: {}
+                    })
+                };
+
+                options.gridPromise.done(function (grid) {
+                    var gridViews = gridViewsBuilder.build.call(self, grid.collection);
+                    deferred.resolve(gridViews);
+                }).fail(function () {
+                    deferred.reject();
+                });
+            },
+
+            /**
+             * Creates grid view
+             *
+             * @param {orodatagrid.PageableCollection} collection
+             * @returns {orodatagrid.datagrid.GridViewsView}
+             */
+            build: function (collection) {
+                var options, gridViews;
+                options = gridViewsBuilder.combineGridViewsOptions.call(this);
+                gridViews = new GridViewsView(_.extend({collection: collection}, options));
+                $(gridGridViewsSelector).append(gridViews.render().$el);
+
+                return gridViews;
             },
 
             /**
@@ -193,10 +233,25 @@ define(function (require) {
              * @returns {Object}
              */
             combineGridViewsOptions: function () {
-                return this.metadata.gridViews || {};
+                return this.metadata.gridViews;
             }
         };
 
+
+    /**
+     * Runs passed builder
+     *
+     * @param {jQuery.Deferred} deferred
+     * @param {Object} options
+     * @param {Object} builder
+     */
+    function runBuilder(deferred, options, builder) {
+        if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
+            deferred.reject();
+            throw new TypeError('Builder does not have init method');
+        }
+        _.defer(_.bind(builder.init, builder), deferred, options);
+    }
 
     /**
      * Process datagrid's metadata and creates datagrid
@@ -210,29 +265,25 @@ define(function (require) {
     return function (options) {
         var deferred, promises;
 
-        deferred = $.Deferred();
-        promises = [deferred.promise()];
-
         options.$el = $(document.createDocumentFragment());
         options.gridName = options.metadata.options.gridName;
-        options.gridPromise = promises[0];
-
-        function runBuilder(deferred, builder) {
-            if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
-                deferred.reject();
-                throw new TypeError('Builder does not have init method');
-            }
-            _.defer(_.bind(builder.init, builder), deferred, options);
-        }
 
         // run grid builders
-        runBuilder(deferred, gridBuilder);
+        deferred = $.Deferred();
+        options.gridPromise = deferred.promise();
+        promises = [options.gridPromise];
+        runBuilder(deferred, options, gridBuilder);
+
+        // run gridViews builder
+        deferred = $.Deferred();
+        promises.push(deferred.promise());
+        runBuilder(deferred, options, gridViewsBuilder);
 
         // run other builders
         _.each(options.builders, function (module) {
             var deferred = $.Deferred();
             promises.push(deferred.promise());
-            require([module], _.partial(runBuilder, deferred));
+            require([module], _.partial(runBuilder, deferred, options));
         });
 
         $.when.apply($, promises).always(function () {

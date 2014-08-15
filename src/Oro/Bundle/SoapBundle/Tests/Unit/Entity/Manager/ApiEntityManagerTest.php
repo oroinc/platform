@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
 
@@ -61,6 +64,98 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $manager = $this->createApiEntityManager($className, $metadata);
         $this->assertEquals($entity->id, $manager->getEntityId($entity));
+    }
+
+    /**
+     * Test getList with criteria as an array
+     */
+    public function testGetSimpleFilteredList()
+    {
+        $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
+        $entity = new Entity();
+        $entity->id = 1;
+        $entity->name = 'entityName';
+
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->setConstructorArgs(array($className))
+            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues'))
+            ->getMock();
+
+        $metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array('id')));
+
+        $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->getMock();
+
+        $criteria = ['gender' => 'male'];
+        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with($this->equalTo($criteria))
+            ->will($this->returnValue([$entity]));
+
+        $objectManager
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with($this->equalTo($className))
+            ->will($this->returnValue($repository));
+
+        $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
+
+        $result = $manager->getList(3, 1, $criteria);
+
+        $this->assertSame($result[0], $entity);
+    }
+
+    /**
+     * Test getList with criteria as Criteria instance
+     */
+    public function testGetCriteriaFilteredList()
+    {
+        $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
+        $entity = new Entity();
+        $entity->id = 1;
+        $entity->name = 'entityName';
+
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->setConstructorArgs(array($className))
+            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues'))
+            ->getMock();
+
+        $metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array('id')));
+
+        $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->getMock();
+
+        $criteria = new Criteria();
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository
+            ->expects($this->once())
+            ->method('matching')
+            ->with($this->equalTo($criteria))
+            ->will($this->returnValue(new ArrayCollection([$entity])));
+
+        $objectManager
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with($this->equalTo($className))
+            ->will($this->returnValue($repository));
+
+        $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
+
+        $result = $manager->getList(3, 1, $criteria);
+        var_dump($result);
+        $this->assertSame($result[0], $entity);
     }
 
     /**
