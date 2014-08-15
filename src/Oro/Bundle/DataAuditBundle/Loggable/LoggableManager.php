@@ -7,13 +7,13 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
-use Oro\Bundle\UserBundle\Entity\User;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
+use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -23,59 +23,35 @@ class LoggableManager
 {
     protected static $userCache = array();
 
-    /**
-     * @var string
-     */
     const ACTION_CREATE = 'create';
-
-    /**
-     * @var string
-     */
     const ACTION_UPDATE = 'update';
-
-    /**
-     * @var string
-     */
     const ACTION_REMOVE = 'remove';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $configs = array();
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $username;
 
-    /**
-     * @var string
-     */
+    /** @var Organization|null */
+    protected $organization = null;
+
+    /** @var string */
     protected $logEntityClass;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $pendingLogEntityInserts = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $pendingRelatedEntities = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $collectionLogData = array();
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $auditConfigProvider;
 
     /**
@@ -125,6 +101,14 @@ class LoggableManager
         } else {
             throw new \InvalidArgumentException("Username must be a string, or object should have method: getUsername");
         }
+    }
+
+    /**
+     * @param $organization
+     */
+    public function setOrganization(Organization $organization)
+    {
+        $this->organization = $organization;
     }
 
     /**
@@ -281,6 +265,7 @@ class LoggableManager
         $logEntry->setObjectClass($meta->name);
         $logEntry->setLoggedAt();
         $logEntry->setUser($user);
+        $logEntry->setOrganization($this->organization);
         $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
 
         $entityId = $this->getIdentifier($entity);

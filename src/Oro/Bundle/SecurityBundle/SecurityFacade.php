@@ -12,24 +12,16 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SecurityFacade
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     private $securityContext;
 
-    /**
-     * @var AclAnnotationProvider
-     */
+    /** @var AclAnnotationProvider */
     protected $annotationProvider;
 
-    /**
-     * @var ObjectIdentityFactory
-     */
+    /** @var ObjectIdentityFactory */
     protected $objectIdentityFactory;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
@@ -145,7 +137,7 @@ class SecurityFacade
             if (is_string($attributes) && $object == null) {
                 $delimiter = strpos($attributes, ';');
                 if ($delimiter) {
-                    $object = substr($attributes, $delimiter + 1);
+                    $object     = substr($attributes, $delimiter + 1);
                     $attributes = substr($attributes, 0, $delimiter);
                 }
             }
@@ -206,5 +198,15 @@ class SecurityFacade
         }
 
         return false;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOrganizationId()
+    {
+        /** @var Organization $organization */
+        $organization = $this->getOrganization();
+        return $organization ? $organization->getId() : null;
     }
 }
