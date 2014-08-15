@@ -148,6 +148,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevelNames($object)
     {
+        $maxLevel = AccessLevel::SYSTEM_LEVEL;
         if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $minLevel = AccessLevel::BASIC_LEVEL;
         } else {
@@ -159,15 +160,17 @@ class EntityAclExtension extends AbstractAclExtension
                 );
             }
             if ($metadata->isUserOwned()) {
+                $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::BASIC_LEVEL;
             } elseif ($metadata->isBusinessUnitOwned()) {
+                $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::LOCAL_LEVEL;
             } elseif ($metadata->isOrganizationOwned()) {
                 $minLevel = AccessLevel::GLOBAL_LEVEL;
             }
         }
 
-        return AccessLevel::getAccessLevelNames($minLevel);
+        return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
     /**
@@ -340,8 +343,9 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevel($mask, $permission = null)
+    public function getAccessLevel($mask, $permission = null, $object = null)
     {
+
         if (0 === $this->removeServiceBits($mask)) {
             return AccessLevel::NONE_LEVEL;
         }
@@ -357,6 +361,10 @@ class EntityAclExtension extends AbstractAclExtension
             if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $accessLevel))) {
                 $result = AccessLevel::getConst($accessLevel . '_LEVEL');
             }
+        }
+
+        if ($object && $result === AccessLevel::SYSTEM_LEVEL) {
+            $result = $this->fixMaxAccessLevel($result, $object);
         }
 
         return $result;
@@ -480,7 +488,6 @@ class EntityAclExtension extends AbstractAclExtension
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                     $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
-                        $securityToken->getOrganizationContext(),
                         $securityToken->getUser(),
                         $object,
                         true,
@@ -497,6 +504,32 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         return $result;
+    }
+
+    /**
+     * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
+     * if object have owner type OWNER_TYPE_BUSINESS_UNIT or OWNER_TYPE_USER
+     *
+     * @param int   $accessLevel Current object access level
+     * @param mixed $object      Object for test
+     * @return int
+     */
+    protected function fixMaxAccessLevel($accessLevel, $object)
+    {
+        $metadata = $this->getMetadata($object);
+        if ($metadata->hasOwner()) {
+            if (
+            in_array(
+                $metadata->getOwnerType(),
+                [OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT, OwnershipMetadata::OWNER_TYPE_USER]
+            )
+            ) {
+                $accessLevel = AccessLevel::GLOBAL_LEVEL;
+            }
+        }
+
+        return $accessLevel;
+
     }
 
     /**

@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone'
-    ], function (_, Backbone) {
+define([
+    'underscore',
+    'backbone'
+], function (_, Backbone) {
     'use strict';
+
+    var ActionsPanel;
 
     /**
      * Panel with action buttons
@@ -10,11 +15,11 @@ define(['underscore', 'backbone'
      * @class   orodatagrid.datagrid.ActionsPanel
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    ActionsPanel = Backbone.View.extend({
         /** @property String */
         className: 'btn-group',
 
-        /** @property {Array.<orodatagrid.datagrid.action.AbstractAction>} */
+        /** @property {Array.<oro.datagrid.action.AbstractAction>} */
         actions: [],
 
         /** @property {Array.<orodatagrid.datagrid.ActionLauncher>} */
@@ -29,11 +34,24 @@ define(['underscore', 'backbone'
         initialize: function (options) {
             var opts = options || {};
 
+            this.subviews = [];
             if (opts.actions) {
                 this.setActions(opts.actions);
             }
 
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            ActionsPanel.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.launchers;
+            delete this.actions;
+            ActionsPanel.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -61,24 +79,16 @@ define(['underscore', 'backbone'
         /**
          * Set actions
          *
-         * @param {Array.<orodatagrid.datagrid.action.AbstractAction>} actions
+         * @param {Array.<oro.datagrid.action.AbstractAction>} actions
          */
         setActions: function (actions) {
             this.actions = [];
             this.launchers = [];
             _.each(actions, function (action) {
-                this.addAction(action);
+                this.actions.push(action);
+                this.launchers.push(action.createLauncher());
             }, this);
-        },
-
-        /**
-         * Adds action to toolbar
-         *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
-         */
-        addAction: function (action) {
-            this.actions.push(action);
-            this.launchers.push(action.createLauncher());
+            this.subviews.push.apply(this.subviews, this.actions);
         },
 
         /**
@@ -107,4 +117,6 @@ define(['underscore', 'backbone'
             return this;
         }
     });
+
+    return ActionsPanel;
 });

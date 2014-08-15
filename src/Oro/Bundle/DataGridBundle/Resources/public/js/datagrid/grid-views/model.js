@@ -1,9 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['backbone', 'underscore'
-    ], function (Backbone, _) {
+define([
+    'backbone',
+    'underscore'
+], function (Backbone, _) {
     'use strict';
 
-    return Backbone.Model.extend({
+    var GridViewsModel;
+
+    GridViewsModel = Backbone.Model.extend({
         /** @property */
         idAttribute: 'name',
 
@@ -50,4 +55,6 @@ define(['backbone', 'underscore'
             };
         }
     });
+
+    return GridViewsModel;
 });

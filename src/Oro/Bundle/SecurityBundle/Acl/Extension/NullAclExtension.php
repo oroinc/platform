@@ -112,7 +112,7 @@ final class NullAclExtension implements AclExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevel($mask, $permission = null)
+    public function getAccessLevel($mask, $permission = null, $object = null)
     {
         return AccessLevel::UNKNOWN;
     }

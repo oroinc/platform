@@ -42,11 +42,12 @@ class BusinessUnitManager
     /**
      * Get business units ids
      *
+     * @param int|null $organizationId
      * @return array
      */
-    public function getBusinessUnitIds()
+    public function getBusinessUnitIds($organizationId = null)
     {
-        return $this->getBusinessUnitRepo()->getBusinessUnitIds();
+        return $this->getBusinessUnitRepo()->getBusinessUnitIds($organizationId);
     }
 
     /**

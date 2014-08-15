@@ -90,7 +90,6 @@ class OroUserBundleInstaller implements
         $this->addOroUserEmailOriginForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
-        $this->addOroAccessRoleForeignKeys($schema);
         $this->addOroUserStatusForeignKeys($schema);
 
         EmailTemplateOwner::addOwnerToOroEmailTemplate($schema);
@@ -264,11 +263,9 @@ class OroUserBundleInstaller implements
     {
         $table = $schema->createTable('oro_access_role');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
-        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('role', 'string', ['length' => 30, 'precision' => 0]);
         $table->addColumn('label', 'string', ['length' => 30, 'precision' => 0]);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
-        $table->addIndex(['business_unit_owner_id'], 'IDX_673F65E759294170', []);
         $table->setPrimaryKey(['id']);
     }
 
@@ -479,22 +476,6 @@ class OroUserBundleInstaller implements
             ['role_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
-        );
-    }
-
-    /**
-     * Add oro_access_role foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroAccessRoleForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_access_role');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_business_unit'),
-            ['business_unit_owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL']
         );
     }
 

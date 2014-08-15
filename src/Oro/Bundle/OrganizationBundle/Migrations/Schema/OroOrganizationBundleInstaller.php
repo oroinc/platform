@@ -42,7 +42,7 @@ class OroOrganizationBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_business_unit');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer');
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('phone', 'string', ['notnull' => false, 'length' => 100]);

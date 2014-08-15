@@ -652,7 +652,14 @@ class AclPrivilegeRepository
                 foreach ($extension->getPermissions($mask) as $permission) {
                     if (!$privilege->hasPermission($permission) && in_array($permission, $permissions)) {
                         $privilege->addPermission(
-                            new AclPermission($permission, $extension->getAccessLevel($mask, $permission))
+                            new AclPermission(
+                                $permission,
+                                $extension->getAccessLevel(
+                                    $mask,
+                                    $permission,
+                                    $privilege->getIdentity()->getId()
+                                )
+                            )
                         );
                     }
                 }
