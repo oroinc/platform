@@ -1,16 +1,22 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backgrid'
-    ], function ($, _, Backgrid) {
+define([
+    'jquery',
+    'underscore',
+    'backgrid'
+], function ($, _, Backgrid) {
     'use strict';
+
+    var ActionCell;
 
     /**
      * Cell for grid, contains actions
      *
-     * @export  orodatagrid/js/datagrid/cell/action-cell
-     * @class   orodatagrid.datagrid.cell.ActionCell
+     * @export  oro/datagrid/cell/action-cell
+     * @class   oro.datagrid.cell.ActionCell
      * @extends Backgrid.Cell
      */
-    return Backgrid.Cell.extend({
+    ActionCell = Backgrid.Cell.extend({
 
         /** @property */
         className: "action-cell",
@@ -55,22 +61,39 @@ define(['jquery', 'underscore', 'backgrid'
         /**
          * Initialize cell actions and launchers
          */
-        initialize: function() {
-            Backgrid.Cell.prototype.initialize.apply(this, arguments);
+        initialize: function () {
+            this.subviews = [];
+
+            ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
-            _.each(this.actions, function(action) {
-                action.on('run', this.onActionRun, this);
+            _.each(this.actions, function (action) {
+                this.listenTo(action, 'run', this.onActionRun);
             }, this);
 
             this.launchers = this.createLaunchers();
+            this.subviews.push.apply(this.subviews, this.actions);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.launchers;
+            delete this.actions;
+            delete this.column;
+            this.$('.dropdown-toggle').dropdown('destroy');
+            ActionCell.__super__.dispose.apply(this, arguments);
         },
 
         /**
          * Handle action run
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          */
-        onActionRun: function(action) {
+        onActionRun: function (action) {
             this.$('.dropdown.open').removeClass('open');
         },
 
@@ -79,18 +102,15 @@ define(['jquery', 'underscore', 'backgrid'
          *
          * @return {Array}
          */
-        createActions: function() {
-            var result = [];
+        createActions: function () {
+            var result, actions, config;
+            result = [];
+            actions = this.column.get('actions');
+            config = this.model.get('action_configuration');
 
-            var actions = this.column.get('actions');
-            var actionConfiguration = this.model.get('action_configuration');
-            _.each(actions, function(action, name) {
+            _.each(actions, function (action, name) {
                 // filter available actions for current row
-                if (
-                    _.isUndefined(actionConfiguration)
-                    || _.isUndefined(actionConfiguration[name])
-                    || actionConfiguration[name]
-                    ) {
+                if (!config || config[name] !== false) {
                     result.push(this.createAction(action));
                 }
             }, this);
@@ -101,11 +121,11 @@ define(['jquery', 'underscore', 'backgrid'
         /**
          * Creates action
          *
-         * @param {Function} actionPrototype
+         * @param {Function} Action
          * @protected
          */
-        createAction: function(actionPrototype) {
-            return new actionPrototype({
+        createAction: function (Action) {
+            return new Action({
                 model: this.model,
                 datagrid: this.column.get('datagrid')
             });
@@ -116,12 +136,13 @@ define(['jquery', 'underscore', 'backgrid'
          *
          * @protected
          */
-        createLaunchers: function() {
+        createLaunchers: function () {
             var result = [];
 
-            _.each(this.actions, function(action) {
-                var options = {};
-                var launcher = action.createLauncher(options);
+            _.each(this.actions, function (action) {
+                var options, launcher;
+                options = {};
+                launcher = action.createLauncher(options);
                 result.push(launcher);
             }, this);
 
@@ -132,6 +153,7 @@ define(['jquery', 'underscore', 'backgrid'
          * Render cell with actions
          */
         render: function () {
+            var launchers, $listsContainer;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.launchers)) {
                 this.$el.empty();
@@ -140,15 +162,12 @@ define(['jquery', 'underscore', 'backgrid'
             }
             this.$el.empty().append(this.template());
 
-            var launchers = this.getLaunchersByIcons();
-            var $listsContainer = this.$('.launchers-dropdown-menu');
+            launchers = this.getLaunchersByIcons();
+            $listsContainer = this.$('.launchers-dropdown-menu');
 
             if (launchers.withIcons.length) {
-                this.renderLaunchersList(
-                    launchers.withIcons, {
-                        withIcons: true
-                    }
-                ).appendTo($listsContainer);
+                this.renderLaunchersList(launchers.withIcons, {withIcons: true})
+                    .appendTo($listsContainer);
             }
 
             if (launchers.withIcons.length && launchers.withoutIcons.length) {
@@ -156,11 +175,8 @@ define(['jquery', 'underscore', 'backgrid'
             }
 
             if (launchers.withoutIcons.length) {
-                this.renderLaunchersList(
-                    launchers.withoutIcons, {
-                        withIcons: false
-                    }
-                ).appendTo($listsContainer);
+                this.renderLaunchersList(launchers.withoutIcons, {withIcons: false})
+                    .appendTo($listsContainer);
             }
 
             return this;
@@ -170,14 +186,15 @@ define(['jquery', 'underscore', 'backgrid'
          * Render launchers list
          *
          * @param {Array} launchers
-         * @param {Object} [templateParameters]
+         * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLaunchersList: function(launchers, templateParameters) {
-            templateParameters = templateParameters || {};
-            var result = $(this.launchersListTemplate(templateParameters));
-            var $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
-            _.each(launchers, function(launcher) {
+        renderLaunchersList: function (launchers, params) {
+            var result, $launchersList;
+            params = params || {};
+            result = $(this.launchersListTemplate(params));
+            $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
+            _.each(launchers, function (launcher) {
                 $launchersList.append(this.renderLauncherItem(launcher));
             }, this);
 
@@ -188,13 +205,14 @@ define(['jquery', 'underscore', 'backgrid'
          * Render launcher
          *
          * @param {orodatagrid.datagrid.ActionLauncher} launcher
-         * @param {Object} [templateParameters]
+         * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLauncherItem: function(launcher, templateParameters) {
-            templateParameters = templateParameters || {};
-            var result = $(this.launcherItemTemplate(templateParameters));
-            var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
+        renderLauncherItem: function (launcher, params) {
+            var result, $launcherItem;
+            params = params || {};
+            result = $(this.launcherItemTemplate(params));
+            $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
             return result;
         },
@@ -205,21 +223,21 @@ define(['jquery', 'underscore', 'backgrid'
          * @return {Object}
          * @protected
          */
-        getLaunchersByIcons: function() {
-            var result = {
+        getLaunchersByIcons: function () {
+            var launchers = {
                 withIcons: [],
                 withoutIcons: []
             };
 
-            _.each(this.launchers, function(launcher) {
+            _.each(this.launchers, function (launcher) {
                 if (launcher.icon) {
-                    result.withIcons.push(launcher);
+                    launchers.withIcons.push(launcher);
                 } else {
-                    result.withoutIcons.push(launcher);
+                    launchers.withoutIcons.push(launcher);
                 }
             }, this);
 
-            return result;
+            return launchers;
         },
 
         /**
@@ -228,9 +246,11 @@ define(['jquery', 'underscore', 'backgrid'
          * @param {Event} e
          * @protected
          */
-        _toggleDropdown: function(e) {
+        _toggleDropdown: function (e) {
             this.$('.dropdown-toggle').dropdown('toggle');
             e.stopPropagation();
         }
     });
+
+    return ActionCell;
 });

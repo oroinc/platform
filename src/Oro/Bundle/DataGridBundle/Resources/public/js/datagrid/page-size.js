@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define([
+    'jquery',
+    'underscore',
+    'backbone'
+], function ($, _, Backbone) {
     'use strict';
+
+    var PageSize;
 
     /**
      * Datagrid page size widget
@@ -10,7 +16,7 @@ define(['jquery', 'underscore', 'backbone'
      * @class   orodatagrid.datagrid.PageSize
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    PageSize = Backbone.View.extend({
         /** @property */
         template: '#template-datagrid-toolbar-page-size',
 
@@ -55,7 +61,7 @@ define(['jquery', 'underscore', 'backbone'
             this.enabled = options.enable != false;
             this.hidden = options.hide == true;
 
-            Backbone.View.prototype.initialize.call(this, options);
+            PageSize.__super__.initialize.call(this, options);
         },
 
         /**
@@ -128,4 +134,6 @@ define(['jquery', 'underscore', 'backbone'
             return this;
         }
     });
+
+    return PageSize;
 });

@@ -1,7 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-header-cell'
-    ], function (_, Backgrid, ActionCell, ActionHeaderCell) {
+define([
+    'underscore',
+    'backgrid',
+    'oro/datagrid/cell/action-cell',
+    '../header-cell/action-header-cell'
+], function (_, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
+
+    var ActionColumn;
 
     /**
      * Column of grid that contains row actions
@@ -10,12 +17,11 @@ define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-
      * @class   orodatagrid.datagrid.column.ActionColumn
      * @extends Backgrid.Column
      */
-    return Backgrid.Column.extend({
-
+    ActionColumn = Backgrid.Column.extend({
         /** @property {Object} */
-        defaults: _.extend({}, Backgrid.Column.prototype.defaults, {
+        defaults: _.defaults({
             name: '',
-            label: '',
+            label: 'test',
             sortable: false,
             editable: false,
             cell: ActionCell,
@@ -23,7 +29,7 @@ define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-
             datagrid: null,
             actions: [],
             massActions: []
-        }),
+        }, Backgrid.Column.prototype.defaults),
 
         /**
          * {@inheritDoc}
@@ -39,7 +45,9 @@ define(['underscore', 'backgrid', '../cell/action-cell', '../header-cell/action-
             if (_.isEmpty(attrs.actions) && _.isEmpty(attrs.massActions)) {
                 this.set('renderable', false);
             }
-            Backgrid.Column.prototype.initialize.apply(this, arguments);
+            ActionColumn.__super__.initialize.apply(this, arguments);
         }
     });
+
+    return ActionColumn;
 });

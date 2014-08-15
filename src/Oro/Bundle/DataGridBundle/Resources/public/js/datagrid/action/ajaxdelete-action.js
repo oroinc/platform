@@ -1,16 +1,20 @@
 /*global define*/
-define(['./model-action', 'oroui/js/delete-confirmation'
-    ], function (ModelAction, DeleteConfirmation) {
+define([
+    './model-action',
+    'oroui/js/delete-confirmation'
+], function (ModelAction, DeleteConfirmation) {
     'use strict';
+
+    var AjaxdeleteAction;
 
     /**
      * Ajax delete action, triggers REST AJAX request
      *
-     * @export  orodatagrid/js/datagrid/action/ajaxdelete-action
-     * @class   orodatagrid.datagrid.action.AjaxdeleteAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/ajaxdelete-action
+     * @class   oro.datagrid.action.AjaxdeleteAction
+     * @extends oro.datagrid.action.ModelAction
      */
-    return ModelAction.extend({
+    AjaxdeleteAction = ModelAction.extend({
         confirmation: true,
 
         /** @property {Function} */
@@ -25,4 +29,6 @@ define(['./model-action', 'oroui/js/delete-confirmation'
             empty_selection: 'Please, select item to remove.'
         }
     });
+
+    return AjaxdeleteAction;
 });

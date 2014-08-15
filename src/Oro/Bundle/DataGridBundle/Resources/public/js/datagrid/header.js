@@ -1,7 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['backbone', 'backgrid', './header-cell/header-cell'
-    ], function (Backbone, Backgrid, HeaderCell) {
+define([
+    'underscore',
+    'backbone',
+    'backgrid',
+    './header-cell/header-cell'
+], function (_, Backbone, Backgrid, HeaderCell) {
     "use strict";
+
+    var Header;
 
     /**
      * Datagrid header widget
@@ -10,7 +17,7 @@ define(['backbone', 'backgrid', './header-cell/header-cell'
      * @class   orodatagrid.datagrid.Header
      * @extends Backgrid.Header
      */
-    return Backgrid.Header.extend({
+    Header = Backgrid.Header.extend({
         /** @property */
         tagName: "thead",
 
@@ -41,6 +48,26 @@ define(['backbone', 'backgrid', './header-cell/header-cell'
                 collection: this.collection,
                 headerCell: this.headerCell
             });
+
+            this.subviews = [this.row];
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.row.cells, function (cell) {
+                cell.dispose();
+            });
+            delete this.row.cells;
+            delete this.row;
+            delete this.columns;
+            Header.__super__.dispose.apply(this, arguments);
         }
     });
+
+    return Header;
 });
