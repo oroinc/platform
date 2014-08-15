@@ -1,8 +1,13 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['underscore', 'jquery', 'backbone'
-    ], function (_, $, Backbone) {
+define([
+    'underscore',
+    'jquery',
+    'backbone'
+], function (_, $, Backbone) {
     'use strict';
+
+    var AbstractListener;
 
     /**
      * Abstarct listener for datagrid
@@ -11,7 +16,7 @@ define(['underscore', 'jquery', 'backbone'
      * @class   orodatagrid.datagrid.listener.AbstractListener
      * @extends Backbone.Model
      */
-    return Backbone.Model.extend({
+    AbstractListener = Backbone.Model.extend({
         /** @param {String} Column name of cells that will be listened for changing their values */
         columnName: 'id',
 
@@ -33,7 +38,7 @@ define(['underscore', 'jquery', 'backbone'
                 this.dataField = options.dataField;
             }
 
-            Backbone.Model.prototype.initialize.apply(this, arguments);
+            AbstractListener.__super__.initialize.apply(this, arguments);
 
             if (!options.$gridContainer) {
                 throw new Error('gridSelector is not specified');
@@ -45,10 +50,35 @@ define(['underscore', 'jquery', 'backbone'
         },
 
         /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.$gridContainer.off(this.gridEvents);
+            delete this.$gridContainer;
+            delete this.gridEvents;
+            AbstractListener.__super__.dispose.call(this);
+        },
+
+        /**
          * Set datagrid instance
          */
         setDatagridAndSubscribe: function () {
-            this.$gridContainer.on('datagrid:change:' + this.gridName, _.bind(this._onModelEdited, this));
+            this.gridEvents = this.getGridEvents();
+            this.$gridContainer.on(this.gridEvents);
+        },
+
+        /**
+         * Collects event handlers for grid container
+         *
+         * @returns {Object}
+         */
+        getGridEvents: function () {
+            var events = {};
+            events['datagrid:change:' + this.gridName] = _.bind(this._onModelEdited, this);
+            return events;
         },
 
         /**
@@ -81,4 +111,6 @@ define(['underscore', 'jquery', 'backbone'
             throw new Error('_processValue method is abstract and must be implemented');
         }
     });
+
+    return AbstractListener;
 });
