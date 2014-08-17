@@ -14,7 +14,7 @@ parameters:
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
 
     oro_entity_extend.type.enum_value.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType
-    oro_entity_extend.type.enum_collection.class:               Oro\Bundle\EntityExtendBundle\Form\Type\EnumCollectionType
+    oro_entity_extend.type.enum_value_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
 
 services:
     oro_entity_extend.type.entity:
@@ -92,11 +92,9 @@ services:
     oro_entity_extend.type.enum_value:
         class: %oro_entity_extend.type.enum_value.class%
         tags:
-            - { name: form.type, alias: oro_entity_enum_value }
+            - { name: form.type, alias: oro_entity_extend_enum_value }
 
-    oro_entity_extend.type.enum_collection:
-        class: %oro_entity_extend.type.enum_collection.class%
-        arguments:
-            - @oro_entity_config.config_manager
+    oro_entity_extend.type.enum_value_collection:
+        class: %oro_entity_extend.type.enum_value_collection.class%
         tags:
-            - { name: form.type, alias: oro_entity_enum_collection }
+            - { name: form.type, alias: oro_entity_extend_enum_value_collection }

@@ -10,21 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class EnumCollectionType extends CollectionType
+class EnumValueCollectionType extends CollectionType
 {
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -75,6 +62,6 @@ class EnumCollectionType extends CollectionType
      */
     public function getName()
     {
-        return 'oro_entity_enum_collection';
+        return 'oro_entity_extend_enum_value_collection';
     }
 }

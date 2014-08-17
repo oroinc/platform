@@ -77,6 +77,6 @@ class EnumValueType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_entity_enum_value';
+        return 'oro_entity_extend_enum_value';
     }
 }

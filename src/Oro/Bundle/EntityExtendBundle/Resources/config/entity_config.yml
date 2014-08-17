@@ -407,11 +407,11 @@ oro_entity_config:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
-                        type:               oro_entity_enum_collection
+                        type:               oro_entity_extend_enum_value_collection
                         options:
                             block:          general
                             subblock:       properties
                             required:       false
+                            type:           oro_entity_extend_enum_value
                             label:          oro.entity_extend.enum_options
                             tooltip:        oro.entity_extend.enum_options.tooltip
-                            type:           oro_entity_enum_value
