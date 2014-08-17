@@ -28,22 +28,22 @@ class EnumSynchronizer
 
     public function sync()
     {
+        /* @todo: will be implemented later
         $enumConfigProvider   = $this->configManager->getProvider('enum');
         $enumConfigs          = $enumConfigProvider->getConfigs();
 
         foreach ($enumConfigs as $enumEntityConfig) {
-            /** @var ConfigInterface $enumFieldConfig */
             $enumFieldConfig = $enumConfigProvider->getConfigs($enumEntityConfig->getId()->getClassName());
 
 
-            /** @var ConfigInterface $enumFieldConfig   enum value entity config */
             $targetEntityConfig = null;
             // sync enum field settings with entity
-            if ($enumFieldConfig->has('enum_code') && $enumFieldConfig->has('is_public')) {
+            if ($enumFieldConfig->has('enum_code') && $enumFieldConfig->has('enum_public')) {
                 $targetEntityConfig
                     ->set('code', $enumFieldConfig->get('enum_code'))
-                    ->set('public', $enumFieldConfig->get('is_public'));
+                    ->set('public', $enumFieldConfig->get('enum_public'));
             }
         }
+        */
     }
 }

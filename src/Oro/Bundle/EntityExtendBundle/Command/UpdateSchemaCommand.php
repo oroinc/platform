@@ -59,6 +59,9 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         $schemaTool = new SchemaTool($em);
 
         $sqls = $schemaTool->getUpdateSchemaSql($metadata, true);
+
+        // @todo: move enum options from entity config to separate table. will be implemented later
+
         if (0 === count($sqls)) {
             $output->writeln('Nothing to update - a database is already in sync with the current entity metadata.');
         } else {

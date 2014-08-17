@@ -34,10 +34,6 @@
     </script>
 {% endblock %}
 
-{% block oro_entity_multienum_value_widget %}
-    {{ block('oro_entity_enum_value_widget') }}
-{% endblock %}
-
 {% block oro_entity_enum_collection_widget %}
     {% spaceless %}
         {% import 'OroFormBundle:Form:fields.html.twig' as _form %}
@@ -67,7 +63,7 @@
     {% set id                   = context.id %}
     {% set show_form_when_empty = context.show_form_when_empty %}
     {% set has_default          = form.vars.prototype.is_default is defined %}
-    {% set isMultiple           = form.vars.name == 'multi_enum_options' %}
+    {% set isMultiple           = context.multiple %}
 
     {% if has_default or show_form_when_empty %}
         <script type="text/javascript">

@@ -24,14 +24,15 @@ oro:
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many
-                optionSet:          Option set (deprecated)
-                enum:               Option set (enum)
-                multiEnum:          Multi option set (enum)
+                optionSet:          Option Set (deprecated)
+                enum:               Option Set
+                multiEnum:          Multiple Option Set
 
                 ref-one:            System relation
                 ref-many:           System relation
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
+        enum_options: Options
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:

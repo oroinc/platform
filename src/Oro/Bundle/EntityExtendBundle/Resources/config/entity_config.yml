@@ -321,9 +321,8 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                # @deprecated since 1.4, will be removed in 2.0
                 # OptionSet form type fields
-                #
+                # @deprecated since 1.4, will be removed in 2.0
                 set_expanded:
                     options:
                         allowed_type:       [optionSet]
@@ -340,6 +339,7 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
 
+                # @deprecated since 1.4, will be removed in 2.0
                 set_options:
                     options:
                         allowed_type:       [optionSet]
@@ -374,7 +374,6 @@ oro_entity_config:
                 enum_code: # string
                     options:
                         allowed_type:       [enum, multiEnum]
-                        default_value:      false
                         auditable:          false
                     form:
                         type:               text
@@ -387,10 +386,9 @@ oro_entity_config:
                             subblock:       properties
 
                 # the flag state will be copied to enum.entity.public flag
-                is_public:
+                enum_public:
                     options:
                         allowed_type:       [enum, multiEnum]
-                        default_value:      false
                         auditable:          false
                     form:
                         type:               choice
@@ -406,28 +404,14 @@ oro_entity_config:
 
                 enum_options:
                     options:
-                        allowed_type:       [enum]
+                        allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
                         type:               oro_entity_enum_collection
                         options:
-                            required:       false
-                            label:          'Options'
                             block:          general
                             subblock:       properties
+                            required:       false
+                            label:          oro.entity_extend.enum_options
+                            tooltip:        oro.entity_extend.enum_options.tooltip
                             type:           oro_entity_enum_value
-                            tooltip:        oro.entity_extend.field.enum.option.tooltip
-
-                multi_enum_options:
-                    options:
-                        allowed_type:       [multiEnum]
-                        auditable:          false
-                    form:
-                        type:               oro_entity_enum_collection
-                        options:
-                            required:       false
-                            label:          'Options'
-                            block:          general
-                            subblock:       properties
-                            type:           oro_entity_multienum_value
-                            tooltip:        oro.entity_extend.field.enum.option.tooltip

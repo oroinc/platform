@@ -7,8 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-abstract class AbstractEnumType extends AbstractType
+class EnumValueType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -31,6 +32,14 @@ abstract class AbstractEnumType extends AbstractType
                     'label' => 'Value',
                     'required' => true,
                 ]
+            )
+            ->add(
+                'is_default',
+                $options['multiple'] ? 'checkbox' : 'radio',
+                [
+                    'label' => 'Default',
+                    'required' => false,
+                ]
             );
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
@@ -49,5 +58,25 @@ abstract class AbstractEnumType extends AbstractType
                 new FormError('This value should not be blank.')
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'multiple' => false
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'oro_entity_enum_value';
     }
 }
