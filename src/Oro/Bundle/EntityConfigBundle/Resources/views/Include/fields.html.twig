@@ -51,11 +51,11 @@
             </div>
             <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
         </div>
-        {{ _self.oro_item_collection_validate_default_js(_context, 'oro_entity_config_type_extend_set_expanded') }}
+        {{ _self.oro_entity_option_set_collection_js(_context, 'oro_entity_config_type_extend_set_expanded') }}
     {% endspaceless %}
 {% endblock %}
 
-{% macro oro_item_collection_validate_default_js(context, expandedId) %}
+{% macro oro_entity_option_set_collection_js(context, expandedId) %}
     {% set form = context.form %}
     {% set id = context.id %}
     {% set show_form_when_empty = context.show_form_when_empty %}
