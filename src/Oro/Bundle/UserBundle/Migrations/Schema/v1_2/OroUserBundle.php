@@ -139,11 +139,10 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
      */
     public static function addAvatarToUser(Schema $schema, AttachmentExtension $attachmentExtension)
     {
-        $attachmentExtension->addFileRelation(
+        $attachmentExtension->addImageRelation(
             $schema,
             'oro_user',
             'avatar',
-            'image',
             [],
             2,
             58,

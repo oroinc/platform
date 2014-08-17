@@ -219,7 +219,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $extendFieldConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $extendFieldConfig->expects($this->at(0))->method('set')->with('owner', ExtendScope::OWNER_CUSTOM);
         $extendFieldConfig->expects($this->at(1))->method('set')->with('state', ExtendScope::STATE_NEW);
-        $extendFieldConfig->expects($this->at(2))->method('set')->with('extend', true);
+        $extendFieldConfig->expects($this->at(2))->method('set')->with('is_extend', true);
         $extendFieldConfig->expects($this->at(3))->method('set')->with('target_entity', $targetEntity);
         $extendFieldConfig->expects($this->at(4))->method('set')->with('target_field', $targetField);
         $extendFieldConfig->expects($this->at(5))->method('set')->with(

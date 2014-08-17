@@ -1,29 +1,34 @@
 <?php
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtension
+class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
     /** @var ConfigProviderInterface */
     protected $extendConfigProvider;
 
     /**
      * @param ConfigManager   $configManager
+     * @param FieldTypeHelper $fieldTypeHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
     {
         $this->configManager        = $configManager;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
         $this->extendConfigProvider = $configManager->getProvider('extend');
     }
 
@@ -42,24 +47,23 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
-        foreach ($extendConfigs as $entityConfig) {
-            $className    = $entityConfig->getId()->getClassName();
-            $fieldConfigs = $this->extendConfigProvider->getConfigs($className);
+        $entityConfigs = $this->extendConfigProvider->getConfigs();
+        foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('is_extend')) {
+                continue;
+            }
 
+            $fieldConfigs = $this->extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-                /** @var ConfigInterface $entityConfig */
-                if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
                     continue;
                 }
 
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
-
-                if ($fieldConfig->is('state', ExtendScope::STATE_NEW) &&
-                    in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
-                ) {
+                if (in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])) {
                     $this->createRelation($fieldConfig);
                 }
             }
@@ -67,27 +71,26 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     }
 
     /**
-     * @param Config $fieldConfig
+     * @param ConfigInterface $fieldConfig
      */
-    protected function createRelation(Config $fieldConfig)
+    protected function createRelation(ConfigInterface $fieldConfig)
     {
-        if ($this->isInverseSideRelationExist($fieldConfig)) {
-            return;
-        }
-
         $createSelfRelation = true;
-        $relationKey        = null;
 
         if ($fieldConfig->is('relation_key')) {
-            $targetConfig    = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
-            $targetRelations = $targetConfig->get('relation');
-            $relationKey     = $fieldConfig->get('relation_key');
-            if (isset($targetRelations[$relationKey])) {
-
-                $this->createTargetRelation($fieldConfig, $fieldConfig->get('relation_key'));
-
-                if ($targetRelations[$relationKey]['assign']) {
-                    $createSelfRelation = false;
+            $relationKey = $fieldConfig->get('relation_key');
+            $selfConfig  = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
+            $selfRelations = $selfConfig->get('relation');
+            if (isset($selfRelations[$relationKey]['field_id'])) {
+                $createSelfRelation = false;
+            } else {
+                $targetConfig    = $this->extendConfigProvider->getConfig($fieldConfig->get('target_entity'));
+                $targetRelations = $targetConfig->get('relation');
+                if (isset($targetRelations[$relationKey])) {
+                    $this->createTargetRelation($fieldConfig, $relationKey);
+                    if ($targetRelations[$relationKey]['assign']) {
+                        $createSelfRelation = false;
+                    }
                 }
             }
         }
@@ -98,23 +101,25 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     }
 
     /**
-     * @param Config $fieldConfig
+     * @param ConfigInterface $fieldConfig
      */
-    protected function createSelfRelation(Config $fieldConfig)
+    protected function createSelfRelation(ConfigInterface $fieldConfig)
     {
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId     = $fieldConfig->getId();
         $targetEntityClass = $fieldConfig->get('target_entity');
-        $selfEntityClass   = $fieldConfigId->getClassName();
-        $selfFieldType     = $fieldConfigId->getFieldType();
-        $selfFieldName     = $fieldConfigId->getFieldName();
-        $selfConfig        = $this->extendConfigProvider->getConfig($selfEntityClass);
-        $scope             = 'extend';
+        $selfFieldId       = new FieldConfigId(
+            'extend',
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName(),
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType())
+        );
+        $selfConfig        = $this->extendConfigProvider->getConfig($selfFieldId->getClassName());
 
         $relationKey = ExtendHelper::buildRelationKey(
-            $selfEntityClass,
-            $selfFieldName,
-            $selfFieldType,
+            $selfFieldId->getClassName(),
+            $selfFieldId->getFieldName(),
+            $selfFieldId->getFieldType(),
             $targetEntityClass
         );
 
@@ -126,29 +131,29 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
         $owner         = true;
         $targetOwner   = false;
 
-        if (in_array($selfFieldType, ['oneToMany', 'manyToMany'])) {
-            $classNameArray    = explode('\\', $selfEntityClass);
-            $relationFieldName = strtolower(array_pop($classNameArray)) . '_' . $selfFieldName;
+        if (in_array($selfFieldId->getFieldType(), ['oneToMany', 'manyToMany'])) {
+            $classNameArray    = explode('\\', $selfFieldId->getClassName());
+            $relationFieldName = strtolower(array_pop($classNameArray)) . '_' . $selfFieldId->getFieldName();
 
-            if ($selfFieldType == 'oneToMany') {
+            if ($selfFieldId->getFieldType() === 'oneToMany') {
                 $owner       = false;
                 $targetOwner = true;
             }
 
             $targetFieldId = new FieldConfigId(
-                $scope,
+                'extend',
                 $targetEntityClass,
                 $relationFieldName,
-                ExtendHelper::getReverseRelationType($selfFieldType)
+                ExtendHelper::getReverseRelationType($selfFieldId->getFieldType())
             );
         }
 
         $selfRelationConfig = [
             'assign'          => false,
-            'field_id'        => $fieldConfig->getId(),
+            'field_id'        => $selfFieldId,
             'owner'           => $owner,
             'target_entity'   => $targetEntityClass,
-            'target_field_id' => $targetFieldId // for 1:*, create field
+            'target_field_id' => $targetFieldId
         ];
 
         $selfRelations               = $selfConfig->get('relation') ? : [];
@@ -162,10 +167,10 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
 
         $targetRelationConfig = [
             'assign'          => false,
-            'field_id'        => $targetFieldId, // for 1:*, new created field
+            'field_id'        => $targetFieldId,
             'owner'           => $targetOwner,
-            'target_entity'   => $selfEntityClass,
-            'target_field_id' => $fieldConfig->getId(),
+            'target_entity'   => $selfFieldId->getClassName(),
+            'target_field_id' => $selfFieldId,
         ];
 
         $targetRelations               = $targetConfig->get('relation') ? : [];
@@ -178,49 +183,36 @@ class RelationDataConfigDumperExtension extends AbstractEntityConfigDumperExtens
     }
 
     /**
-     * @param Config $fieldConfig
+     * @param ConfigInterface $fieldConfig
      * @param string $relationKey
      */
-    protected function createTargetRelation(Config $fieldConfig, $relationKey)
+    protected function createTargetRelation(ConfigInterface $fieldConfig, $relationKey)
     {
-        $selfEntityClass   = $fieldConfig->getId()->getClassName();
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId     = $fieldConfig->getId();
+        $selfFieldId       = new FieldConfigId(
+            'extend',
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName(),
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType())
+        );
         $targetEntityClass = $fieldConfig->get('target_entity');
 
-        $selfConfig         = $this->extendConfigProvider->getConfig($selfEntityClass);
+        $selfConfig         = $this->extendConfigProvider->getConfig($selfFieldId->getClassName());
         $selfRelations      = $selfConfig->get('relation');
         $selfRelationConfig = & $selfRelations[$relationKey];
 
-        $selfRelationConfig['field_id'] = $fieldConfig->getId();
+        $selfRelationConfig['field_id'] = $selfFieldId;
 
         $targetConfig         = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelations      = $targetConfig->get('relation');
         $targetRelationConfig = & $targetRelations[$relationKey];
 
-        $targetRelationConfig['target_field_id'] = $fieldConfig->getId();
+        $targetRelationConfig['target_field_id'] = $selfFieldId;
 
         $selfConfig->set('relation', $selfRelations);
         $targetConfig->set('relation', $targetRelations);
 
         $this->extendConfigProvider->persist($targetConfig);
-    }
-
-    /**
-     * @param Config $fieldConfig
-     *
-     * @return bool
-     */
-    protected function isInverseSideRelationExist(Config $fieldConfig)
-    {
-        $selfConfig = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
-        if ($selfConfig->has('relation')) {
-            $selfRelations = $selfConfig->get('relation');
-            foreach ($selfRelations as $relation) {
-                if ($relation['field_id'] == $fieldConfig->getId()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

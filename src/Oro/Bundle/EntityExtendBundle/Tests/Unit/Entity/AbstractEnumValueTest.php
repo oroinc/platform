@@ -10,7 +10,7 @@ class AbstractEnumValueTest extends \PHPUnit_Framework_TestCase
     {
         $enumValue = new TestEnumValue('test', 'Test');
 
-        $this->assertEquals('test', $enumValue->getCode());
+        $this->assertEquals('test', $enumValue->getId());
         $this->assertEquals('Test', $enumValue->getName());
         $this->assertEquals(0, $enumValue->getPriority());
         $this->assertFalse($enumValue->isDefault());
@@ -20,7 +20,7 @@ class AbstractEnumValueTest extends \PHPUnit_Framework_TestCase
     {
         $enumValue = new TestEnumValue('test', 'Test', 123, true);
 
-        $this->assertEquals('test', $enumValue->getCode());
+        $this->assertEquals('test', $enumValue->getId());
         $this->assertEquals('Test', $enumValue->getName());
         $this->assertEquals(123, $enumValue->getPriority());
         $this->assertTrue($enumValue->isDefault());

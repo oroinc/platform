@@ -183,11 +183,6 @@ oro_entity_config:
                         default_value:      false
                         auditable:          false
 
-                extend:
-                    options:
-                        default_value:      false
-                        auditable:          false
-
                 length:
                     options:
                         require_schema_update: true
@@ -290,34 +285,46 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
 
+                # the relation key in the following format:
+                # relation_type|owning_entity|target_entity|field_name_in_owning_entity
+                # the relation key can be builded by ExtendHelper::buildRelationKey method
                 relation_key: # string
                     options:
                         auditable:          false
 
-                # indicated whether the relation has the default value or not
-                # for example regular many-to-many or one-to-many have the default value,
-                # but you can create them without the default value
+                # indicated whether a relation has the default value or not
+                # applicable only to many-to-many or one-to-many relations
+                # if not specified or FALSE a relation will have a default value
                 without_default: # bool
                     options:
                         auditable:          false
 
-                target_entity:
+                # the target entity class name
+                target_entity: # string
                     options:
                         auditable:          false
 
-                target_field:
+                # the field name in the target entity that is used to show related entity
+                # this attribute is applicable to many-to-one relations
+                target_field: # string
                     options:
                         auditable:          false
 
-                target_grid:
+                # the list of field names in the target entity that is used to show related entity in a grid
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_grid: # array of strings
                     options:
                         auditable:          false
 
-                target_title:
+                # the list of field names in the target entity that is used to show a title of related entity
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_title: # array of strings
                     options:
                         auditable:          false
 
-                target_detailed:
+                # the list of field names in the target entity that is used to show detailed info about related entity
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_detailed: # array of strings
                     options:
                         auditable:          false
 

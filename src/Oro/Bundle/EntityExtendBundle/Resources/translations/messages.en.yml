@@ -24,6 +24,8 @@ oro:
                 manyToOne:          Many to one
                 manyToMany:         Many to many
                 optionSet:          Option set
+                enum:               Option Set
+                multiEnum:          Multiple Option Set
 
                 ref-one:            System relation
                 ref-many:           System relation
@@ -52,8 +54,8 @@ oro:
 
     entityextend:
         enumvalue:
-            code.label:             Code
-            code.description:       The unique identifier of the option
+            id.label:               Id
+            id.description:         The unique identifier of the option
             name.label:             Name
             name.description:       The option name
             priority.label:         Priority

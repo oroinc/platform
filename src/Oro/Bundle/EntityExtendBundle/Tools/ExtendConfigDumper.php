@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
@@ -33,6 +34,9 @@ class ExtendConfigDumper
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /** @var EntityGenerator */
     protected $entityGenerator;
 
@@ -45,17 +49,20 @@ class ExtendConfigDumper
     /**
      * @param OroEntityManager                $em
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param FieldTypeHelper                 $fieldTypeHelper
      * @param string                          $cacheDir
      * @param EntityGenerator                 $entityGenerator
      */
     public function __construct(
         OroEntityManager $em,
         ExtendDbIdentifierNameGenerator $nameGenerator,
+        FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
-        $this->nameGenerator   = $nameGenerator;
         $this->em              = $em;
+        $this->nameGenerator   = $nameGenerator;
+        $this->fieldTypeHelper = $fieldTypeHelper;
         $this->entityGenerator = $entityGenerator;
         $this->cacheDir        = $cacheDir;
     }
@@ -73,26 +80,19 @@ class ExtendConfigDumper
         $this->extensions[$priority][] = $extension;
     }
 
-    /**
-     * @param null $className
-     */
-    public function updateConfig($className = null)
+    public function updateConfig()
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
 
-        $extendProvider = $this->em->getExtendConfigProvider();
-
-        $extendConfigs = $className
-            ? [$extendProvider->getConfig($className)]
-            : $extendProvider->getConfigs();
-
         foreach ($this->getExtensions() as $extension) {
             if ($extension->supports(self::ACTION_PRE_UPDATE)) {
-                $extension->preUpdate($extendConfigs);
+                $extension->preUpdate();
             }
         }
 
+        $extendProvider = $this->em->getExtendConfigProvider();
+        $extendConfigs  = $extendProvider->getConfigs();
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
@@ -109,7 +109,7 @@ class ExtendConfigDumper
 
         foreach ($this->getExtensions() as $extension) {
             if ($extension->supports(self::ACTION_POST_UPDATE)) {
-                $extension->postUpdate($extendConfigs);
+                $extension->postUpdate();
             }
         }
 
@@ -168,7 +168,7 @@ class ExtendConfigDumper
      */
     protected function getExtensions()
     {
-        if (empty($this->sortedExtensions)) {
+        if (null === $this->sortedExtensions) {
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
@@ -194,31 +194,40 @@ class ExtendConfigDumper
         array &$properties,
         array &$doctrine
     ) {
-        if ($fieldConfig->is('extend')) {
+        if ($fieldConfig->is('is_extend')) {
             $fieldName = $fieldConfig->getId()->getFieldName();
 
             // TODO: getting a field type from a model here is a temporary solution.
             // We need to use $fieldType = $fieldConfig->getId()->getFieldType();
             $fieldType = $this->em->getExtendConfigProvider()
                 ->getConfigManager()
-                ->getConfigFieldModel(
-                    $fieldConfig->getId()->getClassName(),
-                    $fieldConfig->getId()->getFieldName()
-                )
+                ->getConfigFieldModel($fieldConfig->getId()->getClassName(), $fieldName)
                 ->getType();
 
-            if (in_array($fieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
-                $relationProperties[$fieldName] = $fieldConfig->getId()->getFieldName();
-                if ($fieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
-                    $defaultName = self::DEFAULT_PREFIX . $fieldConfig->getId()->getFieldName();
+            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
+            if (in_array($underlyingFieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
+                $relationProperties[$fieldName] = $fieldName;
+                if ($underlyingFieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
+                    $defaultName = self::DEFAULT_PREFIX . $fieldName;
 
                     $defaultProperties[$defaultName] = $defaultName;
                 }
+                if ($fieldType === 'multiEnum') {
+                    $snapshotFieldName              = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
+                    $properties[$snapshotFieldName] = $snapshotFieldName;
+
+                    $doctrine[$entityName]['fields'][$snapshotFieldName] = [
+                        'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName($fieldName),
+                        'type'     => 'string',
+                        'nullable' => true,
+                        'length'   => 500,
+                    ];
+                }
             } else {
-                $properties[$fieldName] = $fieldConfig->getId()->getFieldName();
+                $properties[$fieldName] = $fieldName;
 
                 $doctrine[$entityName]['fields'][$fieldName] = [
-                    'code'      => $fieldName,
+                    'column'    => $fieldName,
                     'type'      => $fieldType,
                     'nullable'  => true,
                     'length'    => $fieldConfig->get('length'),
@@ -258,8 +267,8 @@ class ExtendConfigDumper
                 $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
             }
             $doctrine[$entityName] = [
-                'type'   => 'entity',
-                'table'  => $tableName
+                'type'  => 'entity',
+                'table' => $tableName
             ];
             // add 'id' field only for Custom entity without inheritance
             if (!$extendConfig->has('inherit')) {
@@ -311,7 +320,7 @@ class ExtendConfigDumper
                     $addRemoveMethods[$fieldName]['target']              =
                         $relation['target_field_id']->getFieldName();
                     $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() == 'manyToMany';
+                        $relation['field_id']->getFieldType() === 'manyToMany';
                 }
             }
 

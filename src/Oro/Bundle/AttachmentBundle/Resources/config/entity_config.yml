@@ -8,7 +8,8 @@ oro_entity_config:
                         priority:           0
 
             items:
-                enabled:
+                # indicates whether attachments can be added to the entity or not
+                enabled: # boolean
                     options:
                         priority:           100
                         default_value:      false
@@ -21,7 +22,9 @@ oro_entity_config:
                             required:       true
                             label:          oro.attachment.enabled
                             association_class: 'OroAttachmentBundle:Attachment'
-                maxsize:
+
+                # the max size in megabytes of attached file
+                maxsize: # integer
                     options:
                         priority:           90
                         default_value:      1
@@ -33,7 +36,8 @@ oro_entity_config:
                             required:       false
                             label:          oro.attachment.maxsize
 
-                mimetypes:
+                # the list of all allowed MIME types for attachments
+                mimetypes: # string (actually MIME types are delimited by \n symbol)
                     options:
                         priority:           80
                         auditable:          false
@@ -62,7 +66,8 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
 
-                maxsize:
+                # the max size in megabytes of uploaded file
+                maxsize: # integer
                     options:
                         allowed_type:   [file, image]
                         auditable:      false
@@ -81,7 +86,8 @@ oro_entity_config:
                             empty_data: 1
                             tooltip:    oro.attachment.max_size
 
-                width:
+                # the thubnail picture width in pixels
+                width: # integer
                     options:
                         allowed_type:   [image]
                         auditable:      false
@@ -98,7 +104,8 @@ oro_entity_config:
                             empty_data: 32
                             tooltip:    oro.attachment.thumb_width
 
-                height:
+                # the thubnail picture height in pixels
+                height: # integer
                     options:
                         allowed_type:   [image]
                         auditable:      false

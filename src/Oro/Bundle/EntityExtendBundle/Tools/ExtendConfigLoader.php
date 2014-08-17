@@ -69,7 +69,7 @@ class ExtendConfigLoader extends ConfigLoader
             return $this->configManager
                 ->getProvider('extend')
                 ->getConfig($className, $fieldName)
-                ->is('extend');
+                ->is('is_extend');
         }
 
         return false;

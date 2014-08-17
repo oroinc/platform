@@ -4,7 +4,7 @@ parameters:
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.entity_config_dumper.extension.index.class:     Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension
-    oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension
+    oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
@@ -55,6 +55,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_entity_extend.db_id_name_generator
+            - @oro_entity_extend.extend.field_type_helper
             - @oro_entity_extend.entity_generator
             - %kernel.cache_dir%
 
@@ -69,14 +70,15 @@ services:
         arguments:
             - @oro_entity_config.config_manager
         tags:
-            - { name: oro_entity_extend.entity_config_dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension, priority: -255 }
 
     oro_entity_extend.entity_config_dumper.extension.relation:
         class: %oro_entity_extend.entity_config_dumper.extension.relation.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
         tags:
-            - { name: oro_entity_extend.entity_config_dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension, priority: 255 }
 
     oro_entity_extend.listener.config_subscriber:
         class: %oro_entity_extend.listener.config_subscriber.class%
@@ -115,6 +117,8 @@ services:
 
     oro_entity_extend.extend.field_type_helper:
         class: %oro_entity_extend.extend.field_type_helper.class%
+        arguments:
+            - []
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%

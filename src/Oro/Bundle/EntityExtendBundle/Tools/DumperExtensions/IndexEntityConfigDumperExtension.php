@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -34,11 +33,11 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
         $targetEntityConfigs = $this->configManager->getProvider('extend')->getConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
-            if ($this->isExtend($targetEntityConfig)) {
+            if ($targetEntityConfig->is('is_extend')) {
                 $indices = $targetEntityConfig->has('index')
                     ? $targetEntityConfig->get('index')
                     : [];
@@ -65,7 +64,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         $hasChanges   = false;
         $fieldConfigs = $this->configManager->getProvider('extend')->getConfigs($targetEntityClass);
         foreach ($fieldConfigs as $fieldConfig) {
-            if ($this->isExtend($fieldConfig)) {
+            if ($fieldConfig->is('is_extend')) {
                 $className = $fieldConfig->getId()->getClassName();
                 $fieldName = $fieldConfig->getId()->getFieldName();
                 if ($this->isIndexRequired($className, $fieldName)) {
@@ -81,16 +80,6 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         }
 
         return $hasChanges;
-    }
-
-    /**
-     * @param ConfigInterface $extendConfig
-     *
-     * @return bool
-     */
-    protected function isExtend($extendConfig)
-    {
-        return $extendConfig->is('is_extend') || $extendConfig->is('extend');
     }
 
     /**

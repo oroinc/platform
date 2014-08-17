@@ -580,7 +580,7 @@ class EntityFieldProvider
     protected function isExtendField($className, $fieldName)
     {
         if ($this->extendConfigProvider->hasConfig($className, $fieldName)) {
-            if ($this->extendConfigProvider->getConfig($className, $fieldName)->is('extend')) {
+            if ($this->extendConfigProvider->getConfig($className, $fieldName)->is('is_extend')) {
                 return true;
             }
         }

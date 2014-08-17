@@ -71,8 +71,8 @@ class ExtendTable extends TableWithNameGenerator
         }
 
         if (null !== $oroOptions && isset($oroOptions['extend'])) {
-            if (!isset($oroOptions['extend']['extend'])) {
-                $oroOptions['extend']['extend'] = true;
+            if (!isset($oroOptions['extend']['is_extend'])) {
+                $oroOptions['extend']['is_extend'] = true;
             }
             $options['notnull'] = false;
         }

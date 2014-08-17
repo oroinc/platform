@@ -3,42 +3,6 @@ OroEntityBundle
 
 Entity and entity field selectors, extended functionality of Doctrine entity manager.
 
-- [Form Components Overview](./Resources/doc/form_components.md)
-
-
-    Example for Resources/config/entity_extend.yml
-    TestClassExtend:
-        configs:
-            entity:
-                label:                  TestClassExtend
-        fields:
-            testStringField:
-                type:                   string
-                configs:
-                    entity:
-                        label:          testStringField
-                options:
-                    length:             200
-            testIntegerField:
-                type:                   smallint
-            testHiddenField:
-                mode:                   hidden
-                type:                   string
-            testReadonlyField:
-                mode:                   readonly
-                type:                   string
-
-    Oro\Bundle\UserBundle\Entity\User:
-        fields:
-            testField:
-                type:                   string
-            testHiddenField:
-                mode:                   hidden
-                type:                   string
-            testReadonlyField:
-                mode:                   readonly
-                type:                   string
-                
 **Entity Manager**
 
 In order to extend some native Doctrine Entity Manager functionality a new class `OroEntityManager` was implemented.
@@ -70,7 +34,7 @@ where
 
 Some entities have fields which data is money or percents.
 
-For this data was created new field types - currency and percent.
+For this data was created new field types - money and percent.
 
 **money** field type allow to store money data. It's an alias to decimal(19,4) type.
 
@@ -85,7 +49,7 @@ You can use this field type like:
     protected $taxAmount;
 ```
 
-**Percent** field type allow to store percent data. It's an alias to float type.
+**percent** field type allow to store percent data. It's an alias to float type.
 
 You can use this field type like:
 
@@ -97,6 +61,7 @@ You can use this field type like:
      */
     protected $percentField;
 ```
+
 This two data types are available in extend fields. You can create new fields with this types. Additionally in view pages, in grids and in edit pages this fields will be automatically formatted with currency or percent formatters.
 
 In grid, for percent data type will be automatically generated percent filter.

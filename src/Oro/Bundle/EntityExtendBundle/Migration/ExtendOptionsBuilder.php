@@ -86,17 +86,13 @@ class ExtendOptionsBuilder
 
         $fieldName = $this->getAndRemoveOption($options, ExtendOptionsManager::FIELD_NAME_OPTION);
         if (!$fieldName) {
-            $fieldName  = $this->getFieldName($tableName, $columnName);
+            $fieldName = $this->getFieldName($tableName, $columnName);
         }
-        $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
-        $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
+        $columnType           = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
+        $columnMode           = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
+        $columnUnderlyingType = $this->fieldTypeHelper->getUnderlyingType($columnType);
 
-        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])
-            || in_array(
-                $this->fieldTypeHelper->getUnderlyingType($columnType),
-                ['oneToMany', 'manyToOne', 'manyToMany']
-            )
-        ) {
+        if (in_array($columnUnderlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
@@ -124,7 +120,7 @@ class ExtendOptionsBuilder
             $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
                 $entityClassName,
                 $fieldName,
-                $columnType,
+                $columnUnderlyingType,
                 $options['extend']['target_entity']
             );
         }

@@ -16,8 +16,6 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
@@ -53,7 +51,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
@@ -123,8 +121,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @return Table A table that is used to store enum values
      *
      * @throws \InvalidArgumentException
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function createEnum(
         Schema $schema,
@@ -158,20 +154,20 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'public' => $isPublic
                 ],
                 'dictionary'                              => [
-                    'virtual_fields' => ['code', 'name']
+                    'virtual_fields' => ['id', 'name']
                 ]
             ]
         );
 
         $table->addColumn(
-            'code',
+            'id',
             'string',
             [
-                'length'      => 32,
-                'oro_options' => [
+                'length'        => 32,
+                OroOptions::KEY => [
                     'entity' => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'code'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'code')
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ]
                 ]
             ]
@@ -180,8 +176,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'name',
             'string',
             [
-                'length'      => 255,
-                'oro_options' => [
+                'length'        => 255,
+                OroOptions::KEY => [
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
@@ -193,7 +189,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'priority',
             'integer',
             [
-                'oro_options' => [
+                OroOptions::KEY => [
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
@@ -205,7 +201,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'is_default',
             'boolean',
             [
-                'oro_options' => [
+                OroOptions::KEY => [
                     ExtendOptionsManager::FIELD_NAME_OPTION => 'default',
                     'entity'                                => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
@@ -214,9 +210,78 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 ]
             ]
         );
-        $table->setPrimaryKey(['code']);
+        $table->setPrimaryKey(['id']);
 
         return $table;
+    }
+
+    /**
+     * Adds enumerable field relation
+     *
+     * @param Schema       $schema
+     * @param Table|string $table            A Table object or table name
+     * @param string       $associationName  A relation name
+     * @param string       $enumCode         The target enum identifier
+     * @param bool         $isMultiple       If TRUE this relation can be used to store several options;
+     *                                       otherwise, only one option can be selected for this field
+     * @param array        $options
+     */
+    public function addEnumRelation(
+        Schema $schema,
+        $table,
+        $associationName,
+        $enumCode,
+        $isMultiple = false,
+        array $options = []
+    ) {
+        $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
+        $selfTable     = $this->getTable($table, $schema);
+
+        // make sure a table that is used to store enum values exists
+        if (!$schema->hasTable($enumTableName)) {
+            $this->createEnum($schema, $enumCode);
+        }
+
+        // create appropriate relation
+        if ($isMultiple) {
+            $options['extend']['without_default'] = true;
+            $this->addManyToManyRelation(
+                $schema,
+                $selfTable,
+                $associationName,
+                $enumTableName,
+                ['id'],
+                ['id'],
+                ['id'],
+                $options,
+                'multiEnum'
+            );
+            // create a column that will contain selected options
+            // this column is required to avoid group by clause when multiple enum is shown in a datagrid
+            $selfTable->addColumn(
+                $this->nameGenerator->generateMultipleEnumSnapshotColumnName($associationName),
+                'string',
+                [
+                    'notnull'       => false,
+                    'length'        => 500,
+                    OroOptions::KEY => [
+                        ExtendOptionsManager::MODE_OPTION       => ConfigModelManager::MODE_HIDDEN,
+                        ExtendOptionsManager::FIELD_NAME_OPTION =>
+                            ExtendHelper::getMultipleEnumSnapshotFieldName($associationName)
+                    ]
+                ]
+            );
+        } else {
+            $this->addManyToOneRelation(
+                $schema,
+                $selfTable,
+                $associationName,
+                $enumTableName,
+                'id',
+                $options,
+                'enum'
+            );
+        }
     }
 
     /**
@@ -256,6 +321,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
      * @param array        $options
+     * @param string       $fieldType                 The field type. By default the field type is oneToMany,
+     *                                                but you can specify another type if it is based on oneToMany.
+     *                                                In this case this type should be registered
+     *                                                in entity_extend.yml under underlying_types section
      */
     public function addOneToManyRelation(
         Schema $schema,
@@ -265,7 +334,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options = []
+        array $options = [],
+        $fieldType = 'oneToMany'
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -315,7 +385,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ],
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'oneToMany';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
@@ -334,6 +404,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
      * @param array        $options
+     * @param string       $fieldType                 The field type. By default the field type is manyToMany,
+     *                                                but you can specify another type if it is based on manyToMany.
+     *                                                In this case this type should be registered
+     *                                                in entity_extend.yml under underlying_types section
      */
     public function addManyToManyRelation(
         Schema $schema,
@@ -343,7 +417,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options = []
+        array $options = [],
+        $fieldType = 'manyToMany'
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -410,7 +485,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ],
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToMany';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
@@ -427,6 +502,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Table|string $targetTable      A Table object or table name
      * @param string       $targetColumnName A column name is used to show related entity
      * @param array        $options
+     * @param string       $fieldType        The field type. By default the field type is manyToOne,
+     *                                       but you can specify another type if it is based on manyToOne.
+     *                                       In this case this type should be registered
+     *                                       in entity_extend.yml under underlying_types section
      */
     public function addManyToOneRelation(
         Schema $schema,
@@ -434,7 +513,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $targetTable,
         $targetColumnName,
-        array $options = []
+        array $options = [],
+        $fieldType = 'manyToOne'
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -462,7 +542,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'column'     => $targetColumnName,
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToOne';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
@@ -547,10 +627,25 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
-        $columnTypeName = $targetColumn->getType()->getName();
-        if (!in_array($columnTypeName, [Type::INTEGER, Type::SMALLINT, Type::BIGINT])) {
+        if ($targetColumn->getName() !== 'id') {
             throw new SchemaException(
-                sprintf('A relation column type must be an integer. "%s" type is not supported.', $columnTypeName)
+                sprintf(
+                    'The target column name must be "id". Relation column: "%s::%s". Target column name: "%s".',
+                    $table->getName(),
+                    $columnName,
+                    $targetColumn->getName()
+                )
+            );
+        }
+        $columnTypeName = $targetColumn->getType()->getName();
+        if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT])) {
+            throw new SchemaException(
+                sprintf(
+                    'The type of relation column "%s::%s" must be an integer or string. "%s" type is not supported.',
+                    $table->getName(),
+                    $columnName,
+                    $columnTypeName
+                )
             );
         }
 
@@ -558,6 +653,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * Makes sure that required for any extend field attributes are set
+     *
      * @param array $options
      */
     protected function ensureExtendFieldSet(array &$options)
@@ -565,8 +662,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        if (!isset($options['extend']['extend'])) {
-            $options['extend']['extend'] = true;
+        if (!isset($options['extend']['is_extend'])) {
+            $options['extend']['is_extend'] = true;
+        }
+        if (!isset($options['extend']['owner'])) {
+            $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
         }
     }
 }

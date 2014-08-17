@@ -16,10 +16,10 @@ abstract class AbstractEnumValue
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=32)
+     * @ORM\Column(name="id", type="string", length=32)
      * @ORM\Id
      */
-    private $code;
+    private $id;
 
     /**
      * @var string
@@ -49,14 +49,14 @@ abstract class AbstractEnumValue
     private $locale;
 
     /**
-     * @param string  $code
+     * @param string  $id
      * @param string  $name
      * @param int     $priority
      * @param boolean $default
      */
-    public function __construct($code, $name, $priority = 0, $default = false)
+    public function __construct($id, $name, $priority = 0, $default = false)
     {
-        $this->code     = $code;
+        $this->id       = $id;
         $this->name     = $name;
         $this->priority = $priority;
         $this->default  = $default;
@@ -65,9 +65,9 @@ abstract class AbstractEnumValue
     /**
      * @return string
      */
-    public function getCode()
+    public function getId()
     {
-        return $this->code;
+        return $this->id;
     }
 
     /**
@@ -157,6 +157,6 @@ abstract class AbstractEnumValue
      */
     public function __toString()
     {
-        return $this->code;
+        return $this->id;
     }
 }

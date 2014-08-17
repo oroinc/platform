@@ -13,6 +13,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
     const CUSTOM_INDEX_PREFIX              = 'oro_idx_';
     const RELATION_COLUMN_SUFFIX           = '_id';
+    const SNAPSHOT_COLUMN_SUFFIX           = '_ss';
     const RELATION_DEFAULT_COLUMN_PREFIX   = ExtendConfigDumper::DEFAULT_PREFIX;
 
 
@@ -49,7 +50,8 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     {
         $subtractSize = max(
             strlen(self::RELATION_DEFAULT_COLUMN_PREFIX),
-            strlen(self::RELATION_COLUMN_SUFFIX)
+            strlen(self::RELATION_COLUMN_SUFFIX),
+            strlen(self::SNAPSHOT_COLUMN_SUFFIX)
         );
 
         return $this->getMaxIdentifierSize() - $subtractSize;
@@ -196,6 +198,19 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
         }
 
         return self::ENUM_TABLE_PREFIX . Inflector::tableize($enumCode);
+    }
+
+    /**
+     * Builds a column name for a field that is used to store selected options for multiple enums
+     * This column is required to avoid group by clause when multiple enum is shown in a datagrid
+     *
+     * @param string $associationName
+     *
+     * @return string
+     */
+    public static function generateMultipleEnumSnapshotColumnName($associationName)
+    {
+        return $associationName . self::SNAPSHOT_COLUMN_SUFFIX;
     }
 
     /**

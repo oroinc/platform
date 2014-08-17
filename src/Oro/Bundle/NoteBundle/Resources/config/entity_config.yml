@@ -3,7 +3,7 @@ oro_entity_config:
         entity:
             items:
                 # indicates whether the entity can have notes or not
-                enabled:
+                enabled: # boolean
                     options:
                         require_schema_update: true
                         priority:           250
@@ -16,6 +16,7 @@ oro_entity_config:
                             required:       true
                             label:          oro.note.enabled
                             association_class: 'OroNoteBundle:Note'
+
                 # this attribute can be used to prohibit changing the note association state (no matter whether
                 # it is enabled or not) for the entity
                 # if TRUE than the current state cannot be changed

@@ -58,14 +58,14 @@ class ExtendHelper
     /**
      * @param string $entityClassName
      * @param string $fieldName
-     * @param string $fieldType
+     * @param string $relationType
      * @param string $targetEntityClassName
      *
      * @return string
      */
-    public static function buildRelationKey($entityClassName, $fieldName, $fieldType, $targetEntityClassName)
+    public static function buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClassName)
     {
-        return implode('|', [$fieldType, $entityClassName, $targetEntityClassName, $fieldName]);
+        return implode('|', [$relationType, $entityClassName, $targetEntityClassName, $fieldName]);
     }
 
     /**
@@ -79,6 +79,19 @@ class ExtendHelper
     public static function buildEnumValueShortClassName($enumCode)
     {
         return 'EnumValue' . Inflector::classify($enumCode);
+    }
+
+    /**
+     * Returns the name of a field that is used to store selected options for multiple enums
+     * This field is required to avoid group by clause when multiple enum is shown in a datagrid
+     *
+     * @param string $fieldName The field name that is a reference to enum values table
+     *
+     * @return string
+     */
+    public static function getMultipleEnumSnapshotFieldName($fieldName)
+    {
+        return $fieldName . 'Snapshot';
     }
 
     /**

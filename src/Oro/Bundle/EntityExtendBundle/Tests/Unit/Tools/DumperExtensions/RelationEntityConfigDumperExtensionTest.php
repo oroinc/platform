@@ -7,10 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -18,7 +18,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
-    /** @var  RelationDataConfigDumperExtension */
+    /** @var  RelationEntityConfigDumperExtension */
     protected $extension;
 
     /** @var FieldTypeHelper */
@@ -41,7 +41,10 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('extend')
             ->will($this->returnValue($this->extendConfigProvider));
 
-        $this->extension = new RelationDataConfigDumperExtension($this->configManager);
+        $this->extension = new RelationEntityConfigDumperExtension(
+            $this->configManager,
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+        );
     }
 
     public function testSupportsPreUpdate()
@@ -64,36 +67,23 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateRelationTypeOwnEntity()
     {
         $config = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $configs = [
-            $config
-        ];
+        $config->set('is_extend', true);
 
         $fieldsConfigs = [
             $this->getConfigNewField(
-                [],
+                [
+                    'relation_key' => 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName'
+                ],
                 'oneToMany'
-            ),
-            $this->getConfigNewField(
-                ['owner' => ExtendScope::OWNER_SYSTEM],
-                'oneToMany'
-            ),
+            )
         ];
 
-        // get field configs
-        $this->extendConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->with('TestClass')
-            ->will($this->returnValue($fieldsConfigs));
-
-        $relation = [
+        $relation   = [
             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                'assign'          => true,
-                'owner'           => true,
-                'target_entity'   => 'TestClass',
-                'field_id'        => new FieldConfigId(
+                'assign'        => true,
+                'owner'         => true,
+                'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                'field_id'      => new FieldConfigId(
                     'extend',
                     'TestClass',
                     'testFieldName',
@@ -108,13 +98,22 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->extendConfigProvider
-            ->expects($this->at(1))
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('TestClass')
             ->will($this->returnValue($selfConfig));
 
-        $this->extension->preUpdate($configs);
+        $this->extension->preUpdate();
 
         // assert nothing changed
         $this->assertEquals($relation, $selfConfig->get('relation'));
@@ -126,51 +125,43 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateSelfRelationOneToMany()
     {
         $config = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $configs = [
-            $config
-        ];
+        $config->set('is_extend', true);
 
         $fieldsConfigs = [
             $this->getConfigNewField(
                 [
-                    'state' => ExtendScope::STATE_NEW,
+                    'state'         => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'oneToMany'
             ),
         ];
 
-        // get field configs
-        $this->extendConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->with('TestClass')
-            ->will($this->returnValue($fieldsConfigs));
-
-        $selfConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-
-        $this->extendConfigProvider
-            ->expects($this->at(1))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
-        $this->extendConfigProvider
-            ->expects($this->at(2))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-        $this->extendConfigProvider
-            ->expects($this->at(4))
-            ->method('getConfig')
-            ->with('Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($targetConfig));
 
-        $this->extension->preUpdate($configs);
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
 
         $this->assertEquals(
             [
@@ -225,51 +216,43 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateSelfRelationManyToOne()
     {
         $config = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $configs = [
-            $config
-        ];
+        $config->set('is_extend', true);
 
         $fieldsConfigs = [
             $this->getConfigNewField(
                 [
-                    'state' => ExtendScope::STATE_NEW,
+                    'state'         => ExtendScope::STATE_NEW,
                     'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 ],
                 'manyToOne'
             ),
         ];
 
-        // get field configs
-        $this->extendConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->with('TestClass')
-            ->will($this->returnValue($fieldsConfigs));
-
-        $selfConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-
-        $this->extendConfigProvider
-            ->expects($this->at(1))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
-        $this->extendConfigProvider
-            ->expects($this->at(2))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-        $this->extendConfigProvider
-            ->expects($this->at(4))
-            ->method('getConfig')
-            ->with('Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($targetConfig));
 
-        $this->extension->preUpdate($configs);
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
 
         $this->assertEquals(
             [
@@ -314,11 +297,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateSelfRelationManyToMany()
     {
         $config = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $configs = [
-            $config
-        ];
+        $config->set('is_extend', true);
 
         $fieldsConfigs = [
             $this->getConfigNewField(
@@ -329,47 +308,43 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ),
         ];
 
-        // get field configs
-        $this->extendConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->with('TestClass')
-            ->will($this->returnValue($fieldsConfigs));
-
-        $selfConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-
-        $this->extendConfigProvider
-            ->expects($this->at(1))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
-        $this->extendConfigProvider
-            ->expects($this->at(2))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
-        $this->extendConfigProvider
-            ->expects($this->at(4))
-            ->method('getConfig')
-            ->with('Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($targetConfig));
 
-        $this->extension->preUpdate($configs);
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
 
         $this->assertEquals(
             [
                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                     'assign'          => false,
+                    'owner'           => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'Oro\Bundle\UserBundle\Entity\User',
                         'testclass_testFieldName',
                         'manyToMany'
                     ),
-                    'owner'           => false,
                     'target_entity'   => 'TestClass',
                     'target_field_id' => new FieldConfigId(
                         'extend',
@@ -412,11 +387,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateTargetRelationManyToMany()
     {
         $config = new Config(new EntityConfigId('extend', 'TestClass'));
-        $config->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $configs = [
-            $config
-        ];
+        $config->set('is_extend', true);
 
         $fieldsConfigs = [
             $this->getConfigNewField(
@@ -431,19 +402,12 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ),
         ];
 
-        // get field configs
-        $this->extendConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->with('TestClass')
-            ->will($this->returnValue($fieldsConfigs));
-
         $relation = [
             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                'assign'          => true,
-                'owner'           => true,
-                'target_entity'   => 'TestClass',
-                'field_id'        => new FieldConfigId(
+                'assign'        => true,
+                'owner'         => true,
+                'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                'field_id'      => new FieldConfigId(
                     'extend',
                     'TestClass',
                     'testFieldName',
@@ -452,13 +416,12 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $selfConfig = $this->getEntityConfig(
+        $selfConfig   = $this->getEntityConfig(
             [
-                'state' => ExtendScope::STATE_ACTIVE,
-                'relation' => $relation,
+                'state'    => ExtendScope::STATE_ACTIVE,
+                'relation' => [],
             ]
         );
-
         $targetConfig = $this->getEntityConfig(
             [
                 'state'    => ExtendScope::STATE_ACTIVE,
@@ -468,33 +431,28 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\UserBundle\Entity\User'
         );
 
-        // isInverseSideRelationExist
-        $this->extendConfigProvider
-            ->expects($this->at(1))
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($config));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
 
-        $this->extendConfigProvider
-            ->expects($this->at(2))
-            ->method('getConfig')
-            ->with('Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($targetConfig));
-
-        $this->extendConfigProvider
-            ->expects($this->at(3))
-            ->method('getConfig')
-            ->with('TestClass')
-            ->will($this->returnValue($selfConfig));
-
-
-        $this->extendConfigProvider
-            ->expects($this->at(4))
-            ->method('getConfig')
-            ->with('Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue($targetConfig));
-
-        $this->extension->preUpdate($configs);
+        $this->extension->preUpdate();
 
         // setup expected relation array
         $relationKey = 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName';
@@ -511,7 +469,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * FieldConfig
      *
-     * @param array $values
+     * @param array  $values
      * @param string $type
      * @param string $scope
      *
@@ -522,7 +480,6 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $resultValues = [
             'owner'      => ExtendScope::OWNER_CUSTOM,
             'state'      => ExtendScope::STATE_NEW,
-            'is_extend'  => true,
             'is_deleted' => false,
         ];
 
@@ -531,7 +488,7 @@ class RelationDataConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $fieldConfigId = new FieldConfigId($scope, 'TestClass', 'testFieldName', $type);
-        $config   = new Config($fieldConfigId);
+        $config        = new Config($fieldConfigId);
         $config->setValues($resultValues);
 
         return $config;
