@@ -6,7 +6,7 @@ oro:
             data_type_group:
                 fields:             Fields
                 relations:          Relations
-                enum:               Enum
+                dictionaries:       Dictionaries
             data_type:
                 choose_value:       Choose a field type...
 

@@ -23,10 +23,10 @@ class FieldType extends AbstractType
     const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
     const GROUP_FIELDS                   = 'fields';
     const GROUP_RELATIONS                = 'relations';
-    const GROUP_ENUM                     = 'enum';
+    const GROUP_DICTIONARIES             = 'dictionaries';
 
     protected $types = [
-        self::GROUP_FIELDS => [
+        self::GROUP_FIELDS       => [
             'string',
             'integer',
             'smallint',
@@ -41,12 +41,12 @@ class FieldType extends AbstractType
             'file',
             'image',
         ],
-        self::GROUP_RELATIONS => [
+        self::GROUP_RELATIONS    => [
             'oneToMany',
             'manyToOne',
             'manyToMany',
         ],
-        self::GROUP_ENUM => [
+        self::GROUP_DICTIONARIES => [
             'optionSet',
             'enum',
             'multiEnum',
@@ -193,7 +193,7 @@ class FieldType extends AbstractType
      */
     protected function getFieldTypeChoices($inverseRelationTypes)
     {
-        $fieldTypes = $relationTypes = $enumTypes = [];
+        $fieldTypes = $relationTypes = $dictionaryTypes = [];
 
         foreach ($this->types[self::GROUP_FIELDS] as $type) {
             $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
@@ -201,13 +201,13 @@ class FieldType extends AbstractType
         foreach ($this->types[self::GROUP_RELATIONS] as $type) {
             $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        foreach ($this->types[self::GROUP_ENUM] as $type) {
-            $enumTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        foreach ($this->types[self::GROUP_DICTIONARIES] as $type) {
+            $dictionaryTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
 
         uasort($fieldTypes, 'strcasecmp');
         uasort($relationTypes, 'strcasecmp');
-        uasort($enumTypes, 'strcasecmp');
+        uasort($dictionaryTypes, 'strcasecmp');
 
         if (!empty($inverseRelationTypes)) {
             uasort($inverseRelationTypes, 'strcasecmp');
@@ -215,9 +215,9 @@ class FieldType extends AbstractType
         }
 
         $result = [
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)    => $fieldTypes,
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS) => $relationTypes,
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_ENUM)      => $enumTypes
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)       => $fieldTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS)    => $relationTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_DICTIONARIES) => $dictionaryTypes
         ];
 
         return $result;
