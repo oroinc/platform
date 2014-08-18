@@ -8,8 +8,8 @@ use Doctrine\ORM\Id\BigIntegerIdentityGenerator;
 use Doctrine\ORM\Id\IdentityGenerator;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\OroEntityExtension;
 use Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class GeneratedValueStrategyListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,9 @@ class GeneratedValueStrategyListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new GeneratedValueStrategyListener(OroEntityExtension::POSTGRESQL_DB_DRIVER);
+        $this->listener = new GeneratedValueStrategyListener(
+            DatabaseDriverInterface::DRIVER_POSTGRESQL
+        );
     }
 
     public function testPlatformNotMatch()

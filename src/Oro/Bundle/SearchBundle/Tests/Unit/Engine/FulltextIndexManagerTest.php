@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
@@ -29,12 +30,12 @@ class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getParams')
             ->will(
                 $this->returnValue(
-                    ['driver' => 'pdo_mysql']
+                    ['driver' => DatabaseDriverInterface::DRIVER_MYSQL]
                 )
             );
 
         $config = [
-            'pdo_mysql' => 'Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql'
+            DatabaseDriverInterface::DRIVER_MYSQL => 'Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql'
         ];
 
         $this->indexManager = new FulltextIndexManager($this->connection, $config);
