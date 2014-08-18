@@ -1,7 +1,8 @@
 /*global define*/
 define([
+    'oroui/js/mediator',
     './../base/page-region-view'
-], function (PageRegionView) {
+], function (mediator, PageRegionView) {
     'use strict';
 
     var PageContentView;
@@ -18,6 +19,8 @@ define([
             if (!data) {
                 return;
             }
+
+            mediator.execute('layout:dispose', this.$el);
 
             PageRegionView.prototype.render.call(this);
 

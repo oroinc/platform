@@ -5,12 +5,11 @@ config:
                 - 'jquery'
     map:
         '*':
-            'jquery.validate': 'oroform/js/validate-extend'
-        'oroform/js/validate-extend':
+            'jquery.validate': 'oroform/js/extend/validate'
+        'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
     paths:
         'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
-        'oroform/js/validate-extend': 'bundles/oroform/js/validate-extend.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
         'oroform/js/validator/datetime': 'bundles/oroform/js/validator/datetime.js'

@@ -6,7 +6,6 @@ use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Exception\ValidatorException;
 
 class UniqueAddressTypesValidator extends ConstraintValidator
 {

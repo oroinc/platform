@@ -53,59 +53,46 @@ All text fields data will be store in **all_text** virtual field. Additionally, 
 Example:
 
 ```
-    Acme\DemoBundle\Entity\Product:
-        alias: demo_product
-        flexible_manager: demo_product_manager
-        label: Demo products
-        route:
-            name: acme_demo_search_product
-            parameters:
-                id: id
-        title_fields: [name]
-        fields:
-            -
-                name: name
-                target_type: text
-            -
-                name: description
-                target_type: text
-                target_fields: [description, another_index_name]
-            -
-                name: manufacturer
-                relation_type: many-to-one
-                relation_fields:
-                    -
-                        name: name
-                        target_type: text
-                        target_fields: [manufacturer, all_data]
-                    -
-                        name: id
-                        target_type: integer
-                        target_fields: [manufacturer]
-            -
-                name: categories
-                relation_type: many-to-many
-                relation_fields:
-                    -
-                        name: name
-                        target_type: text
-                        target_fields: [all_data]
+Acme\DemoBundle\Entity\Product:
+    alias: demo_product                                      # Alias for 'from' keyword in advanced search
+    search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
+    label: Demo products                                     # Label for entity to identify entity in search results
+    route:
+        name: acme_demo_search_product                       # Route name to generate url link tho the entity record
+        parameters:                                          # Array with parameters for route
+            id: id
+    title_fields: [name]
+    fields:
+        -
+            name: name                                       # Name of field in entity
+            target_type: text                                # Type of virtual search field. Supported target types:
+                                                             # text (string and text fields), integer, double, datetime
+        -
+            name: description
+            target_type: text
+            target_fields: [description, another_index_name] # Array of virtual fields for entity field from 'name' parameter.
+        -
+            name: manufacturer
+            relation_type: many-to-one                       # Indicate that this field is relation field to another table.
+                                                             # Supported: one-to-one, many-to-many, one-to-many, many-to-one.
+            relation_fields:                                 # Array of fields from relation record we must to index.
+                -
+                    name: name
+                    target_type: text
+                    target_fields: [manufacturer, all_data]
+                -
+                    name: id
+                    target_type: integer
+                    target_fields: [manufacturer]
+        -
+            name: categories
+            relation_type: many-to-many
+            relation_fields:
+                -
+                    name: name
+                    target_type: text
+                    target_fields: [all_data]
 ```
-
-Parameters:
-
-- **search_template** - template to use in search result page for this entity type
-- **label**: Label for entity to identify entity in search results
-- **route**: **name** - route name to generate url link tho the entity record, **parameters** - array with parameters for route
-- **alias**: alias for 'from' keyword in advanced search
-- **name**: name of field in entity
-- **target_type**: type of virtual search field. Supported target types: text (string and text fields), integer, double, datetime
-- **target_fields**: array of virtual fields for entity field from 'name' parameter.
-- **relation_type**: indicate that this field is relation field to another table. Supported relation types: one-to-one, many-to-many, one-to-many, many-to-one.
-- **relation_fields**: array of fields from relation record we must to index.
-- **flexible_manager**. If entity has flexible attributes, they can be indexed for search by parameter flexible_manager in mapping config. Value of this parameter
-is the service name for flexible entity. In search index will be indexed all the attributes with parameter **searchable** set to true. All text fields data will
-be store in **all_text** virtual field. Additionally, all the fields will be stored in fieldName virtual fields.
 
 [Query builder](Resources/doc/query_builder.md)
 
