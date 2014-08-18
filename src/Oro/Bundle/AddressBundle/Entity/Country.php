@@ -86,6 +86,13 @@ class Country implements Translatable
     protected $regions;
 
     /**
+     * @var Continent
+     *
+     * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
+     * @ORM\JoinColumn(name="continent_code", referencedColumnName="code")
+     */
+
+    /**
      * @Gedmo\Locale
      */
     protected $locale;
