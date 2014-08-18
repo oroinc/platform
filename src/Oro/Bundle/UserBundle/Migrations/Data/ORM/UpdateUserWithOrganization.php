@@ -14,16 +14,18 @@ class UpdateUserWithOrganization extends UpdateWithOrganization implements Depen
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData'];
+        return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadGroupData'
+        ];
     }
 
     /**
-     * Update users with organization
-     *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
         $this->update($manager, 'OroUserBundle:User');
+        $this->update($manager, 'OroUserBundle:Group');
     }
 }
