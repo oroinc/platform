@@ -310,7 +310,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedCalls'            => [],
                 'expectedException'        => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'expectedExceptionMessage' => 'The option "entity_class" or "autocomplete_alias" must be set.'
+                'expectedExceptionMessage' => 'The option "entity_class" must be set.'
             ],
             'entity_class must be set2'      => [
                 [

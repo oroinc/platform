@@ -45,8 +45,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         EntityManager $entityManager,
         SearchRegistry $registry,
         ConfigProviderInterface $configProvider
-    )
-    {
+    ) {
         $this->entityManager  = $entityManager;
         $this->searchRegistry = $registry;
         $this->configProvider = $configProvider;
@@ -84,9 +83,22 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver
             ->setNormalizers(
                 [
+                    'entity_class'       => function (Options $options, $entityClass) {
+                        if (!empty($entityClass)) {
+                            return $entityClass;
+                        }
+
+                        if ($autoCompleteAlias = $options->get('autocomplete_alias')) {
+                            $searchHandler = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
+
+                            return $searchHandler->getEntityName();
+                        }
+
+                        throw new InvalidConfigurationException('The option "entity_class" must be set.');
+                    },
                     'transformer'        => function (Options $options, $value) {
                         if (!$value) {
-                            if ($className = $this->getClassNameFromOptions($options)) {
+                            if ($className = $options->get('entity_class')) {
                                 $value = $this->createDefaultTransformer($className);
                             }
                         }
@@ -101,19 +113,6 @@ class OroJquerySelect2HiddenType extends AbstractType
                         }
 
                         return $value;
-                    },
-                    'autocomplete_alias' => function (Options $options, $autoCompleteAlias) {
-                        if (!empty($autoCompleteAlias)) {
-                            return $autoCompleteAlias;
-                        }
-
-                        if ($className = $this->getClassNameFromOptions($options, false)) {
-                            $formConfig = $this->configProvider->getConfig($className);
-
-                            return $formConfig->get('autocomplete_alias', false, $autoCompleteAlias);
-                        }
-
-                        throw new InvalidConfigurationException('The option "entity_class" or "autocomplete_alias" must be set.');
                     }
                 ]
             );
@@ -235,31 +234,6 @@ class OroJquerySelect2HiddenType extends AbstractType
         }
 
         $view->vars = array_replace_recursive($view->vars, $vars);
-    }
-
-    /**
-     * @param Options $options
-     * @param bool    $useAlias
-     *
-     * @return mixed
-     */
-    protected function getClassNameFromOptions(Options $options, $useAlias = true)
-    {
-        if ($className = $options->get('entity_class')) {
-            return $className;
-        }
-
-        if (!$useAlias) {
-            return null;
-        }
-
-        if ($autoCompleteAlias = $options->get('autocomplete_alias')) {
-            $searchHandler = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
-
-            return $searchHandler->getEntityName();
-        }
-
-        return null;
     }
 
     /**

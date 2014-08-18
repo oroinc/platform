@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -98,17 +99,13 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                     }
 
                     $formConfig = $this->configManager->getProvider('form')->getConfig($options->get('entity_class'));
-
-                    return $formConfig->get('grid_name', false, $gridName);
-                },
-                'create_form_route' => function (Options $options, $createFormRoute) {
-                    if (!empty($createFormRoute)) {
-                        return $createFormRoute;
+                    if ($formConfig->has('grid_name')) {
+                        return $formConfig->get('grid_name');
                     }
 
-                    $formConfig = $this->configManager->getProvider('form')->getConfig($options->get('entity_class'));
-
-                    return $formConfig->get('create_form_route', false, $createFormRoute);
+                    throw new InvalidConfigurationException(
+                        'The option "grid_name" must be set.'
+                    );
                 },
             ]
         );

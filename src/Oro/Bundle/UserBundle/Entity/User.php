@@ -59,7 +59,6 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          },
  *          "form"={
  *              "form_type"="oro_user_select",
- *              "autocomplete_alias"="users",
  *              "grid_name"="users-select-grid"
  *          }
  *      }
