@@ -121,8 +121,6 @@ services:
 
     oro_user.form.type.user_select:
         class: %oro_user.form.type.user_select.class%
-        arguments:
-            - %oro_user.entity.class%
         tags:
             - { name: form.type, alias: oro_user_select }
 

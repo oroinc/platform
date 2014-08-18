@@ -7,19 +7,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class UserSelectType extends AbstractType
 {
     /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @param string $className
-     */
-    public function __construct($className)
-    {
-        $this->className = $className;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -27,7 +14,6 @@ class UserSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'autocomplete_alias' => 'users',
-                'entity_class'       => $this->className,
                 'configs'            => [
                     'placeholder'             => 'oro.user.form.choose_user',
                     'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
