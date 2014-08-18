@@ -74,10 +74,11 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'oro_search' => array(
                 'engine'          => 'orm',
-                'realtime_update' => true,
-                'engine_orm'      => array('pro_pgSql')
+                'realtime_update' => true
             )
         );
+
+        $this->container->setParameter('oro_search.drivers', array('pro_pgSql'));
         $searchExtension->load($config, $this->container);
     }
 }

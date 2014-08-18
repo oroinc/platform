@@ -79,7 +79,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->once())
             ->method('getParameter')
-            ->with($this->equalTo('oro_search.engine_orm'))
+            ->with($this->equalTo('oro_search.drivers'))
             ->will($this->returnValue('test_orm'));
 
         $searchRepo->expects($this->once())
@@ -138,7 +138,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->any())
             ->method('getParameter')
-            ->with($this->equalTo('oro_search.engine_orm'))
+            ->with($this->equalTo('oro_search.drivers'))
             ->will($this->returnValue('test_orm'));
 
         $searchRepo->expects($this->any())
@@ -219,7 +219,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->any())
             ->method('getParameter')
-            ->with($this->equalTo('oro_search.engine_orm'))
+            ->with($this->equalTo('oro_search.drivers'))
             ->will($this->returnValue('test_orm'));
 
         $searchRepo->expects($this->any())

@@ -101,7 +101,7 @@ class OroSearchExtension extends Extension
         $resources      = $configLoader->load($container);
 
         foreach ($resources as $resource) {
-            $entitiesConfig[] = $resource->data;
+            $entitiesConfig += $resource->data;
         }
 
         $container->setParameter($alias . '.entities_config', $entitiesConfig);

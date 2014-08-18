@@ -35,8 +35,6 @@ class IndexCommand extends ContainerAwareCommand
 
         $changed = $itemRepository->findBy(array('changed' => true));
 
-        // TODO: probably, fulltext index should be dropped here for performance reasons
-
         foreach ($changed as $item) {
             $output->write(sprintf('  Processing "%s" with id #%u', $item->getEntity(), $item->getRecordId()));
 
@@ -54,9 +52,6 @@ class IndexCommand extends ContainerAwareCommand
         }
 
         $entityManager->flush();
-
-        // recreate fulltext index, if necessary
-        // ...
 
         $output->writeln(sprintf('Total indexed items: %u', count($changed)));
     }
