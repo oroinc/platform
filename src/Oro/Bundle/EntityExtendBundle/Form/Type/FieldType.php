@@ -20,9 +20,13 @@ class FieldType extends AbstractType
 {
     const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
     const TYPE_LABEL_PREFIX              = 'oro.entity_extend.form.data_type.';
+    const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
+    const GROUP_FIELDS                   = 'fields';
+    const GROUP_RELATIONS                = 'relations';
+    const GROUP_DICTIONARIES             = 'dictionaries';
 
     protected $types = [
-        'fields'    => [
+        self::GROUP_FIELDS       => [
             'string',
             'integer',
             'smallint',
@@ -37,12 +41,16 @@ class FieldType extends AbstractType
             'file',
             'image',
         ],
-        'relations' => [
+        self::GROUP_RELATIONS    => [
             'oneToMany',
             'manyToOne',
             'manyToMany',
-            'optionSet'
-        ]
+        ],
+        self::GROUP_DICTIONARIES => [
+            'optionSet',
+            'enum',
+            'multiEnum',
+        ],
     ];
 
     /**
@@ -185,25 +193,31 @@ class FieldType extends AbstractType
      */
     protected function getFieldTypeChoices($inverseRelationTypes)
     {
-        $fieldTypes    = [];
-        $relationTypes = [];
+        $fieldTypes = $relationTypes = $dictionaryTypes = [];
 
-        foreach ($this->types['fields'] as $type) {
+        foreach ($this->types[self::GROUP_FIELDS] as $type) {
             $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        foreach ($this->types['relations'] as $type) {
+        foreach ($this->types[self::GROUP_RELATIONS] as $type) {
             $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        if (!empty($inverseRelationTypes)) {
-            $relationTypes = array_merge($relationTypes, $inverseRelationTypes);
+        foreach ($this->types[self::GROUP_DICTIONARIES] as $type) {
+            $dictionaryTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
 
         uasort($fieldTypes, 'strcasecmp');
         uasort($relationTypes, 'strcasecmp');
+        uasort($dictionaryTypes, 'strcasecmp');
+
+        if (!empty($inverseRelationTypes)) {
+            uasort($inverseRelationTypes, 'strcasecmp');
+            $relationTypes = array_merge($relationTypes, $inverseRelationTypes);
+        }
 
         $result = [
-            $this->translator->trans('oro.entity_extend.form.data_type_group.fields')    => $fieldTypes,
-            $this->translator->trans('oro.entity_extend.form.data_type_group.relations') => $relationTypes
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)       => $fieldTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS)    => $relationTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_DICTIONARIES) => $dictionaryTypes
         ];
 
         return $result;

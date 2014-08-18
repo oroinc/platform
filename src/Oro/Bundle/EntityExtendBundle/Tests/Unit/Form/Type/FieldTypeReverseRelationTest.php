@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -23,8 +24,9 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldTypeReverseRelationTest extends TypeTestCase
 {
-    const FIELDS_GROUP    = 'oro.entity_extend.form.data_type_group.fields';
-    const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
+    const FIELDS_GROUP       = 'oro.entity_extend.form.data_type_group.fields';
+    const RELATIONS_GROUP    = 'oro.entity_extend.form.data_type_group.relations';
+    const DICTIONARIES_GROUP = 'oro.entity_extend.form.data_type_group.dictionaries';
 
     /** @var  FieldType $type */
     protected $type;
@@ -39,7 +41,7 @@ class FieldTypeReverseRelationTest extends TypeTestCase
     protected $translatorMock;
 
     protected $defaultFieldTypeChoices = [
-        self::FIELDS_GROUP    => [
+        self::FIELDS_GROUP       => [
             'bigint'   => 'oro.entity_extend.form.data_type.bigint',
             'boolean'  => 'oro.entity_extend.form.data_type.boolean',
             'date'     => 'oro.entity_extend.form.data_type.date',
@@ -54,12 +56,16 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             'string'   => 'oro.entity_extend.form.data_type.string',
             'text'     => 'oro.entity_extend.form.data_type.text',
         ],
-        self::RELATIONS_GROUP => [
+        self::RELATIONS_GROUP    => [
             'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
             'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
             'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
-            'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
-        ]
+        ],
+        self::DICTIONARIES_GROUP => [
+            'enum'      => 'oro.entity_extend.form.data_type.enum',
+            'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
+            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
+        ],
     ];
 
     protected $formOptions = array(
@@ -127,10 +133,11 @@ class FieldTypeReverseRelationTest extends TypeTestCase
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
-        $typeName = 'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o||';
+        $typeName        = 'manyToOne|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel_m_t_o||';
+
         $expectedChoices[self::RELATIONS_GROUP] = array_merge(
-            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation'],
-            $expectedChoices[self::RELATIONS_GROUP]
+            $expectedChoices[self::RELATIONS_GROUP],
+            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation']
         );
         $this->assertSame(
             $expectedChoices,

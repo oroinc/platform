@@ -21,8 +21,9 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldTypeTest extends TypeTestCase
 {
-    const FIELDS_GROUP    = 'oro.entity_extend.form.data_type_group.fields';
-    const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
+    const FIELDS_GROUP       = 'oro.entity_extend.form.data_type_group.fields';
+    const RELATIONS_GROUP    = 'oro.entity_extend.form.data_type_group.relations';
+    const DICTIONARIES_GROUP = 'oro.entity_extend.form.data_type_group.dictionaries';
 
     /** @var  FieldType $type */
     protected $type;
@@ -37,7 +38,7 @@ class FieldTypeTest extends TypeTestCase
     protected $translatorMock;
 
     protected $defaultFieldTypeChoices = [
-        self::FIELDS_GROUP    => [
+        self::FIELDS_GROUP       => [
             'bigint'   => 'oro.entity_extend.form.data_type.bigint',
             'boolean'  => 'oro.entity_extend.form.data_type.boolean',
             'date'     => 'oro.entity_extend.form.data_type.date',
@@ -52,12 +53,16 @@ class FieldTypeTest extends TypeTestCase
             'string'   => 'oro.entity_extend.form.data_type.string',
             'text'     => 'oro.entity_extend.form.data_type.text',
         ],
-        self::RELATIONS_GROUP => [
+        self::RELATIONS_GROUP    => [
             'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
             'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
             'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
-            'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
-        ]
+        ],
+        self::DICTIONARIES_GROUP => [
+            'enum'      => 'oro.entity_extend.form.data_type.enum',
+            'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
+            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
+        ],
     ];
 
     protected $formOptions = array(
@@ -171,10 +176,12 @@ class FieldTypeTest extends TypeTestCase
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
-        $typeName = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1||testentity1_rel1';
+        $typeName        = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1'
+            . '||testentity1_rel1';
+
         $expectedChoices[self::RELATIONS_GROUP] = array_merge(
-            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation'],
-            $expectedChoices[self::RELATIONS_GROUP]
+            $expectedChoices[self::RELATIONS_GROUP],
+            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation']
         );
         $this->assertSame(
             $expectedChoices,
@@ -187,7 +194,7 @@ class FieldTypeTest extends TypeTestCase
 
     public function testTypeWithUnAssignedRelations()
     {
-        $config = $this->prepareRelationsConfig();
+        $config    = $this->prepareRelationsConfig();
         $configKey = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1';
 
         $config['relationConfig'][$configKey]['assign'] = false;
