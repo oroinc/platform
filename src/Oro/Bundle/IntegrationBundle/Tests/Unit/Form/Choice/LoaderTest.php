@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Choice;
 
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 

@@ -45,11 +45,16 @@ class IntegrationController extends FOSRestController
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-        if ($entity->getEditMode() !== $entity::EDIT_MODE_DISALLOW &&
-            !$this->get('oro_integration.delete_manager')->delete($entity)
-        ) {
+
+        if ($entity->getEditMode() === $entity::EDIT_MODE_DISALLOW) {
+            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+        }
+
+        $result = $this->get('oro_integration.delete_manager')->delete($entity);
+        if (!$result) {
             return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
         }
+
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 

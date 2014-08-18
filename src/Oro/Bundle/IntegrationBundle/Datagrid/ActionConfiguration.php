@@ -21,6 +21,7 @@ class ActionConfiguration
             if ($record->getValue('editMode') == Channel::EDIT_MODE_DISALLOW) {
                 $result['delete'] = false;
             }
+
             return $result;
         };
     }
