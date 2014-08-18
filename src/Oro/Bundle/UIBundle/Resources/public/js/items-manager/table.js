@@ -49,7 +49,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
             this._initSorting();
             this._onResetCollection();
 
-            this.element.on('click', '[data-collection-action]',  _.bind(this._onAction, this));
+            this._on({
+                'click [data-collection-action]': '_onAction'
+            });
         },
 
         reset: function () {
