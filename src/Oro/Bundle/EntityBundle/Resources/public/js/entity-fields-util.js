@@ -19,7 +19,7 @@ define(['underscore'], function (_) {
         fields = _.filter(fields, function (item) {
             var result;
             result = !_.some(exclude, function (rule) {
-                var result;
+                var result, cut;
                 // exclude can be a property name
                 if (_.isString(rule)) {
                     result = _.intersection(
@@ -28,7 +28,7 @@ define(['underscore'], function (_) {
                     ).length > 0;
                 } else {
                     // or exclude can be an object with data to compare
-                    var cut = _.pick(item, _.keys(rule));
+                    cut = _.pick(item, _.keys(rule));
                     result  = _.isEqual(cut, rule);
                 }
 
@@ -185,12 +185,13 @@ define(['underscore'], function (_) {
          * @returns {Object}
          */
         getApplicableConditions: function (fieldId) {
+            var chain, result;
             if (!fieldId) {
                 return {};
             }
 
-            var chain = this.pathToEntityChain(fieldId);
-            var result = {
+            chain = this.pathToEntityChain(fieldId);
+            result = {
                 parent_entity: null,
                 entity: chain[chain.length - 1].field.entity.name,
                 field:  chain[chain.length - 1].field.name
@@ -247,15 +248,16 @@ define(['underscore'], function (_) {
          * @returns {string}
          */
         getPathByPropertyPath: function (pathData) {
+            var entityData, fieldIdParts;
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
             }
 
-            var entityData = this.data[this.entity];
-            var fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
-                var fieldPartId = fieldName;
-
-                var fieldsData = null;
+            entityData = this.data[this.entity];
+            fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
+                var fieldPartId, fieldsData;
+                fieldPartId = fieldName;
+                fieldsData = null;
                 if (entityData.hasOwnProperty('fieldsIndex')) {
                     fieldsData = entityData.fieldsIndex;
                 } else if (

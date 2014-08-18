@@ -48,9 +48,10 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             this._initCriteriaList();
             this._initConditionBuilder();
 
-            this.element
-                .on('change', '.operator', $.proxy(this._onChangeOperator, this))
-                .on('click', '.close', $.proxy(this._onConditionClose, this));
+            this._on({
+                'change .operator': '_onChangeOperator',
+                'click .close': '_onConditionClose'
+            });
 
             // if some criteria requires addition modules, load them before initialization
             modules = this.$criteriaList.find('[data-module]').map(function () {
@@ -99,10 +100,12 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
 
         _initCriteriaList: function () {
             this.$criteriaList
-                .sortable(this.options.criteriaList)
-                .on('mousedown', function () {
+                .sortable(this.options.criteriaList);
+            this._on(this.$criteriaList, {
+                mousedown: function () {
                     $(':focus').blur();
-                });
+                }
+            });
         },
 
         _initConditionBuilder: function () {
@@ -116,7 +119,9 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             }
 
             $root.data('value', this._getSourceValue());
-            $root.on('changed', $.proxy(this._onChanged, this));
+            this._on($root, {
+                changed: '_onChanged'
+            });
             this.$rootCondition = $root;
         },
 
@@ -131,27 +136,28 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             // make the group sortable
             $group.sortable(this.options.conditionsGroup);
 
-            // handle condition-item value change
-            $group.on('changed', '>[data-criteria]>[data-value]:not(.operator)', function () {
-                var $content = $(this),
-                    $condition = $content.parent(),
-                    criteria = $condition.data('criteria'),
-                    hasValue = !$.isEmptyObject($content.data('value'));
-                // update validation checkbox if condition 'has/has not' value
-                $condition.find('>input[name^=condition_item_]').prop('checked', hasValue);
-                // if it's value of condition with not default criteria, mixin it's name into value
-                if (hasValue && $.inArray(criteria, ['conditions-group', 'condition-item']) === -1) {
-                    $.extend($content.data('value'), {criteria: criteria});
+            this._on($group, {
+                // handle condition-item value change
+                'changed >[data-criteria]>[data-value]:not(.operator)': function (e) {
+                    var $content = $(e.currentTarget),
+                        $condition = $content.parent(),
+                        criteria = $condition.data('criteria'),
+                        hasValue = !$.isEmptyObject($content.data('value'));
+                    // update validation checkbox if condition 'has/has not' value
+                    $condition.find('>input[name^=condition_item_]').prop('checked', hasValue);
+                    // if it's value of condition with not default criteria, mixin it's name into value
+                    if (hasValue && $.inArray(criteria, ['conditions-group', 'condition-item']) === -1) {
+                        $.extend($content.data('value'), {criteria: criteria});
+                    }
+                },
+                // on change update group's value
+                changed: function () {
+                    var values = [];
+                    $group.find('>[data-criteria]>[data-value]').each(function () {
+                        values.push($(this).data('value'));
+                    });
+                    $group.data('value', values);
                 }
-            });
-
-            // on change update group's value
-            $group.on('changed', function () {
-                var values = [];
-                $group.find('>[data-criteria]>[data-value]').each(function () {
-                    values.push($(this).data('value'));
-                });
-                $group.data('value', values);
             });
         },
 
