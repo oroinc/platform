@@ -28,6 +28,7 @@ class EnumValueCollectionType extends CollectionType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         parent::setDefaultOptions($resolver);
+
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
@@ -36,10 +37,10 @@ class EnumValueCollectionType extends CollectionType
                 'prototype'            => true,
                 'prototype_name'       => '__name__',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'type'                 => 'oro_entity_extend_enum_value',
                 'show_form_when_empty' => true
             ]
         );
-        $resolver->setRequired(['type']);
     }
 
     /**
@@ -48,6 +49,7 @@ class EnumValueCollectionType extends CollectionType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
+
         $view->vars = array_replace(
             $view->vars,
             [
