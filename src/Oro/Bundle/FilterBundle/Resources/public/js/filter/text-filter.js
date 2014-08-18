@@ -1,8 +1,14 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
-    ], function ($, _, __, EmptyFilter) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './empty-filter'
+], function ($, _, __, EmptyFilter) {
     'use strict';
+
+    var TextFilter;
 
     /**
      * Text grid filter.
@@ -11,11 +17,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
      *  - "disable" when filter is disabled
      *  - "update" when filter criteria is changed
      *
-     * @export  orofilter/js/filter/text-filter
-     * @class   orofilter.filter.TextFilter
-     * @extends orofilter.filter.EmptyFilter
+     * @export  oro/filter/text-filter
+     * @class   oro.filter.TextFilter
+     * @extends oro.filter.EmptyFilter
      */
-    return EmptyFilter.extend({
+    TextFilter = EmptyFilter.extend({
         wrappable: true,
 
         wrapperTemplate: '',
@@ -90,7 +96,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
                 };
             }
 
-            EmptyFilter.prototype.initialize.apply(this, arguments);
+            TextFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -195,17 +201,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
         },
 
         /**
-         * Unsubscribe from click on body event
-         *
-         * @return {*}
-         */
-        remove: function () {
-            $('body').off('click', this._clickOutsideCriteriaCallback);
-            EmptyFilter.prototype.remove.call(this);
-            return this;
-        },
-
-        /**
          * Show criteria popup
          *
          * @protected
@@ -276,7 +271,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
          * @inheritDoc
          */
         _onValueUpdated: function (newValue, oldValue) {
-            EmptyFilter.prototype._onValueUpdated.apply(this, arguments);
+            TextFilter.__super__._onValueUpdated.apply(this, arguments);
             this._updateCriteriaHint();
         },
 
@@ -315,4 +310,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './empty-filter'
             return '"' + value.value + '"';
         }
     });
+
+    return TextFilter;
 });

@@ -1,7 +1,4 @@
 config:
-    map:
-       '*':
-          'orodatagrid/js/datagrid/action/merge-mass-action': 'oroentitymerge/js/datagrid/action/merge-mass-action'
     paths:
-        'oroentitymerge/js/datagrid/action/merge-mass-action': 'bundles/oroentitymerge/js/datagrid/action/merge-mass-action.js'
+        'oro/datagrid/action/merge-mass-action': 'bundles/oroentitymerge/js/datagrid/action/merge-mass-action.js'
         'oroentitymerge/js/merge-view': 'bundles/oroentitymerge/js/merge-view.js'

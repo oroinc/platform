@@ -1,10 +1,12 @@
 oro_system_configuration:
     fields:
-        some_field:
+        test_bundle.some_field:
+            data_type: string
             type: text
             options: []
 
-        some_another_field:
+        test_bundle.some_another_field:
+            data_type: string
             type: choice
 
     groups:
@@ -32,5 +34,5 @@ oro_system_configuration:
                                 children:
                                     fourth_group:
                                         children:
-                                            - some_field
-                                            - some_another_field
+                                            - test_bundle.some_field
+                                            - test_bundle.some_another_field
