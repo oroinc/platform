@@ -365,7 +365,7 @@ oro_entity_config:
                 # public enums can be used in any extendable entity, it means that you can
                 # create a field of this enum type in any entity
                 # private enums cannot be reused
-                public:
+                public: # boolean
                     options: []
 
         field:
@@ -388,7 +388,7 @@ oro_entity_config:
                 # indicates whether an enum is public or not
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page
                 # a value of this attribute is moved to entity.enum.public attribure during schema update
-                enum_public:
+                enum_public: # boolean
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
@@ -407,7 +407,7 @@ oro_entity_config:
                 # the list of enum values
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page
                 # a value of this attribute is moved to a table responsible to store enum values during schema update
-                enum_options:
+                enum_options: # array
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
