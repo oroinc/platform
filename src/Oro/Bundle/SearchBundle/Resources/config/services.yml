@@ -33,7 +33,7 @@ services:
         class:                        %oro_search.fulltext_index_manager.class%
         arguments:
             - @doctrine.dbal.default_connection
-            - %oro_search.engine_orm%
+            - %oro_search.drivers%
 
     oro_search.security_provider:
         class:                        %oro_search.security_provider.class%
