@@ -4,20 +4,20 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Query\Result;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Connector abstract class
  */
-abstract class AbstractEngine
+abstract class AbstractEngine implements EngineInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     protected $em;
 
@@ -34,9 +34,9 @@ abstract class AbstractEngine
     /**
      * Init entity manager
      *
-     * @param \Doctrine\ORM\EntityManager $em
+     * @param EntityManager   $em
      * @param EventDispatcher $dispatcher
-     * @param bool $logQueries
+     * @param boolean         $logQueries
      */
     public function __construct(EntityManager $em, EventDispatcher $dispatcher, $logQueries)
     {
@@ -81,7 +81,7 @@ abstract class AbstractEngine
      *   'records_count' - count of records without limit parameters in query
      * )
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -93,7 +93,7 @@ abstract class AbstractEngine
      * @param Query $query
      * @return Result
      */
-    public function search(Query $query)
+    public function search($query)
     {
         $searchResult = $this->doSearch($query);
         foreach ($searchResult['results'] as $resultRecord) {
@@ -111,7 +111,7 @@ abstract class AbstractEngine
     /**
      * Log query
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Result $result
+     * @param Result $result
      */
     protected function logQuery(Result $result)
     {

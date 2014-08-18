@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
- * Use carefully on large datasets - do not run this task too often.
+ * Use carefully on large data sets - do not run this task too often.
  *
  * @author magedan
  */
@@ -23,23 +23,19 @@ class IndexCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Starting index task');
-        $output->writeln('');
 
-        $doctrine = $this->getContainer()->get('doctrine');
-        $orm      = $this->getContainer()->get('oro_search.search.engine');
-        $em       = $doctrine->getManager();
-        $itemRepo = $em->getRepository('OroSearchBundle:Item');
+        $doctrine       = $this->getContainer()->get('doctrine');
+        $engine         = $this->getContainer()->get('oro_search.search.engine');
+        $entityManager  = $doctrine->getManager();
+        $itemRepository = $entityManager->getRepository('OroSearchBundle:Item');
 
-        $itemRepo->setDriversClasses($this->getContainer()->getParameter('oro_search.engine_orm'));
+        if ($this->getContainer()->hasParameter('oro_search.drivers')) {
+            $itemRepository->setDriversClasses($this->getContainer()->getParameter('oro_search.drivers'));
+        }
 
-        $changed = $itemRepo->findBy(
-            array(
-                'changed' => true
-            )
-        );
+        $changed = $itemRepository->findBy(array('changed' => true));
 
-        // probably, fulltext index should be dropped here for performance reasons
-        // ...
+        // TODO: probably, fulltext index should be dropped here for performance reasons
 
         foreach ($changed as $item) {
             $output->write(sprintf('  Processing "%s" with id #%u', $item->getEntity(), $item->getRecordId()));
@@ -50,19 +46,18 @@ class IndexCommand extends ContainerAwareCommand
 
             if ($entity) {
                 $item->setChanged(false)
-                    ->setTitle($orm->getEntityTitle($entity))
-                    ->saveItemData($orm->getMapper()->mapObject($entity));
+                    ->setTitle($engine->getEntityTitle($entity))
+                    ->saveItemData($engine->getMapper()->mapObject($entity));
             } else {
-                $em->remove($item);
+                $entityManager->remove($item);
             }
         }
 
-        $em->flush();
+        $entityManager->flush();
 
         // recreate fulltext index, if necessary
         // ...
 
-        $output->writeln('');
         $output->writeln(sprintf('Total indexed items: %u', count($changed)));
     }
 }

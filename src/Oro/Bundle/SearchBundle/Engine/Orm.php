@@ -125,7 +125,7 @@ class Orm extends AbstractEngine
             if ($realtime) {
                 $this->em->remove($item);
             } else {
-                $item->setChanged(!$realtime);
+                $item->setChanged(false);
                 $this->reindexJob();
                 $this->em->persist($item);
             }
@@ -196,7 +196,7 @@ class Orm extends AbstractEngine
     }
 
     /**
-     * @return \Oro\Bundle\SearchBundle\Engine\ObjectMapper
+     * @return ObjectMapper
      */
     public function getMapper()
     {
@@ -229,7 +229,7 @@ class Orm extends AbstractEngine
     /**
      * Search query with query builder
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -296,7 +296,7 @@ class Orm extends AbstractEngine
     {
         if (!is_object($this->searchRepo)) {
             $this->searchRepo = $this->em->getRepository('OroSearchBundle:Item');
-            $this->searchRepo->setDriversClasses($this->container->getParameter('oro_search.engine_orm'));
+            $this->searchRepo->setDriversClasses($this->container->getParameter('oro_search.drivers'));
         }
 
         return $this->searchRepo;
@@ -355,7 +355,7 @@ class Orm extends AbstractEngine
     }
 
     /**
-     * @param array $fields
+     * @param array|\Doctrine\Common\Collections\Collection $fields
      */
     protected function computeFields($fields)
     {

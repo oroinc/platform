@@ -92,7 +92,7 @@ class Query
     protected $fields;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var ObjectManager
      */
     private $em;
 
@@ -148,7 +148,7 @@ class Query
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $em
+     * @param ObjectManager $em
      */
     public function setEntityManager(ObjectManager $em)
     {
@@ -160,7 +160,7 @@ class Query
      *
      * @param string $query
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function createQuery($query)
     {
@@ -174,7 +174,7 @@ class Query
      *
      * @param array|string $entities
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function from($entities)
     {
@@ -198,7 +198,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function andWhere($fieldName, $condition, $fieldValue, $fieldType = null)
     {
@@ -213,7 +213,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function orWhere($fieldName, $condition, $fieldValue, $fieldType = null)
     {
@@ -229,8 +229,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
-     * @throws \InvalidArgumentException
+     * @return $this
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
@@ -302,7 +301,7 @@ class Query
      *
      * @param int $maxResults
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function setMaxResults($maxResults)
     {
@@ -326,7 +325,7 @@ class Query
      *
      * @param int $firstResult
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return $this
      */
     public function setFirstResult($firstResult)
     {
@@ -352,7 +351,7 @@ class Query
      * @param string $direction
      * @param string $type
      *
-     * @return Query
+     * @return $this
      */
     public function setOrderBy($fieldName, $direction = "ASC", $type = self::TYPE_TEXT)
     {
@@ -408,6 +407,12 @@ class Query
         );
     }
 
+    /**
+     * @param array  $fields
+     * @param array  $field
+     * @param string $entity
+     * @return array
+     */
     private function mapTargetFields($fields, $field, $entity)
     {
         foreach ($field['target_fields'] as $targetFields) {
@@ -419,6 +424,12 @@ class Query
         return $fields;
     }
 
+    /**
+     * @param array  $fields
+     * @param array  $field
+     * @param string $entity
+     * @return array
+     */
     private function mapRelationFields($fields, $field, $entity)
     {
         foreach ($field['relation_fields'] as $relationField) {

@@ -3,17 +3,6 @@ OroSearchBundle
 
 Search bundle create search index for mapping objects and allow to create advanced queries to this indexed data.
 
-Install project
-----------------------------------
-
-**Update database structure**
-
-MySql, Postgres and other db engines use additional indexes for fulltext search. To create this indexes use console command
-
-```
-php app/console oro:search:create-index
-```
-
 MySql config
 ----------------------------------
 
