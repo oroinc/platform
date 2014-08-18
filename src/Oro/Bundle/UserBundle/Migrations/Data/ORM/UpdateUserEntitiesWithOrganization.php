@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
-class UpdateUserWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
+class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
      * {@inheritdoc}
