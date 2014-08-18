@@ -34,6 +34,9 @@ define([
         this.disposed = true;
         return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
     };
+    Backbone.View.prototype.eventNamespace = function () {
+        return '.delegateEvents' + this.cid;
+    };
 
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function () {
