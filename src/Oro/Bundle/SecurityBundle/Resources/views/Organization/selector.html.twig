@@ -13,7 +13,7 @@
                     {% if oro_theme_logo() %}
                         <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
                     {% else %}
-                        {{ organization_name }} <i class="icon-sort-down fix_icon"></i>
+                        <i class="icon-sort-down fix_icon"></i> {{ organization_name }}
                     {% endif %}
                 </a>
             </h1>
