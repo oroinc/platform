@@ -304,7 +304,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         }
 
         if (Integration::EDIT_MODE_DISALLOW === $integration->getEditMode()) {
-            FormUtils::replaceField($form, 'connectors', ['disabled' => true, 'attr'=>['class'=>'hide']]);
+            FormUtils::replaceField($form, 'connectors', ['disabled' => true, 'attr' => ['class' => 'hide']]);
         }
     }
 }
