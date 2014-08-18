@@ -23,6 +23,7 @@ parameters:
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
+    oro_entity_extend.enum_synchronizer.class:                Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -181,3 +182,9 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
+
+    oro_entity_extend.enum_synchronizer:
+        class: %oro_entity_extend.enum_synchronizer.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine.orm.entity_manager
