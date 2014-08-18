@@ -1,8 +1,16 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/modal', './abstract-listener'
-    ], function ($, _, __, mediator, Modal, AbstractListener) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/modal',
+    './abstract-listener'
+], function ($, _, __, mediator, Modal, AbstractListener) {
     'use strict';
+
+    var ColumnFormListener;
 
     /**
      * Listener for entity edit form and datagrid
@@ -11,7 +19,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
      * @class   orodatagrid.datagrid.listener.ColumnFormListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    var ColumnFormListener = AbstractListener.extend({
+    ColumnFormListener = AbstractListener.extend({
 
         /** @param {Object} */
         selectors: {
@@ -29,18 +37,30 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+            this.confirmModal = {};
 
-            AbstractListener.prototype.initialize.apply(this, arguments);
+            ColumnFormListener.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.confirmModal, function (modal) {
+                modal.dispose();
+            });
+            delete this.confirmModal;
+            ColumnFormListener.__super__.dispose.call(this);
         },
 
         /**
          * Set datagrid instance
          */
         setDatagridAndSubscribe: function () {
-            AbstractListener.prototype.setDatagridAndSubscribe.apply(this, arguments);
-
-            this.$gridContainer.on('preExecute:refresh:' + this.gridName, _.bind(this._onExecuteRefreshAction, this));
-            this.$gridContainer.on('preExecute:reset:' + this.gridName, _.bind(this._onExecuteResetAction, this));
+            ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             this._clearState();
             this._restoreState();
@@ -51,6 +71,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
             mediator.bind("pagestate_restored", function () {
                 this._restoreState();
             }, this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        getGridEvents: function () {
+            var events = ColumnFormListener.__super__.getGridEvents.call(this);
+            events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
+            events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
+            return events;
         },
 
         /**
@@ -167,7 +197,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
          * Confirms refresh action that before it will be executed
          *
          * @param {$.Event} e
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -182,7 +212,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
          * Confirms reset action that before it will be executed
          *
          * @param {$.Event} e
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -196,7 +226,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Asks user a confirmation if there are local changes, if user confirms then clears state and runs action
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} actionOptions
          * @param {String} type "reset" or "refresh"
          * @param {Object} confirmModalOptions Options for confirm dialog
@@ -231,7 +261,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
          * Opens confirm modal dialog
          */
         _openConfirmDialog: function (type, options, callback) {
-            this.confirmModal = this.confirmModal || {};
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
@@ -257,17 +286,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
      * @param {Object} [options.metadata] configuration for the grid
      */
     ColumnFormListener.init = function (deferred, options) {
-        var listener, gridOptions, listenerOptions;
+        var gridOptions, gridInitialization;
         gridOptions = options.metadata.options || {};
+        gridInitialization = options.gridPromise;
 
         if (gridOptions.columnListener) {
-            listenerOptions = _.extend({
-                $gridContainer: options.$el,
-                gridName: options.gridName
-            }, gridOptions.columnListener);
+            gridInitialization.done(function (grid) {
+                var listener, listenerOptions;
+                listenerOptions = _.defaults({
+                    $gridContainer: grid.$el,
+                    gridName: grid.name
+                }, gridOptions.columnListener);
 
-            listener = new ColumnFormListener(listenerOptions);
-            deferred.resolve(listener);
+                listener = new ColumnFormListener(listenerOptions);
+                deferred.resolve(listener);
+            }).fail(function () {
+                deferred.reject();
+            });
         } else {
             deferred.reject();
         }

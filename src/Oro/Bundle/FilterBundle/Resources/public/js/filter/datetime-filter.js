@@ -1,17 +1,24 @@
+/*jslint nomen:true*/
 /*global define*/
-
-define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings', 'jquery-ui-timepicker'],
-function ($, _, DateFilter, localeSettings) {
+define([
+    'jquery',
+    'underscore',
+    './date-filter',
+    'orolocale/js/locale-settings',
+    'jquery-ui-timepicker'
+], function ($, _, DateFilter, localeSettings) {
     'use strict';
+
+    var DatetimeFilter;
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      *
-     * @export  orofilter/js/filter/datetime-filter
-     * @class   orofilter.filter.DatetimeFilter
-     * @extends orofilter.filter.DateFilter
+     * @export  oro/filter/datetime-filter
+     * @class   oro.filter.DatetimeFilter
+     * @extends oro.filter.DateFilter
      */
-    return DateFilter.extend({
+    DatetimeFilter = DateFilter.extend({
         /**
          * CSS class for visual datetime input elements
          *
@@ -51,14 +58,21 @@ function ($, _, DateFilter, localeSettings) {
         _initializeDateWidget: function (widgetSelector, options) {
             // we replace warning log function because of incorrect datetime picker parsing default date
             // (all working correct except the message)
-            $.timepicker.log = function(){};
+            $.timepicker.log = function () {};
             return this.$(widgetSelector).datetimepicker(options);
         },
 
         /**
          * @inheritDoc
          */
-        _formatDisplayValue: function(value) {
+        _destroyDateWidget: function (name) {
+            this.dateWidgets[name].datetimepicker('destroy');
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _formatDisplayValue: function (value) {
             var dateFromFormat = this.dateWidgetOptions.altFormat;
             var dateToFormat = this.dateWidgetOptions.dateFormat;
             var timeFromFormat = this.dateWidgetOptions.altTimeFormat;
@@ -77,7 +91,7 @@ function ($, _, DateFilter, localeSettings) {
         /**
          * @inheritDoc
          */
-        _formatRawValue: function(value) {
+        _formatRawValue: function (value) {
             var dateFromFormat = this.dateWidgetOptions.dateFormat;
             var dateToFormat = this.dateWidgetOptions.altFormat;
             var timeFromFormat = this.dateWidgetOptions.timeFormat;
@@ -104,7 +118,7 @@ function ($, _, DateFilter, localeSettings) {
          * @return {Object}
          * @protected
          */
-        _formatValueDatetimes: function(value, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat) {
+        _formatValueDatetimes: function (value, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat) {
             if (value.value && value.value.start) {
                 value.value.start = this._formatDatetime(
                     value.value.start, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
@@ -133,7 +147,7 @@ function ($, _, DateFilter, localeSettings) {
          * @return {String}
          * @protected
          */
-        _formatDatetime: function(value, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat) {
+        _formatDatetime: function (value, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat) {
             try {
                 var separator = this.dateWidgetOptions.altSeparator;
                 var timeSettings = {
@@ -171,7 +185,7 @@ function ($, _, DateFilter, localeSettings) {
          * @return {String}
          * @protected
          */
-        _formatTime: function(value, fromFormat, toFormat) {
+        _formatTime: function (value, fromFormat, toFormat) {
             var fromValue = $.datepicker.parseTime(fromFormat, value);
             if (!fromValue) {
                 fromValue = $.datepicker.parseTime(toFormat, value);
@@ -182,4 +196,6 @@ function ($, _, DateFilter, localeSettings) {
             return $.datepicker.formatTime(toFormat, fromValue);
         }
     });
+
+    return DatetimeFilter;
 });

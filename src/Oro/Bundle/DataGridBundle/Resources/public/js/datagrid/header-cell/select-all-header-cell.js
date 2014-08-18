@@ -1,9 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backgrid', 'backbone'
-    ], function (_, Backgrid, Backbone) {
+define([
+    'underscore',
+    'backgrid',
+    'backbone'
+], function (_, Backgrid, Backbone) {
     "use strict";
 
-    var $ = Backbone.$;
+    var $, SelectAllHeaderCell;
+    $ = Backbone.$;
 
     /**
      * Contains mass-selection logic
@@ -17,7 +22,7 @@ define(['underscore', 'backgrid', 'backbone'
      * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    SelectAllHeaderCell = Backbone.View.extend({
         /** @property */
         className: "select-all-header-cell",
 
@@ -25,10 +30,7 @@ define(['underscore', 'backgrid', 'backbone'
         tagName: "th",
 
         events: {
-            'click [data-select]': 'onSelect',
-            'click [data-select-all]': 'onSelectAll',
-            'click [data-select-none]': 'onSelectNone',
-            'click [data-select-all-visible]': 'onSelectViable'
+            'click': 'onClick'
         },
 
         template: '#template-select-all-header-cell',
@@ -57,19 +59,21 @@ define(['underscore', 'backgrid', 'backbone'
                 'backgrid:selectAll': this.selectAll,
                 'backgrid:selectAllVisible': this.selectAllVisible,
                 'backgrid:selectNone': this.selectNone,
-
-                'backgrid:isSelected': _.bind(function (model, obj) {
-                    if ($.isPlainObject(obj)) {
-                        obj.selected = this.isSelectedModel(model);
-                    }
-                }, this),
-                'backgrid:getSelected': _.bind(function (obj) {
-                    if ($.isEmptyObject(obj)) {
-                        obj.selected = _.keys(this.selectedModels);
-                        obj.inset = this.inset;
-                    }
-                }, this)
+                'backgrid:isSelected': this.isSelected,
+                'backgrid:getSelected': this.getSelected
             });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.selectedModels;
+            delete this.column;
+            SelectAllHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
         /**
@@ -88,7 +92,7 @@ define(['underscore', 'backgrid', 'backbone'
          * Updates state of selection (three states a checkbox: checked, unchecked, or indeterminate)
          */
         updateState: function () {
-            var $checkbox = this.$('[type=checkbox]');
+            var $checkbox = this.$(':checkbox');
             if (_.isEmpty(this.selectedModels)) {
                 $checkbox.prop('indeterminate', false);
                 $checkbox.prop('checked', !this.inset);
@@ -203,50 +207,69 @@ define(['underscore', 'backgrid', 'backbone'
             return this;
         },
 
-        /**
-         * Handles click on checkbox selectAll/selectNone
-         *
-         * @param {jQuery.Event} e
-         */
-        onSelect: function (e) {
-            if (this.inset && _.isEmpty(this.selectedModels) === this.inset) {
-                this.collection.trigger('backgrid:selectAll');
-            } else {
-                this.collection.trigger('backgrid:selectNone');
+        onClick: function (e) {
+            var $el = $(e.target);
+
+            if ($el.is('[data-select]')) {
+                // Handles click on checkbox selectAll/selectNone
+                if (this.inset && _.isEmpty(this.selectedModels) === this.inset) {
+                    this.selectAll();
+                } else {
+                    this.selectNone();
+                }
+                if ($el.is(':checkbox')) {
+                    e.stopPropagation();
+                }
+
+            } else if ($el.is('[data-select-all]')) {
+                // Handles click on selectAll button
+                this.selectAll();
+                e.preventDefault();
+
+            } else if ($el.is('[data-select-all-visible]')) {
+                // Handles click on selectAllVisible button
+                this.selectAllVisible();
+                e.preventDefault();
+
+            } else if ($el.is('[data-select-none]')) {
+                // Handles click on selectNone button
+                this.selectNone();
+                e.preventDefault();
             }
-            if ($(e.target).is(':checkbox')) {
-                e.stopPropagation();
+        },
+
+        /**
+         * Checks if model is selected
+         *  - updates passed obj {selected: true} or {selected: false}
+         *
+         * @param {Backbone.Model} model
+         * @param {Object} obj
+         */
+        isSelected: function (model, obj) {
+            if ($.isPlainObject(obj)) {
+                obj.selected = this.isSelectedModel(model);
             }
         },
 
         /**
-         * Handles click on selectAll button
+         * Collects selected models
+         *  - updates passed obj
+         *  {
+         *      inset: true,// or false
+         *      selected: [
+         *          // array of models' ids
+         *      ]
+         *  }
          *
-         * @param {jQuery.Event} e
+         * @param {Object} obj
          */
-        onSelectAll: function (e) {
-            this.collection.trigger('backgrid:selectAll');
-            e.preventDefault();
-        },
-
-        /**
-         * Handles click on selectAllVisible button
-         *
-         * @param {jQuery.Event}e
-         */
-        onSelectViable: function (e) {
-            this.collection.trigger('backgrid:selectAllVisible');
-            e.preventDefault();
-        },
-
-        /**
-         * Handles click on selectNone button
-         *
-         * @param {jQuery.Event}e
-         */
-        onSelectNone: function (e) {
-            this.collection.trigger('backgrid:selectNone');
-            e.preventDefault();
+        getSelected: function (obj) {
+            if ($.isEmptyObject(obj)) {
+                obj.selected = _.keys(this.selectedModels);
+                obj.inset = this.inset;
+            }
         }
     });
+
+    return SelectAllHeaderCell;
 });

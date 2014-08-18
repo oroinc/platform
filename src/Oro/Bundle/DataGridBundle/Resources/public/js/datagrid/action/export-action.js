@@ -1,22 +1,25 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', './abstract-action'
-    ], function ($, _, AbstractAction) {
+define([
+    'jquery',
+    'underscore',
+    './abstract-action'
+], function ($, _, AbstractAction) {
     'use strict';
+
+    var ExportAction;
 
     /**
      * Allows to export grid data
      *
-     * @export  orodatagrid/js/datagrid/action/export-action
-     * @class   orodatagrid.datagrid.action.ExportAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/export-action
+     * @class   oro.datagrid.action.ExportAction
+     * @extends oro.datagrid.action.AbstractAction
      */
-    return AbstractAction.extend({
+    ExportAction = AbstractAction.extend({
 
         /** @property oro.PageableCollection */
         collection: undefined,
-
-        /** @property {orodatagrid.datagrid.ActionLauncher} */
-        launcher: null,
 
         /**
          * {@inheritdoc}
@@ -31,24 +34,26 @@ define(['jquery', 'underscore', './abstract-action'
             };
             this.collection = options.datagrid.collection;
 
-            AbstractAction.prototype.initialize.apply(this, arguments);
+            ExportAction.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * {@inheritdoc}
          */
         createLauncher: function (options) {
-            this.launcher = AbstractAction.prototype.createLauncher.apply(this, arguments);
+            var launcher = ExportAction.__super__.createLauncher.apply(this, arguments);
             // update 'href' attribute for each export type
-            this.listenTo(this.launcher, 'expand', _.bind(function (launcher) {
+            this.listenTo(launcher, 'expand', function (launcher) {
                 var fetchData = this.collection.getFetchData();
                 _.each(launcher.$el.find('.dropdown-menu a'), function (el) {
                     var $el = $(el);
                     $el.attr('href', this.getLink(_.extend({format: $el.data('key')}, fetchData)));
                 }, this);
-            }, this));
+            });
 
-            return this.launcher;
+            return launcher;
         }
     });
+
+    return ExportAction;
 });

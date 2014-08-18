@@ -1,16 +1,22 @@
+/*jslint nomen:true, browser:true*/
 /*global define*/
-define(['underscore', './abstract-action'
-    ], function (_, AbstractAction) {
+define([
+    'underscore',
+    './abstract-action'
+], function (_, AbstractAction) {
     'use strict';
+
+    var ModelAction, location;
+    location = window.location;
 
     /**
      * Basic model action class.
      *
-     * @export  orodatagrid/js/datagrid/action/model-action
-     * @class   orodatagrid.datagrid.action.ModelAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/model-action
+     * @class   oro.datagrid.action.ModelAction
+     * @extends oro.datagrid.action.AbstractAction
      */
-    return AbstractAction.extend({
+    ModelAction = AbstractAction.extend({
         /** @property {Backbone.Model} */
         model: null,
 
@@ -46,7 +52,7 @@ define(['underscore', './abstract-action'
                 this.backUrlParameter = opts.backUrlParameter;
             }
 
-            AbstractAction.prototype.initialize.apply(this, arguments);
+            ModelAction.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -68,7 +74,7 @@ define(['underscore', './abstract-action'
             }
 
             if (this.backUrl) {
-                backUrl = _.isBoolean(this.backUrl) ? window.location.href : this.backUrl;
+                backUrl = _.isBoolean(this.backUrl) ? location.href : this.backUrl;
                 backUrl = encodeURIComponent(backUrl);
                 result = this.addUrlParameter(result, this.backUrlParameter, backUrl);
             }
@@ -79,49 +85,51 @@ define(['underscore', './abstract-action'
         /**
          * Add parameter to URL
          *
-         * @param {String} url
-         * @param {String} parameterName
-         * @param {String} parameterValue
-         * @return {String}
+         * @param {string} url
+         * @param {string} parameterName
+         * @param {string} parameterValue
+         * @return {string}
          * @protected
          */
         addUrlParameter: function (url, parameterName, parameterValue) {
-            var urlHash, sourceUrl, replaceDuplicates = true;
+            var urlHash, sourceUrl, cl, urlParts, newQueryString, parameters, parameterParts, i,
+                replaceDuplicates = true;
             if (url.indexOf('#') > 0) {
-                var cl = url.indexOf('#');
+                cl = url.indexOf('#');
                 urlHash = url.substring(url.indexOf('#'), url.length);
             } else {
                 urlHash = '';
                 cl = url.length;
             }
-            sourceUrl = url.substring(0,cl);
+            sourceUrl = url.substring(0, cl);
 
-            var urlParts = sourceUrl.split("?");
-            var newQueryString = "";
+            urlParts = sourceUrl.split("?");
+            newQueryString = "";
 
             if (urlParts.length > 1) {
-                var parameters = urlParts[1].split("&");
-                for (var i=0; (i < parameters.length); i++)
-                {
-                    var parameterParts = parameters[i].split("=");
-                    if (!(replaceDuplicates && parameterParts[0] == parameterName))
-                    {
-                        if (newQueryString == "")
+                parameters = urlParts[1].split("&");
+                for (i = 0; (i < parameters.length); i += 1) {
+                    parameterParts = parameters[i].split("=");
+                    if (!(replaceDuplicates && parameterParts[0] === parameterName)) {
+                        if (newQueryString === "") {
                             newQueryString = "?";
-                        else
+                        } else {
                             newQueryString += "&";
-                        newQueryString += parameterParts[0] + "=" + (parameterParts[1] ? parameterParts[1] : '');
+                        }
+                        newQueryString += parameterParts[0] + "=" + (parameterParts[1] || '');
                     }
                 }
             }
-            if (newQueryString == "") {
+            if (newQueryString === "") {
                 newQueryString = "?";
             }
-            if (newQueryString !== "" && newQueryString != '?') {
+            if (newQueryString !== "" && newQueryString !== '?') {
                 newQueryString += "&";
             }
-            newQueryString += parameterName + "=" + (parameterValue ? parameterValue : '');
+            newQueryString += parameterName + "=" + (parameterValue || '');
             return urlParts[0] + newQueryString + urlHash;
         }
     });
+
+    return ModelAction;
 });

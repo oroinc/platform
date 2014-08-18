@@ -38,7 +38,7 @@ class PdoPgsql extends BaseDriver
      */
     public static function getPlainSql()
     {
-        return "CREATE INDEX string_fts ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
+        return "CREATE INDEX value ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
     }
 
     /**

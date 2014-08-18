@@ -13,7 +13,7 @@ define([
             return;
         }
 
-        _ref = this.subviews || [];
+        _ref = _.toArray(this.subviews);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             subview = _ref[_i];
             subview.dispose();
@@ -33,6 +33,9 @@ define([
         }
         this.disposed = true;
         return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+    };
+    Backbone.View.prototype.eventNamespace = function () {
+        return '.delegateEvents' + this.cid;
     };
 
     Backbone.Model.prototype.disposed = false;

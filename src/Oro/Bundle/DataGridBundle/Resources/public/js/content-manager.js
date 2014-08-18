@@ -66,7 +66,7 @@ define([
         gridName = collection.inputName;
         key = gridNameKey(gridName);
         hash = stateHash(collection);
-        mediator.execute('pageCache:state:save', key, collection, hash);
+        mediator.execute('pageCache:state:save', key, collection.clone(), hash);
     }
 
     contentManager = {

@@ -56,8 +56,9 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
             $plainDataWithFrontendHeader
         );
         $complexDataWithBackendHeader = parent::convertToImportFormat($plainDataWithBackendHeader, $skipNullValues);
+        $filteredComplexDataWithBackendHeader = $this->filterEmptyArrays($complexDataWithBackendHeader);
 
-        return $complexDataWithBackendHeader;
+        return $filteredComplexDataWithBackendHeader;
     }
 
     /**
@@ -241,6 +242,32 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         }
 
         return $resultData;
+    }
+
+    /**
+     * Remove all empty arrays and arrays with only null values
+     *
+     * @param array $data
+     * @return array|null
+     */
+    protected function filterEmptyArrays(array $data)
+    {
+        $hasValue = false;
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->filterEmptyArrays($value);
+                $data[$key] = $value;
+            }
+
+            if (array() === $value) {
+                unset($data[$key]);
+            } elseif (null !== $value) {
+                $hasValue = true;
+            }
+        }
+
+        return $hasValue ? $data : array();
     }
 
     /**

@@ -1,9 +1,14 @@
 /*jshint browser:true*/
 /*jslint nomen: true*/
 /*global define, require*/
-define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
-        './map-filter-module-name', './collection-filters-manager'
-    ], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/tools',
+    'oroui/js/mediator',
+    './map-filter-module-name',
+    './collection-filters-manager'
+], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var methods = {
@@ -12,7 +17,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
          */
         initBuilder: function () {
             var modules;
-            this.metadata = _.extend({filters: {}}, this.metadata);
+            _.defaults(this.metadata, {filters: {}});
             modules = methods.collectModules.call(this);
             tools.loadModules(modules, function (modules) {
                 this.modules = modules;

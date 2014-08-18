@@ -1,4 +1,14 @@
-oro_config_bundle:
+oro_config:
     resource:     "@OroConfigBundle/Controller"
     type:         annotation
     prefix:       /config
+
+oro_config_api:
+    resource: "@OroConfigBundle/Resources/config/oro/routing_api.yml"
+    type: rest
+    prefix: api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format: json
+    defaults:
+        version:  latest

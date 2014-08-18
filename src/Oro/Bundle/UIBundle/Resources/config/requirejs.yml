@@ -42,26 +42,29 @@ config:
                 - 'jquery'
     map:
         '*':
-            'jquery': 'oroui/js/jquery-extend'
-            'jquery.select2': 'oroui/js/select2-extend'
+            'jquery': 'oroui/js/extend/jquery'
+            'jquery.select2': 'oroui/js/extend/select2'
+            'chaplin': 'oroui/js/extend/chaplin'
+            'backbone': 'oroui/js/extend/backbone'
+            'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery-ui-timepicker': 'oroui/js/jquery-ui-timepicker-l10n'
-            'chaplin': 'oroui/js/chaplin-extend'
-            'backbone': 'oroui/js/backbone-extend'
-        'oroui/js/jquery-extend':
+        'oroui/js/extend/jquery':
             'jquery': 'jquery'
-        'oroui/js/select2-extend':
+        'oroui/js/extend/select2':
             'jquery.select2': 'jquery.select2'
-        'oroui/js/jquery-ui-extend':
+        'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
+        'oroui/js/extend/chaplin':
+            'chaplin': 'chaplin'
+        'oroui/js/extend/backbone':
+            'backbone': 'backbone'
+        'oroui/js/extend/bootstrap':
+            'bootstrap': 'bootstrap'
         'oroui/js/jquery-ui-datepicker-l10n':
-            'jquery-ui': 'oroui/js/jquery-ui-extend'
+            'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-ui-timepicker-l10n':
             'jquery-ui-timepicker': 'jquery-ui-timepicker'
-        'oroui/js/chaplin-extend':
-            'chaplin': 'chaplin'
-        'oroui/js/backbone-extend':
-            'backbone': 'backbone'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
@@ -85,7 +88,7 @@ config:
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
-        'oroui/js/chaplin-extend': 'bundles/oroui/js/chaplin-extend.js'
+        'oroui/js/app/modules/layout': 'bundles/oroui/js/app/modules/layout.js'
         'oroui/js/app/modules/views': 'bundles/oroui/js/app/modules/views.js'
         'oroui/js/app/modules/messenger': 'bundles/oroui/js/app/modules/messenger.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
@@ -102,7 +105,6 @@ config:
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/init-layout': 'bundles/oroui/js/init-layout.js'
-        'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
         'oroui/js/jquery-ui-datepicker-l10n': 'bundles/oroui/js/jquery-ui-datepicker-l10n.js'
         'oroui/js/jquery-ui-timepicker-l10n': 'bundles/oroui/js/jquery-ui-timepicker-l10n.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
