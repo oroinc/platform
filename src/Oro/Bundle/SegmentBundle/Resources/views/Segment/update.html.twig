@@ -95,32 +95,33 @@
         }]
     %}
 
+    {% set type = 'oro_segment' %}
     {% set dataBlocks = dataBlocks|merge( [{
         'title' : 'oro.segment.form.designer'|trans,
-        'content_attr': {'id': 'segment-designer'},
+        'content_attr': {'id': type ~ '-designer'},
         'subblocks': [
             {
                 'title': 'oro.segment.form.columns'|trans,
-                'spanClass': 'segment-columns responsive-cell',
+                'spanClass': type ~ '-columns responsive-cell',
                 'data': [
                     QD.query_designer_column_form(
                         form.column,
-                        {'id': 'segment-column-form'},
+                        {'id': type ~ '-column-form'},
                         {'entity_choice_id': 'oro_segment_form_entity'},
                         ['column', 'label', 'sorting', 'action']
                     ),
                     QD.query_designer_column_list(
-                        {'id': 'segment-column-list', 'rowId': 'segment-column-row'},
+                        {'id': type ~ '-column-list', 'rowId': type ~ '-column-row'},
                         ['column', 'label', 'sorting', 'action']
                     ),
                 ]
             },
             {
                 'title': 'oro.segment.form.filters'|trans,
-                'spanClass': 'segment-filters responsive-cell',
+                'spanClass': type ~ '-filters responsive-cell',
                 'data': [
                     segmentQD.query_designer_condition_builder({
-                        'id': 'segment-condition-builder',
+                        'id': type ~ '-condition-builder',
                         'criteria_list_id': 'filter-criteria-list',
                         'entity_choice_id': 'oro_segment_form_entity',
                         'currentSegmentId': entity.id|default(null),
@@ -140,6 +141,6 @@
     {{ UI.scrollData(id, data, form) }}
 
     {{ QD.query_designer_column_chain_template('column-chain-template') }}
-    {{ segmentQD.initJsWidgets('segment', form, entities, metadata) }}
+    {{ segmentQD.initJsWidgets(type, form, entities, metadata) }}
 
 {% endblock content_data %}

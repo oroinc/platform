@@ -122,13 +122,13 @@
     {{ _self.query_designer_segment_template('segment-template') }}
     {% set entityFieldsRouteParams = {} %}
     {% set segmentOptions = {
-        valueSource: '#oro_' ~ type ~ '_form_definition',
+        valueSource: '#' ~ type ~ '_form_definition',
         fieldsLoader: {
-            entityChoice: '#oro_' ~ type ~ '_form_entity',
+            entityChoice: '#' ~ type ~ '_form_entity',
             loadingMaskParent: '#' ~ type ~ '-designer',
             routingParams: entityFieldsRouteParams,
             fieldsData: [],
-            confirmMessage: 'oro.' ~ type ~ '.change_entity_confirmation',
+            confirmMessage: type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         filters: {
             criteriaList: '#filter-criteria-list',
@@ -136,7 +136,7 @@
         },
         column: {
             editor: {
-                namePattern: '^oro_' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$'
+                namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$'
             },
             form: '#' ~ type ~ '-column-form',
             itemContainer: '#' ~ type ~ '-column-list .item-container',
@@ -155,24 +155,23 @@
         )}) %}
         {% set segmentOptions = segmentOptions|merge({'fieldsLoader': fieldsLoaderOptions}) %}
     {% endif %}
-    {% if type == 'report' %}
+    {% if type == 'oro_report' %}
         {% set segmentOptions = segmentOptions|merge({'grouping': {
             editor: {
                 mapping: {
                     name: 'oro_report_form[grouping][columnNames]'
                 }
             },
-            form: '#report-grouping-form',
-            itemContainer: '#report-grouping-list .grouping-item-container',
-            itemTemplate: '#report-grouping-item-row'
+            form: '#' ~ type ~ '-grouping-form',
+            itemContainer: '#' ~ type ~ '-grouping-list .grouping-item-container',
+            itemTemplate: '#' ~ type ~ '-grouping-item-row'
         } }) %}
     {% endif %}
-    {% if type == 'segment' %}
+    {% if type == 'oro_segment' %}
         {% set segmentOptions = segmentOptions|merge({'gridFieldChoiceOptions': {
             exclude: ['children']
         } }) %}
     {% endif %}
-
 
     <div data-page-component-module="orosegment/js/app/components/segment"
          data-page-component-options="{{ segmentOptions|json_encode }}"></div>
