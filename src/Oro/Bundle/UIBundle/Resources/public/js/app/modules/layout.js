@@ -12,8 +12,9 @@ require([
         'oroui/js/layout'
     ], function (layout) {
         mediator.setHandler('layout:init', layout.init, layout);
+        mediator.setHandler('layout:dispose', layout.unstyleForm, layout);
         mediator.on('page:beforeChange', layout.pageRendering, layout);
-        mediator.on("page:afterChange", layout.pageRendered, layout);
+        mediator.on('page:afterChange', layout.pageRendered, layout);
     });
 });
 

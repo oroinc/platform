@@ -7,7 +7,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - e
+                    - partial e.{id, entityName}
                     - event.name as eventName
                     - event.id as eventId
                     - recipientList.owner as ownerRecipient

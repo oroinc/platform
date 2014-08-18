@@ -42,29 +42,29 @@ config:
                 - 'jquery'
     map:
         '*':
-            'jquery': 'oroui/js/jquery-extend'
-            'jquery.select2': 'oroui/js/select2-extend'
+            'jquery': 'oroui/js/extend/jquery'
+            'jquery.select2': 'oroui/js/extend/select2'
+            'chaplin': 'oroui/js/extend/chaplin'
+            'backbone': 'oroui/js/extend/backbone'
+            'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery-ui-timepicker': 'oroui/js/jquery-ui-timepicker-l10n'
-            'chaplin': 'oroui/js/chaplin-extend'
-            'backbone': 'oroui/js/backbone-extend'
-            'bootstrap': 'oroui/js/bootstrap-extend'
-        'oroui/js/jquery-extend':
+        'oroui/js/extend/jquery':
             'jquery': 'jquery'
-        'oroui/js/select2-extend':
+        'oroui/js/extend/select2':
             'jquery.select2': 'jquery.select2'
-        'oroui/js/jquery-ui-extend':
+        'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
+        'oroui/js/extend/chaplin':
+            'chaplin': 'chaplin'
+        'oroui/js/extend/backbone':
+            'backbone': 'backbone'
+        'oroui/js/extend/bootstrap':
+            'bootstrap': 'bootstrap'
         'oroui/js/jquery-ui-datepicker-l10n':
-            'jquery-ui': 'oroui/js/jquery-ui-extend'
+            'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-ui-timepicker-l10n':
             'jquery-ui-timepicker': 'jquery-ui-timepicker'
-        'oroui/js/chaplin-extend':
-            'chaplin': 'chaplin'
-        'oroui/js/backbone-extend':
-            'backbone': 'backbone'
-        'oroui/js/bootstrap-extend':
-            'bootstrap': 'bootstrap'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'

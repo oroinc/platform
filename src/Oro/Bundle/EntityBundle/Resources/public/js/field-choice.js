@@ -40,7 +40,7 @@ define(function (require) {
                 self = this;
 
             this._processSelect2Options();
-            this._updateData(this.options.entity, this.options.data);
+            this.updateData(this.options.entity, this.options.data);
 
             select2Options = $.extend({
                 initSelection: function (element, callback) {
@@ -120,19 +120,20 @@ define(function (require) {
         },
 
         _bindFieldsLoader: function () {
-            var self = this, $fieldsLoader;
             if (!this.options.fieldsLoaderSelector) {
                 return;
             }
-            $fieldsLoader = $(this.options.fieldsLoaderSelector);
-            $fieldsLoader.on('fieldsloaderupdate', function (e, data) {
-                self.setValue('');
-                self._updateData($(e.target).val(), data);
+            this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
+            this._on(this.$fieldsLoader, {
+                fieldsloaderupdate: function (e, data) {
+                    this.setValue('');
+                    this.updateData($(e.target).val(), data);
+                }
             });
-            this._updateData($fieldsLoader.val(), $fieldsLoader.data('fields'));
+            this.updateData(this.$fieldsLoader.val(), this.$fieldsLoader.data('fields'));
         },
 
-        _updateData: function (entity, data) {
+        updateData: function (entity, data) {
             data = data || {};
             this.options.entity = entity;
             this.options.data = data;
