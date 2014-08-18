@@ -60,6 +60,13 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
                 if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
                     continue;
                 }
+                // @todo: we need to find a way to use this extension to process OWNER_SYSTEM relations as well
+                // currently we have several problems here:
+                // - collision with associations
+                // - no support unidirectional relations
+                if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                    continue;
+                }
 
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
