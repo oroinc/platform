@@ -80,6 +80,78 @@ class Continent implements Translatable
      */
     protected $locale;
 
+    /**
+     * @param string $code ISO2 Continent code
+     */
+    public function __construct($code)
+    {
+        $this->code = $code;
+        $this->countries = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
+    /**
+     * Get code
+     *
+     * @return string 
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-} 
+    /**
+     * Set name
+     *
+     * @param string $name
+     * @return Continent
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string 
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Add countries
+     *
+     * @param \Oro\Bundle\AddressBundle\Entity\Country $countries
+     * @return Continent
+     */
+    public function addCountry(\Oro\Bundle\AddressBundle\Entity\Country $countries)
+    {
+        $this->countries[] = $countries;
+
+        return $this;
+    }
+
+    /**
+     * Remove countries
+     *
+     * @param \Oro\Bundle\AddressBundle\Entity\Country $countries
+     */
+    public function removeCountry(\Oro\Bundle\AddressBundle\Entity\Country $countries)
+    {
+        $this->countries->removeElement($countries);
+    }
+
+    /**
+     * Get countries
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCountries()
+    {
+        return $this->countries;
+    }
+}

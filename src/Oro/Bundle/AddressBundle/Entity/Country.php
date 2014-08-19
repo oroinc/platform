@@ -91,6 +91,7 @@ class Country implements Translatable
      * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
      * @ORM\JoinColumn(name="continent_code", referencedColumnName="code")
      */
+    protected $continent;
 
     /**
      * @Gedmo\Locale
@@ -249,5 +250,28 @@ class Country implements Translatable
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * Set continent
+     *
+     * @param \Oro\Bundle\AddressBundle\Entity\Continent $continent
+     * @return Country
+     */
+    public function setContinent(\Oro\Bundle\AddressBundle\Entity\Continent $continent = null)
+    {
+        $this->continent = $continent;
+
+        return $this;
+    }
+
+    /**
+     * Get continent
+     *
+     * @return \Oro\Bundle\AddressBundle\Entity\Continent 
+     */
+    public function getContinent()
+    {
+        return $this->continent;
     }
 }
