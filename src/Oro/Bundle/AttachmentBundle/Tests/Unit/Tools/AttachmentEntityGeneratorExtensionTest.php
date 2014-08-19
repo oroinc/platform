@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\AttachmentBundle\Tools\AttachmentsGeneratorExtension;
+use Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class AttachmentsGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class AttachmentEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AttachmentsGeneratorExtension */
+    /** @var AttachmentEntityGeneratorExtension */
     protected $extension;
 
     public function setUp()
     {
-        $this->extension = new AttachmentsGeneratorExtension();
+        $this->extension = new AttachmentEntityGeneratorExtension();
     }
 
     /**

@@ -169,7 +169,7 @@ class ConfigFieldGridController extends Controller
         $extendFieldConfig = $extendProvider->getConfig($entity->getClassName(), $fieldName);
         $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
-        $extendFieldConfig->set('extend', true);
+        $extendFieldConfig->set('is_extend', true);
 
         foreach ($relationValues as $key => $value) {
             $extendFieldConfig->set($key, $value);

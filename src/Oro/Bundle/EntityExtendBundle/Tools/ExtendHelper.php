@@ -58,27 +58,61 @@ class ExtendHelper
     /**
      * @param string $entityClassName
      * @param string $fieldName
-     * @param string $fieldType
+     * @param string $relationType
      * @param string $targetEntityClassName
      *
      * @return string
      */
-    public static function buildRelationKey($entityClassName, $fieldName, $fieldType, $targetEntityClassName)
+    public static function buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClassName)
     {
-        return implode('|', [$fieldType, $entityClassName, $targetEntityClassName, $fieldName]);
+        return implode('|', [$relationType, $entityClassName, $targetEntityClassName, $fieldName]);
     }
 
     /**
-     * Returns a string that can be used as a class name for the entity
-     * represents values of the given enum.
+     * Returns an enum identifier based on the given enum name.
+     *
+     * @param string $enumName
+     *
+     * @return string
+     */
+    public static function buildEnumCode($enumName)
+    {
+        if (function_exists('iconv')) {
+            $enumName = iconv('utf-8', 'ascii//TRANSLIT', $enumName);
+        }
+
+        return strtolower(
+            preg_replace(
+                ['/ +/', '/-+/', '/_{2,}/', '/[^a-z0-9_]+/i'],
+                ['', '_', '_', ''],
+                $enumName
+            )
+        );
+    }
+
+    /**
+     * Returns full class name for an entity is used to store values of the given enum.
      *
      * @param string $enumCode
      *
      * @return string
      */
-    public static function buildEnumValueShortClassName($enumCode)
+    public static function buildEnumValueClassName($enumCode)
     {
-        return 'EnumValue' . Inflector::classify($enumCode);
+        return ExtendConfigDumper::ENTITY . 'EnumValue' . Inflector::classify($enumCode);
+    }
+
+    /**
+     * Returns the name of a field that is used to store selected options for multiple enums
+     * This field is required to avoid group by clause when multiple enum is shown in a datagrid
+     *
+     * @param string $fieldName The field name that is a reference to enum values table
+     *
+     * @return string
+     */
+    public static function getMultipleEnumSnapshotFieldName($fieldName)
+    {
+        return $fieldName . 'Snapshot';
     }
 
     /**

@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tools;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 
-class AttachmentsGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
+class AttachmentEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
     /**
      * {@inheritdoc}

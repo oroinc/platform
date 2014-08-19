@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendHelperTest extends \PHPUnit_Framework_TestCase
@@ -62,6 +63,81 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             'manyToOne|Test\Entity|Test\TargetEntity|testField',
             ExtendHelper::buildRelationKey('Test\Entity', 'testField', 'manyToOne', 'Test\TargetEntity')
         );
+    }
+
+    /**
+     * @dataProvider buildEnumCodeProvider
+     */
+    public function testBuildEnumCode($enumName, $expectedEnumCode)
+    {
+        $this->assertEquals(
+            $expectedEnumCode,
+            ExtendHelper::buildEnumCode($enumName)
+        );
+    }
+
+    public static function buildEnumCodeProvider()
+    {
+        return [
+            ['test', 'test'],
+            ['Test', 'test'],
+            ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
+            ['test123', 'test123'],
+            ['test 123', 'test123'],
+            ['test_123', 'test_123'],
+            ['test___123', 'test_123'],
+            ['test-123', 'test_123'],
+            ['test---123', 'test_123'],
+            ['test---___123', 'test_123'],
+            ['test- - - _ _ _ 123', 'test_123'],
+            ['test \/()[]~!@#$%^&*_+`', 'test_'],
+        ];
+    }
+
+    /**
+     * @dataProvider buildEnumValueClassNameProvider
+     */
+    public function testBuildEnumValueClassName($enumCode, $expectedClassName)
+    {
+        $this->assertEquals(
+            $expectedClassName,
+            ExtendHelper::buildEnumValueClassName($enumCode)
+        );
+    }
+
+    public static function buildEnumValueClassNameProvider()
+    {
+        return [
+            ['test', ExtendConfigDumper::ENTITY . 'EnumValue' . 'Test'],
+            ['test_123', ExtendConfigDumper::ENTITY . 'EnumValue' . 'Test123'],
+        ];
+    }
+
+    public function testGetMultipleEnumSnapshotFieldName()
+    {
+        $this->assertEquals(
+            'testFieldSnapshot',
+            ExtendHelper::getMultipleEnumSnapshotFieldName('testField')
+        );
+    }
+
+    /**
+     * @dataProvider getEnumTranslationKeyProvider
+     */
+    public function testGetEnumTranslationKey($propertyName, $enumCode, $fieldName, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ExtendHelper::getEnumTranslationKey($propertyName, $enumCode, $fieldName)
+        );
+    }
+
+    public static function getEnumTranslationKeyProvider()
+    {
+        return [
+            ['label', 'test_enum', null, 'oro.entityextend.enums.test_enum.entity_label'],
+            ['label', 'test_enum', 'testField', 'oro.entityextend.enumvalue.testField.label'],
+        ];
     }
 
     /**

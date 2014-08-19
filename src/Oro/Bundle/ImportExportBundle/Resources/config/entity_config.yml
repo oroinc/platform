@@ -85,5 +85,5 @@ oro_entity_config:
                 # is relation field should be processed as scalar value when exporting data
                 process_as_scalar:
                     options:
-                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, file, image]
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                         default_value:      false

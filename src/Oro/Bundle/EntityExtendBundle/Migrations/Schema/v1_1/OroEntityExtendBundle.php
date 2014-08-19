@@ -3,17 +3,38 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEntityExtendBundle implements Migration
+class OroEntityExtendBundle implements Migration, ContainerAwareInterface
 {
+    /** @var ContainerInterface */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
         self::oroEnumValueTransTable($schema);
+
+        $queries->addQuery(
+            new AdjustRelationKeyAndIsExtendForFieldQuery(
+                $this->container->get('oro_entity_extend.extend.field_type_helper')
+            )
+        );
     }
 
     /**

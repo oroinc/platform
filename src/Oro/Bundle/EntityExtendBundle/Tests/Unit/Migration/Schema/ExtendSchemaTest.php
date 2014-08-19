@@ -7,8 +7,12 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -41,9 +45,11 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $fieldTypeHelper = $this->getMock('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper');
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper, $fieldTypeHelper);
+        $this->extendOptionsParser  = new ExtendOptionsParser(
+            $this->entityMetadataHelper,
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+        );
         $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 
@@ -100,8 +106,8 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             'configurable_column1',
             'string',
             [
-                'length'      => 100,
-                'oro_options' => [
+                'length'        => 100,
+                OroOptions::KEY => [
                     'datagrid' => ['is_visible' => false, 'other' => 'val'],
                 ]
             ]
@@ -110,9 +116,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             'extend_column1',
             'string',
             [
-                'length'      => 100,
-                'oro_options' => [
-                    'extend'   => ['is_extend' => true, 'owner' => 'Custom'],
+                'length'        => 100,
+                OroOptions::KEY => [
+                    'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
                     'datagrid' => ['is_visible' => false],
                 ]
             ]
@@ -121,7 +127,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             'ref_column1',
             'integer',
             [
-                'oro_options' => [
+                OroOptions::KEY => [
                     ExtendOptionsManager::TYPE_OPTION => 'ref-one'
                 ]
             ]
@@ -136,14 +142,14 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $table1->addOption('comment', 'test');
 
         $table1->addOption(
-            'oro_options',
+            OroOptions::KEY,
             [
                 'entity' => ['icon' => 'icon1'],
             ]
         );
         $configurableColumn1->setOptions(
             [
-                'oro_options' => [
+                OroOptions::KEY => [
                     'datagrid' => ['is_visible' => true],
                     'form'     => ['is_enabled' => false],
                 ]
@@ -184,7 +190,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                         'extend_column1'       => [
                             'type'    => 'string',
                             'configs' => [
-                                'extend'   => ['extend' => true, 'is_extend' => true, 'owner' => 'Custom'],
+                                'extend'   => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
                                 'datagrid' => ['is_visible' => false]
                             ]
                         ],

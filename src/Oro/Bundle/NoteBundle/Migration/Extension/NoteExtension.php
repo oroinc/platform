@@ -58,13 +58,7 @@ class NoteExtension implements ExtendExtensionAwareInterface
             $noteTable,
             $associationName,
             $targetTable,
-            $targetColumnName,
-            [
-                'extend' => [
-                    'owner'     => ExtendScope::OWNER_SYSTEM,
-                    'is_extend' => true
-                ]
-            ]
+            $targetColumnName
         );
     }
 }
