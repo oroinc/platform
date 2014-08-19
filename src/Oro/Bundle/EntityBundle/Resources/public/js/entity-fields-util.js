@@ -85,7 +85,7 @@ define(['underscore'], function (_) {
             }];
 
             if (!path) {
-                return chain;
+                return this.entity ? chain : [];
             }
 
             _.each(path.split('+'), function (item, i) {

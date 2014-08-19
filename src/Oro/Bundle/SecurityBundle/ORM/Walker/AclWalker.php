@@ -155,12 +155,13 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getJoinFromJoinAssociationCondition(Join $join, JoinAssociationCondition $condition)
     {
-
         $conditionalFactors[] = $this->getConditionalFactor($condition);
+
         $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
         if ($organizationConditionFactor) {
             $conditionalFactors[] = $organizationConditionFactor;
         }
+
         $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
         return $join;
     }
