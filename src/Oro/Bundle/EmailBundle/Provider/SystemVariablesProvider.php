@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class SystemVariablesProvider implements SystemVariablesProviderInterface
 {
@@ -18,19 +20,25 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
 
+    /** @var SecurityContext */
+    protected $securityContext;
+
     /**
      * @param TranslatorInterface $translator
      * @param ConfigManager       $configManager
      * @param DateTimeFormatter   $dateTimeFormatter
+     * @param SecurityContext     $securityContext
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatter $dateTimeFormatter,
+        SecurityContext $securityContext
     ) {
         $this->translator        = $translator;
         $this->configManager     = $configManager;
         $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->securityContext   = $securityContext;
     }
 
     /**
@@ -60,6 +68,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
 
         $this->addApplicationShortName($result, $addValue);
         $this->addApplicationFullName($result, $addValue);
+        $this->addOrganizationName($result, $addValue);
         $this->addApplicationUrl($result, $addValue);
         $this->addCurrentDateAndTime($result, $addValue);
 
@@ -70,34 +79,45 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
      * @param array $result
      * @param bool  $addValue
      */
-    protected function addApplicationShortName(array &$result, $addValue)
+    protected function addOrganizationName(array &$result, $addValue)
     {
         if ($addValue) {
-            $val = $this->configManager->get('oro_ui.application_name');
+            /** @var UsernamePasswordOrganizationToken $token */
+            $token = $this->securityContext->getToken();
+            $val   = $token->getOrganizationContext()->getName();
         } else {
             $val = [
                 'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.app_short_name')
+                'label' => $this->translator->trans('oro.email.emailtemplate.organization_name')
             ];
         }
-        $result['appShortName'] = $val;
+        $result['appOrganizationName'] = $val;
     }
 
     /**
+     * @deprecated since 1.3 due to adding Organization Name, will be removed in 1.5
+     *
+     * @param array $result
+     * @param bool  $addValue
+     */
+    protected function addApplicationShortName(array &$result, $addValue)
+    {
+        if ($addValue) {
+            $result['appShortName'] = '';
+        }
+    }
+
+    /**
+     * @deprecated since 1.3 due to adding Organization Name, will be removed in 1.5
+     *
      * @param array $result
      * @param bool  $addValue
      */
     protected function addApplicationFullName(array &$result, $addValue)
     {
         if ($addValue) {
-            $val = $this->configManager->get('oro_ui.application_title');
-        } else {
-            $val = [
-                'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.app_full_name')
-            ];
+            $result['appFullName'] = '';
         }
-        $result['appFullName'] = $val;
     }
 
     /**

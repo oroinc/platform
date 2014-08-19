@@ -228,6 +228,7 @@ services:
             - @translator
             - @oro_config.global
             - @oro_locale.formatter.date_time
+            - @security.context
         lazy: true
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
