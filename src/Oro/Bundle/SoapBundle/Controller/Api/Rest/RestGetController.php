@@ -32,7 +32,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         unset($items);
 
-        return $this->handleView($this->view($result, Codes::HTTP_OK));
+        return new Response(json_encode($result), Codes::HTTP_OK);
     }
 
     /**
@@ -48,8 +48,9 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($item) {
             $item = $this->getPreparedItem($item);
         }
+        $responseData = $item ? json_encode($item) : '';
 
-        return $this->handleView($this->view($item ?: '', $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND));
+        new Response($responseData, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
     }
 
     /**
