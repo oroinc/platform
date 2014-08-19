@@ -46,6 +46,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value')))
         ),
         'full_definition' => array(
+            'page_template' => 'Test:Page:template',
+            'dialog_template' => 'Test:Dialog:template',
             'pre_conditions' => array('@true' => null),
             'conditions' => array('@true' => null),
             'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value'))),
@@ -299,6 +301,18 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             $actualTransition->getFormOptions(),
             'Incorrect form_options'
         );
+
+        if (array_key_exists('page_template', $configuration)) {
+            $this->assertEquals($configuration['page_template'], $actualTransition->getPageTemplate());
+        } else {
+            $this->assertNull($actualTransition->getPageTemplate());
+        }
+
+        if (array_key_exists('page_template', $configuration)) {
+            $this->assertEquals($configuration['dialog_template'], $actualTransition->getDialogTemplate());
+        } else {
+            $this->assertNull($actualTransition->getDialogTemplate());
+        }
 
         if ($preConditions) {
             $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');

@@ -67,7 +67,6 @@ class WidgetController extends Controller
      *      "/transition/create/attributes/{workflowName}/{transitionName}",
      *      name="oro_workflow_widget_start_transition_form"
      * )
-     * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param string $workflowName
@@ -128,12 +127,15 @@ class WidgetController extends Controller
             }
         }
 
-        return array(
-            'transition' => $transition,
-            'data' => $data,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
+        return $this->render(
+            $transition->getDialogTemplate() ?: 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig',
+            array(
+                'transition' => $transition,
+                'data' => $data,
+                'saved' => $saved,
+                'workflowItem' => $workflowItem,
+                'form' => $transitionForm->createView(),
+            )
         );
     }
 
@@ -143,7 +145,6 @@ class WidgetController extends Controller
      *      name="oro_workflow_widget_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
@@ -170,11 +171,14 @@ class WidgetController extends Controller
             }
         }
 
-        return array(
-            'transition' => $transition,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
+        return $this->render(
+            $transition->getDialogTemplate() ?: 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig',
+            array(
+                'transition' => $transition,
+                'saved' => $saved,
+                'workflowItem' => $workflowItem,
+                'form' => $transitionForm->createView(),
+            )
         );
     }
 
