@@ -51,12 +51,16 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
                 ->addRole($role);
         }
 
+        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+
         $admin->setPlainPassword('admin')
             ->setFirstname('John')
             ->setLastname('Doe')
             ->setEmail('admin@example.com')
             ->setOwner($unit)
             ->addGroup($group)
+            ->setOrganization($organization)
+            ->setOrganizations(new ArrayCollection(array($organization)))
             ->setBusinessUnits(
                 new ArrayCollection(array($unit))
             )

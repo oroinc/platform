@@ -53,7 +53,8 @@ parameters:
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
-    oro_security.authentication.listener.form:                 Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+    oro_security.authentication.listener.form.class:           Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+    oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
 
@@ -385,11 +386,23 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
 
     oro_security.authentication.listener.form:
-        class: %oro_security.authentication.listener.form%
+        class: %oro_security.authentication.listener.form.class%
         parent: security.authentication.listener.abstract
         abstract: true
         calls:
             - [setEntityManager, [@doctrine.orm.entity_manager]]
+
+    oro_security.authentication.listener.basic:
+        class: %oro-security.authentication.listener.basic.class%
+        arguments:
+            - @security.context
+            - @security.authentication.manager
+            - null
+            - null
+            - @oro_organization.organization_manager
+            - @?logger
+        public: false
+        abstract: true
 
     oro_security.authentication.provider.username_password_organization:
         class: %oro_security.authentication.provider.username_password_organization.class%

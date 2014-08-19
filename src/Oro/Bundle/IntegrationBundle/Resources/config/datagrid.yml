@@ -100,7 +100,10 @@ datagrid:
             acl_resource: oro_integration_view
             query:
                 select:
-                    - s
+                    - s.code
+                    - s.date
+                    - s.connector
+                    - s.message
                     - i.type as integrationType
                 from:
                     - { table: OroIntegrationBundle:Status, alias: s }

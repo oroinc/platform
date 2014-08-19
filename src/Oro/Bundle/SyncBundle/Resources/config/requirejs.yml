@@ -23,7 +23,7 @@ config:
             exports: 'ab'
     map:
         'autobahn':
-            'when': 'orosync/js/when-extend'
+            'when': 'orosync/js/extend/when'
     paths:
         'cryptojs/core': 'bundles/orosync/lib/cryptojs/core-min.js'
         'cryptojs/enc-base64': 'bundles/orosync/lib/cryptojs/enc-base64-min.js'
@@ -35,7 +35,6 @@ config:
 
         'orosync/js/sync': 'bundles/orosync/js/sync.js'
         'orosync/js/sync/wamp': 'bundles/orosync/js/sync/wamp.js'
-        'orosync/js/when-extend': 'bundles/orosync/js/when-extend.js'
 
 build:
     paths:
