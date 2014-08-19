@@ -42,8 +42,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
     ) {
         $entityTable = $schema->getTable($sourceTable);
 
-        $options['attachment']['maxsize']             = $maxFileSize;
-        $options['importexport']['process_as_scalar'] = true;
+        $options['attachment']['maxsize'] = $maxFileSize;
 
         $this->extendExtension->addManyToOneRelation(
             $schema,
@@ -76,10 +75,9 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
     ) {
         $entityTable = $schema->getTable($sourceTable);
 
-        $options['attachment']['maxsize']             = $maxFileSize;
-        $options['attachment']['width']               = $thumbWidth;
-        $options['attachment']['height']              = $thumbHeight;
-        $options['importexport']['process_as_scalar'] = true;
+        $options['attachment']['maxsize'] = $maxFileSize;
+        $options['attachment']['width']   = $thumbWidth;
+        $options['attachment']['height']  = $thumbHeight;
 
         $this->extendExtension->addManyToOneRelation(
             $schema,

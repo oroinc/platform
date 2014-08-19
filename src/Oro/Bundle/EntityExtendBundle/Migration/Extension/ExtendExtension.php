@@ -261,8 +261,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
 
         // create appropriate relation
-        $options['enum']['enum_code']                 = $enumCode;
-        $options['importexport']['process_as_scalar'] = true;
+        $options['enum']['enum_code'] = $enumCode;
         if ($isMultiple) {
             $options['extend']['without_default'] = true;
             $this->addManyToManyRelation(
