@@ -1,8 +1,13 @@
 /*jslint nomen:true*/
 /*global define, console*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
-    './optional-validation-handler', 'jquery.validate'
-    ], function ($, _, __, tools, validationHandler) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    './../optional-validation-handler',
+    'jquery.validate'
+], function ($, _, __, tools, validationHandler) {
     'use strict';
 
     /**
