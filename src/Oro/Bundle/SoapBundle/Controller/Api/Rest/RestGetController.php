@@ -50,7 +50,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         $responseData = $item ? json_encode($item) : '';
 
-        new Response($responseData, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
+        return new Response($responseData, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
     }
 
     /**
