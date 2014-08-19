@@ -11,6 +11,8 @@ use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
 
 class Transition
 {
+    const DEFAULT_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
+
     /**
      * @var string
      */
@@ -501,7 +503,5 @@ class Transition
     public function getDialogTemplate()
     {
         return $this->dialogTemplate;
-
-
     }
 }

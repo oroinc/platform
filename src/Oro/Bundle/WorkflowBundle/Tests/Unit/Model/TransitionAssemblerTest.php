@@ -179,20 +179,24 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'attribute' => $this->createAttribute()
         );
 
-        $expectedCondition = null;
-        $expectedPreCondition = $this->createCondition();
-        $expectedAction = null;
+        $expectedCondition      = null;
+        $expectedPreCondition   = $this->createCondition();
+        $expectedAction         = null;
         $defaultAclPrecondition = array();
+        $preConditions          = array();
+
         if (isset($configuration['acl_resource'])) {
             $defaultAclPrecondition = array(
                 '@acl_granted' => array(
                     'parameters' => array($configuration['acl_resource'])
                 )
             );
+
             if (isset($configuration['acl_message'])) {
                 $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
             }
         }
+
         if (isset($transitionDefinition['pre_conditions']) && $defaultAclPrecondition) {
             $preConditions = array(
                 '@and' => array(
@@ -202,47 +206,41 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             );
         } elseif (isset($transitionDefinition['pre_conditions'])) {
             $preConditions = $transitionDefinition['pre_conditions'];
-        } else {
-            $preConditions = array();
         }
 
         $count = 0;
+
         if ($preConditions) {
             $this->conditionFactory->expects($this->at($count))
                 ->method('create')
-                ->with(
-                    ConfigurableCondition::ALIAS,
-                    $preConditions
-                )
+                ->with(ConfigurableCondition::ALIAS, $preConditions)
                 ->will($this->returnValue($expectedPreCondition));
             $count++;
         }
+
         if (array_key_exists('conditions', $transitionDefinition)) {
             $expectedCondition = $this->createCondition();
             $this->conditionFactory->expects($this->at($count))
                 ->method('create')
-                ->with(
-                    ConfigurableCondition::ALIAS,
-                    $transitionDefinition['conditions']
-                )
+                ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
                 ->will($this->returnValue($expectedCondition));
         }
 
         $actionFactoryCallCount = 0;
+
         if (array_key_exists('post_actions', $transitionDefinition)) {
             $actionFactoryCallCount++;
         }
+
         if (array_key_exists('init_actions', $transitionDefinition)) {
             $actionFactoryCallCount++;
         }
+
         if ($actionFactoryCallCount) {
             $expectedAction = $this->createAction();
             $this->actionFactory->expects($this->exactly($actionFactoryCallCount))
                 ->method('create')
-                ->with(
-                    ConfigurableAction::ALIAS,
-                    $transitionDefinition['post_actions']
-                )
+                ->with(ConfigurableAction::ALIAS, $transitionDefinition['post_actions'])
                 ->will($this->returnValue($this->createAction()));
         }
 
@@ -284,11 +282,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($configuration['label'], $actualTransition->getLabel(), 'Incorrect label');
 
         $expectedDisplayType = WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE;
+
         if (isset($configuration['display_type'])) {
             $expectedDisplayType = $configuration['display_type'];
         }
-        $this->assertEquals($expectedDisplayType, $actualTransition->getDisplayType(), 'Incorrect display type');
 
+        $this->assertEquals($expectedDisplayType, $actualTransition->getDisplayType(), 'Incorrect display type');
         $this->assertEquals(
             $configuration['frontend_options'],
             $actualTransition->getFrontendOptions(),
@@ -302,17 +301,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'Incorrect form_options'
         );
 
-        if (array_key_exists('page_template', $configuration)) {
-            $this->assertEquals($configuration['page_template'], $actualTransition->getPageTemplate());
-        } else {
-            $this->assertNull($actualTransition->getPageTemplate());
-        }
-
-        if (array_key_exists('page_template', $configuration)) {
-            $this->assertEquals($configuration['dialog_template'], $actualTransition->getDialogTemplate());
-        } else {
-            $this->assertNull($actualTransition->getDialogTemplate());
-        }
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
 
         if ($preConditions) {
             $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
@@ -322,6 +312,23 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
         $this->assertEquals($expectedAction, $actualTransition->getPostAction(), 'Incorrect post_action');
+    }
+
+    /**
+     * @param string $templateType
+     * @param array $configuration
+     * @param $actualTransition
+     */
+    protected function assertTemplate($templateType, $configuration, $actualTransition)
+    {
+        $configKey = $templateType . '_template';
+        $getter    = 'get' . ucfirst($templateType) . 'Template';
+
+        if (array_key_exists($configKey, $configuration)) {
+            $this->assertEquals($configuration[$configKey], $actualTransition->$getter());
+        } else {
+            $this->assertNull($actualTransition->$getter());
+        }
     }
 
     public function configurationDataProvider()
@@ -336,7 +343,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'display_type' => 'page',
                     'form_options' => array(
                         'attribute_fields' => array(
-                            'attribute_onbe' => array('type' => 'text')
+                            'attribute_on_be' => array('type' => 'text')
                         )
                     ),
                     'frontend_options' => array('class' => 'foo', 'icon' => 'bar'),
