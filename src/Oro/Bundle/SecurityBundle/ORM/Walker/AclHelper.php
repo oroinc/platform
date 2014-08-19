@@ -11,6 +11,7 @@ use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
@@ -246,21 +247,6 @@ class AclHelper
                 list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
             }
 
-            $joinConditionsColumns = isset($associationMapping['joinColumns'])
-                ? $associationMapping['joinColumns']
-                : [$associationMapping['mappedBy']];
-
-            $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
-            $joinConditions = [];
-            foreach ($joinConditionsColumns as $joinConditionsColumn) {
-                if (is_string($joinConditionsColumn)) {
-                    $joinConditions[] = $joinConditionsColumn;
-                } else {
-                    $joinConditions[] = $targetEntityMetadata
-                        ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
-                }
-            }
-
             return new JoinAssociationCondition(
                 $join->joinAssociationDeclaration->aliasIdentificationVariable,
                 $entityField,
@@ -269,7 +255,7 @@ class AclHelper
                 $organizationField,
                 $organizationValue,
                 $targetEntity,
-                $joinConditions
+                $this->getJoinConditions($associationMapping)
             );
         }
 
@@ -333,5 +319,44 @@ class AclHelper
         if (!isset($this->entityAliases[$alias])) {
             $this->entityAliases[$alias] = $rangeDeclaration->abstractSchemaName;
         }
+    }
+
+    /**
+     * @param array $associationMapping
+     *
+     * @return array
+     */
+    protected function getJoinConditions(array $associationMapping)
+    {
+        $targetEntity          = $associationMapping['targetEntity'];
+        $type                  = $associationMapping['type'];
+        $targetEntityMetadata  = $this->em->getClassMetadata($targetEntity);
+        $joinConditionsColumns = [];
+        $joinConditions        = [];
+
+        switch ($type) {
+            case ClassMetadataInfo::ONE_TO_ONE:
+            case ClassMetadataInfo::MANY_TO_ONE:
+                $joinConditionsColumns = $associationMapping['joinColumns'];
+                break;
+            case ClassMetadataInfo::ONE_TO_MANY:
+                $joinConditionsColumns = [$associationMapping['mappedBy']];
+                break;
+            case ClassMetadataInfo::MANY_TO_MANY:
+                break;
+            default:
+                return $joinConditions;
+        }
+
+        foreach ($joinConditionsColumns as $joinConditionsColumn) {
+            if (is_string($joinConditionsColumn)) {
+                $joinConditions[] = $joinConditionsColumn;
+            } else {
+                $joinConditions[] = $targetEntityMetadata
+                        ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
+            }
+        }
+
+        return $joinConditions;
     }
 }

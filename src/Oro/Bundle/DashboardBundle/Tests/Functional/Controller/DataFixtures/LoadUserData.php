@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -50,6 +51,10 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setApiKey(self::USER_PASSWORD)
             ->setUser($user);
 
+        $organization = $this->container->get('oro_organization.organization_manager')
+            ->getOrganizationRepo()
+            ->getFirst();
+
         $user
             ->setUsername(self::USER_NAME)
             ->setPlainPassword(self::USER_PASSWORD)
@@ -58,6 +63,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->addRole($role[0])
             ->setEmail('simple@example.com')
             ->setApi($api)
+            ->setOrganization($organization)
+            ->setOrganizations(new ArrayCollection([$organization]))
             ->setSalt('');
 
         $userManager->updateUser($user);
