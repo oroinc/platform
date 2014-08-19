@@ -124,6 +124,7 @@ services:
         class: %oro_search.event_listener.update_schema_listener.class%
         arguments:
             - @oro_search.fulltext_index_manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: console.terminate }
 

@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_ENGINE = 'orm';
     /**
      * Bundle configuration structure
      *
@@ -21,7 +22,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('engine')
                     ->cannotBeEmpty()
-                    ->defaultValue('orm')
+                    ->defaultValue(self::DEFAULT_ENGINE)
                 ->end()
                 ->booleanNode('log_queries')
                     ->defaultFalse()
