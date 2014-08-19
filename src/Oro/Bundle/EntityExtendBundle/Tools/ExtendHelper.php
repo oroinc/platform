@@ -69,16 +69,37 @@ class ExtendHelper
     }
 
     /**
-     * Returns a string that can be used as a class name for the entity
-     * represents values of the given enum.
+     * Returns an enum identifier based on the given enum name.
+     *
+     * @param string $enumName
+     *
+     * @return string
+     */
+    public static function buildEnumCode($enumName)
+    {
+        if (function_exists('iconv')) {
+            $enumName = iconv('utf-8', 'ascii//TRANSLIT', $enumName);
+        }
+
+        return strtolower(
+            preg_replace(
+                ['/ +/', '/-+/', '/_{2,}/', '/[^a-z0-9_]+/i'],
+                ['', '_', '_', ''],
+                $enumName
+            )
+        );
+    }
+
+    /**
+     * Returns full class name for an entity is used to store values of the given enum.
      *
      * @param string $enumCode
      *
      * @return string
      */
-    public static function buildEnumValueShortClassName($enumCode)
+    public static function buildEnumValueClassName($enumCode)
     {
-        return 'EnumValue' . Inflector::classify($enumCode);
+        return ExtendConfigDumper::ENTITY . 'EnumValue' . Inflector::classify($enumCode);
     }
 
     /**

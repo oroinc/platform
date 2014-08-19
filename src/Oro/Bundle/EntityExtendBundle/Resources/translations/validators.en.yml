@@ -1,5 +1,7 @@
 "This value should contains only lower/upper alphabetic symbols and numbers": "This value should contains only lower/upper alphabetic symbols and numbers"
 "This value should contains only lower alphabetic symbols, underscore and numbers": "This value should contains only lower alphabetic symbols, underscore and numbers"
+"This value should contains only alphabetic symbols, numbers, spaces, underscore or minus symbols": "This value should contains only alphabetic symbols, numbers, spaces, underscore or minus symbols"
 "The '{{ value }}' cannot be used as field name": "The '{{ value }}' cannot be used as field name"
 "This value should not be the reserved SQL word.": "This value should not be the reserved SQL word."
 "This value should not be the reserved PHP word.": "This value should not be the reserved PHP word."
+"The enum name must be unique.": "The option set name must be unique."

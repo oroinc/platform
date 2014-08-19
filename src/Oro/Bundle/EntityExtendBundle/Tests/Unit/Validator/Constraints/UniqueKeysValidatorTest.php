@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysConstraint;
-use Oro\Bundle\EntityExtendBundle\Validator\UniqueKeysValidator;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator;
 
 class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +33,7 @@ class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate(array $value, $violation)
     {
-        $constraint = new UniqueKeysConstraint();
+        $constraint = new UniqueKeys();
 
         if ($violation) {
             $this->context

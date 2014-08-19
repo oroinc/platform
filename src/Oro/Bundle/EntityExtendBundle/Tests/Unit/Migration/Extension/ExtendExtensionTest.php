@@ -288,6 +288,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->createEnum(
             $schema,
             'test_status',
+            true,
             true
         );
 
@@ -323,8 +324,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'groups' => ['enum', 'dictionary']
                         ],
                         'enum'       => [
-                            'code'   => 'test_status',
-                            'public' => true,
+                            'code'     => 'test_status',
+                            'public'   => true,
+                            'multiple' => true
                         ],
                         'dictionary' => [
                             'virtual_fields' => ['id', 'name']

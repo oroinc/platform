@@ -56,15 +56,20 @@ class RelationBuilder
         // add a relation field config
         if (!$this->configManager->hasConfigFieldModel($sourceEntityName, $relationName)) {
             $this->configManager->createConfigFieldModel($sourceEntityName, $relationName, $fieldType);
-            $options['extend']['is_extend']       = true;
-            $options['extend']['state']           = ExtendScope::STATE_NEW;
-            $options['extend']['relation_key']    = $relationKey;
-            $options['extend']['target_entity']   = $targetEntityName;
-            $options['extend']['target_title']    = $targetTitleFieldNames;
-            $options['extend']['target_detailed'] = $targetDetailedFieldNames;
-            $options['extend']['target_grid']     = $targetGridFieldNames;
-            $this->updateFieldConfigs($sourceEntityName, $relationName, $options);
+            $options['extend']['state'] = ExtendScope::STATE_NEW;
+        } else {
+            $configFieldModel = $this->configManager->getConfigFieldModel($sourceEntityName, $relationName);
+            if ($configFieldModel->getType() !== $fieldType) {
+                $this->configManager->changeFieldType($sourceEntityName, $relationName, $fieldType);
+            }
         }
+        $options['extend']['is_extend']       = true;
+        $options['extend']['relation_key']    = $relationKey;
+        $options['extend']['target_entity']   = $targetEntityName;
+        $options['extend']['target_title']    = $targetTitleFieldNames;
+        $options['extend']['target_detailed'] = $targetDetailedFieldNames;
+        $options['extend']['target_grid']     = $targetGridFieldNames;
+        $this->updateFieldConfigs($sourceEntityName, $relationName, $options);
 
         // add relation to config
         $relations = $sourceEntityConfig->get('relation', false, []);
@@ -117,13 +122,18 @@ class RelationBuilder
         // add a relation field config
         if (!$this->configManager->hasConfigFieldModel($sourceEntityName, $relationName)) {
             $this->configManager->createConfigFieldModel($sourceEntityName, $relationName, $fieldType);
-            $options['extend']['is_extend']     = true;
-            $options['extend']['state']         = ExtendScope::STATE_NEW;
-            $options['extend']['relation_key']  = $relationKey;
-            $options['extend']['target_entity'] = $targetEntityName;
-            $options['extend']['target_field']  = $targetFieldName;
-            $this->updateFieldConfigs($sourceEntityName, $relationName, $options);
+            $options['extend']['state'] = ExtendScope::STATE_NEW;
+        } else {
+            $configFieldModel = $this->configManager->getConfigFieldModel($sourceEntityName, $relationName);
+            if ($configFieldModel->getType() !== $fieldType) {
+                $this->configManager->changeFieldType($sourceEntityName, $relationName, $fieldType);
+            }
         }
+        $options['extend']['is_extend']     = true;
+        $options['extend']['relation_key']  = $relationKey;
+        $options['extend']['target_entity'] = $targetEntityName;
+        $options['extend']['target_field']  = $targetFieldName;
+        $this->updateFieldConfigs($sourceEntityName, $relationName, $options);
 
         // add relation to config
         $relations = $sourceEntityConfig->get('relation', false, []);
@@ -175,18 +185,43 @@ class RelationBuilder
 
     /**
      * @param string $className
+     * @param array  $values
+     */
+    public function updateEntityConfigs($className, $values)
+    {
+        $this->updateConfigs($className, $values);
+    }
+
+    /**
+     * @param string $className
      * @param string $fieldName
      * @param array  $values
      */
-    protected function updateFieldConfigs($className, $fieldName, $values)
+    public function updateFieldConfigs($className, $fieldName, $values)
+    {
+        $this->updateConfigs($className, $values, $fieldName);
+    }
+
+    /**
+     * @param string $className
+     * @param array  $values
+     * @param string $fieldName
+     */
+    protected function updateConfigs($className, $values, $fieldName = null)
     {
         foreach ($values as $scope => $scopeValues) {
             $configProvider = $this->configManager->getProvider($scope);
-            $fieldConfig    = $configProvider->getConfig($className, $fieldName);
+            $config         = $configProvider->getConfig($className, $fieldName);
+            $hasChanges     = false;
             foreach ($scopeValues as $code => $val) {
-                $fieldConfig->set($code, $val);
+                if (!$config->is($code, $val)) {
+                    $config->set($code, $val);
+                    $hasChanges = true;
+                }
             }
-            $configProvider->persist($fieldConfig);
+            if ($hasChanges) {
+                $configProvider->persist($config);
+            }
         }
     }
 }

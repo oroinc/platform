@@ -32,6 +32,8 @@ oro:
                 ref-many:           System relation
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
+        enum_name:    Name
+        enum_public:  Public
         enum_options: Options
         action:
             apply_changes: "Apply entityconfig changes"

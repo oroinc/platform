@@ -367,30 +367,45 @@ oro_entity_config:
             items:
                 # the unique identifier of this enum
                 code: # string
-                    options: []
+                    options:
+                        auditable:          false
+
                 # indicates whether this enum is public or not
                 # public enums can be used in any extendable entity, it means that you can
                 # create a field of this enum type in any entity
                 # private enums cannot be reused
                 public: # boolean
-                    options: []
+                    options:
+                        auditable:          false
+
+                # indicates whether several options can be selected for this enum
+                # or it supports only one selected option
+                multiple: # boolean
+                    options:
+                        auditable:          false
 
         field:
             items:
                 # the unique identifier of an enum linked to a field
                 enum_code: # string
                     options:
+                        auditable:          false
+
+                # the unique identifier of an enum linked to a field
+                enum_name: # string
+                    options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
-                        type:               text
+                        type:               oro_entity_extend_enum_name
                         options:
-                            required:       true
-                            label:          'Code'
-                            attr:
-                                class:      enum-code
                             block:          general
                             subblock:       properties
+                            required:       true
+                            label:          oro.entity_extend.enum_name
+                            tooltip:        oro.entity_extend.enum_name.tooltip
+                            attr:
+                                class:      enum-code
 
                 # indicates whether an enum is public or not
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page
@@ -402,14 +417,15 @@ oro_entity_config:
                     form:
                         type:               choice
                         options:
+                            block:          general
+                            subblock:       properties
                             required:       false
                             choices:        ['No', 'Yes']
                             empty_value:    false
-                            label:          'Public'
+                            label:          oro.entity_extend.enum_public
+                            tooltip:        oro.entity_extend.enum_public.tooltip
                             attr:
                                 class:      is-enum-public
-                            block:          general
-                            subblock:       properties
 
                 # the list of enum values
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page

@@ -114,21 +114,35 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Creates a table that is used to store enum values for the enum with the given code.
      *
      * @param Schema $schema
-     * @param string $enumCode
+     * @param string $enumCode   The unique identifier of an enum
+     * @param bool   $isMultiple Indicates whether several options can be selected for this enum
+     *                           or it supports only one selected option
      * @param bool   $isPublic   Indicates whether this enum can be used by any entity or
      *                           it is designed to use in one entity only
      *
      * @return Table A table that is used to store enum values
      *
      * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function createEnum(
         Schema $schema,
         $enumCode,
+        $isMultiple = false,
         $isPublic = false
     ) {
+        if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
+            new \InvalidArgumentException(
+                sprintf(
+                    'The enum code "%s" must contain only lower alphabetical symbols, numbers and underscore.',
+                    $enumCode
+                )
+            );
+        }
+
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
-        $className = ExtendConfigDumper::ENTITY . ExtendHelper::buildEnumValueShortClassName($enumCode);
+        $className = ExtendHelper::buildEnumValueClassName($enumCode);
         $table     = $schema->createTable($tableName);
         $table->addOption(
             OroOptions::KEY,
@@ -150,8 +164,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'groups' => ['enum', 'dictionary']
                 ],
                 'enum'                                    => [
-                    'code'   => $enumCode,
-                    'public' => $isPublic
+                    'code'     => $enumCode,
+                    'public'   => $isPublic,
+                    'multiple' => $isMultiple
                 ],
                 'dictionary'                              => [
                     'virtual_fields' => ['id', 'name']
@@ -218,12 +233,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
     /**
      * Adds enumerable field relation
      *
+     * Take in attention that this method creates new private enum if the enum with the given code
+     * is not exist yet. If you want to create a public enum use {@link createEnum} method before.
+     *
      * @param Schema       $schema
-     * @param Table|string $table            A Table object or table name
-     * @param string       $associationName  A relation name
-     * @param string       $enumCode         The target enum identifier
-     * @param bool         $isMultiple       If TRUE this relation can be used to store several options;
-     *                                       otherwise, only one option can be selected for this field
+     * @param Table|string $table           A Table object or table name
+     * @param string       $associationName A relation name
+     * @param string       $enumCode        The target enum identifier
+     * @param bool         $isMultiple      Indicates whether several options can be selected for this enum
+     *                                      or it supports only one selected option
      * @param array        $options
      */
     public function addEnumRelation(
@@ -239,10 +257,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $this->createEnum($schema, $enumCode);
+            $this->createEnum($schema, $enumCode, $isMultiple);
         }
 
         // create appropriate relation
+        $options['extend']['enum_code'] = $enumCode;
         if ($isMultiple) {
             $options['extend']['without_default'] = true;
             $this->addManyToManyRelation(
