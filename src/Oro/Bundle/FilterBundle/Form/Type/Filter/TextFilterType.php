@@ -54,14 +54,15 @@ class TextFilterType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $choices = array(
-            self::TYPE_CONTAINS       => $this->translator->trans('oro.filter.form.label_type_contains'),
-            self::TYPE_NOT_CONTAINS   => $this->translator->trans('oro.filter.form.label_type_not_contains'),
-            self::TYPE_EQUAL          => $this->translator->trans('oro.filter.form.label_type_equals'),
-            self::TYPE_STARTS_WITH    => $this->translator->trans('oro.filter.form.label_type_start_with'),
-            self::TYPE_ENDS_WITH      => $this->translator->trans('oro.filter.form.label_type_end_with'),
-            self::TYPE_IN             => $this->translator->trans('oro.filter.form.label_type_in'),
-            self::TYPE_NOT_IN         => $this->translator->trans('oro.filter.form.label_type_not_in'),
-            FilterUtility::TYPE_EMPTY => $this->translator->trans('oro.filter.form.label_type_empty'),
+            self::TYPE_CONTAINS           => $this->translator->trans('oro.filter.form.label_type_contains'),
+            self::TYPE_NOT_CONTAINS       => $this->translator->trans('oro.filter.form.label_type_not_contains'),
+            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equals'),
+            self::TYPE_STARTS_WITH        => $this->translator->trans('oro.filter.form.label_type_start_with'),
+            self::TYPE_ENDS_WITH          => $this->translator->trans('oro.filter.form.label_type_end_with'),
+            self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
+            self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
+            FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
+            FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
         );
 
         $resolver->setDefaults(

@@ -8,23 +8,25 @@
 #}
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
     {% set datagrid = oro_datagrid_build(name, params) %}
-    {% set metaData = oro_datagrid_metadata(datagrid, params) %}
-    {% if renderParams.routerEnabled is defined %}
-        {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
-        {% set metadataOptions = metadataOptions|merge({'routerEnabled': renderParams.routerEnabled}) %}
-        {% set metaData = metaData|merge({'options': metadataOptions}) %}
-    {% endif %}
-    {% set data     = oro_datagrid_data(datagrid) %}
-    {% set gridId   = 'grid-' ~ name ~ '-' ~ random() %}
-    {% set options  = {
-        el: '#' ~ gridId,
-        builders: metaData.requireJSModules,
-        metadata: metaData,
-        data: data
-    } %}
+    {% if datagrid %}
+        {% set metaData = oro_datagrid_metadata(datagrid, params) %}
+        {% if renderParams.routerEnabled is defined %}
+            {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
+            {% set metadataOptions = metadataOptions|merge({'routerEnabled': renderParams.routerEnabled}) %}
+            {% set metaData = metaData|merge({'options': metadataOptions}) %}
+        {% endif %}
+        {% set data     = oro_datagrid_data(datagrid) %}
+        {% set gridId   = 'grid-' ~ name ~ '-' ~ random() %}
+        {% set options  = {
+            el: '#' ~ gridId,
+            builders: metaData.requireJSModules,
+            metadata: metaData,
+            data: data
+        } %}
 
-    <div id="{{ gridId }}"
-         data-page-component-module="orodatagrid/js/datagrid-builder"
-         data-page-component-options="{{ options|json_encode }}"
-         {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
+        <div id="{{ gridId }}"
+             data-page-component-module="orodatagrid/js/datagrid-builder"
+             data-page-component-options="{{ options|json_encode }}"
+             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
+    {% endif %}
 {% endmacro %}
