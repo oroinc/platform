@@ -95,7 +95,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     }
 
     /**
-     * @deprecated since 1.3 due to adding Organization Name, will be removed in 1.5
+     * @deprecated since 1.4 Avoid usage of "{{ system.appShortName }}" in email templates
      *
      * @param array $result
      * @param bool  $addValue
@@ -108,7 +108,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     }
 
     /**
-     * @deprecated since 1.3 due to adding Organization Name, will be removed in 1.5
+     * @deprecated since 1.4 Avoid usage of "{{ system.appFullName }}" in email templates
      *
      * @param array $result
      * @param bool  $addValue
