@@ -81,10 +81,12 @@ class AclWalker extends TreeWalkerAdapter
                     $subselect = $conditionalExpression->conditionalFactors[$subRequest->getFactorId()]
                         ->simpleConditionalExpression
                         ->subselect;
-                } else {
+                } elseif(isset($conditionalExpression->conditionalTerms)) {
                     $subselect = $conditionalExpression->conditionalTerms[$subRequest->getFactorId()]
                         ->simpleConditionalExpression
                         ->subselect;
+                } else {
+                    $subselect = $conditionalExpression->simpleConditionalExpression->subselect;
                 }
 
                 $whereConditions = $subRequest->getWhereConditions();
@@ -145,54 +147,22 @@ class AclWalker extends TreeWalkerAdapter
     }
 
     /**
-     * Generate Join condition for join without "on" statement
+     * Generate Join condition for join wothout "on" statement
      *
-     * @param Join                     $join
+     * @param Join $join
      * @param JoinAssociationCondition $condition
      * @return Join
      */
     protected function getJoinFromJoinAssociationCondition(Join $join, JoinAssociationCondition $condition)
     {
-        $joinAssociationPathExpression = $join->joinAssociationDeclaration->joinAssociationPathExpression;
 
-        $leftExpression = new ArithmeticExpression();
-        $pathExpression = new PathExpression(
-            self::EXPECTED_TYPE,
-            $joinAssociationPathExpression->identificationVariable,
-            $joinAssociationPathExpression->associationField
-        );
-        $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-        $leftExpression->simpleArithmeticExpression = $pathExpression;
-
-        $conditionalFactors = [];
-
-        foreach ($condition->getJoinConditions() as $joinCondition) {
-            $rightExpression = new ArithmeticExpression();
-            $pathExpression = new PathExpression(
-                self::EXPECTED_TYPE,
-                $condition->getEntityAlias(),
-                $joinCondition
-            );
-            $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
-            $rightExpression->simpleArithmeticExpression = $pathExpression;
-            $factor = new ConditionalPrimary();
-            $factor->simpleConditionalExpression = new ComparisonExpression($leftExpression, '=', $rightExpression);
-            $conditionalFactors[] = $factor;
-        }
         $conditionalFactors[] = $this->getConditionalFactor($condition);
         $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
         if ($organizationConditionFactor) {
-            $aclConditionalFactors[] = $organizationConditionFactor;
+            $conditionalFactors[] = $organizationConditionFactor;
         }
-        $associationDeclaration = new RangeVariableDeclaration(
-            $condition->getEntityClass(),
-            $condition->getEntityAlias()
-        );
-
-        $newJoin = new Join($join->joinType, $associationDeclaration);
-        $newJoin->conditionalExpression = new ConditionalTerm($conditionalFactors);
-
-        return $newJoin;
+        $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
+        return $join;
     }
 
     /**

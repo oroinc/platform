@@ -19,6 +19,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
@@ -174,10 +175,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             if (is_array($this->oneShotIsGrantedObserver)) {
                 /** @var OneShotIsGrantedObserver $observer */
                 foreach ($this->oneShotIsGrantedObserver as $observer) {
-                    $observer->setAccessLevel($this->extension->getAccessLevel($mask));
+                    $observer->setAccessLevel($this->extension->getAccessLevel($mask, null, $this->object));
                 }
             } else {
-                $this->oneShotIsGrantedObserver->setAccessLevel($this->extension->getAccessLevel($mask));
+                $this->oneShotIsGrantedObserver->setAccessLevel(
+                    $this->extension->getAccessLevel($mask, null, $this->object)
+                );
             }
         }
     }
@@ -194,18 +197,25 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         if ($token instanceof UsernamePasswordOrganizationToken
             && $result === self::ACCESS_GRANTED
             && $this->extension instanceof EntityAclExtension
-            && $this->extension->getAccessLevel($this->triggeredMask) < AccessLevel::SYSTEM_LEVEL
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
             $className = ClassUtils::getClass($object);
             $config = $this->configProvider->getConfig($className);
-
-            if ($config && $config->has('organization_field_name')) {
-                $accessor = PropertyAccess::createPropertyAccessor();
-                $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
-                if ($objectOrganization && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()) {
-                    $result = self::ACCESS_DENIED;
+            $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
+            if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
+                || ($accessLevel === AccessLevel::SYSTEM_LEVEL
+                    && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT']))
+            ) {
+                if ($config && $config->has('organization_field_name')) {
+                    $accessor = PropertyAccess::createPropertyAccessor();
+                    /** @var Organization $objectOrganization */
+                    $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
+                    if ($objectOrganization
+                        && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
+                    ) {
+                        $result = self::ACCESS_DENIED;
+                    }
                 }
             }
         }

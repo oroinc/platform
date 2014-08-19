@@ -25,6 +25,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 class AclHelper
 {
     const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
+    const ORO_EMAIL_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
      * @var OwnershipConditionDataBuilder
@@ -172,7 +173,9 @@ class AclHelper
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             $condition = $this->processRangeVariableDeclaration(
                 $identificationVariableDeclaration->rangeVariableDeclaration,
-                $permission
+                $permission,
+                false,
+                $isSubRequest
             );
             if ($condition) {
                 $whereConditions[] = $condition;
@@ -187,7 +190,8 @@ class AclHelper
                         $condition = $this->processRangeVariableDeclaration(
                             $join->joinAssociationDeclaration,
                             $permission,
-                            true
+                            true,
+                            $isSubRequest
                         );
                     } else {
                         $condition = $this->processJoinAssociationPathExpression(
@@ -238,7 +242,11 @@ class AclHelper
             $this->entityAliases[$join->joinAssociationDeclaration->aliasIdentificationVariable] = $targetEntity;
         }
 
-        $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
+        $resultData = null;
+        if (!in_array($targetEntity, [self::ORO_EMAIL_CLASS])) {
+            $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
+        }
+
 
         if ($resultData && is_array($resultData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = null;
@@ -255,7 +263,7 @@ class AclHelper
             foreach ($joinConditionsColumns as $joinConditionsColumn) {
                 if (is_string($joinConditionsColumn)) {
                     $joinConditions[] = $joinConditionsColumn;
-                } else {
+                } elseif ($joinConditionsColumn['referencedColumnName']) {
                     $joinConditions[] = $targetEntityMetadata
                         ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
                 }
@@ -280,20 +288,26 @@ class AclHelper
      * Process where statement
      *
      * @param RangeVariableDeclaration $rangeVariableDeclaration
-     * @param                          $permission
+     * @param string                   $permission
      * @param bool                     $isJoin
+     * @param bool                     $isSubRequest
      * @return null|AclCondition|JoinAclCondition
      */
     protected function processRangeVariableDeclaration(
         RangeVariableDeclaration $rangeVariableDeclaration,
         $permission,
-        $isJoin = false
+        $isJoin = false,
+        $isSubRequest = false
     ) {
         $this->addEntityAlias($rangeVariableDeclaration);
         $entityName = $rangeVariableDeclaration->abstractSchemaName;
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 
-        $resultData = $this->builder->getAclConditionData($entityName, $permission);
+        $resultData = null;
+        $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_EMAIL_CLASS]);
+        if (!$isUserTable || ($isSubRequest === false && $rangeVariableDeclaration->isRoot)) {
+            $resultData = $this->builder->getAclConditionData($entityName, $permission);
+        }
 
         if ($resultData === null || !empty($resultData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue= null;

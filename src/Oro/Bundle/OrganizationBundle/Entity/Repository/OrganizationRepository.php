@@ -58,7 +58,7 @@ class OrganizationRepository extends EntityRepository
     public function getEnabled($asArray = false)
     {
         $organizationsQuery = $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1');
+            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled =  true');
 
         if ($asArray) {
             return $organizationsQuery->getArrayResult();
