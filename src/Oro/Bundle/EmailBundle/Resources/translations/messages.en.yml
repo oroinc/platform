@@ -39,12 +39,13 @@ oro:
             user_first_name:     First name of logged in user
             user_last_name:      Last name of logged in user
             user_full_name:      Full name of logged in user
-            app_short_name:      Short name of application
-            app_full_name:       Full name of application
+            app_short_name:      Short name of application #@deprecated since 1.4 Provider\SystemVariablesProvider
+            app_full_name:       Full name of application  #@deprecated since 1.4 Provider\SystemVariablesProvider
             app_url:             Application URL
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
+            app_organization_name: Application's current organization name
 
         menu:
             emailtemplate_list.description: List of email templates

@@ -88,7 +88,7 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
         } else {
             $val = [
                 'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.organization_name')
+                'label' => $this->translator->trans('oro.email.emailtemplate.app_organization_name')
             ];
         }
         $result['appOrganizationName'] = $val;
