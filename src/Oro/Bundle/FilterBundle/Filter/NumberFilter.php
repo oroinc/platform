@@ -39,7 +39,7 @@ class NumberFilter extends AbstractFilter
             )
         );
 
-        if ($type !== FilterUtility::TYPE_EMPTY) {
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -60,7 +60,7 @@ class NumberFilter extends AbstractFilter
         $data['type'] = isset($data['type']) ? $data['type'] : null;
 
         if (!is_numeric($data['value'])) {
-            if ($data['type'] === FilterUtility::TYPE_EMPTY) {
+            if (in_array($data['type'], [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
                 return $data;
             }
 
@@ -98,6 +98,8 @@ class NumberFilter extends AbstractFilter
                 return $ds->expr()->neq($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
                 return $ds->expr()->isNull($fieldName);
+            case FilterUtility::TYPE_NOT_EMPTY:
+                return $ds->expr()->isNotNull($fieldName);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }
