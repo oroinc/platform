@@ -62,7 +62,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -95,7 +95,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -204,7 +204,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -438,7 +438,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(count($records), $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -493,7 +493,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(

@@ -15,8 +15,10 @@ class OrganizationRepository extends EntityRepository
      */
     public function getFirst()
     {
-        return $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org ORDER BY org.id')
+        return $this->createQueryBuilder('org')
+            ->select('org')
+            ->orderBy('org.id')
+            ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
     }
@@ -29,9 +31,11 @@ class OrganizationRepository extends EntityRepository
      */
     public function getOrganizationById($id)
     {
-        return $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.id = :id')
+        return $this->createQueryBuilder('org')
+            ->select('org')
+            ->where('org.id = :id')
             ->setParameter('id', $id)
+            ->getQuery()
             ->getSingleResult();
     }
 
@@ -43,9 +47,11 @@ class OrganizationRepository extends EntityRepository
      */
     public function getOrganizationByName($name)
     {
-        return $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.name = :name')
+        return $this->createQueryBuilder('org')
+            ->select('org')
+            ->where('org.name = :name')
             ->setParameter('name', $name)
+            ->getQuery()
             ->getSingleResult();
     }
 
@@ -57,8 +63,10 @@ class OrganizationRepository extends EntityRepository
      */
     public function getEnabled($asArray = false)
     {
-        $organizationsQuery = $this->getEntityManager()
-            ->createQuery('SELECT org FROM OroOrganizationBundle:Organization org WHERE org.enabled = 1');
+        $organizationsQuery = $this->createQueryBuilder('org')
+            ->select('org')
+            ->where('org.enabled = true')
+            ->getQuery();
 
         if ($asArray) {
             return $organizationsQuery->getArrayResult();

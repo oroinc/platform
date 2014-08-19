@@ -38,19 +38,30 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 this._renderFilter(data.columnName);
             }
 
-            this.$fieldChoice.on('changed', _.bind(function (e, fieldId) {
-                $(':focus').blur();
-                // reset current value on field change
-                this.element.data('value', {});
-                this._renderFilter(fieldId);
-                e.stopPropagation();
-            }, this));
-
-            this.$filterContainer.on('change', _.bind(function () {
-                if (this.filter) {
-                    this.filter.applyValue();
+            this._on(this.$fieldChoice, {
+                changed: function (e, fieldId) {
+                    $(':focus').blur();
+                    // reset current value on field change
+                    this.element.data('value', {});
+                    this._renderFilter(fieldId);
+                    e.stopPropagation();
                 }
-            }, this));
+            });
+
+            this._on(this.$filterContainer, {
+                change: function () {
+                    if (this.filter) {
+                        this.filter.applyValue();
+                    }
+                }
+            });
+        },
+
+        _destroy: function () {
+            if (this.filter) {
+                this.filter.dispose();
+                delete this.filter;
+            }
         },
 
         _getCreateOptions: function () {
