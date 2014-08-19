@@ -77,49 +77,52 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     $fieldName          = $fieldConfigId->getFieldName();
                     $enumConfigProvider = $this->configManager->getProvider('enum');
                     $enumFieldConfig    = $enumConfigProvider->getConfig($fieldConfigId->getClassName(), $fieldName);
-                    $enumCode           = $enumFieldConfig->get('enum_code');
-                    if (empty($enumCode)) {
-                        $enumCode = ExtendHelper::buildEnumCode($enumFieldConfig->get('enum_name'));
-                    }
-                    $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-                    $isMultiple     = $underlyingType === 'manyToMany';
-                    $isPublic       = $enumFieldConfig->get('enum_public');
-                    // create an entity is used to store enum values
-                    $enumValueEntityName = $this->createEnumValueConfigEntityModel(
-                        $enumCode,
-                        $isMultiple,
-                        $isPublic
-                    );
-                    // create a relation
-                    $fieldOptions = [
-                        'enum'         => [
-                            'enum_code' => $enumCode
-                        ],
-                        'importexport' => [
-                            'process_as_scalar' => true
-                        ]
-                    ];
-                    if ($isMultiple) {
-                        $fieldOptions['extend']['without_default'] = true;
-                        $this->relationBuilder->addManyToManyRelation(
-                            $entityConfig,
-                            $enumValueEntityName,
-                            $fieldName,
-                            ['id'],
-                            ['id'],
-                            ['id'],
-                            $fieldOptions,
-                            $fieldType
+                    $enumName           = $enumFieldConfig->get('enum_name');
+                    if (!empty($enumName)) {
+                        $fieldOptions = [
+                            'importexport' => [
+                                'process_as_scalar' => true
+                            ]
+                        ];
+                        $enumCode     = $enumFieldConfig->get('enum_code');
+                        if (empty($enumCode)) {
+                            $enumCode                          = ExtendHelper::buildEnumCode($enumName);
+                            $fieldOptions['enum']['enum_code'] = $enumCode;
+                        }
+                        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+                        $underlyingType     = $this->fieldTypeHelper->getUnderlyingType($fieldType);
+                        $isMultiple         = $underlyingType === 'manyToMany';
+                        $isPublic           = $enumFieldConfig->get('enum_public');
+                        // create an entity is used to store enum values
+                        $this->createEnumValueConfigEntityModel(
+                            $enumValueClassName,
+                            $enumCode,
+                            $isMultiple,
+                            $isPublic
                         );
-                    } else {
-                        $this->relationBuilder->addManyToOneRelation(
-                            $entityConfig,
-                            $enumValueEntityName,
-                            $fieldName,
-                            'id',
-                            $fieldOptions,
-                            $fieldType
-                        );
+                        // create a relation
+                        if ($isMultiple) {
+                            $fieldOptions['extend']['without_default'] = true;
+                            $this->relationBuilder->addManyToManyRelation(
+                                $entityConfig,
+                                $enumValueClassName,
+                                $fieldName,
+                                ['id'],
+                                ['id'],
+                                ['id'],
+                                $fieldOptions,
+                                $fieldType
+                            );
+                        } else {
+                            $this->relationBuilder->addManyToOneRelation(
+                                $entityConfig,
+                                $enumValueClassName,
+                                $fieldName,
+                                'id',
+                                $fieldOptions,
+                                $fieldType
+                            );
+                        }
                     }
                 }
             }
@@ -127,18 +130,15 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     }
 
     /**
-     * @param string $enumCode   The unique identifier of an enum
-     * @param bool   $isMultiple Indicates whether several options can be selected for this enum
-     *                           or it supports only one selected option
-     * @param bool   $isPublic   Indicates whether this enum can be used by any entity or
-     *                           it is designed to use in one entity only
-     *
-     * @return string The full class name of an entity is used to store enum values
+     * @param string $enumValueClassName The full class name of an entity is used to store enum values
+     * @param string $enumCode           The unique identifier of an enum
+     * @param bool   $isMultiple         Indicates whether several options can be selected for this enum
+     *                                   or it supports only one selected option
+     * @param bool   $isPublic           Indicates whether this enum can be used by any entity or
+     *                                   it is designed to use in one entity only
      */
-    protected function createEnumValueConfigEntityModel($enumCode, $isMultiple, $isPublic)
+    protected function createEnumValueConfigEntityModel($enumValueClassName, $enumCode, $isMultiple, $isPublic)
     {
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-
         if ($this->configManager->hasConfigEntityModel($enumValueClassName)) {
             $this->relationBuilder->updateEntityConfigs(
                 $enumValueClassName,
@@ -149,7 +149,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 ]
             );
 
-            return $enumValueClassName;
+            return;
         }
 
         // create entity
@@ -226,7 +226,5 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 ]
             ]
         );
-
-        return $enumValueClassName;
     }
 }

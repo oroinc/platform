@@ -185,31 +185,31 @@ class RelationBuilder
 
     /**
      * @param string $className
-     * @param array  $values
+     * @param array  $options
      */
-    public function updateEntityConfigs($className, $values)
+    public function updateEntityConfigs($className, $options)
     {
-        $this->updateConfigs($className, $values);
+        $this->updateConfigs($className, $options);
     }
 
     /**
      * @param string $className
      * @param string $fieldName
-     * @param array  $values
+     * @param array  $options
      */
-    public function updateFieldConfigs($className, $fieldName, $values)
+    public function updateFieldConfigs($className, $fieldName, $options)
     {
-        $this->updateConfigs($className, $values, $fieldName);
+        $this->updateConfigs($className, $options, $fieldName);
     }
 
     /**
      * @param string $className
-     * @param array  $values
+     * @param array  $options
      * @param string $fieldName
      */
-    protected function updateConfigs($className, $values, $fieldName = null)
+    protected function updateConfigs($className, $options, $fieldName = null)
     {
-        foreach ($values as $scope => $scopeValues) {
+        foreach ($options as $scope => $scopeValues) {
             $configProvider = $this->configManager->getProvider($scope);
             $config         = $configProvider->getConfig($className, $fieldName);
             $hasChanges     = false;
