@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\EventListener;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
@@ -34,6 +35,8 @@ class GridListener
         $queryBuilder  = $ormDataSource->getQueryBuilder();
         $parameters    = $event->getDatagrid()->getParameters();
 
-        $queryBuilder->setParameter('organization', $this->securityContext->getToken()->getOrganizationContext());
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $queryBuilder->setParameter('organization', $token->getOrganizationContext());
     }
 }

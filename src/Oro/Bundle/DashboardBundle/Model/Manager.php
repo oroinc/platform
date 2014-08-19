@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -233,9 +233,11 @@ class Manager
      */
     public function findDefaultDashboard()
     {
-        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token      = $this->securityContext->getToken();
+        $dashboard  = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
             ->findDefaultDashboard(
-                $this->securityContext->getToken()->getOrganizationContext()
+                $token->getOrganizationContext()
             );
 
         if ($dashboard) {
@@ -251,9 +253,11 @@ class Manager
      */
     public function findAllowedDashboards($permission = 'VIEW')
     {
-        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $qb    = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
         $qb->where('dashboard.organization = :organization')
-            ->setParameter('organization', $this->securityContext->getToken()->getOrganizationContext());
+            ->setParameter('organization', $token->getOrganizationContext());
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
