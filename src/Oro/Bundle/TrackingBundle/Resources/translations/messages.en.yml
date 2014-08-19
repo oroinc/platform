@@ -10,6 +10,7 @@ oro:
             identifier.label:    Identifier
             url.label:           Url
             owner.label:         Owner
+            organization.label:  Organization
 
             saved_message: Website updated
 
@@ -27,6 +28,7 @@ oro:
             website.label:        Website
             code.label:           Code
             logged_at.label:      Logged At
+            user_identifier.label: User Id
 
         trackingdata:
             entity_label:        Tracking Data

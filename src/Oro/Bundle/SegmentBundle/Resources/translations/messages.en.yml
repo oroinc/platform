@@ -15,6 +15,7 @@ oro:
         last_run.label:      Last run
         name.label:          Name
         owner.label:         Owner
+        organization.label:  Organization
 
         entity:
             label:   Entity
