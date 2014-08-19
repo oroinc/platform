@@ -248,13 +248,12 @@ class AclHelper
             $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
         }
 
-
         if ($resultData && is_array($resultData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = null;
             if (!empty($resultData)) {
                 list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
             }
-            
+
             return new JoinAssociationCondition(
                 $join->joinAssociationDeclaration->aliasIdentificationVariable,
                 $entityField,

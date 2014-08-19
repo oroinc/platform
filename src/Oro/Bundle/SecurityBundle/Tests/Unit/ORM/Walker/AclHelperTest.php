@@ -256,10 +256,15 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals('u', $expression->expression->simpleArithmeticExpression->identificationVariable);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
         $conditionalFactors = $join->conditionalExpression->conditionalFactors;
-        $this->assertCount(1, $conditionalFactors);
+        $this->assertCount(2, $conditionalFactors);
         $expression = $conditionalFactors[0]->simpleConditionalExpression;
         $this->assertEquals([1], $this->collectLiterals($expression->literals));
+        $this->assertEquals('user', $expression->expression->simpleArithmeticExpression->field);
         $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
+        $expression = $conditionalFactors[1]->simpleConditionalExpression;
+        $this->assertEquals(1, $expression->rightExpression->simpleArithmeticExpression->value);
+        $this->assertEquals('organization', $expression->leftExpression->simpleArithmeticExpression->field);
+        $this->assertEquals('address', $expression->leftExpression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest2()
@@ -283,10 +288,15 @@ class AclHelperTest extends OrmTestCase
         $this->assertNull($resultAst->whereClause);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
         $conditionalFactors = $join->conditionalExpression->conditionalFactors;
-        $this->assertCount(1, $conditionalFactors);
+        $this->assertCount(2, $conditionalFactors);
         $expression = $conditionalFactors[0]->simpleConditionalExpression;
         $this->assertEquals([1], $this->collectLiterals($expression->literals));
+        $this->assertEquals('user', $expression->expression->simpleArithmeticExpression->field);
         $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
+        $expression = $conditionalFactors[1]->simpleConditionalExpression;
+        $this->assertEquals(1, $expression->rightExpression->simpleArithmeticExpression->value);
+        $this->assertEquals('organization', $expression->leftExpression->simpleArithmeticExpression->field);
+        $this->assertEquals('address', $expression->leftExpression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest3()
