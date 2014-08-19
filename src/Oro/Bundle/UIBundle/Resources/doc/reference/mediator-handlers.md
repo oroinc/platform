@@ -44,6 +44,13 @@ Handler Name | Description
 `showLoading` | shows loading mask
 `hideLoading` | hides loading mask
 
+##Layout
+
+Handler Name | Description
+------------ | -----------
+`layout:init` | initializes proper widgets and plugins in the container
+`layout:dispose` | removes some plugins and widgets from child elements of the container
+
 ##DebugToolbarView
 
 Handler Name | Description
