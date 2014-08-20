@@ -28,7 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class WidgetController extends Controller
 {
-    const DEFAULT_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
+    const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
 
     /**
      * @Route("/steps/{entityClass}/{entityId}", name="oro_workflow_widget_steps")
@@ -129,7 +129,7 @@ class WidgetController extends Controller
         }
 
         return $this->render(
-            $transition->getDialogTemplate() ?: self::DEFAULT_TEMPLATE,
+            $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
             array(
                 'transition' => $transition,
                 'data' => $data,
@@ -173,7 +173,7 @@ class WidgetController extends Controller
         }
 
         return $this->render(
-            $transition->getDialogTemplate() ?: self::DEFAULT_TEMPLATE,
+            $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
             array(
                 'transition' => $transition,
                 'saved' => $saved,

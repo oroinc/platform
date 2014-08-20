@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class WorkflowController extends Controller
 {
-    const DEFAULT_TEMPLATE = 'OroWorkflowBundle:Workflow:transitionForm.html.twig';
+    const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Workflow:transitionForm.html.twig';
     /**
      * @Route(
      *      "/start/{workflowName}/{transitionName}",
@@ -42,7 +42,7 @@ class WorkflowController extends Controller
         );
 
         return $this->render(
-            $transition->getPageTemplate() ?: self::DEFAULT_TEMPLATE,
+            $transition->getPageTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
             array(
                 'transition' => $transition,
                 'workflow' => $workflow,
@@ -82,7 +82,7 @@ class WorkflowController extends Controller
         );
 
         return $this->render(
-            $transition->getPageTemplate() ?: self::DEFAULT_TEMPLATE,
+            $transition->getPageTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
             array(
                 'transition' => $transition,
                 'workflow' => $workflow,
