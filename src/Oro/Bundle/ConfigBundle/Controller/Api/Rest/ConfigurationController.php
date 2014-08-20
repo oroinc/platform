@@ -55,7 +55,7 @@ class ConfigurationController extends FOSRestController
      *
      * @Get("/configuration/{path}",
      *      name="oro_api_get_configuration",
-     *      requirements={"path"="[\w-]+(\/[\w-])*"}
+     *      requirements={"path"="[\w-]+[\w-\/]*"}
      * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",

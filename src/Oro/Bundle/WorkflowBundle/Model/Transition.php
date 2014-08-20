@@ -82,6 +82,16 @@ class Transition
     protected $unavailableHidden = false;
 
     /**
+     * @var string
+     */
+    protected $pageTemplate;
+
+    /**
+     * @var string
+     */
+    protected $dialogTemplate;
+
+    /**
      * Set label.
      *
      * @param string $label
@@ -453,5 +463,43 @@ class Transition
         $this->displayType = $displayType;
 
         return $this;
+    }
+
+    /**
+     * @param string $transitionTemplate
+     * @return Transition
+     */
+    public function setPageTemplate($transitionTemplate)
+    {
+        $this->pageTemplate = $transitionTemplate;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageTemplate()
+    {
+        return $this->pageTemplate;
+    }
+
+    /**
+     * @param string $widgetTemplate
+     * @return Transition
+     */
+    public function setDialogTemplate($widgetTemplate)
+    {
+        $this->dialogTemplate = $widgetTemplate;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDialogTemplate()
+    {
+        return $this->dialogTemplate;
     }
 }

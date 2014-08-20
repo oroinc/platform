@@ -101,3 +101,8 @@ table.grid tr td:first-child,
 table.grid tr th:first-child {
     text-align: left !important;
 }
+table.grid tr td:first-child:before {
+    content: '';
+    min-height: 14px;
+    display: inline-block;
+}
