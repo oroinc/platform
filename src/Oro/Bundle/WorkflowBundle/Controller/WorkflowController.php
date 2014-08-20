@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -18,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class WorkflowController extends Controller
 {
+    const DEFAULT_TEMPLATE = 'OroWorkflowBundle:Workflow:transitionForm.html.twig';
     /**
      * @Route(
      *      "/start/{workflowName}/{transitionName}",
@@ -42,7 +42,7 @@ class WorkflowController extends Controller
         );
 
         return $this->render(
-            $transition->getPageTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            $transition->getPageTemplate() ?: self::DEFAULT_TEMPLATE,
             array(
                 'transition' => $transition,
                 'workflow' => $workflow,
@@ -82,7 +82,7 @@ class WorkflowController extends Controller
         );
 
         return $this->render(
-            $transition->getPageTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            $transition->getPageTemplate() ?: self::DEFAULT_TEMPLATE,
             array(
                 'transition' => $transition,
                 'workflow' => $workflow,
