@@ -55,6 +55,7 @@ class TextFilterTypeTest extends AbstractTypeTestCase
                         TextFilterType::TYPE_IN           => 'oro.filter.form.label_type_in',
                         TextFilterType::TYPE_NOT_IN       => 'oro.filter.form.label_type_not_in',
                         FilterUtility::TYPE_EMPTY         => 'oro.filter.form.label_type_empty',
+                        FilterUtility::TYPE_NOT_EMPTY     => 'oro.filter.form.label_type_not_empty',
                     )
                 )
             )

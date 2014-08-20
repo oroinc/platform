@@ -61,12 +61,13 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
         _initSorting: function () {
             this.element.sortable({
                 cursor: 'move',
-                delay : 100,
+                delay : 25,
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',
-                containment: this.element.closest('.grid'),
+                containment: this.element.closest('.grid tbody'),
                 items: 'tr',
+                tolerance: 'pointer',
                 helper: function (e, ui) {
                     ui.children().each(function () {
                         $(this).width($(this).width());
@@ -110,6 +111,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
+            this.element.sortable('refresh');
 
             mediator.trigger('items-manager:table:add:' + this._getIdentifier(), this.options.collection);
         },
