@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\SidebarBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\TrackingBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
-class UpdateSidebarWidgetsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
+class UpdateTrackingWebsiteWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
     /**
      * {@inheritdoc}
@@ -18,12 +18,10 @@ class UpdateSidebarWidgetsWithOrganization extends UpdateWithOrganization implem
     }
 
     /**
-     * Assign exists sidebar widgets to the default organization
-     *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $this->update($manager, 'OroSidebarBundle:Widget');
+        $this->update($manager, 'OroTrackingBundle:TrackingWebsite');
     }
 }

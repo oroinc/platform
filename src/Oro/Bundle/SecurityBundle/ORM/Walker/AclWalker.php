@@ -81,10 +81,12 @@ class AclWalker extends TreeWalkerAdapter
                     $subselect = $conditionalExpression->conditionalFactors[$subRequest->getFactorId()]
                         ->simpleConditionalExpression
                         ->subselect;
-                } else {
+                } elseif (isset($conditionalExpression->conditionalTerms)) {
                     $subselect = $conditionalExpression->conditionalTerms[$subRequest->getFactorId()]
                         ->simpleConditionalExpression
                         ->subselect;
+                } else {
+                    $subselect = $conditionalExpression->simpleConditionalExpression->subselect;
                 }
 
                 $whereConditions = $subRequest->getWhereConditions();
@@ -145,9 +147,9 @@ class AclWalker extends TreeWalkerAdapter
     }
 
     /**
-     * Generate Join condition for join without "on" statement
+     * Generate Join condition for join wothout "on" statement
      *
-     * @param Join                     $join
+     * @param Join $join
      * @param JoinAssociationCondition $condition
      * @return Join
      */
@@ -157,7 +159,7 @@ class AclWalker extends TreeWalkerAdapter
 
         $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
         if ($organizationConditionFactor) {
-            $aclConditionalFactors[] = $organizationConditionFactor;
+            $conditionalFactors[] = $organizationConditionFactor;
         }
 
         $join->conditionalExpression = new ConditionalTerm($conditionalFactors);

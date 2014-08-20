@@ -85,6 +85,7 @@ oro:
         salt.label:                  Salt
         statuses.label:              Statuses
         username.label:              Username
+        organization.label:          Organization
         #
         # Oro/Bundle/UserBundle/Entity/Group
         #
@@ -96,6 +97,7 @@ oro:
             name.label:  Name
             roles.label: Roles
             owner.label: Owner
+            organization.label: Organization
         #
         # Oro/Bundle/UserBundle/Entity/Role
         #

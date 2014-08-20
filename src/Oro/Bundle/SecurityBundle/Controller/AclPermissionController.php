@@ -59,14 +59,6 @@ class AclPermissionController extends Controller
         }
 
         $token->setOrganizationContext($organization);
-        $this->get('session')->getFlashBag()->add(
-            'success',
-            $this->get('translator')->trans(
-                'oro.security.organization.selected',
-                array('%organization_name%' => $organization->getName())
-            )
-        );
-
         return $this->redirect($this->generateUrl('oro_default'));
     }
 
