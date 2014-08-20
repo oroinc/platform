@@ -299,7 +299,7 @@ define([
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = this._getChoiceOption(value.type);
 
-            if (value.type == this.emptyOption) {
+            if (this.isEmptyType(value.type)) {
                 return option ? option.label : this.placeholder;
             }
 

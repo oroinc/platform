@@ -30,6 +30,7 @@ oro:
         description.label: Description
         enabled.label:     Status
         business_units.label: Bussines units
+        users.label:       Users
         form:
             choose_organization: Choose an organization...
 

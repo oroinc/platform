@@ -325,9 +325,16 @@ Transition configuration has next options:
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
     Display type "page" require "form_options" to be set.
-* **form_type**
-    *string (oro_workflow_attributes - default)*
-    A form type that will be used to render form of transition.
+* **display_type**
+    *string*
+    Frontend transition form display type. Possible options are: dialog, page.
+    Display type "page" require "form_options" to be set.
+* **page_template**
+    *string*
+    Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
+* **dialog_template**
+    *string*
+    Custom transition template for transition dialogs. Should be extended from OroWorkflowBundle:Widget:widget/transitionForm.html.twig.
 * **frontend_options**
     Can have such frontend options as **class** (a CSS class applied to transition button), **icon**
     (CSS class of icon of transition button).
