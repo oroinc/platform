@@ -148,10 +148,11 @@ class Manager
      */
     public function createDashboardModel()
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+
         $dashboard = new Dashboard();
-        $dashboard->setOrganization(
-            $this->securityContext->getToken()->getOrganizationContext()
-        );
+        $dashboard->setOrganization($token->getOrganizationContext());
         return $this->getDashboardModel($dashboard);
     }
 
@@ -235,10 +236,8 @@ class Manager
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token      = $this->securityContext->getToken();
-        $dashboard  = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
-            ->findDefaultDashboard(
-                $token->getOrganizationContext()
-            );
+        $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
+            ->findDefaultDashboard($token->getOrganizationContext());
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);

@@ -7,7 +7,6 @@ parameters:
     oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
     oro_dashboard.dashboard_widget_entity.class: Oro\Bundle\DashboardBundle\Entity\Widget
     oro_dashboard.navigation_listener.class:     Oro\Bundle\DashboardBundle\EventListener\NavigationListener
-    oro_dashboard.grid_listener.class:           Oro\Bundle\DashboardBundle\EventListener\GridListener
     oro_dashboard.form.type.edit.class:          Oro\Bundle\DashboardBundle\Form\Type\DashboardType
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
 
@@ -50,14 +49,6 @@ services:
             - @oro_dashboard.manager
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-
-    oro_dashboard.grid_listener:
-        class: %oro_dashboard.grid_listener.class%
-        arguments:
-            - @security.context
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboards-grid, method: onBuildAfter }
-
 
     oro_dashboard.form.type.edit:
         class: %oro_dashboard.form.type.edit.class%
