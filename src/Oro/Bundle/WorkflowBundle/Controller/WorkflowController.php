@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -22,7 +23,6 @@ class WorkflowController extends Controller
      *      "/start/{workflowName}/{transitionName}",
      *      name="oro_workflow_start_transition_form"
      * )
-     * @Template("OroWorkflowBundle:Workflow:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $workflowName
      * @param string $transitionName
@@ -40,16 +40,20 @@ class WorkflowController extends Controller
             'transitionName' => $transition->getName(),
             'entityId' => $this->getRequest()->get('entityId', 0)
         );
-        return array(
-            'transition' => $transition,
-            'workflow' => $workflow,
-            'transitionUrl' => $this->generateUrl(
-                'oro_workflow_api_rest_workflow_start',
-                $routeParams
-            ),
-            'transitionFormUrl' => $this->generateUrl(
-                'oro_workflow_widget_start_transition_form',
-                $routeParams
+
+        return $this->render(
+            $transition->getPageTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            array(
+                'transition' => $transition,
+                'workflow' => $workflow,
+                'transitionUrl' => $this->generateUrl(
+                    'oro_workflow_api_rest_workflow_start',
+                    $routeParams
+                ),
+                'transitionFormUrl' => $this->generateUrl(
+                    'oro_workflow_widget_start_transition_form',
+                    $routeParams
+                )
             )
         );
     }
@@ -60,7 +64,6 @@ class WorkflowController extends Controller
      *      name="oro_workflow_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @Template("OroWorkflowBundle:Workflow:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
@@ -77,16 +80,20 @@ class WorkflowController extends Controller
             'transitionName' => $transition->getName(),
             'workflowItemId' => $workflowItem->getId(),
         );
-        return array(
-            'transition' => $transition,
-            'workflow' => $workflow,
-            'transitionUrl' => $this->generateUrl(
-                'oro_workflow_api_rest_workflow_transit',
-                $routeParams
-            ),
-            'transitionFormUrl' => $this->generateUrl(
-                'oro_workflow_widget_transition_form',
-                $routeParams
+
+        return $this->render(
+            $transition->getPageTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            array(
+                'transition' => $transition,
+                'workflow' => $workflow,
+                'transitionUrl' => $this->generateUrl(
+                    'oro_workflow_api_rest_workflow_transit',
+                    $routeParams
+                ),
+                'transitionFormUrl' => $this->generateUrl(
+                    'oro_workflow_widget_transition_form',
+                    $routeParams
+                )
             )
         );
     }

@@ -38,7 +38,9 @@ define([
             this.element.attr('data-validation-ignore', '');
             this.errors = $({});
             this.form = this.element.parents('form');
-            this.form.on('submit', $.proxy(this._hideErrors, this));
+            this._on(this.form, {
+                submit: '_hideErrors'
+            });
             if (typeof this.options.namePattern === 'string') {
                 this.options.namePattern = new RegExp(this.options.namePattern);
             }

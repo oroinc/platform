@@ -2,27 +2,26 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/workflowwidget")
@@ -67,7 +66,6 @@ class WidgetController extends Controller
      *      "/transition/create/attributes/{workflowName}/{transitionName}",
      *      name="oro_workflow_widget_start_transition_form"
      * )
-     * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param string $workflowName
@@ -128,12 +126,15 @@ class WidgetController extends Controller
             }
         }
 
-        return array(
-            'transition' => $transition,
-            'data' => $data,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
+        return $this->render(
+            $transition->getDialogTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            array(
+                'transition' => $transition,
+                'data' => $data,
+                'saved' => $saved,
+                'workflowItem' => $workflowItem,
+                'form' => $transitionForm->createView(),
+            )
         );
     }
 
@@ -143,7 +144,6 @@ class WidgetController extends Controller
      *      name="oro_workflow_widget_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @Template("OroWorkflowBundle:Widget:transitionForm.html.twig")
      * @AclAncestor("oro_workflow")
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
@@ -170,11 +170,14 @@ class WidgetController extends Controller
             }
         }
 
-        return array(
-            'transition' => $transition,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
+        return $this->render(
+            $transition->getDialogTemplate() ?: Transition::DEFAULT_TEMPLATE,
+            array(
+                'transition' => $transition,
+                'saved' => $saved,
+                'workflowItem' => $workflowItem,
+                'form' => $transitionForm->createView(),
+            )
         );
     }
 

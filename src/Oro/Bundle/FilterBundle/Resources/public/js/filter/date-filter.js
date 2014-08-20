@@ -1,18 +1,25 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter',
-        'orolocale/js/locale-settings', '../datevariables-widget'
-    ], function ($, _, __, ChoiceFilter, localeSettings) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './choice-filter',
+    'orolocale/js/locale-settings',
+    'orofilter/js/datevariables-widget'
+], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
+
+    var DateFilter;
 
     /**
      * Date filter: filter type as option + interval begin and end dates
      *
-     * @export  orofilter/js/filter/date-filter
-     * @class   orofilter.filter.DateFilter
-     * @extends orofilter.filter.ChoiceFilter
+     * @export  oro/filter/date-filter
+     * @class   oro.filter.DateFilter
+     * @extends oro.filter.ChoiceFilter
      */
-    return ChoiceFilter.extend({
+    DateFilter = ChoiceFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -77,16 +84,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @property
          */
         externalWidgetOptions: {},
-
-        /**
-         * References to date widgets
-         *
-         * @property
-         */
-        dateWidgets: {
-            start: null,
-            end: null
-        },
 
         /**
          * Date filter type values
@@ -166,7 +163,31 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 };
             }
 
-            ChoiceFilter.prototype.initialize.apply(this, arguments);
+            this.dateWidgets = {};
+
+            DateFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.dateParts;
+            delete this.emptyPart;
+            delete this.emptyValue;
+            _.each(this.dateWidgets, function ($elem, name) {
+                if (name.slice(-5) === '_vars') {
+                    this._destroyDateVariablesWidget(name);
+                } else {
+                    this._destroyDateWidget(name);
+                }
+                delete this.dateWidgets[name];
+            }, this);
+            delete this.dateWidgets;
+            DateFilter.__super__.dispose.call(this);
         },
 
         onChangeFilterType: function (e) {
@@ -351,6 +372,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         /**
+         * Removes date widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateWidget: function (name) {
+            this.dateWidgets[name].datepicker('destroy');
+        },
+
+        /**
          * Initialize date variables widget
          *
          * @param {String} widgetSelector
@@ -366,6 +397,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             return widget;
         },
+
+        /**
+         * Removes date variables widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateVariablesWidget: function (name) {
+            this.dateWidgets[name].dateVariables('destroy');
+        },
+
 
         /**
          * @inheritDoc
@@ -561,7 +603,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @inheritDoc
          */
         _hideCriteria: function () {
-            ChoiceFilter.prototype._hideCriteria.apply(this, arguments);
+            DateFilter.__super__._hideCriteria.apply(this, arguments);
         },
 
         _getSelectedChoiceLabel: function (property, value) {
@@ -576,4 +618,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             return selectedChoiceLabel;
         }
     });
+
+    return DateFilter;
 });
