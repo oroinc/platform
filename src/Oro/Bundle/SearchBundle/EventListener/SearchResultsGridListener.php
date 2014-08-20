@@ -21,11 +21,11 @@ class SearchResultsGridListener
     {
         $datagrid = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
+
         if ($datasource instanceof SearchDatasource) {
-            $parameters = $datagrid->getParameters();
+            $parameters   = $datagrid->getParameters();
             $searchEntity = $parameters->get('from', '*');
             $searchEntity = empty($searchEntity) ? '*' : $searchEntity;
-
             $searchString = $parameters->get('search', '');
 
             $datasource->getQuery()

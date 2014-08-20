@@ -124,8 +124,7 @@ class PrepareResultItemListener
             $entity = $this->em->getRepository($name)->find($item->getRecordId());
         }
 
-        if ($this->mapper->getEntityMapParameter($name, 'title_fields')) {
-            $fields = $this->mapper->getEntityMapParameter($name, 'title_fields');
+        if ($fields = $this->mapper->getEntityMapParameter($name, 'title_fields')) {
             $title = array();
             foreach ($fields as $field) {
                 $title[] = $this->mapper->getFieldValue($entity, $field);
