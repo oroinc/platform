@@ -59,6 +59,8 @@ return array(
                 'frontend_options' => array(
                     'class' => 'foo'
                 ),
+                'page_template' => 'Workflow:Test:pageTemplate.html.twig',
+                'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
                 'form_type' => 'custom_workflow_transition',
                 'form_options' => array(
                     'attribute_fields' => array(
@@ -134,6 +136,8 @@ return array(
                 'frontend_options' => array(
                     'icon' => 'bar'
                 ),
+                'page_template' => null,
+                'dialog_template' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'form_options' => array(),
             )
