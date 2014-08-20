@@ -27,39 +27,47 @@ class OroSearchExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $alias  = $this->getAlias();
+        // load entity search configuration from search.yml files
+        $configPart          = array();
+        $ymlLoader           = new YamlCumulativeFileLoader('Resources/config/search.yml');
+        $configurationLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
+        $engineResources     = $configurationLoader->load($container);
+
+        foreach ($engineResources as $resource) {
+            $configPart += $resource->data;
+        }
+
+        // merge entity configuration with main configuration
+        if (isset($configs[0]['entities_config'])) {
+            $configs[0]['entities_config'] = array_merge($configPart, $configs[0]['entities_config']);
+        } else {
+            $configs[0]['entities_config'] = $configPart;
+        }
+
+        // parse and validate configuration
         $config = $this->processConfiguration(new Configuration(), $configs);
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        $ymlLoader    = new YamlCumulativeFileLoader('Resources/config/oro/engine/' . $config['engine'] . '.yml');
-        $configLoader = new CumulativeConfigLoader($alias, $ymlLoader);
-        $resources    = $configLoader->load($container);
+        // set configuration parameters to container
+        $container->setParameter('oro_search.engine', $config['engine']);
+        $container->setParameter('oro_search.engine_parameters', $config['engine_parameters']);
+        $container->setParameter('oro_search.log_queries', $config['log_queries']);
+        $container->setParameter('oro_search.realtime_update', $config['realtime_update']);
+        $container->setParameter('oro_search.entities_config', $config['entities_config']);
+        $container->setParameter('oro_search.twig.item_container_template', $config['item_container_template']);
 
-        if (!empty($resources)) {
-            $resource = end($resources);
-            $loader->load($resource->path);
+        // load engine specific and general search services
+        $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+
+        $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
+        $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
+        $engineResources = $engineLoader->load($container);
+
+        if (!empty($engineResources)) {
+            $resource = end($engineResources);
+            $serviceLoader->load($resource->path);
         }
 
-        $loader->load('services.yml');
-        $this->searchMappingsConfig('entities_config', 'search', $config, $container);
-        $this->searchMappingsConfig('engine_config', 'search_engine', $config, $container);
-
-        if (Configuration::DEFAULT_ENGINE == $config['engine']) {
-            $driversAlias = $alias . '.drivers';
-
-            if ($container->hasParameter($driversAlias)) {
-                $config['drivers'] = $container->getParameter($driversAlias);
-            } else {
-                throw new InvalidConfigurationException(sprintf('"%s" are required for ORM engine', $driversAlias));
-            }
-
-            $this->remapParameters($config, $container, array('drivers' => $driversAlias));
-        }
-
-        $container->setParameter($alias . '.engine', $config['engine']);
-        $container->setParameter($alias . '.log_queries', $config['log_queries']);
-        $container->setParameter($alias . '.realtime_update', $config['realtime_update']);
-        $container->setParameter($alias . '.twig.item_container_template', $config['item_container_template']);
+        $serviceLoader->load('services.yml');
     }
 
     /**
@@ -70,44 +78,5 @@ class OroSearchExtension extends Extension
     public function getAlias()
     {
         return 'oro_search';
-    }
-
-    /**
-     * Add search mapping config
-     *
-     * @param string           $configKey
-     * @param string           $fileName
-     * @param array            $config
-     * @param ContainerBuilder $container
-     */
-    private function searchMappingsConfig($configKey, $fileName, $config, ContainerBuilder $container)
-    {
-        $alias        = $this->getAlias();
-        $configPart   = empty($config[$configKey]) ? array() : $config[$configKey];
-        $ymlLoader    = new YamlCumulativeFileLoader('Resources/config/' . $fileName . '.yml');
-        $configLoader = new CumulativeConfigLoader($alias, $ymlLoader);
-        $resources    = $configLoader->load($container);
-
-        foreach ($resources as $resource) {
-            $configPart += $resource->data;
-        }
-
-        $container->setParameter($alias . '.' . $configKey, $configPart);
-    }
-
-    /**
-     * Remap parameters form to container params
-     *
-     * @param array            $config
-     * @param ContainerBuilder $container
-     * @param array            $map
-     */
-    protected function remapParameters(array $config, ContainerBuilder $container, array $map)
-    {
-        foreach ($map as $name => $paramName) {
-            if (array_key_exists($name, $config)) {
-                $container->setParameter($paramName, $config[$name]);
-            }
-        }
     }
 }

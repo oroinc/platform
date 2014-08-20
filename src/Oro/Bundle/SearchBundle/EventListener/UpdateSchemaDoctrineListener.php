@@ -4,11 +4,9 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
 
-use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
-use Symfony\Component\DependencyInjection\Container;
 
 class UpdateSchemaDoctrineListener
 {
@@ -18,17 +16,10 @@ class UpdateSchemaDoctrineListener
     protected $fulltextIndexManager;
 
     /**
-     * @var Container
-     */
-    protected $container;
-
-    /**
      * @param FulltextIndexManager $fulltextIndexManager
-     * @param Container            $container
      */
-    public function __construct(FulltextIndexManager $fulltextIndexManager, Container $container)
+    public function __construct(FulltextIndexManager $fulltextIndexManager)
     {
-        $this->container            = $container;
         $this->fulltextIndexManager = $fulltextIndexManager;
     }
 
@@ -37,10 +28,7 @@ class UpdateSchemaDoctrineListener
      */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
-        if (
-            $event->getCommand() instanceof UpdateSchemaDoctrineCommand
-            && Configuration::DEFAULT_ENGINE == $this->container->getParameter('oro_search.engine')
-        ) {
+        if ($event->getCommand() instanceof UpdateSchemaDoctrineCommand) {
             $output = $event->getOutput();
             $input  = $event->getInput();
 

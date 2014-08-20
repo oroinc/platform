@@ -30,11 +30,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $doctrineCommand;
 
     /**
@@ -72,12 +67,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this
-            ->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new UpdateSchemaDoctrineListener($this->indexManager, $this->container);
+        $this->listener = new UpdateSchemaDoctrineListener($this->indexManager);
     }
 
     public function testNotRelatedCommand()
@@ -88,30 +78,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getCommand')
             ->will($this->returnValue($command));
-
-        $this->indexManager
-            ->expects($this->never())
-            ->method('createIndexes');
-
-        $this->container
-            ->expects($this->never())
-            ->method('getParameter');
-
-        $this->listener->onConsoleTerminate($this->eventMock);
-    }
-
-    public function testNotOrmEngine()
-    {
-        $this->eventMock
-            ->expects($this->once())
-            ->method('getCommand')
-            ->will($this->returnValue($this->doctrineCommand));
-
-        $this->container
-            ->expects($this->once())
-            ->method('getParameter')
-            ->with('oro_search.engine')
-            ->will($this->returnValue('some-engine'));
 
         $this->indexManager
             ->expects($this->never())
@@ -132,12 +98,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
-
-        $this->container
-            ->expects($this->once())
-            ->method('getParameter')
-            ->with('oro_search.engine')
-            ->will($this->returnValue(Configuration::DEFAULT_ENGINE));
 
         $this->indexManager
             ->expects($this->never())
@@ -163,12 +123,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('createIndexes')
             ->will($this->returnValue(true));
-
-        $this->container
-            ->expects($this->once())
-            ->method('getParameter')
-            ->with('oro_search.engine')
-            ->will($this->returnValue(Configuration::DEFAULT_ENGINE));
 
         $this->output
             ->expects($this->exactly(2))
