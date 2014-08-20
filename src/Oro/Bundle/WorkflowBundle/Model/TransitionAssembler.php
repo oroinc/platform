@@ -126,7 +126,9 @@ class TransitionAssembler extends AbstractAssembler
             ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
-            );
+            )
+            ->setPageTemplate($this->getOption($options, 'page_template'))
+            ->setDialogTemplate($this->getOption($options, 'dialog_template'));
 
         $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {
