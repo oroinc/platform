@@ -44,7 +44,7 @@ class UserController extends Controller
 
     /**
      * @Route("/profile/edit", name="oro_user_profile_update")
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("OroUserBundle:User/Profile:update.html.twig")
      */
     public function updateProfileAction()
     {
@@ -102,7 +102,7 @@ class UserController extends Controller
      * Edit user form
      *
      * @Route("/update/{id}", name="oro_user_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
+     * @Template("OroUserBundle:User:update.html.twig")
      * @Acl(
      *      id="oro_user_user_update",
      *      type="entity",
