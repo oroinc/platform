@@ -14,7 +14,10 @@ class UpdateReportWithOrganization extends UpdateWithOrganization implements Dep
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\ReportBundle\Migrations\Data\ORM\LoadReportTypes'];
+        return [
+            'Oro\Bundle\ReportBundle\Migrations\Data\ORM\LoadReportTypes',
+            'Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'
+        ];
     }
 
     /**
