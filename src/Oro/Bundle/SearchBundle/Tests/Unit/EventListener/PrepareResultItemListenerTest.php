@@ -326,7 +326,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
 
-        $this->mapper->expects($this->exactly(2))
+        $this->mapper->expects($this->once())
             ->method('getEntityMapParameter')
             ->with(get_class($this->entity), 'title_fields')
             ->will($this->returnValue(array('testField')));
