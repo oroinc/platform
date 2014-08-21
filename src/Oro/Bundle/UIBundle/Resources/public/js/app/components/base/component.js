@@ -74,6 +74,12 @@ define([
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
+            // disposes registered sub-components
+            _.each(this.subComponents || [], function (component) {
+                if (component && typeof component.dispose === 'function') {
+                    component.dispose();
+                }
+            });
             // dispose and remove all own properties
             _.each(this, function (item, name) {
                 if (item && typeof item.dispose === "function") {
