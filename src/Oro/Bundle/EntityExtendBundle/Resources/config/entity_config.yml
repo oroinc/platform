@@ -335,7 +335,7 @@ oro_entity_config:
                         allowed_type:       [optionSet]
                         create_only:        true
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             required:       false
                             choices:        ['No', 'Yes']

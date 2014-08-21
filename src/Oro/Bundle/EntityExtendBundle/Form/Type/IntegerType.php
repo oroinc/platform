@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 /**
- * This form type is just a wrapper around standard 'text' form type, but
+ * This form type is just a wrapper around standard 'integer' form type, but
  * this form type can handle 'require_schema_update' option that
  * allows to mark an entity as "Required Update" in case when a value of
  * an entity config attribute is changed.
@@ -12,16 +12,16 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
  *      options:
  *          require_schema_update: true
  *      form:
- *          type: oro_entity_extend_text
+ *          type: oro_entity_extend_integer
  */
-class TextType extends AbstractConfigType
+class IntegerType extends AbstractConfigType
 {
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'oro_entity_extend_text';
+        return 'oro_entity_extend_integer';
     }
 
     /**
@@ -29,6 +29,6 @@ class TextType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'text';
+        return 'integer';
     }
 }
