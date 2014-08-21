@@ -18,6 +18,8 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
+        className: 'btn-group grid-views',
+
         /** @property */
         events: {
             "click a": "onChange"
@@ -25,16 +27,14 @@ define([
 
         /** @property */
         template: _.template(
-            '<div class="btn-group ">' +
-                '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                    '<%=  current %>' + '<span class="caret"></span>' +
-                '</button>' +
-                '<ul class="dropdown-menu pull-right">' +
-                    '<% _.each(choices, function (choice) { %>' +
-                        '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
-                    '<% }); %>' +
-                '</ul>' +
-            '</div>'
+            '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
+                '<%=  current %>' + '<span class="caret"></span>' +
+            '</button>' +
+            '<ul class="dropdown-menu pull-right">' +
+                '<% _.each(choices, function (choice) { %>' +
+                    '<li><a href="#" data-value="' + '<%= choice.value %>' + '">' + '<%= choice.label %>' + '</a></li>' +
+                '<% }); %>' +
+            '</ul>'
         ),
 
         /** @property */

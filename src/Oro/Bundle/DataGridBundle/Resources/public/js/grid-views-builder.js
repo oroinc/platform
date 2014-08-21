@@ -8,7 +8,7 @@ define(function (require) {
         _ = require('underscore'),
         GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
 
-    gridGridViewsSelector = '.page-title > .navbar-extra .span9:last';
+    gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra';
 
     gridViewsBuilder = {
         /**
@@ -47,9 +47,10 @@ define(function (require) {
         build: function (collection) {
             var options, gridViews;
             options = gridViewsBuilder.combineGridViewsOptions.call(this);
-            gridViews = new GridViewsView(_.extend({collection: collection}, options));
-            $(gridGridViewsSelector).append(gridViews.render().$el);
-
+            if (!$.isEmptyObject(options)) {
+                gridViews = new GridViewsView(_.extend({collection: collection}, options));
+                $(gridGridViewsSelector).append(gridViews.render().$el);
+            }
             return gridViews;
         },
 
