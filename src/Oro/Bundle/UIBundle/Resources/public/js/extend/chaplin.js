@@ -92,9 +92,10 @@ define([
             return;
         }
 
-        if (el.nodeName === 'A' && (href = el.getAttribute('href'))) {
+        if (el.nodeName === 'A' && el.getAttribute('href')) {
+            href = el.getAttribute('href');
             // prevent click by empty hashes
-            if (el.getAttribute('href') === '#') {
+            if (href === '#') {
                 event.preventDefault();
                 return;
             }
