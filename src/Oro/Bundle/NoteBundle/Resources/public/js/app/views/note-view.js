@@ -1,16 +1,18 @@
+/*jslint browser:true, nomen:true*/
 /*global define, alert*/
-define(['underscore', 'backbone', 'routing', 'orolocale/js/formatter/datetime', 'autolinker'],
-function (_, Backbone, routing, dateTimeFormatter, autolinker) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/app/views/base/view',
+    'routing',
+    'orolocale/js/formatter/datetime',
+    'autolinker'
+], function ($, _, BaseView, routing, dateTimeFormatter, autolinker) {
     'use strict';
 
-    var $ = Backbone.$;
+    var NoteView;
 
-    /**
-     * @export  oronote/js/note/view
-     * @class   oronote.note.View
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    NoteView = BaseView.extend({
         options: {
             'template': null
         },
@@ -20,76 +22,85 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
         },
 
         events: {
-            'click .item-edit-button': '_edit',
-            'click .item-remove-button': '_delete',
-            'click .accordion-toggle': '_toggle'
+            'click .item-edit-button': 'onEdit',
+            'click .item-remove-button': 'onDelete',
+            'click .accordion-toggle': 'onToggle'
+        },
+
+        listen: {
+            'change model': '_onModelChanged'
         },
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
 
-            this.template = _.template($(this.options.template).html());
-
-            this.listenTo(this.model, 'change', this._onModelChanged);
-            this.listenTo(this.model, 'destroy', this.remove);
+            if (this.options.template) {
+                this.template = _.template($(this.options.template).html());
+            }
         },
 
-        render: function (collapsed) {
-            this.collapsed = _.isUndefined(collapsed) ? false : collapsed;;
 
-            var html = this.template(this._prepareTemplateData());
+        getTemplateData: function () {
+            var data = NoteView.__super__.getTemplateData.call(this);
 
-            this.$el.empty();
-            this.$el.append(html);
-
-            return this;
-        },
-
-        _prepareTemplateData: function () {
-            var data = this.model.toJSON();
-
-            data['collapsed'] = this.collapsed;
-            data['createdAt'] = dateTimeFormatter.formatDateTime(data['createdAt']);
-            data['updatedAt'] = dateTimeFormatter.formatDateTime(data['updatedAt']);
-            data['createdBy_url'] = null;
-            data['updatedBy_url'] = null;
-            if (data['createdBy_id'] && data['createdBy_viewable']) {
-                data['createdBy_url'] = routing.generate('oro_user_view', {'id': data['createdBy_id']});
+            data.collapsed = Boolean(this.collapsed);
+            data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
+            data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
+            data.createdBy_url = null;
+            data.updatedBy_url = null;
+            if (data.createdBy_id && data.createdBy_viewable) {
+                data.createdBy_url = routing.generate('oro_user_view', {'id': data.createdBy_id});
             }
-            if (data['updatedBy_id'] && data['updatedBy_viewable']) {
-                data['updatedBy_url'] = routing.generate('oro_user_view', {'id': data['updatedBy_id']});
+            if (data.updatedBy_id && data.updatedBy_viewable) {
+                data.updatedBy_url = routing.generate('oro_user_view', {'id': data.updatedBy_id});
             }
-            data['message'] = _.escape(data['message']);
-            data['brief_message'] = data['message'].replace(new RegExp('\r?\n', 'g'), ' ');
-            data['message'] = data['message'].replace(new RegExp('\r?\n', 'g'), '<br />');
-            data['message'] = autolinker.link(data['message'], {className: 'no-hash'});
-            if (data['brief_message'].length > 200) {
-                data['brief_message'] = data['brief_message'].substr(0, 200);
+            data.message = _.escape(data.message);
+            data.brief_message = data.message.replace(new RegExp('\r?\n', 'g'), ' ');
+            data.message = data.message.replace(new RegExp('\r?\n', 'g'), '<br />');
+            data.message = autolinker.link(data.message, {className: 'no-hash'});
+            if (data.brief_message.length > 200) {
+                data.brief_message = data.brief_message.substr(0, 200);
             }
-            data['brief_message'] = autolinker.link(data['brief_message'], {className: 'no-hash'});
+            data.brief_message = autolinker.link(data.brief_message, {className: 'no-hash'});
 
             return data;
         },
 
-        _edit: function () {
-            this.trigger('edit', this, this.model);
+        onEdit: function () {
+            this.model.collection.trigger('toEdit', this.model);
         },
 
-        _delete: function () {
-            this.trigger('delete', this, this.model);
+        onDelete: function () {
+            this.model.collection.trigger('toDelete', this.model);
         },
 
-        _toggle: function (e) {
+        onToggle: function (e) {
             e.preventDefault();
+            this.toggle();
+        },
 
-            var $el = $(e.currentTarget);
-            $el.toggleClass('collapsed');
-            $el.closest('.accordion-group').find('.collapse').toggleClass('in');
+        /**
+         * Collapses/expands view elements
+         *
+         * @param {boolean=} collapse
+         */
+        toggle: function (collapse) {
+            if (_.isUndefined(collapse)) {
+                collapse = !this.isCollapsed();
+            }
+            this.$('.accordion-toggle').toggleClass('collapsed', collapse);
+            this.$('.collapse').toggleClass('in', !collapse);
+        },
+
+        isCollapsed: function () {
+            return this.$('.accordion-toggle').hasClass('collapsed');
         },
 
         _onModelChanged: function () {
-            var collapsed = this.$el.find('.accordion-toggle').hasClass('collapsed');
-            this.render(collapsed);
+            this.collapsed = this.isCollapsed();
+            this.render();
         }
     });
+
+    return NoteView;
 });
