@@ -12,6 +12,10 @@ parameters:
     oro_entity_extend.type.choice.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
     oro_entity_extend.type.association_choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
     oro_entity_extend.type.multiple_association_choice.class:   Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType
+    oro_entity_extend.type.association.integer.class:           Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
+    oro_entity_extend.type.association.text.class:              Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+    oro_entity_extend.type.association.textarea.class:          Oro\Bundle\EntityExtendBundle\Form\Type\TextareaAssociationPropertyType
+    oro_entity_extend.type.association.choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType
 
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
 
@@ -96,8 +100,41 @@ services:
         class: %oro_entity_extend.type.multiple_association_choice.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
         tags:
             - { name: form.type, alias: oro_entity_extend_multiple_association_choice }
+
+    oro_entity_extend.type.association.integer:
+        class: %oro_entity_extend.type.association.integer.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_integer }
+
+    oro_entity_extend.type.association.text:
+        class: %oro_entity_extend.type.association.text.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_text }
+
+    oro_entity_extend.type.association.textarea:
+        class: %oro_entity_extend.type.association.textarea.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_textarea }
+
+    oro_entity_extend.type.association.choice:
+        class: %oro_entity_extend.type.association.choice.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_choice }
 
     oro_entity_extend.type.unique_key_collection_type:
         class: %oro_entity_extend.type.unique_key_collection_type.class%

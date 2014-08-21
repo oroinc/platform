@@ -30,11 +30,12 @@ oro_entity_config:
                         default_value:      1
                         auditable:          false
                     form:
-                        type:               integer
+                        type:               oro_entity_extend_association_property_integer
                         options:
                             block:          attachments
                             required:       false
                             label:          oro.attachment.maxsize
+                            association_class: 'OroAttachmentBundle:Attachment'
 
                 # the list of all allowed MIME types for attachments
                 mimetypes: # string (actually MIME types are delimited by \n symbol)
@@ -42,11 +43,12 @@ oro_entity_config:
                         priority:           80
                         auditable:          false
                     form:
-                        type:               textarea
+                        type:               oro_entity_extend_association_property_textarea
                         options:
                             block:          attachments
                             required:       false
                             label:          oro.attachment.mimetypes
+                            association_class: 'OroAttachmentBundle:Attachment'
 
 
                 # this attribute can be used to prohibit changing the attachment association state (no matter whether
