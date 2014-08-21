@@ -25,6 +25,6 @@ class OroIntegrationBundle implements Migration
     public static function modifyChannelTable(Schema $schema)
     {
         $table = $schema->getTable('oro_integration_channel');
-        $table->addColumn('edit_mode', 'smallint', ['notnull' => true]);
+        $table->addColumn('edit_mode', 'integer', ['notnull' => true]);
     }
 }
