@@ -50,8 +50,9 @@ class NavigationListener
         /** @var ItemInterface $reportsMenuItem */
         $reportsMenuItem = $event->getMenu()->getChild('reports_tab');
         if ($reportsMenuItem && $this->securityFacade->hasLoggedUser()) {
+            $organizationId = $this->securityFacade->getOrganizationId();
             $reports = $this->em->getRepository('OroReportBundle:Report')
-                ->findBy([], ['name' => 'ASC']);
+                ->findBy(['organization' => $organizationId], ['name' => 'ASC']);
 
             foreach ($reports as $key => $report) {
                 if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
