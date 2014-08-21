@@ -145,42 +145,9 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getJoinFromJoinAssociationCondition(Join $join, JoinAssociationCondition $condition)
     {
-        $joinAssociationPathExpression = $join->joinAssociationDeclaration->joinAssociationPathExpression;
-
-        $leftExpression = new ArithmeticExpression();
-        $pathExpression = new PathExpression(
-            self::EXPECTED_TYPE,
-            $joinAssociationPathExpression->identificationVariable,
-            $joinAssociationPathExpression->associationField
-        );
-        $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-        $leftExpression->simpleArithmeticExpression = $pathExpression;
-
-        $conditionalFactors = [];
-
-        foreach ($condition->getJoinConditions() as $joinCondition) {
-            $rightExpression = new ArithmeticExpression();
-            $pathExpression = new PathExpression(
-                self::EXPECTED_TYPE,
-                $condition->getEntityAlias(),
-                $joinCondition
-            );
-            $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
-            $rightExpression->simpleArithmeticExpression = $pathExpression;
-            $factor = new ConditionalPrimary();
-            $factor->simpleConditionalExpression = new ComparisonExpression($leftExpression, '=', $rightExpression);
-            $conditionalFactors[] = $factor;
-        }
         $conditionalFactors[] = $this->getConditionalFactor($condition);
-        $associationDeclaration = new RangeVariableDeclaration(
-            $condition->getEntityClass(),
-            $condition->getEntityAlias()
-        );
-
-        $newJoin = new Join($join->joinType, $associationDeclaration);
-        $newJoin->conditionalExpression = new ConditionalTerm($conditionalFactors);
-
-         return $newJoin;
+        $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
+        return $join;
     }
 
     /**
