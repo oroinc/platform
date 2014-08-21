@@ -2,59 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 /**
- * The goal of this form type is to check if an association is set
- * and mark entity as as "Required Update".
- * Also the association cannot be applied to the owning side entities.
+ * The abstract class for form types are used to work with entity config attributes
+ * related to an association selector.
  */
 abstract class AbstractAssociationChoiceType extends AbstractConfigType
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
     /**
      * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventListener(FormEvents::POST_SUBMIT, array($this, 'postSubmit'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        if ($this->isReadOnly($options)) {
-            $this->disableView($view);
-        }
-    }
-
-    /**
-     * Check if the association choice element should be disabled or not
-     *
-     * For example it should be disabled if the editing entity is the owning side of association
-     *
-     * @param array $options
-     *
-     * @return bool
      */
     protected function isReadOnly($options)
     {
@@ -71,39 +29,8 @@ abstract class AbstractAssociationChoiceType extends AbstractConfigType
                     return true;
                 }
             }
-            // disable for immutable entities
-            $configProvider = $this->configManager->getProvider($configId->getScope());
-            if ($configProvider->hasConfig($className)) {
-                $immutable = $configProvider->getConfig($className)->get('immutable');
-                if (true === $immutable) {
-                    return true;
-                }
-            }
         }
 
-        return false;
-    }
-
-    /**
-     * Disables the association choice element
-     *
-     * @param FormView $view
-     */
-    protected function disableView(FormView $view)
-    {
-        $view->vars['disabled'] = true;
-    }
-
-    /**
-     * @param array  $vars
-     * @param string $cssClass
-     */
-    protected function appendClassAttr(array &$vars, $cssClass)
-    {
-        if (isset($vars['attr']['class'])) {
-            $vars['attr']['class'] .= ' ' . $cssClass;
-        } else {
-            $vars['attr']['class'] = $cssClass;
-        }
+        return parent::isReadOnly($options);
     }
 }
