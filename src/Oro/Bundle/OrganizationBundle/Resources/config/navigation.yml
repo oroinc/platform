@@ -30,4 +30,4 @@ oro_titles:
     oro_business_unit_create: 'Create Business Unit'
     oro_business_unit_view: '%%business_unit.name%%'
 
-    oro_organization_update: '%%organization.name%% - Edit'
+    oro_organization_update_current: '%%organization.name%% - Edit'
