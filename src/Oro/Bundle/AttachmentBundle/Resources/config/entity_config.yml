@@ -84,7 +84,7 @@ oro_entity_config:
                             block:      general
                             subblock:   properties
                             empty_data: 1
-                            tooltip:    oro.attachment.max_size
+                            tooltip:    oro.attachment.max_size.tooltip
 
                 # the thubnail picture width in pixels
                 width: # integer
@@ -102,7 +102,7 @@ oro_entity_config:
                             block:      general
                             subblock:   properties
                             empty_data: 32
-                            tooltip:    oro.attachment.thumb_width
+                            tooltip:    oro.attachment.thumb_width.tooltip
 
                 # the thubnail picture height in pixels
                 height: # integer
@@ -120,4 +120,4 @@ oro_entity_config:
                             block:      general
                             subblock:   properties
                             empty_data: 32
-                            tooltip:    oro.attachment.thumb_height
+                            tooltip:    oro.attachment.thumb_height.tooltip
