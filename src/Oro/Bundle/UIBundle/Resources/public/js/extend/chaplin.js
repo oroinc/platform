@@ -70,10 +70,8 @@ define([
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             version = _ref[_i];
             for (name in version) {
-                if (version.hasOwnProperty(name)) {
-                    selector = version[name];
-                    this.registerGlobalRegion(instance, name, selector);
-                }
+                selector = version[name];
+                this.registerGlobalRegion(instance, name, selector);
             }
         }
     };
