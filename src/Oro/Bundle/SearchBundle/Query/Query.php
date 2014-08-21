@@ -101,9 +101,10 @@ class Query
         if ($queryType) {
             $this->createQuery($queryType);
         }
-        $this->options = [];
+
+        $this->options    = array();
         $this->maxResults = 0;
-        $this->from = false;
+        $this->from       = false;
     }
 
     /**
@@ -131,19 +132,19 @@ class Query
      */
     public function setMappingConfig($mappingConfig)
     {
-        $fields = [];
+        $fields = array();
+
         foreach ($mappingConfig as $entity => $config) {
             foreach ($config['fields'] as $field) {
                 if (isset($field['relation_fields'])) {
                     $fields = $this->mapRelationFields($fields, $field, $entity);
-                } else {
-                    if (isset($field['target_fields']) && count($field['target_fields']) > 0) {
-                        $fields = $this->mapTargetFields($fields, $field, $entity);
-                    }
+                } elseif (isset($field['target_fields']) && count($field['target_fields']) > 0) {
+                    $fields = $this->mapTargetFields($fields, $field, $entity);
                 }
             }
         }
-        $this->fields = $fields;
+
+        $this->fields        = $fields;
         $this->mappingConfig = $mappingConfig;
     }
 
@@ -181,6 +182,7 @@ class Query
         if (!is_array($entities)) {
             $entities = [$entities];
         }
+
         $this->from = $entities;
 
         foreach ($this->from as $index => $fromValue) {
@@ -353,11 +355,11 @@ class Query
      *
      * @return $this
      */
-    public function setOrderBy($fieldName, $direction = "ASC", $type = self::TYPE_TEXT)
+    public function setOrderBy($fieldName, $direction = 'ASC', $type = self::TYPE_TEXT)
     {
-        $this->orderBy = $fieldName;
+        $this->orderBy        = $fieldName;
         $this->orderDirection = $direction;
-        $this->orderType = $type;
+        $this->orderType      = $type;
 
         return $this;
     }
@@ -402,9 +404,7 @@ class Query
     {
         $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
 
-        return trim(
-            preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $clearedString))
-        );
+        return trim(preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $clearedString)));
     }
 
     /**

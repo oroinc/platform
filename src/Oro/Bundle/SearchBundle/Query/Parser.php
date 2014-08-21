@@ -3,67 +3,79 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 class Parser
 {
+    /**
+     * @var array
+     */
     protected $orderDirections = array(
         Query::ORDER_ASC,
         Query::ORDER_DESC,
     );
 
-    protected $keywords =
-        array(
-            Query::KEYWORD_AND,
-            Query::KEYWORD_OR,
-            Query::KEYWORD_FROM,
-            Query::KEYWORD_ORDER_BY,
-            Query::KEYWORD_OFFSET,
-            Query::KEYWORD_MAX_RESULTS
-        );
+    /**
+     * @var array
+     */
+    protected $keywords = array(
+        Query::KEYWORD_AND,
+        Query::KEYWORD_OR,
+        Query::KEYWORD_FROM,
+        Query::KEYWORD_ORDER_BY,
+        Query::KEYWORD_OFFSET,
+        Query::KEYWORD_MAX_RESULTS
+    );
 
-    protected $types =
-        array(
-            Query::TYPE_TEXT,
-            Query::TYPE_DATETIME,
-            Query::TYPE_DECIMAL,
-            Query::TYPE_INTEGER,
-        );
+    /**
+     * @var array
+     */
+    protected $types = array(
+        Query::TYPE_TEXT,
+        Query::TYPE_DATETIME,
+        Query::TYPE_DECIMAL,
+        Query::TYPE_INTEGER,
+    );
 
-    protected $typeOperators =
-        array(
-            Query::TYPE_TEXT => array(
-                Query::OPERATOR_CONTAINS,
-                Query::OPERATOR_NOT_CONTAINS
-            ),
-            QUERY::TYPE_INTEGER => array(
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-            ),
-            QUERY::TYPE_DECIMAL => array(
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-            ),
-            QUERY::TYPE_DATETIME => array(
-                Query::OPERATOR_GREATER_THAN,
-                Query::OPERATOR_GREATER_THAN_EQUALS,
-                Query::OPERATOR_LESS_THAN,
-                Query::OPERATOR_LESS_THAN_EQUALS,
-                Query::OPERATOR_EQUALS,
-                Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
-            )
-        );
+    /**
+     * @var array
+     */
+    protected $typeOperators = array(
+        Query::TYPE_TEXT => array(
+            Query::OPERATOR_CONTAINS,
+            Query::OPERATOR_NOT_CONTAINS
+        ),
+        QUERY::TYPE_INTEGER => array(
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+        ),
+        QUERY::TYPE_DECIMAL => array(
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+        ),
+        QUERY::TYPE_DATETIME => array(
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+        )
+    );
 
+    /**
+     * @var array
+     */
     private $mappingConfig;
 
     public function __construct($mappingConfig)
@@ -75,13 +87,14 @@ class Parser
      * Get query from string
      *
      * @param $inputString
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
     public function getQueryFromString($inputString)
     {
         $query = new Query(Query::SELECT);
         $query->setMappingConfig($this->mappingConfig);
         $this->parseExpression($query, trim($inputString));
+
         if (!$query->getFrom()) {
             $query->from('*');
         }
@@ -90,7 +103,7 @@ class Parser
     }
 
     /**
-     * Extention parser
+     * Expression parser
      *
      * @param Query  $query
      * @param string $inputString
@@ -111,7 +124,7 @@ class Parser
         }
         //check if we found 'where' statement
         if (in_array($keyWord, array(Query::KEYWORD_OR, Query::KEYWORD_AND))) {
-            $inputString = $this->Where($query, $keyWord, $inputString);
+            $inputString = $this->where($query, $keyWord, $inputString);
         }
         //check if we found 'from' statement
         if ($keyWord == Query::KEYWORD_FROM) {
@@ -139,25 +152,26 @@ class Parser
     /**
      * ORDER BY keyword
      *
-     * @param  \Oro\Bundle\SearchBundle\Query\Query $query
-     * @param  string                               $inputString
+     * @param  Query  $query
+     * @param  string $inputString
      * @return string
      */
     private function orderBy(Query $query, $inputString)
     {
         $orderType = $this->getWord($inputString);
-        if (!in_array($orderType, $this->types)) {
-            $orderField = $orderType;
-            $orderType = Query::TYPE_TEXT;
-            $inputString = $this->trimString($inputString, $orderType);
 
+        if (!in_array($orderType, $this->types)) {
+            $orderField  = $orderType;
+            $orderType   = Query::TYPE_TEXT;
+            $inputString = $this->trimString($inputString, $orderType);
         } else {
             $inputString = $this->trimString($inputString, $orderType);
-            $orderField = $this->getWord($inputString);
+            $orderField  = $this->getWord($inputString);
             $inputString = $this->trimString($inputString, $orderField);
         }
 
         $orderDirection = $this->getWord($inputString);
+
         if (in_array($orderDirection, $this->orderDirections)) {
             $inputString = $this->trimString($inputString, $orderDirection);
         } else {
@@ -172,16 +186,18 @@ class Parser
     /**
      * OFFSET keyword
      *
-     * @param Query $query
-     * @param       $inputString
+     * @param Query  $query
+     * @param string $inputString
      *
      * @return string
      */
     private function offset(Query $query, $inputString)
     {
-        $offset = $this->getWord($inputString);
+        $offset      = $this->getWord($inputString);
         $inputString = $this->trimString($inputString, $offset);
+
         $query->setFirstResult($offset);
+
         if (!$query->getMaxResults()) {
             $query->setMaxResults(Query::INFINITY);
         }
@@ -199,8 +215,9 @@ class Parser
      */
     private function maxResults(Query $query, $inputString)
     {
-        $maxResults= $this->getWord($inputString);
+        $maxResults  = $this->getWord($inputString);
         $inputString = $this->trimString($inputString, $maxResults);
+
         $query->setMaxResults($maxResults);
 
         return $inputString;
@@ -217,14 +234,15 @@ class Parser
     private function from(Query $query, $inputString)
     {
         if (substr($inputString, 0, 1) == '(') {
-            $fromString = $this->getWord($inputString, ')');
+            $fromString  = $this->getWord($inputString, ')');
             $inputString = $this->trimString($inputString, $fromString . ')');
-            $fromString = str_replace(array('(', ')'), '', $fromString);
-            $query->from(explode(', ', $fromString));
+            $fromString  = str_replace(array('(', ')'), '', $fromString);
 
+            $query->from(explode(', ', $fromString));
         } else {
-            $from = $this->getWord($inputString);
+            $from        = $this->getWord($inputString);
             $inputString = $this->trimString($inputString, $from);
+
             $query->from($from);
         }
 
@@ -234,11 +252,11 @@ class Parser
     /**
      * Parse where statement
      *
-     * @param Query  $query
-     * @param string $keyWord
-     * @param string $inputString
-     *
+     * @param  Query  $query
+     * @param  string $keyWord
+     * @param  string $inputString
      * @return string
+     * @throws \InvalidArgumentException
      */
     private function where(Query $query, $keyWord, $inputString)
     {
@@ -251,33 +269,32 @@ class Parser
         }
 
         //parse field name
-        $fieldName = $this->getWord($inputString);
-        $inputString = $this->trimString($inputString, $fieldName);
-
+        $fieldName    = $this->getWord($inputString);
+        $inputString  = $this->trimString($inputString, $fieldName);
         //parse operator
         $operatorWord = $this->getWord($inputString);
+
         // check operator
         if (!in_array($operatorWord, $this->typeOperators[$typeWord])) {
             throw new \InvalidArgumentException(
                 sprintf('Type %s does not support operator "%s"', $typeWord, $operatorWord)
             );
         }
+
         $inputString = $this->trimString($inputString, $operatorWord);
 
         if (in_array($operatorWord, array(Query::OPERATOR_IN, Query::OPERATOR_NOT_IN))) {
-            $fromString = $this->getWord($inputString, ')');
+            $fromString  = $this->getWord($inputString, ')');
             $inputString = $this->trimString($inputString, $fromString . ')');
-            $fromString = str_replace(array('(', ')'), '', $fromString);
-            $value = explode(', ', $fromString);
+            $fromString  = str_replace(array('(', ')'), '', $fromString);
+            $value       = explode(', ', $fromString);
+        } elseif (substr($inputString, 0, 1) == '"') {
+            $inputString = substr($inputString, 1, strlen($inputString));
+            $value       = $this->getWord($inputString, '"');
+            $inputString = $this->trimString($inputString, $value . '"');
         } else {
-            if (substr($inputString, 0, 1) == '"') {
-                $inputString = substr($inputString, 1, strlen($inputString));
-                $value = $this->getWord($inputString, '"');
-                $inputString = $this->trimString($inputString, $value . '"');
-            } else {
-                $value = $this->getWord($inputString);
-                $inputString = $this->trimString($inputString, $value);
-            }
+            $value       = $this->getWord($inputString);
+            $inputString = $this->trimString($inputString, $value);
         }
 
         $query->where($keyWord, $fieldName, $operatorWord, $value, $typeWord);
