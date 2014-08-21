@@ -42,7 +42,7 @@ oro_entity_config:
                         priority:           80
                         auditable:          false
                     form:
-                        type: textarea
+                        type:             textarea
                         options:
                             block:        attachments
                             required:     false

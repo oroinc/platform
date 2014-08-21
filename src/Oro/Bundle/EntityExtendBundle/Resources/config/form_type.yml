@@ -8,6 +8,7 @@ parameters:
 
     oro_entity_extend.type.integer.class:                       Oro\Bundle\EntityExtendBundle\Form\Type\IntegerType
     oro_entity_extend.type.text.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\TextType
+    oro_entity_extend.type.textarea.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType
     oro_entity_extend.type.choice.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
     oro_entity_extend.type.association_choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
     oro_entity_extend.type.multiple_association_choice.class:   Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType
@@ -68,6 +69,13 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_text }
+
+    oro_entity_extend.type.textarea:
+        class: %oro_entity_extend.type.textarea.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_textarea }
 
     oro_entity_extend.type.choice:
         class: %oro_entity_extend.type.choice.class%
