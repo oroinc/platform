@@ -18,6 +18,9 @@ datagrid:
                 join:
                     left:
                         - { join: website.owner, alias: owner }
+                where:
+                    and:
+                      - website.organization = @oro_security.security_facade->getOrganizationId
         columns:
             name:
                 label:         oro.tracking.trackingwebsite.name.label
