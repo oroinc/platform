@@ -79,11 +79,13 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumCodeProvider()
     {
         return [
+            ['_', '_'],
             ['test', 'test'],
             ['Test', 'test'],
             ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
             ['test123', 'test123'],
-            ['test 123', 'test123'],
+            ['test 123', 'test_123'],
+            [' test 123 ', 'test_123'],
             ['test_123', 'test_123'],
             ['test___123', 'test_123'],
             ['test-123', 'test_123'],
@@ -91,6 +93,86 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['test---___123', 'test_123'],
             ['test- - - _ _ _ 123', 'test_123'],
             ['test \/()[]~!@#$%^&*_+`', 'test_'],
+        ];
+    }
+
+    /**
+     * @dataProvider buildEnumCodeForInvalidEnumNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildEnumCodeForInvalidEnumName($enumName)
+    {
+        var_dump(ExtendHelper::buildEnumCode($enumName));
+    }
+
+    public static function buildEnumCodeForInvalidEnumNameProvider()
+    {
+        return [
+            [''],
+            ['__'],
+            ['_ _'],
+            [' \/()[]~!@#$%^&*+-'],
+        ];
+    }
+
+    /**
+     * @dataProvider buildEnumValueIdProvider
+     */
+    public function testBuildEnumValueId($enumValueName, $expectedEnumValueId)
+    {
+        $enumValueId = ExtendHelper::buildEnumValueId($enumValueName);
+        $this->assertEquals(
+            $expectedEnumValueId,
+            $enumValueId
+        );
+        $this->assertTrue(
+            strlen($enumValueId) <= ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH,
+            sprintf(
+                'The enum value id must be less or equal than %d characters',
+                ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH
+            )
+        );
+    }
+
+    public static function buildEnumValueIdProvider()
+    {
+        return [
+            ['_', '_'],
+            ['test', 'test'],
+            ['Test', 'test'],
+            ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
+            ['test123', 'test123'],
+            ['test 123', 'test_123'],
+            [' test 123 ', 'test_123'],
+            ['test_123', 'test_123'],
+            ['test___123', 'test_123'],
+            ['test-123', 'test_123'],
+            ['test---123', 'test_123'],
+            ['test---___123', 'test_123'],
+            ['test- - - _ _ _ 123', 'test_123'],
+            ['test \/()[]~!@#$%^&*_+`', 'test_'],
+            ['01234567890123456789012345678901', '01234567890123456789012345678901'],
+            ['012345678901234567890123456789012', '012345678901234567890123_226f1a9'],
+            ['sed do eiusmod tempor incididunt ut labore et dolore magna aliqua', 'sed_do_eiusmod_tempor_i_a5e72088'],
+        ];
+    }
+
+    /**
+     * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBuildEnumValueIdForInvalidEnumValueName($enumValueName)
+    {
+        ExtendHelper::buildEnumValueId($enumValueName);
+    }
+
+    public static function buildEnumValueIdForInvalidEnumValueNameProvider()
+    {
+        return [
+            [''],
+            ['__'],
+            ['_ _'],
+            [' \/()[]~!@#$%^&*+-'],
         ];
     }
 

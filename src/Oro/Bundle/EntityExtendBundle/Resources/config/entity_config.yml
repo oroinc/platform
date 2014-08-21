@@ -391,10 +391,17 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # the locale name in which an enum name and options labels are entered
+                # this is a temprary attribute is used to allow create an enum on a field edit page
+                # as part of schema update procedure a value of this attribute is removed
+                enum_locale: # string
+                    options:
+                        auditable:          false
+
                 # the name of an enum linked to a field
                 # this is a temprary attribute is used to allow create an enum on a field edit page
                 # a value of this attribute is used as a label for an entity is used to store enum values
-                # and then as part of schema update procedure it is removed
+                # and then as part of field reference update procedure it is removed
                 enum_name: # string
                     options:
                         allowed_type:       [enum, multiEnum]

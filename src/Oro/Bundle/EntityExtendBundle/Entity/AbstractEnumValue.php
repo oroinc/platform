@@ -5,13 +5,14 @@ namespace Oro\Bundle\EntityExtendBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 
 /**
  * The base class for all entities represent values for a particular enum
  *
  * @ORM\MappedSuperclass
  */
-abstract class AbstractEnumValue
+abstract class AbstractEnumValue implements Translatable
 {
     /**
      * @var string
@@ -46,7 +47,7 @@ abstract class AbstractEnumValue
     /**
      * @Gedmo\Locale
      */
-    private $locale;
+    protected $locale;
 
     /**
      * @param string  $id
@@ -58,8 +59,8 @@ abstract class AbstractEnumValue
     {
         $this->id       = $id;
         $this->name     = $name;
-        $this->priority = $priority;
-        $this->default  = $default;
+        $this->priority = (int)$priority;
+        $this->default  = (bool)$default;
     }
 
     /**
@@ -97,7 +98,7 @@ abstract class AbstractEnumValue
      */
     public function setPriority($priority)
     {
-        $this->priority = $priority;
+        $this->priority = (int)$priority;
 
         return $this;
     }
@@ -117,7 +118,7 @@ abstract class AbstractEnumValue
      */
     public function setDefault($default)
     {
-        $this->default = $default;
+        $this->default = (bool)$default;
 
         return $this;
     }

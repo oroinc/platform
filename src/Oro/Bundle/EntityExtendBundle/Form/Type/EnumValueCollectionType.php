@@ -8,8 +8,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 class EnumValueCollectionType extends CollectionType
 {
     /**

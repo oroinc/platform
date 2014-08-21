@@ -444,9 +444,10 @@ class ConfigManager
             $this->getEntityManager()->persist($model);
         }
 
+        // @todo: need investigation if we can call this flush only if !empty($models)
         $this->getEntityManager()->flush();
 
-        if ($this->cache) {
+        if ($this->cache && !empty($models)) {
             $this->cache->removeAllConfigurable();
         }
 

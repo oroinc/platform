@@ -49,7 +49,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
      */
     public function supports($actionType)
     {
-        return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE;
+        return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE
+        || $actionType === ExtendConfigDumper::ACTION_POST_UPDATE;
     }
 
     /**
@@ -146,6 +147,34 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postUpdate()
+    {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $entityConfigs        = $extendConfigProvider->getConfigs();
+        foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                continue;
+            }
+
+            $entityClassName = $entityConfig->getId()->getClassName();
+            $schema          = $entityConfig->get('schema', false, []);
+            if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
+                continue;
+            }
+
+            $schema['doctrine'][$entityClassName]['repositoryClass']                =
+                'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository';
+            $schema['doctrine'][$entityClassName]['gedmo']['translation']['entity'] =
+                'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation';
+            $entityConfig->set('schema', $schema);
+
+            $this->configManager->persist($entityConfig);
         }
     }
 

@@ -16,6 +16,7 @@ parameters:
     oro_entity_extend.type.enum_value.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType
     oro_entity_extend.type.enum_value_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
     oro_entity_extend.type.enum_name.class:                     Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType
+    oro_entity_extend.entity_config_type.extension.enum.class:  Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension
 
 services:
     oro_entity_extend.type.entity:
@@ -103,9 +104,16 @@ services:
     oro_entity_extend.type.enum_name:
         class: %oro_entity_extend.type.enum_name.class%
         arguments:
-            - @doctrine
-            - @translator
-            - @oro_translation.database_translation.metadata.cache
+            - @oro_entity_config.config_manager
             - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_name }
+
+    oro_entity_extend.entity_config_type.extension.enum:
+        class: %oro_entity_extend.entity_config_type.extension.enum.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_entity_extend.enum_synchronizer
+        tags:
+            - { name: form.type_extension, alias: oro_entity_config_type }
