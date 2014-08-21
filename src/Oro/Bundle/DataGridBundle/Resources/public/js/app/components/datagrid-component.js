@@ -8,16 +8,13 @@ define(function (require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
-    var PageableCollection = require('./pageable-collection');
-    var Grid = require('./datagrid/grid');
-    var GridViewsView = require('./datagrid/grid-views/view');
-    var mapActionModuleName = require('./map-action-module-name');
-    var mapCellModuleName = require('./map-cell-module-name');
-    var gridContentManager = require('./content-manager');
+    var PageableCollection = require('orodatagrid/js/pageable-collection');
+    var Grid = require('orodatagrid/js/datagrid/grid');
+    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
+    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    var gridContentManager = require('orodatagrid/js/content-manager');
 
-    var gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
-
-        helpers = {
+    var helpers = {
             cellType: function (type) {
                 return type + 'Cell';
             },
@@ -182,61 +179,7 @@ define(function (require) {
                     routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
                 };
             }
-        },
-
-        gridViewsBuilder = {
-            /**
-             * Runs grid views builder
-             * Builder interface implementation
-             *
-             * @param {jQuery.Deferred} deferred
-             * @param {Object} options
-             * @param {jQuery} [options.$el] container for the grid
-             * @param {string} [options.gridName] grid name
-             * @param {Object} [options.gridPromise] grid builder's promise
-             * @param {Object} [options.data] data for grid's collection
-             * @param {Object} [options.metadata] configuration for the grid
-             */
-            init: function (deferred, options) {
-                var self = {
-                    metadata: _.defaults(options.metadata, {
-                        gridViews: {}
-                    })
-                };
-
-                options.gridPromise.done(function (grid) {
-                    var gridViews = gridViewsBuilder.build.call(self, grid.collection);
-                    deferred.resolve(gridViews);
-                }).fail(function () {
-                    deferred.reject();
-                });
-            },
-
-            /**
-             * Creates grid view
-             *
-             * @param {orodatagrid.PageableCollection} collection
-             * @returns {orodatagrid.datagrid.GridViewsView}
-             */
-            build: function (collection) {
-                var options, gridViews;
-                options = gridViewsBuilder.combineGridViewsOptions.call(this);
-                gridViews = new GridViewsView(_.extend({collection: collection}, options));
-                $(gridGridViewsSelector).append(gridViews.render().$el);
-
-                return gridViews;
-            },
-
-            /**
-             * Process metadata and combines options for datagrid views
-             *
-             * @returns {Object}
-             */
-            combineGridViewsOptions: function () {
-                return this.metadata.gridViews;
-            }
         };
-
 
     /**
      * Runs passed builder
@@ -274,10 +217,8 @@ define(function (require) {
         promises = [options.gridPromise];
         runBuilder(deferred, options, gridBuilder);
 
-        // run gridViews builder
-        deferred = $.Deferred();
-        promises.push(deferred.promise());
-        runBuilder(deferred, options, gridViewsBuilder);
+        options.builders = options.builders || [];
+        options.builders.push('orodatagrid/js/grid-views-builder');
 
         // run other builders
         _.each(options.builders, function (module) {
