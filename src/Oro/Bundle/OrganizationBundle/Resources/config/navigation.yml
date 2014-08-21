@@ -6,6 +6,14 @@ oro_menu_config:
             extras:
                 routes: ['oro_business_unit_*']
                 description: 'oro.business_unit.menu.list.description'
+
+        oro_organization_list:
+            label: 'oro.organization.entity_plural_label'
+            route: 'oro_organization_update_current'
+            extras:
+                routes: ['oro_organization_*']
+                description: 'oro.organization.menu.list.description'
+
     tree:
         application_menu:
             children:
@@ -14,9 +22,12 @@ oro_menu_config:
                         users_management:
                             children:
                                 oro_business_unit_list: ~
+                                oro_organization_list: ~
 
 oro_titles:
     oro_business_unit_index:  ~
     oro_business_unit_update: '%%business_unit.name%% - Edit'
     oro_business_unit_create: 'Create Business Unit'
     oro_business_unit_view: '%%business_unit.name%%'
+
+    oro_organization_update: '%%organization.name%% - Edit'

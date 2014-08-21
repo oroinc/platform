@@ -1,11 +1,12 @@
 parameters:
     oro_organization.form.type.business_unit.class:                  Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
     oro_organization.form.handler.business_unit.class:               Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler
-
     oro_organization.form.type.business_unit_tree_type.class:        Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
     oro_organization.form.type.business_unit_tree_select_type.class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
     oro_organization.form.type.business_unit.api.class:              Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
 
+    oro_organization.form.type.organization.class:                   Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
+    oro_organization.form.handler.organization.class:                Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler
     oro_organization.form.type.organization_select.class:            Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType
     oro_organization.form.type.organizations_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
 
@@ -68,6 +69,27 @@ services:
     #
     # Organization
     #
+    oro_organization.form.type.organization:
+        class: %oro_organization.form.type.organization.class%
+        tags:
+            - { name: form.type, alias: oro_organization }
+
+    oro_organization.form.organization:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - 'oro_organization_form'
+            - 'oro_organization'
+
+    oro_organization.form.handler.organization:
+        class: %oro_organization.form.handler.organization.class%
+        scope: request
+        arguments:
+            - @oro_organization.form.organization
+            - @request
+            - @doctrine.orm.entity_manager
+
     oro_organization.form.business_unit.api:
         class:           Symfony\Component\Form\Form
         factory_method:  createNamed
