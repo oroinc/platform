@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -17,10 +18,11 @@ class ActiveDashboard
     /**
      * @var integer
      *
-     * @ORM\Column(name="user_id", type="integer")
+     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $userId;
+    protected $id;
 
     /**
      * @var User
@@ -37,6 +39,22 @@ class ActiveDashboard
      * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $organization;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @param User $user
@@ -75,5 +93,28 @@ class ActiveDashboard
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return ActiveDashboard
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

@@ -150,7 +150,6 @@ class Manager
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->securityContext->getToken();
-
         $dashboard = new Dashboard();
         $dashboard->setOrganization($token->getOrganizationContext());
         return $this->getDashboardModel($dashboard);
@@ -217,8 +216,11 @@ class Manager
      */
     public function findUserActiveDashboard(User $user)
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user' => $user));
+            ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard->getDashboard());
@@ -235,9 +237,10 @@ class Manager
     public function findDefaultDashboard()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token      = $this->securityContext->getToken();
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
-            ->findDefaultDashboard($token->getOrganizationContext());
+            ->findDefaultDashboard($organization);
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);
@@ -254,9 +257,10 @@ class Manager
     {
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $qb    = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
         $qb->where('dashboard.organization = :organization')
-            ->setParameter('organization', $token->getOrganizationContext());
+            ->setParameter('organization', $organization);
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
@@ -270,14 +274,18 @@ class Manager
      */
     public function setUserActiveDashboard(DashboardModel $dashboard, User $user, $flush = false)
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $activeDashboard = $this->entityManager
             ->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user' => $user));
+            ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
-            $activeDashboard->setUser($user);
 
+            $activeDashboard->setUser($user);
+            $activeDashboard->setOrganization($organization);
             $this->entityManager->persist($activeDashboard);
         }
 
