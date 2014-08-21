@@ -178,7 +178,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'id',
             'string',
             [
-                'length'        => 32,
+                'length'        => ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH,
                 OroOptions::KEY => [
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
@@ -666,6 +666,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     $columnTypeName
                 )
             );
+        }
+
+        if ($columnTypeName === Type::STRING && $targetColumn->getLength() !== null) {
+            $options['length'] = $targetColumn->getLength();
         }
 
         $table->addColumn($columnName, $columnTypeName, $options);

@@ -8,7 +8,7 @@ oro_entity_config:
                         is_bool:            true
                         allowed_type:       [string,integer,smallint,bigint,boolean,decimal,datetime,date,time,text,float,money,percent,optionSet,enum,multiEnum,file,image,ref-one,manyToOne]
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false

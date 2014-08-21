@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -57,7 +56,17 @@ class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
                 )
             );
 
-        $this->type = new MultipleAssociationChoiceType($this->configManager);
+        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityClassResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->will($this->returnArgument(0));
+
+        $this->type = new MultipleAssociationChoiceType(
+            $this->configManager,
+            $entityClassResolver
+        );
     }
 
     public function testSetDefaultOptions()

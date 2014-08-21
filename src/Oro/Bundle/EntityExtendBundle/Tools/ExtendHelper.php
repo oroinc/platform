@@ -6,6 +6,8 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ExtendHelper
 {
+    const MAX_ENUM_VALUE_ID_LENGTH = 32;
+
     /**
      * @param string $type
      *
@@ -74,20 +76,83 @@ class ExtendHelper
      * @param string $enumName
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public static function buildEnumCode($enumName)
     {
+        if (empty($enumName)) {
+            throw new \InvalidArgumentException('$enumName must not be empty.');
+        }
+
         if (function_exists('iconv')) {
             $enumName = iconv('utf-8', 'ascii//TRANSLIT', $enumName);
         }
 
-        return strtolower(
+        $result = strtolower(
             preg_replace(
-                ['/ +/', '/-+/', '/_{2,}/', '/[^a-z0-9_]+/i'],
-                ['', '_', '_', ''],
-                $enumName
+                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+                ['_', '_', '', '_'],
+                trim($enumName)
             )
         );
+
+        if ($result === '_' && $result !== $enumName) {
+            $result = '';
+        }
+
+        if (empty($result)) {
+            throw new \InvalidArgumentException(
+                sprintf('The conversion of "%s" to enum code produces empty string.', $enumName)
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns an enum value identifier based on the given value name.
+     *
+     * @param string $enumValueName
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function buildEnumValueId($enumValueName)
+    {
+        if (empty($enumValueName)) {
+            throw new \InvalidArgumentException('$enumValueName must not be empty.');
+        }
+
+        if (function_exists('iconv')) {
+            $enumValueName = iconv('utf-8', 'ascii//TRANSLIT', $enumValueName);
+        }
+
+        $result = strtolower(
+            preg_replace(
+                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+                ['_', '_', '', '_'],
+                trim($enumValueName)
+            )
+        );
+
+        if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
+            $hash = dechex(crc32($result));
+            $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
+        }
+
+        if ($result === '_' && $result !== $enumValueName) {
+            $result = '';
+        }
+
+        if (empty($result)) {
+            throw new \InvalidArgumentException(
+                sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
+            );
+        }
+
+        return $result;
     }
 
     /**

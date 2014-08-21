@@ -15,16 +15,23 @@ use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
 class EnumValueTranslation extends AbstractTranslation
 {
     /**
-     * @var string $foreignKey
+     * @var string
      *
      * @ORM\Column(name="foreign_key", type="string", length=32)
      */
     protected $foreignKey;
 
     /**
-     * @var string $content
+     * @var string
      *
      * @ORM\Column(type="string", length=255)
      */
     protected $content;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=4)
+     */
+    protected $field;
 }

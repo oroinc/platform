@@ -3,10 +3,10 @@
     <div class="email-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.label) }}
-            <label class="add-on" title="{{ 'Default'|trans }}">
+            <label class="add-on" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans({}, 'tooltips') }}">
                 {{ form_widget(form.is_default) }}
             </label>
-            <label class="add-on" title="{{ 'Priority'|trans }}">
+            <label class="add-on" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans({}, 'tooltips') }}">
                 <i class="icon-list handle"></i>
                 {{ form_widget(form.priority, {'attr': {'class': 'priority'}}) }}
             </label>

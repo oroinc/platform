@@ -2,104 +2,36 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class EnumNameType extends AbstractType
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var DynamicTranslationMetadataCache */
-    protected $dbTranslationMetadataCache;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     /**
-     * @param ManagerRegistry                 $doctrine
-     * @param TranslatorInterface             $translator
-     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
+     * @param ConfigManager                   $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
-        ManagerRegistry $doctrine,
-        TranslatorInterface $translator,
-        DynamicTranslationMetadataCache $dbTranslationMetadataCache,
+        ConfigManager $configManager,
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->doctrine                   = $doctrine;
-        $this->translator                 = $translator;
-        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
-        $this->nameGenerator              = $nameGenerator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function postSubmit(FormEvent $event)
-    {
-        $form = $event->getForm();
-        if ($form->isValid()) {
-            // add translations for an entity will be used to store enum values
-            $enumName          = $event->getData();
-            $enumCode          = ExtendHelper::buildEnumCode($enumName);
-            $labelsToBeUpdated = [
-                ExtendHelper::getEnumTranslationKey('label', $enumCode)        => $enumName,
-                ExtendHelper::getEnumTranslationKey('plural_label', $enumCode) => $enumName,
-                ExtendHelper::getEnumTranslationKey('description', $enumCode)  => '',
-            ];
-            /** @var EntityManager $em */
-            $em = $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
-            /** @var TranslationRepository $translationRepo */
-            $translationRepo = $em->getRepository(Translation::ENTITY_NAME);
-            $locale          = $this->translator->getLocale();
-            $transValues     = [];
-            foreach ($labelsToBeUpdated as $labelKey => $labelText) {
-                // save into translation table
-                $transValues[] = $translationRepo->saveValue(
-                    $labelKey,
-                    $labelText,
-                    $locale,
-                    TranslationRepository::DEFAULT_DOMAIN,
-                    Translation::SCOPE_UI
-                );
-            }
-            // mark translation cache dirty
-            $this->dbTranslationMetadataCache->updateTimestamp($locale);
-            // flush translations to db
-            $em->flush($transValues);
-        }
+        $this->configManager = $configManager;
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**
@@ -110,15 +42,7 @@ class EnumNameType extends AbstractType
         $resolver->setDefaults(
             array(
                 'constraints' => [
-                    new NotBlank(),
-                    new Length(['max' => $this->nameGenerator->getMaxEnumCodeSize()]),
-                    new Regex(
-                        [
-                            'pattern' => '/^[\w- ]*$/',
-                            'message' => 'This value should contains only alphabetic symbols,'
-                                . ' numbers, spaces, underscore or minus symbols'
-                        ]
-                    )
+                    new NotBlank()
                 ]
             )
         );
@@ -126,13 +50,27 @@ class EnumNameType extends AbstractType
         $constraintsNormalizer = function (Options $options, $constraints) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $options['config_id'];
-
-            $constraints[] = new UniqueEnumName(
-                [
-                    'entityClassName' => $fieldConfigId->getClassName(),
-                    'fieldName'       => $fieldConfigId->getFieldName()
-                ]
-            );
+            $enumCode      = $this->getEnumCode($fieldConfigId);
+            if (empty($enumCode)) {
+                // validations of new enum
+                $constraints[] = new Length(['max' => $this->nameGenerator->getMaxEnumCodeSize()]);
+                $constraints[] = new Regex(
+                    [
+                        'pattern' => '/^[\w- ]*$/',
+                        'message' => 'This value should contains only alphabetic symbols,'
+                            . ' numbers, spaces, underscore or minus symbols'
+                    ]
+                );
+                $constraints[] = new UniqueEnumName(
+                    [
+                        'entityClassName' => $fieldConfigId->getClassName(),
+                        'fieldName'       => $fieldConfigId->getFieldName()
+                    ]
+                );
+            } else {
+                // validations of existing enum
+                $constraints[] = new Length(['max' => 255]);
+            }
 
             return $constraints;
         };
@@ -158,5 +96,26 @@ class EnumNameType extends AbstractType
     public function getParent()
     {
         return 'text';
+    }
+
+    /**
+     * Tries to get an enum code from configs of the given field
+     *
+     * @param FieldConfigId $fieldConfigId
+     *
+     * @return string|null
+     */
+    protected function getEnumCode(FieldConfigId $fieldConfigId)
+    {
+        $enumCode = null;
+
+        $enumConfigProvider = $this->configManager->getProvider('enum');
+        if ($enumConfigProvider->hasConfig($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())) {
+            $enumCode = $enumConfigProvider
+                ->getConfig($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())
+                ->get('enum_code');
+        }
+
+        return $enumCode;
     }
 }

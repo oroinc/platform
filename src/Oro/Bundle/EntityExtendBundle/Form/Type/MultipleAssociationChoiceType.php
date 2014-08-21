@@ -9,16 +9,15 @@ use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
-class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
+class MultipleAssociationChoiceType extends AbstractAssociationType
 {
-    /** @var array */
-    private $owningSideEntities;
-
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
+
         $that    = $this;
         $choices = function (Options $options) use ($that) {
             return $that->getChoices($options['association_class']);
@@ -26,11 +25,10 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
 
         $resolver->setDefaults(
             [
-                'empty_value'       => false,
-                'choices'           => $choices,
-                'multiple'          => true,
-                'expanded'          => true,
-                'association_class' => null, // the group name for owning side entities
+                'empty_value' => false,
+                'choices'     => $choices,
+                'multiple'    => true,
+                'expanded'    => true
             ]
         );
     }
@@ -77,25 +75,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function isReadOnly($options)
-    {
-        $this->ensureOwningSideEntitiesLoaded($options['association_class']);
-
-        /** @var EntityConfigId $configId */
-        $configId  = $options['config_id'];
-        $className = $configId->getClassName();
-
-        // disable for owning side entities
-        if (!empty($className) && in_array($className, $this->owningSideEntities)) {
-            return true;
-        };
-
-        return parent::isReadOnly($options);
-    }
-
-    /**
      * Gets the list of values which state cannot be changed
      *
      * @param array $options
@@ -107,8 +86,8 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
         $result = [];
 
         /** @var EntityConfigId $configId */
-        $configId       = $options['config_id'];
-        $className      = $configId->getClassName();
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
         if (!empty($className)) {
             $configProvider = $this->configManager->getProvider($configId->getScope());
             if ($configProvider->hasConfig($className)) {
@@ -116,38 +95,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationChoiceType
                 if (is_array($immutable) && !empty($immutable)) {
                     $result = $immutable;
                 }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Makes sure that the owning side entities are loaded
-     *
-     * @param string $groupName
-     */
-    protected function ensureOwningSideEntitiesLoaded($groupName)
-    {
-        if (null === $this->owningSideEntities) {
-            $this->owningSideEntities = $this->loadOwningSideEntities($groupName);
-        }
-    }
-
-    /**
-     * Loads the list of owning side entities
-     *
-     * @param $groupName
-     * @return string[]
-     */
-    protected function loadOwningSideEntities($groupName)
-    {
-        $result  = [];
-        $configs = $this->configManager->getProvider('grouping')->getConfigs();
-        foreach ($configs as $config) {
-            $groups = $config->get('groups');
-            if (!empty($groups) && in_array($groupName, $groups)) {
-                $result[] = $config->getId()->getClassName();
             }
         }
 

@@ -2,33 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
- * The abstract form type for form types are used to work with entity config attributes
- * The goal of this form type is to check if an association is set
- * and mark entity as as "Required Update".
+ * The abstract class for form types are used to work with entity config attributes
+ * which can impact a schema of extend entities.
+ * Supported options:
+ *  require_schema_update - if set to true an entity will be marked as "Required Update" in case
+ *                          when a value of an entity config attribute is changed
  */
-abstract class AbstractConfigType extends AbstractType
+abstract class AbstractConfigType extends BaseAbstractConfigType
 {
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
     /**
      * {@inheritdoc}
      */
