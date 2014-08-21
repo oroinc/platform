@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
+namespace Oro\Bundle\OrganizationBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
@@ -15,8 +15,10 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->setLabel('Label_' . $randomPrefix)
             ->setOwner('Main')
             ->setEntity('Business Unit', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
+            ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
+            ->assertTitle('Roles - User Management - System')
             ->close();
 
         return ($randomPrefix);
@@ -90,7 +92,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
      *
      * @dataProvider columnTitle
      */
-    public function testBusinessUnitAcl($aclCase, $username, $role, $unitName)
+    public function testAccountAcl($aclCase, $username, $role, $unitName)
     {
         $roleName = 'Label_' . $role;
         $login = $this->login();
@@ -107,9 +109,6 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             case 'view':
                 $this->viewAcl($login, $username, $roleName, $unitName);
                 break;
-            case 'view list':
-                $this->viewListAcl($login, $roleName, $username);
-                break;
         }
     }
 
@@ -125,7 +124,10 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->setPassword('123123q')
             ->submit()
             ->openBusinessUnits('Oro\Bundle\OrganizationBundle')
-            ->checkContextMenu($unitName, 'Delete');
+            ->filterBy('Name', $unitName)
+            ->checkActionMenu('Delete')
+            ->open(array($unitName))
+            ->assertElementNotPresent("//div[@class='pull-left btn-group icons-holder']/a[@title='Delete Account']");
     }
 
     public function updateAcl($login, $roleName, $username, $unitName)
@@ -140,7 +142,12 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->setPassword('123123q')
             ->submit()
             ->openBusinessUnits('Oro\Bundle\OrganizationBundle')
-            ->checkContextMenu($unitName, 'Update');
+            ->filterBy('Name', $unitName)
+            ->checkActionMenu('Update')
+            ->open(array($unitName))
+            ->assertElementNotPresent(
+                "//div[@class='pull-left btn-group icons-holder']/a[@title='Edit Business Unit']"
+            );
     }
 
     public function createAcl($login, $roleName, $username)
@@ -155,7 +162,9 @@ class BusinessUnitsAclTest extends Selenium2TestCase
             ->setPassword('123123q')
             ->submit()
             ->openBusinessUnits('Oro\Bundle\OrganizationBundle')
-            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create business unit')]");
+            ->assertElementNotPresent(
+                "//div[@class='pull-right title-buttons-container']//a[@title='Create Business Unit']"
+            );
     }
 
     public function viewAcl($login, $username, $roleName)
@@ -174,7 +183,7 @@ class BusinessUnitsAclTest extends Selenium2TestCase
     }
 
     /**
-     * Data provider for Tags ACL test
+     * Data provider for Business Unit ACL test
      *
      * @return array
      */
