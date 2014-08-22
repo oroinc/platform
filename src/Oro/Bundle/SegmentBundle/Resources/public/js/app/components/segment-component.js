@@ -2,10 +2,11 @@
 /*jslint nomen: true*/
 define(function (require) {
     'use strict';
-    var SegmentEditor,
+    var SegmentComponent,
         $ = require('jquery'),
         _ = require('underscore'),
-        Backbone = require('backbone'),
+        BaseComponent = require('oroui/js/app/components/base/component'),
+        BaseCollection = require('oroui/js/app/models/base/collection'),
         __ = require('orotranslation/js/translator'),
         LoadingMask = require('oroui/js/loading-mask'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
@@ -19,7 +20,7 @@ define(function (require) {
     require('oroui/js/items-manager/table');
     require('oroquerydesigner/js/condition-builder');
 
-    SegmentEditor = Backbone.View.extend({
+    SegmentComponent = BaseComponent.extend({
         defaults: {
             entityChoice: '',
             valueSource: '',
@@ -66,7 +67,7 @@ define(function (require) {
                     this.$entityChoice.val(), this.$entityChoice.fieldsLoader('getFieldsData'));
             }
 
-            SegmentEditor.__super__.initialize.call(this, options);
+            SegmentComponent.__super__.initialize.call(this, options);
         },
 
         /**
@@ -80,7 +81,7 @@ define(function (require) {
             this.trigger('dispose:before');
             delete this.options;
             delete this.$storage;
-            SegmentEditor.__super__.dispose.call(this);
+            SegmentComponent.__super__.dispose.call(this);
         },
 
         /**
@@ -259,7 +260,7 @@ define(function (require) {
             });
 
             // prepare collection for Items Manager
-            collection = new (Backbone.Collection)(this.load('grouping_columns'), {model: GroupingModel});
+            collection = new BaseCollection(this.load('grouping_columns'), {model: GroupingModel});
             this.listenTo(collection, 'add remove sort change', function () {
                 this.save(collection.toJSON(), 'grouping_columns');
             });
@@ -336,7 +337,7 @@ define(function (require) {
             });
 
             // prepare collection for Items Manager
-            collection = new (Backbone.Collection)(this.load('columns'), {model: ColumnModel});
+            collection = new BaseCollection(this.load('columns'), {model: ColumnModel});
             this.listenTo(collection, 'add remove sort change', function () {
                 this.save(collection.toJSON(), 'columns');
             });
@@ -480,5 +481,5 @@ define(function (require) {
         }
     });
 
-    return SegmentEditor;
+    return SegmentComponent;
 });

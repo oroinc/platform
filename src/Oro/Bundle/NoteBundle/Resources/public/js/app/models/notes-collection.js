@@ -1,14 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'oronote/js/note/model'],
-function (_, Backbone, NoteModel) {
+define([
+    'oroui/js/app/models/base/collection',
+    './note-model'
+], function (BaseCollection, NoteModel) {
     'use strict';
 
-    /**
-     * @export  oronote/js/note/collection
-     * @class   oronote.note.Collection
-     * @extends Backbone.Collection
-     */
-    return Backbone.Collection.extend({
+    var NotesCollection;
+
+    NotesCollection =  BaseCollection.extend({
         model: NoteModel,
         baseUrl: '',
         sorting: 'DESC',
@@ -25,4 +25,6 @@ function (_, Backbone, NoteModel) {
             this.sorting = mode;
         }
     });
+
+    return NotesCollection;
 });

@@ -106,3 +106,7 @@ table.grid tr td:first-child:before {
     min-height: 14px;
     display: inline-block;
 }
+
+.grid-views {
+    margin-left: 15px;
+}
