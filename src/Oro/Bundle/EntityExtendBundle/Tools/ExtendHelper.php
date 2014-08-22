@@ -161,9 +161,15 @@ class ExtendHelper
      * @param string $enumCode
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public static function buildEnumValueClassName($enumCode)
     {
+        if (empty($enumCode)) {
+            throw new \InvalidArgumentException('$enumCode must not be empty.');
+        }
+
         return ExtendConfigDumper::ENTITY . 'EnumValue' . Inflector::classify($enumCode);
     }
 
