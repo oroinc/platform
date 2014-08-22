@@ -135,11 +135,8 @@ abstract class AbstractMapper
                     $textAllDataField = $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD];
                 }
 
-                $textAllDataField .= sprintf(
-                    '%s %s ',
-                    $value,
-                    Query::clearString($value)
-                );
+                $clearedValue = Query::clearString($value);
+                $textAllDataField .= sprintf(' %s %s ', $value, $clearedValue);
 
                 $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = implode(
                     Query::DELIMITER,

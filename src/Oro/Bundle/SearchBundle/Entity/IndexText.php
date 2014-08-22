@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IndexText
 {
-    const HYPHEN_SUBSTITUTION = '__HYPHEN__';
+    const HYPHEN_SUBSTITUTION = ' ';
 
     const TABLE_NAME = 'oro_search_index_text';
 
