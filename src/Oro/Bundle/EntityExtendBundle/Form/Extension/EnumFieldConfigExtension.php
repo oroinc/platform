@@ -45,7 +45,7 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], 10);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**

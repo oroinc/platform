@@ -43,7 +43,12 @@ class UniqueEnumNameValidator extends ConstraintValidator
 
         $value = (string)$value;
 
-        if ($this->isExistingEnum($value, $constraint->entityClassName, $constraint->fieldName)) {
+        $enumCode = ExtendHelper::buildEnumCode($value, false);
+        if (empty($enumCode)) {
+            return;
+        }
+
+        if ($this->isExistingEnum($enumCode, $constraint->entityClassName, $constraint->fieldName)) {
             $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
     }
@@ -51,16 +56,14 @@ class UniqueEnumNameValidator extends ConstraintValidator
     /**
      * Checks id the enum with the given code is already exist
      *
-     * @param string $enumName
+     * @param string $enumCode
      * @param string $entityClassName
      * @param string $fieldName
      *
      * @return bool
      */
-    protected function isExistingEnum($enumName, $entityClassName, $fieldName)
+    protected function isExistingEnum($enumCode, $entityClassName, $fieldName)
     {
-        $enumCode = ExtendHelper::buildEnumCode($enumName);
-
         $enumConfigProvider = $this->configManager->getProvider('enum');
 
         // at first check if an enum entity with the given code is already exist
@@ -99,8 +102,15 @@ class UniqueEnumNameValidator extends ConstraintValidator
                     // ignore a field for which the validation was called
                     continue;
                 }
-                $existingEnumCode = ExtendHelper::buildEnumCode($enumFieldConfig->get('enum_name'));
-                if (strcasecmp($enumCode, $existingEnumCode) === 0) {
+                if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
+                    continue;
+                }
+                $existingEnumName = $enumFieldConfig->get('enum_name');
+                if (empty($existingEnumName)) {
+                    continue;
+                }
+
+                if (strcasecmp($enumCode, ExtendHelper::buildEnumCode($existingEnumName)) === 0) {
                     return true;
                 }
             }

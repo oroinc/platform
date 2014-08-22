@@ -5,17 +5,23 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\ExecutionContext;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumNameType extends AbstractType
 {
+    const INVALID_ENUM_NAME_MESSAGE =
+        'This value should contains only alphabetic symbols, numbers, spaces, underscore or minus symbols';
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -57,8 +63,19 @@ class EnumNameType extends AbstractType
                 $constraints[] = new Regex(
                     [
                         'pattern' => '/^[\w- ]*$/',
-                        'message' => 'This value should contains only alphabetic symbols,'
-                            . ' numbers, spaces, underscore or minus symbols'
+                        'message' => self::INVALID_ENUM_NAME_MESSAGE
+                    ]
+                );
+                $constraints[] = new Callback(
+                    [
+                        function ($value, ExecutionContext $context) {
+                            if (!empty($value)) {
+                                $code = ExtendHelper::buildEnumCode($value, false);
+                                if (empty($code)) {
+                                    $context->addViolation(self::INVALID_ENUM_NAME_MESSAGE, ['{{ value }}' => $value]);
+                                }
+                            }
+                        }
                     ]
                 );
                 $constraints[] = new UniqueEnumName(

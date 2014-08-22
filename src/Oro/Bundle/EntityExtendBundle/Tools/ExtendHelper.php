@@ -74,14 +74,19 @@ class ExtendHelper
      * Returns an enum identifier based on the given enum name.
      *
      * @param string $enumName
+     * @param bool   $throwExceptionIfInvalidName
      *
-     * @return string
+     * @return string The enum code. Can be empty string if $throwExceptionIfInvalidName = false
      *
      * @throws \InvalidArgumentException
      */
-    public static function buildEnumCode($enumName)
+    public static function buildEnumCode($enumName, $throwExceptionIfInvalidName = true)
     {
         if (empty($enumName)) {
+            if (!$throwExceptionIfInvalidName) {
+                return '';
+            }
+
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
 
@@ -96,12 +101,11 @@ class ExtendHelper
                 trim($enumName)
             )
         );
-
-        if ($result === '_' && $result !== $enumName) {
+        if ($result === '_') {
             $result = '';
         }
 
-        if (empty($result)) {
+        if (empty($result) && $throwExceptionIfInvalidName) {
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum code produces empty string.', $enumName)
             );
@@ -114,14 +118,19 @@ class ExtendHelper
      * Returns an enum value identifier based on the given value name.
      *
      * @param string $enumValueName
+     * @param bool   $throwExceptionIfInvalidName
      *
-     * @return string
+     * @return string The enum value identifier. Can be empty string if $throwExceptionIfInvalidName = false
      *
      * @throws \InvalidArgumentException
      */
-    public static function buildEnumValueId($enumValueName)
+    public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
         if (empty($enumValueName)) {
+            if (!$throwExceptionIfInvalidName) {
+                return '';
+            }
+
             throw new \InvalidArgumentException('$enumValueName must not be empty.');
         }
 
@@ -136,17 +145,16 @@ class ExtendHelper
                 trim($enumValueName)
             )
         );
+        if ($result === '_') {
+            $result = '';
+        }
 
         if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
             $hash = dechex(crc32($result));
             $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
 
-        if ($result === '_' && $result !== $enumValueName) {
-            $result = '';
-        }
-
-        if (empty($result)) {
+        if (empty($result) && $throwExceptionIfInvalidName) {
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
             );

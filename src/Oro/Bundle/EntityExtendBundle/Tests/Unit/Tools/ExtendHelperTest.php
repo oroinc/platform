@@ -79,7 +79,6 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumCodeProvider()
     {
         return [
-            ['_', '_'],
             ['test', 'test'],
             ['Test', 'test'],
             ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
@@ -105,10 +104,23 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         var_dump(ExtendHelper::buildEnumCode($enumName));
     }
 
+    /**
+     * @dataProvider buildEnumCodeForInvalidEnumNameProvider
+     */
+    public function testBuildEnumCodeForInvalidEnumNameIgnoreException($enumValueName)
+    {
+        $this->assertSame(
+            '',
+            ExtendHelper::buildEnumCode($enumValueName, false)
+        );
+    }
+
     public static function buildEnumCodeForInvalidEnumNameProvider()
     {
         return [
             [''],
+            ['_'],
+            ['-'],
             ['__'],
             ['_ _'],
             [' \/()[]~!@#$%^&*+-'],
@@ -137,7 +149,6 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumValueIdProvider()
     {
         return [
-            ['_', '_'],
             ['test', 'test'],
             ['Test', 'test'],
             ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
@@ -166,10 +177,23 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         ExtendHelper::buildEnumValueId($enumValueName);
     }
 
+    /**
+     * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
+     */
+    public function testBuildEnumValueIdForInvalidEnumValueNameIgnoreException($enumValueName)
+    {
+        $this->assertSame(
+            '',
+            ExtendHelper::buildEnumValueId($enumValueName, false)
+        );
+    }
+
     public static function buildEnumValueIdForInvalidEnumValueNameProvider()
     {
         return [
             [''],
+            ['_'],
+            ['-'],
             ['__'],
             ['_ _'],
             [' \/()[]~!@#$%^&*+-'],
