@@ -24,12 +24,12 @@ class IndexListener
     /**
      * @var bool
      */
-    protected $realTime;
+    protected $realTimeUpdate = true;
 
     /**
      * @var array
      */
-    protected $entities;
+    protected $entitiesConfig = [];
 
     /**
      * @var array
@@ -44,19 +44,27 @@ class IndexListener
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EngineInterface $searchEngine
-     * @param $realTime
-     * @param array $entities
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        EngineInterface $searchEngine,
-        $realTime,
-        array $entities
-    ) {
+    public function __construct(DoctrineHelper $doctrineHelper, EngineInterface $searchEngine)
+    {
         $this->doctrineHelper = $doctrineHelper;
         $this->searchEngine   = $searchEngine;
-        $this->realTime       = $realTime;
-        $this->entities       = $entities;
+    }
+
+    /**
+     * @param $realTime bool
+     */
+    public function setRealTimeUpdate($realTime)
+    {
+        $this->realTimeUpdate = $realTime;
+    }
+
+    /**
+     * @param array $entities
+     */
+    public function setEntitiesConfig(array $entities)
+    {
+        $this->entitiesConfig = $entities;
     }
 
     /**
@@ -109,13 +117,13 @@ class IndexListener
     {
         // process saved entities
         if ($this->savedEntities) {
-            $this->searchEngine->save($this->savedEntities, $this->realTime);
+            $this->searchEngine->save($this->savedEntities, $this->realTimeUpdate);
             $this->savedEntities = [];
         }
 
         // process deleted entities
         if ($this->deletedEntities) {
-            $this->searchEngine->delete($this->deletedEntities, $this->realTime);
+            $this->searchEngine->delete($this->deletedEntities, $this->realTimeUpdate);
             $this->deletedEntities = [];
         }
     }
@@ -126,7 +134,7 @@ class IndexListener
      */
     protected function isSupported($entity)
     {
-        return isset($this->entities[ClassUtils::getClass($entity)]);
+        return isset($this->entitiesConfig[ClassUtils::getClass($entity)]);
     }
 
     /**

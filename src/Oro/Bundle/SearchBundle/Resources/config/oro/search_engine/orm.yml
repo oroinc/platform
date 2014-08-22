@@ -16,8 +16,9 @@ services:
             - @event_dispatcher
             - @oro_entity.doctrine_helper
             - @oro_search.mapper
-            - %oro_search.drivers%
-            - %oro_search.log_queries%
+        calls:
+            - [setLogQueries, [%oro_search.log_queries%]]
+            - [setDrivers, [%oro_search.drivers%]]
 
     oro_search.fulltext_index_manager:
         class: %oro_search.fulltext_index_manager.class%

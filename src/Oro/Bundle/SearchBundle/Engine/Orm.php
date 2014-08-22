@@ -37,23 +37,18 @@ class Orm extends AbstractEngine
     /**
      * @var array
      */
-    protected $drivers;
+    protected $drivers = array();
 
     /**
      * @var bool
      */
     protected $needFlush = true;
 
-    public function __construct(
-        ManagerRegistry $registry,
-        EventDispatcher $dispatcher,
-        DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper,
-        array $drivers,
-        $logQueries
-    ) {
-        parent::__construct($registry, $dispatcher, $doctrineHelper, $mapper, $logQueries);
-
+    /**
+     * @param array $drivers
+     */
+    public function setDrivers(array $drivers)
+    {
         $this->drivers = $drivers;
     }
 

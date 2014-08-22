@@ -139,7 +139,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     {
         $mapping = $this->mapper->mapObject($this->product);
 
-        $this->assertEquals('test product ', $mapping['text']['name']);
+        $this->assertEquals('test product', $mapping['text']['name']);
         $this->assertEquals(150, $mapping['decimal']['price']);
         $this->assertEquals(10, $mapping['integer']['count']);
 

@@ -44,27 +44,32 @@ abstract class AbstractEngine implements EngineInterface
     /**
      * @var bool
      */
-    protected $logQueries;
+    protected $logQueries = false;
 
     /**
      * @param ManagerRegistry $registry
      * @param EventDispatcher $dispatcher
      * @param DoctrineHelper  $doctrineHelper
      * @param ObjectMapper    $mapper
-     * @param boolean         $logQueries
      */
     public function __construct(
         ManagerRegistry $registry,
         EventDispatcher $dispatcher,
         DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper,
-        $logQueries
+        ObjectMapper $mapper
     ) {
         $this->registry       = $registry;
         $this->dispatcher     = $dispatcher;
         $this->doctrineHelper = $doctrineHelper;
         $this->mapper         = $mapper;
-        $this->logQueries     = $logQueries;
+    }
+
+    /**
+     * @param bool $logQueries
+     */
+    public function setLogQueries($logQueries)
+    {
+        $this->logQueries = $logQueries;
     }
 
     /**

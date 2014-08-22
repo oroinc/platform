@@ -38,8 +38,9 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_search.search.engine
-            - %oro_search.realtime_update%
-            - %oro_search.entities_config%
+        calls:
+            - [setRealTimeUpdate, [%oro_search.realtime_update%]]
+            - [setEntitiesConfig, [%oro_search.entities_config%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
