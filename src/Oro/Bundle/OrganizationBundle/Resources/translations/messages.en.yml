@@ -48,3 +48,7 @@ oro:
             phone.label:         Phone
             users.label:         Users
             website.label:       Website
+
+        controller:
+            message:
+                saved: Organization saved
