@@ -92,7 +92,10 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     protected $businessUnits;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organization")
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organizations")
+     * @ORM\JoinTable(name="oro_user_organization")
      */
     protected $users;
 
@@ -343,5 +346,21 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
             $this->enabled,
             $this->id,
             ) = unserialize($serialized);
+    }
+
+    /**
+     * @param ArrayCollection $users
+     */
+    public function setUsers(ArrayCollection $users)
+    {
+        $this->users = $users;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

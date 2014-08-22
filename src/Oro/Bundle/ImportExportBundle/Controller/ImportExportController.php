@@ -97,7 +97,10 @@ class ImportExportController extends Controller
         return $this->getExportHandler()->handleExport(
             JobExecutor::JOB_EXPORT_TO_CSV,
             $processorAlias,
-            ProcessorRegistry::TYPE_EXPORT
+            ProcessorRegistry::TYPE_EXPORT,
+            null,
+            null,
+            ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
         );
     }
 

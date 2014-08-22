@@ -3,7 +3,9 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,6 +69,8 @@ class OrganizationTest extends \PHPUnit_Framework_TestCase
             ['enabled', 1],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
+            ['businessUnits', new ArrayCollection([new BusinessUnit()])],
+            ['users', new ArrayCollection([new User()])]
         ];
     }
 }
