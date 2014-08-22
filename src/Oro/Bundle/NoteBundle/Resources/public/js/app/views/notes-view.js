@@ -1,37 +1,41 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'oroui/js/mediator', 'oroui/js/loading-mask', 'oro/dialog-widget', 'oroui/js/delete-confirmation',
-    'oronote/js/note/view', 'oronote/js/note/model', 'oronote/js/note/collection'],
-function (
-    _, Backbone, __, messenger,
-    mediator, LoadingMask, DialogWidget, DeleteConfirmation,
-    NoteView, NoteModel, NoteCollection
-) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/app/views/base/collection-view',
+    'oroui/js/mediator',
+    'oroui/js/loading-mask',
+    'oro/dialog-widget',
+    'oroui/js/delete-confirmation'
+], function ($, _, __, BaseCollectionView, mediator,
+    LoadingMask, DialogWidget, DeleteConfirmation) {
     'use strict';
 
-    var $ = Backbone.$;
+    var NotesView;
 
-    /**
-     * @export  oronote/js/note-list
-     * @class   oronote.NoteList
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    NotesView = BaseCollectionView.extend({
         options: {
             template: null,
             itemTemplate: null,
             itemAddEvent: 'note:add',
             itemViewIdPrefix: 'note-',
-            itemView: NoteView,
+            listSelector: '.items.list-box',
+            fallbackSelector: '.no-data',
+            loadingSelector: '.loading-mask',
             collection: null,
-            model: NoteModel,
             urls: {
-                list: null,
                 createItem: null,
                 updateItem: null,
                 deleteItem: null
             },
             messages: {}
+        },
+
+        listen: {
+            'toEdit collection': '_editItem',
+            'toDelete collection': '_deleteItem'
         },
 
         initialize: function (options) {
@@ -48,47 +52,30 @@ function (
                 forbiddenError: __('oro.note.forbidden_error')
             });
 
-            this.options.collection = this.options.collection || new NoteCollection();
-            this.options.collection.model = this.options.model;
-            this.options.collection.baseUrl = this._getUrl('list');
-
             this.template = _.template($(this.options.template).html());
 
-            this.listenTo(this.getCollection(), 'add', this._onItemAdded);
-            this.listenTo(this.getCollection(), 'remove', this._onItemDeleted);
-            this.listenTo(this.getCollection(), 'reset', this._onItemsAdded);
+            // create communication in scope of active controller
+            mediator.on(this.options.itemAddEvent, this._addItem, this);
 
-            var addItem = _.bind(this._addItem, this);
-            mediator.once('page:request', function () {
-                mediator.off(this.options.itemAddEvent, addItem);
-            }, this);
-            mediator.on(this.options.itemAddEvent, addItem);
+            NotesView.__super__.initialize.call(this, options);
         },
 
         render: function () {
-            this.$el.append(this.template());
-            this.$itemsContainer = this.$el.find('.items');
-            this.$noDataContainer = this.$el.find('.no-data');
-            this.$loadingMaskContainer = this.$el.find('.loading-mask');
-            this.$itemsContainer.hide();
-
+            NotesView.__super__.render.apply(this, arguments);
+            this.$loadingMaskContainer = this.$('.loading-mask');
             return this;
         },
 
-        getCollection: function () {
-            return this.options.collection;
-        },
-
         expandAll: function () {
-            var $groups = this.$itemsContainer.find('.accordion-group');
-            $groups.find('.accordion-toggle').removeClass('collapsed');
-            $groups.find('.collapse').addClass('in');
+            _.each(this.subviews, function (itemView) {
+                itemView.toggle(false);
+            });
         },
 
         collapseAll: function () {
-            var $groups = this.$itemsContainer.find('.accordion-group');
-            $groups.find('.accordion-toggle').addClass('collapsed');
-            $groups.find('.collapse').removeClass('in');
+            _.each(this.subviews, function (itemView) {
+                itemView.toggle(true);
+            });
         },
 
         refresh: function () {
@@ -104,18 +91,25 @@ function (
             $el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
             $el.find('i').attr('class', iconAlt + ' hide-text');
 
-            this._reload(this.getCollection().getSorting() == 'DESC' ? 'ASC' : 'DESC');
+            this._reload(this.collection.getSorting() === 'DESC' ? 'ASC' : 'DESC');
         },
 
         _reload: function (sorting) {
+            var state = {};
             if (!_.isUndefined(sorting)) {
-                this.getCollection().setSorting(sorting);
+                this.collection.setSorting(sorting);
             }
             this._showLoading();
             try {
-                this.getCollection().fetch({
+                _.each(this.subviews, function (itemView) {
+                    state[itemView.model.get('id')] = itemView.isCollapsed();
+                });
+                this.collection.fetch({
                     reset: true,
                     success: _.bind(function () {
+                        _.each(this.subviews, function (itemView) {
+                            itemView.toggle(state[itemView.model.get('id')]);
+                        });
                         this._hideLoading();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -131,11 +125,11 @@ function (
             this._openItemEditForm(this._getMessage('addDialogTitle'), this._getUrl('createItem'));
         },
 
-        _editItem: function (itemView, model) {
+        _editItem: function (model) {
             this._openItemEditForm(this._getMessage('editDialogTitle'), this._getUrl('updateItem', model));
         },
 
-        _deleteItem: function (itemView, model) {
+        _deleteItem: function (model) {
             var confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
@@ -143,36 +137,6 @@ function (
                 this._onItemDelete(model);
             }, this));
             confirm.open();
-        },
-
-        _onItemsAdded: function (models) {
-            if(models.length > 0){
-                var collapsedItems = [];
-                models.each(function (model) {
-                    if (this._isItemViewCollapsed(this._findItemViewElement(model.id))) {
-                        collapsedItems.push(model.id);
-                    }
-                }, this);
-                this.$itemsContainer.empty();
-                this._hideEmptyMessage();
-                models.each(function (model) {
-                    this.$itemsContainer.append(
-                        this._renderItemView(model, _.indexOf(collapsedItems, model.id) != -1)
-                    );
-                }, this);
-            } else {
-                this.$itemsContainer.empty();
-                this._showEmptyMessage();
-            }
-        },
-
-        _onItemAdded: function (model) {
-            if (this.getCollection().getSorting() == 'DESC') {
-                this.$itemsContainer.prepend(this._renderItemView(model));
-            } else {
-                this.$itemsContainer.append(this._renderItemView(model));
-            }
-            this._hideEmptyMessage();
         },
 
         _onItemDelete: function (model) {
@@ -183,10 +147,10 @@ function (
                     url: this._getUrl('deleteItem', model),
                     success: _.bind(function () {
                         this._hideLoading();
-                        messenger.notificationFlashMessage('success', this._getMessage('itemRemoved'));
+                        mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
                     }, this),
                     error: _.bind(function (model, response) {
-                        if (!_.isUndefined(response.status) && response.status == 403) {
+                        if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
@@ -198,61 +162,23 @@ function (
             }
         },
 
-        _onItemDeleted: function () {
-            if(this.getCollection().length > 0){
-                this._hideEmptyMessage();
-            } else {
-                this._showEmptyMessage();
+        /**
+         * Fetches url for certain action
+         *
+         * @param {string} actionKey
+         * @param {Backbone.Model=}model
+         * @returns {string}
+         * @protected
+         */
+        _getUrl: function (actionKey, model) {
+            if (_.isFunction(this.options.urls[actionKey])) {
+                return this.options.urls[actionKey](model);
             }
-        },
-
-        _createItemView: function (model) {
-            var itemView = new this.options.itemView({
-                template: this.options.itemTemplate,
-                id: this._buildItemViewIdAttribute(model.id),
-                model: model
-            });
-            itemView.on('edit', _.bind(this._editItem, this));
-            itemView.on('delete', _.bind(this._deleteItem, this));
-            return itemView;
-        },
-
-        _renderItemView: function (model, collapsed) {
-            return this._createItemView(model).render(collapsed).$el;
-        },
-
-        _findItemViewElement: function (id) {
-            return this.$itemsContainer.find('#' + this._buildItemViewIdAttribute(id));
-        },
-
-        _isItemViewCollapsed: function (viewElement) {
-            return viewElement.length > 0
-                && viewElement.find('.accordion-toggle').hasClass('collapsed');
-        },
-
-        _getUrl: function (optionsKey) {
-            if (_.isFunction(this.options.urls[optionsKey])) {
-                return this.options.urls[optionsKey].apply(this, Array.prototype.slice.call(arguments, 1));
-            }
-            return this.options.urls[optionsKey];
+            return this.options.urls[actionKey];
         },
 
         _getMessage: function (labelKey) {
             return this.options.messages[labelKey];
-        },
-
-        _buildItemViewIdAttribute: function (id) {
-            return this.options.itemViewIdPrefix + id;
-        },
-
-        _showEmptyMessage: function () {
-            this.$noDataContainer.show();
-            this.$itemsContainer.hide();
-        },
-
-        _hideEmptyMessage: function () {
-            this.$noDataContainer.hide();
-            this.$itemsContainer.show();
         },
 
         _openItemEditForm: function (title, url) {
@@ -279,14 +205,15 @@ function (
                     }
                 }, this));
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
+                    var model;
                     this.itemEditDialog.remove();
                     delete this.itemEditDialog;
-                    messenger.notificationFlashMessage('success', this._getMessage('itemSaved'));
-                    var $itemView = this._findItemViewElement(response.id);
-                    if ($itemView.length) {
-                        this.getCollection().get(response.id).set(response);
+                    mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
+                    model = this.collection.get(response.id);
+                    if (model) {
+                        model.set(response);
                     } else {
-                        this.getCollection().add(response);
+                        this.collection.add(response);
                     }
                 }, this));
             }
@@ -323,7 +250,9 @@ function (
 
         _showError: function (message, err) {
             this._hideLoading();
-            messenger.showErrorMessage(message, err);
+            mediator.execute('showErrorMessage', message, err);
         }
     });
+
+    return NotesView;
 });
