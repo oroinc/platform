@@ -20,16 +20,16 @@ class OrganizationType extends AbstractType
                 'choice',
                 [
                     'required' => true,
-                    'label' => 'oro.organization.enabled.label',
-                    'choices' => [1 => 'Active', 0 => 'Inactive']
+                    'label'    => 'oro.organization.enabled.label',
+                    'choices'  => [1 => 'Active', 0 => 'Inactive']
                 ]
             )
             ->add(
                 'name',
                 'text',
                 [
-                    'required' => true,
-                    'label' => 'oro.organization.name.label',
+                    'required'    => true,
+                    'label'       => 'oro.organization.name.label',
                     'constraints' => [
                         new NotBlank()
                     ]
@@ -40,7 +40,7 @@ class OrganizationType extends AbstractType
                 'textarea',
                 [
                     'required' => false,
-                    'label' => 'oro.organization.description.label'
+                    'label'    => 'oro.organization.description.label'
                 ]
             );
     }
@@ -52,9 +52,9 @@ class OrganizationType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class'           => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
-                'intention'            => 'organization',
-                'cascade_validation'   => true,
+                'data_class'         => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
+                'intention'          => 'organization',
+                'cascade_validation' => true,
             )
         );
     }

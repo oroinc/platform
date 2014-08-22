@@ -29,7 +29,6 @@
 
 {% block content_data %}
     {% set id = 'organization-form' %}
-
     {% set dataBlocks = [{
         'title': 'General Information'|trans,
         'class': 'active',
@@ -37,7 +36,6 @@
             {
                 'title': '',
                 'data': [
-                    form_row(form.enabled),
                     form_row(form.name),
                     form_row(form.description),
                     form.owner is defined ? form_row(form.owner) : '',
