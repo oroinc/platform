@@ -71,6 +71,8 @@ services:
     #
     oro_organization.form.type.organization:
         class: %oro_organization.form.type.organization.class%
+        arguments:
+            - @security.context
         tags:
             - { name: form.type, alias: oro_organization }
 
