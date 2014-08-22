@@ -181,7 +181,7 @@ define([
                 // attach created components to controller, to get them disposed together
                 _.each(components, function (component) {
                     if (typeof component.dispose === 'function') {
-                        self['component-' + component.cid] = component;
+                        self['component-' + component.cid || _.uniqueId('component')] = component;
                     }
                 });
 
