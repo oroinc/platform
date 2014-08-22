@@ -15,17 +15,17 @@ class OroDashboardBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addOrganization($schema);
-        self::addPKActiveDashboards($schema, $queries);
+        self::removePKActiveDashboards($schema);
     }
 
     /**
-     * Adds organization_id into oro_dashboard
+     * Adds organization_id into oro_dashboard, oro_dashboard_active
      *
      * @param Schema $schema
      */
     public static function addOrganization(Schema $schema)
     {
-/*        $table = $schema->getTable('oro_dashboard');
+        $table = $schema->getTable('oro_dashboard');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addIndex(['organization_id'], 'IDX_DF2802EF32C8A3DE', []);
         $table->addForeignKeyConstraint(
@@ -33,7 +33,7 @@ class OroDashboardBundle implements Migration
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );*/
+        );
 
         $table = $schema->getTable('oro_dashboard_active');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
@@ -47,12 +47,11 @@ class OroDashboardBundle implements Migration
     }
 
     /**
-     * Removes old pk by user_id, added id auto_increment into oro_dashboard_active
+     * Removes old pk by user_id, foreign key
      *
      * @param Schema   $schema
-     * @param QueryBag $queries
      */
-    public static function addPKActiveDashboards(Schema $schema, QueryBag $queries)
+    public static function removePKActiveDashboards(Schema $schema)
     {
         $table = $schema->getTable('oro_dashboard_active');
 
@@ -60,8 +59,5 @@ class OroDashboardBundle implements Migration
             $table->removeForeignKey('FK_858BA17EA76ED395');
         }
         $table->dropPrimaryKey();
-
-        $queries->addPostQuery('ALTER TABLE oro_dashboard_active ADD id INT AUTO_INCREMENT primary key NOT NULL;');
-        $table->addUniqueIndex(['user_id', 'organization_id'], 'uq_user_org');
     }
 }
