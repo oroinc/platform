@@ -2,6 +2,7 @@ datagrid:
     business-unit-grid:
         options:
             entityHint: business unit
+            skip_acl_walker_check: true
         source:
             acl_resource: oro_business_unit_view
             type: orm

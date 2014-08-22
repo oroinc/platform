@@ -5,6 +5,8 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -17,6 +19,9 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  * @ORM\Table(name="oro_organization")
  * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(
+ *     fields={"name"}
+ * )
  * @Config(
  *      defaultValues={
  *          "security"={

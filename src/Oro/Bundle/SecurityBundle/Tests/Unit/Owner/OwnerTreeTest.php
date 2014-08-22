@@ -199,6 +199,7 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
 
         $tree->addUserBusinessUnit('user', 'org1', 'bu1');
         $this->assertEquals(array('bu', 'bu1'), $tree->getUserBusinessUnitIds('user'));
+        $this->assertEquals(array('bu', 'bu1'), $tree->getUserBusinessUnitIds('user', 'org1'));
     }
 
     public function testAddUserBusinessUnitShouldNotSetUserOrganizationIdsIfOrganizationIdIsNull()

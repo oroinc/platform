@@ -396,7 +396,7 @@ class OwnerTree
         }
         if ($businessUnitId !== null) {
             $this->userBusinessUnitIds[$userId][] = $businessUnitId;
-            if (isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])) {
+            if (!isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])) {
                 $this->userOrganizationBusinessUnitIds[$userId][$organizationId] = [];
             }
             $this->userOrganizationBusinessUnitIds[$userId][$organizationId][] = $businessUnitId;
