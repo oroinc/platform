@@ -64,6 +64,5 @@ define(function (require) {
         }
     };
 
-
     return gridViewsBuilder;
 });

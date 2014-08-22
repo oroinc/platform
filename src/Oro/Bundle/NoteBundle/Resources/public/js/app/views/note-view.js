@@ -33,17 +33,17 @@ define([
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
+            this.collapsed = false;
 
             if (this.options.template) {
                 this.template = _.template($(this.options.template).html());
             }
         },
 
-
         getTemplateData: function () {
             var data = NoteView.__super__.getTemplateData.call(this);
 
-            data.collapsed = Boolean(this.collapsed);
+            data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
             data.createdBy_url = null;

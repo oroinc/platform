@@ -54,7 +54,6 @@ define(function (require) {
             this.processOptions(options);
             this.initDataGrid(options);
 
-
             promises = [this.built.promise()];
 
             // run related builders
