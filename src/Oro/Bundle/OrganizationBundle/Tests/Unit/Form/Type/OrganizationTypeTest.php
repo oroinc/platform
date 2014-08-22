@@ -11,7 +11,11 @@ class OrganizationTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formType = new OrganizationType();
+        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formType = new OrganizationType($securityContext);
     }
 
     /**
