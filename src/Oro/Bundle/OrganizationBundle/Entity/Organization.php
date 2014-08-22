@@ -92,6 +92,8 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     protected $businessUnits;
 
     /**
+     * @var ArrayCollection
+     *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organizations")
      * @ORM\JoinTable(name="oro_user_organization")
      */
@@ -347,15 +349,15 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     }
 
     /**
-     * @param mixed $users
+     * @param ArrayCollection $users
      */
-    public function setUsers($users)
+    public function setUsers(ArrayCollection $users)
     {
         $this->users = $users;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getUsers()
     {
