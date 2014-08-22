@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -15,6 +14,7 @@ use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Connector abstract class
@@ -157,11 +157,12 @@ abstract class AbstractEngine implements EngineInterface
         $entityManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
 
         $jobs = $this->createQueueJobs($entity);
-        foreach ($jobs as $job) {
-            $entityManager->persist($job);
-        }
 
         if ($jobs) {
+            foreach ($jobs as $job) {
+                $entityManager->persist($job);
+            }
+
             $entityManager->flush();
         }
     }
@@ -176,8 +177,8 @@ abstract class AbstractEngine implements EngineInterface
     protected function getEntityTitle($entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        if ($this->mapper->getEntityMapParameter($entityClass, 'title_fields')) {
-            $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+        $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+        if ($fields) {
             $title = array();
             foreach ($fields as $field) {
                 $title[] = $this->mapper->getFieldValue($entity, $field);
@@ -195,6 +196,10 @@ abstract class AbstractEngine implements EngineInterface
      */
     protected function getEntitiesArray($entity)
     {
+        if (!$entity) {
+            return array();
+        }
+
         return is_array($entity) ? $entity : array($entity);
     }
 }

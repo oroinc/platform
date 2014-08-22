@@ -148,9 +148,7 @@ abstract class AbstractMapper
                     )
                 );
 
-                foreach ($objectData[$fieldConfig['target_type']] as $targetField => $value) {
-                    $objectData[$fieldConfig['target_type']][$targetField] = trim($value);
-                }
+                $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
             }
         }
 

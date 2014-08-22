@@ -101,7 +101,6 @@ class Orm extends AbstractEngine
 
         if ($itemsCount % self::BATCH_SIZE > 0) {
             $this->save($entities, true);
-            $entities[] = array();
         }
 
         return $itemsCount;
@@ -278,12 +277,14 @@ class Orm extends AbstractEngine
         $entityManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
 
         $jobs = $this->createQueueJobs($entity);
-        foreach ($jobs as $job) {
-            $entityManager->persist($job);
-        }
+        if ($jobs) {
+            foreach ($jobs as $job) {
+                $entityManager->persist($job);
+            }
 
-        if ($jobs && $this->needFlush) {
-            $entityManager->flush();
+            if ($this->needFlush) {
+                $entityManager->flush();
+            }
         }
     }
 

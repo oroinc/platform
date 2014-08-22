@@ -2,93 +2,99 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Attribute;
 
 class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 {
+    const TEST_COUNT = 10;
+    const TEST_PRICE = 150;
+
+    const ENTITY_MANUFACTURER = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer';
+    const ENTITY_PRODUCT = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product';
+
     /**
      * @var \Oro\Bundle\SearchBundle\Engine\ObjectMapper
      */
     private $mapper;
-    private $mappingConfig
-        = array(
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer' => array(
-                'fields' => array(
-                    array(
-                        'name'            => 'products',
-                        'relation_type'   => 'one-to-many',
-                        'relation_fields' => array(
-                            array(
-                                'name'        => 'name',
-                                'target_type' => 'text',
-                            )
+    /**
+     * @var array
+     */
+    private $mappingConfig = array(
+        self::ENTITY_MANUFACTURER => array(
+            'fields' => array(
+                array(
+                    'name'            => 'products',
+                    'relation_type'   => 'one-to-many',
+                    'relation_fields' => array(
+                        array(
+                            'name'        => 'name',
+                            'target_type' => 'text',
                         )
-                    ),
-                    array(
-                        'name'            => 'parent',
-                        'relation_type'   => 'one-to-many',
-                        'relation_fields' => array(
-                            array()
-                        )
+                    )
+                ),
+                array(
+                    'name'            => 'parent',
+                    'relation_type'   => 'one-to-many',
+                    'relation_fields' => array(
+                        array()
                     )
                 )
+            )
+        ),
+        self::ENTITY_PRODUCT => array(
+            'alias'            => 'test_product',
+            'label'            => 'test product',
+            'title_fields'     => array('name'),
+            'route'            => array(
+                'name'       => 'test_route',
+                'parameters' => array(
+                    'id' => 'id'
+                )
             ),
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product'      => array(
-                'alias'            => 'test_product',
-                'label'            => 'test product',
-                'title_fields'     => array('name'),
-                'route'            => array(
-                    'name'       => 'test_route',
-                    'parameters' => array(
-                        'id' => 'id'
+            'fields'           => array(
+                array(
+                    'name'          => 'name',
+                    'target_type'   => 'text',
+                    'target_fields' => array(
+                        'name',
+                        'all_data'
                     )
                 ),
-                'fields'           => array(
-                    array(
-                        'name'          => 'name',
-                        'target_type'   => 'text',
-                        'target_fields' => array(
-                            'name',
-                            'all_data'
-                        )
-                    ),
-                    array(
-                        'name'          => 'description',
-                        'target_type'   => 'text',
-                        'target_fields' => array(
-                            'description',
-                            'all_data'
-                        )
-                    ),
-                    array(
-                        'name'          => 'price',
-                        'target_type'   => 'decimal',
-                        'target_fields' => array('price')
-                    ),
-                    array(
-                        'name'        => 'count',
-                        'target_type' => 'integer',
-                    ),
-                    array(
-                        'name'            => 'manufacturer',
-                        'relation_type'   => 'one-to-one',
-                        'relation_fields' => array(
-                            array(
-                                'name'          => 'name',
-                                'target_type'   => 'text',
-                                'target_fields' => array(
-                                    'manufacturer',
-                                    'all_data'
-                                )
+                array(
+                    'name'          => 'description',
+                    'target_type'   => 'text',
+                    'target_fields' => array(
+                        'description',
+                        'all_data'
+                    )
+                ),
+                array(
+                    'name'          => 'price',
+                    'target_type'   => 'decimal',
+                    'target_fields' => array('price')
+                ),
+                array(
+                    'name'        => 'count',
+                    'target_type' => 'integer',
+                ),
+                array(
+                    'name'            => 'manufacturer',
+                    'relation_type'   => 'one-to-one',
+                    'relation_fields' => array(
+                        array(
+                            'name'          => 'name',
+                            'target_type'   => 'text',
+                            'target_fields' => array(
+                                'manufacturer',
+                                'all_data'
                             )
                         )
-                    ),
+                    )
                 ),
-            )
-        );
+            ),
+        )
+    );
 
     protected function setUp()
     {
@@ -99,8 +105,8 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->product = new Product();
         $this->product->setName('test product')
-            ->setCount(10)
-            ->setPrice(150)
+            ->setCount(self::TEST_COUNT)
+            ->setPrice(self::TEST_PRICE)
             ->setManufacturer($manufacturer)
             ->setDescription('description')
             ->setCreateDate(new \DateTime());
@@ -140,8 +146,8 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $mapping = $this->mapper->mapObject($this->product);
 
         $this->assertEquals('test product', $mapping['text']['name']);
-        $this->assertEquals(150, $mapping['decimal']['price']);
-        $this->assertEquals(10, $mapping['integer']['count']);
+        $this->assertEquals(self::TEST_PRICE, $mapping['decimal']['price']);
+        $this->assertEquals(self::TEST_COUNT, $mapping['integer']['count']);
 
         $manufacturer = new Manufacturer();
         $manufacturer->setName('reebok');
@@ -153,7 +159,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->mapper->getEntitiesListAliases();
 
-        $this->assertEquals('test_product', $data['Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product']);
+        $this->assertEquals('test_product', $data[self::ENTITY_PRODUCT]);
     }
 
     public function testGetMappingConfig()
@@ -167,25 +173,19 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'test_product',
-            $this->mapper->getEntityMapParameter(
-                'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product',
-                'alias'
-            )
+            $this->mapper->getEntityMapParameter(self::ENTITY_PRODUCT, 'alias')
         );
 
         $this->assertEquals(
             false,
-            $this->mapper->getEntityMapParameter(
-                'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product',
-                'non exists parameter'
-            )
+            $this->mapper->getEntityMapParameter(self::ENTITY_PRODUCT, 'non exists parameter')
         );
     }
 
     public function testGetEntities()
     {
         $entities = $this->mapper->getEntities();
-        $this->assertEquals('Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product', $entities[1]);
+        $this->assertEquals(self::ENTITY_PRODUCT, $entities[1]);
     }
 
     public function testNonExistsConfig()
