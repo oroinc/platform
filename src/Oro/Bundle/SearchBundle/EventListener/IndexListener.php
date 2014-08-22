@@ -2,25 +2,29 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class IndexListener
 {
     /**
-     * @var ContainerInterface
+     * @var DoctrineHelper
      */
-    protected $container;
+    protected $doctrineHelper;
+
+    /**
+     * @var EngineInterface
+     */
+    protected $searchEngine;
 
     /**
      * @var bool
      */
-    protected $realtime;
+    protected $realTime;
 
     /**
      * @var array
@@ -28,65 +32,31 @@ class IndexListener
     protected $entities;
 
     /**
-     * @var AbstractEngine
+     * @var array
      */
-    protected $searchEngine;
+    protected $savedEntities = [];
 
     /**
      * @var array
      */
-    protected $insertEntities = [];
+    protected $deletedEntities = [];
 
     /**
-     * @todo: refactor in global listeners scope story, see BAP-3285
-     *
-     * @var bool
+     * @param DoctrineHelper $doctrineHelper
+     * @param EngineInterface $searchEngine
+     * @param $realTime
+     * @param array $entities
      */
-    protected $postFlush = true;
-
-    /**
-     * Unfortunately, can't use AbstractEngine as a parameter here due to circular reference
-     *
-     * @param ContainerInterface $container
-     * @param bool               $realtime  Realtime update flag
-     * @param array              $entities  Entities config array from search.yml
-     */
-    public function __construct(ContainerInterface $container, $realtime, $entities)
-    {
-        $this->container = $container;
-        $this->realtime  = $realtime;
-        $this->entities  = $entities;
-    }
-
-    /**
-     * @return void
-     */
-    public function disablePostFlush()
-    {
-        $this->postFlush = false;
-
-        register_shutdown_function(
-            function () {
-                if (!$this->postFlush) {
-                    $this->postFlush = true;
-                    $entityManager   = $this->container->get('doctrine.orm.entity_manager');
-
-                    $this->flush($entityManager);
-                }
-            }
-        );
-    }
-
-    /**
-     * @return AbstractEngine
-     */
-    protected function getSearchEngine()
-    {
-        if (!$this->searchEngine) {
-            $this->searchEngine = $this->container->get('oro_search.search.engine');
-        }
-
-        return $this->searchEngine;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EngineInterface $searchEngine,
+        $realTime,
+        array $entities
+    ) {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->searchEngine   = $searchEngine;
+        $this->realTime       = $realTime;
+        $this->entities       = $entities;
     }
 
     /**
@@ -94,27 +64,30 @@ class IndexListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->isActive()) {
-            return;
-        }
+        $entityManager = $args->getEntityManager();
+        $unitOfWork = $entityManager->getUnitOfWork();
 
-        $uow = $args->getEntityManager()->getUnitOfWork();
-
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->insertEntities[] = $entity;
+        // schedule saved entities
+        // inserted and updated entities should be processed as is
+        $savedEntities = array_merge(
+            $unitOfWork->getScheduledEntityInsertions(),
+            $unitOfWork->getScheduledEntityUpdates()
+        );
+        foreach ($savedEntities as $hash => $entity) {
+            if ($this->isSupported($entity) && empty($this->savedEntities[$hash])) {
+                $this->savedEntities[$hash] = $entity;
             }
         }
 
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->getSearchEngine()->save($entity, $this->realtime, true);
-            }
-        }
-
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->getSearchEngine()->delete($entity, true);
+        // schedule deleted entities
+        // deleted entities should be processed as references because on postFlush they are already deleted
+        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
+        foreach ($deletedEntities as $hash => $entity) {
+            if ($this->isSupported($entity) && empty($this->deletedEntities[$hash])) {
+                $this->deletedEntities[$hash] = $entityManager->getReference(
+                    $this->doctrineHelper->getEntityClass($entity),
+                    $this->doctrineHelper->getSingleEntityIdentifier($entity)
+                );
             }
         }
     }
@@ -124,45 +97,43 @@ class IndexListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->postFlush) {
-            return;
+        if ($this->hasEntitiesToIndex()) {
+            $this->indexEntities();
         }
-
-        $this->flush($args->getEntityManager());
     }
 
     /**
-     * @param EntityManager $manager
+     * Synchronise all changed entities with search index
      */
-    protected function flush(EntityManager $manager)
+    protected function indexEntities()
     {
-        if (!$this->isActive() || empty($this->insertEntities)) {
-            return;
+        // process saved entities
+        if ($this->savedEntities) {
+            $this->searchEngine->save($this->savedEntities, $this->realTime);
+            $this->savedEntities = [];
         }
 
-        foreach ($this->insertEntities as $entity) {
-            $this->getSearchEngine()->save($entity, $this->realtime, true);
+        // process deleted entities
+        if ($this->deletedEntities) {
+            $this->searchEngine->delete($this->deletedEntities, $this->realTime);
+            $this->deletedEntities = [];
         }
-
-        $this->insertEntities = [];
-
-        $manager->flush();
     }
 
     /**
-     * @return bool
-     */
-    protected function isActive()
-    {
-        return !empty($this->entities);
-    }
-
-    /**
-     * @param string $entity
+     * @param object $entity
      * @return bool
      */
     protected function isSupported($entity)
     {
-        return isset($this->entities[ClassUtils::getRealClass($entity)]);
+        return isset($this->entities[ClassUtils::getClass($entity)]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasEntitiesToIndex()
+    {
+        return !empty($this->savedEntities) || !empty($this->deletedEntities);
     }
 }

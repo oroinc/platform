@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
+use Oro\Bundle\SearchBundle\EventListener\OrmIndexListener;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
@@ -60,7 +61,9 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $indexListener = $this->getContainer()->get('oro_search.index_listener');
-        $indexListener->disablePostFlush();
+        if ($indexListener instanceof OrmIndexListener) {
+            $indexListener->setEnabled(false);
+        }
 
         $fixtures = null;
         try {
@@ -79,6 +82,9 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
                 $this->processFixtures($input, $output, $fixtures);
             }
         }
+
+        $searchEngine = $this->getContainer()->get('oro_search.search.engine');
+        $searchEngine->reindex();
     }
 
     /**

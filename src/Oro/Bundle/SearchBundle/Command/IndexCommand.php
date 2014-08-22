@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,45 +17,69 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class IndexCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:search:index';
+
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
-        $this->setName('oro:search:index')
-             ->setDescription('Internal command (do not use). Process search index queue.');
+        $this->setName(self::NAME)
+            ->setDescription('Do search index for one specific entity')
+            ->addArgument(
+                'class',
+                InputArgument::REQUIRED,
+                'Full of compact class name of indexed entity ' .
+                '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
+            )
+            ->addArgument(
+                'identifier',
+                InputArgument::REQUIRED|InputArgument::IS_ARRAY,
+                'Identifiers of indexed entities (f.e. 42)'
+            );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting index task');
+        $doctrine   = $this->getContainer()->get('doctrine');
+        $engine     = $this->getContainer()->get('oro_search.search.engine');
+        $class      = $input->getArgument('class');
+        $identifier = $input->getArgument('identifier');
 
-        $doctrine       = $this->getContainer()->get('doctrine');
-        $engine         = $this->getContainer()->get('oro_search.search.engine');
-        $entityManager  = $doctrine->getManager();
-        $itemRepository = $entityManager->getRepository('OroSearchBundle:Item');
-
-        if ($this->getContainer()->hasParameter('oro_search.drivers')) {
-            $itemRepository->setDriversClasses($this->getContainer()->getParameter('oro_search.drivers'));
+        /** @var EntityManager $entityManager */
+        $entityManager = $doctrine->getManagerForClass($class);
+        if (!$entityManager) {
+            throw new \LogicException(sprintf('Entity manager for class %s is not defined', $class));
         }
 
-        $changed = $itemRepository->findBy(array('changed' => true));
-
-        foreach ($changed as $item) {
-            $output->write(sprintf('  Processing "%s" with id #%u', $item->getEntity(), $item->getRecordId()));
-
-            $entity = $doctrine
-                ->getRepository($item->getEntity())
-                ->find($item->getRecordId());
-
+        $savedEntities   = array();
+        $deletedEntities = array();
+        foreach ($identifier as $id) {
+            $entity = $entityManager->find($class, $id);
             if ($entity) {
-                $item->setChanged(false)
-                    ->setTitle($engine->getEntityTitle($entity))
-                    ->saveItemData($engine->getMapper()->mapObject($entity));
+                $savedEntities[] = $entity;
             } else {
-                $entityManager->remove($item);
+                $deletedEntities[] = $entityManager->getReference($class, $id);
             }
         }
 
-        $entityManager->flush();
+        if ($savedEntities) {
+            if ($engine->save($savedEntities, true)) {
+                $output->writeln('<info>Entities successfully updated in index</info>');
+            } else {
+                $output->writeln('<error>Can\'t update entities in index</error>');
+            }
+        }
 
-        $output->writeln(sprintf('Total indexed items: %u', count($changed)));
+        if ($deletedEntities) {
+            if ($engine->delete($deletedEntities, true)) {
+                $output->writeln('<info>Entities successfully deleted from index</info>');
+            } else {
+                $output->writeln('<error>Can\'t delete entities from index</error>');
+            }
+        }
     }
 }

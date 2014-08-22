@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Oro\Bundle\SearchBundle\Command\IndexCommand;
 
 /**
  * Connector abstract class
@@ -17,14 +22,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 abstract class AbstractEngine implements EngineInterface
 {
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    protected $em;
-
-    /**
-     * @var bool
-     */
-    protected $logQueries;
+    protected $registry;
 
     /**
      * @var EventDispatcher
@@ -32,46 +32,40 @@ abstract class AbstractEngine implements EngineInterface
     protected $dispatcher;
 
     /**
-     * Init entity manager
-     *
-     * @param EntityManager   $em
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
+     * @var ObjectMapper
+     */
+    protected $mapper;
+
+    /**
+     * @var bool
+     */
+    protected $logQueries;
+
+    /**
+     * @param ManagerRegistry $registry
      * @param EventDispatcher $dispatcher
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ObjectMapper    $mapper
      * @param boolean         $logQueries
      */
-    public function __construct(EntityManager $em, EventDispatcher $dispatcher, $logQueries)
-    {
-        $this->em = $em;
-        $this->dispatcher = $dispatcher;
-        $this->logQueries = $logQueries;
+    public function __construct(
+        ManagerRegistry $registry,
+        EventDispatcher $dispatcher,
+        DoctrineHelper $doctrineHelper,
+        ObjectMapper $mapper,
+        $logQueries
+    ) {
+        $this->registry       = $registry;
+        $this->dispatcher     = $dispatcher;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->mapper         = $mapper;
+        $this->logQueries     = $logQueries;
     }
-
-    /**
-     * Insert or update record
-     *
-     * @param object $entity
-     * @param bool   $realtime
-     * @param bool   $needToCompute
-     *
-     * @return mixed
-     */
-    abstract public function save($entity, $realtime = true, $needToCompute = false);
-
-    /**
-     * Insert or update record
-     *
-     * @param object $entity
-     * @param bool   $realtime
-     *
-     * @return mixed
-     */
-    abstract public function delete($entity, $realtime = true);
-
-    /**
-     * Reload search index
-     *
-     * @return int Count of index records
-     */
-    abstract public function reindex();
 
     /**
      * Search query with query builder
@@ -88,12 +82,9 @@ abstract class AbstractEngine implements EngineInterface
     abstract protected function doSearch(Query $query);
 
     /**
-     * Search query with query builder
-     *
-     * @param Query $query
-     * @return Result
+     * {@inheritdoc}
      */
-    public function search($query)
+    public function search(Query $query)
     {
         $searchResult = $this->doSearch($query);
         foreach ($searchResult['results'] as $resultRecord) {
@@ -115,12 +106,90 @@ abstract class AbstractEngine implements EngineInterface
      */
     protected function logQuery(Result $result)
     {
+        $entityManager = $this->registry->getManagerForClass('Oro\Bundle\SearchBundle\Entity\Query');
+
         $logRecord = new QueryLog;
-        $logRecord->setEntity(serialize($result->getQuery()->getFrom()));
+        $logRecord->setEntity(implode(',', array_values($result->getQuery()->getFrom())));
         $logRecord->setQuery(serialize($result->getQuery()->getOptions()));
         $logRecord->setResultCount($result->count());
 
-        $this->em->persist($logRecord);
-        $this->em->flush();
+        $entityManager->persist($logRecord);
+        $entityManager->flush($logRecord);
+    }
+
+    /**
+     * Add index task to queue
+     *
+     * @param object|array $entity
+     * @return Job[]
+     */
+    protected function createQueueJobs($entity)
+    {
+        $entities = $this->getEntitiesArray($entity);
+
+        $entityIdentifiers = array();
+        foreach ($entities as $entity) {
+            $class = $this->doctrineHelper->getEntityClass($entity);
+            $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $entityIdentifiers[$class][] = $identifier;
+        }
+
+        $jobs = array();
+        foreach ($entityIdentifiers as $class => $identifiers) {
+            $jobs[] = new Job(IndexCommand::NAME, array_merge(array($class), $identifiers));
+        }
+
+        return $jobs;
+    }
+
+    /**
+     * Add index tasks to job queue
+     *
+     * @param object|array $entity
+     */
+    protected function scheduleIndexation($entity)
+    {
+        $entityManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
+
+        $jobs = $this->createQueueJobs($entity);
+        foreach ($jobs as $job) {
+            $entityManager->persist($job);
+        }
+
+        if ($jobs) {
+            $entityManager->flush();
+        }
+    }
+
+    /**
+     * Get entity string
+     *
+     * @param object $entity
+     *
+     * @return string
+     */
+    protected function getEntityTitle($entity)
+    {
+        $entityClass = ClassUtils::getClass($entity);
+        if ($this->mapper->getEntityMapParameter($entityClass, 'title_fields')) {
+            $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+            $title = array();
+            foreach ($fields as $field) {
+                $title[] = $this->mapper->getFieldValue($entity, $field);
+            }
+        } else {
+            $title = array((string) $entity);
+        }
+
+        return implode(' ', $title);
+    }
+
+    /**
+     * @param object|array $entity
+     * @return array
+     */
+    protected function getEntitiesArray($entity)
+    {
+        return is_array($entity) ? $entity : array($entity);
     }
 }
