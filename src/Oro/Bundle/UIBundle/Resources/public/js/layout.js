@@ -58,7 +58,11 @@ define(function (require) {
                 loaded = $.Deferred();
 
                 require([module], function (component) {
-                    loaded.resolve(component(options));
+                    if (typeof component.init === "function") {
+                        loaded.resolve(component.init(options));
+                    } else {
+                        loaded.resolve(component(options));
+                    }
                 }, function () {
                     loaded.resolve();
                 });

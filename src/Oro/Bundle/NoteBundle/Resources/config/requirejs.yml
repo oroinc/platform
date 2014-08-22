@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oronote/js/app/components/notes-component': 'bundles/oronote/js/app/components/notes-component.js'
