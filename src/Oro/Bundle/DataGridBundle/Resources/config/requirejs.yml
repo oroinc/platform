@@ -52,6 +52,7 @@ config:
         'orodatagrid/js/datagrid/header-cell/select-all-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/select-all-header-cell.js'
         'orodatagrid/js/datagrid/header': 'bundles/orodatagrid/js/datagrid/header.js'
 
+        'orodatagrid/js/grid-views-builder': 'bundles/orodatagrid/js/grid-views-builder.js'
         'orodatagrid/js/totals-builder': 'bundles/orodatagrid/js/totals-builder.js'
         'orodatagrid/js/datagrid/footer': 'bundles/orodatagrid/js/datagrid/footer.js'
         'orodatagrid/js/datagrid/footer/footer-row': 'bundles/orodatagrid/js/datagrid/footer/footer-row.js'
@@ -68,8 +69,9 @@ config:
         'orodatagrid/js/datagrid/pagination': 'bundles/orodatagrid/js/datagrid/pagination.js'
         'orodatagrid/js/datagrid/row': 'bundles/orodatagrid/js/datagrid/row.js'
         'orodatagrid/js/datagrid/toolbar': 'bundles/orodatagrid/js/datagrid/toolbar.js'
-        'orodatagrid/js/datagrid-builder': 'bundles/orodatagrid/js/datagrid-builder.js'
         'orodatagrid/js/pageable-collection': 'bundles/orodatagrid/js/pageable-collection.js'
+
+        'orodatagrid/js/app/components/datagrid-component': 'bundles/orodatagrid/js/app/components/datagrid-component.js'
 
 build:
     paths:

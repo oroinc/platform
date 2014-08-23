@@ -1,14 +1,12 @@
 /*global define*/
-define(['backbone'],
-function (Backbone) {
+define([
+    'oroui/js/app/models/base/model'
+], function (BaseModel) {
     'use strict';
 
-    /**
-     * @export  oronote/js/note/model
-     * @class   oronote.note.Model
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var NoteModel;
+
+    NoteModel = BaseModel.extend({
         defaults: {
             id: '',
             message: '',
@@ -27,4 +25,6 @@ function (Backbone) {
             updatedBy_avatar: null
         }
     });
+
+    return NoteModel;
 });
