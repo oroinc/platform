@@ -145,11 +145,13 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Gets a list of ids for all classes (if $className is not specified) or all fields of
-     * the given $className, which can be managed by this provider.
+     * Gets a list of ids for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className, which can be managed by this provider.
      *
      * @param string|null $className
-     * @param bool $withHidden
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
+     *
      * @return array|ConfigIdInterface[]
      */
     public function getIds($className = null, $withHidden = false)
@@ -162,23 +164,22 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Gets configuration data for all classes (if $className is not specified) or all fields of
-     * the given $className.
+     * Gets configuration data for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className.
      *
      * @param string|null $className
-     * @param bool        $withHidden
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
      *
      * @return array|ConfigInterface[]
      */
     public function getConfigs($className = null, $withHidden = false)
     {
-        $result = array();
-
-        foreach ($this->getIds($className, $withHidden) as $configId) {
-            $result[] = $this->getConfigById($configId);
+        if ($className) {
+            $className = $this->getClassName($className);
         }
 
-        return $result;
+        return $this->configManager->getConfigs($this->getScope(), $className, $withHidden);
     }
 
     /**

@@ -359,13 +359,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
-            $this->createEntityConfigModel('EntityClass2', ConfigModelManager::MODE_HIDDEN),
-            $this->createEntityConfigModel('EntityClass3'),
+            $this->createEntityConfigModel('EntityClass2'),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
-            $this->createFieldConfigModel($entityModel, 'f2', 'int', ConfigModelManager::MODE_HIDDEN),
+            $this->createFieldConfigModel($entityModel, 'f2', 'int'),
         ];
 
         $this->modelManager->expects($this->any())
@@ -373,11 +372,64 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className)
+            ->with($className, $withHidden)
             ->will($this->returnValue($className ? $fieldModels : $models));
 
         $result = $this->configManager->getIds($scope, $className, $withHidden);
         $this->assertEquals($expectedIds, array_values($result));
+    }
+
+    /**
+     * @dataProvider getConfigsProvider
+     */
+    public function testGetConfigs($scope, $className, $withHidden, $expectedConfigs)
+    {
+        $models      = [
+            $this->createEntityConfigModel('EntityClass1'),
+            $this->createEntityConfigModel('EntityClass2'),
+        ];
+        $entityModel = $this->createEntityConfigModel('EntityClass1');
+        $fieldModels = [
+            $this->createFieldConfigModel($entityModel, 'f1', 'int'),
+            $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+        ];
+
+        $this->modelManager->expects($this->any())
+            ->method('checkDatabase')
+            ->will($this->returnValue(true));
+        $this->configCache->expects($this->any())
+            ->method('getConfigurable')
+            ->will($this->returnValue(true));
+        $this->modelManager->expects($this->once())
+            ->method('getModels')
+            ->with($className, $withHidden)
+            ->will($this->returnValue($className ? $fieldModels : $models));
+        if ($className) {
+            $this->modelManager->expects($this->any())
+                ->method('getFieldModel')
+                ->will(
+                    $this->returnValueMap(
+                        [
+                            [$className, 'f1', $fieldModels[0]],
+                            [$className, 'f2', $fieldModels[1]],
+                        ]
+                    )
+                );
+        } else {
+            $this->modelManager->expects($this->any())
+                ->method('getEntityModel')
+                ->will(
+                    $this->returnValueMap(
+                        [
+                            ['EntityClass1', $models[0]],
+                            ['EntityClass2', $models[1]],
+                        ]
+                    )
+                );
+        }
+
+        $result = $this->configManager->getConfigs($scope, $className, $withHidden);
+        $this->assertEquals($expectedConfigs, array_values($result));
     }
 
     public function testClearCache()
@@ -1228,7 +1280,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new EntityConfigId('entity', 'EntityClass1'),
                     new EntityConfigId('entity', 'EntityClass2'),
-                    new EntityConfigId('entity', 'EntityClass3'),
                 ]
             ],
             [
@@ -1237,7 +1288,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 false,
                 [
                     new EntityConfigId('entity', 'EntityClass1'),
-                    new EntityConfigId('entity', 'EntityClass3'),
+                    new EntityConfigId('entity', 'EntityClass2'),
                 ]
             ],
             [
@@ -1255,6 +1306,49 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 false,
                 [
                     new FieldConfigId('entity', 'EntityClass1', 'f1', 'int'),
+                    new FieldConfigId('entity', 'EntityClass1', 'f2', 'int'),
+                ]
+            ],
+        ];
+    }
+
+    public function getConfigsProvider()
+    {
+        return [
+            [
+                'entity',
+                null,
+                true,
+                [
+                    new Config(new EntityConfigId('entity', 'EntityClass1')),
+                    new Config(new EntityConfigId('entity', 'EntityClass2')),
+                ]
+            ],
+            [
+                'entity',
+                null,
+                false,
+                [
+                    new Config(new EntityConfigId('entity', 'EntityClass1')),
+                    new Config(new EntityConfigId('entity', 'EntityClass2')),
+                ]
+            ],
+            [
+                'entity',
+                'EntityClass1',
+                true,
+                [
+                    new Config(new FieldConfigId('entity', 'EntityClass1', 'f1', 'int')),
+                    new Config(new FieldConfigId('entity', 'EntityClass1', 'f2', 'int')),
+                ]
+            ],
+            [
+                'entity',
+                'EntityClass1',
+                false,
+                [
+                    new Config(new FieldConfigId('entity', 'EntityClass1', 'f1', 'int')),
+                    new Config(new FieldConfigId('entity', 'EntityClass1', 'f2', 'int')),
                 ]
             ],
         ];
