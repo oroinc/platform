@@ -63,13 +63,13 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertEquals(
             $user->getId(),
             $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
-            'Should contains predefined default owner - current user'
+            'Should contain predefined default owner - current user'
         );
 
         $this->assertEquals(
             $organization->getId(),
             $form['oro_integration_channel_form[organization]']->getValue(),
-            'Should contains predefined organization'
+            'Should contain predefined organization'
         );
 
         $name                                                   = 'name' . $this->generateRandomString();

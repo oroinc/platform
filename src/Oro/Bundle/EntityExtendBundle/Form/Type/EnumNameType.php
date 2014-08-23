@@ -19,8 +19,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumNameType extends AbstractType
 {
-    const INVALID_ENUM_NAME_MESSAGE =
-        'This value should contains only alphabetic symbols, numbers, spaces, underscore or minus symbols';
+    const INVALID_NAME_MESSAGE =
+        'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
 
     /** @var ConfigManager */
     protected $configManager;
@@ -63,7 +63,7 @@ class EnumNameType extends AbstractType
                 $constraints[] = new Regex(
                     [
                         'pattern' => '/^[\w- ]*$/',
-                        'message' => self::INVALID_ENUM_NAME_MESSAGE
+                        'message' => self::INVALID_NAME_MESSAGE
                     ]
                 );
                 $constraints[] = new Callback(
@@ -72,7 +72,7 @@ class EnumNameType extends AbstractType
                             if (!empty($value)) {
                                 $code = ExtendHelper::buildEnumCode($value, false);
                                 if (empty($code)) {
-                                    $context->addViolation(self::INVALID_ENUM_NAME_MESSAGE, ['{{ value }}' => $value]);
+                                    $context->addViolation(self::INVALID_NAME_MESSAGE, ['{{ value }}' => $value]);
                                 }
                             }
                         }

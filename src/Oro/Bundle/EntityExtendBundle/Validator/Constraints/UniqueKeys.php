@@ -6,7 +6,7 @@ use Symfony\Component\Validator\Constraint;
 
 class UniqueKeys extends Constraint
 {
-    public $message = 'Name and keys combination must be unique';
+    public $message = 'Name and keys combination should be unique.';
 
     /**
      * {@inheritdoc}

@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueEnumName extends Constraint
 {
-    public $message = "The enum name must be unique.";
+    public $message = "The enum name should be unique.";
 
     /** @var string */
     public $entityClassName;
