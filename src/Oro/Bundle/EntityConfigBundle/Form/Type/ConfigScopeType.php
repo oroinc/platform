@@ -103,7 +103,12 @@ class ConfigScopeType extends AbstractType
                             : $this->config->getId()->getScope();
 
                         if ($fieldName) {
-                            $configId = new FieldConfigId($scope, $className, $fieldName);
+                            $configId = new FieldConfigId(
+                                $scope,
+                                $className,
+                                $fieldName,
+                                $this->config->getId()->getFieldType()
+                            );
                         } else {
                             $configId = new EntityConfigId($scope, $className);
                         }

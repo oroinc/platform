@@ -74,6 +74,7 @@ services:
         arguments:
             - @oro_entity_config.cache.file_cache
             - @oro_entity_config.model.file_cache
+            - %kernel.debug%
 
     oro_entity_config.cache.file_cache:
         parent: oro.cache.abstract
