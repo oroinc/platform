@@ -202,14 +202,10 @@ class ExtendConfigDumper
         array &$doctrine
     ) {
         if ($fieldConfig->is('is_extend')) {
-            $fieldName = $fieldConfig->getId()->getFieldName();
-
-            // TODO: getting a field type from a model here is a temporary solution.
-            // We need to use $fieldType = $fieldConfig->getId()->getFieldType();
-            $fieldType = $this->em->getExtendConfigProvider()
-                ->getConfigManager()
-                ->getConfigFieldModel($fieldConfig->getId()->getClassName(), $fieldName)
-                ->getType();
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $fieldConfig->getId();
+            $fieldName     = $fieldConfigId->getFieldName();
+            $fieldType     = $fieldConfigId->getFieldType();
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {

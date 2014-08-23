@@ -97,10 +97,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $entityConfigIdWithOtherScope = new EntityConfigId('otherScope', DemoEntity::ENTITY_NAME);
-        $fieldConfigIdWithOtherScope  = new FieldConfigId('otherScope', DemoEntity::ENTITY_NAME, 'testField', 'string');
 
-        $this->assertEquals($entityConfigId, $this->configProvider->copyId($entityConfigIdWithOtherScope));
-        $this->assertEquals($fieldConfigId, $this->configProvider->copyId($fieldConfigIdWithOtherScope));
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfigById($entityConfigIdWithOtherScope));
     }
 

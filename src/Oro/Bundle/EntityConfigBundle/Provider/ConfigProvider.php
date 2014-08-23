@@ -92,22 +92,6 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Makes a copy of the given configuration id,
-     * but sets the scope property of the new id equal to the scope of this configuration provider.
-     *
-     * @param ConfigIdInterface $configId
-     * @return ConfigIdInterface
-     */
-    public function copyId(ConfigIdInterface $configId)
-    {
-        if ($configId instanceof FieldConfigId) {
-            return $this->getId($configId->getClassName(), $configId->getFieldName(), $configId->getFieldType());
-        } else {
-            return $this->getId($configId->getClassName());
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function hasConfig($className, $fieldName = null)
@@ -141,7 +125,11 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfigById(ConfigIdInterface $configId)
     {
-        return $this->configManager->getConfig($this->copyId($configId));
+        if ($configId instanceof FieldConfigId) {
+            return $this->configManager->getConfig($this->getId($configId->getClassName(), $configId->getFieldName()));
+        } else {
+            return $this->configManager->getConfig($this->getId($configId->getClassName()));
+        }
     }
 
     /**
