@@ -9,8 +9,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueCollectionType extends AbstractType
 {
@@ -84,18 +84,29 @@ class EnumValueCollectionType extends AbstractType
      */
     protected function isImmutable($options)
     {
-        /** @var ConfigIdInterface $configId */
-        $configId  = $options['config_id'];
-        $className = $configId->getClassName();
-        $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
+        $configId = $options['config_id'];
+        if (!($configId instanceof FieldConfigId)) {
+            return false;
+        }
 
-        if (!empty($className)) {
-            // disable for immutable entities or fields
-            $configProvider = $this->configManager->getProvider($configId->getScope());
-            if ($configProvider->hasConfig($className, $fieldName)) {
-                $immutable = $configProvider->getConfig($className, $fieldName)->get('immutable');
-                if (true === $immutable) {
-                    return true;
+        $className = $configId->getClassName();
+        if (empty($className)) {
+            return false;
+        }
+
+        $fieldName = $configId->getFieldName();
+
+        $enumConfigProvider = $this->configManager->getProvider('enum');
+        if ($enumConfigProvider->hasConfig($className, $fieldName)) {
+            $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
+            $enumCode        = $enumFieldConfig->get('enum_code');
+            if (!empty($enumCode)) {
+                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+                if ($enumConfigProvider->hasConfig($enumValueClassName)) {
+                    $enumConfig = $enumConfigProvider->getConfig($enumValueClassName);
+                    if ($enumConfig->get('immutable')) {
+                        return true;
+                    }
                 }
             }
         }
