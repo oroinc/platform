@@ -29,9 +29,10 @@ class CollectionType extends AbstractType
     {
         $view->vars = array_replace(
             $view->vars,
-            array(
-                'show_form_when_empty' => $options['show_form_when_empty']
-            )
+            [
+                'show_form_when_empty' => $options['show_form_when_empty'] && $options['can_add_and_delete'],
+                'can_add_and_delete'   => $options['can_add_and_delete']
+            ]
         );
     }
 
@@ -41,17 +42,19 @@ class CollectionType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'prototype' => true,
-                'prototype_name' => '__name__',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'show_form_when_empty' => true
-            )
+            [
+                'allow_add'                => true,
+                'allow_delete'             => true,
+                'by_reference'             => false,
+                'prototype'                => true,
+                'prototype_name'           => '__name__',
+                'extra_fields_message'     => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'ignore_primary_behaviour' => false,
+                'show_form_when_empty'     => true,
+                'can_add_and_delete'       => true
+            ]
         );
-        $resolver->setRequired(array('type'));
+        $resolver->setRequired(['type']);
     }
 
     /**

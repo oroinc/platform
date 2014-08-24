@@ -2,22 +2,27 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class EnumValueCollectionType extends CollectionType
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $options['options']['multiple'] = $options['config_id']->getFieldType() === 'multiEnum';
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-        parent::buildForm($builder, $options);
+class EnumValueCollectionType extends AbstractType
+{
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -25,18 +30,20 @@ class EnumValueCollectionType extends CollectionType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        parent::setDefaultOptions($resolver);
-
         $resolver->setDefaults(
             [
-                'allow_add'            => true,
-                'allow_delete'         => true,
-                'by_reference'         => false,
-                'prototype'            => true,
-                'prototype_name'       => '__name__',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'type'                 => 'oro_entity_extend_enum_value',
-                'show_form_when_empty' => true
+                'ignore_primary_behaviour' => true,
+                'type'                     => 'oro_entity_extend_enum_value'
+            ]
+        );
+
+        $resolver->setNormalizers(
+            [
+                'can_add_and_delete' => function (Options $options, $value) {
+                    return $this->isImmutable($options)
+                        ? false
+                        : $value;
+                }
             ]
         );
     }
@@ -46,15 +53,20 @@ class EnumValueCollectionType extends CollectionType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        parent::buildView($view, $form, $options);
-
         $view->vars = array_replace(
             $view->vars,
             [
-                'show_form_when_empty' => $options['show_form_when_empty'],
-                'multiple'             => $options['config_id']->getFieldType() === 'multiEnum'
+                'multiple' => $options['config_id']->getFieldType() === 'multiEnum'
             ]
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'oro_collection';
     }
 
     /**
@@ -63,5 +75,31 @@ class EnumValueCollectionType extends CollectionType
     public function getName()
     {
         return 'oro_entity_extend_enum_value_collection';
+    }
+
+    /**
+     * @param array|Options $options
+     *
+     * @return bool
+     */
+    protected function isImmutable($options)
+    {
+        /** @var ConfigIdInterface $configId */
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
+        $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
+
+        if (!empty($className)) {
+            // disable for immutable entities or fields
+            $configProvider = $this->configManager->getProvider($configId->getScope());
+            if ($configProvider->hasConfig($className, $fieldName)) {
+                $immutable = $configProvider->getConfig($className, $fieldName)->get('immutable');
+                if (true === $immutable) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

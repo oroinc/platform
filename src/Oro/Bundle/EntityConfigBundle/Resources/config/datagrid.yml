@@ -79,8 +79,16 @@ datagrid:
                     - cf.fieldName
                     - cf.type
                     - cf.mode
+                    - ce.id as entity_id
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                join:
+                    inner:
+                        - { join: cf.entity, alias: ce }
+                where:
+                    and:
+                        - ce.id = :entity_id
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
 
         columns:
             fieldName:

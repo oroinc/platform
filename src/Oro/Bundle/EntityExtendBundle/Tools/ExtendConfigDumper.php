@@ -215,17 +215,6 @@ class ExtendConfigDumper
 
                     $defaultProperties[$defaultName] = $defaultName;
                 }
-                if ($fieldType === 'multiEnum') {
-                    $snapshotFieldName              = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
-                    $properties[$snapshotFieldName] = $snapshotFieldName;
-
-                    $doctrine[$entityName]['fields'][$snapshotFieldName] = [
-                        'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName($fieldName),
-                        'type'     => 'string',
-                        'nullable' => true,
-                        'length'   => 500,
-                    ];
-                }
             } else {
                 $properties[$fieldName] = $fieldName;
 

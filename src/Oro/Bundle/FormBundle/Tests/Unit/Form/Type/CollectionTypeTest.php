@@ -31,18 +31,66 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, $options);
     }
 
-    public function testBuildView()
+    /**
+     * @dataProvider buildViewDataProvider
+     */
+    public function testBuildView($options, $expectedVars)
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
 
-        $options = array(
-            'show_form_when_empty' => true
-        );
         $this->type->buildView($view, $form, $options);
 
-        $this->assertArrayHasKey('show_form_when_empty', $view->vars);
-        $this->assertEquals($options['show_form_when_empty'], $view->vars['show_form_when_empty']);
+        foreach ($expectedVars as $key => $val) {
+            $this->assertArrayHasKey($key, $view->vars);
+            $this->assertEquals($val, $view->vars[$key]);
+        }
+    }
+
+    public function buildViewDataProvider()
+    {
+        return [
+            [
+                'options'      => [
+                    'show_form_when_empty' => true,
+                    'can_add_and_delete'   => true
+                ],
+                'expectedVars' => [
+                    'show_form_when_empty' => true,
+                    'can_add_and_delete'   => true
+                ],
+            ],
+            [
+                'options'      => [
+                    'show_form_when_empty' => false,
+                    'can_add_and_delete'   => false
+                ],
+                'expectedVars' => [
+                    'show_form_when_empty' => false,
+                    'can_add_and_delete'   => false
+                ],
+            ],
+            [
+                'options'      => [
+                    'show_form_when_empty' => true,
+                    'can_add_and_delete'   => false
+                ],
+                'expectedVars' => [
+                    'show_form_when_empty' => false,
+                    'can_add_and_delete'   => false
+                ],
+            ],
+            [
+                'options'      => [
+                    'show_form_when_empty' => false,
+                    'can_add_and_delete'   => true
+                ],
+                'expectedVars' => [
+                    'show_form_when_empty' => false,
+                    'can_add_and_delete'   => true
+                ],
+            ],
+        ];
     }
 
     public function testSetDefaultOptions()

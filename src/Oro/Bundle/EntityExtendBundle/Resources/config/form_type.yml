@@ -22,6 +22,7 @@ parameters:
     oro_entity_extend.type.enum_value.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType
     oro_entity_extend.type.enum_value_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
     oro_entity_extend.type.enum_name.class:                     Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType
+    oro_entity_extend.type.enum_public.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType
     oro_entity_extend.entity_config_type.extension.enum.class:  Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension
     oro_entity_extend.type.enum_choice.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType
     oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
@@ -153,6 +154,8 @@ services:
 
     oro_entity_extend.type.enum_value_collection:
         class: %oro_entity_extend.type.enum_value_collection.class%
+        arguments:
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_value_collection }
 
@@ -163,6 +166,13 @@ services:
             - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_name }
+
+    oro_entity_extend.type.enum_public:
+        class: %oro_entity_extend.type.enum_public.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_enum_public }
 
     oro_entity_extend.entity_config_type.extension.enum:
         class: %oro_entity_extend.entity_config_type.extension.enum.class%

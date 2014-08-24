@@ -49,12 +49,7 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $alias, $itemsType)
     {
-        $entityId = $this->parameters->get(self::ENTITY_PARAM, 0);
-
-        $query->where($rootAlias.'.mode <> :mode');
-        $query->setParameter('mode', ConfigModelManager::MODE_HIDDEN);
-        $query->innerJoin($rootAlias.'.entity', 'ce', 'WITH', 'ce.id=' . $entityId);
-        $query->addSelect('ce.id as entity_id');
+        $query->setParameter('entity_id', $this->parameters->get(self::ENTITY_PARAM, 0));
 
         return parent::prepareQuery($query, $rootAlias, $alias, $itemsType);
     }

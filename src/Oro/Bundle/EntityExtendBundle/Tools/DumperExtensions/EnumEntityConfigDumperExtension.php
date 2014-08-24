@@ -74,77 +74,79 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
                 $fieldType     = $fieldConfigId->getFieldType();
-                if (in_array($fieldType, ['enum', 'multiEnum'])) {
-                    // prepare input parameters
-                    $fieldOptions       = [
-                        'importexport' => [
-                            'process_as_scalar' => true
-                        ]
-                    ];
-                    $enumConfigProvider = $this->configManager->getProvider('enum');
-                    $enumFieldConfig    = $enumConfigProvider->getConfig(
-                        $fieldConfigId->getClassName(),
-                        $fieldConfigId->getFieldName()
-                    );
-                    $enumCode           = $enumFieldConfig->get('enum_code');
-                    $enumName           = $enumFieldConfig->get('enum_name');
-                    if (empty($enumCode) && empty($enumName)) {
-                        throw new \LogicException(
-                            sprintf(
-                                'Both "enum_code" and "enum_name" cannot be empty. Field: %s::%s.',
-                                $fieldConfigId->getClassName(),
-                                $fieldConfigId->getFieldName()
-                            )
-                        );
-                    }
-                    if (empty($enumCode)) {
-                        $enumCode                          = ExtendHelper::buildEnumCode($enumName);
-                        $fieldOptions['enum']['enum_code'] = $enumCode;
-                    }
-                    $isPublic = $enumFieldConfig->get('enum_public');
-                    if (!empty($enumName) && $isPublic === null) {
-                        throw new \LogicException(
-                            sprintf(
-                                '"enum_public" cannot be empty if "enum_name" is specified. Field: %s::%s.',
-                                $fieldConfigId->getClassName(),
-                                $fieldConfigId->getFieldName()
-                            )
-                        );
-                    }
-                    $isMultiple         = $this->fieldTypeHelper->getUnderlyingType($fieldType) === 'manyToMany';
-                    $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+                if (!in_array($fieldType, ['enum', 'multiEnum'])) {
+                    continue;
+                }
 
-                    // create an entity is used to store enum values
-                    $this->createEnumValueConfigEntityModel(
+                // prepare input parameters
+                $fieldOptions       = [
+                    'importexport' => [
+                        'process_as_scalar' => true
+                    ]
+                ];
+                $enumConfigProvider = $this->configManager->getProvider('enum');
+                $enumFieldConfig    = $enumConfigProvider->getConfig(
+                    $fieldConfigId->getClassName(),
+                    $fieldConfigId->getFieldName()
+                );
+                $enumCode           = $enumFieldConfig->get('enum_code');
+                $enumName           = $enumFieldConfig->get('enum_name');
+                if (empty($enumCode) && empty($enumName)) {
+                    throw new \LogicException(
+                        sprintf(
+                            'Both "enum_code" and "enum_name" cannot be empty. Field: %s::%s.',
+                            $fieldConfigId->getClassName(),
+                            $fieldConfigId->getFieldName()
+                        )
+                    );
+                }
+                if (empty($enumCode)) {
+                    $enumCode                          = ExtendHelper::buildEnumCode($enumName);
+                    $fieldOptions['enum']['enum_code'] = $enumCode;
+                }
+                $isPublic = $enumFieldConfig->get('enum_public');
+                if (!empty($enumName) && $isPublic === null) {
+                    throw new \LogicException(
+                        sprintf(
+                            '"enum_public" cannot be empty if "enum_name" is specified. Field: %s::%s.',
+                            $fieldConfigId->getClassName(),
+                            $fieldConfigId->getFieldName()
+                        )
+                    );
+                }
+                $isMultiple         = $this->fieldTypeHelper->getUnderlyingType($fieldType) === 'manyToMany';
+                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+
+                // create an entity is used to store enum values
+                $this->createEnumValueConfigEntityModel(
+                    $enumValueClassName,
+                    $enumCode,
+                    $isMultiple,
+                    $isPublic
+                );
+
+                // create a relation
+                if ($isMultiple) {
+                    $fieldOptions['extend']['without_default'] = true;
+                    $this->relationBuilder->addManyToManyRelation(
+                        $entityConfig,
                         $enumValueClassName,
-                        $enumCode,
-                        $isMultiple,
-                        $isPublic
+                        $fieldConfigId->getFieldName(),
+                        ['name'],
+                        ['name'],
+                        ['name'],
+                        $fieldOptions,
+                        $fieldType
                     );
-
-                    // create a relation
-                    if ($isMultiple) {
-                        $fieldOptions['extend']['without_default'] = true;
-                        $this->relationBuilder->addManyToManyRelation(
-                            $entityConfig,
-                            $enumValueClassName,
-                            $fieldConfigId->getFieldName(),
-                            ['id'],
-                            ['id'],
-                            ['id'],
-                            $fieldOptions,
-                            $fieldType
-                        );
-                    } else {
-                        $this->relationBuilder->addManyToOneRelation(
-                            $entityConfig,
-                            $enumValueClassName,
-                            $fieldConfigId->getFieldName(),
-                            'id',
-                            $fieldOptions,
-                            $fieldType
-                        );
-                    }
+                } else {
+                    $this->relationBuilder->addManyToOneRelation(
+                        $entityConfig,
+                        $enumValueClassName,
+                        $fieldConfigId->getFieldName(),
+                        'name',
+                        $fieldOptions,
+                        $fieldType
+                    );
                 }
             }
         }
@@ -158,23 +160,52 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
-                continue;
+            if ($entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                $entityClassName = $entityConfig->getId()->getClassName();
+                $schema          = $entityConfig->get('schema', false, []);
+                if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
+                    continue;
+                }
+
+                $schema['doctrine'][$entityClassName]['repositoryClass']                =
+                    'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository';
+                $schema['doctrine'][$entityClassName]['gedmo']['translation']['entity'] =
+                    'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation';
+                $entityConfig->set('schema', $schema);
+                $this->configManager->persist($entityConfig);
+            } elseif ($entityConfig->is('is_extend')) {
+                $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
+                foreach ($fieldConfigs as $fieldConfig) {
+                    /** @var FieldConfigId $fieldConfigId */
+                    $fieldConfigId = $fieldConfig->getId();
+                    if ($fieldConfigId->getFieldType() !== 'multiEnum') {
+                        continue;
+                    }
+
+                    $extendClassName   = $entityConfig->get('extend_class');
+                    $fieldName         = $fieldConfigId->getFieldName();
+                    $snapshotFieldName = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
+
+                    $schema = $entityConfig->get('schema', false, []);
+
+                    if (!empty($schema['doctrine'][$extendClassName]['fields'][$snapshotFieldName])) {
+                        continue;
+                    }
+
+                    $schema['property'][$snapshotFieldName] = $snapshotFieldName;
+
+                    $schema['doctrine'][$extendClassName]['fields'][$snapshotFieldName] = [
+                        'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName($fieldName),
+                        'type'     => 'string',
+                        'nullable' => true,
+                        'length'   => 500,
+                    ];
+
+                    $entityConfig->set('schema', $schema);
+
+                    $this->configManager->persist($entityConfig);
+                }
             }
-
-            $entityClassName = $entityConfig->getId()->getClassName();
-            $schema          = $entityConfig->get('schema', false, []);
-            if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
-                continue;
-            }
-
-            $schema['doctrine'][$entityClassName]['repositoryClass']                =
-                'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository';
-            $schema['doctrine'][$entityClassName]['gedmo']['translation']['entity'] =
-                'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation';
-            $entityConfig->set('schema', $schema);
-
-            $this->configManager->persist($entityConfig);
         }
     }
 

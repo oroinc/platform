@@ -1,7 +1,6 @@
 {% block oro_entity_extend_enum_value_widget %}
-    {% set parentId = form.parent.vars.id %}
-    <div class="email-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
-        <div class="input-append collection-element-primary">
+    <div class="float-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
+        <div class="input-append input-append-sortable collection-element-primary">
             {{ form_widget(form.label) }}
             <label class="add-on" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans({}, 'tooltips') }}">
                 {{ form_widget(form.is_default) }}
@@ -14,84 +13,54 @@
         {{ form_errors(form.label) }}
     </div>
     {{ form_rest(form) }}
-
-    <script type="text/javascript">
-        require(['jquery', 'jquery-ui'],
-                function($){
-                    $('#{{ parentId }}_collection').sortable({
-                        cursor: 'move',
-                        delay : 100,
-                        handle: '.handle',
-                        containment: "parent",
-                        stop  : function () {
-                            var index = 1;
-                            $('#{{ parentId }}_collection input.priority').each(function(i, el){
-                                $(el).val(index++);
-                            })
-                        }
-                    });
-                });
-    </script>
 {% endblock %}
 
 {% block oro_entity_extend_enum_value_collection_widget %}
-    {% spaceless %}
-        {% import 'OroFormBundle:Form:fields.html.twig' as _form %}
-        {% set prototypeHtml = _form.oro_collection_item_prototype(form) %}
-
-        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
-        {% set id = id ~ '_collection' %}
-        <div class="row-oro">
-            <div {{ block('widget_container_attributes') }} data-prototype="{{ prototypeHtml|escape }}">
-                {% if form.children|length %}
-                    {% for child in form.children %}
-                        {{ _form.oro_collection_item_prototype(child) }}
-                    {% endfor %}
-                {% elseif show_form_when_empty %}
-                    {{ prototypeHtml|replace({'__name__': '0'})|raw }}
-                {% endif %}
-            </div>
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
-        </div>
-
-        {{ _self.oro_entity_extend_enum_value_collection_js(_context) }}
-    {% endspaceless %}
+    {{ block('oro_collection_widget') }}
+    {% set id = id ~ '_collection' %}
+    {{ _self.oro_entity_extend_enum_value_collection_js(_context) }}
 {% endblock %}
 
 {% macro oro_entity_extend_enum_value_collection_js(context) %}
-    {% set form                 = context.form %}
-    {% set id                   = context.id %}
-    {% set show_form_when_empty = context.show_form_when_empty %}
-    {% set has_default          = form.vars.prototype.is_default is defined %}
-    {% set isMultiple           = context.multiple %}
+    <script type="text/javascript">
+        require(['jquery', 'jquery-ui'],
+        function($){
+            $(function() {
+                var container = $('#{{ context.id }}');
 
-    {% if has_default or show_form_when_empty %}
-        <script type="text/javascript">
-            require(['jquery'],
-            function($){
-                $(function() {
-                    var container = $('#{{ id }}');
-
-                    {% if has_default and isMultiple == false %}
-                    container.on('click', '[name$="[is_default]"]', function() {
-                        container.find('[name$="[is_default]"]').each(function (idx, el) {
+                {% if context.multiple == false %}
+                container.on('click', '[name$="[is_default]"]', function(e) {
+                    container.find('[name$="[is_default]"]').each(function (idx, el) {
+                        if (el.checked && el.id != e.currentTarget.id) {
                             el.checked = false;
-                        });
-                        this.checked = true;
+                        }
                     });
-                    {% endif %}
+                });
+                {% endif %}
 
-                    var reindex_values = function() {
+                container.sortable({
+                    cursor: 'move',
+                    delay : 100,
+                    handle: '.handle',
+                    containment: "parent",
+                    stop  : function () {
                         var index = 1;
-                        $('#{{ id }} input.priority').each(function(i, el){
+                        $('#{{ context.id }} input.priority').each(function(i, el){
                             $(el).val(index++);
                         })
-                    };
-
-                    $(document).ready(reindex_values);
-                    $(document).on('click', 'a.add-list-item', reindex_values);
+                    }
                 });
+
+                var reindex_values = function() {
+                    var index = 1;
+                    $('#{{ context.id }} input.priority').each(function(i, el){
+                        $(el).val(index++);
+                    })
+                };
+
+                $(document).ready(reindex_values);
+                $(document).on('click', 'a.add-list-item', reindex_values);
             });
-        </script>
-    {% endif %}
+        });
+    </script>
 {% endmacro %}

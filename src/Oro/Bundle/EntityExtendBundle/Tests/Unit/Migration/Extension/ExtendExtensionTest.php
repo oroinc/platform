@@ -42,6 +42,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
                         ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
+                        ['oro_enum_test_enum', ExtendConfigDumper::ENTITY . 'EnumValueTestEnum'],
                     ]
                 )
             );
@@ -277,20 +278,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function testCreateEnum()
     {
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
-        $extension->createEnum(
-            $schema,
-            'test_status',
-            true,
-            true
-        );
+        $extension->createEnum($schema, 'test_status');
 
         $this->assertSchemaSql(
             $schema,
@@ -325,15 +318,15 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         ],
                         'enum'       => [
                             'code'     => 'test_status',
-                            'public'   => true,
-                            'multiple' => true
+                            'public'   => false,
+                            'multiple' => false
                         ],
                         'dictionary' => [
                             'virtual_fields' => ['id', 'name']
                         ],
                     ],
                     'fields'  => [
-                        'id'     => [
+                        'id'       => [
                             'type'    => 'string',
                             'configs' => [
                                 'entity' => [
@@ -370,6 +363,254 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ],
                     ]
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCreateImmutableEnum()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $extension->createEnum(
+            $schema,
+            'test_status',
+            true,
+            true,
+            true,
+            [
+                'test_scope' => [
+                    'test_attr' => 'test'
+                ]
+            ]
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                sprintf(
+                    'CREATE TABLE %stest_status (id VARCHAR(32) NOT NULL,'
+                    . ' name VARCHAR(255) NOT NULL, priority INT NOT NULL, is_default TINYINT(1) NOT NULL,'
+                    . ' PRIMARY KEY(id))',
+                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
+                ),
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
+                    'mode'    => 'readonly',
+                    'configs' => [
+                        'entity'     => [
+                            'label'        => 'oro.entityextend.enums.test_status.entity_label',
+                            'plural_label' => 'oro.entityextend.enums.test_status.entity_plural_label',
+                            'description'  => 'oro.entityextend.enums.test_status.entity_description',
+                        ],
+                        'extend'     => [
+                            'owner'     => ExtendScope::OWNER_SYSTEM,
+                            'is_extend' => true,
+                            'table'     => 'oro_enum_test_status',
+                            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        ],
+                        'grouping'   => [
+                            'groups' => ['enum', 'dictionary']
+                        ],
+                        'enum'       => [
+                            'code'      => 'test_status',
+                            'public'    => true,
+                            'multiple'  => true,
+                            'immutable' => true,
+                        ],
+                        'dictionary' => [
+                            'virtual_fields' => ['id', 'name']
+                        ],
+                        'test_scope' => [
+                            'test_attr' => 'test'
+                        ],
+                    ],
+                    'fields'  => [
+                        'id'       => [
+                            'type'    => 'string',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.id.label',
+                                    'description' => 'oro.entityextend.enumvalue.id.description',
+                                ]
+                            ]
+                        ],
+                        'name'     => [
+                            'type'    => 'string',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.name.label',
+                                    'description' => 'oro.entityextend.enumvalue.name.description',
+                                ]
+                            ]
+                        ],
+                        'priority' => [
+                            'type'    => 'integer',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.priority.label',
+                                    'description' => 'oro.entityextend.enumvalue.priority.description',
+                                ]
+                            ]
+                        ],
+                        'default'  => [
+                            'type'    => 'boolean',
+                            'configs' => [
+                                'entity' => [
+                                    'label'       => 'oro.entityextend.enumvalue.default.label',
+                                    'description' => 'oro.entityextend.enumvalue.default.description',
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
+            ]
+        );
+    }
+
+    public function testAddEnumRelationForExistingEnum()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $enumCode      = 'test_enum';
+        $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
+        $enumClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestEnum';
+
+        $enumTable = $schema->createTable($enumTableName);
+        $enumTable->addColumn('id', 'string', ['length' => 32]);
+        $enumTable->addColumn('name', 'string');
+        $enumTable->setPrimaryKey(['id']);
+
+        $table1 = $schema->createTable('table1');
+        $table1->addColumn('id', 'integer');
+        $table1->setPrimaryKey(['id']);
+
+        $extension->addEnumRelation(
+            $schema,
+            $table1,
+            'enum1',
+            $enumCode
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE oro_enum_test_enum ('
+                . 'id VARCHAR(32) NOT NULL, name VARCHAR(255) NOT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE table1 (id INT NOT NULL, enum1_id VARCHAR(32) DEFAULT NULL, '
+                . 'INDEX idx_table1_enum1_id (enum1_id), PRIMARY KEY(id))',
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_enum1_id '
+                . 'FOREIGN KEY (enum1_id) REFERENCES oro_enum_test_enum (id) ON DELETE SET NULL'
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'fields' => [
+                        'enum1' => [
+                            'type'    => 'enum',
+                            'configs' => [
+                                'extend' => [
+                                    'is_extend'     => true,
+                                    'owner'         => ExtendScope::OWNER_SYSTEM,
+                                    'target_entity' => $enumClassName,
+                                    'target_field'  => 'name',
+                                    'relation_key'  =>
+                                        'manyToOne|Acme\AcmeBundle\Entity\Entity1|' . $enumClassName . '|enum1',
+                                ],
+                                'enum'   => [
+                                    'enum_code' => $enumCode
+                                ]
+                            ]
+                        ]
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testAddEnumRelationMultipleForExistingEnum()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $enumCode      = 'test_enum';
+        $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
+        $enumClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestEnum';
+
+        $enumTable = $schema->createTable($enumTableName);
+        $enumTable->addColumn('id', 'string', ['length' => 32]);
+        $enumTable->addColumn('name', 'string');
+        $enumTable->setPrimaryKey(['id']);
+
+        $table1 = $schema->createTable('table1');
+        $table1->addColumn('id', 'integer');
+        $table1->setPrimaryKey(['id']);
+
+        $extension->addEnumRelation(
+            $schema,
+            $table1,
+            'enum1',
+            $enumCode,
+            true
+        );
+
+        $this->assertSchemaSql(
+            $schema,
+            [
+                'CREATE TABLE oro_enum_test_enum ('
+                . 'id VARCHAR(32) NOT NULL, name VARCHAR(255) NOT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE table1 (id INT NOT NULL, '
+                . 'enum1' . ExtendDbIdentifierNameGenerator::SNAPSHOT_COLUMN_SUFFIX . ' VARCHAR(500) DEFAULT NULL, '
+                . 'PRIMARY KEY(id))',
+                'CREATE TABLE oro_rel_f0617053734a7d29fbe307 ('
+                . 'entity1_id INT NOT NULL, enumvaluetestenum_id VARCHAR(32) NOT NULL, '
+                . 'INDEX IDX_E42EEF03C33725A7 (entity1_id), '
+                . 'INDEX IDX_E42EEF036C5C67FF (enumvaluetestenum_id), '
+                . 'PRIMARY KEY(entity1_id, enumvaluetestenum_id))',
+                'ALTER TABLE oro_rel_f0617053734a7d29fbe307 ADD CONSTRAINT FK_E42EEF03C33725A7 '
+                . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
+                'ALTER TABLE oro_rel_f0617053734a7d29fbe307 ADD CONSTRAINT FK_E42EEF036C5C67FF '
+                . 'FOREIGN KEY (enumvaluetestenum_id) REFERENCES oro_enum_test_enum (id) ON DELETE CASCADE'
+            ]
+        );
+        $this->assertExtendOptions(
+            $schema,
+            [
+                'Acme\AcmeBundle\Entity\Entity1' => [
+                    'fields'        => [
+                        'enum1' => [
+                            'type'    => 'multiEnum',
+                            'configs' => [
+                                'extend' => [
+                                    'is_extend'       => true,
+                                    'owner'           => ExtendScope::OWNER_SYSTEM,
+                                    'without_default' => true,
+                                    'target_entity'   => $enumClassName,
+                                    'target_title'    => ['name'],
+                                    'target_detailed' => ['name'],
+                                    'target_grid'     => ['name'],
+                                    'relation_key'    =>
+                                        'manyToMany|Acme\AcmeBundle\Entity\Entity1|' . $enumClassName . '|enum1',
+                                ],
+                                'enum'   => [
+                                    'enum_code' => $enumCode
+                                ]
+                            ]
+                        ]
+                    ],
                 ],
             ]
         );
