@@ -373,6 +373,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($providers as $provider) {
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
+                if (!isset($item['grid'])) {
+                    continue;
+                }
+
                 $alias     = $joinAlias . $provider->getScope() . '_' . $code;
                 $fieldName = $provider->getScope() . '_' . $code;
 

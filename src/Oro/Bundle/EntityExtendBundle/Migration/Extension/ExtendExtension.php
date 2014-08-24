@@ -114,11 +114,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Creates a table that is used to store enum values for the enum with the given code.
      *
      * @param Schema $schema
-     * @param string $enumCode   The unique identifier of an enum
-     * @param bool   $isMultiple Indicates whether several options can be selected for this enum
-     *                           or it supports only one selected option
-     * @param bool   $isPublic   Indicates whether this enum can be used by any entity or
-     *                           it is designed to use in one entity only
+     * @param string $enumCode    The unique identifier of an enum
+     * @param bool   $isMultiple  Indicates whether several options can be selected for this enum
+     *                            or it supports only one selected option
+     * @param bool   $isPublic    Indicates whether this enum can be used by any entity or
+     *                            it is designed to use in one entity only
+     * @param bool   $isImmutable Indicates whether the changing the list of enum values and
+     *                            public flag is allowed or not.
+     * @param array  $options
      *
      * @return Table A table that is used to store enum values
      *
@@ -130,7 +133,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
         Schema $schema,
         $enumCode,
         $isMultiple = false,
-        $isPublic = false
+        $isPublic = false,
+        $isImmutable = false,
+        array $options = []
     ) {
         if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
             new \InvalidArgumentException(
@@ -143,9 +148,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $className = ExtendHelper::buildEnumValueClassName($enumCode);
-        $table     = $schema->createTable($tableName);
-        $table->addOption(
-            OroOptions::KEY,
+
+        $options = array_merge(
             [
                 ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_READONLY,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
@@ -171,8 +175,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 'dictionary'                              => [
                     'virtual_fields' => ['id', 'name']
                 ]
-            ]
+            ],
+            $options
         );
+        if ($isImmutable) {
+            $options['enum']['immutable'] = true;
+        }
+
+        $table = $schema->createTable($tableName);
+        $table->addOption(OroOptions::KEY, $options);
 
         $table->addColumn(
             'id',
@@ -242,6 +253,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string       $enumCode        The target enum identifier
      * @param bool         $isMultiple      Indicates whether several options can be selected for this enum
      *                                      or it supports only one selected option
+     * @param bool         $isImmutable     Indicates whether the changing the list of enum values and
+     *                                      public flag is allowed or not.
      * @param array        $options
      */
     public function addEnumRelation(
@@ -250,6 +263,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $enumCode,
         $isMultiple = false,
+        $isImmutable = false,
         array $options = []
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
@@ -257,7 +271,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $this->createEnum($schema, $enumCode, $isMultiple);
+            $this->createEnum($schema, $enumCode, $isMultiple, false, $isImmutable);
         }
 
         // create appropriate relation
@@ -269,9 +283,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 $selfTable,
                 $associationName,
                 $enumTableName,
-                ['id'],
-                ['id'],
-                ['id'],
+                ['name'],
+                ['name'],
+                ['name'],
                 $options,
                 'multiEnum'
             );
@@ -281,13 +295,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 $this->nameGenerator->generateMultipleEnumSnapshotColumnName($associationName),
                 'string',
                 [
-                    'notnull'       => false,
-                    'length'        => 500,
-                    OroOptions::KEY => [
-                        ExtendOptionsManager::MODE_OPTION       => ConfigModelManager::MODE_HIDDEN,
-                        ExtendOptionsManager::FIELD_NAME_OPTION =>
-                            ExtendHelper::getMultipleEnumSnapshotFieldName($associationName)
-                    ]
+                    'notnull' => false,
+                    'length'  => 500
                 ]
             );
         } else {
@@ -296,7 +305,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 $selfTable,
                 $associationName,
                 $enumTableName,
-                'id',
+                'name',
                 $options,
                 'enum'
             );

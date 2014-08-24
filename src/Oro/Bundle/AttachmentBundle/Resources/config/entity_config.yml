@@ -13,7 +13,6 @@ oro_entity_config:
                     options:
                         priority:           100
                         default_value:      false
-                        auditable:          false
                         require_schema_update: true
                     form:
                         type:               oro_entity_extend_association_choice
@@ -28,7 +27,6 @@ oro_entity_config:
                     options:
                         priority:           90
                         default_value:      1
-                        auditable:          false
                     form:
                         type:               oro_entity_extend_association_property_integer
                         options:
@@ -41,7 +39,6 @@ oro_entity_config:
                 mimetypes: # string (actually MIME types are delimited by \n symbol)
                     options:
                         priority:           80
-                        auditable:          false
                     form:
                         type:               oro_entity_extend_association_property_textarea
                         options:
@@ -55,7 +52,9 @@ oro_entity_config:
                 # it is enabled or not) for the entity
                 # if TRUE than the current state cannot be changed
                 immutable: # boolean
-                    options: []
+                    options:
+                        auditable:          false
+
         field:
             items:
                 attachment:
@@ -72,7 +71,6 @@ oro_entity_config:
                 maxsize: # integer
                     options:
                         allowed_type:       [file, image]
-                        auditable:          false
                     constraints:
                         - NotBlank:         ~
                         - Type:             integer
@@ -92,7 +90,6 @@ oro_entity_config:
                 width: # integer
                     options:
                         allowed_type:       [image]
-                        auditable:          false
                     constraints:
                         - Type:
                             type:           int
@@ -110,7 +107,6 @@ oro_entity_config:
                 height: # integer
                     options:
                         allowed_type:       [image]
-                        auditable:          false
                     constraints:
                         - Type:
                             type:           int

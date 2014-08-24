@@ -375,12 +375,19 @@ oro_entity_config:
                 # create a field of this enum type in any entity
                 # private enums cannot be reused
                 public: # boolean
-                    options:
-                        auditable:          false
+                    options: []
 
                 # indicates whether several options can be selected for this enum
                 # or it supports only one selected option
                 multiple: # boolean
+                    options:
+                        auditable:          false
+
+                # this attribute can be used to prohibit changing the list of enum values and
+                # public flag
+                # it means that values cannot be added or deleted, but it is still possible
+                # to update name of existing values, reorder them and change default values
+                immutable: # boolean
                     options:
                         auditable:          false
 
@@ -414,18 +421,17 @@ oro_entity_config:
                             required:       true
                             label:          oro.entity_extend.enum_name
                             tooltip:        oro.entity_extend.enum_name.tooltip
-                            attr:
-                                class:      enum-code
 
                 # indicates whether an enum is public or not
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page
                 # as part of schema update procedure a value of this attribute is moved to entity.enum.public attribure
+                # this flag cannot be changed for system enums (owner='system')
                 enum_public: # boolean
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
-                        type:               choice
+                        type:               oro_entity_extend_enum_public
                         options:
                             block:          general
                             subblock:       properties
@@ -434,8 +440,6 @@ oro_entity_config:
                             empty_value:    false
                             label:          oro.entity_extend.enum_public
                             tooltip:        oro.entity_extend.enum_public.tooltip
-                            attr:
-                                class:      is-enum-public
 
                 # the list of enum values
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page

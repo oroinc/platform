@@ -410,14 +410,18 @@
     {% if 'prototype' in widget.vars|keys %}
         {% set form = widget.vars.prototype %}
         {% set name = widget.vars.prototype.vars.name %}
+        {% set can_delete = widget.vars.can_add_and_delete %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
+        {% set can_delete = widget.parent.vars.can_add_and_delete %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
-        <div class="row-oro oro-multiselect-holder">
+        <div class="row-oro oro-multiselect-holder{% if not can_delete %} not-removable{% endif %}">
             {{ form_widget(form) }}
+            {% if can_delete %}
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
@@ -437,7 +441,9 @@
                     {{ prototypeHtml|replace({'__name__': '0'})|raw }}
                 {% endif %}
             </div>
+            {% if can_add_and_delete %}
             <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+            {% endif %}
         </div>
         {{ _self.oro_collection_validate_primary_js(_context) }}
     {% endspaceless %}

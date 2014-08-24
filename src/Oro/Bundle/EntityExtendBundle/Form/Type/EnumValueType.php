@@ -27,12 +27,11 @@ class EnumValueType extends AbstractType
         $builder
             ->add('id', 'hidden')
             ->add('label', 'text', ['required' => true])
-            ->add('is_default', $options['multiple'] ? 'checkbox' : 'radio', ['required' => false])
+            ->add('is_default', 'checkbox', ['required' => false])
             ->add('priority', 'hidden', ['empty_data' => 9999]);
 
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
-
 
     /**
      * POST_SET_DATA event handler
@@ -69,18 +68,6 @@ class EnumValueType extends AbstractType
             [
                 'required'    => true,
                 'constraints' => $constraints
-            ]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'multiple' => false
             ]
         );
     }
