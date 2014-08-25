@@ -1,17 +1,18 @@
 parameters:
-    oro_importexport.handler.import.class:        Oro\Bundle\ImportExportBundle\Handler\ImportHandler
-    oro_importexport.handler.export.class:        Oro\Bundle\ImportExportBundle\Handler\ExportHandler
+    oro_importexport.handler.import.http.class:        Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler
+    oro_importexport.handler.import.cli.class:         Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
+    oro_importexport.handler.export.class:             Oro\Bundle\ImportExportBundle\Handler\ExportHandler
 
 services:
-    oro_importexport.handler.import:
-        class: %oro_importexport.handler.import.class%
+    oro_importexport.handler.import.http:
+        class: %oro_importexport.handler.import.http.class%
         arguments:
             - @oro_importexport.job_executor
             - @oro_importexport.processor.registry
             - @oro_importexport.file.file_system_operator
+            - @translator
             - @session
             - @router
-            - @translator
         lazy: true
 
     oro_importexport.handler.export:
@@ -22,4 +23,13 @@ services:
             - @oro_importexport.file.file_system_operator
             - @oro_importexport.file.mime_type_guesser
             - @router
+        lazy: true
+
+    oro_importexport.handler.import.cli:
+        class: %oro_importexport.handler.import.cli.class%
+        arguments:
+            - @oro_importexport.job_executor
+            - @oro_importexport.processor.registry
+            - @oro_importexport.file.file_system_operator
+            - @translator
         lazy: true

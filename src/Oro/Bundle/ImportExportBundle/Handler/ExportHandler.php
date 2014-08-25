@@ -20,6 +20,11 @@ class ExportHandler extends AbstractHandler
     protected $mimeTypeGuesser;
 
     /**
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     */
+    protected $router;
+
+    /**
      * Constructor
      *
      * @param JobExecutor        $jobExecutor
@@ -35,8 +40,9 @@ class ExportHandler extends AbstractHandler
         MimeTypeGuesser $mimeTypeGuesser,
         Router $router
     ) {
-        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $router);
+        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator);
         $this->mimeTypeGuesser = $mimeTypeGuesser;
+        $this->router = $router;
     }
 
     /**
