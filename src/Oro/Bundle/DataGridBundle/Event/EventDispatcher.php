@@ -11,15 +11,23 @@ use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 class EventDispatcher extends ImmutableEventDispatcher
 {
     /**
-     * @param string                   $eventName
-     * @param GridEventInterface|Event $event
+     * @param string $eventName
+     * @param GridEventInterface|GridConfigurationEventInterface|Event $event
      *
      * @return Event
      */
     public function dispatch($eventName, Event $event = null)
     {
         /** @var DatagridConfiguration $config */
-        $config = $event->getDatagrid()->getConfig();
+        if ($event instanceof GridEventInterface) {
+            $config = $event->getDatagrid()->getConfig();
+        } elseif ($event instanceof GridConfigurationEventInterface) {
+            $config = $event->getConfig();
+        } else {
+            throw new \InvalidArgumentException(
+                'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
+            );
+        }
 
         // get all parents
         $invokedGrids   = $config->offsetGetOr(SystemAwareResolver::KEY_EXTENDED_FROM, []);

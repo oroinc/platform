@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -56,6 +57,9 @@ class Builder
      */
     public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
+        $event = new PreBuild($config, $parameters);
+        $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
+
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
