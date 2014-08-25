@@ -32,7 +32,7 @@ class PreBuild extends Event implements GridConfigurationEventInterface
     }
 
     /**
-     * @return DatagridConfiguration
+     * @return ParameterBag
      */
     public function getParameters()
     {

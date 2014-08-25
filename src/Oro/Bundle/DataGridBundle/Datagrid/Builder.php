@@ -19,6 +19,8 @@ class Builder
     const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
     const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
     const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
+    // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
+    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
     /** @var string */
     protected $baseDatagridClass;

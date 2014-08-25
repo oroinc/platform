@@ -59,10 +59,17 @@ class OrmPagerExtension extends AbstractExtension
     {
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
-        $this->pager->setQueryBuilder($datasource->getQueryBuilder());
+        if ($datasource instanceof OrmDatasource) {
+            $this->pager->setQueryBuilder($datasource->getQueryBuilder());
+            $this->pager->setSkipAclWalkerCheck(
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
+            );
+            $this->pager->setSkipCountWalker(
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH, false)
+            );
+        }
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
         $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
-        $this->pager->setSkipAclWalkerCheck($config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false));
         $this->pager->init();
     }
 
@@ -79,16 +86,16 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $defaultPage    = 1;
+        $defaultPage = 1;
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
         $initialState = [
             'currentPage' => $defaultPage,
-            'pageSize'    => $defaultPerPage
+            'pageSize' => $defaultPerPage
         ];
         $state = [
             'currentPage' => $this->getOr(PagerInterface::PAGE_PARAM, $defaultPage),
-            'pageSize'    => $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage)
+            'pageSize' => $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage)
         ];
 
         $data->offsetAddToArray('initialState', $initialState);
@@ -130,7 +137,7 @@ class OrmPagerExtension extends AbstractExtension
      * Get param or return specified default value
      *
      * @param string $paramName
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
