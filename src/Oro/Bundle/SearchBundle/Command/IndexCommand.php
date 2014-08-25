@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,7 +28,7 @@ class IndexCommand extends ContainerAwareCommand
             ->addArgument(
                 'class',
                 InputArgument::REQUIRED,
-                'Full of compact class name of indexed entity ' .
+                'Full or compact class name of indexed entity ' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
             ->addArgument(

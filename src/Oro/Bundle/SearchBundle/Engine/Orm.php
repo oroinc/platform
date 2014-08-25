@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\EntityManager;
@@ -14,11 +10,12 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
+
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class Orm extends AbstractEngine
 {
@@ -53,18 +50,20 @@ class Orm extends AbstractEngine
     }
 
     /**
-     * Reload search index
-     *
-     * @return int Count of index records
+     * {@inheritdoc}
      */
-    public function reindex()
+    public function reindex($entity = null)
     {
-        // clear old index
-        $this->clearSearchIndex();
+        if (null === $entity) {
+            $this->clearAllSearchIndexes();
+            $entities = $this->mapper->getEntities();
+        } else {
+            $this->clearSearchIndexForEntity($entity);
+            $entities = $this->getEntitiesArray($entity);
+        }
 
         // index data by mapping config
         $recordsCount = 0;
-        $entities     = $this->mapper->getEntities();
 
         while ($entityName = array_shift($entities)) {
             $itemsCount    = $this->reindexSingleEntity($entityName);
@@ -303,9 +302,47 @@ class Orm extends AbstractEngine
     }
 
     /**
+     * Clear search all search indexes or for custom entity
+     *
+     * @param string|null $entityName
+     */
+    protected function clearSearchIndexForEntity($entityName)
+    {
+        /** @var Connection $connection */
+        $connection       = $this->registry->getConnection();
+        $itemsCount       = 0;
+        $entityManager    = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $entityRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        $queryBuilder     = $entityRepository->createQueryBuilder('item')
+            ->where('item.entity = :entity')
+            ->setParameter('entity', $entityName);
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(self::BATCH_SIZE);
+
+        $connection->beginTransaction();
+        try {
+            foreach ($iterator as $entity) {
+                $itemsCount++;
+                $entityManager->remove($entity);
+
+                if (0 == $itemsCount % self::BATCH_SIZE) {
+                    $entityManager->flush();
+                }
+            }
+
+            if ($itemsCount % self::BATCH_SIZE > 0) {
+                $entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            $connection->rollback();
+        }
+    }
+
+    /**
      * Truncate search tables
      */
-    protected function clearSearchIndex()
+    protected function clearAllSearchIndexes()
     {
         /** @var Connection $connection */
         $connection = $this->registry->getConnection();

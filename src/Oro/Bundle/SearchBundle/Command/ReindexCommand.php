@@ -18,16 +18,26 @@ class ReindexCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:search:reindex')
+            ->addOption(
+                'class',
+                null,
+                InputArgument::OPTIONAL,
+                'Full or compact class name of entity which should be reindexed' .
+                '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
+            )
              ->setDescription('Rebuild search index');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting reindex task');
+        $class       = $input->getOption('class');
+        $placeholder = $class ? 'for "' . $class .'" entity' : 'for all mapped entities';
+
+        $output->writeln('Starting reindex task for ' . $placeholder);
 
         /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\AbstractEngine */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
-        $recordsCount = $searchEngine->reindex();
+        $recordsCount = $searchEngine->reindex($class);
 
         $output->writeln(sprintf('Total indexed items: %u', $recordsCount));
     }

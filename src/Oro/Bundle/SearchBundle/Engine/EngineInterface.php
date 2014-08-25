@@ -19,9 +19,10 @@ interface EngineInterface
     /**
      * Reindex entity data
      *
+     * @param string|null $entity
      * @return int Number of reindexed entities
      */
-    public function reindex();
+    public function reindex($entity = null);
 
     /**
      * Save one of several entities to search index

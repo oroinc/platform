@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Connector abstract class
