@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
@@ -79,10 +80,11 @@ class ImportExportController extends Controller
      */
     public function importProcessAction($processorAlias)
     {
-        return $this->getImportHandler()->handleImport(
+        $result = $this->getImportHandler()->handleImport(
             JobExecutor::JOB_IMPORT_FROM_CSV,
             $processorAlias
         );
+        return new JsonResponse($result);
     }
 
     /**
@@ -152,7 +154,7 @@ class ImportExportController extends Controller
      */
     protected function getImportHandler()
     {
-        return $this->get('oro_importexport.handler.import');
+        return $this->get('oro_importexport.handler.import.http');
     }
 
     /**
