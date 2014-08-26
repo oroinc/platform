@@ -214,8 +214,10 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumValueClassNameProvider()
     {
         return [
-            ['test', ExtendConfigDumper::ENTITY . 'EnumValue' . 'Test'],
-            ['test_123', ExtendConfigDumper::ENTITY . 'EnumValue' . 'Test123'],
+            ['test', ExtendConfigDumper::ENTITY . 'EV_Test'],
+            ['test_123', ExtendConfigDumper::ENTITY . 'EV_Test_123'],
+            ['test_enum', ExtendConfigDumper::ENTITY . 'EV_Test_Enum'],
+            ['testenum', ExtendConfigDumper::ENTITY . 'EV_Testenum'],
         ];
     }
 

@@ -178,7 +178,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendConfigDumper::ENTITY . 'EnumValue' . Inflector::classify($enumCode);
+        return ExtendConfigDumper::ENTITY . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
     }
 
     /**

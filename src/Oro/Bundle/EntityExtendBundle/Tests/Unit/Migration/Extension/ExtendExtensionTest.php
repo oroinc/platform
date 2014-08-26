@@ -43,7 +43,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
                         ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
-                        ['oro_enum_test_enum', ExtendConfigDumper::ENTITY . 'EnumValueTestEnum'],
+                        ['oro_enum_test_enum', ExtendConfigDumper::ENTITY . 'EV_Test_Enum'],
                     ]
                 )
             );
@@ -304,7 +304,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getExtendExtension();
 
         $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestStatus';
+        $expectedClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -404,7 +404,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getExtendExtension();
 
         $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestStatus';
+        $expectedClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -517,7 +517,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $enumCode      = 'test_enum';
         $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestEnum';
+        $enumClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);
@@ -581,7 +581,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $enumCode      = 'test_enum';
         $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestEnum';
+        $enumClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);
@@ -609,15 +609,15 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 (id INT NOT NULL, '
                 . 'enum1' . ExtendDbIdentifierNameGenerator::SNAPSHOT_COLUMN_SUFFIX . ' VARCHAR(500) DEFAULT NULL, '
                 . 'PRIMARY KEY(id))',
-                'CREATE TABLE oro_rel_f0617053734a7d29fbe307 ('
-                . 'entity1_id INT NOT NULL, enumvaluetestenum_id VARCHAR(32) NOT NULL, '
-                . 'INDEX IDX_E42EEF03C33725A7 (entity1_id), '
-                . 'INDEX IDX_E42EEF036C5C67FF (enumvaluetestenum_id), '
-                . 'PRIMARY KEY(entity1_id, enumvaluetestenum_id))',
-                'ALTER TABLE oro_rel_f0617053734a7d29fbe307 ADD CONSTRAINT FK_E42EEF03C33725A7 '
+                'CREATE TABLE oro_rel_f061705c40c71809fbe307 ('
+                . 'entity1_id INT NOT NULL, ev_test_enum_id VARCHAR(32) NOT NULL, '
+                . 'INDEX IDX_A8A92398C33725A7 (entity1_id), '
+                . 'INDEX IDX_A8A923982ACB7ECA (ev_test_enum_id), '
+                . 'PRIMARY KEY(entity1_id, ev_test_enum_id))',
+                'ALTER TABLE oro_rel_f061705c40c71809fbe307 ADD CONSTRAINT FK_A8A92398C33725A7 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE oro_rel_f0617053734a7d29fbe307 ADD CONSTRAINT FK_E42EEF036C5C67FF '
-                . 'FOREIGN KEY (enumvaluetestenum_id) REFERENCES oro_enum_test_enum (id) ON DELETE CASCADE'
+                'ALTER TABLE oro_rel_f061705c40c71809fbe307 ADD CONSTRAINT FK_A8A923982ACB7ECA '
+                . 'FOREIGN KEY (ev_test_enum_id) REFERENCES oro_enum_test_enum (id) ON DELETE CASCADE'
             ]
         );
         $this->assertExtendOptions(
