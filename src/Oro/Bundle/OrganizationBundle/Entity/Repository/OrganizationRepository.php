@@ -5,6 +5,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationRepository extends EntityRepository
 {
@@ -92,5 +93,45 @@ class OrganizationRepository extends EntityRepository
             ->setParameter('id', $id)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * Returns user organizations by name
+     * @param User   $user
+     * @param string $name
+     * @return Organization[]
+     */
+    public function getEnabledUserOrganizationsByName(User $user, $name)
+    {
+        $qb = $this->createQueryBuilder('org');
+        $organizations = $user->getOrganizations();
+        $ids = [];
+        foreach ($organizations as $organization) {
+            $ids[] = $organization->getId();
+        }
+
+        return $qb->select('org')
+            ->where('org.enabled = true')
+            ->andWhere($qb->expr()->in('org.id', $ids))
+            ->andWhere($qb->expr()->like('org.name', ':orgName'))
+            ->setParameter('orgName', '%' . str_replace(' ', '%', $name) . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Get user organization by id
+     *
+     * @param User    $user
+     * @param integer $id
+     * @return Organization
+     */
+    public function getEnabledUserOrganizationById(User $user, $id)
+    {
+        return $user->getOrganizations()->filter(
+            function (Organization $item) use ($id) {
+                return $item->getId() == $id && $item->isEnabled();
+            }
+        );
     }
 }
