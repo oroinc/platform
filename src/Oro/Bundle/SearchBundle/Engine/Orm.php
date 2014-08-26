@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\EntityManager;
@@ -14,7 +10,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
@@ -121,20 +116,13 @@ class Orm extends AbstractEngine
             return true;
         }
 
-        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
 
-        $hasDeletedEntities = false;
-        foreach ($entities as $entity) {
-            $item = $this->getIndexRepository()->findOneBy(
-                array(
-                    'entity'   => ClassUtils::getRealClass($entity),
-                    'recordId' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
-                )
-            );
-
-            if ($item) {
-                $entityManager->remove($item);
-                $hasDeletedEntities = true;
+        $hasDeletedEntities = !empty($existingItems);
+        foreach ($existingItems as $items) {
+            foreach ($items as $item) {
+                $itemEntityManager->remove($item);
             }
         }
 
@@ -160,15 +148,56 @@ class Orm extends AbstractEngine
             return true;
         }
 
-        $hasSavedEntities = false;
-        foreach ($entities as $entity) {
-            if ($this->saveEntity($entity)) {
-                $hasSavedEntities = true;
-            }
-        }
+        $hasSavedEntities = $this->saveItemData($entities);
 
         if ($hasSavedEntities && $this->needFlush) {
             $this->flush();
+        }
+
+        return $hasSavedEntities;
+    }
+
+    /**
+     * @param array $entities
+     * @return bool
+     */
+    protected function saveItemData(array $entities)
+    {
+        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
+
+        $hasSavedEntities = false;
+        foreach ($entities as $entity) {
+            $data = $this->mapper->mapObject($entity);
+            if (empty($data)) {
+                continue;
+            }
+
+            $class = $this->doctrineHelper->getEntityClass($entity);
+            $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+            $item = null;
+            if ($id && !empty($existingItems[$class][$id])) {
+                $item = $existingItems[$class][$id];
+            }
+
+            if (!$item) {
+                $item   = new Item();
+                $config = $this->mapper->getEntityConfig($class);
+                $alias  = $config ? $config['alias'] : $class;
+
+                $item->setEntity($class)
+                    ->setRecordId($id)
+                    ->setAlias($alias);
+            }
+
+            $item->setTitle($this->getEntityTitle($entity))
+                ->setChanged(false)
+                ->saveItemData($data);
+
+            $itemEntityManager->persist($item);
+
+            $hasSavedEntities = true;
         }
 
         return $hasSavedEntities;
@@ -188,49 +217,6 @@ class Orm extends AbstractEngine
     public function flush()
     {
         $this->registry->getManager()->flush();
-    }
-
-    /**
-     * @param object $entity
-     * @return bool
-     */
-    protected function saveEntity($entity)
-    {
-        $data = $this->mapper->mapObject($entity);
-        if (empty($data)) {
-            return false;
-        }
-
-        $class = ClassUtils::getRealClass($entity);
-        $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        $item = null;
-        if ($id) {
-            $item = $this->getIndexRepository()->findOneBy(
-                array(
-                    'entity'   => $class,
-                    'recordId' => $id
-                )
-            );
-        }
-
-        if (!$item) {
-            $item   = new Item();
-            $config = $this->mapper->getEntityConfig($class);
-            $alias  = $config ? $config['alias'] : $class;
-
-            $item->setEntity($class)
-                ->setRecordId($id)
-                ->setAlias($alias);
-        }
-
-        $item->setTitle($this->getEntityTitle($entity))
-            ->setChanged(false)
-            ->saveItemData($data);
-
-        $this->registry->getManagerForClass('OroSearchBundle:Item')->persist($item);
-
-        return true;
     }
 
     /**
