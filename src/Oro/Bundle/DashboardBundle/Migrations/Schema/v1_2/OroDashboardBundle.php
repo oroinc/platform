@@ -14,16 +14,17 @@ class OroDashboardBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addOrganization($schema);
-        self::removePKActiveDashboards($schema);
+        self::addOrganizationDashboardTable($schema);
+        self::createOroDashboardActiveTable($schema);
+        self::addOroDashboardActiveForeignKeys($schema);
     }
 
     /**
-     * Adds organization_id into oro_dashboard, oro_dashboard_active
+     * Adds organization_id into oro_dashboard
      *
      * @param Schema $schema
      */
-    public static function addOrganization(Schema $schema)
+    public static function addOrganizationDashboardTable(Schema $schema)
     {
         $table = $schema->getTable('oro_dashboard');
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
@@ -34,30 +35,52 @@ class OroDashboardBundle implements Migration
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
+    }
 
-        $table = $schema->getTable('oro_dashboard_active');
+    /**
+     * Create oro_dashboard_active table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroDashboardActiveTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_dashboard_active_copy');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('dashboard_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['user_id'], 'IDX_858BA17EA76ED395', []);
+        $table->addIndex(['dashboard_id'], 'IDX_858BA17EB9D04D2B', []);
         $table->addIndex(['organization_id'], 'IDX_858BA17E32C8A3DE', []);
+    }
+
+    /**
+     * Add oro_dashboard_active foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroDashboardActiveForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_dashboard_active_copy');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_dashboard'),
+            ['dashboard_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
     }
 
-    /**
-     * Removes old pk by user_id, foreign key
-     *
-     * @param Schema   $schema
-     */
-    public static function removePKActiveDashboards(Schema $schema)
-    {
-        $table = $schema->getTable('oro_dashboard_active');
-
-        if ($table->hasForeignKey('FK_858BA17EA76ED395')) {
-            $table->removeForeignKey('FK_858BA17EA76ED395');
-        }
-        $table->dropPrimaryKey();
-    }
 }

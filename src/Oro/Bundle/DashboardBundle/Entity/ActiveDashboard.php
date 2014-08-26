@@ -27,8 +27,8 @@ class ActiveDashboard
     /**
      * @var User
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $user;
 
@@ -36,15 +36,15 @@ class ActiveDashboard
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\DashboardBundle\Entity\Dashboard")
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $dashboard;
 
     /**
      * @var Organization
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
 
@@ -62,7 +62,6 @@ class ActiveDashboard
      */
     public function setUser($user)
     {
-        $this->userId = $user->getId();
         $this->user = $user;
 
         return $this;

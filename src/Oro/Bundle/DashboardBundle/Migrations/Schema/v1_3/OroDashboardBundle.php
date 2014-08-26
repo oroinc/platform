@@ -14,37 +14,23 @@ class OroDashboardBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addPKActiveDashboard($schema);
-        self::addUserIndexActiveDashboard($schema);
+        self::copyActiveDashboard($queries);
     }
 
     /**
-     * Adds PK to oro_dashboard_active table
+     * Copy data from oro_dashboard_active into oro_dashboard_active_copy, rename and drop it
      *
-     * @param Schema   $schema
+     * @param QueryBag   $queries
      */
-    public static function addPKActiveDashboard(Schema $schema)
+    public static function copyActiveDashboard(QueryBag $queries)
     {
-        $table = $schema->getTable('oro_dashboard_active');
+        $queries->addPreQuery(
+            "INSERT INTO oro_dashboard_active_copy (user_id, dashboard_id)
+             SELECT user_id, dashboard_id
+             FROM oro_dashboard_active;
 
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->setPrimaryKey(['id']);
-    }
-
-    /**
-     * Adds index, foreign key to oro_dashboard_active table
-     *
-     * @param Schema   $schema
-     */
-    public static function addUserIndexActiveDashboard(Schema $schema)
-    {
-        $table = $schema->getTable('oro_dashboard_active');
-        $table->addIndex(['user_id'], 'IDX_dsh_active_usr_id', []);
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+             DROP TABLE oro_dashboard_active;
+             ALTER TABLE oro_dashboard_active_copy RENAME TO oro_dashboard_active;"
         );
     }
 }
