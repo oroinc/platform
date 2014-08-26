@@ -2,18 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
-use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Update and reindex (automatically) fulltext-indexed table(s).
- * Use carefully on large data sets - do not run this task too often.
- *
- * @author magedan
- */
+use Doctrine\ORM\EntityManager;
+
 class IndexCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:search:index';
@@ -24,15 +19,15 @@ class IndexCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName(self::NAME)
-            ->setDescription('Do search index for one specific entity')
+            ->setDescription('Update search index for specified entities with the same type')
             ->addArgument(
                 'class',
                 InputArgument::REQUIRED,
-                'Full or compact class name of indexed entity ' .
+                'Full of compact class name of indexed entities ' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
             ->addArgument(
-                'identifier',
+                'identifiers',
                 InputArgument::REQUIRED|InputArgument::IS_ARRAY,
                 'Identifiers of indexed entities (f.e. 42)'
             );
@@ -43,27 +38,11 @@ class IndexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $doctrine   = $this->getContainer()->get('doctrine');
-        $engine     = $this->getContainer()->get('oro_search.search.engine');
-        $class      = $input->getArgument('class');
-        $identifier = $input->getArgument('identifier');
+        $engine      = $this->getContainer()->get('oro_search.search.engine');
+        $class       = $input->getArgument('class');
+        $identifiers = $input->getArgument('identifiers');
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $doctrine->getManagerForClass($class);
-        if (!$entityManager) {
-            throw new \LogicException(sprintf('Entity manager for class %s is not defined', $class));
-        }
-
-        $savedEntities   = array();
-        $deletedEntities = array();
-        foreach ($identifier as $id) {
-            $entity = $entityManager->find($class, $id);
-            if ($entity) {
-                $savedEntities[] = $entity;
-            } else {
-                $deletedEntities[] = $entityManager->getReference($class, $id);
-            }
-        }
+        list($savedEntities, $deletedEntities) = $this->getSavedAndDeletedEntities($class, $identifiers);
 
         if ($savedEntities) {
             if ($engine->save($savedEntities, true)) {
@@ -80,5 +59,49 @@ class IndexCommand extends ContainerAwareCommand
                 $output->writeln('<error>Can\'t delete entities from index</error>');
             }
         }
+    }
+
+    /**
+     * @param string $class
+     * @param array $identifiers
+     * @return array
+     * @throws \LogicException
+     */
+    protected function getSavedAndDeletedEntities($class, array $identifiers)
+    {
+        $doctrine = $this->getContainer()->get('doctrine');
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $doctrine->getManagerForClass($class);
+        if (!$entityManager) {
+            throw new \LogicException(sprintf('Entity manager for class %s is not defined', $class));
+        }
+
+        $repository = $entityManager->getRepository($class);
+        $metadata = $entityManager->getClassMetadata($class);
+
+        $identifierColumn = $metadata->getSingleIdentifierFieldName();
+        $queryBuilder = $repository->createQueryBuilder('e');
+
+        // get entities to save
+        $savedEntityIds = array();
+        $savedEntities = $queryBuilder->andWhere($queryBuilder->expr()->in('e.' . $identifierColumn, $identifiers))
+            ->getQuery()
+            ->getResult();
+
+        foreach ($savedEntities as $entity) {
+            $ids = $metadata->getIdentifierValues($entity);
+            $savedEntityIds[] = current($ids);
+        }
+
+        // get entities to delete
+        $deletedEntityIds = array_diff($identifiers, $savedEntityIds);
+        $deletedEntities = array();
+
+        foreach ($deletedEntityIds as $id) {
+            $deletedEntities[] = $entityManager->getReference($class, $id);
+        }
+
+        return array($savedEntities, $deletedEntities);
     }
 }

@@ -62,6 +62,8 @@ class OrmEngineTest extends WebTestCase
         // ensure appropriate search items has been deleted
         $this->assertNull($searchItem->getId());
         $this->assertNull($searchIndex->getId());
+        $searchItem = $searchItemRepository->findOneBy(array('title' => $newTitle));
+        $this->assertEmpty($searchItem);
     }
 
     /**
