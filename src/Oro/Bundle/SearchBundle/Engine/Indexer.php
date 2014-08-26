@@ -178,7 +178,7 @@ class Indexer
                 }
             }
             $query->from($queryFromEntities);
-        } else {
+        } elseif ($allowedEntities != $this->mapper->getEntitiesListAliases()) {
             $query->from($allowedEntities);
         }
     }

@@ -8,6 +8,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_ENGINE = 'orm';
+
     /**
      * Bundle configuration structure
      *

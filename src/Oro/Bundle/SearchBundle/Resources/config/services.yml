@@ -35,7 +35,12 @@ services:
 
     oro_search.index_listener:
         class:                        %oro_search.index_listener.class%
-        arguments:                    ["@service_container", %oro_search.realtime_update%, %oro_search.entities_config%]
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_search.search.engine
+        calls:
+            - [setRealTimeUpdate, [%oro_search.realtime_update%]]
+            - [setEntitiesConfig, [%oro_search.entities_config%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
