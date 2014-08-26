@@ -86,9 +86,7 @@ class IndexText
      */
     public function setValue($value)
     {
-        $processedValue = str_replace('-', self::HYPHEN_SUBSTITUTION, $value);
-
-        $this->value = $processedValue;
+        $this->value = $value;
 
         return $this;
     }

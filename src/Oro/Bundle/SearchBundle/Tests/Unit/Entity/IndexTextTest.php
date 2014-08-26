@@ -33,7 +33,7 @@ class IndexTextTest extends \PHPUnit_Framework_TestCase
     public function testValueWithHyphen()
     {
         $this->index->setValue('text-value');
-        $this->assertEquals('text value', $this->index->getValue());
+        $this->assertEquals('text-value', $this->index->getValue());
     }
 
     public function testGetId()
