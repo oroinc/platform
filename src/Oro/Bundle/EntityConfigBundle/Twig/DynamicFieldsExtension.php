@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -30,6 +31,11 @@ class DynamicFieldsExtension extends \Twig_Extension
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var FieldTypeHelper
+     */
+    protected $fieldTypeHelper;
 
     /**
      * @var ConfigProviderInterface
@@ -68,27 +74,24 @@ class DynamicFieldsExtension extends \Twig_Extension
 
     /**
      * @param ConfigManager $configManager
-     * @param ConfigProviderInterface $extendProvider
-     * @param ConfigProviderInterface $entityProvider
-     * @param ConfigProviderInterface $viewProvider
+     * @param FieldTypeHelper $fieldTypeHelper
      * @param DateTimeFormatter $dateTimeFormatter
      * @param UrlGeneratorInterface $router
      */
     public function __construct(
         ConfigManager $configManager,
-        ConfigProviderInterface $extendProvider,
-        ConfigProviderInterface $entityProvider,
-        ConfigProviderInterface $viewProvider,
+        FieldTypeHelper $fieldTypeHelper,
         DateTimeFormatter $dateTimeFormatter,
         UrlGeneratorInterface $router
     ) {
         $this->configManager = $configManager;
-        $this->extendProvider = $extendProvider;
-        $this->entityProvider = $entityProvider;
-        $this->viewProvider = $viewProvider;
+        $this->fieldTypeHelper = $fieldTypeHelper;
         $this->dateTimeFormatter = $dateTimeFormatter;
         $this->router = $router;
 
+        $this->extendProvider = $configManager->getProvider('extend');
+        $this->entityProvider = $configManager->getProvider('entity');
+        $this->viewProvider = $configManager->getProvider('view');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -121,14 +124,16 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldConfigId = $field->getId();
 
             $fieldName = $fieldConfigId->getFieldName();
+            $fieldType = $fieldConfigId->getFieldType();
+            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             /** Prepare OptionSet field type */
-            if ($fieldConfigId->getFieldType() == 'optionSet') {
+            if ($fieldType == 'optionSet') {
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
             }
 
-            if ($value && $fieldConfigId->getFieldType() == 'manyToOne') {
+            if ($value && $underlyingFieldType == 'manyToOne') {
                 $value = $this->propertyAccessor->getValue(
                     FieldAccessor::getValue($entity, $fieldName),
                     $field->get('target_field')
@@ -146,7 +151,7 @@ class DynamicFieldsExtension extends \Twig_Extension
                 $label = $fieldName;
             }
             $dynamicRow[$fieldName] = array(
-                'type'  => $fieldConfigId->getFieldType(),
+                'type'  => $fieldType,
                 'label' => $label,
                 'value' => $value,
             );
@@ -263,15 +268,28 @@ class DynamicFieldsExtension extends \Twig_Extension
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $extendConfig->getId();
 
-        return
-            $config->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$config->is('state', ExtendScope::STATE_NEW)
-            && !$config->is('is_deleted')
-            && $this->viewProvider->getConfigById($config->getId())->is('is_displayable')
-            && !(
-                in_array($fieldConfigId->getFieldType(), array('oneToMany', 'manyToOne', 'manyToMany'))
-                && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
-            );
+        // skip system, new and deleted fields
+        if (!$config->is('owner', ExtendScope::OWNER_CUSTOM)
+            || $config->is('state', ExtendScope::STATE_NEW)
+            || $config->is('is_deleted')
+        ) {
+            return false;
+        }
+
+        // skip invisible fields
+        if (!$this->viewProvider->getConfigById($config->getId())->is('is_displayable')) {
+            return false;
+        }
+
+        // skip relations if they are referenced to deleted entity
+        $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
+        if (in_array($underlyingFieldType, array('oneToMany', 'manyToOne', 'manyToMany'))
+            && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
