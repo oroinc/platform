@@ -98,7 +98,7 @@ class ImportExportController extends Controller
             JobExecutor::JOB_EXPORT_TO_CSV,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
-            null,
+            'csv',
             null,
             ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
         );
