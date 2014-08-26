@@ -55,6 +55,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function preUpdate()
     {

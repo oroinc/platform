@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-class AssociationChoiceTypeTestCase extends AbstractConfigTypeTestCase
+class AssociationTypeTestCase extends AbstractConfigTypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $groupingConfigProvider;

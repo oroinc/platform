@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures;
 use Doctrine\ORM\Mapping as ORM;
 
 use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Translatable\Translatable;
 
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 
 /**
  * @ORM\Table(name="oro_enum_value_test",
@@ -30,6 +30,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class TestEnumValue extends AbstractEnumValue implements Translatable
+class TestEnumValue extends AbstractEnumValue implements ExtendEntityInterface
 {
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\Yaml\Yaml;
 
 class ExtendClassLoadingUtils
 {

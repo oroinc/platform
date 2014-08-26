@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
 
-class MultipleAssociationChoiceTypeTest extends AssociationChoiceTypeTestCase
+class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;

@@ -4,17 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType;
 
-class AssociationChoiceTypeTest extends AssociationTypeTestCase
+class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /** @var AssociationChoiceType */
+    /** @var IntegerAssociationPropertyType */
     protected $type;
 
     protected function setUp()
@@ -28,53 +26,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new AssociationChoiceType($this->configManager, $entityClassResolver);
-    }
-
-    public function testSetDefaultOptions()
-    {
-        $resolver = new OptionsResolver();
-        $this->type->setDefaultOptions($resolver);
-
-        $this->assertEquals(
-            [
-                'empty_value'       => false,
-                'choices'           => ['No', 'Yes'],
-                'association_class' => null
-            ],
-            $resolver->resolve([])
-        );
-    }
-
-    /**
-     * @dataProvider submitProvider
-     */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
-    {
-        $this->doTestSubmit(
-            'enabled',
-            $this->type,
-            [
-                'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-                'association_class' => 'Test\AssocEntity'
-            ],
-            [],
-            $newVal,
-            $oldVal,
-            $state,
-            $isSetStateExpected
-        );
-    }
-
-    public function submitProvider()
-    {
-        return [
-            [false, false, ExtendScope::STATE_ACTIVE, false],
-            [true, true, ExtendScope::STATE_ACTIVE, false],
-            [false, true, ExtendScope::STATE_ACTIVE, false],
-            [true, false, ExtendScope::STATE_ACTIVE, true],
-            [true, false, ExtendScope::STATE_UPDATED, false],
-        ];
+        $this->type = new IntegerAssociationPropertyType($this->configManager, $entityClassResolver);
     }
 
     public function testBuildView()
@@ -114,27 +66,6 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
 
         $this->assertEquals(
             $this->getDisabledFormView(),
-            $view->vars
-        );
-    }
-
-    public function testBuildViewForDisabledWithCssClass()
-    {
-        $this->prepareBuildViewTest();
-
-        $view    = new FormView();
-        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
-        $options = [
-            'config_id'         => new EntityConfigId('test', 'Test\Entity'),
-            'association_class' => 'Test\Entity'
-        ];
-
-        $view->vars['attr']['class'] = 'test-class';
-
-        $this->type->buildView($view, $form, $options);
-
-        $this->assertEquals(
-            $this->getDisabledFormView('test-class'),
             $view->vars
         );
     }
@@ -223,25 +154,28 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_entity_extend_association_choice', $this->type->getName());
+        $this->assertEquals(
+            'oro_entity_extend_association_property_integer',
+            $this->type->getName()
+        );
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $this->assertEquals(
+            'integer',
+            $this->type->getParent()
+        );
     }
 
     /**
-     * @param string|null $cssClass
      * @return array
      */
-    protected function getDisabledFormView($cssClass = null)
+    protected function getDisabledFormView()
     {
         return [
             'disabled' => true,
-            'attr'     => [
-                'class' => empty($cssClass) ? 'disabled-choice' : $cssClass . ' disabled-choice'
-            ],
+            'attr'     => [],
             'value'    => null
         ];
     }
