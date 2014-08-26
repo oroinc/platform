@@ -23,7 +23,7 @@ class IndexCommand extends ContainerAwareCommand
             ->addArgument(
                 'class',
                 InputArgument::REQUIRED,
-                'Full of compact class name of indexed entities ' .
+                'Full or compact class name of indexed entities ' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
             ->addArgument(
@@ -69,10 +69,8 @@ class IndexCommand extends ContainerAwareCommand
      */
     protected function getSavedAndDeletedEntities($class, array $identifiers)
     {
-        $doctrine = $this->getContainer()->get('doctrine');
-
         /** @var EntityManager $entityManager */
-        $entityManager = $doctrine->getManagerForClass($class);
+        $entityManager = $this->getContainer()->get('doctrine')->getManagerForClass($class);
         if (!$entityManager) {
             throw new \LogicException(sprintf('Entity manager for class %s is not defined', $class));
         }
