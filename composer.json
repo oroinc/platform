@@ -21,7 +21,6 @@
         "ext-mbstring": "*",
         "ext-gd": "*",
         "ext-xml": "*",
-        "ext-mysql": "*",
         "symfony/symfony": "2.3.*",
         "doctrine/orm": "2.4.3",
         "doctrine/doctrine-bundle": "1.2.0",
