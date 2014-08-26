@@ -160,7 +160,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     public function postUpdate()
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $extendConfigProvider->getConfigs();
+        $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
             if ($entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
                 $entityClassName = $entityConfig->getId()->getClassName();
@@ -244,7 +244,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         }
 
         // create entity
-        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModelManager::MODE_READONLY);
+        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModelManager::MODE_HIDDEN);
         $this->relationBuilder->updateEntityConfigs(
             $enumValueClassName,
             [

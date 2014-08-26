@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -209,6 +210,25 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
+        $this->entityMetadataHelper->expects($this->at(0))
+            ->method('registerEntityClass')
+            ->with(
+                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity_1',
+                ExtendConfigDumper::ENTITY . 'Entity_1'
+            );
+        $this->entityMetadataHelper->expects($this->at(1))
+            ->method('registerEntityClass')
+            ->with(
+                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity2',
+                ExtendConfigDumper::ENTITY . 'Entity2'
+            );
+        $this->entityMetadataHelper->expects($this->at(2))
+            ->method('registerEntityClass')
+            ->with(
+                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity3',
+                ExtendConfigDumper::ENTITY . 'Entity3'
+            );
+
         $extension->createCustomEntityTable(
             $schema,
             'Entity_1'
@@ -283,24 +303,31 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
+        $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
+        $expectedClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestStatus';
+
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('registerEntityClass')
+            ->with($expectedTableName, $expectedClassName);
+
         $extension->createEnum($schema, 'test_status');
 
         $this->assertSchemaSql(
             $schema,
             [
                 sprintf(
-                    'CREATE TABLE %stest_status (id VARCHAR(32) NOT NULL,'
+                    'CREATE TABLE %s (id VARCHAR(32) NOT NULL,'
                     . ' name VARCHAR(255) NOT NULL, priority INT NOT NULL, is_default TINYINT(1) NOT NULL,'
                     . ' PRIMARY KEY(id))',
-                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
+                    $expectedTableName
                 ),
             ]
         );
         $this->assertExtendOptions(
             $schema,
             [
-                ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
-                    'mode'    => 'readonly',
+                $expectedClassName => [
+                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'configs' => [
                         'entity'     => [
                             'label'        => 'oro.entityextend.enums.test_status.entity_label',
@@ -376,6 +403,13 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
+        $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
+        $expectedClassName = ExtendConfigDumper::ENTITY . 'EnumValueTestStatus';
+
+        $this->entityMetadataHelper->expects($this->once())
+            ->method('registerEntityClass')
+            ->with($expectedTableName, $expectedClassName);
+
         $extension->createEnum(
             $schema,
             'test_status',
@@ -393,18 +427,18 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $schema,
             [
                 sprintf(
-                    'CREATE TABLE %stest_status (id VARCHAR(32) NOT NULL,'
+                    'CREATE TABLE %s (id VARCHAR(32) NOT NULL,'
                     . ' name VARCHAR(255) NOT NULL, priority INT NOT NULL, is_default TINYINT(1) NOT NULL,'
                     . ' PRIMARY KEY(id))',
-                    ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX
+                    $expectedTableName
                 ),
             ]
         );
         $this->assertExtendOptions(
             $schema,
             [
-                ExtendConfigDumper::ENTITY . 'EnumValueTestStatus' => [
-                    'mode'    => 'readonly',
+                $expectedClassName => [
+                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'configs' => [
                         'entity'     => [
                             'label'        => 'oro.entityextend.enums.test_status.entity_label',
@@ -590,7 +624,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $schema,
             [
                 'Acme\AcmeBundle\Entity\Entity1' => [
-                    'fields'        => [
+                    'fields' => [
                         'enum1' => [
                             'type'    => 'multiEnum',
                             'configs' => [

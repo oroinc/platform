@@ -94,7 +94,7 @@ class ExtendConfigDumper
         }
 
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs();
+        $extendConfigs  = $extendProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
@@ -127,7 +127,7 @@ class ExtendConfigDumper
     {
         $schemas        = [];
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs();
+        $extendConfigs  = $extendProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
@@ -366,16 +366,14 @@ class ExtendConfigDumper
             }
 
             // mark all fields as deleted
-            $extendProvider->map(
-                function (Config $config) use ($extendProvider, &$hasChanges) {
-                    if (!$config->is('is_deleted')) {
-                        $config->set('is_deleted', true);
-                        $extendProvider->persist($config);
-                        $hasChanges = true;
-                    }
-                },
-                $className
-            );
+            $fieldConfigs = $extendProvider->getConfigs($className, true);
+            foreach ($fieldConfigs as $fieldConfig) {
+                if (!$fieldConfig->is('is_deleted')) {
+                    $fieldConfig->set('is_deleted', true);
+                    $extendProvider->persist($fieldConfig);
+                    $hasChanges = true;
+                }
+            }
         } elseif (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
             $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
             $extendProvider->persist($extendConfig);

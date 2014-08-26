@@ -137,7 +137,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->at(3))
             ->method('createConfigEntityModel')
-            ->with($enumValueClassName1, ConfigModelManager::MODE_READONLY);
+            ->with($enumValueClassName1, ConfigModelManager::MODE_HIDDEN);
         $this->configManager->expects($this->at(4))
             ->method('createConfigFieldModel')
             ->with($enumValueClassName1, 'id', 'string');
@@ -309,6 +309,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($extendConfigProvider));
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
+            ->with(null, true)
             ->will($this->returnValue($entityConfigs));
 
         $this->configManager->expects($this->once())
@@ -371,6 +372,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($extendConfigProvider));
         $extendConfigProvider->expects($this->at(0))
             ->method('getConfigs')
+            ->with(null, true)
             ->will($this->returnValue($entityConfigs));
         $extendConfigProvider->expects($this->at(1))
             ->method('getConfigs')

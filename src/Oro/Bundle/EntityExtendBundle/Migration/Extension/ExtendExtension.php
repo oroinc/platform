@@ -79,6 +79,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $className = ExtendConfigDumper::ENTITY . $entityName;
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table     = $schema->createTable($tableName);
+        $this->entityMetadataHelper->registerEntityClass($tableName, $className);
 
         $options = new OroOptions($options);
         // set options
@@ -151,7 +152,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options = array_merge(
             [
-                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_READONLY,
+                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_HIDDEN,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
                 'entity'                                  => [
                     'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -183,6 +184,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
 
         $table = $schema->createTable($tableName);
+        $this->entityMetadataHelper->registerEntityClass($tableName, $className);
         $table->addOption(OroOptions::KEY, $options);
 
         $table->addColumn(

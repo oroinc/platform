@@ -61,6 +61,8 @@ class UniqueEnumNameValidator extends ConstraintValidator
      * @param string $fieldName
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function isExistingEnum($enumCode, $entityClassName, $fieldName)
     {
@@ -68,7 +70,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
 
         // at first check if an enum entity with the given code is already exist
         $groupingConfigProvider = $this->configManager->getProvider('grouping');
-        $entityConfigs          = $groupingConfigProvider->getConfigs();
+        $entityConfigs          = $groupingConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
             $groups = $entityConfig->get('groups', false, []);
             if (!empty($groups)
