@@ -134,6 +134,14 @@ abstract class AbstractEntityVoter implements VoterInterface
     }
 
     /**
+     * @param string $class
+     * @param int $identifier
+     * @param string $attribute
+     * @return int
+     */
+    abstract protected function getPermissionForAttribute($class, $identifier, $attribute);
+
+    /**
      * @param object $object
      * @return string
      */
