@@ -161,7 +161,7 @@ class Query
      *
      * @param string $query
      *
-     * @return $this
+     * @return Query
      */
     public function createQuery($query)
     {
@@ -175,7 +175,7 @@ class Query
      *
      * @param array|string $entities
      *
-     * @return $this
+     * @return Query
      */
     public function from($entities)
     {
@@ -200,7 +200,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return $this
+     * @return Query
      */
     public function andWhere($fieldName, $condition, $fieldValue, $fieldType = null)
     {
@@ -215,7 +215,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return $this
+     * @return Query
      */
     public function orWhere($fieldName, $condition, $fieldValue, $fieldType = null)
     {
@@ -231,7 +231,7 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return $this
+     * @return Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
@@ -303,7 +303,7 @@ class Query
      *
      * @param int $maxResults
      *
-     * @return $this
+     * @return Query
      */
     public function setMaxResults($maxResults)
     {
@@ -327,7 +327,7 @@ class Query
      *
      * @param int $firstResult
      *
-     * @return $this
+     * @return Query
      */
     public function setFirstResult($firstResult)
     {
@@ -353,7 +353,7 @@ class Query
      * @param string $direction
      * @param string $type
      *
-     * @return $this
+     * @return Query
      */
     public function setOrderBy($fieldName, $direction = 'ASC', $type = self::TYPE_TEXT)
     {

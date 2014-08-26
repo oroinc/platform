@@ -75,7 +75,7 @@ class Item
      * Set entity name
      *
      * @param string $entityName
-     * @return $this
+     * @return Item
      */
     public function setEntityName($entityName)
     {
@@ -88,7 +88,7 @@ class Item
      * Set record id
      *
      * @param $recordId
-     * @return $this
+     * @return Item
      */
     public function setRecordId($recordId)
     {
@@ -131,7 +131,7 @@ class Item
      *
      * @param string $recordTitle
      *
-     * @return $this
+     * @return Item
      */
     public function setRecordTitle($recordTitle)
     {
@@ -155,7 +155,7 @@ class Item
      *
      * @param string $recordUrl
      *
-     * @return $this
+     * @return Item
      */
     public function setRecordUrl($recordUrl)
     {
@@ -179,7 +179,7 @@ class Item
      *
      * @param string $recordText
      *
-     * @return $this
+     * @return Item
      */
     public function setRecordText($recordText)
     {
