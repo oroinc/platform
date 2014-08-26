@@ -65,12 +65,6 @@ class NavigationListener
                 ->orderBy('report.name', 'ASC');
             $reports = $this->aclHelper->apply($qb)->execute();
 
-            foreach ($reports as $key => $report) {
-                if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
-                    unset($reports[$key]);
-                }
-            }
-
             if (!empty($reports)) {
                 $this->addDivider($reportsMenuItem);
                 $reportMenuData = [];
