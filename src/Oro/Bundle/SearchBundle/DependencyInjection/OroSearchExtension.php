@@ -11,16 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroSearchExtension extends Extension
 {
     /**
-     * Load configuration
-     *
      * @param  array            $configs
      * @param  ContainerBuilder $container
      * @throws InvalidConfigurationException
@@ -57,6 +50,7 @@ class OroSearchExtension extends Extension
 
         // load engine specific and general search services
         $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $serviceLoader->load('services.yml');
 
         $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
         $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);
@@ -66,8 +60,6 @@ class OroSearchExtension extends Extension
             $resource = end($engineResources);
             $serviceLoader->load($resource->path);
         }
-
-        $serviceLoader->load('services.yml');
     }
 
     /**

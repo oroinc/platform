@@ -402,9 +402,7 @@ class Query
      */
     public static function clearString($inputString)
     {
-        $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
-
-        return trim(preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $clearedString)));
+        return trim(preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $inputString)));
     }
 
     /**

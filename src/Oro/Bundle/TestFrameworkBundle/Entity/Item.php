@@ -93,12 +93,6 @@ class Item
      */
     protected $values;
 
-    //TODO: Must ne deleted in in scope of the BAP-5139
-    public function getId()
-    {
-        return $this->id;
-    }
-
     public function __set($name, $value)
     {
         $this->$name = $value;

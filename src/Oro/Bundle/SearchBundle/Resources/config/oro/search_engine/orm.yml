@@ -1,7 +1,8 @@
 parameters:
-    oro_search.engine.class: Oro\Bundle\SearchBundle\Engine\Orm
-    oro_search.fulltext_index_manager.class:              Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
-    oro_search.event_listener.orm.fulltext_index_listener.class: Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
+    oro_search.engine.class:                                      Oro\Bundle\SearchBundle\Engine\Orm
+    oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
+    oro_search.index_listener.class:                              Oro\Bundle\SearchBundle\EventListener\OrmIndexListener
+    oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.drivers:
         pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
@@ -11,14 +12,16 @@ services:
     oro_search.search.engine:
         class: %oro_search.engine.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @event_dispatcher
-            - @service_container
+            - @oro_entity.doctrine_helper
             - @oro_search.mapper
-            - %oro_search.log_queries%
+        calls:
+            - [setLogQueries, [%oro_search.log_queries%]]
+            - [setDrivers, [%oro_search.drivers%]]
 
     oro_search.fulltext_index_manager:
-        class:                        %oro_search.fulltext_index_manager.class%
+        class: %oro_search.fulltext_index_manager.class%
         arguments:
             - @doctrine.dbal.default_connection
             - %oro_search.drivers%
