@@ -123,6 +123,7 @@ services:
         arguments:
             - @oro_importexport.context_registry
             - @doctrine
+            - @oro_security.owner.ownership_metadata_provider
 
     oro_integration.helper.default_owner_helper:
         class: %oro_integration.helper.default_owner_helper.class%

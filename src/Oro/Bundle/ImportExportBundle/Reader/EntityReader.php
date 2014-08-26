@@ -11,6 +11,8 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class EntityReader extends IteratorBasedReader
 {
@@ -20,13 +22,23 @@ class EntityReader extends IteratorBasedReader
     protected $registry;
 
     /**
-     * @param ContextRegistry $contextRegistry
-     * @param ManagerRegistry $registry
+     * @var OwnershipMetadataProvider
      */
-    public function __construct(ContextRegistry $contextRegistry, ManagerRegistry $registry)
-    {
+    protected $ownershipMetadata;
+
+    /**
+     * @param ContextRegistry           $contextRegistry
+     * @param ManagerRegistry           $registry
+     * @param OwnershipMetadataProvider $ownershipMetadata
+     */
+    public function __construct(
+        ContextRegistry $contextRegistry,
+        ManagerRegistry $registry,
+        OwnershipMetadataProvider $ownershipMetadata
+    ) {
         parent::__construct($contextRegistry);
 
+        $this->ownershipMetadata = $ownershipMetadata;
         $this->registry = $registry;
     }
 
@@ -37,7 +49,7 @@ class EntityReader extends IteratorBasedReader
     protected function initializeFromContext(ContextInterface $context)
     {
         if ($context->hasOption('entityName')) {
-            $this->setSourceEntityName($context->getOption('entityName'));
+            $this->setSourceEntityName($context->getOption('entityName'), $context->getOption('organization'));
         } elseif ($context->hasOption('queryBuilder')) {
             $this->setSourceQueryBuilder($context->getOption('queryBuilder'));
         } elseif ($context->hasOption('query')) {
@@ -66,9 +78,10 @@ class EntityReader extends IteratorBasedReader
     }
 
     /**
-     * @param string $entityName
+     * @param string       $entityName
+     * @param Organization $organization
      */
-    public function setSourceEntityName($entityName)
+    public function setSourceEntityName($entityName, Organization $organization = null)
     {
         /** @var QueryBuilder $qb */
         $queryBuilder = $this->registry->getRepository($entityName)->createQueryBuilder('o');
@@ -85,6 +98,16 @@ class EntityReader extends IteratorBasedReader
 
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
             $queryBuilder->orderBy('o.' . $fieldName, 'ASC');
+        }
+
+        // Limit data with current organization
+        if ($organization) {
+            $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
+            if ($organizationField) {
+                $queryBuilder->andWhere('o.' . $organizationField . ' = :organization')
+                    ->setParameter('organization', $organization);
+            }
+
         }
 
         $this->setSourceQueryBuilder($queryBuilder);
