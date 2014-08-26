@@ -65,7 +65,7 @@ class OrmPagerExtension extends AbstractExtension
                 $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
             );
             $this->pager->setSkipCountWalker(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH, false)
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
         }
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));

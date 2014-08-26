@@ -80,7 +80,11 @@ class Pager extends AbstractPager implements PagerInterface
             $query = $this->aclHelper->apply($query);
         }
 
-        return QueryCountCalculator::calculateCount($query, !$this->skipCountWalker);
+        $useWalker = null;
+        if ($this->skipCountWalker !== null) {
+            $useWalker = !$this->skipCountWalker;
+        }
+        return QueryCountCalculator::calculateCount($query, $useWalker);
     }
 
     /**
