@@ -180,18 +180,18 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         return array(
             'no extra parameters' => array(
                 'expectedQuery'
-                    => 'select from test_product, test_customer where and((text)all_text ~ qwerty)',
+                    => 'select from * where and((text)all_text ~ qwerty)',
                 'string' => 'qwerty',
             ),
             'custom offset' => array(
                 'expectedQuery'
-                    => 'select from test_product, test_customer where and((text)all_text ~ qwerty) offset 10',
+                    => 'select from * where and((text)all_text ~ qwerty) offset 10',
                 'string' => 'qwerty',
                 'offset' => 10,
             ),
             'custom offset custom maxResults' => array(
                 'expectedQuery'
-                    => 'select from test_product, test_customer where and((text)all_text ~ qwerty) limit 200 offset 10',
+                    => 'select from * where and((text)all_text ~ qwerty) limit 200 offset 10',
                 'string' => 'qwerty',
                 'offset' => 10,
                 'maxResults' => 200,

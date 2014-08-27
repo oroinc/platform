@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
+use Oro\Bundle\SearchBundle\EventListener\OrmIndexListener;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
@@ -21,7 +22,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -55,12 +56,14 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $indexListener = $this->getContainer()->get('oro_search.index_listener');
-        $indexListener->disablePostFlush();
+        if ($indexListener instanceof OrmIndexListener) {
+            $indexListener->setEnabled(false);
+        }
 
         $fixtures = null;
         try {
@@ -79,6 +82,11 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
                 $this->processFixtures($input, $output, $fixtures);
             }
         }
+
+        $searchEngine = $this->getContainer()->get('oro_search.search.engine');
+        $searchEngine->reindex();
+
+        return 0;
     }
 
     /**
