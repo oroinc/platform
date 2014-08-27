@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
@@ -54,7 +55,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
     public function testIsApplicable()
     {
         $this->assertTrue($this->provider->isApplicable(Segment::GRID_PREFIX . '2'));
-        $this->assertFalse($this->provider->isApplicable(Segment::GRID_PREFIX . '2'));
+        $this->assertFalse($this->provider->isApplicable(Report::GRID_PREFIX . '2'));
     }
 
     public function testGetConfiguration()
