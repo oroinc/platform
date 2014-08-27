@@ -29,7 +29,7 @@ class SearchIndexRepository extends EntityRepository
     /**
      * Search query to index
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -41,7 +41,7 @@ class SearchIndexRepository extends EntityRepository
     /**
      * Get count of records without limit parameters in query
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return integer
      */
@@ -102,10 +102,10 @@ class SearchIndexRepository extends EntityRepository
         $identifiers = array();
         foreach ($entities as $entity) {
             $class = ClassUtils::getClass($entity);
-            $ids = $entityManager->getClassMetadata($class)->getIdentifierValues($entity);
-            $id = current($ids);
-            if ($id) {
-                $identifiers[$class][] = $id;
+            $ids   = $entityManager->getClassMetadata($class)->getIdentifierValues($entity);
+
+            if (!empty($ids)) {
+                $identifiers[$class][] = current($ids);
             }
         }
 
@@ -132,7 +132,7 @@ class SearchIndexRepository extends EntityRepository
         $groupedItems = array();
         foreach ($items as $item) {
             $class = $item->getEntity();
-            $id =  $item->getRecordId();
+            $id    = $item->getRecordId();
             $groupedItems[$class][$id] = $item;
         }
 

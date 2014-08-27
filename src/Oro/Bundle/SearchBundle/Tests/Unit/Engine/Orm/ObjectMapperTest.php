@@ -14,7 +14,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     const ENTITY_PRODUCT = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product';
 
     /**
-     * @var \Oro\Bundle\SearchBundle\Engine\ObjectMapper
+     * @var ObjectMapper
      */
     private $mapper;
     /**
@@ -119,9 +119,9 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $this->route->expects($this->any())
             ->method('generate')
             ->will($this->returnValue('http://example.com'));
-        $params = array(
-            'router'       => $this->route,
-        );
+
+        $params = array('router' => $this->route);
+
         $this->container->expects($this->any())
             ->method('get')
             ->with(
