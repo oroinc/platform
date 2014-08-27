@@ -15,8 +15,6 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 class Orm extends AbstractEngine
 {
     const BATCH_SIZE = 1000;
@@ -52,20 +50,20 @@ class Orm extends AbstractEngine
     /**
      * {@inheritdoc}
      */
-    public function reindex($entity = null)
+    public function reindex($entityName = null)
     {
-        if (null === $entity) {
+        if (null === $entityName) {
             $this->clearAllSearchIndexes();
-            $entities = $this->mapper->getEntities();
+            $entityNames = $this->mapper->getEntities();
         } else {
-            $this->clearSearchIndexForEntity($entity);
-            $entities = $this->getEntitiesArray($entity);
+            $this->clearSearchIndexForEntity($entityName);
+            $entityNames = $this->getEntitiesArray($entityName);
         }
 
         // index data by mapping config
         $recordsCount = 0;
 
-        while ($entityName = array_shift($entities)) {
+        while ($entityName = array_shift($entityNames)) {
             $itemsCount    = $this->reindexSingleEntity($entityName);
             $recordsCount += $itemsCount;
         }
@@ -296,15 +294,13 @@ class Orm extends AbstractEngine
     /**
      * Clear search all search indexes or for custom entity
      *
-     * @param string|null $entityName
+     * @param string $entityName
      */
     protected function clearSearchIndexForEntity($entityName)
     {
-        /** @var Connection $connection */
-        $connection       = $this->registry->getConnection();
         $itemsCount       = 0;
         $entityManager    = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $entityRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        $entityRepository = $this->getIndexRepository();
         $queryBuilder     = $entityRepository->createQueryBuilder('item')
             ->where('item.entity = :entity')
             ->setParameter('entity', $entityName);
@@ -312,22 +308,17 @@ class Orm extends AbstractEngine
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
 
-        $connection->beginTransaction();
-        try {
-            foreach ($iterator as $entity) {
-                $itemsCount++;
-                $entityManager->remove($entity);
+        foreach ($iterator as $entity) {
+            $itemsCount++;
+            $entityManager->remove($entity);
 
-                if (0 == $itemsCount % self::BATCH_SIZE) {
-                    $entityManager->flush();
-                }
-            }
-
-            if ($itemsCount % self::BATCH_SIZE > 0) {
+            if (0 == $itemsCount % self::BATCH_SIZE) {
                 $entityManager->flush();
             }
-        } catch (\Exception $e) {
-            $connection->rollback();
+        }
+
+        if ($itemsCount % self::BATCH_SIZE > 0) {
+            $entityManager->flush();
         }
     }
 
