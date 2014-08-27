@@ -32,7 +32,7 @@ whether need to log search queries to the database;
 - **realtime_update**, default true (converted to container parameter _oro_search.realtime_update_) - flag that
 specifies is search index should be updated in the real time, i.e. right after indexed entity was changed;
 if set this flag to false then reindex jobs will be put to the queue and processed later;
-- **realtime_update**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
+- **item_container_template**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
 (converted to container parameter _oro_search.twig.item_container_template_) - template used to render entity row
 in search results;
 - **entities_config** (converted to container parameter _oro_search.entities_config_) - entity search configuration,
