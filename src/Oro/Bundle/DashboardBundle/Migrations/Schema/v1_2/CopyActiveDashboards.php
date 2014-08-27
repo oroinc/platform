@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\DashboardBundle\Migrations\Schema\v1_3;
+namespace Oro\Bundle\DashboardBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroDashboardBundle implements Migration
+class CopyActiveDashboards implements Migration
 {
     /**
      * {@inheritdoc}

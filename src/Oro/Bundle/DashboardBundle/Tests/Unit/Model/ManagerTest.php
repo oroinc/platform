@@ -644,7 +644,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindAllowedDashboards()
     {
-        $organization = new Organization();
         $permission = 'EDIT';
         $expectedEntities = array($this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'));
         $expectedModels = array(
@@ -670,30 +669,6 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->with('dashboard')
             ->will($this->returnValue($queryBuilder));
-
-        $queryBuilder->expects($this->once())
-            ->method('where')
-            ->with('dashboard.organization = :organization')
-            ->will($this->returnValue($queryBuilder));
-
-        $queryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with('organization', new Organization())
-            ->will($this->returnValue($queryBuilder));
-
-        $token = $this->getMockBuilder(
-            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $token->expects($this->once())
-            ->method('getOrganizationContext')
-            ->will($this->returnValue($organization));
 
         $this->aclHelper->expects($this->once())
             ->method('apply')

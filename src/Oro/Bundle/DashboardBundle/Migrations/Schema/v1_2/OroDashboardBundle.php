@@ -44,6 +44,10 @@ class OroDashboardBundle implements Migration
      */
     protected function createOroDashboardActiveTable(Schema $schema)
     {
+        $table = $schema->getTable('oro_dashboard_active');
+        if ($table->hasIndex('IDX_858BA17EB9D04D2B')) {
+            $table->dropIndex('IDX_858BA17EB9D04D2B');
+        }
         $table = $schema->createTable('oro_dashboard_active_copy');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);

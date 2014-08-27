@@ -255,12 +255,7 @@ class Manager
      */
     public function findAllowedDashboards($permission = 'VIEW')
     {
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->securityContext->getToken();
-        $organization = $token->getOrganizationContext();
-        $qb    = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
-        $qb->where('dashboard.organization = :organization')
-            ->setParameter('organization', $organization);
+        $qb = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')->createQueryBuilder('dashboard');
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
