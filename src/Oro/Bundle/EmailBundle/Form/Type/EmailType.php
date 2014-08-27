@@ -7,13 +7,28 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class EmailType extends AbstractType
 {
+    /**
+     * @var SecurityContextInterface
+     */
+    protected $securityContext;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     */
+    public function __construct(SecurityContextInterface $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -77,14 +92,22 @@ class EmailType extends AbstractType
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
         $form = $event->getForm();
 
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token        = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
+
         FormUtils::replaceField(
             $form,
             'template',
             [
                 'selectedEntity' => $entityClass,
-                'query_builder'  => function (EmailTemplateRepository $templateRepository) use ($entityClass) {
-                    return $templateRepository->getEntityTemplatesQueryBuilder($entityClass, true);
-                },
+                'query_builder'  =>
+                    function (EmailTemplateRepository $templateRepository) use (
+                        $entityClass,
+                        $organization
+                    ) {
+                        return $templateRepository->getEntityTemplatesQueryBuilder($entityClass, $organization, true);
+                    },
             ],
             ['choice_list', 'choices']
         );
