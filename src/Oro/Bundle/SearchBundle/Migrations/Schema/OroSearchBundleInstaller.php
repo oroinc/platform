@@ -73,9 +73,11 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $this->addOroSearchIndexDatetimeForeignKeys($schema);
         $this->addOroSearchIndexTextForeignKeys($schema);
 
-        // add search fulltext index query
-        $query = $this->container->get('oro_search.fulltext_index_manager')->getQuery();
-        $queries->addQuery($query);
+        // add search fulltext index query (only for ORM search engine)
+        if ($this->container->has('oro_search.fulltext_index_manager')) {
+            $query = $this->container->get('oro_search.fulltext_index_manager')->getQuery();
+            $queries->addQuery($query);
+        }
     }
 
     /**
