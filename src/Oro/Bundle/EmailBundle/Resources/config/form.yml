@@ -12,6 +12,8 @@ parameters:
 services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
+        arguments:
+            - @security.context
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
@@ -93,6 +95,8 @@ services:
 
     oro_email.form.type.email:
         class: %oro_email.form.type.email.class%
+        arguments:
+            - @security.context
         tags:
             - { name: form.type, alias: oro_email_email }
 

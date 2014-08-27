@@ -12,11 +12,26 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
+
+    /**
      * SetUp test environment
      */
     protected function setUp()
     {
-        $this->listener = new BuildTemplateFormSubscriber();
+        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->listener = new BuildTemplateFormSubscriber($this->securityContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->securityContext);
+        unset($this->listener);
     }
 
     public function testGetSubscribedEvents()
@@ -63,6 +78,21 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetDataHasTemplates()
     {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -113,6 +143,21 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSubmitData()
     {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();
