@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 
@@ -115,23 +116,19 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $owner = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->userRepo->expects($this->any())
             ->method('find')
             ->will($this->returnValue($user));
 
-        $user->expects($this->any())
-            ->method('getOwner')
-            ->will($this->returnValue($owner));
-
-        if (isset($parameterts['ownerId'])) {
-            $owner->expects($this->any())
-                ->method('getId')
-                ->will($this->returnValue($parameterts['ownerId']));
+        if (isset($parameterts['bUnits'])) {
+            $assignedBUs = new ArrayCollection($parameterts['bUnits']);
+        } else {
+            $assignedBUs = new ArrayCollection();
         }
+
+        $user->expects($this->any())
+            ->method('getBusinessUnits')
+            ->will($this->returnValue($assignedBUs));
 
         $user->expects($this->any())
             ->method('getId')
@@ -155,14 +152,28 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 
     public function dataProvider()
     {
+        $organization1 = new Organization();
+        $organization1->setId(1);
+
+        $organization2 = new Organization();
+        $organization2->setId(2);
+
+        $bu11 = new BusinessUnit();
+        $bu11->setId(1);
+        $bu11->setOrganization($organization1);
+
+        $bu22 = new BusinessUnit();
+        $bu22->setId(2);
+        $bu22->setOrganization($organization2);
+
         return [
             [AccessLevel::BASIC_LEVEL, true],
             [AccessLevel::BASIC_LEVEL, false, ['id' => 2]],
             [AccessLevel::SYSTEM_LEVEL, true],
-            [AccessLevel::LOCAL_LEVEL, true, ['userBU' => [1, 2, 3], 'ownerId' => 1]],
-            [AccessLevel::LOCAL_LEVEL, false, ['userBU' => [2, 3], 'ownerId' => 1]],
-            [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [1, 2], 'ownerId' => 2]],
-            [AccessLevel::DEEP_LEVEL, false, ['userBU' => [1], 'userSubBU' => [2], 'ownerId' => 3]],
+            [AccessLevel::LOCAL_LEVEL, true, ['userBU' => [1, 2, 3], 'bUnits' => [$bu11, $bu22]]],
+            [AccessLevel::LOCAL_LEVEL, false, ['userBU' => [2, 3], 'bUnits' => []]],
+            [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [1, 2], 'bUnits' => [$bu11, $bu22]]],
+            [AccessLevel::DEEP_LEVEL, false, ['userBU' => [1], 'userSubBU' => [2], 'bUnits' => [$bu22]]],
             [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3]]],
             [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 4]],
         ];

@@ -30,7 +30,7 @@ class BusinessUnitManager
     /**
      * Get Business Units tree
      *
-     * @param User $entity
+     * @param User     $entity
      * @param int|null $organizationId
      * @return array
      */
@@ -100,7 +100,20 @@ class BusinessUnitManager
 
             if (!empty($resultBuIds)) {
                 $assignedUser = $this->getUserRepo()->find($userId);
-                return (in_array($assignedUser->getOwner()->getId(), $resultBuIds));
+                $organizationId = $organization->getId();
+                $businessUnits = $assignedUser->getBusinessUnits();
+                $assignedBU = $businessUnits->filter(
+                    function (BusinessUnit $bu) use ($resultBuIds, $organizationId) {
+                        return ($bu->getOrganization()->getId() === $organizationId
+                            && in_array(
+                                $bu->getId(),
+                                $resultBuIds
+                            )
+                        );
+                    }
+                );
+
+                return $assignedBU->count() > 0;
             }
         }
 
