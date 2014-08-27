@@ -57,6 +57,14 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getOwner());
     }
 
+    public function testOrganization()
+    {
+        $this->assertNull($this->dashboard->getOrganization());
+        $value = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->assertEquals($this->dashboard, $this->dashboard->setOrganization($value));
+        $this->assertEquals($value, $this->dashboard->getOrganization());
+    }
+
     public function testStartDashboard()
     {
         $this->assertNull($this->dashboard->getOwner());
