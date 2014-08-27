@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +19,11 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     protected $contextRegistry;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $ownershipMetadataProvider;
+
+    /**
      * @var EntityReaderTestAdapter
      */
     protected $reader;
@@ -28,8 +35,17 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('getByStepExecution'))
             ->getMock();
 
+        $this->ownershipMetadataProvider =
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->reader = new EntityReaderTestAdapter($this->contextRegistry, $this->managerRegistry);
+        $this->reader = new EntityReaderTestAdapter(
+            $this->contextRegistry,
+            $this->managerRegistry,
+            $this->ownershipMetadataProvider
+        );
     }
 
     public function testReadMockIterator()
@@ -309,7 +325,21 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $queryBuilder->expects($this->once())->method('getEntityManager')
             ->will($this->returnValue($entityManager));
 
-        $this->reader->setSourceEntityName($name);
+        $organization = new Organization();
+        $ownershipMetadata = new OwnershipMetadata('', '', '', 'organization');
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->will($this->returnValue($ownershipMetadata));
+        $queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('o.organization = :organization')
+            ->will($this->returnValue($queryBuilder));
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('organization', $organization)
+            ->will($this->returnValue($queryBuilder));
+
+        $this->reader->setSourceEntityName($name, $organization);
     }
 
     /**
