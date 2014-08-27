@@ -6,7 +6,7 @@ OroSearchBundle provides lots of options that can be used to customize search fu
 System Configuration
 --------------------
 
-All configuration data is placed in configuration under alias oro_search.
+All configuration data is placed in configuration under alias `oro_search`.
 Let's look at the configuration example:
 
 ```yml
@@ -46,12 +46,12 @@ After insert, update or delete entity records, search index must be updated. Sea
 consist of data from entities by mapping parameters. Entity search configuration entity maps
 fields to virtual search fields in search index.
 
-Entity search configuration can be store in main config.yml file (in oro_search config section)
-or in search.yml files in config directory of the bundle.
+Entity search configuration can be store in main `config.yml` file (in `oro_search` config section)
+or in `search.yml` files in config directory of the bundle.
 
 Configuration is array that contain info about bundle name, entity name and array of fields. Fields array
 contain array of field name and field type. All text fields data will be store in **all_text** virtual field.
-Additionally, all the fields will be stored in fieldName virtual fields, if not set target_fields parameter.
+Additionally, all the fields will be stored in `fieldName` virtual fields, if not set `target_fields` parameter.
 
 Example:
 
@@ -61,7 +61,7 @@ Acme\DemoBundle\Entity\Product:
     search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
     label: Demo products                                     # Label for entity to identify entity in search results
     route:
-        name: acme_demo_search_product                       # Route name to generate url link tho the entity record
+        name: acme_demo_search_product                       # Route name to generate url link to the entity record
         parameters:                                          # Array with parameters for route
             id: id
     title_fields: [name]
@@ -103,7 +103,7 @@ Search Engine Configuration
 
 Search bundle provides ability to use different search engines through the common interface.
 
-Used search engine defines in configuration under oro_search.engine key. To make engine work
+Used search engine defines in configuration under `oro_search.engine` key. To make engine work
 at least one bundle must have file with name _Resources/config/oro/search_engine/<engine_name>.yml_
 that contains configuration of search engine services that will be added to container services.
 

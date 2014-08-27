@@ -2,17 +2,17 @@ ORM search engine
 =================
 
 OroSearchBundle provides ORM search engine out of the box. It stores index data in DB tables and uses fulltext
-index to perform search. Bundle supports search index for both MySQL and PostgreSQL DBMS. ORM engine is used by default.
+index to perform search. Bundle supports search index for both **MySQL** and **PostgreSQL** DBMS. ORM engine is used by default.
 
 Configuration
 -------------
 
-ORM engine configuration stored at Oro/Bundle/SearchBundle/Resources/config/oro/search_engine/orm.yml
+ORM engine configuration stored at `Oro/Bundle/SearchBundle/Resources/config/oro/search_engine/orm.yml`
 and do not require any additional engine parameters.
 
 ORM search engine has quite straightforward implementation - it simply stores index data in appropriate tables:
-separate tables for text, datetime, decimal and integer value, and another one table to store general information.
-Table that stores text data has fulltext index.
+separate tables for `text`, `datetime`, `decimal` and `integer` value, and another one table to store general information.
+Table that stores text data has `fulltext` index.
 
 ```yml
 parameters:
