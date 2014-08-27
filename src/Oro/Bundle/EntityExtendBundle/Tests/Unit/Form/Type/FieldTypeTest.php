@@ -80,8 +80,7 @@ class FieldTypeTest extends TypeTestCase
         $this->translatorMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translatorMock
-            ->expects($this->any())
+        $this->translatorMock->expects($this->any())
             ->method('trans')
             ->will(
                 $this->returnCallback(
@@ -138,23 +137,25 @@ class FieldTypeTest extends TypeTestCase
         $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityConfigMock
-            ->expects($this->once())
+        $entityConfigMock->expects($this->once())
             ->method('is')
             ->with('relation')
             ->will($this->returnValue(false));
 
-        $entityConfigMock
-            ->expects($this->exactly(0))
+        $entityConfigMock->expects($this->never())
             ->method('get');
 
-        $this->configManagerMock
-            ->expects($this->exactly(2))
+        // to skip public enums
+        $configProviderMock->expects($this->any())
+            ->method('getConfigs')
+            ->with(null, true)
+            ->will($this->returnValue([]));
+
+        $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
 
-        $configProviderMock
-            ->expects($this->exactly(1))
+        $configProviderMock->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($entityConfigMock));
 
@@ -248,20 +249,17 @@ class FieldTypeTest extends TypeTestCase
         $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityConfigMock
-            ->expects($this->at(0))
+        $entityConfigMock->expects($this->at(0))
             ->method('is')
             ->with('relation')
             ->will($this->returnValue(true));
-        $entityConfigMock
-            ->expects($this->at(1))
+        $entityConfigMock->expects($this->at(1))
             ->method('get')
             ->with('relation')
             ->will($this->returnValue($config['relationConfig']));
 
         if ($withAssigned) {
-            $entityConfigMock
-                ->expects($this->at(2))
+            $entityConfigMock->expects($this->at(2))
                 ->method('get')
                 ->with('label')
                 ->will($this->returnValue('labelValue'));
@@ -271,18 +269,21 @@ class FieldTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($entityConfigMock));
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfigById')
             ->with($config['relationTargetConfigFieldId'])
             ->will($this->returnValue($entityConfigMock));
 
-        $this->configManagerMock
-            ->expects($this->exactly(2))
+        // to skip public enums
+        $configProviderMock->expects($this->any())
+            ->method('getConfigs')
+            ->with(null, true)
+            ->will($this->returnValue([]));
+
+        $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
     }

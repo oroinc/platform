@@ -52,8 +52,6 @@ abstract class AbstractEnumType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $that = $this;
-
         $resolver->setDefaults(
             [
                 'enum_code'     => null,
@@ -72,8 +70,8 @@ abstract class AbstractEnumType extends AbstractType
                 'class'    => function (Options $options, $value) {
                     return ExtendHelper::buildEnumValueClassName($options['enum_code']);
                 },
-                'multiple' => function (Options $options, $value) use ($that) {
-                    return $that->configManager->getProvider('enum')
+                'multiple' => function (Options $options, $value) {
+                    return $this->configManager->getProvider('enum')
                         ->getConfig(ExtendHelper::buildEnumValueClassName($options['enum_code']))
                         ->is('multiple');
                 }

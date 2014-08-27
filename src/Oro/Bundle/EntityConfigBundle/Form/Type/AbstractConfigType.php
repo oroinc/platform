@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -31,15 +31,22 @@ abstract class AbstractConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        if ($this->isReadOnly($options)) {
-            $this->disableView($view);
-        }
+        $resolver->setNormalizers(
+            [
+                'disabled'          => function (Options $options, $value) {
+                    return $this->isReadOnly($options) ? true : $value;
+                },
+                'validation_groups' => function (Options $options, $value) {
+                    return $options['disabled'] ? false : $value;
+                }
+            ]
+        );
     }
 
     /**
-     * Check if the form view should be disabled or not
+     * Checks if the form type should be read-only or not
      *
      * @param array $options
      *
@@ -64,28 +71,5 @@ abstract class AbstractConfigType extends AbstractType
         }
 
         return false;
-    }
-
-    /**
-     * Disables the form view
-     *
-     * @param FormView $view
-     */
-    protected function disableView(FormView $view)
-    {
-        $view->vars['disabled'] = true;
-    }
-
-    /**
-     * @param array  $vars
-     * @param string $cssClass
-     */
-    protected function appendClassAttr(array &$vars, $cssClass)
-    {
-        if (isset($vars['attr']['class'])) {
-            $vars['attr']['class'] .= ' ' . $cssClass;
-        } else {
-            $vars['attr']['class'] = $cssClass;
-        }
     }
 }

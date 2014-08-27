@@ -13,6 +13,7 @@ use Symfony\Component\Validator\ExecutionContext;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -93,9 +94,15 @@ class EnumNameType extends AbstractType
         };
 
         $resolver->setNormalizers(
-            array(
-                'constraints' => $constraintsNormalizer
-            )
+            [
+                'constraints'       => $constraintsNormalizer,
+                'disabled'          => function (Options $options, $value) {
+                    return $this->isReadOnly($options) ? true : $value;
+                },
+                'validation_groups' => function (Options $options, $value) {
+                    return $options['disabled'] ? false : $value;
+                }
+            ]
         );
     }
 
@@ -113,6 +120,42 @@ class EnumNameType extends AbstractType
     public function getParent()
     {
         return 'text';
+    }
+
+    /**
+     * Checks if the form type should be read-only or not
+     *
+     * @param Options $options
+     *
+     * @return bool
+     */
+    protected function isReadOnly($options)
+    {
+        $configId = $options['config_id'];
+        if (!($configId instanceof FieldConfigId)) {
+            return false;
+        }
+
+        $className = $configId->getClassName();
+        if (empty($className)) {
+            return false;
+        }
+
+        $fieldName = $configId->getFieldName();
+
+        // disable for new field that reuses a public enum
+        if ($options['config_is_new']) {
+            $enumConfigProvider = $this->configManager->getProvider('enum');
+            if ($enumConfigProvider->hasConfig($className, $fieldName)) {
+                $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
+                $enumCode        = $enumFieldConfig->get('enum_code');
+                if (!empty($enumCode)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

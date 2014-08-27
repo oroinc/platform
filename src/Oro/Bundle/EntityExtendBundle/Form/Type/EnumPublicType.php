@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -27,15 +27,42 @@ class EnumPublicType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        if ($this->isReadOnly($options)) {
-            $view->vars['disabled'] = true;
-        }
+        $resolver->setNormalizers(
+            [
+                'disabled'          => function (Options $options, $value) {
+                    return $this->isReadOnly($options) ? true : $value;
+                },
+                'validation_groups' => function (Options $options, $value) {
+                    return $options['disabled'] ? false : $value;
+                }
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'oro_entity_extend_enum_public';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'choice';
+    }
+
+    /**
+     * Checks if the form type should be read-only or not
+     *
+     * @param Options $options
+     *
+     * @return bool
      */
     protected function isReadOnly($options)
     {
@@ -60,12 +87,17 @@ class EnumPublicType extends AbstractType
             }
         }
 
-        // disable for immutable enums
+        // disable for immutable enums and new field that reuses a public enum
         $enumConfigProvider = $this->configManager->getProvider('enum');
         if ($enumConfigProvider->hasConfig($className, $fieldName)) {
             $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
             $enumCode        = $enumFieldConfig->get('enum_code');
             if (!empty($enumCode)) {
+                // check if a new field reuses existing public enum
+                if ($options['config_is_new']) {
+                    return true;
+                }
+                // check immutable
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
                 if ($enumConfigProvider->hasConfig($enumValueClassName)) {
                     $enumConfig = $enumConfigProvider->getConfig($enumValueClassName);
@@ -77,21 +109,5 @@ class EnumPublicType extends AbstractType
         }
 
         return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_entity_extend_enum_public';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'choice';
     }
 }

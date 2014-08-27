@@ -257,6 +257,8 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
             ->disableOriginalConstructor()
             ->getMock();
+        $configModel->expects($this->never())
+            ->method('getId');
         $configModel->expects($this->once())
             ->method('getType')
             ->will($this->returnValue($dataType));
@@ -329,6 +331,9 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
             ->disableOriginalConstructor()
             ->getMock();
+        $configModel->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(123));
         $configModel->expects($this->once())
             ->method('getType')
             ->will($this->returnValue($dataType));
