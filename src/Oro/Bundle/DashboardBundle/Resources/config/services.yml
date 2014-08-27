@@ -23,6 +23,7 @@ services:
             - @oro_dashboard.factory
             - @doctrine.orm.entity_manager
             - @oro_security.acl_helper
+            - @security.context
 
     oro_dashboard.factory:
         class: %oro_dashboard.factory.class%

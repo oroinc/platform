@@ -4,8 +4,10 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -24,17 +26,28 @@ class Manager
     protected $entityManager;
 
     /**
+     * @var SecurityContextInterface
+     */
+    protected $securityContext;
+
+    /**
      * Constructor
      *
-     * @param Factory $factory
-     * @param EntityManager $entityManager
-     * @param AclHelper $aclHelper
+     * @param Factory                  $factory
+     * @param EntityManager            $entityManager
+     * @param AclHelper                $aclHelper
+     * @param SecurityContextInterface $securityContext
      */
-    public function __construct(Factory $factory, EntityManager $entityManager, AclHelper $aclHelper)
-    {
-        $this->factory = $factory;
-        $this->entityManager = $entityManager;
-        $this->aclHelper = $aclHelper;
+    public function __construct(
+        Factory $factory,
+        EntityManager $entityManager,
+        AclHelper $aclHelper,
+        SecurityContextInterface $securityContext
+    ) {
+        $this->factory         = $factory;
+        $this->entityManager   = $entityManager;
+        $this->aclHelper       = $aclHelper;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -137,6 +150,12 @@ class Manager
     {
         $dashboard = new Dashboard();
 
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            $dashboard->setOrganization($token->getOrganizationContext());
+        }
+
         return $this->getDashboardModel($dashboard);
     }
 
@@ -201,8 +220,11 @@ class Manager
      */
     public function findUserActiveDashboard(User $user)
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user' => $user));
+            ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard->getDashboard());
@@ -218,8 +240,11 @@ class Manager
      */
     public function findDefaultDashboard()
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $dashboard = $this->entityManager->getRepository('OroDashboardBundle:Dashboard')
-            ->findDefaultDashboard();
+            ->findDefaultDashboard($organization);
 
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);
@@ -248,14 +273,18 @@ class Manager
      */
     public function setUserActiveDashboard(DashboardModel $dashboard, User $user, $flush = false)
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
         $activeDashboard = $this->entityManager
             ->getRepository('OroDashboardBundle:ActiveDashboard')
-            ->findOneBy(array('user' => $user));
+            ->findOneBy(array('user' => $user, 'organization' => $organization));
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
-            $activeDashboard->setUser($user);
 
+            $activeDashboard->setUser($user);
+            $activeDashboard->setOrganization($organization);
             $this->entityManager->persist($activeDashboard);
         }
 
