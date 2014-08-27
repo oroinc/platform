@@ -5,6 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class DashboardRepository extends EntityRepository
@@ -22,10 +23,12 @@ class DashboardRepository extends EntityRepository
     }
 
     /**
+     * @param Organization $organization
+     *
      * @return Dashboard|null
      */
-    public function findDefaultDashboard()
+    public function findDefaultDashboard(Organization $organization)
     {
-        return $this->findOneBy(array('isDefault' => true));
+        return $this->findOneBy(array('isDefault' => true, 'organization' => $organization));
     }
 }
