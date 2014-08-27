@@ -17,6 +17,16 @@ class OroDashboardBundle implements Migration
         self::addOrganizationDashboardTable($schema);
         self::createOroDashboardActiveTable($schema);
         self::addOroDashboardActiveForeignKeys($schema);
+
+        //Copy data from oro_dashboard_active into oro_dashboard_active_copy, rename and drop it
+        $queries->addPostQuery(
+            "INSERT INTO oro_dashboard_active_copy (user_id, dashboard_id)
+             SELECT user_id, dashboard_id
+             FROM oro_dashboard_active;
+
+             DROP TABLE oro_dashboard_active;
+             ALTER TABLE oro_dashboard_active_copy RENAME TO oro_dashboard_active;"
+        );
     }
 
     /**
@@ -46,6 +56,7 @@ class OroDashboardBundle implements Migration
     {
         $table = $schema->getTable('oro_dashboard_active');
         if ($table->hasIndex('IDX_858BA17EB9D04D2B')) {
+            $table->removeForeignKey('FK_858BA17EB9D04D2B');
             $table->dropIndex('IDX_858BA17EB9D04D2B');
         }
         $table = $schema->createTable('oro_dashboard_active_copy');

@@ -148,10 +148,14 @@ class Manager
      */
     public function createDashboardModel()
     {
+        $dashboard = new Dashboard();
+
         /** @var UsernamePasswordOrganizationToken $token */
         $token = $this->securityContext->getToken();
-        $dashboard = new Dashboard();
-        $dashboard->setOrganization($token->getOrganizationContext());
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            $dashboard->setOrganization($token->getOrganizationContext());
+        }
+
         return $this->getDashboardModel($dashboard);
     }
 
