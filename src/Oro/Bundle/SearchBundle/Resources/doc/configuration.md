@@ -104,7 +104,7 @@ Search Engine Configuration
 Search bundle provides ability to use different search engines through the common interface.
 
 Used search engine defines in configuration under oro_search.engine key. To make engine work
-at least one bundle must have file with name Resources/config/oro/search_engine/<engine_name>.yml
+at least one bundle must have file with name _Resources/config/oro/search_engine/<engine_name>.yml_
 that contains configuration of search engine services that will be added to container services.
 
 The only one required service that must be defined in engine configuration is _oro_search.search.engine_.
