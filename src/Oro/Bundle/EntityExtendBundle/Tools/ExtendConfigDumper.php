@@ -4,11 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
@@ -414,22 +412,5 @@ class ExtendConfigDumper
         $targetConfig->set('schema', $schema);
 
         $extendProvider->persist($targetConfig);
-    }
-
-    /**
-     * Get entity identifier name by class name
-     *
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getEntityIdentifier($className)
-    {
-        // Extend entity always have "id" identifier
-        if (ExtendHelper::isCustomEntity($className)) {
-            return 'id';
-        }
-
-        return $this->em->getClassMetadata($className)->getSingleIdentifierColumnName();
     }
 }
