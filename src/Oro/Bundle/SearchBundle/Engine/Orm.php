@@ -50,21 +50,21 @@ class Orm extends AbstractEngine
     /**
      * {@inheritdoc}
      */
-    public function reindex($entityName = null)
+    public function reindex($class = null)
     {
-        if (null === $entityName) {
+        if (null === $class) {
             $this->clearAllSearchIndexes();
             $entityNames = $this->mapper->getEntities();
         } else {
-            $this->clearSearchIndexForEntity($entityName);
-            $entityNames = $this->getEntitiesArray($entityName);
+            $this->clearSearchIndexForEntity($class);
+            $entityNames = array($class);
         }
 
         // index data by mapping config
         $recordsCount = 0;
 
-        while ($entityName = array_shift($entityNames)) {
-            $itemsCount    = $this->reindexSingleEntity($entityName);
+        while ($class = array_shift($entityNames)) {
+            $itemsCount    = $this->reindexSingleEntity($class);
             $recordsCount += $itemsCount;
         }
 
@@ -298,10 +298,9 @@ class Orm extends AbstractEngine
      */
     protected function clearSearchIndexForEntity($entityName)
     {
-        $itemsCount       = 0;
-        $entityManager    = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $entityRepository = $this->getIndexRepository();
-        $queryBuilder     = $entityRepository->createQueryBuilder('item')
+        $itemsCount    = 0;
+        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')
             ->where('item.entity = :entity')
             ->setParameter('entity', $entityName);
 
