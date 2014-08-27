@@ -25,7 +25,9 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param $entityName
+     * @param              $entityName
+     * @param Organization $organization
+     *
      * @return EmailTemplate[]
      */
     public function getTemplateByEntityName($entityName, Organization $organization)
