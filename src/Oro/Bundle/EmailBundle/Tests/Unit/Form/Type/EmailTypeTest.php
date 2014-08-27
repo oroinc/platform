@@ -16,6 +16,17 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 
 class EmailTypeTest extends TypeTestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+    }
+
     protected function getExtensions()
     {
         $emailAddressType  = new EmailAddressType($this->securityContext);
