@@ -42,6 +42,7 @@ class TagsTest extends Selenium2TestCase
         $login->openTags('Oro\Bundle\TagBundle')
             ->filterBy('Tag', $tagName)
             ->edit()
+            ->assertTitle("Records tagged as \"{$tagName}\" - Tags - System")
             ->setTagName($newTagName)
             ->save()
             ->assertTitle('Tags - System')

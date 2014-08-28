@@ -19,6 +19,7 @@ class CalendarTest extends Selenium2TestCase
         $eventName = 'Event_'.mt_rand();
         $login = $this->login();
         $login->openCalendar('Oro\Bundle\CalendarBundle')
+            ->assertTitle('My Calendar - John Doe')
             ->addEvent()
             ->setTitle($eventName)
             ->saveEvent()
@@ -41,6 +42,7 @@ class CalendarTest extends Selenium2TestCase
             ->editEvent($eventName)
             ->setTitle($newEventTitle)
             ->saveEvent()
+            ->assertTitle('My Calendar - John Doe')
             ->checkEventPresent($newEventTitle);
 
         return $newEventTitle;
@@ -57,6 +59,7 @@ class CalendarTest extends Selenium2TestCase
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->deleteEvent()
+            ->assertTitle('My Calendar - John Doe')
             ->checkEventNotPresent($eventName);
     }
 }

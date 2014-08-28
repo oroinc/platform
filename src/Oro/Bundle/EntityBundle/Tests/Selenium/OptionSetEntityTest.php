@@ -11,7 +11,6 @@ class OptionSetEntityTest extends Selenium2TestCase
      */
     public function testCreateOptionSetEntity()
     {
-        $this->markTestIncomplete('Due to BAP-2966');
         $entityData = array(
             'entityName' => 'optionset'.mt_rand(),
             'stringField' => 'string_field',
@@ -55,7 +54,6 @@ class OptionSetEntityTest extends Selenium2TestCase
      */
     public function testCreateNewOptionSetEntityRecord($entityData)
     {
-        //TODO: complete test when BAP-2966 will be fixed
         $this->markTestIncomplete('Due to BAP-2966');
         $login = $this->login();
         $login->openNavigation('Oro\Bundle\NavigationBundle')
