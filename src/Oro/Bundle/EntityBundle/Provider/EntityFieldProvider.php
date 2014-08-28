@@ -13,7 +13,6 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -336,19 +335,9 @@ class EntityFieldProvider
         foreach ($associationNames as $associationName) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
-                /**
-                 * Skip association if it was deleted
-                 */
-                /** @var Config $associationConfig */
-                $associationConfig = $this->extendConfigProvider->getConfig($className, $associationName);
-                if ($associationConfig && $associationConfig->is('is_deleted')) {
-                    continue;
-                }
-
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
-
                 if ($applyExclusions && $this->exclusionProvider->isIgnoredRelation($metadata, $associationName)) {
                     continue;
                 }
@@ -481,6 +470,13 @@ class EntityFieldProvider
         if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
             $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
             if ($this->isExtendField($metadata->name, $guessedFieldName)) {
+                return true;
+            }
+        }
+        // skip a relation if it was deleted
+        if ($this->extendConfigProvider->hasConfig($metadata->name, $associationName)) {
+            $fieldConfig = $this->extendConfigProvider->getConfig($metadata->name, $associationName);
+            if ($fieldConfig->is('is_deleted')) {
                 return true;
             }
         }
