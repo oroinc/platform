@@ -54,7 +54,7 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber($this->integrationFormSubscriber);
         $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
-        $builder->addEventSubscriber($this->organizationSubscriber);
+        //$builder->addEventSubscriber($this->organizationSubscriber);
 
         $builder->add(
             self::TYPE_FIELD_NAME,

@@ -15,6 +15,16 @@ class OroTrackerBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addOrganization($schema);
+        //Add organization fields to ownership entity config
+        $queries->addQuery(
+            new UpdateOwnershipTypeQuery(
+                'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite',
+                [
+                    'organization_field_name' => 'organization',
+                    'organization_column_name' => 'organization_id'
+                ]
+            )
+        );
     }
 
     /**
