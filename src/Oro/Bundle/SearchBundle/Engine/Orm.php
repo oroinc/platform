@@ -48,21 +48,23 @@ class Orm extends AbstractEngine
     }
 
     /**
-     * Reload search index
-     *
-     * @return int Count of index records
+     * {@inheritdoc}
      */
-    public function reindex()
+    public function reindex($class = null)
     {
-        // clear old index
-        $this->clearSearchIndex();
+        if (null === $class) {
+            $this->clearAllSearchIndexes();
+            $entityNames = $this->mapper->getEntities();
+        } else {
+            $this->clearSearchIndexForEntity($class);
+            $entityNames = array($class);
+        }
 
         // index data by mapping config
         $recordsCount = 0;
-        $entities     = $this->mapper->getEntities();
 
-        while ($entityName = array_shift($entities)) {
-            $itemsCount    = $this->reindexSingleEntity($entityName);
+        while ($class = array_shift($entityNames)) {
+            $itemsCount    = $this->reindexSingleEntity($class);
             $recordsCount += $itemsCount;
         }
 
@@ -290,9 +292,39 @@ class Orm extends AbstractEngine
     }
 
     /**
+     * Clear search all search indexes or for custom entity
+     *
+     * @param string $entityName
+     */
+    protected function clearSearchIndexForEntity($entityName)
+    {
+        $itemsCount    = 0;
+        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')
+            ->where('item.entity = :entity')
+            ->setParameter('entity', $entityName);
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(self::BATCH_SIZE);
+
+        foreach ($iterator as $entity) {
+            $itemsCount++;
+            $entityManager->remove($entity);
+
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $entityManager->flush();
+            }
+        }
+
+        if ($itemsCount % self::BATCH_SIZE > 0) {
+            $entityManager->flush();
+        }
+    }
+
+    /**
      * Truncate search tables
      */
-    protected function clearSearchIndex()
+    protected function clearAllSearchIndexes()
     {
         /** @var Connection $connection */
         $connection = $this->registry->getConnection();
