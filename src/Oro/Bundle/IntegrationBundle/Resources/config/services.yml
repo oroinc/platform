@@ -7,7 +7,6 @@ parameters:
 
     oro_integration.form.subscriber.channel_subscriber.class:             Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
     oro_integration.form.subscriber.default_user_owner_subscriber.class:  Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber
-    oro_integration.form.subscriber.organization_subscriber.class:        Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
 
@@ -53,7 +52,6 @@ services:
             - @oro_integration.manager.types_registry
             - @oro_integration.form.subscriber.default_user_owner_subscriber
             - @oro_integration.form.subscriber.channel_subscriber
-            - @oro_integration.form.subscriber.organization_subscriber
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 
@@ -77,11 +75,6 @@ services:
         class: %oro_integration.form.subscriber.default_user_owner_subscriber.class%
         arguments:
             - @oro_security.security_facade
-
-    oro_integration.form.subscriber.organization_subscriber:
-        class: %oro_integration.form.subscriber.organization_subscriber.class%
-        arguments:
-            - @doctrine.orm.entity_manager
 
     oro_integration.form.handler.integration:
         class:                        %oro_integration.form.handler.integration.class%
