@@ -16,7 +16,6 @@ class Test404 extends Selenium2TestCase
         $login = $this->login();
         $login->openAclCheck('Oro\Bundle\SecurityBundle')
             ->assertAcl('404', '404 - Not Found')
-            ->assertTitle('404 - Not Found')
             ->assertElementPresent(
                 "//div[@class='pagination-centered popup-box-errors'][contains(., '404 Not Found')]"
             );
