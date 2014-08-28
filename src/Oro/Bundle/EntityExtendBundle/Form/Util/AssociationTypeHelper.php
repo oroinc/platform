@@ -13,7 +13,7 @@ class AssociationTypeHelper extends ConfigTypeHelper
     protected $entityClassResolver;
 
     /** @var array */
-    protected $owningSideEntities;
+    protected $owningSideEntities = [];
 
     /**
      * @param ConfigManager       $configManager
@@ -74,36 +74,27 @@ class AssociationTypeHelper extends ConfigTypeHelper
     }
 
     /**
+     * Returns all entities included in the given group
+     *
      * @param string $groupName
      *
-     * @return string[]
+     * @return string[] The list of class names
      */
     public function getOwningSideEntities($groupName)
     {
-        if (null === $this->owningSideEntities) {
-            $this->owningSideEntities = $this->loadOwningSideEntities($groupName);
+        if (!isset($this->owningSideEntities[$groupName])) {
+            $this->owningSideEntities[$groupName] = $this->loadOwningSideEntities($groupName);
         }
 
-        return $this->owningSideEntities;
-    }
-
-    /**
-     * Makes sure that the owning side entities are loaded
-     *
-     * @param string $groupName
-     */
-    protected function ensureOwningSideEntitiesLoaded($groupName)
-    {
-        if (null === $this->owningSideEntities) {
-            $this->owningSideEntities = $this->loadOwningSideEntities($groupName);
-        }
+        return $this->owningSideEntities[$groupName];
     }
 
     /**
      * Loads the list of owning side entities
      *
      * @param $groupName
-     * @return string[]
+     *
+     * @return string[] The list of class names
      */
     protected function loadOwningSideEntities($groupName)
     {

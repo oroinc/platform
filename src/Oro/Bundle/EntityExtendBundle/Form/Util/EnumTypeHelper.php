@@ -57,6 +57,10 @@ class EnumTypeHelper extends ConfigTypeHelper
         $enumConfigProvider   = $this->configManager->getProvider('enum');
         $entityConfigs        = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('is_extend')) {
+                continue;
+            }
+
             $enumFieldConfigs = $enumConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($enumFieldConfigs as $enumFieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
