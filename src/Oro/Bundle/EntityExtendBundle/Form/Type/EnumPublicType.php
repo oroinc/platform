@@ -87,7 +87,10 @@ class EnumPublicType extends AbstractType
             }
         }
 
-        // check if immutable enum or new field reuses a public enum
+        // check if:
+        //  - immutable enum
+        //  - new field reuses a public enum
+        //  - a public enum is reused by other fields
         $enumConfigProvider = $this->configManager->getProvider('enum');
         if ($enumConfigProvider->hasConfig($className, $fieldName)) {
             $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
@@ -103,6 +106,29 @@ class EnumPublicType extends AbstractType
                     $enumConfig = $enumConfigProvider->getConfig($enumValueClassName);
                     if ($enumConfig->get('immutable')) {
                         return true;
+                    }
+                }
+                // check if a public enum is reused by other fields
+                $entityConfigs = $extendConfigProvider->getConfigs();
+                foreach ($entityConfigs as $entityConfig) {
+                    $enumFieldConfigs = $enumConfigProvider->getConfigs($entityConfig->getId()->getClassName());
+                    foreach ($enumFieldConfigs as $enumFieldConfig) {
+                        /** @var FieldConfigId $fieldConfigId */
+                        $fieldConfigId = $enumFieldConfig->getId();
+                        if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
+                            // skip not enum fields
+                            continue;
+                        }
+                        if ($fieldConfigId->getFieldName() === $fieldName
+                            && $fieldConfigId->getClassName() === $className
+                        ) {
+                            // skip current field
+                            continue;
+                        }
+                        $fieldEnumCode = $enumFieldConfig->get('enum_code');
+                        if (!empty($fieldEnumCode) && $fieldEnumCode === $enumCode) {
+                            return true;
+                        }
                     }
                 }
             }
