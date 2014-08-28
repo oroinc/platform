@@ -331,7 +331,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ENTITY,
                 array(
                     'owner',
-                    array('bu4', 'bu41', 'bu411'),
+                    array('bu3','bu4', 'bu31', 'bu41', 'bu411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4'
@@ -346,7 +346,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ENTITY,
                 array(
                     'owner',
-                    array('user4', 'user41', 'user411'),
+                    array('user3', 'user4', 'user31', 'user41', 'user411'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4'
@@ -361,7 +361,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::BUSINESS_UNIT,
                 array(
                     'id',
-                    array('bu4', 'bu41', 'bu411'),
+                    array('bu3', 'bu4', 'bu31', 'bu41', 'bu411'),
                     PathExpression::TYPE_STATE_FIELD,
                     null,
                     null
@@ -382,7 +382,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ENTITY,
                 array(
                     'owner',
-                    array('bu4'),
+                    array('bu3', 'bu4'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4'
@@ -397,7 +397,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::TEST_ENTITY,
                 array(
                     'owner',
-                    array('user4'),
+                    array('user3', 'user4'),
                     PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                     'organization',
                     'org4'
@@ -412,7 +412,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 self::BUSINESS_UNIT,
                 array(
                     'id',
-                    array('bu4'),
+                    array('bu3', 'bu4'),
                     PathExpression::TYPE_STATE_FIELD,
                     null,
                     null
