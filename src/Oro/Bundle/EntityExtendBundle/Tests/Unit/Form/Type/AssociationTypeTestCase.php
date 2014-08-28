@@ -16,17 +16,9 @@ class AssociationTypeTestCase extends AbstractConfigTypeTestCase
         parent::setUp();
     }
 
-    protected function prepareBuildViewTest()
+    protected function setConfigProvidersForSubmitTest(array &$configProviders)
     {
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['grouping', $this->groupingConfigProvider],
-                        ['test', $this->testConfigProvider],
-                    ]
-                )
-            );
+        parent::setConfigProvidersForSubmitTest($configProviders);
+        $configProviders['grouping'] = $this->groupingConfigProvider;
     }
 }

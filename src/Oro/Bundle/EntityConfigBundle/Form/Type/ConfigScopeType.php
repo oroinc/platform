@@ -71,7 +71,8 @@ class ConfigScopeType extends AbstractType
             if (isset($config['form']['type'])) {
                 $options = isset($config['form']['options']) ? $config['form']['options'] : array();
 
-                $options['config_id'] = $this->config->getId();
+                $options['config_id']     = $this->config->getId();
+                $options['config_is_new'] = $this->configModel->getId() == false;
 
                 /**
                  * Disable field on editAction

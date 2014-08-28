@@ -58,7 +58,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
-        // disable for owning side entity
+        // check owning side entity
         $associationClass = $options['association_class'];
         if (strpos($associationClass, ':') !== false || strpos($associationClass, '\\') !== false) {
             // the association class is full class name or entity name
@@ -74,7 +74,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
         }
 
         if (!empty($className)) {
-            // disable for dictionary entities
+            // check dictionary entities
             $groupingConfigProvider = $this->configManager->getProvider('grouping');
             if ($groupingConfigProvider->hasConfig($className)) {
                 $groups = $groupingConfigProvider->getConfig($className)->get('groups');

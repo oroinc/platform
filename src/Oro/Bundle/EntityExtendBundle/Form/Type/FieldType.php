@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -100,53 +101,18 @@ class FieldType extends AbstractType
             ]
         );
 
-        $entityProvider = $this->configManager->getProvider('entity');
-        $extendProvider = $this->configManager->getProvider('extend');
-        $entityConfig   = $extendProvider->getConfig($options['class_name']);
-
-        $inverseRelationTypes = [];
-        if ($entityConfig->is('relation')) {
-            $originalFieldNames = array();
-            $relations          = $entityConfig->get('relation');
-            foreach ($relations as $relationKey => $relation) {
-                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
-                    continue;
-                }
-
-                /** @var FieldConfigId $fieldId */
-                $fieldId = $relation['field_id'];
-                /** @var FieldConfigId $targetFieldId */
-                $targetFieldId = $relation['target_field_id'];
-
-                $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
-                $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
-
-                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
-                if (strlen($fieldName) > $maxFieldNameLength) {
-                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
-                    $originalFieldNames[$cutFieldName] = $fieldName;
-                    $fieldName                         = $cutFieldName;
-                }
-
-                $key                        = $relationKey . '||' . $fieldName;
-                $inverseRelationTypes[$key] = $this->translator->trans(
-                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
-                    [
-                        '%entity_name%' => $this->translator->trans($entityLabel),
-                        '%field_name%'  => $this->translator->trans($fieldLabel)
-                    ]
-                );
-            }
-
+        $originalFieldNames = [];
+        $reverseRelationTypes = $this->getReverseRelationTypes($options['class_name'], $originalFieldNames);
+        if (!empty($originalFieldNames)) {
             $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
+        $publicEnumTypes = $this->getPublicEnumTypes();
 
         $builder->add(
             'type',
             'genemu_jqueryselect2_choice',
             [
-                'choices'     => $this->getFieldTypeChoices($inverseRelationTypes),
+                'choices'     => $this->getFieldTypeChoices($reverseRelationTypes, $publicEnumTypes),
                 'empty_value' => '',
                 'block'       => 'general',
                 'configs'     => [
@@ -187,11 +153,12 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @param array $inverseRelationTypes
+     * @param array $reverseRelationTypes
+     * @param array $publicEnumTypes
      *
      * @return array
      */
-    protected function getFieldTypeChoices($inverseRelationTypes)
+    protected function getFieldTypeChoices($reverseRelationTypes, $publicEnumTypes)
     {
         $fieldTypes = $relationTypes = $dictionaryTypes = [];
 
@@ -209,9 +176,13 @@ class FieldType extends AbstractType
         uasort($relationTypes, 'strcasecmp');
         uasort($dictionaryTypes, 'strcasecmp');
 
-        if (!empty($inverseRelationTypes)) {
-            uasort($inverseRelationTypes, 'strcasecmp');
-            $relationTypes = array_merge($relationTypes, $inverseRelationTypes);
+        if (!empty($reverseRelationTypes)) {
+            uasort($reverseRelationTypes, 'strcasecmp');
+            $relationTypes = array_merge($relationTypes, $reverseRelationTypes);
+        }
+        if (!empty($publicEnumTypes)) {
+            uasort($publicEnumTypes, 'strcasecmp');
+            $dictionaryTypes = array_merge($dictionaryTypes, $publicEnumTypes);
         }
 
         $result = [
@@ -219,6 +190,56 @@ class FieldType extends AbstractType
             $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS)    => $relationTypes,
             $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_DICTIONARIES) => $dictionaryTypes
         ];
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param array  $originalFieldNames
+     * @return array
+     */
+    protected function getReverseRelationTypes($className, array &$originalFieldNames)
+    {
+        $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfig   = $extendProvider->getConfig($className);
+
+        $entityProvider = $this->configManager->getProvider('entity');
+
+        $result = [];
+        if ($entityConfig->is('relation')) {
+            $relations = $entityConfig->get('relation');
+            foreach ($relations as $relationKey => $relation) {
+                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
+                    continue;
+                }
+
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
+                $targetFieldId = $relation['target_field_id'];
+
+                $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
+                $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
+
+                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+                if (strlen($fieldName) > $maxFieldNameLength) {
+                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
+                    $originalFieldNames[$cutFieldName] = $fieldName;
+                    $fieldName                         = $cutFieldName;
+                }
+
+                $key          = $relationKey . '||' . $fieldName;
+                $result[$key] = $this->translator->trans(
+                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
+                    [
+                        '%entity_name%' => $this->translator->trans($entityLabel),
+                        '%field_name%'  => $this->translator->trans($fieldLabel)
+                    ]
+                );
+            }
+        }
 
         return $result;
     }
@@ -269,5 +290,40 @@ class FieldType extends AbstractType
         }
 
         return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getPublicEnumTypes()
+    {
+        $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfigs  = $extendProvider->getConfigs(null, true);
+
+        $enumProvider = $this->configManager->getProvider('enum');
+
+        $result = [];
+        foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                continue;
+            }
+            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
+                continue;
+            }
+
+            $className  = $entityConfig->getId()->getClassName();
+            $enumConfig = $enumProvider->getConfig($className);
+            if (!$enumConfig->is('public')) {
+                continue;
+            }
+
+            $enumCode     = $enumConfig->get('code');
+            $key          = ($enumConfig->is('multiple') ? 'multiEnum' : 'enum'). '||' . $enumCode;
+            $result[$key] = $this->translator->trans(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode)
+            );
+        }
+
+        return $result;
     }
 }

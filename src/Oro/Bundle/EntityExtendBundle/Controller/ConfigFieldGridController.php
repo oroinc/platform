@@ -145,35 +145,34 @@ class ConfigFieldGridController extends Controller
         $extendProvider     = $configManager->getProvider('extend');
         $extendEntityConfig = $extendProvider->getConfig($entity->getClassName());
 
-        $relationValues  = [];
-        $relationOptions = explode('||', $fieldType);
-        $relationName    = $relationOptions[0];
-        $relationOptions = explode('|', $relationOptions[0]);
+        $fieldOptions = [
+            'extend' => [
+                'is_extend' => true,
+                'owner'     => ExtendScope::OWNER_CUSTOM,
+                'state'     => ExtendScope::STATE_NEW,
+            ]
+        ];
 
-        /**
-         * fieldType example: oneToMany|EntityFrom|EntityTo|test_one_to_many
-         * check if fieldType has 4th option [fieldName]
-         */
-        if (count($relationOptions) == 4) {
-            $fieldType = ExtendHelper::getReverseRelationType($relationOptions[0]);
-
-            $relations = $extendEntityConfig->get('relation');
-            if (isset($relations[$relationName])) {
-                $relationValues['target_entity'] = $relations[$relationName]['target_entity'];
-                $relationValues['relation_key']  = $relationName;
+        // check if a field type is complex, for example reverse relation or public enum
+        $fieldTypeParts = explode('||', $fieldType);
+        if (count($fieldTypeParts) > 1) {
+            if (in_array($fieldTypeParts[0], ['enum', 'multiEnum'])) { // enum
+                $fieldType = $fieldTypeParts[0];
+                $fieldOptions['enum']['enum_code'] = $fieldTypeParts[1];
+            } else {
+                $firstPartItems = explode('|', $fieldTypeParts[0]);
+                if (count($firstPartItems) === 4) { // reverse relation
+                    $fieldType = ExtendHelper::getReverseRelationType($firstPartItems[0]);
+                    $relationKey = $fieldTypeParts[0];
+                    $fieldOptions['extend']['relation_key'] = $relationKey;
+                    $relations = $extendEntityConfig->get('relation');
+                    $fieldOptions['extend']['target_entity'] = $relations[$relationKey]['target_entity'];
+                }
             }
         }
 
         $newFieldModel = $configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
-
-        $extendFieldConfig = $extendProvider->getConfig($entity->getClassName(), $fieldName);
-        $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
-        $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
-        $extendFieldConfig->set('is_extend', true);
-
-        foreach ($relationValues as $key => $value) {
-            $extendFieldConfig->set($key, $value);
-        }
+        $this->updateFieldConfigs($configManager, $newFieldModel, $fieldOptions);
 
         $form = $this->createForm('oro_entity_config_type', null, ['config_model' => $newFieldModel]);
 
@@ -333,5 +332,32 @@ class ConfigFieldGridController extends Controller
         $configManager->flush();
 
         return new JsonResponse(array('message' => 'Item was restored', 'successful' => true), Codes::HTTP_OK);
+    }
+
+    /**
+     * @param ConfigManager    $configManager
+     * @param FieldConfigModel $fieldModel
+     * @param array            $options
+     */
+    protected function updateFieldConfigs(ConfigManager $configManager, FieldConfigModel $fieldModel, $options)
+    {
+        $className = $fieldModel->getEntity()->getClassName();
+        $fieldName = $fieldModel->getFieldName();
+        foreach ($options as $scope => $scopeValues) {
+            $configProvider = $configManager->getProvider($scope);
+            $config         = $configProvider->getConfig($className, $fieldName);
+            $hasChanges     = false;
+            foreach ($scopeValues as $code => $val) {
+                if (!$config->is($code, $val)) {
+                    $config->set($code, $val);
+                    $hasChanges = true;
+                }
+            }
+            if ($hasChanges) {
+                $configProvider->persist($config);
+                $indexedValues = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
+                $fieldModel->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
+            }
+        }
     }
 }

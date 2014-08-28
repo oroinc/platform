@@ -1,13 +1,13 @@
 {% block oro_entity_extend_enum_value_widget %}
     <div class="float-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append input-append-sortable collection-element-primary">
-            {{ form_widget(form.label) }}
-            <label class="add-on" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans({}, 'tooltips') }}">
-                {{ form_widget(form.is_default) }}
+            {{ form_widget(form.label, {disabled: disabled}) }}
+            <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans({}, 'tooltips') }}">
+                {{ form_widget(form.is_default, {disabled: disabled}) }}
             </label>
-            <label class="add-on" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans({}, 'tooltips') }}">
-                <i class="icon-list handle"></i>
-                {{ form_widget(form.priority, {'attr': {'class': 'priority'}}) }}
+            <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans({}, 'tooltips') }}">
+                <i class="icon-list ui-sortable-handle{% if disabled %} disabled{% endif %}"></i>
+                {{ form_widget(form.priority, {disabled: disabled}) }}
             </label>
         </div>
         {{ form_errors(form.label) }}
@@ -17,8 +17,10 @@
 
 {% block oro_entity_extend_enum_value_collection_widget %}
     {{ block('oro_collection_widget') }}
-    {% set id = id ~ '_collection' %}
-    {{ _self.oro_entity_extend_enum_value_collection_js(_context) }}
+    {% if not disabled %}
+        {% set id = id ~ '_collection' %}
+        {{ _self.oro_entity_extend_enum_value_collection_js(_context) }}
+    {% endif %}
 {% endblock %}
 
 {% macro oro_entity_extend_enum_value_collection_js(context) %}
@@ -41,7 +43,6 @@
                 container.sortable({
                     cursor: 'move',
                     delay : 100,
-                    handle: '.handle',
                     containment: "parent",
                     stop  : function () {
                         var index = 1;

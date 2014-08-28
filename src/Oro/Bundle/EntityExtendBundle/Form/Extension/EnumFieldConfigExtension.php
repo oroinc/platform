@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -92,6 +93,8 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
      * Post submit event handler
      *
      * @param FormEvent $event
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function postSubmit(FormEvent $event)
     {
@@ -108,15 +111,12 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
             return;
         }
 
-        $data       = $event->getData();
-        $enumConfig = $configModel->toArray('enum');
+        $data         = $event->getData();
+        $enumConfig   = $configModel->toArray('enum');
 
-        $enumName = $data['enum']['enum_name'];
-        $enumCode = null;
-        if (isset($enumConfig['enum_code'])) {
-            $enumCode = $enumConfig['enum_code'];
-        }
-        if (empty($enumCode)) {
+        $enumName = $this->getValue($data['enum'], 'enum_name');
+        $enumCode = $this->getValue($enumConfig, 'enum_code');
+        if (empty($enumCode) && $enumName !== null) {
             $enumCode = ExtendHelper::buildEnumCode($enumName);
         }
 
@@ -124,13 +124,23 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
         $enumConfigProvider = $this->configManager->getProvider('enum');
         if ($enumConfigProvider->hasConfig($enumValueClassName)) {
-            $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
-            $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $data['enum']['enum_options'], $locale);
-            $this->enumSynchronizer->applyEnumEntityOptions($enumValueClassName, $data['enum']['enum_public']);
+            if ($configModel->getId()) {
+                if ($enumName !== null) {
+                    $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+                }
+                $enumOptions = $this->getValue($data['enum'], 'enum_options');
+                if ($enumOptions !== null) {
+                    $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+                }
+                $enumPublic = $this->getValue($data['enum'], 'enum_public');
+                if ($enumPublic !== null) {
+                    $this->enumSynchronizer->applyEnumEntityOptions($enumValueClassName, $enumPublic);
+                }
+            }
 
             unset($data['enum']['enum_name']);
-            unset($data['enum']['enum_public']);
             unset($data['enum']['enum_options']);
+            unset($data['enum']['enum_public']);
             $event->setData($data);
         } else {
             $data['enum']['enum_locale'] = $locale;
@@ -144,5 +154,17 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
     public function getExtendedType()
     {
         return 'oro_entity_config_type';
+    }
+
+    /**
+     * @param array  $values
+     * @param string $name
+     * @return mixed
+     */
+    protected function getValue(array $values, $name)
+    {
+        return isset($values[$name]) && array_key_exists($name, $values)
+            ? $values[$name]
+            : null;
     }
 }

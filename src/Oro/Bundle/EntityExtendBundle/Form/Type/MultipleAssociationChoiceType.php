@@ -18,15 +18,12 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     {
         parent::setDefaultOptions($resolver);
 
-        $that    = $this;
-        $choices = function (Options $options) use ($that) {
-            return $that->getChoices($options['association_class']);
-        };
-
         $resolver->setDefaults(
             [
                 'empty_value' => false,
-                'choices'     => $choices,
+                'choices'     => function (Options $options) {
+                    return $this->getChoices($options['association_class']);
+                },
                 'multiple'    => true,
                 'expanded'    => true
             ]
@@ -47,6 +44,22 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
                 $choiceView->vars['disabled'] = true;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'oro_entity_extend_multiple_association_choice';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'choice';
     }
 
     /**
@@ -99,21 +112,5 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_entity_extend_multiple_association_choice';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'choice';
     }
 }

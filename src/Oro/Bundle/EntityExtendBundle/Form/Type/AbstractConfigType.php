@@ -39,6 +39,10 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
         /** @var ConfigIdInterface $configId */
         $configId = $options['config_id'];
 
+        if (!$form->isValid()) {
+            return;
+        }
+
         // change the entity state to "Requires update" if the attribute has "require_schema_update" option
         // and the value of the attribute was changed
         $configProvider = $this->configManager->getProvider($configId->getScope());
@@ -50,9 +54,7 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
                 $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
                 if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
                     $extendConfig->set('state', ExtendScope::STATE_UPDATED);
-
-                    $extendConfigProvider->persist($extendConfig);
-                    $extendConfigProvider->flush();
+                    $this->configManager->persist($extendConfig);
                 }
             }
         }

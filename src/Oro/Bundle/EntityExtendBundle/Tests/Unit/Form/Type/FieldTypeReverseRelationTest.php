@@ -227,8 +227,7 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             ->setMockClassName('configProviderMock')
             ->getMock();
 
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfig')
             ->will(
                 $this->returnCallback(
@@ -242,14 +241,18 @@ class FieldTypeReverseRelationTest extends TypeTestCase
                     }
                 )
             );
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfigById')
             ->with($config['targetFieldId'])
             ->will($this->returnValue($entityConfigMockTarget));
 
-        $this->configManagerMock
-            ->expects($this->exactly(2))
+        // to skip public enums
+        $configProviderMock->expects($this->any())
+            ->method('getConfigs')
+            ->with(null, true)
+            ->will($this->returnValue([]));
+
+        $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
     }

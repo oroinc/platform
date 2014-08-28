@@ -17,11 +17,23 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     }
 
     /**
-     * @dataProvider buildViewProvider
+     * @dataProvider setDefaultOptionsProvider
      */
-    public function testBuildView($configId, $hasConfig, $immutable, $expectedViewVars)
-    {
-        $this->doTestBuildView($this->type, $configId, $hasConfig, $immutable, $expectedViewVars);
+    public function testSetDefaultOptions(
+        $configId,
+        $hasConfig,
+        $immutable,
+        array $options,
+        array $expectedOptions
+    ) {
+        $this->doTestSetDefaultOptions(
+            $this->type,
+            $configId,
+            $hasConfig,
+            $immutable,
+            $options,
+            $expectedOptions
+        );
     }
 
     public function testGetName()
