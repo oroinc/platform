@@ -60,7 +60,7 @@ abstract class AbstractConfigType extends AbstractType
         $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
 
         if (!empty($className)) {
-            // disable for immutable entities or fields
+            // check 'immutable' attribute
             $configProvider = $this->configManager->getProvider($configId->getScope());
             if ($configProvider->hasConfig($className, $fieldName)) {
                 $immutable = $configProvider->getConfig($className, $fieldName)->get('immutable');

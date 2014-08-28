@@ -78,7 +78,7 @@ class EnumPublicType extends AbstractType
 
         $fieldName = $configId->getFieldName();
 
-        // disable for system fields
+        // check if a system field
         $extendConfigProvider = $this->configManager->getProvider('extend');
         if ($extendConfigProvider->hasConfig($className, $fieldName)) {
             $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
@@ -87,13 +87,13 @@ class EnumPublicType extends AbstractType
             }
         }
 
-        // disable for immutable enums and new field that reuses a public enum
+        // check if immutable enum or new field reuses a public enum
         $enumConfigProvider = $this->configManager->getProvider('enum');
         if ($enumConfigProvider->hasConfig($className, $fieldName)) {
             $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
             $enumCode        = $enumFieldConfig->get('enum_code');
             if (!empty($enumCode)) {
-                // check if a new field reuses existing public enum
+                // check if a new field reuses public enum
                 if ($options['config_is_new']) {
                     return true;
                 }

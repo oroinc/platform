@@ -143,7 +143,7 @@ class EnumNameType extends AbstractType
 
         $fieldName = $configId->getFieldName();
 
-        // disable for new field that reuses a public enum
+        // check if new field reuses a public enum
         if ($options['config_is_new']) {
             $enumConfigProvider = $this->configManager->getProvider('enum');
             if ($enumConfigProvider->hasConfig($className, $fieldName)) {
