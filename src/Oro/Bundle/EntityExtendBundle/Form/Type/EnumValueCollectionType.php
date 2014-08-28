@@ -90,7 +90,7 @@ class EnumValueCollectionType extends AbstractType
             if (!empty($enumCode)) {
                 // check if a new field reuses existing public enum
                 if ($options['config_is_new']) {
-                    return true;
+                    return 2;
                 }
                 // check immutable
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
