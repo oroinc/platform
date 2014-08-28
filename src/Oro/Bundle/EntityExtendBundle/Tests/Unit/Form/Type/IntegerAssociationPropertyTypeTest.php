@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
@@ -20,7 +21,10 @@ class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new IntegerAssociationPropertyType($this->configManager, $entityClassResolver);
+        $this->type = new IntegerAssociationPropertyType(
+            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            $this->configManager
+        );
     }
 
     public function testGetName()

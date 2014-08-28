@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -63,8 +63,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             ->will($this->returnArgument(0));
 
         $this->type = new MultipleAssociationChoiceType(
-            $this->configManager,
-            $entityClassResolver
+            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            $this->configManager
         );
     }
 

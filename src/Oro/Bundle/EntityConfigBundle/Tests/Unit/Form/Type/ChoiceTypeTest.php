@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
 class ChoiceTypeTest extends AbstractConfigTypeTestCase
 {
@@ -13,7 +14,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new ChoiceType($this->configManager);
+        $this->type = new ChoiceType(new ConfigTypeHelper($this->configManager));
     }
 
     /**

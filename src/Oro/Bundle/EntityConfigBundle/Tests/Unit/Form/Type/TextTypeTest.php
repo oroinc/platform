@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Form\Type\TextType;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
@@ -13,7 +14,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new TextType($this->configManager);
+        $this->type = new TextType(new ConfigTypeHelper($this->configManager));
     }
 
     /**

@@ -6,9 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
 /**
  * The abstract class for form types are used to work with entity config attributes.
@@ -17,15 +16,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 abstract class AbstractConfigType extends AbstractType
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var ConfigTypeHelper */
+    private $typeHelper;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigTypeHelper $typeHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigTypeHelper $typeHelper)
     {
-        $this->configManager = $configManager;
+        $this->typeHelper = $typeHelper;
     }
 
     /**
@@ -57,19 +56,15 @@ abstract class AbstractConfigType extends AbstractType
         /** @var ConfigIdInterface $configId */
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
-        $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
 
-        if (!empty($className)) {
-            // check 'immutable' attribute
-            $configProvider = $this->configManager->getProvider($configId->getScope());
-            if ($configProvider->hasConfig($className, $fieldName)) {
-                $immutable = $configProvider->getConfig($className, $fieldName)->get('immutable');
-                if (true === $immutable) {
-                    return true;
-                }
-            }
+        if (empty($className)) {
+            return false;
         }
 
-        return false;
+        return $this->typeHelper->isImmutable(
+            $configId->getScope(),
+            $className,
+            $this->typeHelper->getFieldName($configId)
+        );
     }
 }

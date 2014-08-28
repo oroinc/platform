@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
@@ -13,7 +14,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new TextareaType($this->configManager);
+        $this->type = new TextareaType(new ConfigTypeHelper($this->configManager));
     }
 
     /**

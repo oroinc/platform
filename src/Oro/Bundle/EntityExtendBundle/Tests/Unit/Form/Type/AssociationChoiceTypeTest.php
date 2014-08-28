@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class AssociationChoiceTypeTest extends AssociationTypeTestCase
 {
@@ -22,7 +23,10 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new AssociationChoiceType($this->configManager, $entityClassResolver);
+        $this->type = new AssociationChoiceType(
+            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            $this->configManager
+        );
     }
 
     /**

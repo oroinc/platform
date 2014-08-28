@@ -11,8 +11,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\ExecutionContext;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -22,21 +23,21 @@ class EnumNameType extends AbstractType
     const INVALID_NAME_MESSAGE =
         'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var EnumTypeHelper */
+    protected $typeHelper;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     /**
-     * @param ConfigManager                   $configManager
+     * @param EnumTypeHelper                  $typeHelper
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
-        ConfigManager $configManager,
+        EnumTypeHelper $typeHelper,
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->configManager = $configManager;
+        $this->typeHelper    = $typeHelper;
         $this->nameGenerator = $nameGenerator;
     }
 
@@ -56,8 +57,7 @@ class EnumNameType extends AbstractType
         $constraintsNormalizer = function (Options $options, $constraints) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $options['config_id'];
-            $enumCode      = $this->getEnumCode($fieldConfigId);
-            if (empty($enumCode)) {
+            if (!$this->typeHelper->hasEnumCode($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())) {
                 // validations of new enum
                 $constraints[] = new Length(['max' => $this->nameGenerator->getMaxEnumCodeSize()]);
                 $constraints[] = new Regex(
@@ -130,51 +130,24 @@ class EnumNameType extends AbstractType
      */
     protected function isReadOnly($options)
     {
-        $configId = $options['config_id'];
-        if (!($configId instanceof FieldConfigId)) {
-            return false;
-        }
-
+        /** @var ConfigIdInterface $configId */
+        $configId  = $options['config_id'];
         $className = $configId->getClassName();
+
         if (empty($className)) {
             return false;
         }
 
-        $fieldName = $configId->getFieldName();
+        $fieldName = $this->typeHelper->getFieldName($configId);
+        if (empty($fieldName)) {
+            return false;
+        }
 
         // check if new field reuses a public enum
-        if ($options['config_is_new']) {
-            $enumConfigProvider = $this->configManager->getProvider('enum');
-            if ($enumConfigProvider->hasConfig($className, $fieldName)) {
-                $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
-                $enumCode        = $enumFieldConfig->get('enum_code');
-                if (!empty($enumCode)) {
-                    return true;
-                }
-            }
+        if ($options['config_is_new'] && $this->typeHelper->hasEnumCode($className, $fieldName)) {
+            return true;
         }
 
         return false;
-    }
-
-    /**
-     * Tries to get an enum code from configs of the given field
-     *
-     * @param FieldConfigId $fieldConfigId
-     *
-     * @return string|null
-     */
-    protected function getEnumCode(FieldConfigId $fieldConfigId)
-    {
-        $enumCode = null;
-
-        $enumConfigProvider = $this->configManager->getProvider('enum');
-        if ($enumConfigProvider->hasConfig($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())) {
-            $enumCode = $enumConfigProvider
-                ->getConfig($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())
-                ->get('enum_code');
-        }
-
-        return $enumCode;
     }
 }

@@ -8,21 +8,21 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueCollectionType extends AbstractType
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var EnumTypeHelper */
+    protected $typeHelper;
 
     /**
-     * @param ConfigManager $configManager
+     * @param EnumTypeHelper $typeHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(EnumTypeHelper $typeHelper)
     {
-        $this->configManager = $configManager;
+        $this->typeHelper = $typeHelper;
     }
 
     /**
@@ -57,7 +57,7 @@ class EnumValueCollectionType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['multiple'] = $options['config_id']->getFieldType() === 'multiEnum';
+        $view->vars['multiple'] = $this->typeHelper->getFieldType($options['config_id']) === 'multiEnum';
     }
 
     /**
@@ -69,36 +69,28 @@ class EnumValueCollectionType extends AbstractType
      */
     protected function getState($options)
     {
-        $configId = $options['config_id'];
-        if (!($configId instanceof FieldConfigId)) {
-            return 0;
-        }
-
+        /** @var ConfigIdInterface $configId */
+        $configId  = $options['config_id'];
         $className = $configId->getClassName();
+
         if (empty($className)) {
             return 0;
         }
 
-        $fieldName = $configId->getFieldName();
+        $fieldName = $this->typeHelper->getFieldName($configId);
+        if (empty($fieldName)) {
+            return 0;
+        }
 
-        // check for immutable enums and new field that reuses a public enum
-        $enumConfigProvider = $this->configManager->getProvider('enum');
-        if ($enumConfigProvider->hasConfig($className, $fieldName)) {
-            $enumFieldConfig = $enumConfigProvider->getConfig($className, $fieldName);
-            $enumCode        = $enumFieldConfig->get('enum_code');
-            if (!empty($enumCode)) {
-                // check if a new field reuses existing public enum
-                if ($options['config_is_new']) {
-                    return 2;
-                }
-                // check immutable
-                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-                if ($enumConfigProvider->hasConfig($enumValueClassName)) {
-                    $enumConfig = $enumConfigProvider->getConfig($enumValueClassName);
-                    if ($enumConfig->get('immutable')) {
-                        return 1;
-                    }
-                }
+        $enumCode = $this->typeHelper->getEnumCode($className, $fieldName);
+        if (!empty($enumCode)) {
+            if ($options['config_is_new']) {
+                // a new field reuses public enum
+                return 2;
+            }
+            if ($this->typeHelper->isImmutable('enum', ExtendHelper::buildEnumValueClassName($enumCode))) {
+                // an enum is immutable
+                return 1;
             }
         }
 
