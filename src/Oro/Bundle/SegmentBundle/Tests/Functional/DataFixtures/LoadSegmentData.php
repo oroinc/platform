@@ -35,8 +35,6 @@ class LoadSegmentData extends AbstractFixture
         if (!$organisation) {
             $organisation = new Organization();
             $organisation->setName('Test Org');
-            $organisation->setCurrency('USD');
-            $organisation->setPrecision('0.00');
             $manager->persist($organisation);
         }
 
