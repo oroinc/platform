@@ -68,11 +68,13 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \Exception $exception
+     * @param \PHPUnit_Framework_MockObject_MockObject $datasource
+     * @param bool                                     $useOrmDatasorce
+     * @param \Exception                               $exception
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidate($exception)
+    public function testValidate($datasource, $useOrmDatasorce, $exception)
     {
         $provider = $this
             ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
@@ -104,8 +106,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getConfiguration')
             ->will($this->returnValue($configuration));
 
-        $datagrid   = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $datasource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
 
         $this->gridBuilder
             ->expects($this->once())
@@ -116,6 +117,23 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($datasource));
+
+        $qb = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datasource
+            ->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        if ($useOrmDatasorce) {
+            $qb
+                ->expects($this->once())
+                ->method('setMaxResults')
+                ->will($this->returnSelf());
+        }
 
         if ($exception) {
             $datasource
@@ -147,10 +165,40 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     public function validateDataProvider()
     {
         return [
-            [DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql')],
-            [new InvalidConfigurationException()],
-            [null],
+            [
+                $this->getDataSourceInterfaceMock(),
+                false,
+                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql')
+            ],
+            [$this->getDataSourceInterfaceMock(), false, new InvalidConfigurationException()],
+            [$this->getDataSourceInterfaceMock(), false, null],
+            [
+                $this->getOrmDataSourceInterfaceMock(),
+                true,
+                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql')
+            ],
+            [$this->getOrmDataSourceInterfaceMock(), true, new InvalidConfigurationException()],
+            [$this->getOrmDataSourceInterfaceMock(), true, null],
         ];
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getDataSourceInterfaceMock()
+    {
+        return $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getOrmDataSourceInterfaceMock()
+    {
+        return $this
+            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
