@@ -62,9 +62,11 @@ define([
     Chaplin.Layout.prototype.registerGlobalRegions = function(instance) {
         var name, selector, version, _i, _len, _ref;
         _ref = utils.getAllPropertyVersions(instance, 'regions');
+
         if (instance.hasOwnProperty('regions')) {
             _ref.push(instance.regions);
         }
+
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             version = _ref[_i];
             for (name in version) {
@@ -88,10 +90,10 @@ define([
             return;
         }
 
-        if (el.nodeName === 'A') {
+        if (el.nodeName === 'A' && el.getAttribute('href')) {
             href = el.getAttribute('href');
             // prevent click by empty hashes
-            if (el.getAttribute('href') === '#') {
+            if (href === '#') {
                 event.preventDefault();
                 return;
             }
@@ -103,6 +105,7 @@ define([
 
         payload = {prevented: false, target: el};
         Chaplin.mediator.publish('openLink:before', payload);
+
         if (payload.prevented !== false) {
             event.preventDefault();
             return;

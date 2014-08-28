@@ -48,6 +48,10 @@ class Security
     {
         $aclResource = $this->getAutocompleteAclResource($name);
 
-        return $aclResource && $this->securityFacade->isGranted($aclResource);
+        if ($aclResource) {
+            return $this->securityFacade->isGranted($aclResource);
+        }
+
+        return true;
     }
 }

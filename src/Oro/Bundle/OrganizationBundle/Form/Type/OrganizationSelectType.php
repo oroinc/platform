@@ -17,7 +17,7 @@ class OrganizationSelectType extends AbstractType
                 'configs' => [
                     'placeholder' => 'oro.organization.form.choose_organization',
                 ],
-                'autocomplete_alias' => 'organization'
+                'autocomplete_alias' => 'user_organizations'
             ]
         );
     }
