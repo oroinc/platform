@@ -154,7 +154,6 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 
         $result = $manager->getList(3, 1, $criteria);
-        var_dump($result);
         $this->assertSame($result[0], $entity);
     }
 
