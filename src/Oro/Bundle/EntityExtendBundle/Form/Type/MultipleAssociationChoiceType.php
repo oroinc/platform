@@ -68,11 +68,10 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
      */
     protected function getChoices($groupName)
     {
-        $this->ensureOwningSideEntitiesLoaded($groupName);
-
         $choices              = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
-        foreach ($this->owningSideEntities as $className) {
+        $owningSideEntities = $this->typeHelper->getOwningSideEntities($groupName);
+        foreach ($owningSideEntities as $className) {
             $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
         }
 
@@ -96,21 +95,17 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
      */
     protected function getReadOnlyValues(array $options)
     {
-        $result = [];
-
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
+
         if (!empty($className)) {
-            $configProvider = $this->configManager->getProvider($configId->getScope());
-            if ($configProvider->hasConfig($className)) {
-                $immutable = $configProvider->getConfig($className)->get('immutable');
-                if (is_array($immutable) && !empty($immutable)) {
-                    $result = $immutable;
-                }
+            $immutable = $this->typeHelper->getImmutable($configId->getScope(), $className);
+            if (is_array($immutable)) {
+                return $immutable;
             }
         }
 
-        return $result;
+        return [];
     }
 }

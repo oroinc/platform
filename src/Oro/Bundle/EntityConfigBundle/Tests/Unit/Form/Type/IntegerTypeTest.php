@@ -13,27 +13,15 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new IntegerType($this->configManager);
+        $this->type = new IntegerType($this->typeHelper);
     }
 
     /**
      * @dataProvider setDefaultOptionsProvider
      */
-    public function testSetDefaultOptions(
-        $configId,
-        $hasConfig,
-        $immutable,
-        array $options,
-        array $expectedOptions
-    ) {
-        $this->doTestSetDefaultOptions(
-            $this->type,
-            $configId,
-            $hasConfig,
-            $immutable,
-            $options,
-            $expectedOptions
-        );
+    public function testSetDefaultOptions($configId, $immutable, array $options, array $expectedOptions)
+    {
+        $this->doTestSetDefaultOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 
     public function testGetName()

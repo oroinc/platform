@@ -6,8 +6,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
+use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType as BaseAbstractConfigType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
@@ -19,6 +21,19 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 abstract class AbstractConfigType extends BaseAbstractConfigType
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /**
+     * @param ConfigTypeHelper $typeHelper
+     * @param ConfigManager    $configManager
+     */
+    public function __construct(ConfigTypeHelper $typeHelper, ConfigManager $configManager)
+    {
+        parent::__construct($typeHelper);
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */

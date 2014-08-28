@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
@@ -20,7 +21,10 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new ChoiceAssociationPropertyType($this->configManager, $entityClassResolver);
+        $this->type = new ChoiceAssociationPropertyType(
+            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            $this->configManager
+        );
     }
 
     public function testGetName()

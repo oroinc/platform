@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\IntegerType;
 
@@ -15,7 +16,10 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new IntegerType($this->configManager);
+        $this->type = new IntegerType(
+            new ConfigTypeHelper($this->configManager),
+            $this->configManager
+        );
     }
 
     /**
