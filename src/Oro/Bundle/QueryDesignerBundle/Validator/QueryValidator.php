@@ -9,6 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -68,13 +69,19 @@ class QueryValidator extends ConstraintValidator
         $builder->setGridName($gridPrefix);
         $builder->setSource($value);
 
-        $datagrid = $this->gridBuilder->build(
+        $dataGrid = $this->gridBuilder->build(
             $builder->getConfiguration(),
             new ParameterBag()
         );
 
+        $dataSource = $dataGrid->getDatasource();
+        if ($dataSource instanceof OrmDatasource) {
+            $qb = $dataSource->getQueryBuilder();
+            $qb->setMaxResults(1);
+        }
+
         try {
-            $datagrid->getDatasource()->getResults();
+            $dataSource->getResults();
         } catch (DBALException $e) {
             $this->context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
         } catch (InvalidConfigurationException $e) {

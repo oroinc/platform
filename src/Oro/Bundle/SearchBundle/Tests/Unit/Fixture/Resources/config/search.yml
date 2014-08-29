@@ -1,9 +1,11 @@
 Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer:
-  fields:
-    -
-      name: products
-      relation_type: one-to-many
-      relation_fields:
+    alias: test_entity
+    search_template: OroSearchBundle:Test:searchResult.html.twig
+    fields:
         -
-          name: name
-          target_type: text
+            name: products
+            relation_type: one-to-many
+            relation_fields:
+                -
+                    name: name
+                    target_type: text

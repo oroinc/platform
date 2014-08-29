@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class IndexText
 {
-    const HYPHEN_SUBSTITUTION = '__HYPHEN__';
+    const HYPHEN_SUBSTITUTION = ' ';
 
     const TABLE_NAME = 'oro_search_index_text';
 
@@ -86,9 +86,7 @@ class IndexText
      */
     public function setValue($value)
     {
-        $processedValue = str_replace('-', self::HYPHEN_SUBSTITUTION, $value);
-
-        $this->value = $processedValue;
+        $this->value = $value;
 
         return $this;
     }
@@ -100,13 +98,7 @@ class IndexText
      */
     public function getValue()
     {
-        if (null !== $this->value) {
-            $originalValue = str_replace(self::HYPHEN_SUBSTITUTION, '-', $this->value);
-        } else {
-            $originalValue = null;
-        }
-
-        return $originalValue;
+        return $this->value;
     }
 
     /**

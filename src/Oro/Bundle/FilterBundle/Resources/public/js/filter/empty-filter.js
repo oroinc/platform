@@ -25,6 +25,13 @@ define([
         emptyOption: 'filter_empty_option',
 
         /**
+         * Template selector for filter criteria
+         *
+         * @property
+         */
+        notEmptyOption: 'filter_not_empty_option',
+
+        /**
          * Stores old value for empty filter
          *
          * @property
@@ -117,14 +124,14 @@ define([
             var type = container.find(this.criteriaValueSelectors.type).val();
             var button = container.find(this.updateSelector);
 
-            if (type == this.emptyOption) {
+            if (this.isEmptyType(type)) {
                 var query = item.val();
-                if (query != this.emptyOption) {
+                if (!this.isEmptyType(query)) {
                     this.query = query;
                     this.revertQuery = true;
                 }
 
-                item.hide().val(this.emptyOption);
+                item.hide().val(type);
                 button.addClass(this.updateSelectorEmptyClass);
 
                 return;
@@ -145,7 +152,7 @@ define([
          * @inheritDoc
          */
         isEmptyValue: function () {
-            if (this.value.type === this.emptyOption) {
+            if (this.isEmptyType(this.value.type)) {
                 return false;
             }
 
@@ -153,6 +160,14 @@ define([
                 return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
             return true;
+        },
+
+        /**
+         * @param {String} type
+         * @returns {Boolean}
+         */
+        isEmptyType: function(type) {
+            return _.contains([this.emptyOption, this.notEmptyOption], type);
         }
     });
 

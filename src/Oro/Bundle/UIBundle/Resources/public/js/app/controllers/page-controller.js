@@ -153,6 +153,11 @@ define([
          */
         onPageLoaded: function (model, options) {
             var attributes;
+
+            // dispose all components, in case it's page update with the same controller instance
+            // (eg. POST data submitted and page data received instead of redirect)
+            this._disposeComponents();
+
             attributes = model.getAttributes();
             this.publishEvent('page:update', attributes, options.actionArgs, options.xhr);
             this.adjustTitle(attributes.title);
@@ -181,7 +186,7 @@ define([
                 // attach created components to controller, to get them disposed together
                 _.each(components, function (component) {
                     if (typeof component.dispose === 'function') {
-                        self['component-' + component.cid] = component;
+                        self['component-' + component.cid || _.uniqueId('component')] = component;
                     }
                 });
 
@@ -361,6 +366,20 @@ define([
             options.actionArgs = options.actionArgs || {};
             _.defaults(options.actionArgs, {params: {}, route: {}, options: {}});
             this.model.save(null, options);
+        },
+
+        /**
+         * Disposes all attached page components
+         *
+         * @private
+         */
+        _disposeComponents: function () {
+            _.each(this, function (component, name) {
+                if ('component-' === name.substr(0, 10)) {
+                    component.dispose();
+                    delete this[name];
+                }
+            }, this);
         }
     });
 
