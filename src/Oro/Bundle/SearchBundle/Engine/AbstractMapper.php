@@ -127,7 +127,7 @@ abstract class AbstractMapper
                     if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
                         $objectData[$fieldConfig['target_type']][$targetField] = '';
                     }
-                    $objectData[$fieldConfig['target_type']][$targetField] .= $value . ' ';
+                    $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
                 }
 
                 $textAllDataField = '';
