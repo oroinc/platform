@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
@@ -17,6 +18,22 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
      * @var ObjectMapper
      */
     private $mapper;
+
+    /**
+     * @var Product
+     */
+    private $product;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $router;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $container;
+
     /**
      * @var array
      */
@@ -111,16 +128,16 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->setDescription('description')
             ->setCreateDate(new \DateTime());
 
-        $this->route = $this
+        $this->router = $this
             ->getMockBuilder('Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->route->expects($this->any())
+        $this->router->expects($this->any())
             ->method('generate')
             ->will($this->returnValue('http://example.com'));
 
-        $params = array('router' => $this->route);
+        $params = array('router' => $this->router);
 
         $this->container->expects($this->any())
             ->method('get')
@@ -143,16 +160,39 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
 
     public function testMapObject()
     {
-        $mapping = $this->mapper->mapObject($this->product);
+        $productName = $this->product->getName();
+        $productDescription = $this->product->getDescription();
+        $manufacturerName = $this->product->getManufacturer()->getName();
+        $allTextData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
 
-        $this->assertEquals('test product', $mapping['text']['name']);
-        $this->assertEquals(self::TEST_PRICE, $mapping['decimal']['price']);
-        $this->assertEquals(self::TEST_COUNT, $mapping['integer']['count']);
+        $productMapping = array(
+            'text' => array(
+                'name' => $productName,
+                'description' => $productDescription,
+                'manufacturer' => $manufacturerName,
+                'all_data' => $allTextData,
+                Indexer::TEXT_ALL_DATA_FIELD => $allTextData,
+            ),
+            'decimal' => array(
+                'price' => $this->product->getPrice(),
+            ),
+            'integer' => array(
+                'count' => $this->product->getCount(),
+            )
+        );
+        $this->assertEquals($productMapping, $this->mapper->mapObject($this->product));
 
         $manufacturer = new Manufacturer();
         $manufacturer->setName('reebok');
         $manufacturer->addProduct($this->product);
-        $this->mapper->mapObject($manufacturer);
+
+        $manufacturerMapping = array(
+            'text' => array(
+                'products' => $productName,
+                Indexer::TEXT_ALL_DATA_FIELD => $productName
+            )
+        );
+        $this->assertEquals($manufacturerMapping, $this->mapper->mapObject($manufacturer));
     }
 
     public function testGetEntitiesListAliases()
