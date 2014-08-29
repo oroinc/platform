@@ -44,12 +44,10 @@ abstract class AbstractMapper
      */
     public function getEntityMapParameter($entity, $parameter, $defaultValue = false)
     {
-        if ($this->getEntityConfig($entity)) {
-            $entityConfig = $this->getEntityConfig($entity);
+        $entityConfig = $this->getEntityConfig($entity);
 
-            if (isset($entityConfig[$parameter])) {
-                return $entityConfig[$parameter];
-            }
+        if ($entityConfig && isset($entityConfig[$parameter])) {
+            return $entityConfig[$parameter];
         }
 
         return $defaultValue;
@@ -127,6 +125,7 @@ abstract class AbstractMapper
                     if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
                         $objectData[$fieldConfig['target_type']][$targetField] = '';
                     }
+
                     $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
                 }
 
