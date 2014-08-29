@@ -20,6 +20,7 @@ class EmailTemplateTest extends Selenium2TestCase
 
         $login = $this->login();
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
+            ->assertTitle('Templates - Emails - System')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
@@ -54,6 +55,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->assertTitle('Templates - Emails - System')
             ->close()
             ->open(array($newTemplateName))
+            ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
             ->getFields($fields);
         $this->assertEquals('User', $fields['entityname']);
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
@@ -75,6 +77,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->open(array($templateName))
+            ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
@@ -92,6 +95,7 @@ class EmailTemplateTest extends Selenium2TestCase
     {
         $login = $this->login();
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
+            ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
             ->delete('Template name', $templateName)
             ->assertTitle('Templates - Emails - System')
             ->assertMessage('Item deleted');
