@@ -643,9 +643,11 @@ define(function (require) {
          * @private
          */
         _onRemove: function (model) {
-            mediator.trigger('datagrid:removeRow:' + this.name, model);
+            mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
             this.collection.fetch({reset: true});
+
+            mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },
 
         /**

@@ -19,7 +19,7 @@
         require(
             ['jquery', 'oroui/js/mediator'],
             function ($, mediator) {
-                mediator.on('datagrid:removeRow:{{ gridName }}', function(model){
+                mediator.on('datagrid:beforeRemoveRow:{{ gridName }}', function(model){
                     $('[data-menu="' + model.get('id') + '"]').remove();
                     if (!$('[data-menu]').length) {
                         $('.menu-divider').remove();
