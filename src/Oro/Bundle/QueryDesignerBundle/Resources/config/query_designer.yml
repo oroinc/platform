@@ -1,6 +1,6 @@
 query_designer:
     grouping:
-        exclude: [{type: text}, {type: array}, {type: object}]
+        exclude: [{type: text}, {type: array}, {type: json_array}, {type: simple_array}, {type: object}]
 
     filters:
         string:

@@ -105,4 +105,37 @@ class EnumTypeHelper extends ConfigTypeHelper
 
         return false;
     }
+
+    /**
+     * Returns the list of data type keys for all public enums
+     *
+     * @return string[] key = enum code, value = data type key
+     */
+    public function getPublicEnumTypes()
+    {
+        $result = [];
+
+        $enumConfigProvider   = $this->configManager->getProvider('enum');
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
+        foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                continue;
+            }
+            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
+                continue;
+            }
+
+            $className  = $entityConfig->getId()->getClassName();
+            $enumConfig = $enumConfigProvider->getConfig($className);
+            if (!$enumConfig->is('public')) {
+                continue;
+            }
+
+            $enumCode          = $enumConfig->get('code');
+            $result[$enumCode] = ($enumConfig->is('multiple') ? 'multiEnum' : 'enum') . '||' . $enumCode;
+        }
+
+        return $result;
+    }
 }

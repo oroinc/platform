@@ -6,7 +6,6 @@ oro:
             data_type_group:
                 fields:             Fields
                 relations:          Relations
-                dictionaries:       Dictionaries
             data_type:
                 choose_value:       Choose a field type...
 
@@ -17,6 +16,8 @@ oro:
                 boolean:            Boolean
                 decimal:            Decimal
                 date:               Date
+                datetime:           DateTime
+                time:               Time
                 text:               Text
                 float:              Float
                 money:              Currency
@@ -25,14 +26,18 @@ oro:
                 manyToOne:          Many to one
                 manyToMany:         Many to many
                 optionSet:          Option Set (deprecated)
-                enum:               Option Set
-                multiEnum:          Multiple Option Set
+                enum:               Select
+                multiEnum:          Multi-Select
 
                 ref-one:            System relation
                 ref-many:           System relation
+                array:              Binary
+                json_array:         Binary
+                simple_array:       Binary
+                object:             Binary
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
-        enum_name:    Name
+        enum_name:    Option Set Name
         enum_public:  Public
         enum_options: Options
         action:

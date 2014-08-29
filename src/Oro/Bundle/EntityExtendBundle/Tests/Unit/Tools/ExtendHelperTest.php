@@ -101,7 +101,7 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildEnumCodeForInvalidEnumName($enumName)
     {
-        var_dump(ExtendHelper::buildEnumCode($enumName));
+        ExtendHelper::buildEnumCode($enumName);
     }
 
     /**
@@ -125,6 +125,44 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['_ _'],
             [' \/()[]~!@#$%^&*+-'],
         ];
+    }
+
+    /**
+     * @dataProvider generateEnumCodeProvider
+     */
+    public function testGenerateEnumCode($entityClassName, $fieldName, $expectedEnumCode)
+    {
+        $this->assertEquals(
+            $expectedEnumCode,
+            ExtendHelper::generateEnumCode($entityClassName, $fieldName)
+        );
+    }
+
+    public static function generateEnumCodeProvider()
+    {
+        return [
+            ['Test\Entity', 'field1', 'entity_field1_489d47b1'],
+            ['Oro\Bundle\EntityExtendBundle\Entity\EnumValue', 'foreignKey', 'enum_value_foreign_key_5e7e84e3'],
+            ['Oro\Bundle\EntityExtendBundle\Entity\EnumValue', 'foreign_key', 'enum_value_foreign_key_f1145bcc'],
+        ];
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $entityClassName must not be empty.
+     */
+    public function testGenerateEnumCodeForEmptyClassName()
+    {
+        ExtendHelper::generateEnumCode('', 'testField');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $fieldName must not be empty.
+     */
+    public function testGenerateEnumCodeForEmptyFieldName()
+    {
+        ExtendHelper::generateEnumCode('Test\Entity', '');
     }
 
     /**

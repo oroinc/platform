@@ -425,6 +425,74 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetPublicEnumTypes()
+    {
+        $config1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
+        $config1->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config1->set('state', ExtendScope::STATE_ACTIVE);
+        $config2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
+        $config2->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config2->set('state', ExtendScope::STATE_UPDATED);
+        $config3 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
+        $config3->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config3->set('state', ExtendScope::STATE_NEW);
+        $config4 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
+        $config4->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config4->set('state', ExtendScope::STATE_DELETED);
+        $config5 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
+        $config5->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config5->set('state', ExtendScope::STATE_ACTIVE);
+        $config6 = new Config(new EntityConfigId('extend', 'Test\Entity6'));
+
+        $enumConfig1 = new Config(new EntityConfigId('enum', 'Test\EnumValue1'));
+        $enumConfig1->set('public', true);
+        $enumConfig1->set('code', 'test_enum1');
+        $enumConfig1->set('multiple', true);
+        $enumConfig2 = new Config(new EntityConfigId('enum', 'Test\EnumValue2'));
+        $enumConfig2->set('public', true);
+        $enumConfig2->set('code', 'test_enum2');
+        $enumConfig5 = new Config(new EntityConfigId('enum', 'Test\EnumValue3'));
+        $enumConfig5->set('code', 'test_enum5');
+
+        $configs = [$config1, $config2, $config3, $config4, $config5, $config6];
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider   = $this->getConfigProviderMock();
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['enum', $enumConfigProvider],
+                        ['extend', $extendConfigProvider]
+                    ]
+                )
+            );
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfigs')
+            ->with(null, true)
+            ->will($this->returnValue($configs));
+        $enumConfigProvider->expects($this->exactly(3))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Test\EnumValue1', null, $enumConfig1],
+                        ['Test\EnumValue2', null, $enumConfig2],
+                        ['Test\EnumValue5', null, $enumConfig5],
+                    ]
+                )
+            );
+
+        $this->assertEquals(
+            [
+                'test_enum1' => 'multiEnum||test_enum1',
+                'test_enum2' => 'enum||test_enum2'
+            ],
+            $this->typeHelper->getPublicEnumTypes()
+        );
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

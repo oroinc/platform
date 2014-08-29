@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Util\Inflector;
-
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
@@ -182,22 +180,57 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      * Builds a table name for an enum entity
      *
      * @param string $enumCode
+     * @param bool   $allowHash If TRUE and $enumCode exceeds a limit for an enum code
+     *                          a table name is generated based on a hash
+     *                          If FALSE an exception will be raised
+     *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
-    public function generateEnumTableName($enumCode)
+    public function generateEnumTableName($enumCode, $allowHash = false)
     {
         if (strlen($enumCode) > $this->getMaxEnumCodeSize()) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The enum code length must be less or equal %d characters. Code: %s.',
-                    $this->getMaxEnumCodeSize(),
-                    $enumCode
-                )
-            );
+            if (!$allowHash) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'The enum code length must be less or equal %d characters. Code: %s.',
+                        $this->getMaxEnumCodeSize(),
+                        $enumCode
+                    )
+                );
+            }
+
+            $hash = dechex(crc32($enumCode));
+
+            // try to build "good looking" name if it is possible
+            $lastPos  = strrpos($enumCode, '_');
+            $lastPart = $lastPos !== false ? substr($enumCode, $lastPos + 1) : null;
+            if ($lastPart) {
+                if (strlen($lastPart) === strlen($hash)) {
+                    // suppose that the last part is a hash
+                    return self::ENUM_TABLE_PREFIX . $hash . '_' . $lastPart;
+                }
+                if (strlen($lastPart) <= $this->getMaxEnumCodeSize() - strlen($hash) - 1) {
+                    $lastPos = strrpos($enumCode, '_', -(strlen($enumCode) - $lastPos + 1));
+                    if ($lastPos !== false) {
+                        $longerLastPart = substr($enumCode, $lastPos + 1);
+                        if (strlen($longerLastPart) <= $this->getMaxEnumCodeSize() - strlen($hash) - 1) {
+                            return self::ENUM_TABLE_PREFIX . $hash . '_' . $longerLastPart;
+                        }
+                    }
+
+                    return self::ENUM_TABLE_PREFIX . $hash . '_' . $lastPart;
+                }
+            }
+
+            return
+                self::ENUM_TABLE_PREFIX
+                . $hash . '_'
+                . substr($enumCode, -($this->getMaxEnumCodeSize() - strlen($hash) - 1));
         }
 
-        return self::ENUM_TABLE_PREFIX . Inflector::tableize($enumCode);
+        return self::ENUM_TABLE_PREFIX . $enumCode;
     }
 
     /**

@@ -115,6 +115,35 @@ class ExtendHelper
     }
 
     /**
+     * Generates an enum identifier based on the given entity class and field.
+     * This method can be used if there is no enum name and as result
+     * {@link buildEnumCode()} method cannot be used.
+     *
+     * @param string $entityClassName
+     * @param string $fieldName
+     *
+     * @return string The enum code.
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function generateEnumCode($entityClassName, $fieldName)
+    {
+        if (empty($entityClassName)) {
+            throw new \InvalidArgumentException('$entityClassName must not be empty.');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty.');
+        }
+
+        return sprintf(
+            '%s_%s_%s',
+            Inflector::tableize(self::getShortClassName($entityClassName)),
+            Inflector::tableize($fieldName),
+            dechex(crc32($entityClassName . '::' . $fieldName))
+        );
+    }
+
+    /**
      * Returns an enum value identifier based on the given value name.
      *
      * @param string $enumValueName

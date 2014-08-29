@@ -413,14 +413,15 @@ oro_entity_config:
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
-                    form:
-                        type:               oro_entity_extend_enum_name
-                        options:
-                            block:          general
-                            subblock:       properties
-                            required:       true
-                            label:          oro.entity_extend.enum_name
-                            tooltip:        oro.entity_extend.enum_name.tooltip
+                    # todo: this works properly, but we temporaty disable it untill a decision about UI is taken
+                    #form:
+                    #    type:               oro_entity_extend_enum_name
+                    #    options:
+                    #        block:          general
+                    #        subblock:       properties
+                    #        required:       true
+                    #        label:          oro.entity_extend.enum_name
+                    #        tooltip:        oro.entity_extend.enum_name.tooltip
 
                 # indicates whether an enum is public or not
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page
@@ -430,16 +431,17 @@ oro_entity_config:
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
-                    form:
-                        type:               oro_entity_extend_enum_public
-                        options:
-                            block:          general
-                            subblock:       properties
-                            required:       false
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
-                            label:          oro.entity_extend.enum_public
-                            tooltip:        oro.entity_extend.enum_public.tooltip
+                    # todo: this works properly, but we temporaty disable it untill a decision about UI is taken
+                    #form:
+                    #    type:               oro_entity_extend_enum_public
+                    #    options:
+                    #        block:          general
+                    #        subblock:       properties
+                    #        required:       false
+                    #        choices:        ['No', 'Yes']
+                    #        empty_value:    false
+                    #        label:          oro.entity_extend.enum_public
+                    #        tooltip:        oro.entity_extend.enum_public.tooltip
 
                 # the list of enum values
                 # this is a temprary attribute is used to allow create/edit an enum on a field edit page

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -111,13 +110,18 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
             return;
         }
 
-        $data         = $event->getData();
-        $enumConfig   = $configModel->toArray('enum');
+        $data       = $event->getData();
+        $enumConfig = $configModel->toArray('enum');
 
         $enumName = $this->getValue($data['enum'], 'enum_name');
         $enumCode = $this->getValue($enumConfig, 'enum_code');
-        if (empty($enumCode) && $enumName !== null) {
-            $enumCode = ExtendHelper::buildEnumCode($enumName);
+        if (empty($enumCode)) {
+            $enumCode = $enumName !== null
+                ? ExtendHelper::buildEnumCode($enumName)
+                : ExtendHelper::generateEnumCode(
+                    $configModel->getEntity()->getClassName(),
+                    $configModel->getFieldName()
+                );
         }
 
         $locale             = $this->translator->getLocale();

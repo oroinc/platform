@@ -320,6 +320,89 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider enumTypeProvider
      */
+    public function testPostSubmitForNewEnumWithoutNameAndPublic($dataType)
+    {
+        $entityClassName    = 'Test\Entity';
+        $fieldName          = 'testField';
+        $enumCode           = ExtendHelper::generateEnumCode($entityClassName, $fieldName);
+        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $locale             = 'fr';
+
+        $entityConfigModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityConfigModel->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue($entityClassName));
+
+        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configModel->expects($this->never())
+            ->method('getId');
+        $configModel->expects($this->once())
+            ->method('getType')
+            ->will($this->returnValue($dataType));
+        $configModel->expects($this->once())
+            ->method('getEntity')
+            ->will($this->returnValue($entityConfigModel));
+        $configModel->expects($this->once())
+            ->method('getFieldName')
+            ->will($this->returnValue($fieldName));
+
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+
+        $event = $this->getFormEventMock($configModel, $form);
+
+        $enumOptions   = [
+            ['id' => 'test', 'label' => 'test']
+        ];
+        $submittedData = [
+            'enum' => [
+                'enum_options' => $enumOptions
+            ]
+        ];
+        $expectedData  = [
+            'enum' => [
+                'enum_options' => $enumOptions,
+                'enum_locale'  => $locale
+            ]
+        ];
+
+        $event->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($submittedData));
+        $configModel->expects($this->once())
+            ->method('toArray')
+            ->with('enum')
+            ->will($this->returnValue([]));
+
+        $this->translator->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue($locale));
+        $enumConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('enum')
+            ->will($this->returnValue($enumConfigProvider));
+        $enumConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($enumValueClassName)
+            ->will($this->returnValue(false));
+
+        $event->expects($this->once())
+            ->method('setData')
+            ->with($expectedData);
+
+        $this->extension->postSubmit($event);
+    }
+
+    /**
+     * @dataProvider enumTypeProvider
+     */
     public function testPostSubmitForExistingEnum($dataType)
     {
         $enumCode           = 'test_enum';

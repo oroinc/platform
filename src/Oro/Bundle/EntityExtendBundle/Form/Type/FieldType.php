@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -11,7 +10,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -24,7 +22,6 @@ class FieldType extends AbstractType
     const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
     const GROUP_FIELDS                   = 'fields';
     const GROUP_RELATIONS                = 'relations';
-    const GROUP_DICTIONARIES             = 'dictionaries';
 
     protected $types = [
         self::GROUP_FIELDS       => [
@@ -35,22 +32,21 @@ class FieldType extends AbstractType
             'boolean',
             'decimal',
             'date',
+            'datetime',
             'text',
             'float',
             'money',
             'percent',
             'file',
             'image',
+            'optionSet',
+            'enum',
+            'multiEnum',
         ],
         self::GROUP_RELATIONS    => [
             'oneToMany',
             'manyToOne',
             'manyToMany',
-        ],
-        self::GROUP_DICTIONARIES => [
-            'optionSet',
-            'enum',
-            'multiEnum',
         ],
     ];
 
@@ -106,13 +102,12 @@ class FieldType extends AbstractType
         if (!empty($originalFieldNames)) {
             $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
-        $publicEnumTypes = $this->getPublicEnumTypes();
 
         $builder->add(
             'type',
             'genemu_jqueryselect2_choice',
             [
-                'choices'     => $this->getFieldTypeChoices($reverseRelationTypes, $publicEnumTypes),
+                'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'empty_value' => '',
                 'block'       => 'general',
                 'configs'     => [
@@ -154,13 +149,12 @@ class FieldType extends AbstractType
 
     /**
      * @param array $reverseRelationTypes
-     * @param array $publicEnumTypes
      *
      * @return array
      */
-    protected function getFieldTypeChoices($reverseRelationTypes, $publicEnumTypes)
+    protected function getFieldTypeChoices($reverseRelationTypes)
     {
-        $fieldTypes = $relationTypes = $dictionaryTypes = [];
+        $fieldTypes = $relationTypes = [];
 
         foreach ($this->types[self::GROUP_FIELDS] as $type) {
             $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
@@ -168,27 +162,18 @@ class FieldType extends AbstractType
         foreach ($this->types[self::GROUP_RELATIONS] as $type) {
             $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        foreach ($this->types[self::GROUP_DICTIONARIES] as $type) {
-            $dictionaryTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
 
         uasort($fieldTypes, 'strcasecmp');
         uasort($relationTypes, 'strcasecmp');
-        uasort($dictionaryTypes, 'strcasecmp');
 
         if (!empty($reverseRelationTypes)) {
             uasort($reverseRelationTypes, 'strcasecmp');
             $relationTypes = array_merge($relationTypes, $reverseRelationTypes);
         }
-        if (!empty($publicEnumTypes)) {
-            uasort($publicEnumTypes, 'strcasecmp');
-            $dictionaryTypes = array_merge($dictionaryTypes, $publicEnumTypes);
-        }
 
         $result = [
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)       => $fieldTypes,
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS)    => $relationTypes,
-            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_DICTIONARIES) => $dictionaryTypes
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)    => $fieldTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS) => $relationTypes,
         ];
 
         return $result;
@@ -290,40 +275,5 @@ class FieldType extends AbstractType
         }
 
         return true;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getPublicEnumTypes()
-    {
-        $extendProvider = $this->configManager->getProvider('extend');
-        $entityConfigs  = $extendProvider->getConfigs(null, true);
-
-        $enumProvider = $this->configManager->getProvider('enum');
-
-        $result = [];
-        foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
-                continue;
-            }
-            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
-                continue;
-            }
-
-            $className  = $entityConfig->getId()->getClassName();
-            $enumConfig = $enumProvider->getConfig($className);
-            if (!$enumConfig->is('public')) {
-                continue;
-            }
-
-            $enumCode     = $enumConfig->get('code');
-            $key          = ($enumConfig->is('multiple') ? 'multiEnum' : 'enum'). '||' . $enumCode;
-            $result[$key] = $this->translator->trans(
-                ExtendHelper::getEnumTranslationKey('label', $enumCode)
-            );
-        }
-
-        return $result;
     }
 }

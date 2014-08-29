@@ -26,7 +26,6 @@ class FieldTypeReverseRelationTest extends TypeTestCase
 {
     const FIELDS_GROUP       = 'oro.entity_extend.form.data_type_group.fields';
     const RELATIONS_GROUP    = 'oro.entity_extend.form.data_type_group.relations';
-    const DICTIONARIES_GROUP = 'oro.entity_extend.form.data_type_group.dictionaries';
 
     /** @var  FieldType $type */
     protected $type;
@@ -42,29 +41,28 @@ class FieldTypeReverseRelationTest extends TypeTestCase
 
     protected $defaultFieldTypeChoices = [
         self::FIELDS_GROUP       => [
-            'bigint'   => 'oro.entity_extend.form.data_type.bigint',
-            'boolean'  => 'oro.entity_extend.form.data_type.boolean',
-            'date'     => 'oro.entity_extend.form.data_type.date',
-            'decimal'  => 'oro.entity_extend.form.data_type.decimal',
-            'file'     => 'oro.entity_extend.form.data_type.file',
-            'float'    => 'oro.entity_extend.form.data_type.float',
-            'image'    => 'oro.entity_extend.form.data_type.image',
-            'integer'  => 'oro.entity_extend.form.data_type.integer',
-            'money'    => 'oro.entity_extend.form.data_type.money',
-            'percent'  => 'oro.entity_extend.form.data_type.percent',
-            'smallint' => 'oro.entity_extend.form.data_type.smallint',
-            'string'   => 'oro.entity_extend.form.data_type.string',
-            'text'     => 'oro.entity_extend.form.data_type.text',
+            'bigint'    => 'oro.entity_extend.form.data_type.bigint',
+            'boolean'   => 'oro.entity_extend.form.data_type.boolean',
+            'date'      => 'oro.entity_extend.form.data_type.date',
+            'datetime'  => 'oro.entity_extend.form.data_type.datetime',
+            'decimal'   => 'oro.entity_extend.form.data_type.decimal',
+            'enum'      => 'oro.entity_extend.form.data_type.enum',
+            'file'      => 'oro.entity_extend.form.data_type.file',
+            'float'     => 'oro.entity_extend.form.data_type.float',
+            'image'     => 'oro.entity_extend.form.data_type.image',
+            'integer'   => 'oro.entity_extend.form.data_type.integer',
+            'money'     => 'oro.entity_extend.form.data_type.money',
+            'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
+            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
+            'percent'   => 'oro.entity_extend.form.data_type.percent',
+            'smallint'  => 'oro.entity_extend.form.data_type.smallint',
+            'string'    => 'oro.entity_extend.form.data_type.string',
+            'text'      => 'oro.entity_extend.form.data_type.text',
         ],
         self::RELATIONS_GROUP    => [
             'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
             'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
             'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
-        ],
-        self::DICTIONARIES_GROUP => [
-            'enum'      => 'oro.entity_extend.form.data_type.enum',
-            'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
-            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
         ],
     ];
 
@@ -245,12 +243,6 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             ->method('getConfigById')
             ->with($config['targetFieldId'])
             ->will($this->returnValue($entityConfigMockTarget));
-
-        // to skip public enums
-        $configProviderMock->expects($this->any())
-            ->method('getConfigs')
-            ->with(null, true)
-            ->will($this->returnValue([]));
 
         $this->configManagerMock->expects($this->any())
             ->method('getProvider')

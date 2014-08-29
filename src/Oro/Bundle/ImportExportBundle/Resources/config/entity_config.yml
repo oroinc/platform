@@ -31,18 +31,7 @@ oro_entity_config:
                 # is filed will be used to find existing entity
                 identity:
                     options:
-                        allowed_type: 
-                            - string
-                            - integer
-                            - smallint
-                            - bigint
-                            - boolean
-                            - decimal
-                            - date
-                            - text
-                            - float
-                            - money
-                            - percent
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
                     form:
                         type:               choice
                         options:

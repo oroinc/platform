@@ -93,28 +93,25 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 );
                 $enumCode           = $enumFieldConfig->get('enum_code');
                 $enumName           = $enumFieldConfig->get('enum_name');
-                if (empty($enumCode) && empty($enumName)) {
+                $isPublic           = $enumFieldConfig->get('enum_public');
+                if (empty($enumCode) && $isPublic && empty($enumName)) {
                     throw new \LogicException(
                         sprintf(
-                            'Both "enum_code" and "enum_name" cannot be empty. Field: %s::%s.',
+                            'Both "enum_code" and "enum_name" cannot be empty for a public enum. Field: %s::%s.',
                             $fieldConfigId->getClassName(),
                             $fieldConfigId->getFieldName()
                         )
                     );
                 }
                 if (empty($enumCode)) {
-                    $enumCode                          = ExtendHelper::buildEnumCode($enumName);
-                    $fieldOptions['enum']['enum_code'] = $enumCode;
-                }
-                $isPublic = $enumFieldConfig->get('enum_public');
-                if (!empty($enumName) && $isPublic === null) {
-                    throw new \LogicException(
-                        sprintf(
-                            '"enum_public" cannot be empty if "enum_name" is specified. Field: %s::%s.',
+                    $enumCode = $enumName !== null
+                        ? ExtendHelper::buildEnumCode($enumName)
+                        : ExtendHelper::generateEnumCode(
                             $fieldConfigId->getClassName(),
                             $fieldConfigId->getFieldName()
-                        )
-                    );
+                        );
+
+                    $fieldOptions['enum']['enum_code'] = $enumCode;
                 }
                 $isMultiple         = $this->fieldTypeHelper->getUnderlyingType($fieldType) === 'manyToMany';
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
@@ -256,7 +253,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 'extend'     => [
                     'owner'     => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
-                    'table'     => $this->nameGenerator->generateEnumTableName($enumCode),
+                    'table'     => $this->nameGenerator->generateEnumTableName($enumCode, true),
                     'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
                 ],
                 'grouping'   => [

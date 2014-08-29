@@ -54,13 +54,13 @@
 
                 var reindex_values = function() {
                     var index = 1;
-                    $('#{{ context.id }} input.priority').each(function(i, el){
+                    $('#{{ context.id }} [name$="[priority]"]').each(function(i, el){
                         $(el).val(index++);
                     })
                 };
 
-                $(document).ready(reindex_values);
-                $(document).on('click', 'a.add-list-item', reindex_values);
+                reindex_values();
+                container.parent().on('click', 'a.add-list-item', reindex_values);
             });
         });
     </script>
