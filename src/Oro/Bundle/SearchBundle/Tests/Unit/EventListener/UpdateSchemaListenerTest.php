@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener;
+use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 
 class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,11 +26,6 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $output;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $command;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -79,7 +75,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
         $command = $this->getMock('Oro\Bundle\SearchBundle\Command\IndexCommand', ['execute']);
 
         $this->eventMock
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('getCommand')
             ->will($this->returnValue($command));
 
@@ -99,7 +95,7 @@ class UpdateSchemaListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->eventMock
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('getCommand')
             ->will($this->returnValue($this->doctrineCommand));
 

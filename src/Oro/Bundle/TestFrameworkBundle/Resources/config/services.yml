@@ -1,4 +1,12 @@
 parameters:
     test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
+    oro_test.event_listener.update_schema_listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\UpdateSchemaListener
 
+services:
+    oro_test.event_listener.update_schema_listener:
+        class: %oro_test.event_listener.update_schema_listener.class%
+        arguments:
+            - @kernel
+        tags:
+            - { name: kernel.event_listener, event: console.terminate }

@@ -5,6 +5,7 @@ Client Side Architecture
  * [Application](#application)
  * [App Modules](#app-modules)
  * [Page Controller](#page-controller)
+ * [Page Component](#page-component)
 
 ## Chaplin
 
@@ -144,3 +145,7 @@ Event Name | Arguments
 `'page:beforeError'` | `xhr`, `payload`
 `'page:error'` | `pageData`, `actionArgs`, `xhr`
 
+## Page Component
+Because our appproach is a "Blocks-Driven" application (meaning that one controller for all routes and loaded page-content consists of self-sufficient blocks), we introduce the new kind of entity that takes responsibility for initializing views, binding them with app's environment and disposing them at the appropriate time. Basically it performs the job of the controller and any page may contain mulitple components like this.
+
+For additional details please read [Page Component](./page-component.md).
