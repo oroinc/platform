@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -13,58 +15,56 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 class Orm extends AbstractEngine
 {
     const BATCH_SIZE = 1000;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var SearchIndexRepository
      */
-    protected $searchRepo;
+    protected $indexRepository;
 
     /**
      * @var ObjectMapper
      */
     protected $mapper;
 
-    public function __construct(
-        EntityManager $em,
-        EventDispatcher $dispatcher,
-        ContainerInterface $container,
-        ObjectMapper $mapper,
-        $logQueries
-    ) {
-        parent::__construct($em, $dispatcher, $logQueries);
+    /**
+     * @var array
+     */
+    protected $drivers = array();
 
-        $this->container = $container;
-        $this->mapper    = $mapper;
+    /**
+     * @var bool
+     */
+    protected $needFlush = true;
+
+    /**
+     * @param array $drivers
+     */
+    public function setDrivers(array $drivers)
+    {
+        $this->drivers = $drivers;
     }
 
     /**
-     * Reload search index
-     *
-     * @return int Count of index records
+     * {@inheritdoc}
      */
-    public function reindex()
+    public function reindex($class = null)
     {
-        //clear old index
-        $this->clearSearchIndex();
+        if (null === $class) {
+            $this->clearAllSearchIndexes();
+            $entityNames = $this->mapper->getEntities();
+        } else {
+            $this->clearSearchIndexForEntity($class);
+            $entityNames = array($class);
+        }
 
-        //index data by mapping config
+        // index data by mapping config
         $recordsCount = 0;
-        $entities     = $this->mapper->getEntities();
 
-        while ($entityName = array_shift($entities)) {
-            $itemsCount    = $this->reindexSingleEntity($entityName);
+        while ($class = array_shift($entityNames)) {
+            $itemsCount    = $this->reindexSingleEntity($class);
             $recordsCount += $itemsCount;
         }
 
@@ -77,168 +77,159 @@ class Orm extends AbstractEngine
      */
     protected function reindexSingleEntity($entityName)
     {
-        $itemsCount   = 0;
-        $queryBuilder = $this->em->getRepository($entityName)->createQueryBuilder('entity');
-
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getRepository($entityName);
+        $queryBuilder = $entityManager->createQueryBuilder('entity');
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);
 
+        $itemsCount = 0;
+        $entities = array();
+
         foreach ($iterator as $entity) {
-            if (null !== $this->save($entity, true)) {
-                $itemsCount++;
-            }
+            $entities[] = $entity;
+            $itemsCount++;
 
             if (0 == $itemsCount % self::BATCH_SIZE) {
-                $this->em->flush();
-                $this->em->clear();
+                $this->save($entities, true);
+                $entities[] = array();
             }
         }
 
         if ($itemsCount % self::BATCH_SIZE > 0) {
-            $this->em->flush();
-            $this->em->clear();
+            $this->save($entities, true);
         }
 
         return $itemsCount;
     }
 
     /**
-     * Delete record from index
-     *
-     * @param object $entity   Entity to be removed from index
-     * @param bool   $realtime [optional] Perform immediate insert/update to
-     *                              search attributes table(s). True by default.
-     * @return bool|int Index item id on success, false otherwise
+     * {@inheritdoc}
      */
-    public function delete($entity, $realtime = true)
+    public function delete($entity, $realTime = true)
     {
-        $item = $this->getIndexRepo()->findOneBy(
-            array(
-                'entity'   => ClassUtils::getRealClass($entity),
-                'recordId' => $entity->getId()
-            )
-        );
-
-        if ($item) {
-            $id = $item->getId();
-
-            if ($realtime) {
-                $this->em->remove($item);
-            } else {
-                $item->setChanged(!$realtime);
-                $this->reindexJob();
-                $this->em->persist($item);
-            }
-
-            return $id;
+        $entities = $this->getEntitiesArray($entity);
+        if (!$entities) {
+            return false;
         }
 
-        return false;
+        if (!$realTime) {
+            $this->scheduleIndexation($entities);
+            return true;
+        }
+
+        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
+
+        $hasDeletedEntities = !empty($existingItems);
+        foreach ($existingItems as $items) {
+            foreach ($items as $item) {
+                $itemEntityManager->remove($item);
+            }
+        }
+
+        if ($hasDeletedEntities && $this->needFlush) {
+            $this->flush();
+        }
+
+        return $hasDeletedEntities;
     }
 
     /**
-     * Insert or update record
-     *
-     * @param object $entity   New/updated entity
-     * @param bool   $realtime [optional] Perform immediate insert/update to
-     *                              search attributes table(s). True by default.
-     * @param bool   $needToCompute
-     * @return Item Index item on success, null otherwise
+     * {@inheritdoc}
      */
-    public function save($entity, $realtime = true, $needToCompute = false)
+    public function save($entity, $realTime = true)
     {
-        $data = $this->mapper->mapObject($entity);
-        if (empty($data)) {
-            return null;
+        $entities = $this->getEntitiesArray($entity);
+        if (!$entities) {
+            return false;
         }
 
-        $name = ClassUtils::getRealClass($entity);
-        $entityMeta = $this->em->getClassMetadata($name);
-        $identifierField = $entityMeta->getSingleIdentifierFieldName($entityMeta);
-        $id = $entityMeta->getReflectionProperty($identifierField)->getValue($entity);
-
-        $item = null;
-        if ($id) {
-            $item = $this->getIndexRepo()->findOneBy(
-                array(
-                    'entity'   => $name,
-                    'recordId' => $id
-                )
-            );
+        if (!$realTime) {
+            $this->scheduleIndexation($entities);
+            return true;
         }
 
-        if (!$item) {
-            $item   = new Item();
-            $config = $this->mapper->getEntityConfig($name);
-            $alias  = $config ? $config['alias'] : $name;
+        $hasSavedEntities = $this->saveItemData($entities);
 
-            $item->setEntity($name)
-                 ->setRecordId($id)
-                 ->setAlias($alias);
+        if ($hasSavedEntities && $this->needFlush) {
+            $this->flush();
         }
 
-        $item->setChanged(!$realtime);
+        return $hasSavedEntities;
+    }
 
-        if ($realtime) {
+    /**
+     * @param array $entities
+     * @return bool
+     */
+    protected function saveItemData(array $entities)
+    {
+        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
+
+        $hasSavedEntities = false;
+        foreach ($entities as $entity) {
+            $data = $this->mapper->mapObject($entity);
+            if (empty($data)) {
+                continue;
+            }
+
+            $class = $this->doctrineHelper->getEntityClass($entity);
+            $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+            $item = null;
+            if ($id && !empty($existingItems[$class][$id])) {
+                $item = $existingItems[$class][$id];
+            }
+
+            if (!$item) {
+                $item   = new Item();
+                $config = $this->mapper->getEntityConfig($class);
+                $alias  = $config ? $config['alias'] : $class;
+
+                $item->setEntity($class)
+                    ->setRecordId($id)
+                    ->setAlias($alias);
+            }
+
             $item->setTitle($this->getEntityTitle($entity))
+                ->setChanged(false)
                 ->saveItemData($data);
-        } else {
-            $this->reindexJob();
+
+            $itemEntityManager->persist($item);
+
+            $hasSavedEntities = true;
         }
 
-        $this->em->persist($item);
-
-        if ($needToCompute) {
-            $this->computeSet($item);
-        }
-
-        return $item;
+        return $hasSavedEntities;
     }
 
     /**
-     * @return \Oro\Bundle\SearchBundle\Engine\ObjectMapper
+     * @param bool $needFlush
      */
-    public function getMapper()
+    public function setNeedFlush($needFlush)
     {
-        return $this->mapper;
+        $this->needFlush = $needFlush;
     }
 
     /**
-     * Get entity string
-     *
-     * @param object $entity
-     *
-     * @return string
+     * Flush entity manager entities
      */
-    public function getEntityTitle($entity)
+    public function flush()
     {
-        $entityClass = ClassUtils::getRealClass($entity);
-        if ($this->mapper->getEntityMapParameter($entityClass, 'title_fields')) {
-            $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
-            $title = array();
-            foreach ($fields as $field) {
-                $title[] = $this->mapper->getFieldValue($entity, $field);
-            }
-        } else {
-            $title = array((string) $entity);
-        }
-
-        return implode(' ', $title);
+        $this->registry->getManager()->flush();
     }
 
     /**
-     * Search query with query builder
-     *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
-     *
-     * @return array
+     * {@inheritdoc}
      */
     protected function doSearch(Query $query)
     {
         $results = array();
-        $searchResults = $this->getIndexRepo()->search($query);
+        $searchResults = $this->getIndexRepository()->search($query);
         if (($query->getMaxResults() > 0 || $query->getFirstResult() > 0)) {
-            $recordsCount = $this->getIndexRepo()->getRecordsCount($query);
+            $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
         } else {
             $recordsCount = count($searchResults);
         }
@@ -247,9 +238,9 @@ class Orm extends AbstractEngine
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
-                /** @var $item \Oro\Bundle\SearchBundle\Entity\Item  */
+                /** @var $item Item  */
                 $results[] = new ResultItem(
-                    $this->em,
+                    $this->registry->getManagerForClass($item->getEntity()),
                     $item->getEntity(),
                     $item->getRecordId(),
                     $item->getTitle(),
@@ -267,47 +258,76 @@ class Orm extends AbstractEngine
     }
 
     /**
-     * Add reindex task to job queue if it has not been added earlier
+     * {@inheritdoc}
      */
-    protected function reindexJob()
+    protected function scheduleIndexation($entity)
     {
-        // check if reindex task has not been added earlier
-        $command = 'oro:search:index';
-        $currJob = $this->em
-            ->createQuery("SELECT j FROM JMSJobQueueBundle:Job j WHERE j.command = :command AND j.state <> :state")
-            ->setParameter('command', $command)
-            ->setParameter('state', Job::STATE_FINISHED)
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+        $entityManager = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
 
-        if (!$currJob) {
-            $job = new Job($command);
+        $jobs = $this->createQueueJobs($entity);
+        if ($jobs) {
+            foreach ($jobs as $job) {
+                $entityManager->persist($job);
+            }
 
-            $this->em->persist($job);
+            if ($this->needFlush) {
+                $entityManager->flush();
+            }
         }
     }
 
     /**
      * Get search index repository
      *
-     * @return \Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository
+     * @return SearchIndexRepository
      */
-    protected function getIndexRepo()
+    protected function getIndexRepository()
     {
-        if (!is_object($this->searchRepo)) {
-            $this->searchRepo = $this->em->getRepository('OroSearchBundle:Item');
-            $this->searchRepo->setDriversClasses($this->container->getParameter('oro_search.engine_orm'));
+        if (!$this->indexRepository) {
+            $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
+            $this->indexRepository->setDriversClasses($this->drivers);
         }
 
-        return $this->searchRepo;
+        return $this->indexRepository;
+    }
+
+    /**
+     * Clear search all search indexes or for custom entity
+     *
+     * @param string $entityName
+     */
+    protected function clearSearchIndexForEntity($entityName)
+    {
+        $itemsCount    = 0;
+        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+        $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')
+            ->where('item.entity = :entity')
+            ->setParameter('entity', $entityName);
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(self::BATCH_SIZE);
+
+        foreach ($iterator as $entity) {
+            $itemsCount++;
+            $entityManager->remove($entity);
+
+            if (0 == $itemsCount % self::BATCH_SIZE) {
+                $entityManager->flush();
+            }
+        }
+
+        if ($itemsCount % self::BATCH_SIZE > 0) {
+            $entityManager->flush();
+        }
     }
 
     /**
      * Truncate search tables
      */
-    protected function clearSearchIndex()
+    protected function clearAllSearchIndexes()
     {
-        $connection = $this->em->getConnection();
+        /** @var Connection $connection */
+        $connection = $this->registry->getConnection();
         $dbPlatform = $connection->getDatabasePlatform();
         $connection->beginTransaction();
         try {
@@ -322,50 +342,20 @@ class Orm extends AbstractEngine
         } catch (\Exception $e) {
             $connection->rollback();
         }
-
     }
 
     /**
      * Truncate query for table
      *
-     * @param $dbPlatform
-     * @param $connection
-     * @param $table
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     * @param string $entityName
      */
-    protected function truncate($dbPlatform, $connection, $table)
+    protected function truncate(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
     {
-        $cmd = $this->em->getClassMetadata($table);
-        $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
-        $connection->executeUpdate($q);
-    }
-
-    /**
-     * @param Item $item
-     */
-    protected function computeSet(Item $item)
-    {
-        $this->em->getUnitOfWork()->computeChangeSet(
-            $this->em->getClassMetadata(DoctrineClassUtils::getClass($item)),
-            $item
-        );
-        $this->computeFields($item->getTextFields());
-        $this->computeFields($item->getIntegerFields());
-        $this->computeFields($item->getDatetimeFields());
-        $this->computeFields($item->getDecimalFields());
-    }
-
-    /**
-     * @param array $fields
-     */
-    protected function computeFields($fields)
-    {
-        if (count($fields)) {
-            foreach ($fields as $field) {
-                $this->em->getUnitOfWork()->computeChangeSet(
-                    $this->em->getClassMetadata(DoctrineClassUtils::getClass($field)),
-                    $field
-                );
-            }
-        }
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->registry->getManagerForClass($entityName)->getClassMetadata($entityName);
+        $query = $dbPlatform->getTruncateTableSql($metadata->getTableName());
+        $connection->executeUpdate($query);
     }
 }

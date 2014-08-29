@@ -122,7 +122,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $client = self::$clientInstance = static::createClient($options, $server);
 
             if (self::getDbIsolationSetting()) {
-                //This is a workaround for MyISAM search tables that are not transactionanl
+                //This is a workaround for MyISAM search tables that are not transactional
                 if (self::getDbReindexSetting()) {
                     self::getContainer()->get('oro_search.search.engine')->reindex();
                 }

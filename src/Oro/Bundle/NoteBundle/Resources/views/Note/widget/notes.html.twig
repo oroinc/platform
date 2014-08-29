@@ -53,11 +53,13 @@
                     entityClass: oro_class_name(entity, true), entityId: entity.id
                 }))
             } %}
-            {% include 'OroNoteBundle:Note:js/list.js.twig' with {'id': 'template-note-list'} %}
-            {% include 'OroNoteBundle:Note:js/view.js.twig' with {'id': 'template-note-item'} %}
+
             <div class="container-fluid accordion"
                 data-page-component-module="oronote/js/app/components/notes-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
+
+            {% include 'OroNoteBundle:Note:js/list.js.twig' with {'id': 'template-note-list'} %}
+            {% include 'OroNoteBundle:Note:js/view.js.twig' with {'id': 'template-note-item'} %}
         {% endblock %}
     {% endblock %}
 </div>
