@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -25,6 +26,6 @@ class OroIntegrationBundle implements Migration
     public static function modifyChannelTable(Schema $schema)
     {
         $table = $schema->getTable('oro_integration_channel');
-        $table->addColumn('edit_mode', 'integer', ['notnull' => true]);
+        $table->addColumn('edit_mode', 'integer', ['notnull' => true, 'default' => Channel::EDIT_MODE_ALLOW]);
     }
 }
