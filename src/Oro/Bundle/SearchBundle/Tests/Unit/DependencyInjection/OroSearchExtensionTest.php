@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
@@ -34,27 +35,30 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadWithConfigInFiles()
     {
         $searchExtension = new OroSearchExtension();
+
         $config = array(
             'oro_search' => array(
-                'engine'          => 'orm',
+                'engine'          => 'some-engine',
                 'realtime_update' => true
             )
         );
+
         $searchExtension->load($config, $this->container);
     }
 
     public function testLoadWithConfigPaths()
     {
         $searchExtension = new OroSearchExtension();
+
         $config = array(
             'oro_search' => array(
-                'engine'          => 'orm',
+                'engine'          => 'some-engine',
                 'realtime_update' => true,
                 'entities_config' => array(
                     'Oro\Bundle\DataBundle\Entity\Product' => array(
-                        'alias'             => 'test_alias',
-                        'search_template'   => 'test_template',
-                        'fields'            => array(
+                        'alias'           => 'test_alias',
+                        'search_template' => 'test_template',
+                        'fields'          => array(
                             array(
                                 'name'          => 'name',
                                 'target_type'   => 'string',
@@ -65,6 +69,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
+
         $searchExtension->load($config, $this->container);
     }
 
@@ -73,11 +78,12 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $searchExtension = new OroSearchExtension();
         $config = array(
             'oro_search' => array(
-                'engine'          => 'orm',
-                'realtime_update' => true,
-                'engine_orm'      => array('pro_pgSql')
+                'engine'          => Configuration::DEFAULT_ENGINE,
+                'realtime_update' => true
             )
         );
+
+        $this->container->setParameter('oro_search.drivers', array('pro_pgSql'));
         $searchExtension->load($config, $this->container);
     }
 }
