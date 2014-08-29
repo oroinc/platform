@@ -18,7 +18,7 @@ oro_entity_config:
                 # this attribute can be used to prohibit changing activity state (no matter whether
                 # it is enabled or not) for the entity
                 # if TRUE than no one activity state can be changed
-                # also it can be an array with the list of activities which state cannot be changed
+                # also it can be an array with the list of class names of activities which state cannot be changed
                 immutable: # boolean or array
                     options:
                         auditable:          false

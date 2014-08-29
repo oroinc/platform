@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
@@ -30,8 +31,8 @@ class CollectionType extends AbstractType
         $view->vars = array_replace(
             $view->vars,
             [
-                'show_form_when_empty' => $options['show_form_when_empty'] && $options['can_add_and_delete'],
-                'can_add_and_delete'   => $options['can_add_and_delete']
+                'handle_primary'       => $options['handle_primary'],
+                'show_form_when_empty' => $options['show_form_when_empty']
             ]
         );
     }
@@ -43,18 +44,24 @@ class CollectionType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'allow_add'                => true,
-                'allow_delete'             => true,
-                'by_reference'             => false,
-                'prototype'                => true,
-                'prototype_name'           => '__name__',
-                'extra_fields_message'     => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'ignore_primary_behaviour' => false,
-                'show_form_when_empty'     => true,
-                'can_add_and_delete'       => true
+                'allow_add'            => true,
+                'allow_delete'         => true,
+                'by_reference'         => false,
+                'prototype'            => true,
+                'prototype_name'       => '__name__',
+                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'handle_primary'       => true,
+                'show_form_when_empty' => true
             ]
         );
         $resolver->setRequired(['type']);
+        $resolver->setNormalizers(
+            [
+                'show_form_when_empty' => function (Options $options, $value) {
+                    return !$options['allow_add'] ? false : $value;
+                }
+            ]
+        );
     }
 
     /**

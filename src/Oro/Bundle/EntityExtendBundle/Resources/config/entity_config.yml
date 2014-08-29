@@ -387,7 +387,12 @@ oro_entity_config:
                 # public flag
                 # it means that values cannot be added or deleted, but it is still possible
                 # to update name of existing values, reorder them and change default values
-                immutable: # boolean
+                # examples of possible values:
+                #   false or empty array - no any restrictions
+                #   true - means that all constraints are applied, so it will not be allowed to add/delete options and change 'public' flag
+                #   ['add', 'delete', 'public']  - the same as true; it will not be allowed to add/delete options and change 'public' flag
+                #   ['delete'] - it is not allowed to delete options, but new options can be added and 'public' can be changed
+                immutable: # boolean or array
                     options:
                         auditable:          false
 

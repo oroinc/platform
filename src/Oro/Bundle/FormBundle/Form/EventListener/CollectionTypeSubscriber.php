@@ -90,7 +90,7 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
      */
     protected function hasPrimaryBehaviour(FormEvent $event)
     {
-        if ($event->getForm()->getConfig()->getOption('ignore_primary_behaviour')) {
+        if (!$event->getForm()->getConfig()->getOption('handle_primary')) {
             return false;
         }
         /** @var FormInterface $child */

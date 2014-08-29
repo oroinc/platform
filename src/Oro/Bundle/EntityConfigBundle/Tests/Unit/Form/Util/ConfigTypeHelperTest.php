@@ -136,7 +136,7 @@ class ConfigTypeHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider isImmutableProvider
      */
-    public function testIsImmutable($value, $expected, $fieldName = null)
+    public function testIsImmutable($value, $expected, $fieldName = null, $constraintName = null)
     {
         $scope     = 'test_scope';
         $className = 'Test\Entity';
@@ -165,21 +165,35 @@ class ConfigTypeHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $expected,
-            $this->typeHelper->isImmutable($scope, $className, $fieldName)
+            $this->typeHelper->isImmutable($scope, $className, $fieldName, $constraintName)
         );
     }
 
     public function isImmutableProvider()
     {
         return [
-            [true, true, null],
-            [false, false, null],
-            [null, false, null],
-            [['val1', 'val2'], false, null],
-            [true, true, 'testField'],
-            [false, false, 'testField'],
-            [null, false, 'testField'],
-            [['val1', 'val2'], false, 'testField'],
+            [true, true, null, null],
+            [true, true, null, 'val1'],
+            [false, false, null, null],
+            [false, false, null, 'val1'],
+            [null, false, null, null],
+            [null, false, null, 'val1'],
+            [[], false, null, null],
+            [[], false, null, 'val1'],
+            [['val1', 'val2'], false, null, null],
+            [['val1', 'val2'], true, null, 'val2'],
+            [['val1'], false, null, 'val2'],
+            [true, true, 'testField', null],
+            [true, true, 'testField', 'val1'],
+            [false, false, 'testField', null],
+            [false, false, 'testField', 'val1'],
+            [null, false, 'testField', null],
+            [null, false, 'testField', 'val1'],
+            [[], false, 'testField', null],
+            [[], false, 'testField', 'val1'],
+            [['val1', 'val2'], false, 'testField', null],
+            [['val1', 'val2'], true, 'testField', 'val2'],
+            [['val1'], false, 'testField', 'val2'],
         ];
     }
 

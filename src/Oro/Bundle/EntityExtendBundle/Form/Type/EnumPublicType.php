@@ -89,8 +89,9 @@ class EnumPublicType extends AbstractType
                 // a new field reuses public enum
                 return true;
             }
-            if ($this->typeHelper->isImmutable('enum', ExtendHelper::buildEnumValueClassName($enumCode))) {
-                // an enum is immutable
+            $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+            if ($this->typeHelper->isImmutable('enum', $enumValueClassName, null, 'public')) {
+                // is immutable
                 return true;
             }
             if ($this->typeHelper->hasOtherReferences($enumCode, $className, $fieldName)) {

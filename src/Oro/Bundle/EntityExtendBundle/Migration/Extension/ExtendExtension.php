@@ -114,15 +114,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
     /**
      * Creates a table that is used to store enum values for the enum with the given code.
      *
-     * @param Schema $schema
-     * @param string $enumCode    The unique identifier of an enum
-     * @param bool   $isMultiple  Indicates whether several options can be selected for this enum
-     *                            or it supports only one selected option
-     * @param bool   $isPublic    Indicates whether this enum can be used by any entity or
-     *                            it is designed to use in one entity only
-     * @param bool   $isImmutable Indicates whether the changing the list of enum values and
-     *                            public flag is allowed or not.
-     * @param array  $options
+     * @param Schema        $schema
+     * @param string        $enumCode   The unique identifier of an enum
+     * @param bool          $isMultiple Indicates whether several options can be selected for this enum
+     *                                  or it supports only one selected option
+     * @param bool          $isPublic   Indicates whether this enum can be used by any entity or
+     *                                  it is designed to use in one entity only
+     * @param bool|string[] $immutable  Indicates whether the changing the list of enum values and
+     *                                  public flag is allowed or not. More details can be found
+     *                                  in entity_config.yml
+     * @param array         $options
      *
      * @return Table A table that is used to store enum values
      *
@@ -135,7 +136,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $enumCode,
         $isMultiple = false,
         $isPublic = false,
-        $isImmutable = false,
+        $immutable = false,
         array $options = []
     ) {
         if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
@@ -179,7 +180,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ],
             $options
         );
-        if ($isImmutable) {
+        if ($immutable) {
             $options['enum']['immutable'] = true;
         }
 
@@ -249,15 +250,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Take in attention that this method creates new private enum if the enum with the given code
      * is not exist yet. If you want to create a public enum use {@link createEnum} method before.
      *
-     * @param Schema       $schema
-     * @param Table|string $table           A Table object or table name
-     * @param string       $associationName A relation name
-     * @param string       $enumCode        The target enum identifier
-     * @param bool         $isMultiple      Indicates whether several options can be selected for this enum
-     *                                      or it supports only one selected option
-     * @param bool         $isImmutable     Indicates whether the changing the list of enum values and
-     *                                      public flag is allowed or not.
-     * @param array        $options
+     * @param Schema        $schema
+     * @param Table|string  $table           A Table object or table name
+     * @param string        $associationName A relation name
+     * @param string        $enumCode        The target enum identifier
+     * @param bool          $isMultiple      Indicates whether several options can be selected for this enum
+     *                                       or it supports only one selected option
+     * @param bool|string[] $immutable       Indicates whether the changing the list of enum values and
+     *                                       public flag is allowed or not. More details can be found
+     *                                       in entity_config.yml
+     * @param array         $options
      */
     public function addEnumRelation(
         Schema $schema,
@@ -265,7 +267,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $enumCode,
         $isMultiple = false,
-        $isImmutable = false,
+        $immutable = false,
         array $options = []
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
@@ -273,7 +275,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $this->createEnum($schema, $enumCode, $isMultiple, false, $isImmutable);
+            $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
         }
 
         // create appropriate relation

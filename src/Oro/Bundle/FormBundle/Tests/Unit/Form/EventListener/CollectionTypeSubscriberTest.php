@@ -107,8 +107,8 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())->method('getConfig')
             ->will($this->returnValue($formConfig));
         $formConfig->expects($this->once())->method('getOption')
-            ->with('ignore_primary_behaviour')
-            ->will($this->returnValue(true));
+            ->with('handle_primary')
+            ->will($this->returnValue(false));
 
         $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
@@ -137,8 +137,8 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
         $form->expects($this->once())->method('getConfig')
             ->will($this->returnValue($formConfig));
         $formConfig->expects($this->once())->method('getOption')
-            ->with('ignore_primary_behaviour')
-            ->will($this->returnValue(false));
+            ->with('handle_primary')
+            ->will($this->returnValue(true));
 
         if ($checkIsNew) {
             $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');

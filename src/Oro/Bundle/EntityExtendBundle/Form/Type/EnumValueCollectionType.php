@@ -27,27 +27,32 @@ class EnumValueCollectionType extends AbstractType
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
             [
-                'ignore_primary_behaviour' => true,
-                'type'                     => 'oro_entity_extend_enum_value'
+                'handle_primary' => false,
+                'type'           => 'oro_entity_extend_enum_value'
             ]
         );
 
         $resolver->setNormalizers(
             [
-                'can_add_and_delete' => function (Options $options, $value) {
-                    return $this->getState($options) > 0 ? false : $value;
+                'disabled'          => function (Options $options, $value) {
+                    return $this->isDisabled($options) ? true : $value;
                 },
-                'disabled' => function (Options $options, $value) {
-                    return $this->getState($options) === 2 ? true : $value;
+                'allow_add'         => function (Options $options, $value) {
+                    return $options['disabled'] || $this->isDisabled($options, 'add') ? false : $value;
+                },
+                'allow_delete'      => function (Options $options, $value) {
+                    return $options['disabled'] || $this->isDisabled($options, 'delete') ? false : $value;
                 },
                 'validation_groups' => function (Options $options, $value) {
                     return $options['disabled'] ? false : $value;
-                }
+                },
             ]
         );
     }
@@ -61,40 +66,44 @@ class EnumValueCollectionType extends AbstractType
     }
 
     /**
-     * Checks if the form type should be read-only or not
+     * Checks if the given constraint is applied or not
      *
-     * @param Options $options
+     * @param Options     $options
+     * @param string|null $constraintName Can be: null, 'add', 'delete'
      *
-     * @return int 0 - no restrictions, 1 - cannot add/delete, 2 = read only
+     * @return bool
      */
-    protected function getState($options)
+    protected function isDisabled($options, $constraintName = null)
     {
         /** @var ConfigIdInterface $configId */
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
         if (empty($className)) {
-            return 0;
+            return false;
         }
 
         $fieldName = $this->typeHelper->getFieldName($configId);
         if (empty($fieldName)) {
-            return 0;
+            return false;
         }
 
         $enumCode = $this->typeHelper->getEnumCode($className, $fieldName);
         if (!empty($enumCode)) {
             if ($options['config_is_new']) {
                 // a new field reuses public enum
-                return 2;
+                return true;
             }
-            if ($this->typeHelper->isImmutable('enum', ExtendHelper::buildEnumValueClassName($enumCode))) {
-                // an enum is immutable
-                return 1;
+            if ($constraintName) {
+                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+                if ($this->typeHelper->isImmutable('enum', $enumValueClassName, null, $constraintName)) {
+                    // is immutable
+                    return true;
+                }
             }
         }
 
-        return 0;
+        return false;
     }
 
     /**

@@ -52,17 +52,31 @@ class ConfigTypeHelper
     }
 
     /**
-     * Checks if a config for the given entity/field is immutable
+     * Checks if a config for the given entity/field is immutable.
+     *
+     * Please take in account that if $constraintName is not specified this method returns TRUE
+     * only if all constraints are applied (in other words immutable equals TRUE),
+     * FALSE is returned if there are no any restrictions or only part of constraints are applied.
+     * More details can be found in corresponding entity_config.yml.
+     *
+     * To check a particular constraint you can use $constraintName parameter.
      *
      * @param string      $scope
      * @param string      $className
      * @param string|null $fieldName
+     * @param string|null $constraintName
      *
      * @return bool
      */
-    public function isImmutable($scope, $className, $fieldName = null)
+    public function isImmutable($scope, $className, $fieldName = null, $constraintName = null)
     {
-        return $this->getImmutable($scope, $className, $fieldName) === true;
+        $immutable = $this->getImmutable($scope, $className, $fieldName);
+
+        if (!empty($constraintName) && is_array($immutable)) {
+            return in_array($constraintName, $immutable);
+        }
+
+        return $immutable === true;
     }
 
     /**
@@ -72,7 +86,9 @@ class ConfigTypeHelper
      * @param string      $className
      * @param string|null $fieldName
      *
-     * @return mixed
+     * @return mixed The returned value depends on a scope, for example in some scopes it can be only boolean,
+     *               but other scopes can allow to use either boolean or array. More details can be found
+     *               in corresponding entity_config.yml
      */
     public function getImmutable($scope, $className, $fieldName = null)
     {
