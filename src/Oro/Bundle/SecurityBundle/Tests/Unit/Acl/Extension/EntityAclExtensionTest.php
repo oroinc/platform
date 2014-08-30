@@ -595,7 +595,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->user4,
                 $this->org4,
                 new TestEntity(1, $this->user3, $this->org4),
-                false
+                true
             ),
             array(
                 EntityMaskBuilder::MASK_VIEW_LOCAL,
@@ -623,7 +623,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->user4,
                 $this->org4,
                 new TestEntity(1, $this->user3, $this->org3),
-                false
+                true
             ),
             array(
                 EntityMaskBuilder::MASK_VIEW_BASIC,

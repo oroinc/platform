@@ -26,25 +26,19 @@ class ChannelType extends AbstractType
     /** @var IntegrationFormSubscriber */
     protected $integrationFormSubscriber;
 
-    /** @var IntegrationFormSubscriber */
-    protected $organizationSubscriber;
-
     /**
      * @param TypesRegistry              $registry
      * @param DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber
      * @param IntegrationFormSubscriber  $integrationFormSubscriber
-     * @param OrganizationSubscriber     $organizationSubscriber
      */
     public function __construct(
         TypesRegistry $registry,
         DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber,
-        IntegrationFormSubscriber $integrationFormSubscriber,
-        OrganizationSubscriber $organizationSubscriber
+        IntegrationFormSubscriber $integrationFormSubscriber
     ) {
         $this->registry                   = $registry;
         $this->defaultUserOwnerSubscriber = $defaultUserOwnerSubscriber;
         $this->integrationFormSubscriber  = $integrationFormSubscriber;
-        $this->organizationSubscriber     = $organizationSubscriber;
     }
 
     /**
@@ -54,7 +48,6 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber($this->integrationFormSubscriber);
         $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
-        $builder->addEventSubscriber($this->organizationSubscriber);
 
         $builder->add(
             self::TYPE_FIELD_NAME,

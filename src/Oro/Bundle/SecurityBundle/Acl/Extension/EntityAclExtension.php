@@ -166,6 +166,7 @@ class EntityAclExtension extends AbstractAclExtension
                 $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::LOCAL_LEVEL;
             } elseif ($metadata->isOrganizationOwned()) {
+                $maxLevel = AccessLevel::GLOBAL_LEVEL;
                 $minLevel = AccessLevel::GLOBAL_LEVEL;
             }
         }
@@ -508,7 +509,7 @@ class EntityAclExtension extends AbstractAclExtension
 
     /**
      * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
-     * if object have owner type OWNER_TYPE_BUSINESS_UNIT or OWNER_TYPE_USER
+     * if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION
      *
      * @param int   $accessLevel Current object access level
      * @param mixed $object      Object for test
@@ -521,7 +522,11 @@ class EntityAclExtension extends AbstractAclExtension
             if (
             in_array(
                 $metadata->getOwnerType(),
-                [OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT, OwnershipMetadata::OWNER_TYPE_USER]
+                [
+                    OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
+                    OwnershipMetadata::OWNER_TYPE_USER,
+                    OwnershipMetadata::OWNER_TYPE_ORGANIZATION
+                ]
             )
             ) {
                 $accessLevel = AccessLevel::GLOBAL_LEVEL;
