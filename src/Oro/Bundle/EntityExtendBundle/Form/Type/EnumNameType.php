@@ -5,10 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ExecutionContext;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -49,7 +46,7 @@ class EnumNameType extends AbstractType
         $resolver->setDefaults(
             array(
                 'constraints' => [
-                    new NotBlank()
+                    new Assert\NotBlank()
                 ]
             )
         );
@@ -59,14 +56,14 @@ class EnumNameType extends AbstractType
             $fieldConfigId = $options['config_id'];
             if (!$this->typeHelper->hasEnumCode($fieldConfigId->getClassName(), $fieldConfigId->getFieldName())) {
                 // validations of new enum
-                $constraints[] = new Length(['max' => $this->nameGenerator->getMaxEnumCodeSize()]);
-                $constraints[] = new Regex(
+                $constraints[] = new Assert\Length(['max' => $this->nameGenerator->getMaxEnumCodeSize()]);
+                $constraints[] = new Assert\Regex(
                     [
                         'pattern' => '/^[\w- ]*$/',
                         'message' => self::INVALID_NAME_MESSAGE
                     ]
                 );
-                $constraints[] = new Callback(
+                $constraints[] = new Assert\Callback(
                     [
                         function ($value, ExecutionContext $context) {
                             if (!empty($value)) {
@@ -86,7 +83,7 @@ class EnumNameType extends AbstractType
                 );
             } else {
                 // validations of existing enum
-                $constraints[] = new Length(['max' => 255]);
+                $constraints[] = new Assert\Length(['max' => 255]);
             }
 
             return $constraints;

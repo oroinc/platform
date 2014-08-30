@@ -6,9 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ExecutionContext;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -43,11 +41,11 @@ class EnumValueType extends AbstractType
         $data = $event->getData();
 
         $constraints = [
-            new NotBlank(),
-            new Length(['max' => 255])
+            new Assert\NotBlank(),
+            new Assert\Length(['max' => 255])
         ];
         if (empty($data['id'])) {
-            $constraints[] = new Callback(
+            $constraints[] = new Assert\Callback(
                 [
                     function ($value, ExecutionContext $context) {
                         if (!empty($value)) {
