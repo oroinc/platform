@@ -66,38 +66,36 @@ class UniqueEnumNameValidator extends ConstraintValidator
      */
     protected function isExistingEnum($enumCode, $entityClassName, $fieldName)
     {
-        $enumConfigProvider = $this->configManager->getProvider('enum');
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $enumConfigProvider   = $this->configManager->getProvider('enum');
 
         // at first check if an enum entity with the given code is already exist
-        $groupingConfigProvider = $this->configManager->getProvider('grouping');
-        $entityConfigs          = $groupingConfigProvider->getConfigs(null, true);
+        $entityConfigs = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            $groups = $entityConfig->get('groups', false, []);
-            if (!empty($groups)
-                && in_array('enum', $groups)
-                && $enumConfigProvider->hasConfig($entityConfig->getId()->getClassName())
-            ) {
-                $enumEntityConfig = $enumConfigProvider->getConfig($entityConfig->getId()->getClassName());
-                $existingEnumCode = $enumEntityConfig->get('code');
-                if (strcasecmp($enumCode, $existingEnumCode) === 0) {
-                    return true;
-                }
+            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+                continue;
+            }
+            $enumEntityConfig = $enumConfigProvider->getConfig($entityConfig->getId()->getClassName());
+            if ($enumCode === $enumEntityConfig->get('code')) {
+                return true;
             }
         }
 
         // if an enum entity with the given code was not found than check if there is new field with
-        // the given enum name
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $extendConfigProvider->getConfigs();
+        // the given enum code
+        $entityConfigs = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('is_extend')) {
+                continue;
+            }
             if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                 continue;
             }
 
-            $enumFieldConfigs = $enumConfigProvider->getConfigs($entityConfig->getId()->getClassName());
-            foreach ($enumFieldConfigs as $enumFieldConfig) {
+            $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
+            foreach ($fieldConfigs as $fieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
-                $fieldConfigId = $enumFieldConfig->getId();
+                $fieldConfigId = $fieldConfig->getId();
                 if ($fieldConfigId->getFieldName() === $fieldName
                     && $fieldConfigId->getClassName() === $entityClassName
                 ) {
@@ -107,12 +105,16 @@ class UniqueEnumNameValidator extends ConstraintValidator
                 if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
                     continue;
                 }
-                $existingEnumName = $enumFieldConfig->get('enum_name');
-                if (empty($existingEnumName)) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW])) {
                     continue;
                 }
 
-                if (strcasecmp($enumCode, ExtendHelper::buildEnumCode($existingEnumName)) === 0) {
+                $enumFieldConfig  = $enumConfigProvider->getConfig(
+                    $fieldConfigId->getClassName(),
+                    $fieldConfigId->getFieldName()
+                );
+                $existingEnumName = $enumFieldConfig->get('enum_name');
+                if (!empty($existingEnumName) && $enumCode === ExtendHelper::buildEnumCode($existingEnumName)) {
                     return true;
                 }
             }
