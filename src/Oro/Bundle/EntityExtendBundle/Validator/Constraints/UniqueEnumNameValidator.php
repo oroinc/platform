@@ -54,7 +54,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
     }
 
     /**
-     * Checks id the enum with the given code is already exist
+     * Checks if an enum with the given code already exist
      *
      * @param string $enumCode
      * @param string $entityClassName
