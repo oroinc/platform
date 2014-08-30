@@ -18,6 +18,28 @@ class OroUserBundle implements Migration
         self::oroUserOrganizationTable($schema);
         self::oroUserOrganizationForeignKeys($schema);
         self::removeRoleOwner($schema, $queries);
+
+        //Add organization fields to ownership entity config
+        $queries->addQuery(
+            new UpdateOwnershipTypeQuery(
+                'Oro\Bundle\UserBundle\Entity\Group',
+                [
+                    'organization_field_name' => 'organization',
+                    'organization_column_name' => 'organization_id'
+                ]
+            )
+        );
+
+        //Add organization fields to ownership entity config
+        $queries->addQuery(
+            new UpdateOwnershipTypeQuery(
+                'Oro\Bundle\UserBundle\Entity\User',
+                [
+                    'organization_field_name' => 'organization',
+                    'organization_column_name' => 'organization_id'
+                ]
+            )
+        );
     }
 
     public static function removeRoleOwner(Schema $schema, QueryBag $queries)
@@ -27,7 +49,6 @@ class OroUserBundle implements Migration
             $queries->addQuery(
                 new UpdateRoleOwnerQuery()
             );
-
 
             if ($table->hasForeignKey('FK_673F65E759294170')) {
                 $table->removeForeignKey('FK_673F65E759294170');

@@ -141,7 +141,7 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
 
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isOrganizationOwned()) {
-            return in_array($ownerId, $userOrganizationIds);
+            return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds);
         } elseif ($metadata->isBusinessUnitOwned()) {
             return in_array($tree->getBusinessUnitOrganizationId($ownerId), $allowedOrganizationIds);
         } elseif ($metadata->isUserOwned()) {

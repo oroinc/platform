@@ -1,0 +1,42 @@
+parameters:
+    oro_search.engine.class:                                      Oro\Bundle\SearchBundle\Engine\Orm
+    oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
+    oro_search.index_listener.class:                              Oro\Bundle\SearchBundle\EventListener\OrmIndexListener
+    oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
+    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
+    oro_search.drivers:
+        pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
+        pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
+
+services:
+    oro_search.search.engine:
+        class: %oro_search.engine.class%
+        arguments:
+            - @doctrine
+            - @event_dispatcher
+            - @oro_entity.doctrine_helper
+            - @oro_search.mapper
+        calls:
+            - [setLogQueries, [%oro_search.log_queries%]]
+            - [setDrivers, [%oro_search.drivers%]]
+
+    oro_search.fulltext_index_manager:
+        class: %oro_search.fulltext_index_manager.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+            - %oro_search.drivers%
+
+    oro_search.event_listener.update_schema_listener:
+        class: %oro_search.event_listener.update_schema_listener.class%
+        arguments:
+            - @oro_search.fulltext_index_manager
+            - @service_container
+        tags:
+            - { name: kernel.event_listener, event: console.terminate }
+
+    oro_search.event_listener.orm.fulltext_index_listener:
+        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        arguments:
+            - %database_driver%
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }

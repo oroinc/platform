@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
 class OroDashboardBundle implements Migration
 {
@@ -16,6 +17,17 @@ class OroDashboardBundle implements Migration
     {
         self::addOrganizationDashboardTable($schema);
         self::dropOroDashboardActiveTableIndexes($schema);
+
+        //Add organization fields to ownership entity config
+        $queries->addQuery(
+            new UpdateOwnershipTypeQuery(
+                'Oro\Bundle\DashboardBundle\Entity\Dashboard',
+                [
+                    'organization_field_name' => 'organization',
+                    'organization_column_name' => 'organization_id'
+                ]
+            )
+        );
     }
 
     /**
