@@ -11,6 +11,7 @@ class SoapAddressTypeApiTest extends WebTestCase
 {
     protected function setUp()
     {
+        $this->markTestIncomplete("Test should be fixed in OEE-257 task");
         $this->initClient(array(), $this->generateWsseAuthHeader());
         $this->initSoapClient();
     }
