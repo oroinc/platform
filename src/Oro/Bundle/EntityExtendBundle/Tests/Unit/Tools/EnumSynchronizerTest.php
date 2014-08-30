@@ -3,12 +3,17 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Doctrine\ORM\Query;
+
 use Gedmo\Translatable\TranslatableListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,16 +46,488 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will($this->returnArgument(0));
-
         $this->synchronizer = new EnumSynchronizer(
             $this->configManager,
             $this->doctrine,
             $this->translator,
             $this->dbTranslationMetadataCache
         );
+    }
+
+    /**
+     * @dataProvider enumTypeProvider
+     */
+    public function testSyncNoChanges($enumType)
+    {
+        $config1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
+        $config1->set('is_extend', true);
+        $config2 = new Config(new EntityConfigId('extend', 'Test\Entity2'));
+        $config2->set('is_extend', true);
+        $config2->set('is_deleted', true);
+        $config3 = new Config(new EntityConfigId('extend', 'Test\Entity3'));
+
+        $configs = [$config1, $config2, $config3];
+
+        $fieldConfig1 = new Config(new FieldConfigId('extend', 'Test\Entity1', 'field1', $enumType));
+        $fieldConfig2 = new Config(new FieldConfigId('extend', 'Test\Entity1', 'field2', $enumType));
+        $fieldConfig2->set('is_deleted', true);
+        $fieldConfig3 = new Config(new FieldConfigId('extend', 'Test\Entity1', 'field3', 'string'));
+
+        $fieldConfigs = [$fieldConfig1, $fieldConfig2, $fieldConfig3];
+
+        $enumFieldConfig1 = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field1', $enumType));
+
+        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['enum', $enumConfigProvider]
+                    ]
+                )
+            );
+        $extendConfigProvider->expects($this->at(0))
+            ->method('getConfigs')
+            ->will($this->returnValue($configs));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('getConfigs')
+            ->with($config1->getId()->getClassName())
+            ->will($this->returnValue($fieldConfigs));
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Entity1', 'field1')
+            ->will($this->returnValue($enumFieldConfig1));
+
+        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        $synchronizer = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
+            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'],
+            [
+                $this->configManager,
+                $this->doctrine,
+                $this->translator,
+                $this->dbTranslationMetadataCache
+            ]
+        );
+
+        $synchronizer->expects($this->never())
+            ->method('updateEnumFieldConfig');
+
+        $synchronizer->sync();
+    }
+
+    /**
+     * @dataProvider enumTypeProvider
+     */
+    public function testSyncForAlreadySynchronizedField($enumType)
+    {
+        $enumCode = 'test_enum';
+
+        $entityConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
+        $entityConfig->set('is_extend', true);
+        $fieldConfig     = new Config(new FieldConfigId('extend', 'Test\Entity1', 'field1', $enumType));
+        $enumFieldConfig = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field1', $enumType));
+        $enumFieldConfig->set('enum_code', $enumCode);
+
+        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['enum', $enumConfigProvider]
+                    ]
+                )
+            );
+        $extendConfigProvider->expects($this->at(0))
+            ->method('getConfigs')
+            ->will($this->returnValue([$entityConfig]));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('getConfigs')
+            ->with($entityConfig->getId()->getClassName())
+            ->will($this->returnValue([$fieldConfig]));
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Entity1', 'field1')
+            ->will($this->returnValue($enumFieldConfig));
+        $this->configManager->expects($this->never())
+            ->method('persist');
+
+        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        $synchronizer = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
+            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'],
+            [
+                $this->configManager,
+                $this->doctrine,
+                $this->translator,
+                $this->dbTranslationMetadataCache
+            ]
+        );
+
+        $synchronizer->expects($this->never())
+            ->method('applyEnumNameTrans');
+        $synchronizer->expects($this->never())
+            ->method('applyEnumOptions');
+        $synchronizer->expects($this->never())
+            ->method('applyEnumEntityOptions');
+
+        $synchronizer->sync();
+    }
+
+    /**
+     * @dataProvider enumTypeProvider
+     */
+    public function testSyncForNewField($enumType)
+    {
+        $enumCode    = 'test_enum';
+        $enumName    = 'Test Enum';
+        $locale      = 'fr';
+        $enumPublic  = true;
+        $enumOptions = [['label' => 'Opt1']];
+
+        $enumValueClassName = 'Test\EnumValue';
+
+        $entityConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
+        $entityConfig->set('is_extend', true);
+        $fieldConfig = new Config(new FieldConfigId('extend', 'Test\Entity1', 'field1', $enumType));
+        $fieldConfig->set('target_entity', $enumValueClassName);
+        $enumFieldConfig = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field1', $enumType));
+        $enumFieldConfig->set('enum_code', $enumCode);
+        $enumFieldConfig->set('enum_name', $enumName);
+        $enumFieldConfig->set('enum_locale', $locale);
+        $enumFieldConfig->set('enum_public', $enumPublic);
+        $enumFieldConfig->set('enum_options', $enumOptions);
+
+        $expectedEnumFieldConfig = new Config($enumFieldConfig->getId());
+        $expectedEnumFieldConfig->set('enum_code', $enumCode);
+
+        $enumConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['enum', $enumConfigProvider]
+                    ]
+                )
+            );
+        $extendConfigProvider->expects($this->at(0))
+            ->method('getConfigs')
+            ->will($this->returnValue([$entityConfig]));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('getConfigs')
+            ->with($entityConfig->getId()->getClassName())
+            ->will($this->returnValue([$fieldConfig]));
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with('Test\Entity1', 'field1')
+            ->will($this->returnValue($enumFieldConfig));
+        $this->configManager->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($enumFieldConfig));
+        $this->configManager->expects($this->once())
+            ->method('flush');
+
+        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        $synchronizer = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
+            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'],
+            [
+                $this->configManager,
+                $this->doctrine,
+                $this->translator,
+                $this->dbTranslationMetadataCache
+            ]
+        );
+
+        $synchronizer->expects($this->once())
+            ->method('applyEnumNameTrans')
+            ->with($enumCode, $enumName, $locale);
+        $synchronizer->expects($this->once())
+            ->method('applyEnumOptions')
+            ->with($enumValueClassName, $enumOptions, $locale);
+        $synchronizer->expects($this->once())
+            ->method('applyEnumEntityOptions')
+            ->with($enumValueClassName, $enumPublic, false);
+
+        $synchronizer->sync();
+
+        $this->assertEquals($expectedEnumFieldConfig, $enumFieldConfig);
+    }
+
+    public function enumTypeProvider()
+    {
+        return [
+            ['enum'],
+            ['multiEnum']
+        ];
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $enumCode must not be empty.
+     */
+    public function testApplyEnumNameTransWithEmptyEnumCode()
+    {
+        $this->synchronizer->applyEnumNameTrans('', 'Test Enum', 'fr');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $enumName must not be empty.
+     */
+    public function testApplyEnumNameTransWithEmptyEnumName()
+    {
+        $this->synchronizer->applyEnumNameTrans('test_enum', '', 'fr');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage $locale must not be empty.
+     */
+    public function testApplyEnumNameTransWithEmptyLocale()
+    {
+        $this->synchronizer->applyEnumNameTrans('test_enum', 'Test Enum', null);
+    }
+
+    public function testApplyEnumNameTransNoChanges()
+    {
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum';
+        $locale   = 'fr';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                [],
+                null,
+                $locale
+            )
+            ->will($this->returnValue($enumName));
+
+        $this->doctrine->expects($this->never())
+            ->method('getManagerForClass');
+        $this->dbTranslationMetadataCache->expects($this->never())
+            ->method('updateTimestamp');
+
+        $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+    }
+
+    public function testApplyEnumNameTransEnumNameChanged()
+    {
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum New';
+        $locale   = 'fr';
+
+        $oldEnumName = 'Test Enum';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                [],
+                null,
+                $locale
+            )
+            ->will($this->returnValue($oldEnumName));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($em));
+        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($transRepo));
+
+        $transLabelObj       = new \stdClass();
+        $transPluralLabelObj = new \stdClass();
+
+        $transRepo->expects($this->at(0))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transLabelObj));
+        $transRepo->expects($this->at(1))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transPluralLabelObj));
+
+        $em->expects($this->once())
+            ->method('flush')
+            ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj]));
+        $this->dbTranslationMetadataCache->expects($this->once())
+            ->method('updateTimestamp')
+            ->with($locale);
+
+        $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+    }
+
+    public function testApplyEnumNameTransNoTrans()
+    {
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum New';
+        $locale   = 'fr';
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                [],
+                null,
+                $locale
+            )
+            ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($em));
+        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($transRepo));
+
+        $transLabelObj       = new \stdClass();
+        $transPluralLabelObj = new \stdClass();
+
+        $transRepo->expects($this->at(0))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transLabelObj));
+        $transRepo->expects($this->at(1))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transPluralLabelObj));
+
+        $em->expects($this->once())
+            ->method('flush')
+            ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj]));
+        $this->dbTranslationMetadataCache->expects($this->once())
+            ->method('updateTimestamp')
+            ->with($locale);
+
+        $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+    }
+
+    public function testApplyEnumNameTransNoTransForDefaultLocale()
+    {
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum New';
+        $locale   = Translation::DEFAULT_LOCALE;
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                [],
+                null,
+                $locale
+            )
+            ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($em));
+        $transRepo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Translation::ENTITY_NAME)
+            ->will($this->returnValue($transRepo));
+
+        $transLabelObj       = new \stdClass();
+        $transPluralLabelObj = new \stdClass();
+        $transDescriptionObj = new \stdClass();
+
+        $transRepo->expects($this->at(0))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transLabelObj));
+        $transRepo->expects($this->at(1))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+                $enumName,
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transPluralLabelObj));
+        $transRepo->expects($this->at(2))
+            ->method('saveValue')
+            ->with(
+                ExtendHelper::getEnumTranslationKey('description', $enumCode),
+                '',
+                $locale,
+                TranslationRepository::DEFAULT_DOMAIN,
+                Translation::SCOPE_UI
+            )
+            ->will($this->returnValue($transDescriptionObj));
+
+        $em->expects($this->once())
+            ->method('flush')
+            ->with($this->identicalTo([$transLabelObj, $transPluralLabelObj, $transDescriptionObj]));
+        $this->dbTranslationMetadataCache->expects($this->once())
+            ->method('updateTimestamp')
+            ->with($locale);
+
+        $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
     /**

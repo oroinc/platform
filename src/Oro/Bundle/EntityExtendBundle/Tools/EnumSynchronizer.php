@@ -21,8 +21,6 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class EnumSynchronizer
 {
-    const DEFAULT_LOCALE = 'en';
-
     /** @var ConfigManager */
     protected $configManager;
 
@@ -62,7 +60,7 @@ class EnumSynchronizer
         $enumConfigProvider   = $this->configManager->getProvider('enum');
         $entityConfigs        = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('is_extend')) {
+            if (!$entityConfig->is('is_extend') || $entityConfig->is('is_deleted')) {
                 continue;
             }
 
@@ -70,7 +68,9 @@ class EnumSynchronizer
             foreach ($fieldConfigs as $fieldConfig) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
-                if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
+                if ($fieldConfig->is('is_deleted')
+                    || !in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])
+                ) {
                     continue;
                 }
 
@@ -80,31 +80,29 @@ class EnumSynchronizer
                 );
 
                 $enumCode = $enumFieldConfig->get('enum_code');
-                if (empty($enumCode)) {
-                    continue;
-                }
+                if (!empty($enumCode)) {
+                    $enumValueClassName = $fieldConfig->get('target_entity');
+                    $enumName           = $enumFieldConfig->get('enum_name');
+                    $locale             = $enumFieldConfig->get('enum_locale');
+                    $isPublic           = $enumFieldConfig->get('enum_public');
+                    $enumOptions        = $enumFieldConfig->get('enum_options');
 
-                $enumValueClassName = $fieldConfig->get('target_entity');
-                $enumName           = $enumFieldConfig->get('enum_name');
-                $locale             = $enumFieldConfig->get('enum_locale');
-                $isPublic           = $enumFieldConfig->get('enum_public');
-                $enumOptions        = $enumFieldConfig->get('enum_options');
+                    if (empty($locale)) {
+                        $locale = Translation::DEFAULT_LOCALE;
+                    }
 
-                if (empty($locale)) {
-                    $locale = self::DEFAULT_LOCALE;
-                }
+                    if (!empty($enumName)) {
+                        $this->applyEnumNameTrans($enumCode, $enumName, $locale);
+                    }
+                    if (!empty($enumOptions)) {
+                        $this->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+                    }
+                    if ($isPublic !== null) {
+                        $this->applyEnumEntityOptions($enumValueClassName, $isPublic, false);
+                    }
 
-                if (!empty($enumName)) {
-                    $this->applyEnumNameTrans($enumCode, $enumName, $locale);
+                    $this->updateEnumFieldConfig($enumFieldConfig);
                 }
-                if (!empty($enumOptions)) {
-                    $this->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
-                }
-                if ($isPublic !== null) {
-                    $this->applyEnumEntityOptions($enumValueClassName, $isPublic, false);
-                }
-
-                $this->updateEnumFieldConfig($enumFieldConfig);
             }
         }
 
@@ -140,7 +138,7 @@ class EnumSynchronizer
             // labels initialization
             $labelsToBeUpdated[$labelKey]       = $enumName;
             $labelsToBeUpdated[$pluralLabelKey] = $enumName;
-            if ($locale === self::DEFAULT_LOCALE) {
+            if ($locale === Translation::DEFAULT_LOCALE) {
                 // set empty description only for default locale
                 $labelsToBeUpdated[$descriptionKey] = '';
             }
@@ -249,7 +247,7 @@ class EnumSynchronizer
         }
 
         if (!empty($changes)) {
-            if ($locale !== self::DEFAULT_LOCALE) {
+            if ($locale !== Translation::DEFAULT_LOCALE) {
                 foreach ($changes as $value) {
                     $value->setLocale($locale);
                 }
