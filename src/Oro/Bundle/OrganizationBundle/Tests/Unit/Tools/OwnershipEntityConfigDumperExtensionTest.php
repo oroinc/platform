@@ -77,7 +77,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         // should be skipped because it is not new entity
         $extendConfig4 = new Config(new EntityConfigId('extend', 'Test\Entity4'));
         $extendConfig4->set('owner', ExtendScope::OWNER_CUSTOM);
-        $extendConfig4->set('state', ExtendScope::STATE_UPDATED);
+        $extendConfig4->set('state', ExtendScope::STATE_UPDATE);
         // should be skipped because it is not custom entity
         $extendConfig5 = new Config(new EntityConfigId('extend', 'Test\Entity5'));
         $extendConfig5->set('owner', ExtendScope::OWNER_SYSTEM);

@@ -114,7 +114,7 @@ class EntityProcessor
                 if (!$entityConfig->is('is_extend')) {
                     continue;
                 }
-                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
+                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
                     continue;
                 }
 

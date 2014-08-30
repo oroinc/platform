@@ -49,7 +49,7 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
             ['', 'old', ExtendScope::STATE_ACTIVE, true],
             ['new', '', ExtendScope::STATE_ACTIVE, true],
             ['new', 'old', ExtendScope::STATE_ACTIVE, true],
-            ['new', 'old', ExtendScope::STATE_UPDATED, false],
+            ['new', 'old', ExtendScope::STATE_UPDATE, false],
         ];
     }
 

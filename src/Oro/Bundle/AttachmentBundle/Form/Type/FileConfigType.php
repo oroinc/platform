@@ -55,7 +55,7 @@ class FileConfigType extends AbstractType
                 $entityExtendConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
                 if ($this->isApplicable($entityExtendConfig, $relationKey)) {
                     if ($entityExtendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATED);
+                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATE);
 
                         $this->extendConfigProvider->persist($entityExtendConfig);
                         $this->extendConfigProvider->flush();

@@ -56,7 +56,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
             [true, true, ExtendScope::STATE_ACTIVE, false],
             [false, true, ExtendScope::STATE_ACTIVE, false],
             [true, false, ExtendScope::STATE_ACTIVE, true],
-            [true, false, ExtendScope::STATE_UPDATED, false],
+            [true, false, ExtendScope::STATE_UPDATE, false],
         ];
     }
 

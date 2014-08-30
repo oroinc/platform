@@ -73,7 +73,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldConfig2 = new Config(new FieldConfigId('extend', 'Test\EnumValue1', 'field2', 'multiEnum'));
         $fieldConfig2->set('state', ExtendScope::STATE_NEW);
         $fieldConfig3 = new Config(new FieldConfigId('extend', 'Test\EnumValue1', 'field3', 'enum'));
-        $fieldConfig3->set('state', ExtendScope::STATE_UPDATED);
+        $fieldConfig3->set('state', ExtendScope::STATE_UPDATE);
         $fieldConfig4 = new Config(new FieldConfigId('extend', 'Test\EnumValue1', 'field4', 'manyToOne'));
         $fieldConfig4->set('state', ExtendScope::STATE_NEW);
         $fieldConfig5 = new Config(new FieldConfigId('extend', 'Test\EnumValue1', 'field5', 'enum'));

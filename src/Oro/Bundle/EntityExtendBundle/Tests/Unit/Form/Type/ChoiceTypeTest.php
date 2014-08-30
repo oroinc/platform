@@ -49,7 +49,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
             [true, true, ExtendScope::STATE_ACTIVE, false],
             [false, true, ExtendScope::STATE_ACTIVE, true],
             [true, false, ExtendScope::STATE_ACTIVE, true],
-            [true, false, ExtendScope::STATE_UPDATED, false],
+            [true, false, ExtendScope::STATE_UPDATE, false],
         ];
     }
 

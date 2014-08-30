@@ -101,7 +101,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             [['Test\Entity3'], [], ExtendScope::STATE_ACTIVE, true],
             [['Test\Entity3', 'Test\Entity4'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
             [['Test\Entity3'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
-            [['Test\Entity3'], [], ExtendScope::STATE_UPDATED, false],
+            [['Test\Entity3'], [], ExtendScope::STATE_UPDATE, false],
         ];
     }
 

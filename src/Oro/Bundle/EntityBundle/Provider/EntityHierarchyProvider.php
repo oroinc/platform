@@ -69,7 +69,10 @@ class EntityHierarchyProvider
 
             $entityConfigs = $this->extendConfigProvider->getConfigs();
             foreach ($entityConfigs as $entityConfig) {
-                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
+                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
+                    continue;
+                }
+                if ($entityConfig->is('is_deleted')) {
                     continue;
                 }
 

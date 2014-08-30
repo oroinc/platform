@@ -432,17 +432,23 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         $config1->set('state', ExtendScope::STATE_ACTIVE);
         $config2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
         $config2->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
-        $config2->set('state', ExtendScope::STATE_UPDATED);
+        $config2->set('state', ExtendScope::STATE_UPDATE);
         $config3 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
         $config3->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
         $config3->set('state', ExtendScope::STATE_NEW);
         $config4 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
         $config4->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
-        $config4->set('state', ExtendScope::STATE_DELETED);
+        $config4->set('state', ExtendScope::STATE_DELETE);
         $config5 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
         $config5->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
         $config5->set('state', ExtendScope::STATE_ACTIVE);
         $config6 = new Config(new EntityConfigId('extend', 'Test\Entity6'));
+        $config7 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
+        $config7->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config7->set('state', ExtendScope::STATE_ACTIVE);
+        $config7->set('is_deleted', true);
+
+        $configs = [$config1, $config2, $config3, $config4, $config5, $config6, $config7];
 
         $enumConfig1 = new Config(new EntityConfigId('enum', 'Test\EnumValue1'));
         $enumConfig1->set('public', true);
@@ -453,8 +459,6 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         $enumConfig2->set('code', 'test_enum2');
         $enumConfig5 = new Config(new EntityConfigId('enum', 'Test\EnumValue3'));
         $enumConfig5->set('code', 'test_enum5');
-
-        $configs = [$config1, $config2, $config3, $config4, $config5, $config6];
 
         $extendConfigProvider = $this->getConfigProviderMock();
         $enumConfigProvider   = $this->getConfigProviderMock();

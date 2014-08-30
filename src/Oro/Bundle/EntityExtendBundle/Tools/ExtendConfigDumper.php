@@ -227,11 +227,11 @@ class ExtendConfigDumper
             }
         }
 
-        if (!$fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if (!$fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
 
-        if ($fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('is_deleted', true);
         }
     }
@@ -355,7 +355,7 @@ class ExtendConfigDumper
         $hasChanges = false;
         $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $extendConfig->getId()->getClassName();
-        if ($extendConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if ($extendConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
             if (!$extendConfig->is('is_deleted')) {
                 $extendConfig->set('is_deleted', true);

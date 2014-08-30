@@ -117,7 +117,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
 
         $expectedExtendConfig = new Config($extendConfigId);
         if ($isSetStateExpected) {
-            $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATED);
+            $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATE);
             $this->configManager->expects($this->once())
                 ->method('persist')
                 ->with($expectedExtendConfig);

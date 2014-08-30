@@ -243,7 +243,7 @@ class ExtendConfigProcessor
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                $extendConfig->set('state', ExtendScope::STATE_UPDATE);
             }
             $this->configManager->persist($extendConfig);
         }
@@ -305,7 +305,7 @@ class ExtendConfigProcessor
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                $extendConfig->set('state', ExtendScope::STATE_UPDATE);
             }
             $this->configManager->persist($extendConfig);
         }

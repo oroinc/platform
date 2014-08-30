@@ -90,7 +90,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATED])) {
+            if (!$entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                 continue;
             }
 

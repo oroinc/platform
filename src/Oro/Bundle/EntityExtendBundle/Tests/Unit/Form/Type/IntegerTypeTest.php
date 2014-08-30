@@ -49,7 +49,7 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
             ['', 123, ExtendScope::STATE_ACTIVE, true],
             [1234, null, ExtendScope::STATE_ACTIVE, true],
             [1234, 123, ExtendScope::STATE_ACTIVE, true],
-            [1234, 123, ExtendScope::STATE_UPDATED, false],
+            [1234, 123, ExtendScope::STATE_UPDATE, false],
         ];
     }
 

@@ -228,7 +228,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED],
+            ['state' => ExtendScope::STATE_UPDATE],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
@@ -566,7 +566,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $extendConfigEntity->all()
         );
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED, 'owner' => ExtendScope::OWNER_CUSTOM],
+            ['state' => ExtendScope::STATE_UPDATE, 'owner' => ExtendScope::OWNER_CUSTOM],
             $extendConfigField->all()
         );
         $this->assertEquals(

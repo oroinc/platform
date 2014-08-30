@@ -68,7 +68,7 @@ abstract class AbstractConfigType extends BaseAbstractConfigType
                 $extendConfigProvider = $this->configManager->getProvider('extend');
                 $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
                 if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                    $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                    $extendConfig->set('state', ExtendScope::STATE_UPDATE);
                     $this->configManager->persist($extendConfig);
                 }
             }

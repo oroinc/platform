@@ -45,16 +45,23 @@ class EntityHierarchyProviderTest extends OrmTestCase
         );
         $newCustomEntityConfig->set('state', ExtendScope::STATE_NEW);
 
-        $deletedCustomEntityConfig = new Config(
+        $toBeDeletedCustomEntityConfig = new Config(
             new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity5')
         );
-        $deletedCustomEntityConfig->set('state', ExtendScope::STATE_DELETED);
+        $toBeDeletedCustomEntityConfig->set('state', ExtendScope::STATE_DELETE);
+
+        $deletedCustomEntityConfig = new Config(
+            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity6')
+        );
+        $deletedCustomEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
+        $deletedCustomEntityConfig->set('is_deleted', true);
 
         $entityConfigs = [
             $config1,
             $config2,
             $config3,
             $newCustomEntityConfig,
+            $toBeDeletedCustomEntityConfig,
             $deletedCustomEntityConfig
         ];
 

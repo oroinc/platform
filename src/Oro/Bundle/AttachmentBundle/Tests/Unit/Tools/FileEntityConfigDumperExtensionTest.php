@@ -165,7 +165,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $entityConfig->set('is_extend', true);
 
         $fieldConfig = new Config(new FieldConfigId('extend', $entityClass, $fieldName, $fieldType));
-        $fieldConfig->set('state', ExtendScope::STATE_UPDATED);
+        $fieldConfig->set('state', ExtendScope::STATE_UPDATE);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

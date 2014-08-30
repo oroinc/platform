@@ -156,7 +156,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
             1
         );
 
-        $entityConfig->expects($this->at(1))->method('set')->with('state', ExtendScope::STATE_UPDATED);
+        $entityConfig->expects($this->at(1))->method('set')->with('state', ExtendScope::STATE_UPDATE);
         $entityConfig->expects($this->at(2))->method('set')->with('upgradeable', true);
 
         $this->configManager->expects($this->at(15))->method('persist')->with($entityConfig);

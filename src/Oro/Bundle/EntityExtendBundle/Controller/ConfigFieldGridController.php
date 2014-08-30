@@ -187,7 +187,7 @@ class ConfigFieldGridController extends Controller
                 );
 
                 if (!$extendEntityConfig->is('state', ExtendScope::STATE_NEW)) {
-                    $extendEntityConfig->set('state', ExtendScope::STATE_UPDATED);
+                    $extendEntityConfig->set('state', ExtendScope::STATE_UPDATE);
                 }
 
                 $extendEntityConfig->set('upgradeable', true);
@@ -253,14 +253,14 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $fieldConfig->set('state', ExtendScope::STATE_DELETED);
+        $fieldConfig->set('state', ExtendScope::STATE_DELETE);
         $configManager->persist($fieldConfig);
 
         $fields = $extendConfigProvider->filter(
             function (ConfigInterface $config) {
                 return in_array(
                     $config->get('state'),
-                    array(ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED)
+                    array(ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE)
                 );
             },
             $className
@@ -319,7 +319,7 @@ class ConfigFieldGridController extends Controller
             );
         $fieldConfig->set(
             'state',
-            $isFieldExist ? ExtendScope::STATE_UPDATED : ExtendScope::STATE_NEW
+            $isFieldExist ? ExtendScope::STATE_UPDATE : ExtendScope::STATE_NEW
         );
 
         $configManager->persist($fieldConfig);

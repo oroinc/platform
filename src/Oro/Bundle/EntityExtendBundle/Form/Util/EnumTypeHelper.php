@@ -122,7 +122,10 @@ class EnumTypeHelper extends ConfigTypeHelper
             if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
                 continue;
             }
-            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETED])) {
+            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
+                continue;
+            }
+            if ($entityConfig->is('is_deleted')) {
                 continue;
             }
 
