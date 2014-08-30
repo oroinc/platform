@@ -510,7 +510,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddEnumRelationForExistingEnum()
+    public function testAddEnumFieldForExistingEnum()
     {
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -528,7 +528,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $table1->addColumn('id', 'integer');
         $table1->setPrimaryKey(['id']);
 
-        $extension->addEnumRelation(
+        $extension->addEnumField(
             $schema,
             $table1,
             'enum1',
@@ -574,7 +574,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddEnumRelationMultipleForExistingEnum()
+    public function testAddEnumFieldMultipleForExistingEnum()
     {
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
@@ -592,7 +592,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $table1->addColumn('id', 'integer');
         $table1->setPrimaryKey(['id']);
 
-        $extension->addEnumRelation(
+        $extension->addEnumField(
             $schema,
             $table1,
             'enum1',

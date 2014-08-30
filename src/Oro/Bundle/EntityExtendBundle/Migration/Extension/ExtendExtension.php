@@ -245,7 +245,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
-     * Adds enumerable field relation
+     * Adds enumerable field
      *
      * Take in attention that this method creates new private enum if the enum with the given code
      * is not exist yet. If you want to create a public enum use {@link createEnum} method before.
@@ -261,7 +261,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                       in entity_config.yml
      * @param array         $options
      */
-    public function addEnumRelation(
+    public function addEnumField(
         Schema $schema,
         $table,
         $associationName,
