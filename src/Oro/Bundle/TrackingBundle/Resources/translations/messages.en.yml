@@ -11,7 +11,7 @@ oro:
             url.label:           Url
             owner.label:         Owner
 
-            saved_message: Website updated
+            saved_message: Tracking Website saved
 
         trackingevent:
             entity_label:        Tracking Event

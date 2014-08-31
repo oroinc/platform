@@ -23,7 +23,8 @@ class SimpleSearchTest extends Selenium2TestCase
         $search = new Search($this);
         $result = $search->search('admin')
             ->submit()
-            ->result('John Doe');
+            ->result('John Doe')
+            ->assertTitle('admin - Search Results');
         $this->assertNotEmpty($result);
     }
 }

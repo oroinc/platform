@@ -1,0 +1,120 @@
+Configuration
+=============
+
+OroSearchBundle provides lots of options that can be used to customize search functionality.
+
+System Configuration
+--------------------
+
+All configuration data is placed in configuration under alias `oro_search`.
+Let's look at the configuration example:
+
+```yml
+oro_search:
+    engine: orm
+    engine_parameters:
+        ...
+    log_queries: true
+    realtime_update: false
+    item_container_template: MyBundle:Search:itemContainer.html.twig
+    entities_config:
+        ...
+```
+
+Description of parameters:
+
+- **engine**, default "orm" (converted to container parameter _oro_search.engine_) - specifies search engine name
+used to perform search and indexation (see section [Search Engine Configuration](#search-engine-configuration));
+- **engine_parameters** (converted to container parameter _oro_search.engine_parameters_) - additional parameters
+of search engine used for initialization (f.e. IP, port, credentials etc);
+- **log_queries**, default false (converted to container parameter _oro_search.log_queries_) - flag that defines
+whether need to log search queries to the database;
+- **realtime_update**, default true (converted to container parameter _oro_search.realtime_update_) - flag that
+specifies is search index should be updated in the real time, i.e. right after indexed entity was changed;
+if set this flag to false then reindex jobs will be put to the queue and processed later;
+- **item_container_template**, default "OroSearchBundle:Datagrid:itemContainer.html.twig"
+(converted to container parameter _oro_search.twig.item_container_template_) - template used to render entity row
+in search results;
+- **entities_config** (converted to container parameter _oro_search.entities_config_) - entity search configuration,
+can be used to override default entity search configuration (see section [Entity Configuration](#entity-configuration)).
+
+
+Entity Configuration
+--------------------
+
+After insert, update or delete entity records, search index must be updated. Search index
+consist of data from entities by mapping parameters. Entity search configuration entity maps
+fields to virtual search fields in search index.
+
+Entity search configuration can be store in main `config.yml` file (in `oro_search` config section)
+or in `search.yml` files in config directory of the bundle.
+
+Configuration is array that contain info about bundle name, entity name and array of fields. Fields array
+contain array of field name and field type. All text fields data will be store in **all_text** virtual field.
+Additionally, all the fields will be stored in `fieldName` virtual fields, if not set `target_fields` parameter.
+
+Example:
+
+```yml
+Acme\DemoBundle\Entity\Product:
+    alias: demo_product                                      # Alias for 'from' keyword in advanced search
+    search_template: AcmeDemoBundle:result.html.twig         # Template to use in search result page for this entity type
+    label: Demo products                                     # Label for entity to identify entity in search results
+    route:
+        name: acme_demo_search_product                       # Route name to generate url link to the entity record
+        parameters:                                          # Array with parameters for route
+            id: id
+    title_fields: [name]
+    fields:
+        -
+            name: name                                       # Name of field in entity
+            target_type: text                                # Type of virtual search field. Supported target types:
+                                                             # text (string and text fields), integer, double, datetime
+        -
+            name: description
+            target_type: text
+            target_fields: [description, another_index_name] # Array of virtual fields for entity field from 'name' parameter.
+        -
+            name: manufacturer
+            relation_type: many-to-one                       # Indicate that this field is relation field to another table.
+                                                             # Supported: one-to-one, many-to-many, one-to-many, many-to-one.
+            relation_fields:                                 # Array of fields from relation record we must to index.
+                -
+                    name: name
+                    target_type: text
+                    target_fields: [manufacturer, all_data]
+                -
+                    name: id
+                    target_type: integer
+                    target_fields: [manufacturer]
+        -
+            name: categories
+            relation_type: many-to-many
+            relation_fields:
+                -
+                    name: name
+                    target_type: text
+                    target_fields: [all_data]
+```
+
+
+Search Engine Configuration
+---------------------------
+
+Search bundle provides ability to use different search engines through the common interface.
+
+Used search engine defines in configuration under `oro_search.engine` key. To make engine work
+at least one bundle must have file with name _Resources/config/oro/search_engine/\<engine_name\>.yml_
+that contains configuration of search engine services that will be added to container services.
+
+The only one required service that must be defined in engine configuration is _oro_search.search.engine_.
+Search engine class must implement interface _Oro\Bundle\SearchBundle\Engine\EngineInterface_ and implement
+all required methods. To make implementation easier there is abstract engine
+_Oro\Bundle\SearchBundle\Engine\AbstractEngine_ that provides useful functionality (logging, queuing etc).
+
+If search engine requires some additional parameters (credentials, index configuration etc.) then they can be
+passed through configuration using key _oro_search.engine_parameters_, so these parameters can be injected into
+search services.
+
+Also engine configuration can override existing services to support some specific use cases of search engine
+(f.e. ORM engine overrides index listener to support single flush).

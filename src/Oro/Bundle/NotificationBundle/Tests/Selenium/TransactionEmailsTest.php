@@ -20,6 +20,7 @@ class TransactionEmailsTest extends Selenium2TestCase
 
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
+            ->assertTitle('Notification Rules - Emails - System')
             ->add()
             ->assertTitle('Add Notification Rule - Notification Rules - Emails - System')
             ->setEntityName('Calendar event')
