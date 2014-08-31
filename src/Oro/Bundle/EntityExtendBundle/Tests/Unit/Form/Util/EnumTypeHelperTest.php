@@ -283,9 +283,10 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         $config1Field1->set('enum_code', $enumCode);
         $config1Field2 = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field2', $enumType));
         $config1Field2->set('enum_code', $enumCode);
+        $config1Field3 = new Config(new FieldConfigId('enum', 'Test\Entity1', 'field3', 'string'));
 
         $configs      = [$config1, $config2];
-        $fieldConfigs = [$config1Field1, $config1Field2];
+        $fieldConfigs = [$config1Field1, $config1Field2, $config1Field3];
 
         $extendConfigProvider = $this->getConfigProviderMock();
         $enumConfigProvider   = $this->getConfigProviderMock();
@@ -447,8 +448,11 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         $config7->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
         $config7->set('state', ExtendScope::STATE_ACTIVE);
         $config7->set('is_deleted', true);
+        $config8 = new Config(new EntityConfigId('extend', 'Test\EnumValue8'));
+        $config8->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config8->set('state', ExtendScope::STATE_ACTIVE);
 
-        $configs = [$config1, $config2, $config3, $config4, $config5, $config6, $config7];
+        $configs = [$config1, $config2, $config3, $config4, $config5, $config6, $config7, $config8];
 
         $enumConfig1 = new Config(new EntityConfigId('enum', 'Test\EnumValue1'));
         $enumConfig1->set('public', true);
@@ -459,6 +463,8 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
         $enumConfig2->set('code', 'test_enum2');
         $enumConfig5 = new Config(new EntityConfigId('enum', 'Test\EnumValue3'));
         $enumConfig5->set('code', 'test_enum5');
+        $enumConfig8 = new Config(new EntityConfigId('enum', 'Test\EnumValue8'));
+        $enumConfig8->set('code', 'test_enum8');
 
         $extendConfigProvider = $this->getConfigProviderMock();
         $enumConfigProvider   = $this->getConfigProviderMock();
@@ -476,7 +482,7 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigs')
             ->with(null, true)
             ->will($this->returnValue($configs));
-        $enumConfigProvider->expects($this->exactly(3))
+        $enumConfigProvider->expects($this->exactly(4))
             ->method('getConfig')
             ->will(
                 $this->returnValueMap(
@@ -484,6 +490,7 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
                         ['Test\EnumValue1', null, $enumConfig1],
                         ['Test\EnumValue2', null, $enumConfig2],
                         ['Test\EnumValue5', null, $enumConfig5],
+                        ['Test\EnumValue8', null, $enumConfig8],
                     ]
                 )
             );
