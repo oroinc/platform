@@ -28,7 +28,7 @@ class ActiveDashboard
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $user;
 
@@ -36,7 +36,7 @@ class ActiveDashboard
      * @var Dashboard
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\DashboardBundle\Entity\Dashboard")
-     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $dashboard;
 
