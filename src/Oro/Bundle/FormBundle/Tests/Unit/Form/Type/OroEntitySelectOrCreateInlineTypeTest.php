@@ -133,13 +133,17 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $this->config
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnCallback(function ($argument) use ($inputOptions) {
-                if (array_key_exists($argument, $inputOptions)) {
-                    return $inputOptions[$argument];
-                }
+            ->will(
+                $this->returnCallback(
+                    function ($argument) use ($inputOptions) {
+                        if (array_key_exists($argument, $inputOptions)) {
+                            return $inputOptions[$argument];
+                        }
 
-                return null;
-            }));
+                        return null;
+                    }
+                )
+            );
 
         if ($aclExpectedToCall) {
             if (!empty($expectedOptions['create_acl'])) {
@@ -183,11 +187,13 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
      */
     public function formTypeDataProvider()
     {
+        $converter = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
+
         return [
             'create disabled'                   => [
                 [
                     'grid_name'      => 'test',
-                    'converter'      => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'      => $converter,
                     'entity_class'   => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'        => [
                         'route_name' => 'test'
@@ -210,7 +216,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create no route'                   => [
                 [
                     'grid_name'      => 'test',
-                    'converter'      => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'      => $converter,
                     'entity_class'   => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'        => [
                         'route_name' => 'test'
@@ -233,7 +239,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create has route disabled'         => [
                 [
                     'grid_name'         => 'test',
-                    'converter'         => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'         => $converter,
                     'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'           => [
                         'route_name' => 'test'
@@ -259,7 +265,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create enabled acl disallowed'     => [
                 [
                     'grid_name'         => 'test',
-                    'converter'         => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'         => $converter,
                     'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'           => [
                         'route_name' => 'test'
@@ -285,7 +291,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create enabled acl allowed'        => [
                 [
                     'grid_name'         => 'test',
-                    'converter'         => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'         => $converter,
                     'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'           => [
                         'route_name' => 'test'
@@ -311,7 +317,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create enabled acl allowed custom' => [
                 [
                     'grid_name'                    => 'test',
-                    'converter'                    => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
+                    'converter'                    => $converter,
                     'entity_class'                 => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'                      => [
                         'route_name' => 'test'
