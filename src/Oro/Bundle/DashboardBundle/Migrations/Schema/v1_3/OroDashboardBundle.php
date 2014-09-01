@@ -29,7 +29,7 @@ class OroDashboardBundle implements Migration
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
@@ -41,7 +41,7 @@ class OroDashboardBundle implements Migration
             $schema->getTable('oro_dashboard'),
             ['dashboard_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
 
         $queries->addPostQuery(
