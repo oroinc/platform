@@ -9,7 +9,7 @@
     <div class="nav top-search fix_logo">
         <div class="dropdown header-utility-dropdown">
             <i class="icon-ellipsis-vertical dropdown-toggle btn-organization-switcher" data-toggle="dropdown"></i>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu dropdown-organization-switcher">
                 {% for organization in organizations %}
                     {% if curr_organization.getId() != organization.id %}
                         <li>
