@@ -10,6 +10,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 abstract class AbstractEmailFixture extends AbstractFixture implements DependentFixtureInterface
 {
@@ -29,6 +30,7 @@ abstract class AbstractEmailFixture extends AbstractFixture implements Dependent
     public function load(ObjectManager $manager)
     {
         $adminUser = $this->getAdminUser($manager);
+        $organization = $this->getOrganization($manager);
 
         $emailTemplates = $this->getEmailTemplatesList($this->getEmailsDir());
 
@@ -36,6 +38,7 @@ abstract class AbstractEmailFixture extends AbstractFixture implements Dependent
             $template = file_get_contents($file['path']);
             $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
             $emailTemplate->setOwner($adminUser);
+            $emailTemplate->setOrganization($organization);
             $manager->persist($emailTemplate);
         }
 
@@ -75,6 +78,15 @@ abstract class AbstractEmailFixture extends AbstractFixture implements Dependent
         }
 
         return $templates;
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @return Organization
+     */
+    protected function getOrganization(ObjectManager $manager)
+    {
+        return $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
     }
 
     /**

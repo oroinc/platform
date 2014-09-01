@@ -55,16 +55,18 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $classConfig = $this->loadEntityConfigData($logger, $this->className);
-        $data = unserialize($classConfig['data']);
+        if ($classConfig) {
+            $data = unserialize($classConfig['data']);
 
-        $data = $this->getNewData($data);
+            $data = $this->getNewData($data);
 
-        $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
-        $params = ['data' => $data, 'id' => $classConfig['id']];
-        $types  = ['data' => 'array', 'id' => 'integer'];
-        $this->logQuery($logger, $query, $params, $types);
-        if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
+            $params = ['data' => $data, 'id' => $classConfig['id']];
+            $types  = ['data' => 'array', 'id' => 'integer'];
+            $this->logQuery($logger, $query, $params, $types);
+            if (!$dryRun) {
+                $this->connection->executeUpdate($query, $params, $types);
+            }
         }
     }
 
@@ -85,7 +87,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
 
         $rows = $this->connection->fetchAll($sql, $params, $types);
 
-        return $rows[0];
+        return isset($rows[0]) ? $rows[0] : false;
     }
 
     /**
