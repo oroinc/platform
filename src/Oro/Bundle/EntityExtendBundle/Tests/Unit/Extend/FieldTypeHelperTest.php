@@ -17,30 +17,6 @@ class FieldTypeHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider isRealRelationProvider
-     */
-    public function testIsRealRelation($type, $expectedResult)
-    {
-        $this->assertEquals(
-            $expectedResult,
-            $this->helper->isRealRelation($type)
-        );
-    }
-
-    public function isRealRelationProvider()
-    {
-        return [
-            ['ref-one', true],
-            ['ref-many', true],
-            ['manyToOne', true],
-            ['oneToMany', true],
-            ['manyToMany', true],
-            ['integer', false],
-            ['enum', false]
-        ];
-    }
-
-    /**
      * @dataProvider getUnderlyingTypeProvider
      */
     public function testGetUnderlyingType($type, $expectedType)

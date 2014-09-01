@@ -11,14 +11,6 @@ class FieldTypeHelper
      */
     protected $underlyingTypesMap;
 
-    protected $realRelationTypes = [
-        'ref-one'    => true,
-        'ref-many'   => true,
-        'manyToOne'  => true,
-        'oneToMany'  => true,
-        'manyToMany' => true
-    ];
-
     /**
      * @param string[] $underlyingTypesMap key = data type name, value = underlying data type
      */
@@ -39,17 +31,5 @@ class FieldTypeHelper
         }
 
         return $this->underlyingTypesMap[$type];
-    }
-
-    /**
-     * Check if relation is real relation
-     *
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function isRealRelation($type)
-    {
-        return isset($this->realRelationTypes[$type]);
     }
 }
