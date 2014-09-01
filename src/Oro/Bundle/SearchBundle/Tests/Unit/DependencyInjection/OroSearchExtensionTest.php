@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\TestBundle;
-
 use Oro\Component\Config\CumulativeResourceManager;
 
 class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
@@ -61,7 +60,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
                         'fields'          => array(
                             array(
                                 'name'          => 'name',
-                                'target_type'   => 'string',
+                                'target_type'   => 'text',
                                 'target_fields' => array('name', 'all_data')
                             )
                         )
