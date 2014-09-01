@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_ENGINE = 'orm';
@@ -18,6 +20,14 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_search');
+
+        $targetTypes   = array('text', 'decimal', 'integer', 'datetime');
+        $relationTypes = array(
+            Indexer::RELATION_ONE_TO_ONE,
+            Indexer::RELATION_ONE_TO_MANY,
+            Indexer::RELATION_MANY_TO_ONE,
+            Indexer::RELATION_MANY_TO_MANY
+        );
 
         $rootNode
             ->children()
@@ -66,18 +76,24 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                             ->children()
                                 ->scalarNode('name')->end()
-                                ->scalarNode('relation_type')->end()
-                                ->scalarNode('target_type')->end()
+                                ->enumNode('target_type')
+                                    ->values($targetTypes)
+                                ->end()
                                 ->arrayNode('target_fields')
                                     ->prototype('scalar')->end()
                                 ->end()
                                 ->scalarNode('getter')->end()
+                                ->enumNode('relation_type')
+                                    ->values($relationTypes)
+                                ->end()
                                 ->scalarNode('relation_class')->end()
                                 ->arrayNode('relation_fields')
                                     ->prototype('array')
                                     ->children()
                                         ->scalarNode('name')->end()
-                                        ->scalarNode('target_type')->end()
+                                        ->enumNode('target_type')
+                                            ->values($targetTypes)
+                                        ->end()
                                         ->arrayNode('target_fields')
                                             ->prototype('scalar')->end()
                                         ->end()
