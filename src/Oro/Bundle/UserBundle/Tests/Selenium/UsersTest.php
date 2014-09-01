@@ -17,6 +17,7 @@ class UsersTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
+            ->assertTitle('Users - User Management - System')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)

@@ -26,23 +26,23 @@
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
             <div class="message">
                 <%= message %>
-                <% if (hasUpdate) { %>
-                <div class="details">
-                    <div>
-                        <%= _.template(
-                            {{ 'oro.note.updated_by'|trans|json_encode|raw }},
-                            {
-                                user: updatedBy_url
-                                    ? '<a class="user" href="' + updatedBy_url + '">' + updatedBy + '</a>'
-                                    : '<i class="user">' + updatedBy + '</i>',
-                                date: '<i class="date">' + updatedAt + '</i>'
-                            },
-                            {interpolate: /\{\{(.+?)\}\}/g}
-                        ) %>
-                    </div>
-                </div>
-                <% } %>
             </div>
+            <% if (hasUpdate) { %>
+            <div class="details">
+                <div>
+                    <%= _.template(
+                            {{ 'oro.note.updated_by'|trans|json_encode|raw }},
+                    {
+                    user: updatedBy_url
+                    ? '<a class="user" href="' + updatedBy_url + '">' + updatedBy + '</a>'
+                    : '<i class="user">' + updatedBy + '</i>',
+                    date: '<i class="date">' + updatedAt + '</i>'
+                    },
+                    {interpolate: /\{\{(.+?)\}\}/g}
+                    ) %>
+                </div>
+            </div>
+            <% } %>
         </div>
     </div>
 </script>
