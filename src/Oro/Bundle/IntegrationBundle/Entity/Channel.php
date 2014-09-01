@@ -138,7 +138,12 @@ class Channel
     /**
      * @var integer
      *
-     * @ORM\Column(name="edit_mode", type="integer", nullable=false, options={"default"=3}))
+     * @ORM\Column(
+     *     name="edit_mode",
+     *     type="integer",
+     *     nullable=false,
+     *     options={"default"=\Oro\Bundle\IntegrationBundle\Entity\Channel::EDIT_MODE_ALLOW})
+     * )
      */
     protected $editMode;
 
