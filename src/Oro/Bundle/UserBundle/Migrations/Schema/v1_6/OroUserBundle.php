@@ -8,8 +8,6 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
-use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
-
 class OroUserBundle implements Migration
 {
     /**
