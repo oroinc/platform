@@ -138,7 +138,7 @@ class Channel
     /**
      * @var integer
      *
-     * @ORM\Column(name="edit_mode", type="integer", nullable=false)
+     * @ORM\Column(name="edit_mode", type="integer", nullable=false, options={"default"=3}))
      */
     protected $editMode;
 
