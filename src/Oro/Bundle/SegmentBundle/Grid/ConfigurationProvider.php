@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Grid;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
@@ -16,6 +17,9 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
 
     /** @var ManagerRegistry */
     protected $doctrine;
+
+    /** @var DatagridConfiguration[] */
+    private $configuration = [];
 
     /**
      * Constructor
@@ -44,14 +48,18 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
      */
     public function getConfiguration($gridName)
     {
-        $id                = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
-        $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
-        $segment           = $segmentRepository->find($id);
+        if (empty($this->configuration[$gridName])) {
+            $id                = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
+            $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
+            $segment           = $segmentRepository->find($id);
 
-        $this->builder->setGridName($gridName);
-        $this->builder->setSource($segment);
+            $this->builder->setGridName($gridName);
+            $this->builder->setSource($segment);
 
-        return $this->builder->getConfiguration();
+            $this->configuration[$gridName] = $this->builder->getConfiguration();
+        }
+
+        return $this->configuration[$gridName];
     }
 
     /**
