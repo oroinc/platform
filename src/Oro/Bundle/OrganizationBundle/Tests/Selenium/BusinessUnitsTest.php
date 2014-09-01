@@ -46,7 +46,7 @@ class BusinessUnitsTest extends Selenium2TestCase
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
-            ->assertTile("{$unitName} - Business Units - User Management - System")
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->edit()
             ->setBusinessUnitName($newUnitName)
             ->save()
@@ -67,7 +67,7 @@ class BusinessUnitsTest extends Selenium2TestCase
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
-            ->asserTitle("{$unitName} - Business Units - User Management - System")
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->delete()
             ->assertTitle('Business Units - User Management - System')
             ->assertMessage('Business Unit deleted');
