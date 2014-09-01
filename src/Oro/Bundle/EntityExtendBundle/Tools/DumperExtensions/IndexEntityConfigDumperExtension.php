@@ -106,7 +106,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     {
         $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
         if (in_array($underlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
-            // a relation fields already have an index
+            // relation fields already have an index
             return false;
         }
 
