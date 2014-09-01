@@ -38,8 +38,7 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
         EntityManager $em,
         SearchRegistry $searchRegistry,
         ConfigProviderInterface $configProvider
-    )
-    {
+    ) {
         $this->em             = $em;
         $this->searchRegistry = $searchRegistry;
         $this->configProvider = $configProvider;

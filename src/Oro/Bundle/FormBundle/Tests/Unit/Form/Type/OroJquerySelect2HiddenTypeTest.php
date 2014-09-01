@@ -93,8 +93,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         array $options,
         array $expectedCalls,
         array $expectedVars
-    )
-    {
+    ) {
         if (isset($options['converter'])
             && is_string($options['converter'])
             && method_exists($this, $options['converter'])
@@ -242,8 +241,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         array $expectedCalls,
         $expectedException,
         $expectedExceptionMessage
-    )
-    {
+    ) {
         if (isset($options['converter'])
             && is_string($options['converter'])
             && method_exists($this, $options['converter'])

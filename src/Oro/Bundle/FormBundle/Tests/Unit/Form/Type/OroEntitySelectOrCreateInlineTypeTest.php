@@ -129,8 +129,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $aclAllowed,
         $aclExpectedToCall,
         array $expectedViewVars = []
-    )
-    {
+    ) {
         $this->config
             ->expects($this->any())
             ->method('get')
