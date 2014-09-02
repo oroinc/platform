@@ -596,11 +596,11 @@
         <div class="input-append">
             {{ form_widget(form) }}
             <button class="add-on btn entity-select-btn"><i class="icon-align-justify"></i></button>
-        </div>
 
-        {% if form.vars.create_enabled %}
-            <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
-        {% endif %}
+            {% if form.vars.create_enabled %}
+                <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+            {% endif %}
+        </div>
     </div>
 
     {% if configs.extra_config is defined and configs.extra_config %}
