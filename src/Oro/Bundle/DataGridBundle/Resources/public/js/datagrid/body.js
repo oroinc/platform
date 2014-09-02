@@ -85,9 +85,8 @@ define([
          * @inheritDoc
          */
         removeRow: function (model, collection, options) {
-            var index = collection.indexOf(model);
-            if (index < this.rows.length) {
-                this._stopListeningToOneRowEvents(this.rows[index]);
+            if (options && !_.isUndefined(options.index)) {
+                this._stopListeningToOneRowEvents(this.rows[options.index]);
             }
             Body.__super__.removeRow.apply(this, arguments);
         },
