@@ -40,24 +40,19 @@
                 });
                 {% endif %}
 
+                var reindex_values = function() {
+                    var index = 1;
+                    $('#{{ context.id }} input.priority').each(function(i, el){
+                        $(el).val(index++);
+                    })
+                };
+
                 container.sortable({
                     cursor: 'move',
                     delay : 100,
                     containment: "parent",
-                    stop  : function () {
-                        var index = 1;
-                        $('#{{ context.id }} input.priority').each(function(i, el){
-                            $(el).val(index++);
-                        })
-                    }
+                    stop  : reindex_values
                 });
-
-                var reindex_values = function() {
-                    var index = 1;
-                    $('#{{ context.id }} [name$="[priority]"]').each(function(i, el){
-                        $(el).val(index++);
-                    })
-                };
 
                 reindex_values();
                 container.parent().on('click', 'a.add-list-item', reindex_values);

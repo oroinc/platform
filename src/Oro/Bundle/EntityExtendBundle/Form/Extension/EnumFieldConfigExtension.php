@@ -66,6 +66,7 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         };
 
         $enumConfig = $configModel->toArray('enum');
+        // new enum
         if (empty($enumConfig['enum_code'])) {
             return;
         }
@@ -127,7 +128,9 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         $locale             = $this->translator->getLocale();
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
         $enumConfigProvider = $this->configManager->getProvider('enum');
+
         if ($enumConfigProvider->hasConfig($enumValueClassName)) {
+            // new enum case
             if ($configModel->getId()) {
                 if ($enumName !== null) {
                     $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
@@ -147,6 +150,18 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
             unset($data['enum']['enum_public']);
             $event->setData($data);
         } else {
+            // existing enum config, sort and set locale
+            usort(
+                $data['enum']['enum_options'],
+                function ($a, $b) {
+                    if ($a['priority'] == $b['priority']) {
+                        return 0;
+                    }
+
+                    return $a['priority'] < $b['priority'] ? -1 : 1;
+                }
+            );
+
             $data['enum']['enum_locale'] = $locale;
             $event->setData($data);
         }

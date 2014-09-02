@@ -25,7 +25,7 @@ class EnumValueType extends AbstractType
             ->add('id', 'hidden')
             ->add('label', 'text', ['required' => true])
             ->add('is_default', 'checkbox', ['required' => false])
-            ->add('priority', 'hidden', ['empty_data' => 9999]);
+            ->add('priority', 'hidden', ['empty_data' => 9999, 'attr' => ['class' => 'priority']]);
 
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
