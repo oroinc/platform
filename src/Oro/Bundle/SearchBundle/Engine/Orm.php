@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
