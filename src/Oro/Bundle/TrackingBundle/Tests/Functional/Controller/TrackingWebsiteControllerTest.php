@@ -32,7 +32,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Website updated", $crawler->html());
+        $this->assertContains("Tracking Website saved", $crawler->html());
     }
 
     /**
@@ -63,7 +63,7 @@ class TrackingWebsiteControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains("Website updated", $crawler->html());
+        $this->assertContains("Tracking Website saved", $crawler->html());
     }
 
     /**
