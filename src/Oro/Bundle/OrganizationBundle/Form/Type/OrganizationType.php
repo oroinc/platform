@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class OrganizationType extends AbstractType
 {
@@ -55,6 +58,18 @@ class OrganizationType extends AbstractType
                     'label'    => 'oro.organization.description.label'
                 ]
             );
+        // we should set enabled for current organization because form change enabled property to false
+        // if 'enabled' field is disabled
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $currentOrganization = $this->securityContext->getToken()->getOrganizationContext();
+                $data = $event->getData();
+                if (is_object($data) && $data->getId() === $currentOrganization->getId()) {
+                    $data->setEnabled(true);
+                }
+            }
+        );
     }
 
     /**
