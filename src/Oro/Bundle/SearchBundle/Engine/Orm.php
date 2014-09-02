@@ -17,8 +17,6 @@ use Oro\Bundle\SearchBundle\Entity\Item;
 
 class Orm extends AbstractEngine
 {
-    const BATCH_SIZE = 1000;
-
     /**
      * @var SearchIndexRepository
      */
@@ -69,38 +67,6 @@ class Orm extends AbstractEngine
         }
 
         return $recordsCount;
-    }
-
-    /**
-     * @param string $entityName
-     * @return int
-     */
-    protected function reindexSingleEntity($entityName)
-    {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getRepository($entityName);
-        $queryBuilder = $entityManager->createQueryBuilder('entity');
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(self::BATCH_SIZE);
-
-        $itemsCount = 0;
-        $entities = array();
-
-        foreach ($iterator as $entity) {
-            $entities[] = $entity;
-            $itemsCount++;
-
-            if (0 == $itemsCount % self::BATCH_SIZE) {
-                $this->save($entities, true);
-                $entities[] = array();
-            }
-        }
-
-        if ($itemsCount % self::BATCH_SIZE > 0) {
-            $this->save($entities, true);
-        }
-
-        return $itemsCount;
     }
 
     /**
@@ -305,18 +271,18 @@ class Orm extends AbstractEngine
             ->setParameter('entity', $entityName);
 
         $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(self::BATCH_SIZE);
+        $iterator->setBufferSize(static::BATCH_SIZE);
 
         foreach ($iterator as $entity) {
             $itemsCount++;
             $entityManager->remove($entity);
 
-            if (0 == $itemsCount % self::BATCH_SIZE) {
+            if (0 == $itemsCount % static::BATCH_SIZE) {
                 $entityManager->flush();
             }
         }
 
-        if ($itemsCount % self::BATCH_SIZE > 0) {
+        if ($itemsCount % static::BATCH_SIZE > 0) {
             $entityManager->flush();
         }
     }
@@ -326,36 +292,6 @@ class Orm extends AbstractEngine
      */
     protected function clearAllSearchIndexes()
     {
-        /** @var Connection $connection */
-        $connection = $this->registry->getConnection();
-        $dbPlatform = $connection->getDatabasePlatform();
-        $connection->beginTransaction();
-        try {
-            $connection->query('SET FOREIGN_KEY_CHECKS=0');
-            $this->truncate($dbPlatform, $connection, 'OroSearchBundle:Item');
-            $this->truncate($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
-            $this->truncate($dbPlatform, $connection, 'OroSearchBundle:IndexText');
-            $this->truncate($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
-            $this->truncate($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
-            $connection->query('SET FOREIGN_KEY_CHECKS=1');
-            $connection->commit();
-        } catch (\Exception $e) {
-            $connection->rollback();
-        }
-    }
-
-    /**
-     * Truncate query for table
-     *
-     * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
-     * @param string $entityName
-     */
-    protected function truncate(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
-    {
-        /** @var ClassMetadata $metadata */
-        $metadata = $this->registry->getManagerForClass($entityName)->getClassMetadata($entityName);
-        $query = $dbPlatform->getTruncateTableSql($metadata->getTableName());
-        $connection->executeUpdate($query);
+        $this->getIndexRepository()->truncateIndex();
     }
 }

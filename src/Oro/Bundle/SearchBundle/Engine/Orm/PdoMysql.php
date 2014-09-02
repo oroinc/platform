@@ -1,12 +1,13 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoMysql extends BaseDriver
@@ -253,5 +254,18 @@ class PdoMysql extends BaseDriver
     protected function isAllDataField($fieldName)
     {
         return $fieldName == Indexer::TEXT_ALL_DATA_FIELD;
+    }
+
+    /**
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     */
+    protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
+    {
+        $connection->query('SET FOREIGN_KEY_CHECKS=0');
+
+        parent::truncateEntities($dbPlatform, $connection);
+
+        $connection->query('SET FOREIGN_KEY_CHECKS=1');
     }
 }
