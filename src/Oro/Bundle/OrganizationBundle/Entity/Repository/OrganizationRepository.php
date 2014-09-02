@@ -79,17 +79,18 @@ class OrganizationRepository extends EntityRepository
     /**
      * Update all records in given table with organization id
      *
-     * @param string  $tableName table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
-     * @param integer $id        Organization id
+     * @param string  $tableName    table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
+     * @param integer $id           Organization id
+     * @param string  $relationName relation name to update. By default 'organization'
      *
      * @return integer Number of rows affected
      */
-    public function updateWithOrganization($tableName, $id)
+    public function updateWithOrganization($tableName, $id, $relationName = 'organization')
     {
         return $this->getEntityManager()
             ->createQueryBuilder()
             ->update($tableName, 't')
-            ->set('t.organization', ':id')
+            ->set('t.' . $relationName, ':id')
             ->setParameter('id', $id)
             ->getQuery()
             ->execute();

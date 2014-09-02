@@ -4,11 +4,12 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -39,6 +40,26 @@ class EmbedFormController extends Controller
         $form->handleRequest($request);
         if ($form->isValid()) {
             $entity = $form->getData();
+
+            /**
+             * Set owner ID (current organization) to concrete form entity
+             */
+            $entityClass      = ClassUtils::getClass($entity);
+            $config           = $this->get('oro_entity_config.provider.ownership');
+            $entityConfig     = $config->getConfig($entityClass);
+            $formEntityConfig = $config->getConfig($formEntity);
+
+            if (
+                $entityConfig->has('owner_field_name') &&
+                $entityConfig->get('owner_type') == OwnershipType::OWNER_TYPE_ORGANIZATION
+            ) {
+                $accessor = PropertyAccess::createPropertyAccessor();
+                $accessor->setValue(
+                    $entity,
+                    $entityConfig->get('owner_field_name'),
+                    $accessor->getValue($formEntity, $formEntityConfig->get('owner_field_name'))
+                );
+            }
             $em->persist($entity);
             $em->flush();
 
