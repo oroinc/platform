@@ -37,5 +37,5 @@ Oro\Bundle\UserBundle\Entity\User:
             target_fields:          [nameSuffix]
         -
             name:                   birthday
-            target_type:            birthday
+            target_type:            datetime
             target_fields:          [birthday]
