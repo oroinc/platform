@@ -13,22 +13,6 @@
   }
 }
 .form-signin {
-  @media screen and (-webkit-min-device-pixel-ratio:0) {
-    select.login_custom {
-      height: 34px;
-      width: 228px !important;
-      border-left-color: #ccc;
-      z-index: 1;
-      position: relative;
-      -webkit-margin-start: -3px;
-      text-indent: 6px;
-    }
-    span.login_custom {
-      position:relative;
-      z-index: 2;
-    }
-  }
-
   margin: 0 auto;
   max-width: 410px;
   padding: 0;
@@ -86,6 +70,38 @@
     &:-ms-input-placeholder {
       color:#999
     }
+  }
+  select.login_custom:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+  select.login_custom {
+    height: 34px;
+    width: 211px !important;
+    padding: 0 14px 0 0;
+    -webkit-appearance: none;
+    -moz-appearance:    none;
+    appearance:         none;
+    border-radius: 0 5px 5px 0 !important;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-top-left-radius: 0px;
+    -moz-border-radius-topright: 5px;
+    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius-topleft: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    -webkit-box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+    text-decoration: none;
+  }
+  .organization-selector-arrow{
+    position: relative;
+    top: 8px;
+    left: -15px;
+    margin-right: -9px;
+    z-index: 5;
   }
   .add-on {
     & + input[type="text"],
