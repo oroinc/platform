@@ -147,7 +147,7 @@ class MultiEnumFilterTest extends OrmTestCase
             . ' WHERE o IN('
             . 'SELECT filter_test'
             . ' FROM Stub:TestEntity filter_test'
-            . ' LEFT JOIN filter_test.values filter_test_rel'
+            . ' INNER JOIN filter_test.values filter_test_rel'
             . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
@@ -196,7 +196,7 @@ class MultiEnumFilterTest extends OrmTestCase
             . ' WHERE o NOT IN('
             . 'SELECT filter_test'
             . ' FROM Stub:TestEntity filter_test'
-            . ' LEFT JOIN filter_test.values filter_test_rel'
+            . ' INNER JOIN filter_test.values filter_test_rel'
             . ' WHERE filter_test_rel IN(:param1))',
             $result
         );

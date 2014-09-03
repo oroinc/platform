@@ -172,7 +172,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         if ($relJoinType === 'LEFT') {
             $qb->leftJoin(sprintf('%s.%s', $rootAlias, $rootField), $relAlias);
         } else {
-            $qb->leftJoin(sprintf('%s.%s', $rootAlias, $rootField), $relAlias);
+            $qb->innerJoin(sprintf('%s.%s', $rootAlias, $rootField), $relAlias);
         }
 
         return $qb;
