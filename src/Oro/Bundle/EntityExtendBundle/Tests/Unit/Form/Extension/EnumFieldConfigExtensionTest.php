@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
 
+use Symfony\Component\Form\FormEvents;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Form\FormEvents;
 
 class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -144,7 +145,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
         $initialData = [];
         $enumOptions = [
-            ['id' => 'test', 'label' => 'test']
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
         ];
 
         $expectedData = [
@@ -271,7 +272,9 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event = $this->getFormEventMock($configModel, $form);
 
         $enumOptions   = [
-            ['id' => 'test', 'label' => 'test']
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 4],
+            ['label' => 'Value 1', 'priority' => 2],
         ];
         $submittedData = [
             'enum' => [
@@ -284,7 +287,11 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             'enum' => [
                 'enum_name'    => $enumName,
                 'enum_public'  => true,
-                'enum_options' => $enumOptions,
+                'enum_options' => [
+                    ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
+                    ['label' => 'Value 1', 'priority' => 2],
+                    ['id' => 'val1', 'label' => 'Value 1', 'priority' => 3],
+                ],
                 'enum_locale'  => $locale
             ]
         ];
@@ -358,7 +365,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event = $this->getFormEventMock($configModel, $form);
 
         $enumOptions   = [
-            ['id' => 'test', 'label' => 'test']
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
         ];
         $submittedData = [
             'enum' => [
@@ -429,7 +436,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $event = $this->getFormEventMock($configModel, $form);
 
         $enumOptions   = [
-            ['id' => 'test', 'label' => 'test']
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
         ];
         $submittedData = [
             'enum' => [
@@ -439,8 +446,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $expectedData  = [
-            'enum' => [
-            ]
+            'enum' => []
         ];
 
         $event->expects($this->once())

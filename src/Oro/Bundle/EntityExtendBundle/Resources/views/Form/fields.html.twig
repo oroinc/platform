@@ -42,7 +42,7 @@
 
                 var reindex_values = function() {
                     var index = 1;
-                    $('#{{ context.id }} input.priority').each(function(i, el){
+                    $('#{{ context.id }} [name$="[priority]"]').each(function(i, el){
                         $(el).val(index++);
                     })
                 };
