@@ -50,6 +50,8 @@ class Configuration implements ConfigurationInterface
                             ->thenInvalid('Invalid property type "%s"')
                         ->end()
                     ->end()
+                    // if "data name" is not specified a field name is used
+                    ->scalarNode(PropertyInterface::DATA_NAME_KEY)->end()
                     // just validate type if node exist
                     ->scalarNode(PropertyInterface::FRONTEND_TYPE_KEY)->defaultValue(self::DEFAULT_FRONTEND_TYPE)->end()
                     ->scalarNode('label')->end()

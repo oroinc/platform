@@ -60,6 +60,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
      */
     public function preUpdate()
     {
+        $enumConfigProvider   = $this->configManager->getProvider('enum');
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs();
         foreach ($entityConfigs as $entityConfig) {
@@ -81,19 +82,18 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 }
 
                 // prepare input parameters
-                $fieldOptions       = [
+                $fieldOptions    = [
                     'importexport' => [
                         'process_as_scalar' => true
                     ]
                 ];
-                $enumConfigProvider = $this->configManager->getProvider('enum');
-                $enumFieldConfig    = $enumConfigProvider->getConfig(
+                $enumFieldConfig = $enumConfigProvider->getConfig(
                     $fieldConfigId->getClassName(),
                     $fieldConfigId->getFieldName()
                 );
-                $enumCode           = $enumFieldConfig->get('enum_code');
-                $enumName           = $enumFieldConfig->get('enum_name');
-                $isPublic           = $enumFieldConfig->get('enum_public');
+                $enumCode        = $enumFieldConfig->get('enum_code');
+                $enumName        = $enumFieldConfig->get('enum_name');
+                $isPublic        = $enumFieldConfig->get('enum_public');
                 if (empty($enumCode) && $isPublic && empty($enumName)) {
                     throw new \LogicException(
                         sprintf(

@@ -54,26 +54,28 @@ abstract class AbstractEnumType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                // either enum_code or class must be specified
                 'enum_code'     => null,
                 'class'         => null,
                 'query_builder' => function (EntityRepository $repo) {
                     return $repo->createQueryBuilder('o')->orderBy('o.priority');
                 },
-                'property'      => 'name'
+                'property'      => 'name',
+                'multiple'      => null
             ]
         );
-
-        $resolver->setRequired(['enum_code']);
 
         $resolver->setNormalizers(
             [
                 'class'    => function (Options $options, $value) {
-                    return ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    return !empty($value)
+                        ? $value
+                        : ExtendHelper::buildEnumValueClassName($options['enum_code']);
                 },
                 'multiple' => function (Options $options, $value) {
-                    return $this->configManager->getProvider('enum')
-                        ->getConfig(ExtendHelper::buildEnumValueClassName($options['enum_code']))
-                        ->is('multiple');
+                    return $value !== null
+                        ? $value
+                        : $this->configManager->getProvider('enum')->getConfig($options['class'])->is('multiple');
                 }
             ]
         );
@@ -92,7 +94,7 @@ abstract class AbstractEnumType extends AbstractType
             // set initial options for new entity
             $formConfig = $form->getConfig();
             /** @var EntityRepository $repo */
-            $repo   = $this->doctrine->getRepository($formConfig->getOption('class'));
+            $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
             $data = $repo->createQueryBuilder('e')
                 ->where('e.default = true')
                 ->getQuery()

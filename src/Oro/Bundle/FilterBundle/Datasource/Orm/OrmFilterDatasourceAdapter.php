@@ -119,4 +119,14 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     {
         return $this->qb;
     }
+
+    /**
+     * Creates new instance of QueryBuilder object
+     *
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder()
+    {
+        return $this->qb->getEntityManager()->createQueryBuilder();
+    }
 }
