@@ -2,6 +2,9 @@
 "It may take few minutes...": "It may take few minutes..."
 oro:
     entity_extend:
+        datagrid:
+            enum:
+                filter.empty:       None
         form:
             data_type_group:
                 fields:             Fields

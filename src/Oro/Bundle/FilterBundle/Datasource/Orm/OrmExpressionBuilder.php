@@ -3,12 +3,17 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\ORM\Query\Expr;
+
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 
 class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
+    /** @var Expr */
     protected $expr;
 
+    /**
+     * @param Expr $expr
+     */
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;
