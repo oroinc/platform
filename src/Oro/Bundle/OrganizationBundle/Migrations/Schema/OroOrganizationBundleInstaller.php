@@ -44,8 +44,16 @@ class OroOrganizationBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
-        $table->addColumn('created_at', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
-        $table->addColumn('updated_at', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
+        $table->addColumn(
+            'created_at',
+            'datetime',
+            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
+        );
+        $table->addColumn(
+            'updated_at',
+            'datetime',
+            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
+        );
         $table->addColumn('enabled', 'boolean', ['default' => '1']);
         $table->addUniqueIndex(['name'], 'uniq_bb42b65d5e237e06');
         $table->setPrimaryKey(['id']);

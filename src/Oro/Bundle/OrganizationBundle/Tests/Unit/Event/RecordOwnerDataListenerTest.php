@@ -3,6 +3,8 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
@@ -11,7 +13,6 @@ use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
 {

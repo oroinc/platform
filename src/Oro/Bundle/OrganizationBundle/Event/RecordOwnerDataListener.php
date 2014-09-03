@@ -19,13 +19,10 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 
 class RecordOwnerDataListener
 {
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityContextLink;
-    /**
-     * @var ConfigProvider
-     */
+
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /**
