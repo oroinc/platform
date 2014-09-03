@@ -67,6 +67,7 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
 
         $enumConfig = $configModel->toArray('enum');
         if (empty($enumConfig['enum_code'])) {
+            // new enum - a form already has a all data because on submit them are not removed from a config
             return;
         }
 
@@ -127,7 +128,9 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         $locale             = $this->translator->getLocale();
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
         $enumConfigProvider = $this->configManager->getProvider('enum');
+
         if ($enumConfigProvider->hasConfig($enumValueClassName)) {
+            // existing enum
             if ($configModel->getId()) {
                 if ($enumName !== null) {
                     $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
@@ -147,6 +150,8 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
             unset($data['enum']['enum_public']);
             $event->setData($data);
         } else {
+            // new enum
+            $this->sortOptions($data['enum']['enum_options']);
             $data['enum']['enum_locale'] = $locale;
             $event->setData($data);
         }
@@ -170,5 +175,26 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         return isset($values[$name]) && array_key_exists($name, $values)
             ? $values[$name]
             : null;
+    }
+
+    /**
+     * @param array $options
+     */
+    protected function sortOptions(array &$options)
+    {
+        usort(
+            $options,
+            function ($a, $b) {
+                if ($a['priority'] == $b['priority']) {
+                    return 0;
+                }
+
+                return $a['priority'] < $b['priority'] ? -1 : 1;
+            }
+        );
+        $index = 0;
+        foreach ($options as &$option) {
+            $option['priority'] = ++$index;
+        }
     }
 }
