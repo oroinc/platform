@@ -123,7 +123,7 @@ class OroDashboardBundleInstaller implements Installation
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
@@ -135,7 +135,7 @@ class OroDashboardBundleInstaller implements Installation
             $schema->getTable('oro_dashboard'),
             ['dashboard_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 

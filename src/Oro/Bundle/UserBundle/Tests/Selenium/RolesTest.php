@@ -88,7 +88,9 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle')
+            ->assertTitle('Roles - User Management - System')
             ->add()
+            ->assertTitle('Create Role - Roles - User Management - System')
             ->setLabel($this->newRole['LABEL'] . $randomPrefix)
             ->setOwner('Main')
             ->save()

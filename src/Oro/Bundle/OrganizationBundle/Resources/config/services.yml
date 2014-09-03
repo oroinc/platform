@@ -109,12 +109,16 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_organization.link.security_context:
+        tags:
+            - { name: oro_service_link,  service: security.context }
+
     #
     # Listeners / Subscribers
     #
     oro_organization.entity_ownership.listener:
         class: %oro_organization.entity_ownership.listener.class%
-        arguments: ["@service_container", "@oro_entity_config.provider.ownership"]
+        arguments: ["@oro_organization.link.security_context", "@oro_entity_config.provider.ownership"]
         tags:
              - { name: doctrine.event_listener, event: prePersist }
 

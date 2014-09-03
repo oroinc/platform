@@ -386,20 +386,4 @@ class Channel
     {
         return $this->enabled;
     }
-
-    /**
-     * @return Organization
-     */
-    public function getOwner()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * @param Organization $organization
-     */
-    public function setOwner(Organization $organization)
-    {
-        $this->organization = $organization;
-    }
 }

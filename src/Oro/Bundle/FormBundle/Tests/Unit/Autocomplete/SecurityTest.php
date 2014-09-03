@@ -43,7 +43,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
 
     public function testIsAutocompleteGranted()
     {
-        $this->assertFalse($this->security->isAutocompleteGranted('test_acl_resource'));
+        $this->assertTrue($this->security->isAutocompleteGranted('test_acl_resource'));
 
         $this->security->setAutocompleteAclResource('test_search', 'test_acl_resource');
 

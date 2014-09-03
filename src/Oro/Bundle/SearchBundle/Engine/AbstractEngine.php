@@ -6,9 +6,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -21,6 +23,8 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
  */
 abstract class AbstractEngine implements EngineInterface
 {
+    const BATCH_SIZE = 1000;
+
     /**
      * @var ManagerRegistry
      */
@@ -165,6 +169,38 @@ abstract class AbstractEngine implements EngineInterface
 
             $entityManager->flush();
         }
+    }
+
+    /**
+     * @param string $entityName
+     * @return int
+     */
+    protected function reindexSingleEntity($entityName)
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getRepository($entityName);
+        $queryBuilder = $entityManager->createQueryBuilder('entity');
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(static::BATCH_SIZE);
+
+        $itemsCount = 0;
+        $entities = array();
+
+        foreach ($iterator as $entity) {
+            $entities[] = $entity;
+            $itemsCount++;
+
+            if (0 == $itemsCount % static::BATCH_SIZE) {
+                $this->save($entities, true);
+                $entities[] = array();
+            }
+        }
+
+        if ($itemsCount % static::BATCH_SIZE > 0) {
+            $this->save($entities, true);
+        }
+
+        return $itemsCount;
     }
 
     /**
