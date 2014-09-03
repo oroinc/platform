@@ -20,4 +20,19 @@ class TestEntity
      * @ORM\ManyToMany(targetEntity="TestEnumValue")
      */
     protected $values;
+
+    /** @var string */
+    protected $valuesSnapshot;
+
+    public function getValuesSnapshot()
+    {
+        return $this->valuesSnapshot;
+    }
+
+    public function setValuesSnapshot($value)
+    {
+        $this->valuesSnapshot = $value;
+
+        return $this;
+    }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -29,7 +28,7 @@ class MultiEnumManager
         );
 
         // check if multi-enum modifications exist
-        $updates = []; // [entity, snapshotFieldSetter, snapshotValue]
+        $updates = []; // [entityClassMetadata, entity, snapshotFieldSetter, snapshotValue]
         /** @var PersistentCollection $coll */
         foreach ($collections as $coll) {
             $mapping = $coll->getMapping();
@@ -41,17 +40,14 @@ class MultiEnumManager
                 $suffix        = $this->getSnapshotFieldMethodSuffix($mapping['fieldName']);
                 $snapshotValue = $this->buildSnapshotValue($coll);
                 if ($owner->{'get' . $suffix}() !== $snapshotValue) {
-                    $updates[] = [$owner, 'set' . $suffix, $snapshotValue];
+                    $updates[] = [$coll->getTypeClass(), $owner, 'set' . $suffix, $snapshotValue];
                 }
             }
         }
         // if any, update corresponding snapshots
         foreach ($updates as $item) {
-            $item[0]->{$item[1]}($item[2]);
-            $uow->computeChangeSet(
-                $em->getClassMetadata(ClassUtils::getClass($item[0])),
-                $item[0]
-            );
+            $item[1]->{$item[2]}($item[3]);
+            $uow->computeChangeSet($item[0], $item[1]);
         }
     }
 
@@ -77,7 +73,7 @@ class MultiEnumManager
         if (strlen($snapshot) > ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH) {
             $snapshot  = substr($snapshot, 0, ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH);
             $lastDelim = strrpos($snapshot, ',');
-            if (ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH - $lastDelim + 1 < 3) {
+            if (ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH - $lastDelim - 1 < 3) {
                 $lastDelim = strrpos($snapshot, ',', -(strlen($snapshot) - $lastDelim + 1));
             }
             $snapshot = substr($snapshot, 0, $lastDelim + 1) . '...';
