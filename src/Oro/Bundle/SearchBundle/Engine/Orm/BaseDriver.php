@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
@@ -84,6 +86,64 @@ abstract class BaseDriver
         $qb->select($qb->expr()->countDistinct('search.id'));
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Truncate all entities
+     *
+     * @throws \Exception
+     */
+    public function truncateIndex()
+    {
+        /** @var Connection $connection */
+        $connection = $this->em->getConnection();
+        $dbPlatform = $connection->getDatabasePlatform();
+        $connection->beginTransaction();
+        try {
+            $this->truncateEntities($dbPlatform, $connection);
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     */
+    protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
+    {
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexText');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
+    }
+
+    /**
+     * Truncate query for table
+     *
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     * @param string $entityName
+     */
+    protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
+    {
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->em->getClassMetadata($entityName);
+        $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName()) ;
+        $connection->executeUpdate($query);
+    }
+
+    /**
+     * @param AbstractPlatform $dbPlatform
+     * @param string $tableName
+     * @return string
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        return $dbPlatform->getTruncateTableSql($tableName);
     }
 
     /**
