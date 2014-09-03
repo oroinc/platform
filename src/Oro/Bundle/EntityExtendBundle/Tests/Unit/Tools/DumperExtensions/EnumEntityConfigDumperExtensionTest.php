@@ -165,7 +165,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'owner'     => ExtendScope::OWNER_SYSTEM,
                         'is_extend' => true,
                         'table'     => $this->nameGenerator->generateEnumTableName($enumCode1),
-                        'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                     ],
                     'grouping'   => [
                         'groups' => ['enum', 'dictionary']
@@ -333,7 +333,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'owner'     => ExtendScope::OWNER_SYSTEM,
                         'is_extend' => true,
                         'table'     => $this->nameGenerator->generateEnumTableName($enumCode1, true),
-                        'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                        'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                     ],
                     'grouping'   => [
                         'groups' => ['enum', 'dictionary']
@@ -453,9 +453,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testPostUpdateForEnumValues()
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $entityConfig1->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $entityConfig1->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $entityConfig2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $entityConfig2->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $entityConfig2->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $entityConfig2->set(
             'schema',
             [
@@ -563,7 +563,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                                 'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName('field1'),
                                 'type'     => 'string',
                                 'nullable' => true,
-                                'length'   => 500,
+                                'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
                             ],
                             ExtendHelper::getMultipleEnumSnapshotFieldName('field2') => [
                                 'column' => 'field2'

@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -338,7 +339,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'owner'     => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
                             'table'     => 'oro_enum_test_status',
-                            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                            'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                         ],
                         'grouping'   => [
                             'groups' => ['enum', 'dictionary']
@@ -449,7 +450,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'owner'     => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
                             'table'     => 'oro_enum_test_status',
-                            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                            'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                         ],
                         'grouping'   => [
                             'groups' => ['enum', 'dictionary']

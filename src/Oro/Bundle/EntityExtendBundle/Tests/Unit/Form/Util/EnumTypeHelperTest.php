@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -429,27 +430,27 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetPublicEnumTypes()
     {
         $config1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $config1->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config1->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config1->set('state', ExtendScope::STATE_ACTIVE);
         $config2 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config2->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config2->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config2->set('state', ExtendScope::STATE_UPDATE);
         $config3 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config3->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config3->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config3->set('state', ExtendScope::STATE_NEW);
         $config4 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config4->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config4->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config4->set('state', ExtendScope::STATE_DELETE);
         $config5 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
-        $config5->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config5->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config5->set('state', ExtendScope::STATE_ACTIVE);
         $config6 = new Config(new EntityConfigId('extend', 'Test\Entity6'));
         $config7 = new Config(new EntityConfigId('extend', 'Test\EnumValue2'));
-        $config7->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config7->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config7->set('state', ExtendScope::STATE_ACTIVE);
         $config7->set('is_deleted', true);
         $config8 = new Config(new EntityConfigId('extend', 'Test\EnumValue8'));
-        $config8->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $config8->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $config8->set('state', ExtendScope::STATE_ACTIVE);
 
         $configs = [$config1, $config2, $config3, $config4, $config5, $config6, $config7, $config8];

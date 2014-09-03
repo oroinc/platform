@@ -7,6 +7,8 @@ use Doctrine\Common\Inflector\Inflector;
 class ExtendHelper
 {
     const MAX_ENUM_VALUE_ID_LENGTH = 32;
+    const MAX_ENUM_SNAPSHOT_LENGTH = 500;
+    const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
 
     /**
      * @param string $type
@@ -179,7 +181,7 @@ class ExtendHelper
         }
 
         if (strlen($result) > self::MAX_ENUM_VALUE_ID_LENGTH) {
-            $hash = dechex(crc32($result));
+            $hash   = dechex(crc32($result));
             $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
 

@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumNameValidator;
 
@@ -104,7 +105,7 @@ class UniqueEnumNameValidatorTest extends \PHPUnit_Framework_TestCase
         $fieldConfigs2 = [$fieldConfig21];
 
         $enumValueConfig = new Config(new EntityConfigId('extend', 'Test\EnumValue'));
-        $enumValueConfig->set('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue');
+        $enumValueConfig->set('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS);
         $enumValueEnumConfig = new Config(new EntityConfigId('enum', 'Test\EnumValue'));
         $enumValueEnumConfig->set('code', 'existing_enum');
 

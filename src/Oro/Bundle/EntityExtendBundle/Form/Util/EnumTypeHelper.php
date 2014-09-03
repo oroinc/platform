@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Util;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumTypeHelper extends ConfigTypeHelper
 {
@@ -119,7 +120,7 @@ class EnumTypeHelper extends ConfigTypeHelper
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+            if (!$entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
                 continue;
             }
             if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
