@@ -72,7 +72,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
         // at first check if an enum entity with the given code is already exist
         $entityConfigs = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+            if (!$entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
                 continue;
             }
             $enumEntityConfig = $enumConfigProvider->getConfig($entityConfig->getId()->getClassName());

@@ -164,7 +164,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'owner'     => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
                     'table'     => $tableName,
-                    'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                 ],
                 'grouping'                                => [
                     'groups' => ['enum', 'dictionary']
@@ -300,7 +300,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 'string',
                 [
                     'notnull' => false,
-                    'length'  => 500
+                    'length'  => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
                 ]
             );
         } else {

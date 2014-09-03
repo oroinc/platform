@@ -159,7 +159,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            if ($entityConfig->is('inherit', 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')) {
+            if ($entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
                 $entityClassName = $entityConfig->getId()->getClassName();
                 $schema          = $entityConfig->get('schema', false, []);
                 if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
@@ -197,7 +197,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName($fieldName),
                         'type'     => 'string',
                         'nullable' => true,
-                        'length'   => 500,
+                        'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
                     ];
 
                     $entityConfig->set('schema', $schema);
@@ -254,7 +254,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'owner'     => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
                     'table'     => $this->nameGenerator->generateEnumTableName($enumCode, true),
-                    'inherit'   => 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue'
+                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                 ],
                 'grouping'   => [
                     'groups' => ['enum', 'dictionary']
