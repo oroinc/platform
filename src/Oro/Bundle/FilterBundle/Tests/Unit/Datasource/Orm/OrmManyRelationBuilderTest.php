@@ -87,7 +87,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
             . ' WHERE o ' . $operator . '('
             . 'SELECT filter_test'
             . ' FROM Stub:TestOrder filter_test'
-            . ' LEFT JOIN filter_test.products filter_test_rel'
+            . ' INNER JOIN filter_test.products filter_test_rel'
             . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
@@ -143,7 +143,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
             . ' WHERE p ' . $operator . '('
             . 'SELECT filter_test'
             . ' FROM ' . self::NS . 'TestProduct filter_test'
-            . ' LEFT JOIN filter_test.notes filter_test_rel'
+            . ' INNER JOIN filter_test.notes filter_test_rel'
             . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
@@ -176,7 +176,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
             . ' WHERE p1 ' . $operator . '('
             . 'SELECT filter_test'
             . ' FROM ' . self::NS . 'TestProduct filter_test'
-            . ' LEFT JOIN filter_test.orders filter_test_rel'
+            . ' INNER JOIN filter_test.orders filter_test_rel'
             . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
