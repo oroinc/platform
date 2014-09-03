@@ -64,7 +64,6 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             this.options.dialogOptions.close = runner(closeHandlers);
 
             this.on('widgetRender', _.bind(this._initAdjustHeight, this));
-            this.on('contentLoadError', _.bind(this.loadErrorHandler, this));
 
             this.initializeWidget(options);
         },
@@ -170,13 +169,6 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
 
         getWidget: function() {
             return this.widget;
-        },
-
-        loadErrorHandler: function()
-        {
-            if (this.model) {
-                this.model.destroy();
-            }
         },
 
         getActionsElement: function() {
