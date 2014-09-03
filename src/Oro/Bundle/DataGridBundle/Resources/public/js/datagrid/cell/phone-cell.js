@@ -1,23 +1,21 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'jquery',
-    'backbone',
-    'backgrid'
-], function ($, Backbone, Backgrid) {
-    "use strict";
+    'backgrid',
+    'orodatagrid/js/datagrid/formatter/phone-formatter'
+], function (Backgrid, PhoneFormatter) {
+    'use strict';
 
     var PhoneCell;
 
     /**
-     * Renders a link with tel protocol.
+     * Phone cell
      *
      * @export  oro/datagrid/cell/phone-cell
      * @class   oro.datagrid.cell.PhoneCell
-     * @extends Backbone.View
+     * @extends Backgrid.Cell
      */
-    PhoneCell = Backbone.View.extend({
-
+    PhoneCell = Backgrid.Cell.extend({
         /** @property */
         className: "phone-cell",
 
@@ -30,20 +28,24 @@ define([
         },
 
         /**
-         * Initializer. If the underlying model triggers a `select` event, this cell
-         * will change its checked value according to the event's `selected` value.
-         *
-         * @param {Object} options
-         * @param {Backgrid.Column} options.column
-         * @param {Backbone.Model} options.model
+         @property {(Backgrid.PhoneFormatter|Object|string)}
          */
-        initialize: function (options) {
-            Backgrid.requireOptions(options, ["model", "column"]);
+        formatter: new PhoneFormatter(),
 
-            this.column = options.column;
-            if (!(this.column instanceof Backgrid.Column)) {
-                this.column = new Backgrid.Column(this.column);
-            }
+
+        /**
+         * @override
+         * @inheritDoc
+         * @return {oro.datagrid.cell.PhoneCell}
+         */
+        render: function() {
+            var phoneNumber = this.model.get(this.column.get("name"));
+            var formattedValue = this.formatter.fromRaw(phoneNumber, this.model);
+
+            this.$el.empty();
+            this.$el.html(formattedValue);
+
+            return this;
         },
 
         /**
@@ -51,16 +53,6 @@ define([
          */
         stopPropagation: function (e) {
             e.stopPropagation();
-        },
-
-        /**
-         * Renders phone
-         */
-        render: function () {
-            var phone = (this.model.get(this.column.get("name")) || "");
-
-            this.$el.html("<a href=\"tel:" + phone + "\">" + phone + "</a>");
-            return this;
         }
     });
 
