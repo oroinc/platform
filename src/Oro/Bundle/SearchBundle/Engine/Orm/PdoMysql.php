@@ -257,8 +257,7 @@ class PdoMysql extends BaseDriver
     }
 
     /**
-     * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
+     * {@inheritdoc}
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {

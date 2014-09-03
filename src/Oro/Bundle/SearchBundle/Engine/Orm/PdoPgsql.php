@@ -131,9 +131,7 @@ class PdoPgsql extends BaseDriver
     }
 
     /**
-     * @param AbstractPlatform $dbPlatform
-     * @param string $tableName
-     * @return string
+     * {@inheritdoc}
      */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
