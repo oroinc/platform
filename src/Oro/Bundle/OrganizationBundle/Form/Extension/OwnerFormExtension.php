@@ -107,7 +107,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->businessUnitManager = $businessUnitManager;
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
-        $this->fieldName = RecordOwnerDataListener::OWNER_FIELD_NAME;
         $this->aclVoter = $aclVoter;
         $this->treeProvider = $treeProvider;
     }
@@ -149,9 +148,11 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         $metadata = $this->getMetadata($dataClassName);
-        if (!$metadata) {
+        if (!$metadata || $metadata->isOrganizationOwned()) {
             return;
         }
+
+        $this->fieldName = $metadata->getOwnerFieldName();
 
         $this->checkIsGranted('CREATE', 'entity:' . $dataClassName);
         $defaultOwner = null;
@@ -164,9 +165,6 @@ class OwnerFormExtension extends AbstractTypeExtension
             if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
                 $defaultOwner = $this->getCurrentBusinessUnit();
             }
-        } elseif ($metadata->isOrganizationOwned()) {
-            $this->addOrganizationOwnerField($builder, $user);
-            $defaultOwner = $this->getCurrentOrganization();
         }
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
@@ -510,31 +508,6 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param User                 $user
-     */
-    protected function addOrganizationOwnerField(FormBuilderInterface $builder, User $user)
-    {
-        $fieldOptions = array(
-            'class' => 'OroOrganizationBundle:Organization',
-            'property' => 'name',
-            'mapped' => true,
-            'required' => true,
-            'constraints' => array(new NotBlank())
-        );
-        if (!$this->isAssignGranted) {
-            $organizations = array();
-            $bu = $user->getBusinessUnits();
-            /** @var $businessUnit BusinessUnit */
-            foreach ($bu as $businessUnit) {
-                $organizations[] = $businessUnit->getOrganization();
-            }
-            $fieldOptions['choices'] = $organizations;
-        }
-        $builder->add($this->fieldName, 'entity', $fieldOptions);
-    }
-
-    /**
      * Check is granting user to object in given permission
      *
      * @param string        $permission
@@ -565,12 +538,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
 
         if ($metadata->hasOwner()) {
-            if (!method_exists($dataClassName, 'getOwner')) {
-                throw new \LogicException(
-                    sprintf('Method getOwner must be implemented for %s entity.', $dataClassName)
-                );
-            }
-
             return $metadata;
         } else {
             return false;
