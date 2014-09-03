@@ -108,8 +108,9 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
                 'targetEntity' => self::ENUM_VALUE_CLASS
             ],
             [
-                new TestEnumValue('val1', 'Value 1'),
                 new TestEnumValue('val2', 'Value 2'),
+                new TestEnumValue('val1', 'Value 1'),
+                new TestEnumValue('val3', 'Value 3'),
             ]
         );
 
@@ -131,7 +132,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->handleOnFlush($event);
 
         $this->assertEquals(
-            'val1,val2',
+            'val1,val2,val3',
             $owner->getValuesSnapshot()
         );
     }

@@ -28,7 +28,7 @@ class MultiEnumManager
         );
 
         // check if multi-enum modifications exist
-        $updates = []; // [entityClassMetadata, entity, snapshotFieldSetter, snapshotValue]
+        $updates = [];
         /** @var PersistentCollection $coll */
         foreach ($collections as $coll) {
             $mapping = $coll->getMapping();
@@ -45,6 +45,7 @@ class MultiEnumManager
             }
         }
         // if any, update corresponding snapshots
+        // $item = [entityClassMetadata, entity, snapshotFieldSetter, snapshotValue]
         foreach ($updates as $item) {
             $item[1]->{$item[2]}($item[3]);
             $uow->computeChangeSet($item[0], $item[1]);
