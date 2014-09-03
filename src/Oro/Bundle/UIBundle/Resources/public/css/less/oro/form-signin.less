@@ -71,10 +71,14 @@
       color:#999
     }
   }
+  select.login_custom:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
   select.login_custom {
     height: 34px;
-    width: 224px !important;
-    padding: 0;
+    width: 211px !important;
+    padding: 0 14px 0 0;
     -webkit-appearance: none;
     -moz-appearance:    none;
     appearance:         none;
@@ -90,11 +94,12 @@
     -webkit-box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
     box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.75);
+    text-decoration: none;
   }
   .organization-selector-arrow{
     position: relative;
-    top: 9px;
-    left: -17px;
+    top: 8px;
+    left: -15px;
     margin-right: -9px;
     z-index: 5;
   }
