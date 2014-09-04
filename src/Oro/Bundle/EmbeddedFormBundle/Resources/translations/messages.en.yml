@@ -6,6 +6,7 @@ oro:
         form_type.label:     Form Type
         id.label:            ID
         title.label:         Title
+        owner.label:         Organization
 
         back_link_default_text: Back
         get_code:               Get code
