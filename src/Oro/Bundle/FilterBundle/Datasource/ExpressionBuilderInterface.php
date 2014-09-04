@@ -157,4 +157,13 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function notLike($x, $y, $withParam = false);
+
+    /**
+     * Creates a literal expression of the given argument.
+     *
+     * @param mixed $literal Argument to be converted to literal.
+     *
+     * @return mixed
+     */
+    public function literal($literal);
 }

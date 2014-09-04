@@ -73,6 +73,7 @@ class StringFilter extends AbstractFilter
      * @param int                              $comparisonType
      * @param string                           $fieldName
      * @param string                           $parameterName
+     *
      * @return string
      */
     protected function buildComparisonExpr(
@@ -91,9 +92,15 @@ class StringFilter extends AbstractFilter
             case TextFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
-                return $ds->expr()->isNull($fieldName);
+                return $ds->expr()->orX(
+                    $ds->expr()->isNull($fieldName),
+                    $ds->expr()->eq($fieldName, $ds->expr()->literal(''))
+                );
             case FilterUtility::TYPE_NOT_EMPTY:
-                return $ds->expr()->isNotNull($fieldName);
+                return $ds->expr()->andX(
+                    $ds->expr()->isNotNull($fieldName),
+                    $ds->expr()->neq($fieldName, $ds->expr()->literal(''))
+                );
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }
