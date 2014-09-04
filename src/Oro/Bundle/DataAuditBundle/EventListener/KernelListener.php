@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
 
 class KernelListener implements EventSubscriberInterface
@@ -45,7 +45,7 @@ class KernelListener implements EventSubscriberInterface
         if (null !== $token && $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->loggableManager->setUsername($token);
 
-            if ($token instanceof UsernamePasswordOrganizationToken) {
+            if ($token instanceof OrganizationContextTokenInterface) {
                 $this->loggableManager->setOrganization($token->getOrganizationContext());
             }
         }

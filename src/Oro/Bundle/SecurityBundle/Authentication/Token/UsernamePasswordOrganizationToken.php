@@ -7,16 +7,12 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class UsernamePasswordOrganizationToken extends UsernamePasswordToken
+class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements OrganizationContextTokenInterface
 {
-    /**
-     * @var Organization
-     */
+    /** @var Organization */
     protected $organizationContext;
 
-    /**
-     * @var OrganizationManager
-     */
+    /** @var OrganizationManager */
     protected $manager;
 
     /**

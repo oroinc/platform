@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 /**
  * Class WsseAuthProvider
@@ -38,5 +41,19 @@ class WsseAuthProvider extends Provider
         }
 
         return parent::getSalt($user);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function authenticate(TokenInterface $token)
+    {
+        if ($token instanceof OrganizationContextTokenInterface) {
+            /**
+             * TODO: OEE-303
+             */
+        }
+
+        return parent::authenticate($token);
     }
 }
