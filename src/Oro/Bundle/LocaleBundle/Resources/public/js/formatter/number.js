@@ -109,7 +109,7 @@ define(['numeral', '../locale-settings', 'underscore'
                 return doFormat(value, options, formattersChain);
             },
             formatInteger: function(value) {
-                var options = _.extend({},localeSettings.getNumberFormats('integer'));
+                var options = _.extend({},localeSettings.getNumberFormats('decimal'));
                 options.style = 'integer';
                 options.max_fraction_digits = 0;
                 options.min_fraction_digits = 0;
