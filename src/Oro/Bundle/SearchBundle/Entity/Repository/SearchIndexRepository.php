@@ -61,6 +61,14 @@ class SearchIndexRepository extends EntityRepository
     }
 
     /**
+     * Truncate all search index tables
+     */
+    public function truncateIndex()
+    {
+        $this->getDriverRepo()->truncateIndex();
+    }
+
+    /**
      * Get driver repository
      *
      * @return \Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver
