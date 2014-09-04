@@ -18,11 +18,6 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
     protected $platform;
 
     /**
-     * @var ForeignKeyConstraint[]
-     */
-    protected $foreignKeys = [];
-
-    /**
      * {@inheritdoc}
      */
     public function setDatabasePlatform(AbstractPlatform $platform)
@@ -48,16 +43,19 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
             return;
         }
 
+        /** @var ForeignKeyConstraint[] $foreignKeys */
+        $foreignKeys = [];
+
         foreach ($schema->getTables() as $table) {
-            /** @var ForeignKeyConstraint[] $foreignKeys */
-            $foreignKeys = array_filter(
+            /** @var ForeignKeyConstraint[] $tableForeignKeys */
+            $tableForeignKeys = array_filter(
                 $table->getForeignKeys(),
-                function (ForeignKeyConstraint $foreignKey) use ($tableName, $columnName) {
-                    if ($foreignKey->getForeignTableName() !== $tableName) {
+                function (ForeignKeyConstraint $tableForeignKey) use ($tableName, $columnName) {
+                    if ($tableForeignKey->getForeignTableName() !== $tableName) {
                         return false;
                     }
 
-                    if ($foreignKey->getForeignColumns() !== [$columnName]) {
+                    if ($tableForeignKey->getForeignColumns() !== [$columnName]) {
                         return false;
                     }
 
@@ -65,14 +63,14 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
                 }
             );
 
-            foreach ($foreignKeys as $foreignKey) {
-                $this->foreignKeys[$foreignKey->getName()] = $foreignKey;
+            foreach ($tableForeignKeys as $tableForeignKey) {
+                $foreignKeys[$tableForeignKey->getName()] = $tableForeignKey;
 
-                $foreignKeyTableName   = $foreignKey->getLocalTable()->getName();
-                $foreignKeyColumnNames = $foreignKey->getLocalColumns();
+                $foreignKeyTableName   = $tableForeignKey->getLocalTable()->getName();
+                $foreignKeyColumnNames = $tableForeignKey->getLocalColumns();
 
                 $queries->addPreQuery(
-                    $this->platform->getDropForeignKeySQL($foreignKey, $foreignKeyTableName)
+                    $this->platform->getDropForeignKeySQL($tableForeignKey, $foreignKeyTableName)
                 );
 
                 $schema
@@ -84,12 +82,10 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
 
         $targetColumn->setType($type);
 
-        foreach ($this->foreignKeys as $foreignKey) {
+        foreach ($foreignKeys as $foreignKey) {
             $queries->addPostQuery(
                 $this->platform->getCreateForeignKeySQL($foreignKey, $foreignKey->getLocalTable())
             );
         }
-
-        $this->foreignKeys = [];
     }
 }
