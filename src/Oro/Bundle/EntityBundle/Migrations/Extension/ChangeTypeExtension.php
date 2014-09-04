@@ -7,18 +7,11 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class ChangeTypeExtension
+class ChangeTypeExtension implements DatabasePlatformAwareInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
-
     /**
      * @var AbstractPlatform
      */
@@ -30,11 +23,11 @@ class ChangeTypeExtension
     protected $foreignKeys = [];
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * {@inheritdoc}
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function setDatabasePlatform(AbstractPlatform $platform)
     {
-        $this->managerRegistry = $managerRegistry;
+        $this->platform = $platform;
     }
 
     /**
@@ -48,21 +41,6 @@ class ChangeTypeExtension
      */
     public function changePrimaryKeyType(Schema $schema, QueryBag $queries, $tableName, $columnName, $type)
     {
-        $platformName = $this->getPlatform()->getName();
-
-        /** Apply only for mysql platform */
-        if ($platformName !== DatabasePlatformInterface::DATABASE_MYSQL) {
-            throw new \Exception(
-                sprintf(
-                    'Type changing of "%s.%s" on "%s" platform is not implemented.',
-                    $tableName,
-                    $columnName,
-                    $platformName
-                )
-            );
-        }
-
-        /** Already applied */
         $targetColumn = $schema->getTable($tableName)->getColumn($columnName);
         $type         = Type::getType($type);
 
@@ -97,7 +75,10 @@ class ChangeTypeExtension
                     $this->platform->getDropForeignKeySQL($foreignKey, $foreignKeyTableName)
                 );
 
-                $schema->getTable($foreignKeyTableName)->getColumn(reset($foreignKeyColumnNames))->setType($type);
+                $schema
+                    ->getTable($foreignKeyTableName)
+                    ->getColumn(reset($foreignKeyColumnNames))
+                    ->setType($type);
             }
         }
 
@@ -110,17 +91,5 @@ class ChangeTypeExtension
         }
 
         $this->foreignKeys = [];
-    }
-
-    /**
-     * @return AbstractPlatform
-     */
-    protected function getPlatform()
-    {
-        if (!$this->platform) {
-            $this->platform = $this->managerRegistry->getConnection()->getDatabasePlatform();
-        }
-
-        return $this->platform;
     }
 }

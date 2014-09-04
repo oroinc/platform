@@ -171,7 +171,5 @@ services:
 
     oro_entity.migration.extension.change_type:
         class: %oro_entity.migration.extension.change_type.class%
-        arguments:
-            - @doctrine
         tags:
             - { name: oro_migration.extension, extension_name: change_type }
