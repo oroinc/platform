@@ -144,6 +144,7 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
             case 'boolean':
                 return 'boolean';
             case 'date':
+                return 'date';
             case 'datetime':
                 return 'datetime';
         }
