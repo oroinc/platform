@@ -5,61 +5,63 @@ namespace Oro\Bundle\EntityBundle\Grid;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as OrmSorterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
+use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 
-class ExtendExtension extends AbstractExtension
+abstract class AbstractFieldsExtension extends AbstractExtension
 {
-    const EXTEND_ENTITY_CONFIG_PATH = '[extended_entity_name]';
-
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager       $configManager
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
     {
-        $this->configManager = $configManager;
+        $this->configManager       = $configManager;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH, false) !== false;
+        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $entityName = $this->getExtendedEntityNameByConfig($config);
-        $fields     = $this->getDynamicFields($entityName);
+        $fields = $this->getFields($config);
         foreach ($fields as $field) {
-            $fieldName   = $field->getFieldName();
-            $fieldConfig = $this->getFieldConfig('entity', $field->getClassName(), $fieldName);
-            $column      = [
-                'label' => $fieldConfig->get('label') ? : $fieldName
+            $fieldName = $field->getFieldName();
+            $column    = [
+                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName
             ];
-            $sorter      = [
+            $sorter    = [
                 'data_name' => $fieldName
             ];
-            $filter      = [
+            $filter    = [
                 'data_name' => $fieldName,
                 'enabled'   => false,
                 'options'   => []
@@ -71,7 +73,7 @@ class ExtendExtension extends AbstractExtension
                 $column
             );
             $config->offsetSetByPath(
-                sprintf('%s[%s]', OrmSorterConfiguration::COLUMNS_PATH, $fieldName),
+                sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $fieldName),
                 $sorter
             );
             $config->offsetSetByPath(
@@ -82,19 +84,16 @@ class ExtendExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        if (!($datasource instanceof OrmDatasource)) {
-            return;
-        }
-
-        $entityName = $this->getExtendedEntityNameByConfig($config);
-        $fields     = $this->getDynamicFields($entityName);
+        $fields = $this->getFields($config);
         if (empty($fields)) {
             return;
         }
+
+        $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
 
         /** @var QueryBuilder $qb */
         $qb        = $datasource->getQueryBuilder();
@@ -103,7 +102,7 @@ class ExtendExtension extends AbstractExtension
 
         /** @var From $fromPart */
         foreach ($fromParts as $fromPart) {
-            if ($this->prepareEntityName($fromPart->getFrom()) == $entityName) {
+            if ($this->entityClassResolver->getEntityClass($fromPart->getFrom()) == $entityClassName) {
                 $alias = $fromPart->getAlias();
             }
         }
@@ -111,18 +110,16 @@ class ExtendExtension extends AbstractExtension
         if ($alias === false) {
             // add entity if it not exists in from clause
             $alias = 'o';
-            $qb->from($entityName, $alias);
+            $qb->from($entityClassName, $alias);
         }
 
         $relationIndex    = 0;
         $relationTemplate = 'auto_rel_%d';
         foreach ($fields as $field) {
             $fieldName = $field->getFieldName();
-            $fieldType = $field->getFieldType();
-
-            switch ($fieldType) {
+            switch ($field->getFieldType()) {
                 case 'enum':
-                    $extendFieldConfig = $this->getFieldConfig('extend', $field->getClassName(), $fieldName);
+                    $extendFieldConfig = $this->getFieldConfig('extend', $field);
                     $joinAlias         = sprintf($relationTemplate, ++$relationIndex);
                     $qb->leftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
                     $columnDataName = $fieldName;
@@ -149,7 +146,7 @@ class ExtendExtension extends AbstractExtension
                 $columnDataName
             );
             $config->offsetSetByPath(
-                sprintf('%s[%s][data_name]', OrmSorterConfiguration::COLUMNS_PATH, $fieldName),
+                sprintf('%s[%s][data_name]', SorterConfiguration::COLUMNS_PATH, $fieldName),
                 $sorterDataName
             );
             $config->offsetSetByPath(
@@ -160,7 +157,7 @@ class ExtendExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPriority()
     {
@@ -168,55 +165,35 @@ class ExtendExtension extends AbstractExtension
     }
 
     /**
-     * Convert entityName to the full format
+     * Gets a root entity name for which additional fields to be shown
      *
-     * @param  string $entityName
+     * @param DatagridConfiguration $config
+     *
+     * @return string Entity class name
+     */
+    abstract protected function getEntityName(DatagridConfiguration $config);
+
+    /**
+     * Gets a list of fields to show
+     *
+     * @param DatagridConfiguration $config
+     *
+     * @return FieldConfigId[]
+     */
+    abstract protected function getFields(DatagridConfiguration $config);
+
+    /**
+     * Gets the full class name for the given entity name
+     *
+     * @param string $entityName
+     *
      * @return string
      */
     protected function prepareEntityName($entityName)
     {
-        return $this->configManager->getEntityManager()->getClassMetadata($entityName)->getName();
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     * @throws \Exception when class was not found by $entityName
-     * @return string extended entity class name
-     */
-    protected function getExtendedEntityNameByConfig(DatagridConfiguration $config)
-    {
-        return $this->prepareEntityName($config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH));
-    }
-
-    /**
-     * Get list of dynamic fields to show
-     *
-     * @param string $entityName
-     *
-     * @return FieldConfigId[]
-     */
-    protected function getDynamicFields($entityName)
-    {
-        $fields = [];
-        if ($this->configManager->hasConfig($entityName)) {
-            $entityConfigProvider   = $this->configManager->getProvider('entity');
-            $extendConfigProvider   = $this->configManager->getProvider('extend');
-            $datagridConfigProvider = $this->configManager->getProvider('datagrid');
-
-            $fieldIds = $entityConfigProvider->getIds($entityName);
-            foreach ($fieldIds as $fieldId) {
-                $extendConfig = $extendConfigProvider->getConfigById($fieldId);
-                if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                    && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-                    && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-                    && !$extendConfig->is('is_deleted')
-                ) {
-                    $fields[] = $fieldId;
-                }
-            }
-        }
-
-        return $fields;
+        return $this->configManager->getEntityManager()
+            ->getClassMetadata($entityName)
+            ->getName();
     }
 
     /**
@@ -225,15 +202,9 @@ class ExtendExtension extends AbstractExtension
      * @param array         $sorter
      * @param array         $filter
      */
-    protected function prepareFieldConfigs(
-        FieldConfigId $field,
-        array &$column,
-        array &$sorter,
-        array &$filter
-    ) {
-        $fieldName = $field->getFieldName();
-        $fieldType = $field->getFieldType();
-        switch ($fieldType) {
+    protected function prepareFieldConfigs(FieldConfigId $field, array &$column, array &$sorter, array &$filter)
+    {
+        switch ($field->getFieldType()) {
             case 'integer':
             case 'smallint':
             case 'bigint':
@@ -248,12 +219,15 @@ class ExtendExtension extends AbstractExtension
                 break;
             case 'boolean':
                 $column['frontend_type'] = Property::TYPE_BOOLEAN;
+                $filter['type']          = 'boolean';
                 break;
             case 'date':
                 $column['frontend_type'] = Property::TYPE_DATE;
+                $filter['type']          = 'date';
                 break;
             case 'datetime':
                 $column['frontend_type'] = Property::TYPE_DATETIME;
+                $filter['type']          = 'datetime';
                 break;
             case 'money':
                 $column['frontend_type'] = Property::TYPE_CURRENCY;
@@ -264,7 +238,7 @@ class ExtendExtension extends AbstractExtension
                 $filter['type']          = 'percent';
                 break;
             case 'enum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $field->getClassName(), $fieldName);
+                $extendFieldConfig = $this->getFieldConfig('extend', $field);
 
                 $column['frontend_type']    = Property::TYPE_STRING;
                 $filter['type']             = 'enum';
@@ -272,7 +246,7 @@ class ExtendExtension extends AbstractExtension
                 $filter['options']['class'] = $extendFieldConfig->get('target_entity');
                 break;
             case 'multiEnum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $field->getClassName(), $fieldName);
+                $extendFieldConfig = $this->getFieldConfig('extend', $field);
 
                 $column['frontend_type']           = Property::TYPE_HTML;
                 $column['type']                    = 'twig';
@@ -290,15 +264,14 @@ class ExtendExtension extends AbstractExtension
     }
 
     /**
-     * @param string $scope
-     * @param string $className
-     * @param string $fieldName
+     * @param string        $scope
+     * @param FieldConfigId $fieldId
      *
      * @return ConfigInterface
      */
-    protected function getFieldConfig($scope, $className, $fieldName)
+    protected function getFieldConfig($scope, FieldConfigId $fieldId)
     {
         return $this->configManager->getProvider($scope)
-            ->getConfig($className, $fieldName);
+            ->getConfig($fieldId->getClassName(), $fieldId->getFieldName());
     }
 }

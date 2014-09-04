@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\EntityBundle\Grid\ExtendExtension;
+use Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -13,7 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
+class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
     const ENTITY_NAME  = 'Test:Entity';
@@ -22,9 +22,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityClassResolver;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $datagridConfig;
 
-    /** @var ExtendExtension */
+    /** @var DynamicFieldsExtension */
     protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -33,25 +36,58 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $datagridConfigProvider;
+
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityConfigProvider = $this->getConfigProviderMock();
-        $this->extendConfigProvider = $this->getConfigProviderMock();
+        $this->entityConfigProvider   = $this->getConfigProviderMock();
+        $this->extendConfigProvider   = $this->getConfigProviderMock();
+        $this->datagridConfigProvider = $this->getConfigProviderMock();
 
-        $this->extension = new ExtendExtension($this->configManager);
+        $this->extension = new DynamicFieldsExtension($this->configManager, $this->entityClassResolver);
     }
 
     public function testIsApplicable()
     {
         $this->assertFalse(
-            $this->extension->isApplicable(DatagridConfiguration::create([]))
+            $this->extension->isApplicable(
+                DatagridConfiguration::create(
+                    [
+                        'source' => [
+                            'type' => 'orm'
+                        ]
+                    ]
+                )
+            )
         );
         $this->assertTrue(
-            $this->extension->isApplicable(DatagridConfiguration::create(['extended_entity_name' => 'entity']))
+            $this->extension->isApplicable(
+                DatagridConfiguration::create(
+                    [
+                        'extended_entity_name' => 'entity',
+                        'source'               => [
+                            'type' => 'orm'
+                        ]
+                    ]
+                )
+            )
+        );
+        $this->assertFalse(
+            $this->extension->isApplicable(
+                DatagridConfiguration::create(
+                    [
+                        'extended_entity_name' => 'entity'
+                    ]
+                )
+            )
         );
     }
 
@@ -70,16 +106,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'string';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -87,6 +118,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -130,16 +167,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldName  = 'testField';
         $fieldLabel = 'test.field.label';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -147,6 +179,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -199,16 +237,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldName  = 'testField';
         $fieldLabel = 'test.field.label';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -216,6 +249,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -267,16 +306,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'boolean';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -284,6 +318,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -306,6 +346,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'filters'              => [
                     'columns' => [
                         $fieldName => [
+                            'type'      => 'boolean',
                             'data_name' => $fieldName,
                             'enabled'   => false,
                             'options'   => []
@@ -324,16 +365,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'date';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -341,6 +377,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -363,6 +405,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'filters'              => [
                     'columns' => [
                         $fieldName => [
+                            'type'      => 'date',
                             'data_name' => $fieldName,
                             'enabled'   => false,
                             'options'   => []
@@ -381,16 +424,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'datetime';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -398,6 +436,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -420,6 +464,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'filters'              => [
                     'columns' => [
                         $fieldName => [
+                            'type'      => 'datetime',
                             'data_name' => $fieldName,
                             'enabled'   => false,
                             'options'   => []
@@ -438,16 +483,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'money';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -455,6 +495,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -496,16 +542,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldLabel = 'test.field.label';
         $fieldType  = 'percent';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -513,6 +554,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
         $this->extension->processConfigs($config);
@@ -556,16 +603,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $targetEntity = 'Test\TargetEntity';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -573,6 +615,12 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, $fieldName)
             ->will($this->returnValue($entityFieldConfig));
+
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, $fieldName, $fieldType));
         $extendFieldConfig->set('target_entity', $targetEntity);
@@ -627,16 +675,17 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $targetEntity = 'Test\TargetEntity';
         $twigTemplate = 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig';
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, $fieldName)
+            ->will($this->returnValue($datagridFieldConfig));
 
         $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
@@ -693,34 +742,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Class 'fake class' does not exist
-     */
-    public function testVisitDatasourceThrowAnException()
-    {
-        $entityName = 'fake class';
-
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($entityName)
-            ->will($this->throwException(new \Exception('Class \'' . $entityName . '\' does not exist')));
-
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-
-        $this->extension->visitDatasource(
-            DatagridConfiguration::create(['extended_entity_name' => $entityName]),
-            $datasource
-        );
-    }
-
     public function testVisitDatasourceNoFields()
     {
         $entityName = self::ENTITY_NAME;
@@ -729,11 +750,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -756,11 +776,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS
-        );
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')
@@ -791,13 +810,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS,
-            2
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->exactly(3))
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $from = $this->getMockBuilder('Doctrine\ORM\Query\Expr\From')
             ->disableOriginalConstructor()
@@ -867,13 +884,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS,
-            2
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->exactly(3))
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, $fieldName, $fieldType));
         $extendFieldConfig->set('target_field', $targetFieldName);
@@ -953,13 +968,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->setExpectationForGetExtendedEntityNameByConfig(
-            $em,
-            $entityName,
-            self::ENTITY_CLASS,
-            2
-        );
-        $this->setExpectationForGetDynamicFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->entityClassResolver->expects($this->exactly(3))
+            ->method('getEntityClass')
+            ->with($entityName)
+            ->will($this->returnValue(self::ENTITY_CLASS));
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
 
         $from = $this->getMockBuilder('Doctrine\ORM\Query\Expr\From')
             ->disableOriginalConstructor()
@@ -1035,28 +1048,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    protected function setExpectationForGetExtendedEntityNameByConfig(
-        \PHPUnit_Framework_MockObject_MockObject $em,
-        $entityName,
-        $resultEntityName,
-        $count = 1
-    ) {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->exactly($count))
-            ->method('getName')
-            ->will($this->returnValue($resultEntityName));
-        $em->expects($this->exactly($count))
-            ->method('getClassMetadata')
-            ->with($entityName)
-            ->will($this->returnValue($metadata));
-        $this->configManager->expects($this->exactly($count))
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-    }
-
-    protected function setExpectationForGetDynamicFields($className, $fieldName, $fieldType)
+    protected function setExpectationForGetFields($className, $fieldName, $fieldType)
     {
         $fieldId = new FieldConfigId('entity', $className, $fieldName, $fieldType);
 
@@ -1073,7 +1065,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($className)
             ->will($this->returnValue(true));
 
-        $datagridConfigProvider = $this->getConfigProviderMock();
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->will(
@@ -1081,7 +1072,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         ['entity', $this->entityConfigProvider],
                         ['extend', $this->extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
+                        ['datagrid', $this->datagridConfigProvider],
                     ]
                 )
             );
@@ -1094,7 +1085,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigById')
             ->with($this->identicalTo($fieldId))
             ->will($this->returnValue($extendConfig));
-        $datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->once())
             ->method('getConfigById')
             ->with($this->identicalTo($fieldId))
             ->will($this->returnValue($datagridConfig));

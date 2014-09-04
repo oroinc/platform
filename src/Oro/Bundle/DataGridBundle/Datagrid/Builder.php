@@ -59,27 +59,14 @@ class Builder
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
-        /** @var Acceptor $acceptor */
-        $acceptor = new $this->acceptorClass();
-        $acceptor->setConfig($config);
-
-        foreach ($this->extensions as $extension) {
-            /**
-             * ATTENTION: extension object should be cloned cause it can contain some state
-             */
-            $extension = clone $extension;
-            $extension->setParameters($parameters);
-
-            if ($extension->isApplicable($config)) {
-                $acceptor->addExtension($extension);
-            }
-        }
-
         /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor, $parameters);
+        $datagrid = new $class($name, $config, $parameters);
 
         $event = new BuildBefore($datagrid, $config);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
+
+        $acceptor = $this->createAcceptor($config, $parameters);
+        $datagrid->setAcceptor($acceptor);
 
         $this->buildDataSource($datagrid, $config);
         $acceptor->processConfiguration();
@@ -119,6 +106,33 @@ class Builder
         $this->extensions[] = $extension;
 
         return $this;
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param ParameterBag          $parameters
+     *
+     * @return Acceptor
+     */
+    protected function createAcceptor(DatagridConfiguration $config, ParameterBag $parameters)
+    {
+        /** @var Acceptor $acceptor */
+        $acceptor = new $this->acceptorClass();
+        $acceptor->setConfig($config);
+
+        foreach ($this->extensions as $extension) {
+            /**
+             * ATTENTION: extension object should be cloned cause it can contain some state
+             */
+            $extension = clone $extension;
+            $extension->setParameters($parameters);
+
+            if ($extension->isApplicable($config)) {
+                $acceptor->addExtension($extension);
+            }
+        }
+
+        return $acceptor;
     }
 
     /**
