@@ -74,6 +74,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'js_engine' => 'node',
+                    'cache_impl' => null,
                     'config' => array(
                         'waitSeconds' => 0,
                     ),
@@ -94,6 +95,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'scriptType' => 'text/javascript'
                     ),
                     'js_engine' => 'node',
+                    'cache_impl' => null,
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
                     'build' => array(
