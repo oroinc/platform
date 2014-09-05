@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
+use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
  * Class EmailTemplateTest
  *
- * @package Oro\Bundle\TestFrameworkBundle\Tests\Selenium
+ * @package Oro\Bundle\EmailBundle\Tests\Selenium
  */
 class EmailTemplateTest extends Selenium2TestCase
 {
@@ -19,6 +20,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $templateName = 'EmailTemplate_'.mt_rand();
 
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->assertTitle('Templates - Emails - System')
             ->add()
@@ -47,6 +49,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $newTemplateName = 'Clone_' . $templateName;
         $fields = array();
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->cloneEntity('Template name', $templateName)
             ->setName($newTemplateName)
@@ -67,7 +70,7 @@ class EmailTemplateTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testCreateEmailTemplate
+     * @depends testCloneEmailTemplate
      * @param $templateName
      * @return string
      */
@@ -75,6 +78,7 @@ class EmailTemplateTest extends Selenium2TestCase
     {
         $newTemplateName = 'Update_' . $templateName;
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->open(array($templateName))
             ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
@@ -94,6 +98,7 @@ class EmailTemplateTest extends Selenium2TestCase
     public function testDeleteEmailTemplate($templateName)
     {
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
             ->delete('Template name', $templateName)
