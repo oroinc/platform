@@ -173,6 +173,46 @@ class WorkflowController extends FOSRestController
     }
 
     /**
+     * Returns:
+     * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
+     * - HTTP_BAD_REQUEST (400) response: array('message' => errorMessageString)
+     * - HTTP_FORBIDDEN (403) response: array('message' => errorMessageString)
+     * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
+     * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
+     *
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/transit/{entityClass}/{entityId}/{transitionName}",
+     *      requirements={"version"="latest|v1", "entityId"="\d+"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Perform transition for workflow item by entity class and id", resource=true)
+     * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityClass Full path to entity class (e.g. "Oro\Bundle\UserBundle\Entity\User")
+     * @param int $entityId
+     * @param string $transitionName
+     * @return Response
+     */
+    public function transitByEntityAction($entityClass, $entityId, $transitionName)
+    {
+        $workflowManager = $this->get('oro_workflow.manager');
+
+        try {
+            $entity = $this->getEntityReference($entityClass, $entityId);
+        } catch (\ReflectionException $e) {
+            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+        }
+
+        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+
+        if (!$workflowItem) {
+            return $this->handleError($this->get('translator')->trans('Entity not found'), Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->transitAction($workflowItem, $transitionName);
+    }
+
+    /**
      * Returns
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
      *
