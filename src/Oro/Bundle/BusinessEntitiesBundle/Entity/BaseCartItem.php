@@ -3,7 +3,8 @@
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use OroCRM\Bundle\MagentoBundle\Entity\Cart;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Class BasePerson
@@ -63,14 +64,14 @@ class BaseCartItem
      *
      * @ORM\Column(name="discount_amount", type="money")
      */
-    protected $discountAmount;
+    protected $discountAmount = 0;
 
     /**
      * @var float
      *
      * @ORM\Column(name="tax_percent", type="percent")
      */
-    protected $taxPercent;
+    protected $taxPercent = 0;
 
     /**
      * @var float
@@ -83,6 +84,13 @@ class BaseCartItem
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -90,6 +98,13 @@ class BaseCartItem
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 
@@ -131,13 +146,13 @@ class BaseCartItem
     /**
      * @param mixed $cart
      */
-    public function setCart($cart)
+    public function setCart(BaseCart $cart)
     {
         $this->cart = $cart;
     }
 
     /**
-     * @return Cart
+     * @return BaseCart
      */
     public function getCart()
     {
@@ -258,7 +273,7 @@ class BaseCartItem
      */
     public function setDiscountAmount($discountAmount)
     {
-        $this->discountAmount = $discountAmount;
+        $this->discountAmount = (float)$discountAmount;
         return $this;
     }
 
@@ -277,7 +292,7 @@ class BaseCartItem
      */
     public function setTaxPercent($taxPercent)
     {
-        $this->taxPercent = $taxPercent;
+        $this->taxPercent = (float)$taxPercent;
         return $this;
     }
 

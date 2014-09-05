@@ -4,7 +4,9 @@ namespace Oro\Bundle\AttachmentBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class PlaceholderFilter
 {
@@ -14,11 +16,18 @@ class PlaceholderFilter
     protected $attachmentConfigProvider;
 
     /**
-     * @param ConfigProvider $attachmentConfigProvider
+     * @var ConfigProvider
      */
-    public function __construct(ConfigProvider $attachmentConfigProvider)
+    protected $entityConfigProvider;
+
+    /**
+     * @param ConfigProvider $attachmentConfigProvider
+     * @param ConfigProvider $entityConfigProvider
+     */
+    public function __construct(ConfigProvider $attachmentConfigProvider, ConfigProvider $entityConfigProvider)
     {
         $this->attachmentConfigProvider = $attachmentConfigProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**
@@ -37,6 +46,10 @@ class PlaceholderFilter
 
         return
             $this->attachmentConfigProvider->hasConfig($className)
-            && $this->attachmentConfigProvider->getConfig($className)->is('enabled');
+            && $this->attachmentConfigProvider->getConfig($className)->is('enabled')
+            && $this->entityConfigProvider->hasConfig(
+                AttachmentScope::ATTACHMENT,
+                ExtendHelper::buildAssociationName($className)
+            );
     }
 }

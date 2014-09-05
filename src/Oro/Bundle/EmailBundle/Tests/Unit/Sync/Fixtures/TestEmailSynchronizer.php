@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 
@@ -20,9 +21,10 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
         EmailAddressManager $emailAddressManager,
+        EmailAddressHelper $emailAddressHelper,
         KnownEmailAddressChecker $knownEmailAddressChecker
     ) {
-        parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
+        parent::__construct($em, $emailEntityBuilder, $emailAddressManager, $emailAddressHelper);
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
     }
 

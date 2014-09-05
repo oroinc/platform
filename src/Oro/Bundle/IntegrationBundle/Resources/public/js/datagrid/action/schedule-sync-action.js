@@ -11,7 +11,7 @@ define(['orodatagrid/js/datagrid/action/ajax-action', 'orotranslation/js/transla
      * @extends orodatagrid.datagrid.action.ModelAction
      */
     return AjaxAction.extend({
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }

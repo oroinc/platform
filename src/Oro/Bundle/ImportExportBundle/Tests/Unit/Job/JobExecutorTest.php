@@ -93,7 +93,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\ImportExportBundle\Job\JobResult', $result);
         $this->assertFalse($result->isSuccessful());
         $this->assertEquals(array('Can\'t find job "test"'), $result->getFailureExceptions());
-        $this->assertStringStartsWith('test_' . date('Y_m_d_H_i_'), $result->getJobCode());
+        $this->assertStringStartsWith('test_' . date('Y_m_d_H_'), $result->getJobCode());
     }
 
     public function testExecuteJobSuccess()

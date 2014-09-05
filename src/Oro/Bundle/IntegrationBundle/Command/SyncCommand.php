@@ -7,7 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+use Oro\Component\Log\OutputLogger;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
@@ -79,6 +80,10 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
         $connector           = $input->getOption('connector');
@@ -107,7 +112,7 @@ class SyncCommand extends AbstractSyncCronCommand
             }
             $integrations = [$integration];
         } else {
-            $integrations = $repository->getConfiguredChannelsForSync();
+            $integrations = $repository->getConfiguredChannelsForSync(null, true);
         }
 
         /** @var Integration $integration */
@@ -120,7 +125,7 @@ class SyncCommand extends AbstractSyncCronCommand
                 }
 
                 $result   = $processor->process($integration, $connector, $connectorParameters);
-                $exitCode = $result ?: self::STATUS_FAILED;
+                $exitCode = $result ? : self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
 

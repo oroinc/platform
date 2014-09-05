@@ -272,18 +272,24 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'))
             ->will($this->returnValue($repositoryMock));
 
-        $shouldBeDisable = $eventManager instanceof OroEventManager;
+        $shouldBeDisabled = $eventManager instanceof OroEventManager;
+        if ($shouldBeDisabled) {
+            $eventManager->expects($this->once())
+                ->method('disableListeners')
+                ->with('^Oro');
+        } else {
+            $eventManager->expects($this->never())
+                ->method('disableListeners');
+        }
 
-        $eventManager->expects($shouldBeDisable ? $this->once() : $this->never())
-            ->method('enable');
         $this->em->expects($this->once())
             ->method('persist')
             ->with($this->item);
         $this->em->expects($this->once())
             ->method('flush')
             ->with($this->item);
-        $eventManager->expects($shouldBeDisable ? $this->once() : $this->never())
-            ->method('disable');
+        $eventManager->expects($shouldBeDisabled ? $this->once() : $this->never())
+            ->method('clearDisabledListeners');
 
         return $this->em;
     }

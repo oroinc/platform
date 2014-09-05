@@ -5,7 +5,6 @@ oro:
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
 
-        created_at.label:    Created At
         entity_label:        Dashboard
         entity_plural_label: Dashboards
         id.label:            Id
@@ -14,7 +13,6 @@ oro:
         management_title:    Manage dashboards
         name.label:          Name
         owner.label:         Owner
-        updated_at.label:    Updated At
         widgets.label:       Widgets
 
         start_dashboard: Clone from

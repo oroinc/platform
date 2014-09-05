@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 
 class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
@@ -47,7 +48,8 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
         $this->checker = new KnownEmailAddressChecker(
             $this->log,
             $this->em,
-            $this->emailAddressManager
+            $this->emailAddressManager,
+            new EmailAddressHelper()
         );
     }
 

@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(
@@ -31,6 +32,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -64,6 +68,13 @@ class Tagging
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 

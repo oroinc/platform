@@ -1,6 +1,5 @@
 oro:
     reminder:
-        created_at.label:                 Created At
         expire_at.label:                  Expire At
         failure_exception.label:          Failure exception
         id.label:                         Id
@@ -14,7 +13,6 @@ oro:
         start_at.label:                   Start At
         state.label:                      State
         subject.label:                    Subject
-        updated_at.label:                 Updated At
 
         entity_label:        Reminder
         entity_plural_label: Reminders

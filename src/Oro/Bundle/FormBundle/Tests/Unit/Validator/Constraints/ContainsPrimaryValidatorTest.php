@@ -8,7 +8,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type array or Traversable and ArrayAccess, boolean given
+     * @expectedExceptionMessage Expected argument of type "array or Traversable and ArrayAccess", "boolean" given
      */
     public function testValidateException()
     {

@@ -42,6 +42,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_email.email.entity.builder
             - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
             - @oro_imap.connector.factory
             - @oro_security.encoder.mcrypt
         tags:

@@ -66,10 +66,7 @@
             {% if form.parent %}
                 {% set combinedError = '' %}
                 {% for error in errors %}
-                    {% set error = error.messagePluralization is null
-                        ? error.messageTemplate|trans(error.messageParameters, 'validators')
-                        : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators') %}
-                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error : error %}
+                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
                 {% endfor %}
                 <span class="validation-failed">{{ combinedError }}</span>
             {% else %}

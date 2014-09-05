@@ -49,7 +49,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
                 $this->returnCallback(
                     function ($sql) use (&$records, &$actualSql) {
                         $actualSql = $sql;
-                        return $this->createCountStatementMock(count($records));
+                        return $this->createFetchStatementMock([['sclr0' => count($records)]]);
                     }
                 )
             );
@@ -62,7 +62,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_) AS e',
+            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -81,7 +81,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
                 $this->returnCallback(
                     function ($sql) use (&$records, &$actualSql) {
                         $actualSql = $sql;
-                        return $this->createCountStatementMock(count($records));
+                        return $this->createFetchStatementMock([['sclr0' => count($records)]]);
                     }
                 )
             );
@@ -95,7 +95,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_) AS e',
+            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -171,7 +171,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock(count($records)),
+            $this->createFetchStatementMock([['sclr0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1], $records[2]])
         ];
 
@@ -204,7 +204,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_) AS e',
+            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -402,7 +402,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock(count($records)),
+            $this->createFetchStatementMock([['sclr0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1]]),
             $this->createFetchStatementMock([$records[2]])
         ];
@@ -438,7 +438,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(count($records), $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_) AS e',
+            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
@@ -461,7 +461,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createCountStatementMock(count($records)),
+            $this->createFetchStatementMock([['sclr0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
         ];
 
@@ -493,7 +493,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_) AS e',
+            'SELECT count(DISTINCT e0_.a) AS sclr0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(

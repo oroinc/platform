@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Helper;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
@@ -12,26 +14,26 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class DefaultOwnerHelper
 {
-    /** @var EntityManager */
-    protected $em;
+    /** @var RegistryInterface */
+    protected $registry;
 
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
 
     /**
-     * @param EntityManager             $em
+     * @param RegistryInterface         $registry
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
      */
-    public function __construct(EntityManager $em, OwnershipMetadataProvider $ownershipMetadataProvider)
+    public function __construct(RegistryInterface $registry, OwnershipMetadataProvider $ownershipMetadataProvider)
     {
-        $this->em                        = $em;
+        $this->registry                  = $registry;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
      * Populate owner to target entity based on integration configuration and entity's ownership type
      *
-     * @param object  $entity
+     * @param object      $entity
      * @param Integration $integration
      */
     public function populateChannelOwner($entity, Integration $integration)
@@ -39,7 +41,7 @@ class DefaultOwnerHelper
         $defaultUserOwner = $integration->getDefaultUserOwner();
 
         $className         = ClassUtils::getClass($entity);
-        $doctrineMetadata  = $this->em->getClassMetadata($className);
+        $doctrineMetadata  = $this->getEm()->getClassMetadata($className);
         $ownershipMetadata = $this->getMetadata($className);
 
         if ($defaultUserOwner && $ownershipMetadata->isUserOwned()) {
@@ -67,11 +69,21 @@ class DefaultOwnerHelper
      */
     protected function ensureNotDetached($entity)
     {
-        $uow = $this->em->getUnitOfWork();
+        $uow = $this->getEm()->getUnitOfWork();
+
         if ($uow->getEntityState($entity, UnitOfWork::STATE_DETACHED) === UnitOfWork::STATE_DETACHED) {
-            $entity = $this->em->find(ClassUtils::getClass($entity), $entity->getId());
+            $entity = $this->getEm()->find(ClassUtils::getClass($entity), $entity->getId());
+            $uow->markReadOnly($entity);
         }
 
         return $entity;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    private function getEm()
+    {
+        return $this->registry->getManager();
     }
 }

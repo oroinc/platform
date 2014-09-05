@@ -1,5 +1,5 @@
 parameters:
-    oro_user.importexport.templatefixture.userfixture.class: Oro\Bundle\UserBundle\ImportExport\TemplateFixture\UserFixture
+    oro_user.importexport.template_fixture.user.class:    Oro\Bundle\UserBundle\ImportExport\TemplateFixture\UserFixture
 
 services:
     oro_user.importexport.data_converter:
@@ -23,7 +23,7 @@ services:
         tags:
             - { name: oro_importexport.processor, type: export_template, entity: %oro_user.entity.class%, alias: oro_user }
 
-    oro_user.importexport.templatefixture.userfixture:
-        class: %oro_user.importexport.templatefixture.userfixture.class%
+    oro_user.importexport.template_fixture.user:
+        class: %oro_user.importexport.template_fixture.user.class%
         tags:
-            - { name: oro_importexport.template_fixture, entity: %oro_user.entity.class% }
+            - { name: oro_importexport.template_fixture }

@@ -9,3 +9,6 @@ oro:
             choose_entity_fields:   Choose fields...
             entity_fields:          Fields
             entity_related:         Related
+
+        validation:
+            unique_field: Value for field "%field%" must be unique|Combination of values for "%field%" fields must be unique

@@ -10,13 +10,14 @@
 "Loading...": "Loading..."
 "Saving...": "Saving..."
 "Deleting...": "Deleting..."
-"Unexpected error occured. Please contact system administrator.": "Unexpected error occured. Please contact system administrator."
+"Unexpected error occurred. Please contact system administrator.": "Unexpected error occurred. Please contact system administrator."
 Now: Now
 Prev: Prev
 Next: Next
 Today: Today
 Wk: Wk
 Done: Done
+Close: Close
 AM: AM
 A: A
 PM: PM
@@ -34,3 +35,8 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
+
+oro:
+    ui:
+        widget_loading_filed: "Widget content loading failed"
+        forbidden_error: You do not have permission to perform this action.

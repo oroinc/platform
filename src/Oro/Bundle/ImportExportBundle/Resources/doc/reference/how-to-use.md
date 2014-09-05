@@ -296,13 +296,13 @@ class ContactFixture implements TemplateFixtureInterface
 
 ```
 parameters:
-    orocrm_contact.importexport.templatefixture.contactfixture.class: OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
+    orocrm_contact.importexport.template_fixture.contact.class: OroCRM\Bundle\ContactBundle\ImportExport\TemplateFixture\ContactFixture
 
 services:
-    orocrm_contact.importexport.templatefixture.contactfixture:
-        class: %orocrm_contact.importexport.templatefixture.contactfixture.class%
+    orocrm_contact.importexport.template_fixture.contact:
+        class: %orocrm_contact.importexport.template_fixture.contact.class%
         tags:
-            - { name: oro_importexport.template_fixture, entity: %orocrm_contact.entity.class% }
+            - { name: oro_importexport.template_fixture }
 
 ```
 

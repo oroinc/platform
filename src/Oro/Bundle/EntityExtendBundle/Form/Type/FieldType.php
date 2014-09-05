@@ -19,25 +19,30 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 class FieldType extends AbstractType
 {
     const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
+    const TYPE_LABEL_PREFIX              = 'oro.entity_extend.form.data_type.';
 
     protected $types = [
-        'string'     => 'oro.entity_extend.form.data_type.string',
-        'integer'    => 'oro.entity_extend.form.data_type.integer',
-        'smallint'   => 'oro.entity_extend.form.data_type.smallint',
-        'bigint'     => 'oro.entity_extend.form.data_type.bigint',
-        'boolean'    => 'oro.entity_extend.form.data_type.boolean',
-        'decimal'    => 'oro.entity_extend.form.data_type.decimal',
-        'date'       => 'oro.entity_extend.form.data_type.date',
-        'text'       => 'oro.entity_extend.form.data_type.text',
-        'float'      => 'oro.entity_extend.form.data_type.float',
-        'money'      => 'oro.entity_extend.form.data_type.money',
-        'percent'    => 'oro.entity_extend.form.data_type.percent',
-        'file'       => 'oro.entity_extend.form.data_type.file',
-        'image'      => 'oro.entity_extend.form.data_type.image',
-        'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
-        'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
-        'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
-        'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
+        'fields'    => [
+            'string',
+            'integer',
+            'smallint',
+            'bigint',
+            'boolean',
+            'decimal',
+            'date',
+            'text',
+            'float',
+            'money',
+            'percent',
+            'file',
+            'image',
+        ],
+        'relations' => [
+            'oneToMany',
+            'manyToOne',
+            'manyToMany',
+            'optionSet'
+        ]
     ];
 
     /**
@@ -91,10 +96,10 @@ class FieldType extends AbstractType
         $extendProvider = $this->configManager->getProvider('extend');
         $entityConfig   = $extendProvider->getConfig($options['class_name']);
 
+        $inverseRelationTypes = [];
         if ($entityConfig->is('relation')) {
             $originalFieldNames = array();
-            $types     = [];
-            $relations = $entityConfig->get('relation');
+            $relations          = $entityConfig->get('relation');
             foreach ($relations as $relationKey => $relation) {
                 if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
                     continue;
@@ -111,31 +116,36 @@ class FieldType extends AbstractType
 
                 $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
                 if (strlen($fieldName) > $maxFieldNameLength) {
-                    $cutFieldName = substr($fieldName, 0, $maxFieldNameLength);
+                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
                     $originalFieldNames[$cutFieldName] = $fieldName;
-                    $fieldName = $cutFieldName;
+                    $fieldName                         = $cutFieldName;
                 }
 
-                $key         = $relationKey . '||' . $fieldName;
-                $types[$key] = sprintf(
-                    '%s (%s) %s',
-                    $this->translator->trans('Relation'),
-                    $this->translator->trans($entityLabel),
-                    $this->translator->trans($fieldLabel)
+                $key                        = $relationKey . '||' . $fieldName;
+                $inverseRelationTypes[$key] = $this->translator->trans(
+                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
+                    [
+                        '%entity_name%' => $this->translator->trans($entityLabel),
+                        '%field_name%'  => $this->translator->trans($fieldLabel)
+                    ]
                 );
             }
 
-            $this->types = array_merge($this->types, $types);
             $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
 
         $builder->add(
             'type',
-            'choice',
+            'genemu_jqueryselect2_choice',
             [
-                'choices'     => $this->types,
-                'empty_value' => 'Select field type',
+                'choices'     => $this->getFieldTypeChoices($inverseRelationTypes),
+                'empty_value' => '',
                 'block'       => 'general',
+                'configs'     => [
+                    'placeholder'          => self::TYPE_LABEL_PREFIX . 'choose_value',
+                    'is_translated_group'  => true,
+                    'is_translated_option' => true,
+                ]
             ]
         );
     }
@@ -166,6 +176,37 @@ class FieldType extends AbstractType
     public function getName()
     {
         return 'oro_entity_extend_field_type';
+    }
+
+    /**
+     * @param array $inverseRelationTypes
+     *
+     * @return array
+     */
+    protected function getFieldTypeChoices($inverseRelationTypes)
+    {
+        $fieldTypes    = [];
+        $relationTypes = [];
+
+        foreach ($this->types['fields'] as $type) {
+            $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+        foreach ($this->types['relations'] as $type) {
+            $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+        if (!empty($inverseRelationTypes)) {
+            $relationTypes = array_merge($relationTypes, $inverseRelationTypes);
+        }
+
+        uasort($fieldTypes, 'strcasecmp');
+        uasort($relationTypes, 'strcasecmp');
+
+        $result = [
+            $this->translator->trans('oro.entity_extend.form.data_type_group.fields')    => $fieldTypes,
+            $this->translator->trans('oro.entity_extend.form.data_type_group.relations') => $relationTypes
+        ];
+
+        return $result;
     }
 
     /**

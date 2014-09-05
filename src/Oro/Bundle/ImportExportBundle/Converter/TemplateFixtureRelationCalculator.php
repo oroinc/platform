@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
-use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
 {
     /**
-     * @var TemplateFixtureRegistry
+     * @var TemplateManager
      */
-    protected $fixtureRegistry;
+    protected $templateManager;
 
     /**
      * @var FieldHelper
@@ -19,18 +19,13 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
     protected $fieldHelper;
 
     /**
-     * @var \Iterator
+     * @param TemplateManager $templateManager
+     * @param FieldHelper     $fieldHelper
      */
-    protected $fixtureData;
-
-    /**
-     * @param TemplateFixtureRegistry $fixtureRegistry
-     * @param FieldHelper $fieldHelper
-     */
-    public function __construct(TemplateFixtureRegistry $fixtureRegistry, FieldHelper $fieldHelper)
+    public function __construct(TemplateManager $templateManager, FieldHelper $fieldHelper)
     {
-        $this->fixtureRegistry = $fixtureRegistry;
-        $this->fieldHelper = $fieldHelper;
+        $this->templateManager = $templateManager;
+        $this->fieldHelper     = $fieldHelper;
     }
 
     /**
@@ -39,7 +34,8 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
     public function getMaxRelatedEntities($entityName, $fieldName)
     {
         $maxFields = 0;
-        foreach ($this->getFixtureData($entityName) as $fixture) {
+        $fixtures = $this->templateManager->getEntityFixture($entityName)->getData();
+        foreach ($fixtures as $fixture) {
             try {
                 $fieldValue = $this->fieldHelper->getObjectValue($fixture, $fieldName);
                 if ($fieldValue instanceof \Countable || is_array($fieldValue)) {
@@ -55,25 +51,5 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
         }
 
         return $maxFields;
-    }
-
-    /**
-     * @param string $entityName
-     * @return \Iterator
-     * @throws LogicException
-     */
-    protected function getFixtureData($entityName)
-    {
-        if (!$this->fixtureData) {
-            if (!$this->fixtureRegistry->hasEntityFixture($entityName)) {
-                throw new LogicException(
-                    sprintf('There is no template fixture registered for "%s".', $entityName)
-                );
-            }
-
-            $this->fixtureData = $this->fixtureRegistry->getEntityFixture($entityName)->getData();
-        }
-
-        return $this->fixtureData;
     }
 }

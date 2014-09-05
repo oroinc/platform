@@ -30,7 +30,7 @@ datagrid:
                 frontend_type: html
                 template: OroAttachmentBundle:Attachment:Datagrid/Property/fileSize.html.twig
             createdAt:
-                label: oro.attachment.file.created_at.label
+                label: oro.ui.created_at
                 frontend_type: datetime
             comment:
                 label: oro.attachment.comment.label

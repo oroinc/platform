@@ -11,6 +11,12 @@
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
         {% endif -%}
     {% endif %}
+    {% if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined %}
+        {% if item.extras.routes|length > 1 %}
+            {% set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode })%}
+        {% endif %}
+        {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
+    {% endif %}
     {{ block('item_renderer') }}
 {% endblock %}
 

@@ -166,7 +166,7 @@ define(function (require) {
         },
 
         /**
-         * Inits this.rowActions and this.rowClickAction
+         * Init this.rowActions and this.rowClickAction
          *
          * @private
          */
@@ -389,7 +389,7 @@ define(function (require) {
          * @private
          */
         _listenToCollectionEvents: function () {
-            this.collection.on('request', function (model, xhr, options) {
+            this.collection.on('request', function (model, xhr) {
                 this._beforeRequest();
                 var self = this;
                 var always = xhr.always;
@@ -442,14 +442,12 @@ define(function (require) {
          * Listen to commands on mediator
          */
         _listenToCommands: function () {
-            var grid = this;
+            mediator.on('datagrid:setParam:' + this.name, function (param, value) {
+                this.setAdditionalParameter(param, value);
+            }, this);
 
-            mediator.on('datagrid:setParam:' + grid.name, function (param, value) {
-                grid.setAdditionalParameter(param, value);
-            });
-
-            mediator.on('datagrid:restoreState:' + grid.name, function (columnName, dataField, included, excluded) {
-                grid.collection.each(function (model) {
+            mediator.on('datagrid:restoreState:' + this.name, function (columnName, dataField, included, excluded) {
+                this.collection.each(function (model) {
                     if (_.indexOf(included, model.get(dataField)) !== -1) {
                         model.set(columnName, true);
                     }
@@ -457,7 +455,7 @@ define(function (require) {
                         model.set(columnName, false);
                     }
                 });
-            });
+            }, this);
         },
 
         /**
@@ -528,12 +526,12 @@ define(function (require) {
          */
         _defineNoDataBlock: function () {
             var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
-                template = _.isEmpty(this.collection.state.filters) ?
-                        'oro.datagrid.noentities' : 'oro.datagrid.noresults';
-            template = this.noColumnsFlag ? 'oro.datagrid.nocolumns' : template;
+                message = _.isEmpty(this.collection.state.filters) ?
+                        'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+            message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hint: __(template, placeholders).replace('\n', '<br />')
+                hint: __(message, placeholders).replace('\n', '<br />')
             }))).hide();
         },
 

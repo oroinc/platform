@@ -32,18 +32,16 @@ oro:
             choose_organization: Choose a organization...
 
         businessunit:
+            email.label:         Email
+            entity_description:  Represent business unit
             entity_label:        Business Unit
             entity_plural_label: Business Units
-            entity_description:  Represent business unit
-            id.label:           Id
-            website.label:      Website
-            users.label:        Users
-            phone.label:        Phone
-            owner.label:        Owner
-            parent.label:       Parent Business Unit
-            organization.label: Organization
-            name.label:         Name
-            fax.label:          Fax
-            email.label:        Email
-            created_at.label:   Created at
-            updated_at.label:   Updated at
+            fax.label:           Fax
+            id.label:            Id
+            name.label:          Name
+            organization.label:  Organization
+            owner.label:         Owner
+            parent.label:        Parent Business Unit
+            phone.label:         Phone
+            users.label:         Users
+            website.label:       Website

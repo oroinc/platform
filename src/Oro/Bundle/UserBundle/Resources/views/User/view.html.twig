@@ -3,7 +3,6 @@
 
 {% set fullname = entity|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
-{% set audit_entity_class = 'Oro_Bundle_UserBundle_Entity_User' %}
 
 {% block navButtons %}
     {% if editRoute is defined %}
@@ -55,8 +54,8 @@
 {% endblock breadcrumbs %}
 
 {% block stats %}
-    <li>{{ 'oro.user.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.user.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
     <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A' }}</li>
     <li>{{ 'oro.user.login_count.label'|trans }}: {{ entity.loginCount|default(0) }}</li>
 {% endblock stats %}

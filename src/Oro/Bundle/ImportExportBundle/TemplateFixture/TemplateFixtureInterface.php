@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 
-interface TemplateFixtureInterface
+interface TemplateFixtureInterface extends TemplateEntityRepositoryInterface
 {
     /**
      * Get fixtures for template data.

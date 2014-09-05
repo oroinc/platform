@@ -1,18 +1,21 @@
-/*jslint browser:true, nomen:true*/
+/*jslint browser:true, eqeq:true, nomen:true*/
 /*global define*/
 define([
+    'jquery',
     'underscore',
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page'
-], function (_, Chaplin, __, BaseController, PageModel) {
+    'oroui/js/app/models/page-model'
+], function ($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, utils, mediator, PageController;
+    var document, location, history, console, utils, mediator, PageController;
 
     document = window.document;
     location = window.location;
+    history = window.history;
+    console = window.console;
     utils = Chaplin.utils;
     mediator = Chaplin.mediator;
 
@@ -66,14 +69,10 @@ define([
                 options: options
             };
 
-            if (!route.previous || options.silent) {
-                // - page just loaded from server, does not require update
-                // - page was updated locally and url is changed, no request required
-
-                if (!route.previous) {
-                    // if this first time dispatch, trigger event 'page:afterChange'
-                    this.onPageUpdated(this.model, null, {actionArgs: args});
-                }
+            if (!route.previous) {
+                // page just loaded from server, does not require update
+                // just trigger event 'page:afterChange'
+                this.onPageUpdated(this.model, null, {actionArgs: args});
                 return;
             }
 
@@ -113,10 +112,7 @@ define([
          */
         _beforePageLoad: function (route, params, options) {
             var oldRoute, newRoute, url, opts;
-            // suppress 'page:beforeChange' event, on server redirection
-            if (options.redirection) {
-                return true;
-            }
+
             oldRoute = route.previous;
             newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
@@ -171,13 +167,28 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
+            var initialization, self;
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
-                return true;
+                return;
             }
-            //@todo develop approach to postpone 'page:afterChange' event
-            // until all inline scripts on a page have not finished changes
-            _.delay(_.bind(this.publishEvent, this), 50, 'page:afterChange');
+
+            self = this;
+
+            // init components
+            initialization = mediator.execute('layout:init', document.body);
+            initialization.done(function (components) {
+                // attach created components to controller, to get them disposed together
+                _.each(components, function (component) {
+                    if (typeof component.dispose === 'function') {
+                        self['component-' + component.cid] = component;
+                    }
+                });
+
+                _.defer(function () {
+                    self.publishEvent('page:afterChange');
+                });
+            });
         },
 
         /**
@@ -213,10 +224,10 @@ define([
                 return;
             }
 
-            // @TODO make common handler for 403 response and might for other responses
             payload = {stopPageProcessing: false};
             this.publishEvent('page:beforeError', xhr, payload);
             if (payload.stopPageProcessing) {
+                history.back();
                 return;
             }
 
@@ -225,7 +236,10 @@ define([
                 model.set(data, options);
             } else {
                 if (mediator.execute('retrieveOption', 'debug')) {
-                    document.body.innerHTML = rawData;
+                    document.writeln(rawData);
+                    if (console) {
+                        console.error('Unexpected content format');
+                    }
                 } else {
                     mediator.execute('showMessage', 'error', __('Sorry, page was not loaded correctly'));
                 }
@@ -244,7 +258,7 @@ define([
          */
         _processRedirect: function (data, options) {
             var url, delimiter, parser;
-            url = data.url || data.location;
+            url = data.url != null ? data.url : data.location;
             if (data.fullRedirect) {
                 delimiter = url.indexOf('?') === -1 ? '?' : '&';
                 location.replace(url + delimiter + '_rand=' + Math.random());
@@ -269,13 +283,21 @@ define([
          */
         _setNavigationHandlers: function (url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
+
             mediator.setHandler('refreshPage', function (options) {
+                var queue;
+                mediator.trigger('page:beforeRefresh', (queue = []));
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                utils.redirectTo({url: url}, options);
-                mediator.trigger('page:refreshed');
+                $.when.apply($, queue).done(function (customOptions) {
+                    _.extend(options, customOptions || {});
+                    utils.redirectTo({url: url}, options);
+                    mediator.trigger('page:afterRefresh');
+                });
             });
+
             mediator.setHandler('submitPage', this._submitPage, this);
+
             //@TODO discuss why is this handler needed
             mediator.setHandler('afterPageChange', function () {
                 // fake page:afterChange event trigger
@@ -310,7 +332,8 @@ define([
             } else if (jsonStartPos === 0) {
                 dataObj = JSON.parse(rawData);
             } else {
-                throw "Unexpected content format";
+                // there's nothing to do
+                dataObj = rawData;
             }
 
             if (additionalData) {

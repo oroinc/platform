@@ -1,3 +1,4 @@
 config:
     paths:
-        'orosegment/js/segment': 'bundles/orosegment/js/segment.js'
+        'orosegment/js/app/components/refresh-button': 'bundles/orosegment/js/app/components/refresh-button.js'
+        'orosegment/js/app/components/segment': 'bundles/orosegment/js/app/components/segment.js'

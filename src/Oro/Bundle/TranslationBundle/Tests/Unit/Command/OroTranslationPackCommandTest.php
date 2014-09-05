@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Translation\Extractor\ChainExtractor;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
@@ -101,55 +102,6 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     *
-     * @dataProvider formatProvider
-     *
-     * @param string $expectedFormat
-     * @param string $inputFormat
-     */
-    public function testDump($expectedFormat, $inputFormat)
-    {
-        $kernel = new TestKernel();
-        $kernel->boot();
-
-        $phpUnit    = $this;
-        $writerMock = $this->getMock('Symfony\Component\Translation\Writer\TranslationWriter');
-        $writerMock->expects($this->once())->method('writeTranslations')->will(
-            $this->returnCallback(
-                function ($result, $format, $path) use ($phpUnit, $expectedFormat) {
-                    $separator = DIRECTORY_SEPARATOR;
-                    $result    = strpos(
-                        $path['path'],
-                        "language-pack/SomeProject{$separator}SomeBundle{$separator}translations"
-                    );
-                    $phpUnit->assertTrue($result !== false);
-
-                    $phpUnit->assertEquals($format, $expectedFormat);
-                }
-            )
-        );
-
-        $extractor = new ChainExtractor();
-        $kernel->getContainer()->set('translation.writer', $writerMock);
-        $kernel->getContainer()->set('translation.loader', new TranslationLoader());
-        $kernel->getContainer()->set('translation.extractor', $extractor);
-
-        $app         = new Application($kernel);
-        $commandMock = $this->getCommandMock(array('createDirectory'));
-        $commandMock->expects($this->once())->method('createDirectory');
-        $app->add($commandMock);
-        $command = $app->find('oro:translation:pack');
-        $command->setApplication($app);
-
-        $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), '--dump' => true, 'project' => 'SomeProject');
-        if ($inputFormat) {
-            $input['--output-format'] = $inputFormat;
-        }
-        $tester->execute($input);
-    }
-
     public function testUpload()
     {
         $this->runUploadDownloadTest('upload');
@@ -244,21 +196,6 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             'format do not specified, yml default' => array('yml', false),
             'format specified xml expected '       => array('xml', 'xml')
         );
-    }
-
-    public function testCreateDirectory()
-    {
-        $dirPath = sys_get_temp_dir() . '/testDir';
-        $cmd     = $this->getCommandMock();
-
-        $class  = new \ReflectionClass($cmd);
-        $method = $class->getMethod('createDirectory');
-        $method->setAccessible(true);
-
-        $method->invokeArgs($cmd, array($dirPath));
-
-        $this->assertTrue(is_dir($dirPath));
-        rmdir($dirPath);
     }
 
     /**

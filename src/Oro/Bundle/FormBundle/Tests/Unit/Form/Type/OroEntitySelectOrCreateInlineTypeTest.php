@@ -76,7 +76,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         return array(
             array(
                 array(),
-                'The required option "grid_name" is  missing.'
+                'The required option "grid_name" is missing.'
             )
         );
     }

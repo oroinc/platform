@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity
@@ -72,6 +73,13 @@ class EmbeddedForm
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -79,6 +87,13 @@ class EmbeddedForm
      * @var \DateTime $updated
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

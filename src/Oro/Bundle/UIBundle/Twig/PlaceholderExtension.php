@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
@@ -24,6 +25,11 @@ class PlaceholderExtension extends \Twig_Extension
      * @var HttpKernelExtension
      */
     protected $kernelExtension;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @param \Twig_Environment   $environment
@@ -86,6 +92,14 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * Renders the given item.
      *
      * @param array $item
@@ -104,9 +118,13 @@ class PlaceholderExtension extends \Twig_Extension
         }
 
         if (isset($item['action'])) {
-            /** @var HttpKernelExtension $kernelExtension */
+            $query = array();
+            if ($this->request) {
+                $query = $this->request->query->all();
+            }
+
             return $this->kernelExtension->renderFragment(
-                $this->kernelExtension->controller($item['action'], $variables)
+                $this->kernelExtension->controller($item['action'], $variables, $query)
             );
         }
 

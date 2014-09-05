@@ -37,7 +37,7 @@ class ExtendClassLoadingUtils
      */
     public static function getAliasesPath($cacheDir)
     {
-        return self::getEntityCacheDir($cacheDir) . '/alias.yml';
+        return self::getEntityCacheDir($cacheDir) . '/alias.data';
     }
 
     /**
@@ -61,22 +61,14 @@ class ExtendClassLoadingUtils
      */
     public static function setAliases($cacheDir)
     {
-        $aliasesPath = self::getAliasesPath($cacheDir);
-        if (file_exists($aliasesPath)) {
-            $aliases = Yaml::parse(
-                file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
-            );
+        $aliases = self::getAliases($cacheDir);
+        foreach ($aliases as $className => $alias) {
+            if (class_exists($className) && !class_exists($alias, false)) {
+                $aliasArr   = explode('\\', $alias);
+                $shortAlias = array_pop($aliasArr);
 
-            if (is_array($aliases)) {
-                foreach ($aliases as $className => $alias) {
-                    if (class_exists($className) && !class_exists($alias, false)) {
-                        $aliasArr   = explode('\\', $alias);
-                        $shortAlias = array_pop($aliasArr);
-
-                        class_alias($className, $shortAlias);
-                        class_alias($className, $alias);
-                    }
-                }
+                class_alias($className, $shortAlias);
+                class_alias($className, $alias);
             }
         }
     }
@@ -91,7 +83,7 @@ class ExtendClassLoadingUtils
     {
         $aliasesPath = self::getAliasesPath($cacheDir);
         if (file_exists($aliasesPath)) {
-            $aliases = Yaml::parse(
+            $aliases = unserialize(
                 file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
             );
             if (is_array($aliases)) {

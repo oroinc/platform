@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
@@ -106,6 +107,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->securityContext,
             $this->emailAddressManager,
+            new EmailAddressHelper(),
             $this->emailProcessor,
             $this->logger,
             $this->nameFormatter,

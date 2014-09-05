@@ -537,7 +537,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['translatable', 'translatable10']));
+            ->will($this->returnValue(['translatable', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -550,10 +550,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $config   = new Config($configId);
         $config->set('other', 'otherVal');
-        $config->set('translatable', 'oro.configtests.unit.fixture.demoentity.entity_translatable');
+        $config->set('translatable', 'labelVal');
         $config->set('other10', 'otherVal10');
-        $config->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
+        $config->set('translatable10', 'labelVal10');
+        $config->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.entity_auto_generated');
+
         $result = $this->configManager->createConfigEntityModel(self::ENTITY_CLASS);
+
         $this->assertEquals($model, $result);
         $this->assertEquals(
             [$config],
@@ -621,7 +624,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['translatable', 'translatable10']));
+            ->will($this->returnValue(['translatable', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -633,11 +636,15 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             );
 
         $config   = new Config($configId);
-        $config->set('other', 'otherVal');
-        $config->set('translatable', 'oro.configtests.unit.fixture.demoentity.id.translatable');
+
         $config->set('other10', 'otherVal10');
-        $config->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
+        $config->set('translatable10', 'labelVal10');
+        $config->set('other', 'otherVal');
+        $config->set('translatable', 'labelVal');
+        $config->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.id.auto_generated');
+
         $result = $this->configManager->createConfigFieldModel(self::ENTITY_CLASS, 'id', 'int');
+
         $this->assertEquals($model, $result);
         $this->assertEquals(
             [$config],
@@ -674,7 +681,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -691,12 +698,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with(Events::UPDATE_ENTITY_CONFIG);
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.entity_translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.entity_auto_generated');
 
         $actualConfig = null;
         $this->configProvider->expects($this->once())
@@ -738,7 +746,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -751,12 +759,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($config));
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.entity_translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
-        $expectedConfig->set('translatable2', 'oro.configtests.unit.fixture.demoentity.entity_translatable2');
+        $expectedConfig->set('translatable2', 'labelVal2');
         $expectedConfig->set('other2', 'otherVal2');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.entity_auto_generated');
 
         $actualConfig = null;
         $this->configProvider->expects($this->once())
@@ -798,7 +807,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -850,13 +859,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('persist');
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.entity_translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
-
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.entity_auto_generated');
         $actualConfig = null;
         $this->configProvider->expects($this->once())
             ->method('persist')
@@ -899,7 +908,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -912,12 +921,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($config));
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.id.auto_generated');
 
         $actualConfig = null;
         $this->configProvider->expects($this->once())
@@ -961,7 +971,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -974,12 +984,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($config));
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
-        $expectedConfig->set('translatable2', 'oro.configtests.unit.fixture.demoentity.id.translatable2');
+        $expectedConfig->set('translatable2', 'labelVal2');
         $expectedConfig->set('other2', 'otherVal2');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.id.auto_generated');
 
         $actualConfig = null;
         $this->configProvider->expects($this->once())
@@ -1023,7 +1034,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10', 'auto_generated']));
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
@@ -1071,12 +1082,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('persist');
 
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
-        $expectedConfig->set('other1', 'otherVal1');
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');
-        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
+        $expectedConfig->set('translatable10', 'labelVal10');
         $expectedConfig->set('other10', 'otherVal10');
+        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('auto_generated', 'oro.configtests.unit.fixture.demoentity.id.auto_generated');
 
         $actualConfig = null;
         $this->configProvider->expects($this->once())

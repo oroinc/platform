@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,6 +65,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->emailProcessor = new Processor(
             $this->doctrineHelper,
             $this->mailer,
+            new EmailAddressHelper(),
             $this->emailEntityBuilder,
             $this->emailOwnerProvider,
             $this->emailActivityManager
@@ -161,6 +160,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      * @dataProvider messageDataProvider
      * @param array $data
      * @param array $expectedMessageData
+     * 
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testProcess($data, $expectedMessageData)
     {
@@ -180,7 +181,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($expectedMessageData['subject']);
         $message->expects($this->once())
             ->method('setBody')
-            ->with($expectedMessageData['body'], 'text/plain');
+            ->with(
+                $expectedMessageData['body'],
+                isset($expectedMessageData['type']) ? $expectedMessageData['type'] : 'text/plain'
+            );
 
         $this->mailer->expects($this->once())
             ->method('createMessage')
@@ -230,7 +234,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->emailEntityBuilder->expects($this->once())
             ->method('body')
-            ->with($expectedMessageData['body'], false, true)
+            ->with(
+                $expectedMessageData['body'],
+                isset($data['type']) && $data['type'] === 'html' ? true : false,
+                true
+            )
             ->will($this->returnValue($body));
 
         $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
@@ -273,6 +281,22 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'to' => array('to@test.com'),
                     'subject' => 'subject',
                     'body' => 'body'
+                )
+            ),
+            array(
+                array(
+                    'from' => 'from@test.com',
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'type' => 'html'
+                ),
+                array(
+                    'from' => array('from@test.com'),
+                    'to' => array('to@test.com'),
+                    'subject' => 'subject',
+                    'body' => 'body',
+                    'type' => 'text/html'
                 )
             ),
             array(
@@ -386,6 +410,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     [
                         $this->doctrineHelper,
                         $this->mailer,
+                        new EmailAddressHelper(),
                         $this->emailEntityBuilder,
                         $this->emailOwnerProvider,
                         $this->emailActivityManager

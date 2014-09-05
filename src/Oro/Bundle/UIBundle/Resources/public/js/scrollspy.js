@@ -79,7 +79,9 @@ define(function (require) {
                 }
             });
 
-            $spy.scrollspy('refresh').scrollspy('process');
+            if ($spy.data('scrollspy')) {
+                $spy.scrollspy('refresh').scrollspy('process');
+            }
         });
     };
 

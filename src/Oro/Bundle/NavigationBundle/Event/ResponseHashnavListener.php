@@ -64,16 +64,22 @@ class ResponseHashnavListener
                 $isFullRedirect = true;
             }
             if ($location) {
-                $event->setResponse(
-                    $this->templating->renderResponse(
-                        'OroNavigationBundle:HashNav:redirect.html.twig',
-                        array(
-                            'full_redirect' => $isFullRedirect,
-                            'location'      => $location,
-                        )
+                $response = $this->templating->renderResponse(
+                    'OroNavigationBundle:HashNav:redirect.html.twig',
+                    array(
+                        'full_redirect' => $isFullRedirect,
+                        'location'      => $location,
                     )
                 );
             }
+
+            // disable cache for ajax navigation pages and change content type to json
+            $response->headers->set('Content-Type', 'application/json');
+            $response->headers->addCacheControlDirective('no-cache', true);
+            $response->headers->addCacheControlDirective('max-age', 0);
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+            $response->headers->addCacheControlDirective('no-store', true);
+            $event->setResponse($response);
         }
     }
 }

@@ -5,7 +5,6 @@ namespace Oro\Bundle\HelpBundle\EventListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 
@@ -17,17 +16,11 @@ class HelpLinkRequestListener
     protected $container;
 
     /**
-     * @var HelpLinkProvider
-     */
-    protected $linkProvider;
-
-    /**
      * @param ContainerInterface $container
-     * @param HelpLinkProvider $linkProvider
      */
-    public function __construct(ContainerInterface $container, HelpLinkProvider $linkProvider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->linkProvider = $linkProvider;
+        $this->container = $container;
     }
 
     /**
@@ -36,7 +29,9 @@ class HelpLinkRequestListener
     public function onKernelController(FilterControllerEvent $event)
     {
         if (HttpKernel::MASTER_REQUEST == $event->getRequestType()) {
-            $this->linkProvider->setRequest($event->getRequest());
+            /** @var HelpLinkProvider $linkProvider */
+            $linkProvider = $this->container->get('oro_help.model.help_link_provider');
+            $linkProvider->setRequest($event->getRequest());
         }
 
         return;

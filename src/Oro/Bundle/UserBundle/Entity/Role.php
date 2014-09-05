@@ -35,6 +35,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
@@ -48,7 +51,7 @@ class Role extends BaseRole
      * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose

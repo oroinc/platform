@@ -38,8 +38,12 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 
         $em->expects($this->any())->method('getRepository')->with('OroIntegrationBundle:Channel')
             ->will($this->returnValue($this->repo));
+        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry->expects($this->any())->method('getManager')
+            ->will($this->returnValue($em));
+        $link =new ServiceLink($container, $proxiedServiceID);
 
-        $this->contextMediator = new ConnectorContextMediator(new ServiceLink($container, $proxiedServiceID), $em);
+        $this->contextMediator = new ConnectorContextMediator($link, $registry);
     }
 
     protected function tearDown()

@@ -9,7 +9,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fixtureRegistry;
+    protected $templateManager;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -23,30 +23,14 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fixtureRegistry = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry')
+        $this->templateManager = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calculator = new TemplateFixtureRelationCalculator($this->fixtureRegistry, $this->fieldHelper);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage There is no template fixture registered for "stdClass".
-     */
-    public function testGetMaxRelatedEntitiesException()
-    {
-        $entityName = 'stdClass';
-
-        $this->fixtureRegistry->expects($this->once())
-            ->method('hasEntityFixture')
-            ->with($entityName)
-            ->will($this->returnValue(false));
-
-        $this->calculator->getMaxRelatedEntities($entityName, 'test');
+        $this->calculator = new TemplateFixtureRelationCalculator($this->templateManager, $this->fieldHelper);
     }
 
     /**
@@ -64,11 +48,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($fixtureData));
 
-        $this->fixtureRegistry->expects($this->once())
-            ->method('hasEntityFixture')
-            ->with($entityName)
-            ->will($this->returnValue(true));
-        $this->fixtureRegistry->expects($this->once())
+        $this->templateManager->expects($this->once())
             ->method('getEntityFixture')
             ->with($entityName)
             ->will($this->returnValue($fixture));

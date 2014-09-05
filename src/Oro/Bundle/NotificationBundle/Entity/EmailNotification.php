@@ -24,6 +24,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
@@ -86,6 +89,7 @@ class EmailNotification
      * Set entityName
      *
      * @param string $entityName
+     *
      * @return EmailNotification
      */
     public function setEntityName($entityName)
@@ -132,6 +136,7 @@ class EmailNotification
      * Set template
      *
      * @param EmailTemplate $template
+     *
      * @return EmailNotification
      */
     public function setTemplate(EmailTemplate $template)
@@ -155,6 +160,7 @@ class EmailNotification
      * Set recipient
      *
      * @param RecipientList $recipientList
+     *
      * @return EmailNotification
      */
     public function setRecipientList(RecipientList $recipientList)

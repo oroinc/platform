@@ -104,6 +104,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 try {
                     model = new ConnectionModel();
                     model.set('owner', ownerId);
+                    model.urlRoot = this.getCollection().url;
                     this.getCollection().create(model, {
                         wait: true,
                         success: _.bind(function () {

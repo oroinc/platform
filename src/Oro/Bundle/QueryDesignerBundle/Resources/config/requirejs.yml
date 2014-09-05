@@ -5,3 +5,6 @@ config:
         'oroquerydesigner/js/function-choice': 'bundles/oroquerydesigner/js/function-choice.js'
         'oroquerydesigner/js/items-manager/grouping-model': 'bundles/oroquerydesigner/js/items-manager/grouping-model.js'
         'oroquerydesigner/js/items-manager/column-model': 'bundles/oroquerydesigner/js/items-manager/column-model.js'
+
+        'oroquerydesigner/js/app/components/column-form': 'bundles/oroquerydesigner/js/app/components/column-form.js'
+        'oroquerydesigner/js/app/components/condition-builder': 'bundles/oroquerydesigner/js/app/components/condition-builder.js'

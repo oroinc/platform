@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js/translator'
+define(['underscore', 'backbone', 'oroui/js/widget/abstract'
     ], function (_, Backbone, AbstractWidget) {
     'use strict';
 
@@ -112,17 +112,19 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract', 'orotranslation/js
             if (!(events || (events = _.result(this, 'widgetEvents')))) return;
             this._undelegateWidgetEvents();
             for (var key in events) {
-                var method = events[key];
-                if (!_.isFunction(method)) method = this[events[key]];
-                if (!method) throw new Error('Method "' + events[key] + '" does not exist');
-                var match = key.match(delegateEventSplitter);
-                var eventName = match[1], selector = match[2];
-                method = _.bind(method, this);
-                eventName += '.delegateWidgetEvents' + this.cid;
-                if (selector === '') {
-                    this.widget.on(eventName, method);
-                } else {
-                    this.widget.on(eventName, selector, method);
+                if (events.hasOwnProperty(key)) {
+                    var method = events[key];
+                    if (!_.isFunction(method)) method = this[events[key]];
+                    if (!method) throw new Error('Method "' + events[key] + '" does not exist');
+                    var match = key.match(delegateEventSplitter);
+                    var eventName = match[1], selector = match[2];
+                    method = _.bind(method, this);
+                    eventName += '.delegateWidgetEvents' + this.cid;
+                    if (selector === '') {
+                        this.widget.on(eventName, method);
+                    } else {
+                        this.widget.on(eventName, selector, method);
+                    }
                 }
             }
         },

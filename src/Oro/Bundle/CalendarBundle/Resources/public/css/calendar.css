@@ -32,16 +32,21 @@
 }
 
 .calendars .media-body {
-    margin-top: 2px;
-    margin-left: 10px;
+    margin-top:  2px;
+    margin-left: 20px;
 }
 
-.calendars .media-body.usser-calendar {
-    font-size: 13px;
-    line-height: 17px;
-    font-weight: bold;
-    color: #444 !important;
-    margin-top: 0;
+.calendars .media-body .user-calendar {
+    color:         #444 !important;
+    display:       inline-block;
+    font-size:     13px;
+    font-weight:   bold;
+    line-height:   17px;
+    margin-top:    0;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    white-space:   nowrap;
+    width:         80%;
 }
 
 .calendars .icons-holder .icons-holder-text [class^="icon-"] {
@@ -58,8 +63,12 @@
     display: none;
 }
 
-.calendars form .select2-container {
+.calendars form .input-append {
+    display: block;
+}
 
+.calendars form .select2-container {
+    width: 85%;
 }
 
 .calendar-container .fc-grid th {

@@ -53,6 +53,9 @@ class ImportProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getOption', 'addFailureException')
             ->with('entityName')
             ->will($this->returnValue('\stdClass'));
+        $this->context->expects($this->once())
+            ->method('setValue')
+            ->with('itemData', $this->item);
         $this->context->expects($this->any())
             ->method('getConfiguration')
             ->will($this->returnValue([]));

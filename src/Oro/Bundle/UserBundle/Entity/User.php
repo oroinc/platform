@@ -263,6 +263,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -279,6 +282,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -406,6 +412,9 @@ class User extends ExtendUser implements
      *      defaultValues={
      *          "importexport"={
      *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
      *          }
      *      }
      * )
@@ -475,6 +484,13 @@ class User extends ExtendUser implements
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -482,6 +498,13 @@ class User extends ExtendUser implements
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

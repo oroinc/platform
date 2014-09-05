@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(
@@ -26,6 +27,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -97,6 +101,13 @@ class ProcessTrigger
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -104,6 +115,13 @@ class ProcessTrigger
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -259,7 +258,19 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValue(
                     array(
-                        array('fieldName' => 'test')
+                        'testSingle'   => array('fieldName' => 'testSingle'),
+                        'testMultiple' => array('fieldName' => 'testMultiple'),
+                    )
+                )
+            );
+        $classMetadata->expects($this->exactly(2))
+            ->method('isAssociationWithSingleJoinColumn')
+            ->with($this->isType('string'))
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array('testSingle', true),
+                        array('testMultiple', false),
                     )
                 )
             );
@@ -269,10 +280,10 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->once())
             ->method('addSelect')
-            ->with('_test');
+            ->with('_testSingle');
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('o.test', '_test');
+            ->with('o.testSingle', '_testSingle');
         $queryBuilder->expects($this->once())
             ->method('orderBy')
             ->with('o.id', 'ASC');

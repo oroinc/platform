@@ -1,7 +1,7 @@
 /*global define*/
 define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
-        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'jquery.dialog.extended'
-    ], function ($, _, tools, error, AbstractWidget, StateModel) {
+        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger', 'orotranslation/js/translator', 'jquery.dialog.extended'
+    ], function ($, _, tools, error, AbstractWidget, StateModel, messenger, __) {
     'use strict';
 
     /**
@@ -110,8 +110,29 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
                 });
             }
             this._hideLoading();
-            this.widget.remove();
+            if (this.widget) {
+                this.widget.remove();
+            }
             AbstractWidget.prototype.remove.call(this);
+        },
+
+        /**
+         * Handle content loading failure.
+         * @private
+         */
+        _onContentLoadFail: function(jqxhr) {
+            if (jqxhr.status != 403) {
+                AbstractWidget.prototype._onContentLoadFail.apply(this, arguments);
+            }
+
+            messenger.notificationFlashMessage('error', __('oro.ui.forbidden_error'));
+
+            if (this.widget) {
+                this.widget.dialog("close");
+            } else {
+                //for case if error triggered before widget rendering
+                this.closeHandler();
+            }
         },
 
         handleStateChange: function(e, data) {

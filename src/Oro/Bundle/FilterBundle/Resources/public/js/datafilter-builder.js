@@ -12,7 +12,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
          */
         initBuilder: function () {
             var modules;
-            this.metadata = _.extend({filters: {}}, this.$el.data('metadata'));
+            this.metadata = _.extend({filters: {}}, this.metadata);
             modules = methods.collectModules.call(this);
             tools.loadModules(modules, function (modules) {
                 this.modules = modules;
@@ -33,13 +33,14 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
         },
 
         build: function () {
+            var options, filtersList;
             if (!this.collection || !this.modules) {
                 return;
             }
 
-            var options = methods.combineOptions.call(this);
+            options = methods.combineOptions.call(this);
             options.collection = this.collection;
-            var filtersList = new FiltersManager(options);
+            filtersList = new FiltersManager(options);
             this.$el.prepend(filtersList.render().$el);
             mediator.trigger('datagrid_filters:rendered', this.collection);
             this.metadata.state.filters = this.metadata.state.filters || [];
@@ -47,7 +48,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
                 filtersList.$el.hide();
             }
 
-            this.deferred.resolve();
+            this.deferred.resolve(filtersList);
         },
 
         /**
@@ -78,32 +79,32 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
          * Builder interface implementation
          *
          * @param {jQuery.Deferred} deferred
-         * @param {jQuery} $el
-         * @param {String} gridName
+         * @param {Object} options
+         * @param {jQuery} [options.$el] container for the grid
+         * @param {string} [options.gridName] grid name
+         * @param {Object} [options.gridPromise] grid builder's promise
+         * @param {Object} [options.data] data for grid's collection
+         * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, $el, gridName) {
-            var self, onCollectionSet;
+        init: function (deferred, options) {
+            var self;
             self = {
                 deferred: deferred,
-                $el: $el,
-                gridName: gridName,
+                $el: options.$el,
+                gridName: options.gridName,
+                metadata: options.metadata,
                 collection: null,
                 modules: null
             };
 
-            onCollectionSet = function (collection) {
-                if (self.gridName === collection.inputName) {
-                    self.collection = collection;
-                    methods.build.call(self);
-                    mediator.off('datagrid_collection_set_after', onCollectionSet);
-                }
-            };
-            mediator.on('datagrid_collection_set_after', onCollectionSet);
-            mediator.once('page:request', function () {
-                mediator.off('datagrid_collection_set_after', onCollectionSet);
-            });
-
             methods.initBuilder.call(self);
+
+            options.gridPromise.done(function (grid) {
+                self.collection = grid.collection;
+                methods.build.call(self);
+            }).fail(function () {
+                deferred.reject();
+            });
         }
     };
 });

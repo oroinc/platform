@@ -5,8 +5,10 @@ namespace Oro\Bundle\ReportBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
 /**
  * @ORM\Entity()
@@ -28,12 +30,17 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
  */
-class Report extends AbstractQueryDesigner
+class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    const GRID_PREFIX = 'oro_report_table_';
+
     /**
      * @var integer
      *
@@ -97,6 +104,13 @@ class Report extends AbstractQueryDesigner
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -104,8 +118,23 @@ class Report extends AbstractQueryDesigner
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
+    }
 
     /**
      * Get id
@@ -233,9 +262,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Get this report definition in YAML format
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDefinition()
     {
@@ -243,10 +270,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Set this report definition in YAML format
-     *
-     * @param string $definition
-     * @return Report
+     * {@inheritdoc}
      */
     public function setDefinition($definition)
     {

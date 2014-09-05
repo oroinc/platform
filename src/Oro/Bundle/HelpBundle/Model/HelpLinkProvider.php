@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\HelpBundle\Model;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -56,6 +57,11 @@ class HelpLinkProvider
     protected $helpAnnotation;
 
     /**
+     * @var CacheProvider
+     */
+    protected $cache;
+
+    /**
      * @var string
      */
     protected $format = '%server%/%vendor%/%bundle%/%controller%_%action%';
@@ -68,6 +74,16 @@ class HelpLinkProvider
     {
         $this->parser = $parser;
         $this->helper = $helper;
+    }
+
+    /**
+     * Set cache instance
+     *
+     * @param CacheProvider $cache
+     */
+    public function setCache(CacheProvider $cache)
+    {
+        $this->cache = $cache;
     }
 
     public function setRequest(Request $request)
@@ -94,6 +110,26 @@ class HelpLinkProvider
      * @return string
      */
     public function getHelpLinkUrl()
+    {
+        if ($this->cache && $this->cache->contains($this->requestRoute)) {
+            $helpLink = $this->cache->fetch($this->requestRoute);
+        } else {
+            $helpLink = $this->constructedHelpLinkUrl();
+
+            if ($this->cache) {
+                $this->cache->save($this->requestRoute, $helpLink);
+            }
+        }
+
+        return $helpLink;
+    }
+
+    /**
+     * Construct help link URL based on route.
+     *
+     * @return string
+     */
+    protected function constructedHelpLinkUrl()
     {
         $config = $this->getConfiguration();
         if (isset($config['link'])) {

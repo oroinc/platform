@@ -389,10 +389,10 @@ class ConfigManager
      */
     public function clearConfigurableCache()
     {
+        $this->modelManager->clearCheckDatabase();
         if ($this->cache) {
             $this->cache->removeAllConfigurable();
         }
-        $this->modelManager->clearCheckDatabase();
     }
 
     /**
@@ -438,10 +438,6 @@ class ConfigManager
         $models = [];
         $this->prepareFlush($models);
 
-        if ($this->cache) {
-            $this->cache->removeAllConfigurable();
-        }
-
         $this->auditManager->log();
 
         foreach ($models as $model) {
@@ -449,6 +445,10 @@ class ConfigManager
         }
 
         $this->getEntityManager()->flush();
+
+        if ($this->cache) {
+            $this->cache->removeAllConfigurable();
+        }
 
         $this->persistConfigs   = [];
         $this->configChangeSets = [];
@@ -929,7 +929,7 @@ class ConfigManager
             $translatablePropertyNames = $provider->getPropertyConfig()
                 ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
             foreach ($translatablePropertyNames as $propertyName) {
-                if (!in_array($propertyName, $defaultValues)) {
+                if (empty($defaultValues[$propertyName])) {
                     $defaultValues[$propertyName] =
                         ConfigHelper::getTranslationKey($scope, $propertyName, $className);
                 }
@@ -975,7 +975,7 @@ class ConfigManager
         $translatablePropertyNames = $provider->getPropertyConfig()
             ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {
-            if (!in_array($propertyName, $defaultValues)) {
+            if (empty($defaultValues[$propertyName])) {
                 $defaultValues[$propertyName] =
                     ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
             }

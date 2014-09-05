@@ -38,8 +38,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'oro.tag.created.label'|trans }}: {{ form.vars.value.created ? form.vars.value.created|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.tag.updated.label'|trans }}: {{ form.vars.value.updated ? form.vars.value.updated|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ form.vars.value.created ? form.vars.value.created|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ form.vars.value.updated ? form.vars.value.updated|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}

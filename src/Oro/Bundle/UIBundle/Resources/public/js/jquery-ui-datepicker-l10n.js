@@ -7,7 +7,7 @@ define(['jquery', 'orotranslation/js/translator',
     var locale = localeSettings.getLocale();
 
     $.datepicker.regional[locale] = {
-        closeText: __("Done"), // Display text for close link
+        closeText: __("Close"), // Display text for close link
         prevText: __("Prev"), // Display text for previous month link
         nextText: __("Next"), // Display text for next month link
         currentText: __("Today"), // Display text for current month link

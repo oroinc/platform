@@ -25,7 +25,7 @@ class SidebarTest extends WebTestCase
             $this->getUrl('oro_api_get_sidebars', array('position' => $position['position']))
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 204);
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
         $this->assertEmpty($result->getContent());
     }
 

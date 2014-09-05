@@ -36,8 +36,10 @@ services:
            - @oro_config.config_definition_bag
 
     oro_config.twig.config_extension:
-        class:                        %oro_config.twig_extension.class%
-        arguments:                    ["@oro_config.global", %oro_config.entities%]
+        class: %oro_config.twig_extension.class%
+        arguments:
+           - @oro_config.global
+           - @oro_entity_config.config_manager
         tags:
             - { name: twig.extension }
 

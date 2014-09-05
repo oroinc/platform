@@ -13,6 +13,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendConfigDumper
 {
     const ACTION_PRE_UPDATE  = 'preUpdate';
@@ -91,7 +94,17 @@ class ExtendConfigDumper
         }
 
         foreach ($extendConfigs as $extendConfig) {
-            $this->checkSchema($extendConfig, $aliases);
+            if ($extendConfig->is('upgradeable')) {
+                if ($extendConfig->is('is_extend')) {
+                    $this->checkSchema($extendConfig, $aliases);
+                }
+                // some bundles can change configs in pre persist events,
+                // and other bundles can produce more changes depending on already made, it's a bit hacky,
+                // but it's a service operation so called inevitable evil
+                $extendProvider->flush();
+                $this->checkState($extendConfig);
+                $extendProvider->flush();
+            }
         }
 
         foreach ($this->getExtensions() as $extension) {
@@ -128,7 +141,7 @@ class ExtendConfigDumper
      */
     public function clear($keepEntityProxies = false)
     {
-        $filesystem   = new Filesystem();
+        $filesystem = new Filesystem();
 
         if ($keepEntityProxies) {
             $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
@@ -227,15 +240,9 @@ class ExtendConfigDumper
      * @param array|null      $aliases
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function checkSchema(ConfigInterface $extendConfig, $aliases)
     {
-        if (!$extendConfig->is('is_extend') || !$extendConfig->is('upgradeable')) {
-            return;
-        }
-
         $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $extendConfig->getId()->getClassName();
         $doctrine       = [];
@@ -263,8 +270,6 @@ class ExtendConfigDumper
             ];
         }
 
-        $entityState = $extendConfig->get('state');
-
         $schema             = $extendConfig->get('schema');
         $properties         = [];
         $relationProperties = $schema ? $schema['relation'] : [];
@@ -283,23 +288,6 @@ class ExtendConfigDumper
             );
 
             $extendProvider->persist($fieldConfig);
-        }
-
-        $extendProvider->flush();
-
-        $extendConfig->set('state', $entityState);
-        if ($extendConfig->is('state', ExtendScope::STATE_DELETED)) {
-            $extendConfig->set('is_deleted', true);
-
-            $extendProvider->map(
-                function (Config $config) use ($extendProvider) {
-                    $config->set('is_deleted', true);
-                    $extendProvider->persist($config);
-                },
-                $className
-            );
-        } else {
-            $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
 
         $relations = $extendConfig->get('relation', false, []);
@@ -348,7 +336,34 @@ class ExtendConfigDumper
         $extendConfig->set('schema', $schema);
 
         $extendProvider->persist($extendConfig);
-        $extendProvider->flush();
+    }
+
+    /**
+     * @param ConfigInterface $extendConfig
+     */
+    protected function checkState(ConfigInterface $extendConfig)
+    {
+        $extendProvider = $this->em->getExtendConfigProvider();
+        $className      = $extendConfig->getId()->getClassName();
+        if ($extendConfig->is('state', ExtendScope::STATE_DELETED)) {
+            // mark entity as deleted
+            $extendConfig->set('is_deleted', true);
+            $extendProvider->persist($extendConfig);
+
+            // mark all fields as deleted
+            $extendProvider->map(
+                function (Config $config) use ($extendProvider) {
+                    if (!$config->is('is_deleted')) {
+                        $config->set('is_deleted', true);
+                        $extendProvider->persist($config);
+                    }
+                },
+                $className
+            );
+        } else {
+            $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
+            $extendProvider->persist($extendConfig);
+        }
     }
 
     /**

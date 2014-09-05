@@ -51,6 +51,8 @@ function (_, Backbone, routing, dateTimeFormatter, autolinker) {
             data['collapsed'] = this.collapsed;
             data['createdAt'] = dateTimeFormatter.formatDateTime(data['createdAt']);
             data['updatedAt'] = dateTimeFormatter.formatDateTime(data['updatedAt']);
+            data['createdBy_url'] = null;
+            data['updatedBy_url'] = null;
             if (data['createdBy_id'] && data['createdBy_viewable']) {
                 data['createdBy_url'] = routing.generate('oro_user_view', {'id': data['createdBy_id']});
             }

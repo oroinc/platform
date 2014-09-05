@@ -1,6 +1,12 @@
 parameters:
-    oro_importexport.template_fixture.registry.class: Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry
+    oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
+    oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
 
 services:
-    oro_importexport.template_fixture.registry:
-        class: %oro_importexport.template_fixture.registry.class%
+    oro_importexport.template_fixture.entity_registry:
+        class: %oro_importexport.template_fixture.entity_registry.class%
+
+    oro_importexport.template_fixture.manager:
+        class: %oro_importexport.template_fixture.manager.class%
+        arguments:
+            - @oro_importexport.template_fixture.entity_registry

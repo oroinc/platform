@@ -35,7 +35,7 @@ function($, _, __, tools) {
             }
             if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
                 // JSON REST response
-                _.each(err.errors, function(value) { errors.push(__(value)); });
+                _.each(err.errors, function(value) { errors.push(value); });
             }
             this.addErrors(container, errors);
 
@@ -50,8 +50,7 @@ function($, _, __, tools) {
                         this.removeFieldErrors(field);
 
                         if (!_.isUndefined(value.errors) && _.isArray(value.errors)) {
-                            this.addFieldErrors(field,
-                                _.map(value.errors, function(val) { return __(val) }));
+                            this.addFieldErrors(field, value.errors);
                         }
                     }, this));
                 this.setFocusOnFirstErrorField(container);

@@ -34,7 +34,7 @@
                 </script>
                 {% endblock %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
+                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
@@ -204,11 +204,11 @@
 {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
 {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
     with {
-        'script': block('head_script'),
-        'content': block('page_container'),
-        'menu': block('application_menu'),
-        'breadcrumb': block('breadcrumb'),
-        'userMenu': block('user_menu')
+        'data': {
+            'scripts': block('head_script'),
+            'content': block('page_container'),
+            'breadcrumb': block('breadcrumb')|trim
+        }
     }
-    %}
+%}
 {% endif %}

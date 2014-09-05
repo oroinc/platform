@@ -8,11 +8,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as Serializer;
 
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * Workflow item
@@ -33,6 +34,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *              "immutable"=true
  *          },
  *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
  *              "immutable"=true
  *          }
  *      }
@@ -121,6 +125,13 @@ class WorkflowItem
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 
@@ -128,6 +139,13 @@ class WorkflowItem
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updated;
 

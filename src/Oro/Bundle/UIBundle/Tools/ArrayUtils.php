@@ -8,6 +8,49 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class ArrayUtils
 {
     /**
+     * Return the values from a single column in the input array
+     *
+     * http://php.net/manual/en/function.array-column.php
+     *
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     *
+     * @return array
+     */
+    public static function arrayColumn(array $array, $columnKey, $indexKey = null)
+    {
+        $result = [];
+
+        if (empty($array)) {
+            throw new \InvalidArgumentException('Array is empty');
+        }
+
+        if (empty($columnKey)) {
+            throw new \InvalidArgumentException('Column key is empty');
+        }
+
+        foreach ($array as $item) {
+            if (!isset($item[$columnKey])) {
+                continue;
+            }
+
+            if ($indexKey && !isset($item[$indexKey])) {
+                continue;
+            }
+
+            if ($indexKey) {
+                $index          = $item[$indexKey];
+                $result[$index] = $item[$columnKey];
+            } else {
+                $result[] = $item[$columnKey];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Sorts an array by specified property.
      *
      * This method uses the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability

@@ -66,7 +66,7 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type DateTime, boolean given
+     * @expectedExceptionMessage Expected argument of type "DateTime", "boolean" given
      */
     public function testValidateExceptionWhenInvalidArgumentType()
     {
@@ -77,7 +77,7 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type DateTime, object given
+     * @expectedExceptionMessage Expected argument of type "DateTime", "DateTime" given
      */
     public function testValidateExceptionWhenInvalidConstraintType()
     {
@@ -89,7 +89,7 @@ class DateEarlierThanValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type FormInterface, array given
+     * @expectedExceptionMessage Expected argument of type "FormInterface", "array" given
      */
     public function testValidateExceptionWhenInvalidRootType()
     {

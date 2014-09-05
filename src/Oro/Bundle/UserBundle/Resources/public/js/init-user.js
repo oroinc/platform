@@ -10,7 +10,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
      * ============================================================ */
     $(function() {
         function checkRoleInputs() {
-            var inputs = $('#roles-list .controls').find(':checkbox');
+            var inputs = $('#roles-list').find('.controls :checkbox');
             inputs.attr('required', inputs.filter(':checked').length > 0 ? null : 'required');
         }
 
@@ -18,7 +18,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
             messenger.setup();
         }
 
-        $(document).on('click', '#roles-list input', function (e) {
+        $(document).on('click', '#roles-list input', function () {
             checkRoleInputs();
         });
 
@@ -32,7 +32,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
          */
         mediator.on("page:afterChange", initFlashMessages);
 
-        $(document).on('change', '#btn-enable input', function(e) {
+        $(document).on('change', '#btn-enable input', function() {
             $('.status-enabled').toggleClass('hide');
             $('.status-disabled').toggleClass('hide');
         });
@@ -84,12 +84,12 @@ function($, _, __, mediator, messenger, DialogWidget) {
             return false;
         });
 
-        $(document).on('submit', '#create-status-form', function(e) {
+        $(document).on('submit', '#create-status-form', function() {
             $.ajax({
                 type:'POST',
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
-                success: function(response) {
+                success: function() {
                     dialogBlock.dialog("destroy");
                 }
             });

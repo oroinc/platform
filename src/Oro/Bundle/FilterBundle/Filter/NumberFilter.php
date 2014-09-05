@@ -25,19 +25,23 @@ class NumberFilter extends AbstractFilter
             return false;
         }
 
+        $type = $data['type'];
+
         $parameterName = $ds->generateParameterName($this->getName());
 
         $this->applyFilterToClause(
             $ds,
             $this->buildComparisonExpr(
                 $ds,
-                $data['type'],
+                $type,
                 $this->get(FilterUtility::DATA_NAME_KEY),
                 $parameterName
             )
         );
 
-        $ds->setParameter($parameterName, $data['value']);
+        if ($type !== FilterUtility::TYPE_EMPTY) {
+            $ds->setParameter($parameterName, $data['value']);
+        }
 
         return true;
     }
@@ -49,11 +53,19 @@ class NumberFilter extends AbstractFilter
      */
     public function parseData($data)
     {
-        if (!is_array($data) || !array_key_exists('value', $data) || !is_numeric($data['value'])) {
+        if (!is_array($data) || !array_key_exists('value', $data)) {
             return false;
         }
 
         $data['type'] = isset($data['type']) ? $data['type'] : null;
+
+        if (!is_numeric($data['value'])) {
+            if ($data['type'] === FilterUtility::TYPE_EMPTY) {
+                return $data;
+            }
+
+            return false;
+        }
 
         return $data;
     }
@@ -84,6 +96,8 @@ class NumberFilter extends AbstractFilter
                 return $ds->expr()->lt($fieldName, $parameterName, true);
             case NumberFilterType::TYPE_NOT_EQUAL:
                 return $ds->expr()->neq($fieldName, $parameterName, true);
+            case FilterUtility::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }

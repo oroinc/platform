@@ -1,6 +1,6 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tools'
+define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
     ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
@@ -573,6 +573,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/tool
             collectionOptions.inputName = this.inputName;
             var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
             newCollection.state = tools.deepClone(this.state);
+            newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
         }
     });

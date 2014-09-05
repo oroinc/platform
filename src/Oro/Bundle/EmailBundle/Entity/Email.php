@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
 
 /**
@@ -66,6 +66,13 @@ class Email extends ExtendEmail
      *
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 

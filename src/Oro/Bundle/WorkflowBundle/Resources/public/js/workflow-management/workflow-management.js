@@ -135,7 +135,7 @@ function(_, Backbone, routing, messenger, __,
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes, I Agree'),
-                content: __('Are you sure you want to change entity?')
+                content: __('oro.workflow.change_entity_confirmation')
             });
             confirm.on('ok', _.bind(function() {
                 this.model.set('entity', this.$entitySelectEl.val());

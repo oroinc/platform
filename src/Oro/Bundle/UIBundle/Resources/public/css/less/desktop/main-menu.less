@@ -5,6 +5,9 @@
 
 // common decoration
 .main-menu {
+  .unclickable {
+    cursor: default;
+  }
   .dropdown:hover > .dropdown-menu { /* Opens on hover for all 2+ levels */
     display: block;
   }
@@ -153,6 +156,7 @@
       color: transparent;
       i[class^=icon-] {
         vertical-align: middle;
+        vertical-align: -webkit-baseline-middle;
         display: inline-block !important;
         color: @menuItemFirstLevelTextColor;
         font-size: @baseFontSize;
@@ -258,7 +262,7 @@
     > li.dropdown,
     > li.accordion-group {
       > a {
-        cursor: pointer;
+        cursor: default;
         font-size: 15px;
         line-height: 34px;
         &:hover {

@@ -6,14 +6,14 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
-use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
 class TemplateFixtureReader extends IteratorBasedReader
 {
     /**
-     * @var TemplateFixtureRegistry
+     * @var TemplateManager
      */
-    protected $fixtureRegistry;
+    protected $templateManager;
 
     /**
      * @var TemplateFixtureInterface
@@ -22,13 +22,13 @@ class TemplateFixtureReader extends IteratorBasedReader
 
     /**
      * @param ContextRegistry $contextRegistry
-     * @param TemplateFixtureRegistry $fixtureRegistry
+     * @param TemplateManager $templateManager
      */
-    public function __construct(ContextRegistry $contextRegistry, TemplateFixtureRegistry $fixtureRegistry)
+    public function __construct(ContextRegistry $contextRegistry, TemplateManager $templateManager)
     {
         parent::__construct($contextRegistry);
 
-        $this->fixtureRegistry = $fixtureRegistry;
+        $this->templateManager = $templateManager;
     }
 
     /**
@@ -36,20 +36,13 @@ class TemplateFixtureReader extends IteratorBasedReader
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        if ($context->hasOption('entityName')) {
-            $this->fixture = $this->fixtureRegistry->getEntityFixture($context->getOption('entityName'));
-        } else {
+        if (!$context->hasOption('entityName')) {
             throw new InvalidConfigurationException(
                 'Configuration of fixture reader must contain "entityName".'
             );
         }
 
-        if ($this->fixture) {
-            $this->setSourceIterator($this->fixture->getData());
-        } else {
-            throw new InvalidConfigurationException(
-                sprintf('There is no template fixture registered for "%s".', $context->getOption('entityName'))
-            );
-        }
+        $this->fixture = $this->templateManager->getEntityFixture($context->getOption('entityName'));
+        $this->setSourceIterator($this->fixture->getData());
     }
 }

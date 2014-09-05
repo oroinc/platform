@@ -10,9 +10,9 @@ define(['backbone', 'orocalendar/js/calendar/connection/collection'
      */
     return Backbone.Model.extend({
         /** @property */
+        collection:  ConnectionCollection,
         idAttribute: 'calendar',
-
-        collection: ConnectionCollection,
+        urlRoot:     null,
 
         defaults: {
             color : null,

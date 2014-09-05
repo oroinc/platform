@@ -11,7 +11,8 @@ define([
 
     PageView = BaseView.extend({
         events: {
-            'submit form': 'onSubmit'
+            'submit form': 'onSubmit',
+            'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
         },
 
         listen: {
@@ -64,6 +65,10 @@ define([
                 });
                 mediator.execute('submitPage', options);
             }
+        },
+
+        onRefreshClick: function () {
+            mediator.execute('refreshPage');
         }
     });
 

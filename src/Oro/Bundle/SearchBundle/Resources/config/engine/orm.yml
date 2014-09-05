@@ -10,4 +10,9 @@ parameters:
 services:
     oro_search.search.engine:
         class: %oro_search.search.engine.class%
-        arguments: [@doctrine.orm.entity_manager, @event_dispatcher, @service_container, @oro_search.mapper, %oro_search.log_queries%]
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @event_dispatcher
+            - @service_container
+            - @oro_search.mapper
+            - %oro_search.log_queries%

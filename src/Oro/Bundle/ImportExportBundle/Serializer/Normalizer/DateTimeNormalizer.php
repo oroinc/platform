@@ -54,11 +54,15 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      * @param string $class
      * @param mixed $format
      * @param array $context
-     * @return \DateTime
+     * @return \DateTime|null
      * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (empty($data)) {
+            return null;
+        }
+
         $timezone = $this->getTimezone($context);
         $format = $this->getFormat($context);
         $datetime = \DateTime::createFromFormat($format . '|', (string) $data, $timezone);

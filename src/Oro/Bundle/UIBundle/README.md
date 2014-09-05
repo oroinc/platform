@@ -5,14 +5,17 @@ User interface layouts and controls.
 
 ## Table of Contents
 
-- [TWIG Filters](./Resources/doc/reference/twig_filters.md)
-- [Form Components](./Resources/doc/reference/form_components.md)
-- [JavaScript Tools and Libraries](./Resources/doc/reference/js_tools_and_libraries.md)
+- [Client Side Architecture](./Resources/doc/reference/client-side-architecture.md)
+- [Mediator Handlers](./Resources/doc/reference/mediator-handlers.md)
+- [Client Side Navigation](./Resources/doc/reference/client-side-navigation.md)
+- [TWIG Filters](./Resources/doc/reference/twig-filters.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
+- [Items Manager](./Resources/doc/reference/items-manager.md)
 
 ## Configuration Settings
 
-- oro_ui.application_name - application name to display in header
+- oro_ui.application_url   - application frontend URL
+- oro_ui.application_name  - application name to display in header
 - oro_ui.application_title - application title for name reference in header
 
 ### Hide 'Add to favorites' and 'Minimize to the pinbar' buttons for the start page
@@ -25,9 +28,7 @@ oro_ui:
 
 ## Introduction to placeholders
 
-In order to improve layouts and make them more flexible a new twig token `placeholder` is implemented. It allows us to combine
-several blocks (templates or actions) and output them in different places in twig templates. This way we can customize layouts
-without modifying twig templates.
+In order to improve layouts and make them more flexible a new twig token `placeholder` is implemented. It allows us to combine several blocks (templates or actions) and output them in different places in twig templates. This way we can customize layouts without modifying twig templates.
 
 ### Placeholder declaration in YAML
 
@@ -110,34 +111,3 @@ or see "template_name" variable for AJAX requests that expecting JSON
 ```
 
 The templates hinting is enabled by default in development mode.
-
-## Customization RequireJS config
-Main RequireJS config at the moment placed in `src/Oro/Bundle/UIBundle/Resources/views/Default/require.js.config.html.twig` template. But it's possible to customize it for you needs:
-
- - Create your template like `MyBundle/Resources/views/require.js.config.html.twig`:
-
-```html
-<script type="text/javascript">
-    // get reference to original require.js configuration object
-    require = require || {};
-    require.paths = require.paths || {};
-    // and customize it in a way you want
-    require.paths['my/module'] = 'mybundle/js/module';
-    // ...
-</script>
-```
-
- - In `MyBundle/Resources/config/placeholders.yml` define item for a placeholder `require_js_config`
-
-```yml
-placeholders:
-    requirejs_config_extend:
-        items:
-            require_js_config:
-                order: 100
-items:
-    require_js_config:
-        template: MyBundle::require.js.config.html.twig
-```
-
- - And your script will be injected into a document's head, after main `require.js.config.html.twig` and right before `require.js` lib.

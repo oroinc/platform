@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
@@ -13,9 +11,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class ReverseSyncProcessor
 {
-    /** @var EntityManager */
-    protected $em;
-
     /** @var ProcessorRegistry */
     protected $processorRegistry;
 
@@ -29,20 +24,17 @@ class ReverseSyncProcessor
     protected $logger;
 
     /**
-     * @param EntityManager     $em
      * @param ProcessorRegistry $processorRegistry
      * @param Executor          $jobExecutor
      * @param TypesRegistry     $registry
      * @param LoggerStrategy    $logger
      */
     public function __construct(
-        EntityManager $em,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
         LoggerStrategy $logger
     ) {
-        $this->em                = $em;
         $this->processorRegistry = $processorRegistry;
         $this->jobExecutor       = $jobExecutor;
         $this->registry          = $registry;
@@ -52,9 +44,9 @@ class ReverseSyncProcessor
     /**
      * Process channel synchronization
      *
-     * @param Integration $integration  Integration object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
+     * @param Integration $integration Integration object
+     * @param string      $connector   Connector name
+     * @param array       $parameters  Connector additional parameters
      *
      * @return $this
      */
@@ -86,9 +78,9 @@ class ReverseSyncProcessor
             ProcessorRegistry::TYPE_EXPORT =>
                 array_merge(
                     [
-                        'entityName' => $realConnector->getImportEntityFQCN(),
+                        'entityName'     => $realConnector->getImportEntityFQCN(),
                         'processorAlias' => reset($processorAliases),
-                        'channel'    => $integration->getId()
+                        'channel'        => $integration->getId()
                     ],
                     $parameters
                 ),
@@ -167,7 +159,7 @@ class ReverseSyncProcessor
      * Clone object here because it will be modified and changes should not be shared between
      *
      * @param Integration $integration
-     * @param string $connector
+     * @param string      $connector
      *
      * @return TwoWaySyncConnectorInterface
      */

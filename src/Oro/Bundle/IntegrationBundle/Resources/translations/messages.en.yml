@@ -56,6 +56,12 @@ oro:
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
             default_user_owner.label:       Default owner
+        integration_status:
+            competed.label:  Completed
+            failed.label:    Failed
+            code.label:      Status
+            message.label:   Message
+            connector.label: Connector
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: Failed to add sync job to the queue. Error: %s.

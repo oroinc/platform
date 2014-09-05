@@ -214,7 +214,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
 
-        if ($this->cache && !$hasInCache) {
+        if ($this->cache && $cacheKey && !$hasInCache) {
             $this->cache->save($cacheKey, $key);
         }
 

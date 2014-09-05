@@ -8,7 +8,7 @@ use Symfony\Component\Process\Process;
 
 class PermissionsHandler
 {
-    const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rwX,d:g:{group}:rwX" {path}';
+    const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rw,d:g:{group}:rw" {path}';
     const CHMOD   = 'chmod +a "{user} allow delete,write,append,file_inherit,directory_inherit" {path}';
     const PS_AUX  = "ps aux|grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx'|grep -v root|head -1|cut -d' ' -f1";
 

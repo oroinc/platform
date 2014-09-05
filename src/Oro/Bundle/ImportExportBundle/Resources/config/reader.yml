@@ -19,4 +19,4 @@ services:
         class: %oro_importexport.reader.template_fixture.class%
         arguments:
             - @oro_importexport.context_registry
-            - @oro_importexport.template_fixture.registry
+            - @oro_importexport.template_fixture.manager

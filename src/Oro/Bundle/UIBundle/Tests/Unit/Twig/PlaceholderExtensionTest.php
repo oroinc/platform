@@ -1,5 +1,8 @@
 <?php
+
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
+
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
 
@@ -74,9 +77,14 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testRenderPlaceholder()
     {
         $variables = array('variables' => 'test');
+        $query = array('key' => 'value');
         $expectedTemplateRender = '<p>template</p>';
         $expectedActionRender = '<p>action</p>';
         $expectedResult = $expectedTemplateRender . self::DELIMITER . $expectedActionRender;
+
+        $request = new Request();
+        $request->query->add($query);
+        $this->extension->setRequest($request);
 
         $this->placeholderProvider->expects($this->once())
             ->method('getPlaceholderItems')
@@ -96,7 +104,7 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->kernelExtension->expects($this->once())
             ->method('controller')
-            ->with(self::ACTION_NAME, $variables)
+            ->with(self::ACTION_NAME, $variables, $query)
             ->will($this->returnValue($controllerReference));
 
         $this->kernelExtension->expects($this->once())

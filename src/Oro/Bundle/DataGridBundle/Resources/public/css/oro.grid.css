@@ -54,6 +54,15 @@ table.grid tbody tr.row-click-action {
     border-left: none;
     border-color: #dddddd;
     border-radius: 0;
+
+}
+.grid-toolbar .pagination input[type=number] {
+    -moz-appearance:textfield;
+}
+.grid-toolbar .pagination input[type=number]::-webkit-inner-spin-button,
+.grid-toolbar .pagination input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .no-data {

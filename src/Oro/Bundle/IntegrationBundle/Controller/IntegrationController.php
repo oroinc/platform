@@ -149,7 +149,13 @@ class IntegrationController extends Controller
         $em->flush($integration);
 
         return $this->redirect(
-            $this->generateUrl('oro_integration_update', ['id'=>$integration->getid()])
+            $this->generateUrl(
+                'oro_integration_update',
+                [
+                    'id'=>$integration->getid(),
+                    '_enableContentProviders' => 'mainMenu'
+                ]
+            )
         );
     }
 
@@ -167,8 +173,19 @@ class IntegrationController extends Controller
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_integration_update', 'parameters' => ['id' => $integration->getId()]],
-                ['route' => 'oro_integration_index'],
+                [
+                    'route' => 'oro_integration_update',
+                    'parameters' => [
+                        'id' => $integration->getId(),
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
+                [
+                    'route' => 'oro_integration_index',
+                    'parameters' => [
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
                 $integration
             );
         }

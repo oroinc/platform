@@ -21,7 +21,7 @@
     {% set containerId = "chart-container-" ~ random() %}
     <div class="chart-container">
         <div class="clearfix">
-            <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
+            <div id="{{ containerId }}-chart" class="line-chart chart pull-left"></div>
         </div>
     </div>
 
@@ -196,7 +196,11 @@
                 });
     </script>
 {% else %}
-    <div class="clearfix no-data">
-        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    <div class="container-fluid grid-container-parent">
+        <div class="grid-container">
+            <div class="clearfix no-data">
+                <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+            </div>
+        </div>
     </div>
 {% endif %}

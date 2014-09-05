@@ -35,6 +35,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
@@ -55,8 +58,7 @@ class CalendarEvent implements RemindableInterface
      * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @ConfigField(
      *  defaultValues={
-     *      "dataaudit"={"auditable"=true},
-     *      "email"={"available_in_template"=true}
+     *      "dataaudit"={"auditable"=true}
      *  }
      * )
      */
@@ -66,11 +68,6 @@ class CalendarEvent implements RemindableInterface
      * @var string
      *
      * @ORM\Column(name="title", type="text", nullable=false)
-     * @ConfigField(
-     *  defaultValues={
-     *      "email"={"available_in_template"=true}
-     *  }
-     * )
      */
     protected $title;
 
@@ -78,11 +75,6 @@ class CalendarEvent implements RemindableInterface
      * @var \DateTime
      *
      * @ORM\Column(name="start_at", type="datetime")
-     * @ConfigField(
-     *  defaultValues={
-     *      "email"={"available_in_template"=true}
-     *  }
-     * )
      */
     protected $start;
 
@@ -90,11 +82,6 @@ class CalendarEvent implements RemindableInterface
      * @var \DateTime
      *
      * @ORM\Column(name="end_at", type="datetime")
-     * @ConfigField(
-     *  defaultValues={
-     *      "email"={"available_in_template"=true}
-     *  }
-     * )
      */
     protected $end;
 
@@ -102,11 +89,6 @@ class CalendarEvent implements RemindableInterface
      * @var bool
      *
      * @ORM\Column(name="all_day", type="boolean")
-     * @ConfigField(
-     *  defaultValues={
-     *      "email"={"available_in_template"=true}
-     *  }
-     * )
      */
     protected $allDay;
 

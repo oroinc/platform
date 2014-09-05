@@ -20,6 +20,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -115,7 +116,8 @@ class OrmTotalsExtension extends AbstractExtension
                     $this->getData(
                         $result,
                         $rowConfig['columns'],
-                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
+                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
+                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
                     )
                 );
             }
@@ -267,9 +269,10 @@ class OrmTotalsExtension extends AbstractExtension
      * @param ResultsObject $pageData Grid page data
      * @param array $columnsConfig Total row columns config
      * @param bool $perPage Get data only for page data or for all data
+     * @param bool $skipAclWalkerCheck Check Acl with acl helper or not
      * @return array
      */
-    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
+    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false, $skipAclWalkerCheck = false)
     {
         // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
         //       can be unexpected
@@ -296,7 +299,11 @@ class OrmTotalsExtension extends AbstractExtension
 
         $this->addPageLimits($query, $pageData, $perPage);
 
-        $resultData = $this->aclHelper->apply($query)
+        if (!$skipAclWalkerCheck) {
+            $query = $this->aclHelper->apply($query);
+        }
+
+        $resultData = $query
             ->setFirstResult(null)
             ->setMaxResults(1)
             ->getScalarResult();
@@ -326,14 +333,16 @@ class OrmTotalsExtension extends AbstractExtension
             $data = $pageData['data'];
         }
         foreach ($rootIdentifiers as $identifier) {
-            $ids = [];
-            foreach ($data as $res) {
-                $ids[] = $res[$identifier['alias']];
-            }
+            $ids = ArrayUtils::arrayColumn($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
                 : $identifier['fieldAlias'];
+
+            $filteredIds = array_filter($ids);
+            if (empty($filteredIds)) {
+                continue;
+            }
 
             $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }

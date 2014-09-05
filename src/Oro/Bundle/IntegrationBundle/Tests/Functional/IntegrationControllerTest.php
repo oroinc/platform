@@ -173,7 +173,7 @@ class IntegrationControllerTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($response, 204);
+        $this->assertEmptyResponseStatusCodeEquals($response, 204);
 
         $response = $this->client->requestGrid(
             'oro-integration-grid',

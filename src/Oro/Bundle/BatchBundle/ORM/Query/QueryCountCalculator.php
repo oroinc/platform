@@ -6,24 +6,43 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * Calculates total count of query records
  */
 class QueryCountCalculator
 {
+    /** @var bool|null */
+    private $shouldUseWalker;
+
     /**
      * Calculates total count of query records
      *
      * @param Query $query
+     * @param bool  $useWalker
+     *
      * @return integer
      */
-    public static function calculateCount(Query $query)
+    public static function calculateCount(Query $query, $useWalker = null)
     {
         /** @var QueryCountCalculator $instance */
         $instance = new static();
 
+        $instance->setUseWalker($useWalker);
         return $instance->getCount($query);
+    }
+
+    /**
+     * @param bool $value  Determine should CountWalker be used or wrap count query with additional select.
+     *                     Walker might be turned off on queries where exists GROUP BY statement and count select
+     *                     will returns large dataset(it's only critical when more then e.g. 1000 results returned)
+     *                     Another point to disable it, when query has LIMIT and you want to count results
+     *                     relatively to it.
+     */
+    public function setUseWalker($value)
+    {
+        $this->shouldUseWalker = $value;
     }
 
     /**
@@ -31,21 +50,28 @@ class QueryCountCalculator
      * Notes: this method do not make any modifications of the given query
      *
      * @param Query $query
+     *
      * @return integer
      */
     public function getCount(Query $query)
     {
-        $parser            = new Parser($query);
-        $parserResult      = $parser->parse();
-        $parameterMappings = $parserResult->getParameterMappings();
-        list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
+        if ($this->useWalker($query)) {
+            $paginator = new Paginator($query);
+            $paginator->setUseOutputWalkers(false);
+            $result = $paginator->count();
+        } else {
+            $parser            = new Parser($query);
+            $parserResult      = $parser->parse();
+            $parameterMappings = $parserResult->getParameterMappings();
+            list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
 
-        $statement = $query->getEntityManager()->getConnection()->executeQuery(
-            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
-            $sqlParameters,
-            $parameterTypes
-        );
-        $result    = $statement->fetchColumn();
+            $statement = $query->getEntityManager()->getConnection()->executeQuery(
+                'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+                $sqlParameters,
+                $parameterTypes
+            );
+            $result = $statement->fetchColumn();
+        }
 
         return $result ? (int)$result : 0;
     }
@@ -53,6 +79,7 @@ class QueryCountCalculator
     /**
      * @param Query $query
      * @param array $paramMappings
+     *
      * @return array
      * @throws QueryException
      */
@@ -100,5 +127,21 @@ class QueryCountCalculator
         }
 
         return array($sqlParams, $types);
+    }
+
+    /**
+     * If flag to use walker not set manually we try to figure out if it will not brake query logic
+     *
+     * @param Query $query
+     *
+     * @return bool
+     */
+    private function useWalker(Query $query)
+    {
+        if (null === $this->shouldUseWalker) {
+            $this->shouldUseWalker = !$query->contains('GROUP BY') && null === $query->getMaxResults();
+        }
+
+        return $this->shouldUseWalker;
     }
 }

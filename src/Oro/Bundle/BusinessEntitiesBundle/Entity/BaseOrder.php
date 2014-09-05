@@ -4,7 +4,9 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Class BaseOrder
@@ -120,6 +122,13 @@ class BaseOrder
      * @var \DateTime $createdAt
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -127,6 +136,13 @@ class BaseOrder
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

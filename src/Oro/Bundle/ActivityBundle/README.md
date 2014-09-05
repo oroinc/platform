@@ -176,36 +176,34 @@ To add activity button on the view page of the entity your activity can be assig
 Create TWIG template responsible to render the button, for example:
 
 ``` twig
-{% if oro_has_email(entity) %}
-    {{ UI.clientButton({
-        'dataUrl': path(
-            'oro_email_email_create', {
-                to: oro_get_email(entity),
-                entityClass: oro_class_name(entity, true),
-                entityId: entity.id
-        }) ,
-        'aCss': 'no-hash',
-        'iCss': 'icon-envelope',
-        'dataId': entity.id,
-        'label' : 'oro.email.send_email'|trans,
-        'widget' : {
-            'type' : 'dialog',
-            'multiple' : true,
-            'reload-grid-name' : 'activity-email-grid',
-            'options' : {
-                'alias': 'email-dialog',
-                'dialogOptions' : {
-                    'title' : 'oro.email.send_email'|trans,
-                    'allowMaximize': true,
-                    'allowMinimize': true,
-                    'dblclick': 'maximize',
-                    'maximizedHeightDecreaseBy': 'minimize-bar',
-                    'width': 1000
-                }
+{{ UI.clientButton({
+    'dataUrl': path(
+        'oro_email_email_create', {
+            to: oro_get_email(entity),
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }) ,
+    'aCss': 'no-hash',
+    'iCss': 'icon-envelope',
+    'dataId': entity.id,
+    'label' : 'oro.email.send_email'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : true,
+        'reload-grid-name' : 'activity-email-grid',
+        'options' : {
+            'alias': 'email-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.email.send_email'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 1000
             }
         }
-    }) }}
-{% endif %}
+    }
+}) }}
 ```
 
 Register this template in *placeholders.yml*, for example:

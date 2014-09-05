@@ -19,7 +19,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
             htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
                 '<b><%- title %></b><%= tooltipHTML %><ul>' +
                 '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
-                '<li><a class="ui_dvariable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
+                '<li><a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
                 '<% }); %>' +
                 '</ul></div>'
         },
@@ -68,7 +68,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
 
             layout.initPopover(widget);
 
-            widget.find('.ui-datevariables-div a.ui_dvariable').click(
+            widget.find('.ui-datevariables-div a.ui_date_variable').click(
                 _.bind(this.onSelectVar, this)
             );
         },

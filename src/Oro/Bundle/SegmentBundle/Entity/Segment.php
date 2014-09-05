@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
 /**
  * Segment
@@ -31,12 +33,17 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
  */
-class Segment extends AbstractQueryDesigner
+class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    const GRID_PREFIX = 'oro_segment_grid_';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
@@ -94,6 +101,13 @@ class Segment extends AbstractQueryDesigner
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -101,8 +115,23 @@ class Segment extends AbstractQueryDesigner
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
+    }
 
     /**
      * Get id

@@ -64,13 +64,24 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject|SyncProcessor
      */
-    protected function getSyncProcessor($mockedMethods = [])
+    protected function getSyncProcessor($mockedMethods = null)
     {
+        $repository = $this
+            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry->expects($this->any())->method('getManager')
+            ->will($this->returnValue($this->em));
+        $registry->expects($this->any())->method('getRepository')
+            ->will($this->returnValue($repository));
+
         return $this->getMock(
             'Oro\Bundle\IntegrationBundle\Provider\SyncProcessor',
             $mockedMethods,
             [
-                $this->em,
+                $registry,
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,
@@ -126,16 +137,6 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getProcessorAliasesByEntity')
             ->will($this->returnValue([]));
 
-        $repositoty = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em
-            ->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repositoty));
-
         $jobResult = new JobResult();
         $jobResult->setContext(new TestContext());
         $jobResult->setSuccessful(true);
@@ -155,14 +156,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($jobResult));
 
-        $processor = new SyncProcessor(
-            $this->em,
-            $this->processorRegistry,
-            $this->jobExecutor,
-            $this->registry,
-            $this->log
-        );
-
+        $processor = $this->getSyncProcessor();
         $processor->process($this->integration, $connector, ['testParameter' => 'testValue']);
     }
 }

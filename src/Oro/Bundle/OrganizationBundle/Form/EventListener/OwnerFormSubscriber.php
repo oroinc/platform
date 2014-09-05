@@ -54,7 +54,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         $this->managerRegistry = $managerRegistry;
         $this->fieldName = $fieldName;
         $this->fieldLabel = $fieldLabel;
-        $this->isAssignGranted = $isAssignGranted;
+        $this->isAssignGranted = &$isAssignGranted;
         $this->defaultOwner = $defaultOwner;
     }
 
@@ -74,11 +74,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     public function postSetData(FormEvent $event)
     {
         $form = $event->getForm();
-        if ($form->getParent()) {
-            return;
-        }
-
-        if (!$form->has($this->fieldName)) {
+        if ($form->getParent() || !$form->has($this->fieldName)) {
             return;
         }
 

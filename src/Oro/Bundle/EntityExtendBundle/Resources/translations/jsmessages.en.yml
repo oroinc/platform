@@ -2,3 +2,8 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
 "Yes, Proceed": "Yes, Proceed"
+
+oro:
+    entity_extend:
+        schema_updated: Schema updated
+        schema_update_failed: Schema update failed

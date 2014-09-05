@@ -81,6 +81,12 @@ class ConstraintsProvider
 
         if (isset($this->metadataConstraintsCache[$parentKey][$name])) {
             $result = $this->metadataConstraintsCache[$parentKey][$name]->constraints;
+        } else {
+            //If no metadata for the fields name, try getting it with the property path
+            $propertyPath = (string)$form->getPropertyPath();
+            if (isset($this->metadataConstraintsCache[$parentKey][$propertyPath])) {
+                $result = $this->metadataConstraintsCache[$parentKey][$propertyPath]->constraints;
+            }
         }
 
         return $result;

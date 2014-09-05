@@ -63,6 +63,7 @@ define([
 
             id = 'sfwdt' + token;
             this.$el
+                .appendTo('body')
                 .attr('id', id)
                 .attr('data-sfurl', url);
             this.$el.html(data);

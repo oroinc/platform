@@ -32,7 +32,7 @@ class CommandExecutor
     /**
      * @var int
      */
-    protected $defaultTimeout = 300;
+    protected $defaultTimeout = 3600;
 
     /**
      * Constructor

@@ -1,7 +1,0 @@
-Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
-    name:        oro.organization.businessunit.entity_label
-    description: oro.organization.businessunit.entity_description
-
-Oro\Bundle\OrganizationBundle\Entity\Organization:
-    name:        oro.organization.entity_label
-    description: oro.organization.entity_description

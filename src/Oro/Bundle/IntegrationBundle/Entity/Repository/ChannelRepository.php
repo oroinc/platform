@@ -9,18 +9,16 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 class ChannelRepository extends EntityRepository
 {
-    /** @var array */
-    protected $loadedInstances = [];
-
     /**
      * Returns channels that have configured transports
      * Assume that they are ready for sync
      *
      * @param null|string $type
+     * @param boolean     $isReadOnly
      *
      * @return array
      */
-    public function getConfiguredChannelsForSync($type = null)
+    public function getConfiguredChannelsForSync($type = null, $isReadOnly = false)
     {
         $qb = $this->createQueryBuilder('c')
             ->where('c.transport is NOT NULL')
@@ -32,25 +30,15 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('type', $type);
         }
 
-        return $qb->getQuery()
-            ->getResult();
-    }
+        $integrations = $qb->getQuery()->getResult();
 
-    /**
-     * Find all integrations with given type
-     *
-     * @param string $type
-     *
-     * @deprecated since RC2 will be removed in 1.0
-     * @return array
-     */
-    protected function getChannelsBytType($type)
-    {
-        $integrations = $this->createQueryBuilder('c')
-            ->where('c.type = :type')
-            ->setParameter('type', $type)
-            ->getQuery()
-            ->getResult();
+        if ($isReadOnly) {
+            $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
+
+            foreach ($integrations as $integration) {
+                $unitOfWork->markReadOnly($integration);
+            }
+        }
 
         return $integrations;
     }
@@ -64,15 +52,11 @@ class ChannelRepository extends EntityRepository
      */
     public function getOrLoadById($id)
     {
-        $uow = $this->getEntityManager()->getUnitOfWork();
+        $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
+        $integration = $this->getEntityManager()->find('OroIntegrationBundle:Channel', $id);
+        $unitOfWork->markReadOnly($integration);
 
-        if (!isset($this->loadedInstances[$id])) {
-            $this->loadedInstances[$id] = $this->findOneBy(['id' => $id]);
-        } else {
-            $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
-        }
-
-        return $this->loadedInstances[$id];
+        return $integration;
     }
 
     /**
@@ -84,7 +68,7 @@ class ChannelRepository extends EntityRepository
     public function addStatus(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
-            $integration = $this->getEntityManager()->merge($integration);
+            $integration = $this->getOrLoadById($integration->getId());
 
             $this->getEntityManager()->persist($status);
             $integration->addStatus($status);

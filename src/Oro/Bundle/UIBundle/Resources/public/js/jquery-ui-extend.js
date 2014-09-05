@@ -3,7 +3,7 @@
 define(['jquery', 'jquery-ui'], function ($) {
     'use strict';
 
-    /* datapicker extend:start */
+    /* datepicker extend:start */
     (function () {
 
         /**
@@ -90,6 +90,9 @@ define(['jquery', 'jquery-ui'], function ($) {
             var events, input = elem;
 
             if (!elem) {
+                if (!$.datepicker._curInst) {
+                    return;
+                }
                 input = $.datepicker._curInst.input.get(0);
             }
             events = getEvents(input.id);
@@ -101,5 +104,5 @@ define(['jquery', 'jquery-ui'], function ($) {
             _hideDatepicker.apply(this, arguments);
         };
     }());
-    /* datapicker extend:end */
+    /* datepicker extend:end */
 });

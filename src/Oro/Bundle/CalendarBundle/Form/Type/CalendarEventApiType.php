@@ -20,7 +20,7 @@ class CalendarEventApiType extends CalendarEventType
                 'calendar',
                 'oro_entity_identifier',
                 array(
-                    'label'    => 'oro.calendar.entity_name',
+                    'label'    => 'oro.calendar.entity_label',
                     'required' => true,
                     'class'    => 'OroCalendarBundle:Calendar',
                     'multiple' => false
