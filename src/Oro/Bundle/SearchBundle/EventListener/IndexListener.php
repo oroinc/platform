@@ -117,14 +117,16 @@ class IndexListener
     {
         // process saved entities
         if ($this->savedEntities) {
-            $this->searchEngine->save($this->savedEntities, $this->realTimeUpdate);
+            $savedEntities = $this->savedEntities;
             $this->savedEntities = [];
+            $this->searchEngine->save($savedEntities, $this->realTimeUpdate);
         }
 
         // process deleted entities
         if ($this->deletedEntities) {
-            $this->searchEngine->delete($this->deletedEntities, $this->realTimeUpdate);
+            $deletedEntities = $this->deletedEntities;
             $this->deletedEntities = [];
+            $this->searchEngine->delete($deletedEntities, $this->realTimeUpdate);
         }
     }
 

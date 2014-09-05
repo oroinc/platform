@@ -15,6 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ReindexCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName('oro:search:reindex')
@@ -27,9 +30,18 @@ class ReindexCommand extends ContainerAwareCommand
              ->setDescription('Rebuild search index');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $class       = $input->getArgument('class');
+        $class = $input->getArgument('class');
+        if ($class) {
+            // convert from short format to FQСN
+            $class = $this->getContainer()->get('doctrine')
+                ->getManagerForClass($class)->getClassMetadata($class)->getName();
+        }
+
         $placeholder = $class ? '"' . $class .'" entity' : 'all mapped entities';
 
         $output->writeln('Starting reindex task for ' . $placeholder);
