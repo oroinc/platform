@@ -81,6 +81,6 @@ class TrackingWebsite extends AbstractPageEntity
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
-        return new TrackingWebsites($this->test);
+        return new TrackingWebsites($this->test, false);
     }
 }

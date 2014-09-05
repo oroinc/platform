@@ -3,29 +3,53 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension;
+use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-use Oro\Bundle\SecurityBundle\Migrations\Schema\SetOwnershipTypeQuery;
-
-class OroIntegrationBundle implements Migration
+class OroIntegrationBundle implements Migration, ChangeTypeExtensionAwareInterface
 {
     /**
-     * Set ownership type for Integration entity to Organization
-     *
-     * @inheritdoc
+     * @var ChangeTypeExtension
+     */
+    protected $changeTypeExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChangeTypeExtension(ChangeTypeExtension $changeTypeExtension)
+    {
+        $this->changeTypeExtension = $changeTypeExtension;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            new SetOwnershipTypeQuery(
-                'Oro\Bundle\IntegrationBundle\Entity\Channel',
-                [
-                    'owner_field_name' => 'organization',
-                    'owner_column_name' => 'organization_id'
-                ]
-            )
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_channel',
+            'id',
+            Type::INTEGER
+        );
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_channel_status',
+            'id',
+            Type::INTEGER
+        );
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_transport',
+            'id',
+            Type::INTEGER
         );
     }
 }

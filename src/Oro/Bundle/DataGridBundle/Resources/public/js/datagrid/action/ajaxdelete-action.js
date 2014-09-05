@@ -1,8 +1,9 @@
 /*global define*/
 define([
     './model-action',
-    'oroui/js/delete-confirmation'
-], function (ModelAction, DeleteConfirmation) {
+    'oroui/js/delete-confirmation',
+    'oroui/js/mediator'
+], function (ModelAction, DeleteConfirmation, mediator) {
     'use strict';
 
     var AjaxdeleteAction;
@@ -27,6 +28,18 @@ define([
             success: 'Removed.',
             error: 'Not removed.',
             empty_selection: 'Please, select item to remove.'
+        },
+
+        _doAjaxRequest: function () {
+            mediator.trigger('datagrid:beforeRemoveRow:' + this.datagrid.name, this.model);
+
+            AjaxdeleteAction.__super__._doAjaxRequest.apply(this, arguments);
+        },
+
+        _onAjaxSuccess: function (data) {
+            mediator.trigger('datagrid:afterRemoveRow:' + this.datagrid.name);
+
+            AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, arguments);
         }
     });
 
