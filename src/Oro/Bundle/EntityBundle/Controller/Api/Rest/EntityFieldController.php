@@ -54,11 +54,11 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
     public function getFieldsAction($entityName)
     {
         $entityName         = str_replace('_', '\\', $entityName);
-        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withEntityDetails  = ('1' == $this->getRequest()->query->get('with-entity-details'));
-        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
-        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $applyExclusions    = ('1' == $this->getRequest()->query->get('apply-exclusions'));
+        $withRelations      = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
+        $withEntityDetails  = filter_var($this->getRequest()->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
+        $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualFields  = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions    = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
