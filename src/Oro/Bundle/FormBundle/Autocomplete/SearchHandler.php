@@ -79,7 +79,7 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->indexer = $indexer;
         if (empty($config[$this->entityName]['alias'])) {
-            throw new \RuntimeException("Cannot init entity search alias.");
+            throw new \RuntimeException(sprintf('Cannot init search alias for entity "%s".', $this->entityName));
         }
         $this->entitySearchAlias = $config[$this->entityName]['alias'];
     }
