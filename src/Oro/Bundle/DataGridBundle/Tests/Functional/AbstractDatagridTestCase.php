@@ -6,6 +6,16 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractDatagridTestCase extends WebTestCase
 {
+    /**
+     * Should return data for test grid method
+     * Format of data is following:
+     *   [
+     *      'gridParameters' => array of params needed to pass to grid request, required param 'gridName'
+     *      'gridFilters'    => array of filters
+     *   ]
+     *
+     * @return array
+     */
     abstract public function gridProvider();
 
     protected function setUp()
@@ -19,22 +29,22 @@ abstract class AbstractDatagridTestCase extends WebTestCase
     /**
      * @dataProvider gridProvider
      *
-     * @param array $filters
+     * @param array $requestData
      */
-    public function testGrid($filters)
+    public function testGrid($requestData)
     {
-        $this->client->requestGrid($filters['gridParameters'], $filters['gridFilters']);
+        $this->client->requestGrid($requestData['gridParameters'], $requestData['gridFilters']);
         $response = $this->client->getResponse();
         $result   = $this->getJsonResponseContent($response, 200);
 
         foreach ($result['data'] as $row) {
-            foreach ($filters['assert'] as $fieldName => $value) {
+            foreach ($requestData['assert'] as $fieldName => $value) {
                 $this->assertEquals($value, $row[$fieldName]);
             }
             break;
         }
 
-        $this->assertCount((int) $filters['expectedResultCount'], $result['data']);
+        $this->assertCount((int) $requestData['expectedResultCount'], $result['data']);
     }
 }
 
