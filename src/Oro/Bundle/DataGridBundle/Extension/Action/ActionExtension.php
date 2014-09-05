@@ -66,8 +66,8 @@ class ActionExtension extends AbstractExtension
         $actionConfiguration = $config->offsetGetOr(static::ACTION_CONFIGURATION_KEY);
 
         if ($actionConfiguration && is_callable($actionConfiguration)) {
-            $callable = function (ResultRecordInterface $record) use ($actionConfiguration) {
-                $result = call_user_func($actionConfiguration, $record);
+            $callable = function (ResultRecordInterface $record) use ($actionConfiguration, $config) {
+                $result = call_user_func($actionConfiguration, $record, $config->offsetGetOr(static::ACTION_KEY, []));
 
                 return is_array($result) ? $result : [];
             };
