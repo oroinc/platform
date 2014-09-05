@@ -118,9 +118,8 @@
     @param array    entities
     @param array    metadata
 #}
-{% macro initJsWidgets(type, form, entities, metadata) %}
+{% macro initJsWidgets(type, form, entities, metadata, entityFieldsRouteParams = {}) %}
     {{ _self.query_designer_segment_template('segment-template') }}
-    {% set entityFieldsRouteParams = {} %}
     {% set segmentOptions = {
         valueSource: '#oro_' ~ type ~ '_form_definition',
         fieldsLoader: {

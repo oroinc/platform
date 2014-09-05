@@ -213,7 +213,7 @@ define([
                     if (model) {
                         model.set(response);
                     } else {
-                        this.collection.add(response);
+                        this.collection.add(response, {at:0});
                     }
                 }, this));
             }
