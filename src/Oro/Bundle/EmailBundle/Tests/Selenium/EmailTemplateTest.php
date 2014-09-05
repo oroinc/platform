@@ -100,7 +100,6 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
             ->delete('Template name', $templateName)
             ->assertTitle('Templates - Emails - System')
             ->assertMessage('Item deleted');
