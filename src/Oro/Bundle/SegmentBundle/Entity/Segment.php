@@ -168,10 +168,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set name
      *
      * @param string $name
+     * @return Segment
      */
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
     }
 
     /**
@@ -188,10 +191,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set description
      *
      * @param string $description
+     * @return Segment
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     /**
@@ -208,10 +214,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set segment type
      *
      * @param SegmentType $type
+     * @return Segment
      */
     public function setType(SegmentType $type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -228,10 +237,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set the full name of an entity on which this segment is based
      *
      * @param string $entity
+     * @return Segment
      */
     public function setEntity($entity)
     {
         $this->entity = $entity;
+
+        return $this;
     }
 
     /**
@@ -248,10 +260,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set a business unit owning this segment
      *
      * @param BusinessUnit $owningBusinessUnit
+     * @return Segment
      */
     public function setOwner(BusinessUnit $owningBusinessUnit)
     {
         $this->owner = $owningBusinessUnit;
+
+        return $this;
     }
 
     /**
@@ -268,10 +283,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set this segment definition in YAML format
      *
      * @param string $definition
+     * @return Segment
      */
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+
+        return $this;
     }
 
     /**
@@ -288,10 +306,13 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set created date/time
      *
      * @param \DateTime $created
+     * @return Segment
      */
     public function setCreatedAt(\DateTime $created)
     {
         $this->createdAt = $created;
+
+        return $this;
     }
 
     /**
@@ -308,20 +329,26 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * Set last update date/time
      *
      * @param \DateTime $updated
+     * @return Segment
      */
     public function setUpdatedAt(\DateTime $updated)
     {
         $this->updatedAt = $updated;
+
+        return $this;
     }
 
     /**
      * Set last run date/time
      *
      * @param \Datetime $lastRun
+     * @return Segment
      */
     public function setLastRun($lastRun)
     {
         $this->lastRun = $lastRun;
+
+        return $this;
     }
 
     /**

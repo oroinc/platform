@@ -26,6 +26,7 @@ define(function (require) {
             valueSource: '',
             fieldsLoader: {
                 loadingMaskParent: '',
+                router: null,
                 routingParams: {},
                 fieldsData: [],
                 confirmMessage: ''
@@ -198,7 +199,7 @@ define(function (require) {
             $entityChoice = this.$entityChoice = $(options.entityChoice);
             $entityChoice
                 .fieldsLoader({
-                    router: 'oro_api_querydesigner_fields_entity',
+                    router: options.router,
                     routingParams: options.routingParams,
                     confirm: confirm,
                     requireConfirm: function () {
