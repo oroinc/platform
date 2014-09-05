@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
@@ -12,7 +10,6 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
@@ -31,11 +28,6 @@ abstract class AbstractEngine implements EngineInterface
     protected $registry;
 
     /**
-     * @var EventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
@@ -52,18 +44,15 @@ abstract class AbstractEngine implements EngineInterface
 
     /**
      * @param ManagerRegistry $registry
-     * @param EventDispatcher $dispatcher
      * @param DoctrineHelper  $doctrineHelper
      * @param ObjectMapper    $mapper
      */
     public function __construct(
         ManagerRegistry $registry,
-        EventDispatcher $dispatcher,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper
     ) {
         $this->registry       = $registry;
-        $this->dispatcher     = $dispatcher;
         $this->doctrineHelper = $doctrineHelper;
         $this->mapper         = $mapper;
     }
@@ -95,10 +84,9 @@ abstract class AbstractEngine implements EngineInterface
      */
     public function search(Query $query)
     {
+        // search must be performed as fast as possible and it might return lots of entities (10M and more)
+        // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
-        foreach ($searchResult['results'] as $resultRecord) {
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($resultRecord));
-        }
         $result = new Result($query, $searchResult['results'], $searchResult['records_count']);
 
         if ($this->logQueries) {

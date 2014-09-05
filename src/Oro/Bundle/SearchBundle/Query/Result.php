@@ -86,6 +86,7 @@ class Result extends ArrayCollection
         if ($this->count()) {
             $resultData['count'] = $this->count();
 
+            /** @var Result\Item $resultRecord */
             foreach ($this as $resultRecord) {
                 $resultData['data'][] = $resultRecord->toArray();
             }
