@@ -140,7 +140,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options
+     * @param array        $options                   Entity config values
+     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
      */
     public function addOneToManyRelation(
         Schema $schema,
