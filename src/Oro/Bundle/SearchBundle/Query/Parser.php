@@ -163,7 +163,7 @@ class Parser
         if (!in_array($orderType, $this->types)) {
             $orderField  = $orderType;
             $orderType   = Query::TYPE_TEXT;
-            $inputString = $this->trimString($inputString, $orderType);
+            $inputString = $this->trimString($inputString, $orderField);
         } else {
             $inputString = $this->trimString($inputString, $orderType);
             $orderField  = $this->getWord($inputString);

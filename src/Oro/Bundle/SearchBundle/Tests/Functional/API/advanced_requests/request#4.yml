@@ -1,8 +1,6 @@
 # common test case
 request:
     query: "from oro_test_item where decimal decimalValue >= 0.90"
-    offset: ~
-    max_results: ~
 response:
     records_count: 1
     count: 1

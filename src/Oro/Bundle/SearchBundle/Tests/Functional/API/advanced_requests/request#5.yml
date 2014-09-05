@@ -1,8 +1,6 @@
 # common test case
 request:
     query: "from oro_test_item where decimal floatValue != 10.50"
-    offset: ~
-    max_results: ~
 response:
     records_count: 8
     count: 8
