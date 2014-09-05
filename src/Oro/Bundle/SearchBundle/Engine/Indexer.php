@@ -21,9 +21,9 @@ class Indexer
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
     /**
-     * @var AbstractEngine
+     * @var EngineInterface
      */
-    protected $adapter;
+    protected $engine;
 
     /**
      * @var ObjectManager
@@ -42,18 +42,18 @@ class Indexer
 
     /**
      * @param ObjectManager $em
-     * @param AbstractEngine $adapter
+     * @param EngineInterface $engine
      * @param ObjectMapper $mapper
      * @param SecurityProvider $securityProvider
      */
     public function __construct(
         ObjectManager $em,
-        AbstractEngine $adapter,
+        EngineInterface $engine,
         ObjectMapper $mapper,
         SecurityProvider $securityProvider
     ) {
         $this->em      = $em;
-        $this->adapter = $adapter;
+        $this->engine  = $engine;
         $this->mapper  = $mapper;
         $this->securityProvider = $securityProvider;
     }
@@ -142,7 +142,7 @@ class Indexer
             return new Result($query, array(), 0);
         }
 
-        return $this->adapter->search($query);
+        return $this->engine->search($query);
     }
 
     /**

@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
  * Use carefully on large data sets - do not run this task too often.
@@ -46,7 +48,7 @@ class ReindexCommand extends ContainerAwareCommand
 
         $output->writeln('Starting reindex task for ' . $placeholder);
 
-        /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\AbstractEngine */
+        /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
         $recordsCount = $searchEngine->reindex($class);
 
