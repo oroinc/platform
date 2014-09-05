@@ -18,5 +18,6 @@ request:
     oro_report_form[filter][criterion]: ""
     oro_report_form[name]: Admin
     oro_report_form[type]: TABLE
+    oro_report_form[owner]: 1
 response:
     - [admin, Administrator, Main, ROLE_ADMINISTRATOR, admin@example.com]

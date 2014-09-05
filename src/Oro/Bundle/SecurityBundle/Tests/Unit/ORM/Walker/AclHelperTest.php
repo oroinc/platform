@@ -149,10 +149,7 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper3',
                 'resultWalker3',
-                [
-                    'Doctrine\ORM\Query\QueryException',
-                    'A single-valued association path expression to an inverse side is not supported in DQL queries.'
-                ]
+                []
             ]
             ,
             [
@@ -171,10 +168,7 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper4',
                 'resultWalker4',
-                [
-                    'Doctrine\ORM\Query\QueryException',
-                    'A single-valued association path expression to an inverse side is not supported in DQL queries.'
-                ]
+                []
             ]
         ];
     }
@@ -243,11 +237,11 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals([1, 2, 3], $this->collectLiterals($expression->literals));
         $this->assertEquals('u', $expression->expression->simpleArithmeticExpression->identificationVariable);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
-        $this->assertEquals(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-            $join->joinAssociationDeclaration->abstractSchemaName
-        );
-        $this->assertEquals('address', $join->joinAssociationDeclaration->aliasIdentificationVariable);
+        $conditionalFactors = $join->conditionalExpression->conditionalFactors;
+        $this->assertCount(1, $conditionalFactors);
+        $expression = $conditionalFactors[0]->simpleConditionalExpression;
+        $this->assertEquals([1], $this->collectLiterals($expression->literals));
+        $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest2()
@@ -270,19 +264,11 @@ class AclHelperTest extends OrmTestCase
     {
         $this->assertNull($resultAst->whereClause);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
-        $this->assertEquals(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-            $join->joinAssociationDeclaration->abstractSchemaName
-        );
-        $this->assertEquals(
-            [1],
-            $this->collectLiterals(
-                $join->conditionalExpression
-                    ->conditionalFactors[0]
-                    ->simpleConditionalExpression
-                    ->literals
-            )
-        );
+        $conditionalFactors = $join->conditionalExpression->conditionalFactors;
+        $this->assertCount(1, $conditionalFactors);
+        $expression = $conditionalFactors[0]->simpleConditionalExpression;
+        $this->assertEquals([1], $this->collectLiterals($expression->literals));
+        $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest3()

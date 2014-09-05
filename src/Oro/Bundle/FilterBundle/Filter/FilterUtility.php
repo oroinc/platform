@@ -16,6 +16,7 @@ class FilterUtility
     const TRANSLATABLE_KEY  = 'translatable';
     const FORM_OPTIONS_KEY  = 'options';
     const TYPE_EMPTY        = 'filter_empty_option';
+    const TYPE_NOT_EMPTY    = 'filter_not_empty_option';
 
     public function getParamMap()
     {

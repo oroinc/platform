@@ -6,6 +6,7 @@ User interface layouts and controls.
 ## Table of Contents
 
 - [Client Side Architecture](./Resources/doc/reference/client-side-architecture.md)
+- [Page Component](./Resources/doc/reference/page-component.md)
 - [Mediator Handlers](./Resources/doc/reference/mediator-handlers.md)
 - [Client Side Navigation](./Resources/doc/reference/client-side-navigation.md)
 - [TWIG Filters](./Resources/doc/reference/twig-filters.md)

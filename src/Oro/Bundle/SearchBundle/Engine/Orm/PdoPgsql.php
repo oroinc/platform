@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -127,5 +128,20 @@ class PdoPgsql extends BaseDriver
             ]
         );
         $qb->orderBy('rankField', 'DESC');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        $query = parent::getTruncateQuery($dbPlatform, $tableName);
+
+        // cascade required to perform truncate of related entities
+        if (strpos($query, ' CASCADE') === false) {
+            $query .= ' CASCADE';
+        }
+
+        return $query;
     }
 }

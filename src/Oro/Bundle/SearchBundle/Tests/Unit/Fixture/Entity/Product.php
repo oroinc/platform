@@ -31,7 +31,7 @@ class Product
     private $name;
 
     /**
-     * @var decimal $price
+     * @var float $price
      *
      * @ORM\Column(name="price", type="decimal")
      */
@@ -129,7 +129,7 @@ class Product
     /**
      * Set manufacturer
      *
-     * @param  \Oro\Bundle\SearchBundle\Tests\Fixture\Entity\Manufacturer $manufacturer
+     * @param  Manufacturer $manufacturer
      * @return Product
      */
     public function setManufacturer(Manufacturer $manufacturer = null)
@@ -142,7 +142,7 @@ class Product
     /**
      * Get manufacturer
      *
-     * @return \Oro\Bundle\SearchBundle\Tests\Fixture\Entity
+     * @return Manufacturer
      */
     public function getManufacturer()
     {

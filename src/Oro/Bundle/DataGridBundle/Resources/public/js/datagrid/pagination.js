@@ -1,7 +1,13 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define([
+    'jquery',
+    'underscore',
+    'backbone'
+], function ($, _, Backbone) {
     'use strict';
+
+    var Pagination;
 
     /**
      * Datagrid pagination widget
@@ -10,7 +16,7 @@ define(['jquery', 'underscore', 'backbone'
      * @class   orodatagrid.datagrid.Pagination
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    Pagination = Backbone.View.extend({
         /** @property */
         windowSize: 10,
 
@@ -64,7 +70,7 @@ define(['jquery', 'underscore', 'backbone'
 
             this.template = _.template($(options.template || this.template).html());
 
-            Backbone.View.prototype.initialize.call(this, options);
+            Pagination.__super__.initialize.call(this, options);
         },
 
         /**
@@ -207,4 +213,6 @@ define(['jquery', 'underscore', 'backbone'
             return this;
         }
     });
+
+    return Pagination;
 });

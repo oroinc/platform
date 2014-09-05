@@ -58,7 +58,11 @@ define(function (require) {
                 loaded = $.Deferred();
 
                 require([module], function (component) {
-                    loaded.resolve(component(options));
+                    if (typeof component.init === "function") {
+                        loaded.resolve(component.init(options));
+                    } else {
+                        loaded.resolve(component(options));
+                    }
                 }, function () {
                     loaded.resolve();
                 });
@@ -131,18 +135,51 @@ define(function (require) {
             }
         },
 
-        styleForm: function (container) {
-            var selectElements, fileElements;
+        /**
+         * Bind forms widget and plugins to elements
+         *
+         * @param {jQuery=} $container
+         */
+        styleForm: function ($container) {
+            var $elements;
             if ($.isPlainObject($.uniform)) {
-                selectElements = $(container).find('select:not(.select2)');
-                selectElements.uniform();
+                // bind uniform plugin to select elements
+                $elements = $container.find('select:not(.select2)');
+                $elements.uniform();
+                if ($elements.is('.error:not([multiple])')) {
+                    $elements.removeClass('error').closest('.selector').addClass('error');
+                }
 
-                fileElements = $(container).find('input:file');
-                fileElements.uniform({fileDefaultHtml: __('Please select a file...')});
-
-                selectElements.trigger('uniformInit');
-                fileElements.trigger('uniformInit');
+                // bind uniform plugin to input:file elements
+                $elements = $container.find('input:file');
+                $elements.uniform({fileDefaultHtml: __('Please select a file...')});
+                if ($elements.is('.error')) {
+                    $elements.removeClass('error').closest('.uploader').addClass('error');
+                }
             }
+        },
+
+        /**
+         * Removes forms widget and plugins from elements
+         *
+         * @param {jQuery=} $container
+         */
+        unstyleForm: function ($container) {
+            var $elements;
+
+            // removes uniform plugin from elements
+            if ($.isPlainObject($.uniform)) {
+                $elements = $container.find('select:not(.select2)');
+                $.uniform.restore($elements);
+            }
+
+            // removes select2 plugin from elements
+            $container.find('.select2-container').each(function () {
+                var $this = $(this);
+                if ($this.data('select2')) {
+                    $this.select2('destroy');
+                }
+            });
         },
 
         onPageRendered: function (cb) {
