@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -12,10 +10,10 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\Rest\Util\Codes;
 
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 
@@ -28,6 +26,15 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
     /**
      * Get entities with fields
      *
+     * @QueryParam(
+     *      name="with-relations",
+     *      nullable=true,
+     *      requirements="true|false",
+     *      default="true",
+     *      strict=true,
+     *      description="Indicates whether association fields should be returned as well."
+     * )
+     *
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
@@ -39,11 +46,12 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
     public function fieldsAction()
     {
         /** @var EntityWithFieldsProvider $provider */
-        $provider = $this->get('oro_query_designer.entity_field_list_provider');
+        $provider      = $this->get('oro_query_designer.entity_field_list_provider');
+        $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $statusCode    = Codes::HTTP_OK;
 
-        $statusCode = Codes::HTTP_OK;
         try {
-            $result = $provider->getFields(true, true);
+            $result = $provider->getFields(true, true, $withRelations);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result     = array('message' => $ex->getMessage());

@@ -31,11 +31,13 @@ require(['jquery', 'routing'],
                         selector.attr('id', parentDiv.attr(selectorIdAttribute));
                         selector.attr('class', 'security-permission');
                         $.each(data, function (value, text) {
-                            var option = $('<option>').attr('value', value).text(text);
-                            if (parentDiv.attr(valueAttribute) == value) {
-                                option.attr('selected', 'selected');
+                            if (value !== 'template_name') {
+                                var option = $('<option>').attr('value', value).text(text);
+                                if (parentDiv.attr(valueAttribute) == value) {
+                                    option.attr('selected', 'selected');
+                                }
+                                selector.append(option);
                             }
-                            selector.append(option);
                         });
                         selectDiv.append(selector);
                         selectDiv.show();

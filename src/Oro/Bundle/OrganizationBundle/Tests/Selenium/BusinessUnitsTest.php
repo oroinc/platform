@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Selenium;
 
+use Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages\BusinessUnits;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -19,11 +21,13 @@ class BusinessUnitsTest extends Selenium2TestCase
         $unitName = 'Unit_'.mt_rand();
 
         $login = $this->login();
-        $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
+        /* @var BusinessUnits $login */
+        $login = $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->assertTitle('Business Units - User Management - System')
             ->add()
-            ->assertTitle('Create Business Unit - Business Units - User Management - System')
-            ->setBusinessUnitName($unitName)
+            ->assertTitle('Create Business Unit - Business Units - User Management - System');
+        /* @var BusinessUnit $login */
+        $login->setBusinessUnitName($unitName)
             ->setOwner('Main')
             ->save()
             ->assertMessage('Business Unit saved')
@@ -43,10 +47,11 @@ class BusinessUnitsTest extends Selenium2TestCase
     {
         $newUnitName = 'Update_' . $unitName;
         $login = $this->login();
+        /* @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
-            ->assertTile("{$unitName} - Business Units - User Management - System")
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->edit()
             ->setBusinessUnitName($newUnitName)
             ->save()
@@ -64,10 +69,11 @@ class BusinessUnitsTest extends Selenium2TestCase
     public function testDeleteBusinessUnit($unitName)
     {
         $login = $this->login();
+        /* @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
-            ->asserTitle("{$unitName} - Business Units - User Management - System")
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->delete()
             ->assertTitle('Business Units - User Management - System')
             ->assertMessage('Business Unit deleted');
