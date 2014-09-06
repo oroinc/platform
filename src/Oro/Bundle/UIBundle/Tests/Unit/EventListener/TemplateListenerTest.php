@@ -156,8 +156,7 @@ class TemplateListenerTest extends \PHPUnit_Framework_TestCase
     {
         $templateReference = $this->getMockBuilder('Symfony\Component\Templating\TemplateReferenceInterface')
             ->disableOriginalConstructor()
-            ->setMethods('getLogicalName')
-            ->getMockForAbstractClass();
+            ->getMock();
         $templateReference->expects($this->any())
             ->method('getLogicalName')
             ->will($this->returnValue($templateLogicalName));
