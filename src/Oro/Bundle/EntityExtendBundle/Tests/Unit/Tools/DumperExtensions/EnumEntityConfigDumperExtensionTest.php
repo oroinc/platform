@@ -167,16 +167,10 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'table'     => $this->nameGenerator->generateEnumTableName($enumCode1),
                         'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                     ],
-                    'grouping'   => [
-                        'groups' => ['enum', 'dictionary']
-                    ],
                     'enum'       => [
                         'code'     => $enumCode1,
                         'public'   => true,
                         'multiple' => false
-                    ],
-                    'dictionary' => [
-                        'virtual_fields' => ['id', 'name']
                     ]
                 ]
             );
@@ -335,16 +329,10 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'table'     => $this->nameGenerator->generateEnumTableName($enumCode1, true),
                         'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                     ],
-                    'grouping'   => [
-                        'groups' => ['enum', 'dictionary']
-                    ],
                     'enum'       => [
                         'code'     => $enumCode1,
                         'public'   => false,
                         'multiple' => false
-                    ],
-                    'dictionary' => [
-                        'virtual_fields' => ['id', 'name']
                     ]
                 ]
             );

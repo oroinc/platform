@@ -256,16 +256,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'table'     => $this->nameGenerator->generateEnumTableName($enumCode, true),
                     'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                 ],
-                'grouping'   => [
-                    'groups' => ['enum', 'dictionary']
-                ],
                 'enum'       => [
                     'code'     => $enumCode,
                     'public'   => $isPublic,
                     'multiple' => $isMultiple
-                ],
-                'dictionary' => [
-                    'virtual_fields' => ['id', 'name']
                 ]
             ]
         );

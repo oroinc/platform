@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
@@ -62,10 +63,10 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
     /**
      * {@inheritdoc}
      */
-    protected function prepareFieldConfigs(FieldConfigId $field, array &$column, array &$sorter, array &$filter)
+    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
-        $filter['enabled'] = true;
+        parent::prepareColumnOptions($field, $columnOptions);
 
-        parent::prepareFieldConfigs($field, $column, $sorter, $filter);
+        $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
     }
 }

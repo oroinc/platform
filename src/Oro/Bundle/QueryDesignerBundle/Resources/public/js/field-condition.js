@@ -152,7 +152,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 value = {
                     columnName: this.element.find('input.select').select2('val'),
                     criterion: {
-                        filter: this.filter.type,
+                        filter: this.filter.name,
                         data: this.filter.getValue()
                     }
                 };

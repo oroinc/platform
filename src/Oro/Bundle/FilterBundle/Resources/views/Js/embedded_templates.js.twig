@@ -48,9 +48,25 @@
 
 <script type="text/template" id="select-filter-template-embedded">
     <div class="filter-item">
-        <span> <%= _.__('oro.filter.embedded.date.field_to_value') %> </span>
+        <span> <%= _.__('oro.filter.embedded.select.field_to_value') %> </span>
         <div class="filter-select filter-criteria-selector">
             <select>
+                <% _.each(options, function (option) { %>
+                <option title="<%- option.label %>" value="<%= option.value %>"
+                    <% if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="multiselect-filter-template-embedded">
+    <div class="filter-item">
+        <span> <%= _.__('oro.filter.embedded.select.field_to_value') %> </span>
+        <div class="filter-select filter-criteria-selector">
+            <select multiple>
                 <% _.each(options, function (option) { %>
                 <option title="<%- option.label %>" value="<%= option.value %>"
                     <% if (option.value == selected.value) { %> selected="selected"<% } %>>

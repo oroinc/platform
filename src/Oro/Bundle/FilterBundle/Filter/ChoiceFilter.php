@@ -104,6 +104,9 @@ class ChoiceFilter extends AbstractFilter
         $metadata                    = parent::getMetadata();
         $metadata['choices']         = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];
+        if (!empty($formView->vars['default_value'])) {
+            $metadata['placeholder'] = $formView->vars['default_value'];
+        }
 
         if ($fieldView->vars['multiple']) {
             $metadata[FilterUtility::TYPE_KEY] = 'multichoice';

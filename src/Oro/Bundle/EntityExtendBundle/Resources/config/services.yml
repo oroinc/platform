@@ -29,6 +29,7 @@ parameters:
     oro_entity_extend.enum_filter.class:                      Oro\Bundle\EntityExtendBundle\Filter\EnumFilter
     oro_entity_extend.multi_enum_filter.class:                Oro\Bundle\EntityExtendBundle\Filter\MultiEnumFilter
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
+    oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -237,3 +238,10 @@ services:
             - @doctrine
         tags:
             - { name: twig.extension }
+
+    oro_entity_extend.datagrid.column_options_guesser:
+        class: %oro_entity_extend.datagrid.column_options_guesser.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_datagrid.column_options_guesser }

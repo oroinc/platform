@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -79,6 +80,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
+            new FieldTypeHelper([]),
             $this->doctrine,
             $translator,
             []
@@ -204,7 +206,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name'                => 'rel1',
-                'type'                => 'integer',
+                'type'                => 'ref-many',
                 'label'               => 'Rel1',
                 'relation_type'       => 'ref-many',
                 'related_entity_name' => 'Acme\Entity\Test1'
@@ -242,7 +244,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name'                  => 'rel1',
-                'type'                  => 'integer',
+                'type'                  => 'ref-many',
                 'label'                 => 'Rel1',
                 'relation_type'         => 'ref-many',
                 'related_entity_name'   => 'Acme\Entity\Test1',
@@ -280,7 +282,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name'                        => 'rel1',
-                'type'                        => 'integer',
+                'type'                        => 'ref-many',
                 'label'                       => 'Rel1',
                 'relation_type'               => 'ref-many',
                 'related_entity_name'         => 'Acme\Entity\Test1',
@@ -321,7 +323,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name'                  => 'rel1',
-                'type'                  => 'integer',
+                'type'                  => 'ref-many',
                 'label'                 => 'Rel1',
                 'relation_type'         => 'ref-many',
                 'related_entity_name'   => 'Acme\Entity\Test1',
@@ -359,7 +361,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name'                        => 'rel1',
-                'type'                        => 'integer',
+                'type'                        => 'ref-many',
                 'label'                       => 'Rel1',
                 'relation_type'               => 'ref-many',
                 'related_entity_name'         => 'Acme\Entity\Test1',
@@ -395,7 +397,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'name' => 'rel1',
-                'type' => 'integer',
+                'type' => 'ref-one',
                 'label' => 'Rel11',
                 'relation_type' => 'ref-one',
                 'related_entity_name' => 'Acme\Entity\Test11',
@@ -494,6 +496,18 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($em));
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->will($this->returnValue(true));
+        $fieldConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $fieldConfig->expects($this->any())
+            ->method('is')
+            ->with('is_deleted')
+            ->will($this->returnValue(false));
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($fieldConfig));
 
         $this->entityConfigProvider->expects($this->any())
             ->method('hasConfig')

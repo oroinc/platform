@@ -51,29 +51,29 @@ class EnumFilterTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getResult'))
             ->getMockForAbstractClass();
-        $query->expects($this->once())
+        $query->expects($this->any())
             ->method('getResult')
             ->will($this->returnValue($values));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $qb->expects($this->once())
+        $qb->expects($this->any())
             ->method('orderBy')
             ->with('o.priority')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->any())
             ->method('getQuery')
             ->will($this->returnValue($query));
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->with($class ? : ExtendHelper::buildEnumValueClassName($enumCode))
+            ->with($class !== null ? $class : ExtendHelper::buildEnumValueClassName($enumCode))
             ->will($this->returnValue($repo));
-        $repo->expects($this->once())
+        $repo->expects($this->any())
             ->method('createQueryBuilder')
             ->with('o')
             ->will($this->returnValue($qb));
@@ -105,6 +105,9 @@ class EnumFilterTypeTest extends TypeTestCase
         $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function setDefaultOptionsProvider()
     {
         return [
@@ -193,6 +196,23 @@ class EnumFilterTypeTest extends TypeTestCase
                         'multiple' => false,
                         'choices'  => [
                             'val1' => 'Value1'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'enumCode'        => null,
+                'class'           => '',
+                'nullValue'       => ':empty:',
+                'fieldOptions'    => null,
+                'expectedOptions' => [
+                    'enum_code'     => null,
+                    'class'         => '',
+                    'null_value'    => ':empty:',
+                    'field_options' => [
+                        'multiple' => true,
+                        'choices'  => [
+                            ':empty:' => 'None'
                         ]
                     ]
                 ]

@@ -53,17 +53,19 @@ class EnumFilterType extends AbstractChoiceType
         );
         $resolver->setNormalizers(
             [
-                'class'    => function (Options $options, $value) {
-                    return !empty($value)
-                        ? $value
-                        : ExtendHelper::buildEnumValueClassName($options['enum_code']);
-                },
+                'class'         => function (Options $options, $value) {
+                        return $value !== null
+                            ? $value
+                            : ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    },
                 // this normalizer allows to add/override field_options options outside
                 'field_options' => function (Options $options, $value) use (&$defaultFieldOptions) {
-                    $value['choices'] = $this->getChoices($options['class'], $options['null_value']);
+                        $value['choices'] = $options['class'] !== null
+                            ? $this->getChoices($options['class'], $options['null_value'])
+                            : [];
 
-                    return array_merge($defaultFieldOptions, $value);
-                }
+                        return array_merge($defaultFieldOptions, $value);
+                    }
             ]
         );
     }
@@ -98,16 +100,18 @@ class EnumFilterType extends AbstractChoiceType
             $choices[$nullValue] = $this->translator->trans('oro.entity_extend.datagrid.enum.filter.empty');
         }
 
-        /** @var EntityRepository $repo */
-        $repo = $this->doctrine->getRepository($enumValueClassName);
-        /** @var AbstractEnumValue[] $values */
-        $values = $repo->createQueryBuilder('o')
-            ->orderBy('o.priority')
-            ->getQuery()
-            ->getResult();
+        if (!empty($enumValueClassName)) {
+            /** @var EntityRepository $repo */
+            $repo = $this->doctrine->getRepository($enumValueClassName);
+            /** @var AbstractEnumValue[] $values */
+            $values = $repo->createQueryBuilder('o')
+                ->orderBy('o.priority')
+                ->getQuery()
+                ->getResult();
 
-        foreach ($values as $value) {
-            $choices[$value->getId()] = $value->getName();
+            foreach ($values as $value) {
+                $choices[$value->getId()] = $value->getName();
+            }
         }
 
         return $choices;

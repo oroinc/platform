@@ -82,8 +82,15 @@ class Configuration implements ConfigurationInterface
                             ->thenInvalid('Invalid filter type "%s"')
                         ->end()
                     ->end()
+                    ->arrayNode('options')
+                        ->useAttributeAsKey('name')
+                        ->prototype('variable')->end()
+                    ->end()
                     ->scalarNode('template_theme')
                         ->defaultValue('embedded')
+                    ->end()
+                    ->arrayNode('require_js_modules')
+                        ->prototype('scalar')->end()
                     ->end()
                     ->arrayNode('query_type')
                         ->isRequired()
@@ -92,6 +99,19 @@ class Configuration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                     ->end()
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($value) {
+                            if (empty($value['options'])) {
+                                unset($value['options']);
+                            }
+                            if (empty($value['require_js_modules'])) {
+                                unset($value['require_js_modules']);
+                            }
+                            return $value;
+                        }
+                    )
                 ->end()
             ->end();
 

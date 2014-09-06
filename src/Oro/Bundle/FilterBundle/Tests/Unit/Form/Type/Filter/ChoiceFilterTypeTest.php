@@ -51,6 +51,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                         ChoiceFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
                     ),
                     'populate_default' => false,
+                    'default_value' => null,
                     'is_translated_choices' => false
                 )
             )

@@ -166,16 +166,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'table'     => $tableName,
                     'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                 ],
-                'grouping'                                => [
-                    'groups' => ['enum', 'dictionary']
-                ],
                 'enum'                                    => [
                     'code'     => $enumCode,
                     'public'   => $isPublic,
                     'multiple' => $isMultiple
-                ],
-                'dictionary'                              => [
-                    'virtual_fields' => ['id', 'name']
                 ]
             ],
             $options
