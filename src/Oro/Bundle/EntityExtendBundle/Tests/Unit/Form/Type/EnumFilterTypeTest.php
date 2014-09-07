@@ -225,7 +225,14 @@ class EnumFilterTypeTest extends TypeTestCase
      */
     protected function getOptionsResolver()
     {
-        return new OptionsResolver();
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(
+            [
+                'null_value' => null
+            ]
+        );
+
+        return $resolver;
     }
 
     public function testGetName()

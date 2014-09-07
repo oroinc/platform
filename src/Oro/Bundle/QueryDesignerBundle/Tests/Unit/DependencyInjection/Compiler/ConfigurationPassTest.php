@@ -108,11 +108,11 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'applicable'         => [
                         ['type' => 'other']
                     ],
-                    'type'               => 'string',
-                    'options'            => ['option1' => true, 'option2' => 'val2'],
-                    'require_js_modules' => ['module1', 'module2'],
-                    'template_theme'     => 'embedded',
-                    'query_type'         => ['all']
+                    'type'           => 'string',
+                    'options'        => ['option1' => true, 'option2' => 'val2'],
+                    'init_module'    => 'module1',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
             ],
             'grouping'   => [

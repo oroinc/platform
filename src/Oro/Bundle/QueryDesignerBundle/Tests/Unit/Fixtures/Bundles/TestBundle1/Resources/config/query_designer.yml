@@ -22,7 +22,7 @@ query_designer:
             options:
                 option1: true
                 option2: val1
-            require_js_modules: ['module1']
+            init_module: 'module1'
             query_type: [all]
 
     grouping:

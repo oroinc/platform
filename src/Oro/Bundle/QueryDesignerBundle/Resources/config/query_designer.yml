@@ -35,6 +35,7 @@ query_designer:
                 populate_default: true
                 default_value: Any
                 class: ''
+            init_module: oroquerydesigner/js/enum-filter-initialized
             query_type: [all]
         multiEnum:
             applicable: [{type: multiEnum}]
@@ -44,4 +45,5 @@ query_designer:
                 populate_default: true
                 default_value: Any
                 class: ''
+            init_module: oroquerydesigner/js/enum-filter-initialized
             query_type: [all]

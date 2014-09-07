@@ -45,6 +45,7 @@ class ChoiceFilterType extends AbstractChoiceType
                 'operator_choices'      => $choices,
                 'populate_default'      => false,
                 'default_value'         => null,
+                'null_value'            => null,
                 'is_translated_choices' => false
             )
         );
@@ -59,6 +60,9 @@ class ChoiceFilterType extends AbstractChoiceType
         if (isset($options['populate_default'])) {
             $view->vars['populate_default'] = $options['populate_default'];
             $view->vars['default_value']    = $options['default_value'];
+        }
+        if (!empty($options['null_value'])) {
+            $view->vars['null_value'] = $options['null_value'];
         }
     }
 

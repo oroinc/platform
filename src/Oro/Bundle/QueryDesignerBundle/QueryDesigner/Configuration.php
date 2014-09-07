@@ -89,9 +89,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('template_theme')
                         ->defaultValue('embedded')
                     ->end()
-                    ->arrayNode('require_js_modules')
-                        ->prototype('scalar')->end()
-                    ->end()
+                    ->scalarNode('init_module')->end()
                     ->arrayNode('query_type')
                         ->isRequired()
                         ->requiresAtLeastOneElement()
@@ -106,8 +104,8 @@ class Configuration implements ConfigurationInterface
                             if (empty($value['options'])) {
                                 unset($value['options']);
                             }
-                            if (empty($value['require_js_modules'])) {
-                                unset($value['require_js_modules']);
+                            if (empty($value['init_module'])) {
+                                unset($value['init_module']);
                             }
                             return $value;
                         }

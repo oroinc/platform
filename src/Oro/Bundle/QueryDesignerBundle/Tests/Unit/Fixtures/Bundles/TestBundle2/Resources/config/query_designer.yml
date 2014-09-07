@@ -9,7 +9,6 @@ query_designer:
         filter5:
             options:
                 option2: val2
-            require_js_modules: ['module2']
 
     grouping:
         exclude: [{type: array}]

@@ -38,9 +38,6 @@ class MultiEnumFilter extends ChoiceFilter
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
-        if (isset($params['null_value'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['null_value'] = $params['null_value'];
-        }
         parent::init($name, $params);
     }
 

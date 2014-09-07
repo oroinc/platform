@@ -70,8 +70,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
         _renderFilter: function (fieldId) {
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
-                filterId = this._getApplicableFilterId(conditions);
-            this._createFilter(this.options.filters[filterId]);
+                filterId = this._getApplicableFilterId(conditions),
+                filter = this.options.filters[filterId];
+            if (filter.init_module) {
+                require([filter.init_module], _.bind(function (initializer) {
+                    initializer(filter, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
+                    this._createFilter(filter);
+                }, this));
+            } else {
+                this._createFilter(filter);
+            }
         },
 
         _getApplicableFilterId: function (conditions) {
