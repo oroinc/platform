@@ -127,10 +127,12 @@ class EntityFieldProvider
      *                                   .       'label'         - field label
      *                                   If a field is an identifier (primary key in terms of a database)
      *                                   .       'identifier'    - true for an identifier field
+     *                                   If a field represents a relation and $withRelations = true or
+     *                                   a virtual field has 'filter_by_id' = true following attribute is added:
+     *                                   .       'related_entity_name' - entity full class name
      *                                   If a field represents a relation and $withRelations = true
      *                                   the following attributes are added:
      *                                   .       'relation_type'       - relation type
-     *                                   .       'related_entity_name' - entity full class name
      *                                   If a field represents a relation and $withEntityDetails = true
      *                                   the following attributes are added:
      *                                   .       'related_entity_label'        - entity label
@@ -200,21 +202,20 @@ class EntityFieldProvider
             $metadata = $em->getClassMetadata($className);
 
             // add regular fields
-            foreach ($metadata->getFieldNames() as $fieldName) {
+            $fieldNames = $metadata->getFieldNames();
+            foreach ($fieldNames as $fieldName) {
                 if ($this->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
-
                 if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                     continue;
                 }
 
-                $fieldLabel = $this->getFieldLabel($className, $fieldName);
                 $this->addField(
                     $result,
                     $fieldName,
                     $metadata->getTypeOfField($fieldName),
-                    $fieldLabel,
+                    $this->getFieldLabel($className, $fieldName),
                     $metadata->isIdentifier($fieldName),
                     $translate
                 );
@@ -255,7 +256,7 @@ class EntityFieldProvider
             $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
             $fieldLabel = isset($query['select']['label'])
                 ? $query['select']['label']
-                : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+                : $this->getFieldLabel($className, $fieldName);
 
             $this->addField(
                 $result,
@@ -265,6 +266,9 @@ class EntityFieldProvider
                 false,
                 $translate
             );
+            if (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
+                $result[$fieldName]['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
+            }
         }
     }
 
@@ -283,7 +287,7 @@ class EntityFieldProvider
             return true;
         }
         // skip non configurable field
-        if (!$this->extendConfigProvider->hasConfig($metadata->name, $fieldName)) {
+        if (!$this->extendConfigProvider->hasConfig($metadata->getName(), $fieldName)) {
             return true;
         }
 
@@ -310,7 +314,7 @@ class EntityFieldProvider
         if ($isIdentifier) {
             $field['identifier'] = true;
         }
-        $result[] = $field;
+        $result[$name] = $field;
     }
 
     /**
@@ -339,6 +343,11 @@ class EntityFieldProvider
         $metadata         = $em->getClassMetadata($className);
         $associationNames = $metadata->getAssociationNames();
         foreach ($associationNames as $associationName) {
+            if (isset($result[$associationName])) {
+                // skip because a field with this name is already added, it could be a virtual field
+                continue;
+            }
+
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                 if ($this->isIgnoredRelation($metadata, $associationName)) {
@@ -414,7 +423,7 @@ class EntityFieldProvider
                     ' (' . $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) . ')';
             }
 
-            $fieldType  = $this->getRelationFieldType($relatedClassName, $fieldName);
+            $fieldType = $this->getRelationFieldType($relatedClassName, $fieldName);
 
             $this->addRelation(
                 $result,
@@ -474,18 +483,11 @@ class EntityFieldProvider
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         // skip non configurable relation
-        if (!$this->extendConfigProvider->hasConfig($metadata->name, $associationName)) {
+        if (!$this->extendConfigProvider->hasConfig($metadata->getName(), $associationName)) {
             return true;
         }
-        // skip 'default_' extend field
-//        if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-//            $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
-//            if ($this->isExtendField($metadata->name, $guessedFieldName)) {
-//                return true;
-//            }
-//        }
         // skip a relation if it was deleted
-        $fieldConfig = $this->extendConfigProvider->getConfig($metadata->name, $associationName);
+        $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $associationName);
         if ($fieldConfig->is('is_deleted')) {
             return true;
         }
@@ -531,7 +533,7 @@ class EntityFieldProvider
             $this->addEntityDetails($relatedEntityName, $relation, $translate);
         }
 
-        $result[] = $relation;
+        $result[$name] = $relation;
     }
 
     /**
@@ -576,24 +578,6 @@ class EntityFieldProvider
     }
 
     /**
-     * Checks whether the given field is extend or not.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @return bool
-     */
-    protected function isExtendField($className, $fieldName)
-    {
-        if ($this->extendConfigProvider->hasConfig($className, $fieldName)) {
-            if ($this->extendConfigProvider->getConfig($className, $fieldName)->is('is_extend')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Gets a field label
      *
      * @param string $className
@@ -603,10 +587,13 @@ class EntityFieldProvider
     protected function getFieldLabel($className, $fieldName)
     {
         if ($this->entityConfigProvider->hasConfig($className, $fieldName)) {
-            return $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
+            $label = $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
+            if (!empty($label)) {
+                return $label;
+            }
         }
 
-        return $fieldName;
+        return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
     }
 
     /**
@@ -649,11 +636,11 @@ class EntityFieldProvider
         usort(
             $fields,
             function ($a, $b) {
-                if (isset($a['related_entity_name']) !== isset($b['related_entity_name'])) {
-                    if (isset($a['related_entity_name'])) {
+                if (isset($a['relation_type']) !== isset($b['relation_type'])) {
+                    if (isset($a['relation_type'])) {
                         return 1;
                     }
-                    if (isset($b['related_entity_name'])) {
+                    if (isset($b['relation_type'])) {
                         return -1;
                     }
                 }
