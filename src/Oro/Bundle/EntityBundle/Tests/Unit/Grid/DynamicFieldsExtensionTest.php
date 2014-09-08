@@ -3,32 +3,25 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
     const ENTITY_NAME  = 'Test:Entity';
+    const FIELD_NAME   = 'testField';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityClassResolver;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $datagridConfig;
-
-    /** @var DynamicFieldsExtension */
-    protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
@@ -38,6 +31,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $datagridConfigProvider;
+
+    /** @var DynamicFieldsExtension */
+    protected $extension;
 
     protected function setUp()
     {
@@ -52,7 +48,23 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extendConfigProvider   = $this->getConfigProviderMock();
         $this->datagridConfigProvider = $this->getConfigProviderMock();
 
-        $this->extension = new DynamicFieldsExtension($this->configManager, $this->entityClassResolver);
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entity', $this->entityConfigProvider],
+                        ['extend', $this->extendConfigProvider],
+                        ['datagrid', $this->datagridConfigProvider],
+                    ]
+                )
+            );
+
+        $this->extension = new DynamicFieldsExtension(
+            $this->configManager,
+            $this->entityClassResolver,
+            new DatagridGuesserMock()
+        );
     }
 
     public function testIsApplicable()
@@ -99,660 +111,138 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessConfigsForString()
+    public function testProcessConfigs()
     {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
         $fieldLabel = 'test.field.label';
         $fieldType  = 'string';
 
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
         $this->entityConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($entityFieldConfig));
 
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'string'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'string',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
+        $datagridFieldConfig = new Config(
+            new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
-    }
-
-    /**
-     * @dataProvider intTypeProvider
-     */
-    public function testProcessConfigsForInt($fieldType)
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
         $this->datagridConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
         $this->extension->processConfigs($config);
         $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'integer'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
+            array_merge(
+                $initialConfig,
+                [
+                    'columns'              => [
+                        self::FIELD_NAME => [
+                            'label'         => $fieldLabel,
+                            'frontend_type' => 'string'
                         ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'number',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function intTypeProvider()
-    {
-        return [
-            ['integer'],
-            ['smallint'],
-            ['bigint'],
-        ];
-    }
-
-    /**
-     * @dataProvider floatTypeProvider
-     */
-    public function testProcessConfigsForFloat($fieldType)
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'decimal'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'number',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => [
-                                'data_type' => 'data_decimal'
+                    ],
+                    'sorters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => self::FIELD_NAME
                             ]
                         ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function floatTypeProvider()
-    {
-        return [
-            ['float'],
-            ['decimal'],
-        ];
-    }
-
-    public function testProcessConfigsForBoolean()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'boolean';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'boolean'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'boolean',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function testProcessConfigsForDate()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'date';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'date'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'date',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function testProcessConfigsForDateTime()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'datetime';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'datetime'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'datetime',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function testProcessConfigsForMoney()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'money';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'currency'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'number',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function testProcessConfigsForPercent()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'percent';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'percent'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'      => 'percent',
-                            'data_name' => $fieldName,
-                            'enabled'   => false,
-                            'options'   => []
-                        ]
-                    ]
-                ],
-            ],
-            $config->toArray()
-        );
-    }
-
-    public function testProcessConfigsForEnum()
-    {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
-        $fieldLabel = 'test.field.label';
-        $fieldType  = 'enum';
-
-        $targetEntity = 'Test\TargetEntity';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entityName)
-            ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $entityFieldConfig->set('label', $fieldLabel);
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($entityFieldConfig));
-
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $extendFieldConfig->set('target_entity', $targetEntity);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($extendFieldConfig));
-
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
-        $this->extension->processConfigs($config);
-        $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'string'
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'       => 'enum',
-                            'null_value' => ':empty:',
-                            'data_name'  => $fieldName,
-                            'enabled'    => false,
-                            'options'    => [
-                                'class' => $targetEntity
+                    ],
+                    'filters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'type'      => 'string',
+                                'data_name' => self::FIELD_NAME,
+                                'enabled'   => false
                             ]
                         ]
-                    ]
-                ],
-            ],
+                    ],
+                ]
+            ),
             $config->toArray()
         );
     }
 
-    public function testProcessConfigsForMultiEnum()
+    public function testProcessConfigsWithVisibleFilter()
     {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
         $fieldLabel = 'test.field.label';
-        $fieldType  = 'multiEnum';
-
-        $targetEntity = 'Test\TargetEntity';
-        $twigTemplate = 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig';
+        $fieldType  = 'string';
 
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
-        $datagridFieldConfig = new Config(new FieldConfigId('datagrid', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($datagridFieldConfig));
-
-        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $entityFieldConfig = new Config(new FieldConfigId('entity', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType));
         $entityFieldConfig->set('label', $fieldLabel);
         $this->entityConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($entityFieldConfig));
 
-        $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, $fieldName, $fieldType));
-        $extendFieldConfig->set('target_entity', $targetEntity);
-        $this->extendConfigProvider->expects($this->once())
+        $datagridFieldConfig = new Config(
+            new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
+        );
+        $datagridFieldConfig->set('show_filter', true);
+        $this->datagridConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
-            ->will($this->returnValue($extendFieldConfig));
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
+            ->will($this->returnValue($datagridFieldConfig));
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
         $this->extension->processConfigs($config);
         $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'label'         => $fieldLabel,
-                        'frontend_type' => 'html',
-                        'template'      => $twigTemplate,
-                        'type'          => 'twig',
-                        'context'       => [
-                            'entity_class' => $targetEntity
+            array_merge(
+                $initialConfig,
+                [
+                    'columns'              => [
+                        self::FIELD_NAME => [
+                            'label'         => $fieldLabel,
+                            'frontend_type' => 'string'
                         ]
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $fieldName
-                        ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'type'       => 'multi_enum',
-                            'null_value' => ':empty:',
-                            'data_name'  => $fieldName,
-                            'enabled'    => false,
-                            'options'    => [
-                                'class' => $targetEntity
+                    ],
+                    'sorters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => self::FIELD_NAME
                             ]
                         ]
-                    ]
-                ],
-            ],
+                    ],
+                    'filters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'type'      => 'string',
+                                'data_name' => self::FIELD_NAME,
+                                'enabled'   => true
+                            ]
+                        ]
+                    ],
+                ]
+            ),
             $config->toArray()
         );
     }
 
     public function testVisitDatasourceNoFields()
     {
-        $entityName = self::ENTITY_NAME;
-
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -764,21 +254,19 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
         $datasource->setQueryBuilder($qb);
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
         $this->extension->visitDatasource($config, $datasource);
     }
 
     public function testVisitDatasourceForNotConfigurableEntity()
     {
-        $entityName = self::ENTITY_NAME;
-
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
 
         $this->configManager->expects($this->once())
@@ -795,14 +283,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
         $datasource->setQueryBuilder($qb);
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
         $this->extension->visitDatasource($config, $datasource);
     }
 
     public function testVisitDatasource()
     {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
         $fieldType  = 'string';
         $alias      = 'c';
 
@@ -810,11 +296,11 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityClassResolver->expects($this->exactly(3))
+        $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
         $from = $this->getMockBuilder('Doctrine\ORM\Query\Expr\From')
             ->disableOriginalConstructor()
@@ -824,7 +310,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($alias));
         $from->expects($this->once())
             ->method('getFrom')
-            ->will($this->returnValue($entityName));
+            ->will($this->returnValue(self::ENTITY_NAME));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -835,45 +321,46 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$from]));
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($alias . '.' . $fieldName)
+            ->with($alias . '.' . self::FIELD_NAME)
             ->will($this->returnSelf());
 
         $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
         $datasource->setQueryBuilder($qb);
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
         $this->extension->visitDatasource($config, $datasource);
         $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'data_name' => $fieldName
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $alias . '.' . $fieldName
+            array_merge(
+                $initialConfig,
+                [
+                    'columns'              => [
+                        self::FIELD_NAME => [
+                            'data_name' => self::FIELD_NAME
                         ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $alias . '.' . $fieldName
+                    ],
+                    'sorters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
                         ]
-                    ]
-                ],
-            ],
+                    ],
+                    'filters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ],
+                ]
+            ),
             $config->toArray()
         );
     }
 
     public function testVisitDatasourceForEnum()
     {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
         $fieldType  = 'enum';
         $alias      = 'c';
 
@@ -884,17 +371,17 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityClassResolver->expects($this->exactly(3))
+        $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
-        $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, $fieldName, $fieldType));
+        $extendFieldConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType));
         $extendFieldConfig->set('target_field', $targetFieldName);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::ENTITY_CLASS, $fieldName)
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($extendFieldConfig));
 
         $from = $this->getMockBuilder('Doctrine\ORM\Query\Expr\From')
@@ -905,7 +392,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($alias));
         $from->expects($this->once())
             ->method('getFrom')
-            ->will($this->returnValue($entityName));
+            ->will($this->returnValue(self::ENTITY_NAME));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -916,63 +403,64 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$from]));
         $qb->expects($this->once())
             ->method('leftJoin')
-            ->with($alias . '.' . $fieldName, $relAlias)
+            ->with($alias . '.' . self::FIELD_NAME, $relAlias)
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($relAlias . '.' . $targetFieldName . ' as ' . $fieldName)
+            ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
             ->will($this->returnSelf());
 
         $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
         $datasource->setQueryBuilder($qb);
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
         $this->extension->visitDatasource($config, $datasource);
         $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'data_name' => $fieldName
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $relAlias . '.' . $targetFieldName
+            array_merge(
+                $initialConfig,
+                [
+                    'columns'              => [
+                        self::FIELD_NAME => [
+                            'data_name' => self::FIELD_NAME
                         ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $alias . '.' . $fieldName
+                    ],
+                    'sorters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $relAlias . '.' . $targetFieldName
+                            ]
                         ]
-                    ]
-                ],
-            ],
+                    ],
+                    'filters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ],
+                ]
+            ),
             $config->toArray()
         );
     }
 
     public function testVisitDatasourceForMultiEnum()
     {
-        $entityName = self::ENTITY_NAME;
-        $fieldName  = 'testField';
         $fieldType  = 'multiEnum';
         $alias      = 'c';
 
-        $snapshotFieldName = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
+        $snapshotFieldName = ExtendHelper::getMultipleEnumSnapshotFieldName(self::FIELD_NAME);
 
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityClassResolver->expects($this->exactly(3))
+        $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->with($entityName)
+            ->with(self::ENTITY_NAME)
             ->will($this->returnValue(self::ENTITY_CLASS));
-        $this->setExpectationForGetFields(self::ENTITY_CLASS, $fieldName, $fieldType);
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
         $from = $this->getMockBuilder('Doctrine\ORM\Query\Expr\From')
             ->disableOriginalConstructor()
@@ -982,7 +470,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($alias));
         $from->expects($this->once())
             ->method('getFrom')
-            ->will($this->returnValue($entityName));
+            ->will($this->returnValue(self::ENTITY_NAME));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -999,33 +487,72 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
         $datasource->setQueryBuilder($qb);
 
-        $config = DatagridConfiguration::create(['extended_entity_name' => $entityName]);
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
         $this->extension->visitDatasource($config, $datasource);
         $this->assertEquals(
-            [
-                'extended_entity_name' => $entityName,
-                'columns'              => [
-                    $fieldName => [
-                        'data_name' => $snapshotFieldName
-                    ]
-                ],
-                'sorters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $alias . '.' . $snapshotFieldName
+            array_merge(
+                $initialConfig,
+                [
+                    'columns'              => [
+                        self::FIELD_NAME => [
+                            'data_name' => $snapshotFieldName
                         ]
-                    ]
-                ],
-                'filters'              => [
-                    'columns' => [
-                        $fieldName => [
-                            'data_name' => $alias . '.' . $fieldName
+                    ],
+                    'sorters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . $snapshotFieldName
+                            ]
                         ]
-                    ]
-                ],
-            ],
+                    ],
+                    'filters'              => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => $alias . '.' . self::FIELD_NAME
+                            ]
+                        ]
+                    ],
+                ]
+            ),
             $config->toArray()
         );
+    }
+
+    protected function getDatagridConfiguration()
+    {
+        return DatagridConfiguration::create(['extended_entity_name' => self::ENTITY_NAME]);
+    }
+
+    protected function setExpectationForGetFields($className, $fieldName, $fieldType)
+    {
+        $fieldId = new FieldConfigId('entity', $className, $fieldName, $fieldType);
+
+        $extendConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
+        $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
+        $extendConfig->set('is_deleted', false);
+
+        $datagridConfig = new Config(new FieldConfigId('datagrid', $className, $fieldName, $fieldType));
+        $datagridConfig->set('is_visible', true);
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+
+        $this->entityConfigProvider->expects($this->once())
+            ->method('getIds')
+            ->with($className)
+            ->will($this->returnValue([$fieldId]));
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfigById')
+            ->with($this->identicalTo($fieldId))
+            ->will($this->returnValue($extendConfig));
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfigById')
+            ->with($this->identicalTo($fieldId))
+            ->will($this->returnValue($datagridConfig));
     }
 
     /**
@@ -1046,48 +573,5 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    protected function setExpectationForGetFields($className, $fieldName, $fieldType)
-    {
-        $fieldId = new FieldConfigId('entity', $className, $fieldName, $fieldType);
-
-        $extendConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
-        $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
-        $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-        $extendConfig->set('is_deleted', false);
-
-        $datagridConfig = new Config(new FieldConfigId('datagrid', $className, $fieldName, $fieldType));
-        $datagridConfig->set('is_visible', true);
-
-        $this->configManager->expects($this->once())
-            ->method('hasConfig')
-            ->with($className)
-            ->will($this->returnValue(true));
-
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entity', $this->entityConfigProvider],
-                        ['extend', $this->extendConfigProvider],
-                        ['datagrid', $this->datagridConfigProvider],
-                    ]
-                )
-            );
-
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getIds')
-            ->with($className)
-            ->will($this->returnValue([$fieldId]));
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfigById')
-            ->with($this->identicalTo($fieldId))
-            ->will($this->returnValue($extendConfig));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfigById')
-            ->with($this->identicalTo($fieldId))
-            ->will($this->returnValue($datagridConfig));
     }
 }

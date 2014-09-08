@@ -341,16 +341,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'table'     => 'oro_enum_test_status',
                             'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                         ],
-                        'grouping'   => [
-                            'groups' => ['enum', 'dictionary']
-                        ],
                         'enum'       => [
                             'code'     => 'test_status',
                             'public'   => false,
                             'multiple' => false
-                        ],
-                        'dictionary' => [
-                            'virtual_fields' => ['id', 'name']
                         ],
                     ],
                     'fields'  => [
@@ -452,17 +446,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'table'     => 'oro_enum_test_status',
                             'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                         ],
-                        'grouping'   => [
-                            'groups' => ['enum', 'dictionary']
-                        ],
                         'enum'       => [
                             'code'      => 'test_status',
                             'public'    => true,
                             'multiple'  => true,
                             'immutable' => true,
-                        ],
-                        'dictionary' => [
-                            'virtual_fields' => ['id', 'name']
                         ],
                         'test_scope' => [
                             'test_attr' => 'test'

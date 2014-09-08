@@ -9,13 +9,18 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 class EnumFilter extends ChoiceFilter
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
-        if (isset($params['null_value'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['null_value'] = $params['null_value'];
+        if (isset($params['class'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
+            unset($params['class']);
+        }
+        if (isset($params['enum_code'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['enum_code'] = $params['enum_code'];
+            unset($params['enum_code']);
         }
         parent::init($name, $params);
     }

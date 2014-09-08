@@ -160,7 +160,7 @@ class EntityFieldChoiceType extends AbstractType
                     $attributes['data-' . $key] = $val;
                 }
             }
-            if (!isset($field['related_entity_name'])) {
+            if (!isset($field['relation_type'])) {
                 $choiceFields[$field['name']] = new ChoiceListItem($field['label'], $attributes);
             } else {
                 $choiceRelations[$field['name']] = new ChoiceListItem($field['label'], $attributes);

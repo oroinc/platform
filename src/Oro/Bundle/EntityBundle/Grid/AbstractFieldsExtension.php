@@ -6,19 +6,18 @@ use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration as FilterConfiguration;
 
 abstract class AbstractFieldsExtension extends AbstractExtension
@@ -29,14 +28,22 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
+    /** @var DatagridGuesser */
+    protected $datagridGuesser;
+
     /**
      * @param ConfigManager       $configManager
      * @param EntityClassResolver $entityClassResolver
+     * @param DatagridGuesser     $datagridGuesser
      */
-    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        EntityClassResolver $entityClassResolver,
+        DatagridGuesser $datagridGuesser
+    ) {
         $this->configManager       = $configManager;
         $this->entityClassResolver = $entityClassResolver;
+        $this->datagridGuesser     = $datagridGuesser;
     }
 
     /**
@@ -54,32 +61,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     {
         $fields = $this->getFields($config);
         foreach ($fields as $field) {
-            $fieldName = $field->getFieldName();
-            $column    = [
-                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName
-            ];
-            $sorter    = [
-                'data_name' => $fieldName
-            ];
-            $filter    = [
-                'data_name' => $fieldName,
-                'enabled'   => false,
-                'options'   => []
-            ];
-            $this->prepareFieldConfigs($field, $column, $sorter, $filter);
-
-            $config->offsetSetByPath(
-                sprintf('[%s][%s]', FormatterConfiguration::COLUMNS_KEY, $fieldName),
-                $column
-            );
-            $config->offsetSetByPath(
-                sprintf('%s[%s]', SorterConfiguration::COLUMNS_PATH, $fieldName),
-                $sorter
-            );
-            $config->offsetSetByPath(
-                sprintf('%s[%s]', FilterConfiguration::COLUMNS_PATH, $fieldName),
-                $filter
-            );
+            $columnOptions = [];
+            $this->prepareColumnOptions($field, $columnOptions);
+            $this->datagridGuesser->setColumnOptions($config, $field->getFieldName(), $columnOptions);
         }
     }
 
@@ -198,69 +182,31 @@ abstract class AbstractFieldsExtension extends AbstractExtension
 
     /**
      * @param FieldConfigId $field
-     * @param array         $column
-     * @param array         $sorter
-     * @param array         $filter
+     * @param array         $columnOptions
      */
-    protected function prepareFieldConfigs(FieldConfigId $field, array &$column, array &$sorter, array &$filter)
+    protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
-        switch ($field->getFieldType()) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-                $column['frontend_type'] = Property::TYPE_INTEGER;
-                $filter['type']          = 'number';
-                break;
-            case 'decimal':
-            case 'float':
-                $column['frontend_type']        = Property::TYPE_DECIMAL;
-                $filter['type']                 = 'number';
-                $filter['options']['data_type'] = NumberFilterType::DATA_DECIMAL;
-                break;
-            case 'boolean':
-                $column['frontend_type'] = Property::TYPE_BOOLEAN;
-                $filter['type']          = 'boolean';
-                break;
-            case 'date':
-                $column['frontend_type'] = Property::TYPE_DATE;
-                $filter['type']          = 'date';
-                break;
-            case 'datetime':
-                $column['frontend_type'] = Property::TYPE_DATETIME;
-                $filter['type']          = 'datetime';
-                break;
-            case 'money':
-                $column['frontend_type'] = Property::TYPE_CURRENCY;
-                $filter['type']          = 'number';
-                break;
-            case 'percent':
-                $column['frontend_type'] = Property::TYPE_PERCENT;
-                $filter['type']          = 'percent';
-                break;
-            case 'enum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $field);
+        $fieldName = $field->getFieldName();
 
-                $column['frontend_type']    = Property::TYPE_STRING;
-                $filter['type']             = 'enum';
-                $filter['null_value']       = ':empty:';
-                $filter['options']['class'] = $extendFieldConfig->get('target_entity');
-                break;
-            case 'multiEnum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $field);
+        $columnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label' => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName
+            ],
+            DatagridGuesser::SORTER    => [
+                'data_name' => $fieldName
+            ],
+            DatagridGuesser::FILTER    => [
+                'data_name' => $fieldName,
+                'enabled'   => false
+            ],
+        ];
 
-                $column['frontend_type']           = Property::TYPE_HTML;
-                $column['type']                    = 'twig';
-                $column['template']                = 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig';
-                $column['context']['entity_class'] = $extendFieldConfig->get('target_entity');
-                $filter['type']                    = 'multi_enum';
-                $filter['null_value']              = ':empty:';
-                $filter['options']['class']        = $extendFieldConfig->get('target_entity');
-                break;
-            default:
-                $column['frontend_type'] = Property::TYPE_STRING;
-                $filter['type']          = Property::TYPE_STRING;
-                break;
-        }
+        $this->datagridGuesser->applyColumnGuesses(
+            $field->getClassName(),
+            $fieldName,
+            $field->getFieldType(),
+            $columnOptions
+        );
     }
 
     /**

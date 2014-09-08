@@ -76,7 +76,7 @@ abstract class AbstractQueryConverter
      *      key   = {declared entity class name}::{declared field name}
      *      value = data type
      */
-    protected $virtualColumnTypes;
+    protected $virtualColumnOptions;
 
     /**
      * Constructor
@@ -221,9 +221,9 @@ abstract class AbstractQueryConverter
         $this->tableAliases             = [];
         $this->columnAliases            = [];
         $this->virtualColumnExpressions = [];
-        $this->virtualColumnTypes       = [];
+        $this->virtualColumnOptions     = [];
         $this->buildQuery();
-        $this->virtualColumnTypes       = null;
+        $this->virtualColumnOptions     = null;
         $this->virtualColumnExpressions = null;
         $this->columnAliases            = null;
         $this->tableAliases             = null;
@@ -698,8 +698,10 @@ abstract class AbstractQueryConverter
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
 
         $key = sprintf('%s::%s', $className, $fieldName);
-        if (!isset($this->virtualColumnTypes[$key])) {
-            $this->virtualColumnTypes[$key] = $query['select']['return_type'];
+        if (!isset($this->virtualColumnOptions[$key])) {
+            $options = $query['select'];
+            unset($options['expr']);
+            $this->virtualColumnOptions[$key] = $options;
         }
     }
 
@@ -1011,8 +1013,8 @@ abstract class AbstractQueryConverter
         if ($this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
             // try to guess virtual column type
             $key = sprintf('%s::%s', $className, $fieldName);
-            if (isset($this->virtualColumnTypes[$key])) {
-                $result = $this->virtualColumnTypes[$key];
+            if (isset($this->virtualColumnOptions[$key]['return_type'])) {
+                $result = $this->virtualColumnOptions[$key]['return_type'];
             }
         }
 

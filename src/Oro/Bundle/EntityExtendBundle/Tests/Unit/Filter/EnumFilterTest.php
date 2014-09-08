@@ -53,6 +53,42 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testInitWithClass()
+    {
+        $params = [
+            'class' => 'Test\EnumValue'
+        ];
+        $this->filter->init('test', $params);
+        $this->assertAttributeEquals(
+            [
+                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                'options'                        => [
+                    'class' => 'Test\EnumValue'
+                ]
+            ],
+            'params',
+            $this->filter
+        );
+    }
+
+    public function testInitWithEnumCode()
+    {
+        $params = [
+            'enum_code' => 'test_enum'
+        ];
+        $this->filter->init('test', $params);
+        $this->assertAttributeEquals(
+            [
+                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                'options'                        => [
+                    'enum_code' => 'test_enum'
+                ]
+            ],
+            'params',
+            $this->filter
+        );
+    }
+
     public function testGetForm()
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
