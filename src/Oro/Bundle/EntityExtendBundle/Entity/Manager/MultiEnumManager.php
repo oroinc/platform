@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
 use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -40,7 +41,8 @@ class MultiEnumManager
                 $suffix        = $this->getSnapshotFieldMethodSuffix($mapping['fieldName']);
                 $snapshotValue = $this->buildSnapshotValue($coll);
                 if ($owner->{'get' . $suffix}() !== $snapshotValue) {
-                    $updates[] = [$coll->getTypeClass(), $owner, 'set' . $suffix, $snapshotValue];
+                    $ownerMetadata = $em->getClassMetadata(ClassUtils::getClass($owner));
+                    $updates[]     = [$ownerMetadata, $owner, 'set' . $suffix, $snapshotValue];
                 }
             }
         }
