@@ -32,7 +32,7 @@ class EntityListener
                 $assignedOrganizations = $entity->getOrganizations();
                 foreach ($assignedOrganizations as $organization) {
                     if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        // create a default calendar to a new user
+                        // create a default calendar for assigned organization
                         $calendar = new Calendar();
                         $calendar->setOwner($entity);
                         $calendar->setOrganization($organization);
