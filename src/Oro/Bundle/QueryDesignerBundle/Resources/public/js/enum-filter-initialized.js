@@ -12,7 +12,7 @@ define(['jquery','underscore', 'orotranslation/js/translator', 'routing', 'oroui
                 url: routing.generate('oro_api_get_entity_extend_enum', {entityName: className.replace(/\\/g, '_')}),
                 async: false,
                 success: function (data) {
-                    _.sortBy(data, 'priority');
+                    data = _.sortBy(data, 'priority');
                     choices = _.map(data, function (item) {
                         return {value: item.id, label: item.name};
                     });
