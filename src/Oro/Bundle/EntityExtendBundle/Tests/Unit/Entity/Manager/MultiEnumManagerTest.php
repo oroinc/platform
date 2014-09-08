@@ -49,7 +49,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $this->uow->expects($this->never())
-            ->method('computeChangeSet');
+            ->method('recomputeSingleEntityChangeSet');
 
         $event = $this->getOnFlushEventArgsMock();
         $this->manager->handleOnFlush($event);
@@ -90,7 +90,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $this->uow->expects($this->never())
-            ->method('computeChangeSet');
+            ->method('recomputeSingleEntityChangeSet');
 
         $event = $this->getOnFlushEventArgsMock();
         $this->manager->handleOnFlush($event);
@@ -130,7 +130,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadata));
 
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
                 $this->identicalTo($metadata),
                 $owner
@@ -192,7 +192,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadata));
 
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
                 $this->identicalTo($metadata),
                 $owner
@@ -263,7 +263,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($metadata));
 
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
                 $this->identicalTo($metadata),
                 $owner

@@ -190,9 +190,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 [
                     'enum'         => [
                         'enum_code' => $enumCode1
-                    ],
-                    'importexport' => [
-                        'process_as_scalar' => true
                     ]
                 ],
                 'enum'
@@ -222,9 +219,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'extend'       => [
                         'without_default' => true
-                    ],
-                    'importexport' => [
-                        'process_as_scalar' => true
                     ]
                 ],
                 'multiEnum'
@@ -239,9 +233,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 [
                     'enum'         => [
                         'enum_code' => $enumCode5
-                    ],
-                    'importexport' => [
-                        'process_as_scalar' => true
                     ]
                 ],
                 'enum'
@@ -352,9 +343,6 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 [
                     'enum'         => [
                         'enum_code' => $enumCode1
-                    ],
-                    'importexport' => [
-                        'process_as_scalar' => true
                     ]
                 ],
                 'enum'
@@ -409,6 +397,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                    ],
+                    'importexport' => [
+                        'identity' => true
                     ]
                 ]
             );

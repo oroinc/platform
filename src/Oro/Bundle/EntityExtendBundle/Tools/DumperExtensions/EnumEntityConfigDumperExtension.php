@@ -82,11 +82,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 }
 
                 // prepare input parameters
-                $fieldOptions    = [
-                    'importexport' => [
-                        'process_as_scalar' => true
-                    ]
-                ];
+                $fieldOptions    = [];
                 $enumFieldConfig = $enumConfigProvider->getConfig(
                     $fieldConfigId->getClassName(),
                     $fieldConfigId->getFieldName()
@@ -283,6 +279,9 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 'entity' => [
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                ],
+                'importexport' => [
+                    'identity' => true
                 ]
             ]
         );

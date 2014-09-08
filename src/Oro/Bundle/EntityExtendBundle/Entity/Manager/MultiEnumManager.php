@@ -50,7 +50,7 @@ class MultiEnumManager
         // $item = [entityClassMetadata, entity, snapshotFieldSetter, snapshotValue]
         foreach ($updates as $item) {
             $item[1]->{$item[2]}($item[3]);
-            $uow->computeChangeSet($item[0], $item[1]);
+            $uow->recomputeSingleEntityChangeSet($item[0], $item[1]);
         }
     }
 
