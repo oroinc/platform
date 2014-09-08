@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
  * Iterates results of Query using buffer, allows to iterate large query
@@ -103,12 +104,17 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     protected $maxResults;
 
     /**
+     * @var bool|null
+     */
+    private $useCountWalker;
+
+    /**
      * Constructor
      *
      * @param Query|QueryBuilder $source
-     * @throws \InvalidArgumentException
+     * @param null|bool $useCountWalker
      */
-    public function __construct($source)
+    public function __construct($source, $useCountWalker = null)
     {
         if (null === $source) {
             throw new \InvalidArgumentException('The $source must not be null');
@@ -123,6 +129,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
             );
         }
         $this->source = $source;
+        $this->useCountWalker = $useCountWalker;
     }
 
     /**
@@ -224,7 +231,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
             // restore original max results
             $query->setMaxResults($this->maxResults);
 
-            $this->totalCount = QueryCountCalculator::calculateCount($query);
+            $this->totalCount = QueryCountCalculator::calculateCount($query, $this->useCountWalker);
         }
 
         return $this->totalCount;
