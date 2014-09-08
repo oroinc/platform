@@ -243,8 +243,11 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                     'criterion'  => [
                         'filter' => 'enum',
                         'data'   => [
-                            'type'  => '1',
-                            'value' => ['status1']
+                            'params' => [
+                                'class'      => 'Test\EnumValue',
+                                'null_value' => ':empty:'
+                            ],
+                            'value'  => ['status1']
                         ]
                     ]
                 ],
@@ -321,7 +324,10 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                             'column'      => 't1.vc1',
                             'filter'      => 'enum',
                             'filterData'  => [
-                                'type'  => '1',
+                                'params' => [
+                                    'class'      => 'Test\EnumValue',
+                                    'null_value' => ':empty:'
+                                ],
                                 'value' => ['status1']
                             ],
                             'columnAlias' => 'c2'

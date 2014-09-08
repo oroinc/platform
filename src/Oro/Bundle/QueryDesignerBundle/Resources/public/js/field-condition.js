@@ -159,10 +159,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             if (!this.filter.isEmptyValue()) {
                 value = {
                     columnName: this.element.find('input.select').select2('val'),
-                    criterion: {
-                        filter: this.filter.name,
-                        data: this.filter.getValue()
-                    }
+                    criterion: this._getFilterCriterion()
                 };
             } else {
                 value = {};
@@ -170,6 +167,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             this.element.data('value', value);
             this.element.trigger('changed');
+        },
+
+        _getFilterCriterion: function () {
+            var data = this.filter.getValue();
+
+            if (this.filter.filterParams) {
+                data.params = this.filter.filterParams;
+            }
+
+            return {
+                filter: this.filter.name,
+                data: data
+            };
         },
 
         selectField: function (name) {

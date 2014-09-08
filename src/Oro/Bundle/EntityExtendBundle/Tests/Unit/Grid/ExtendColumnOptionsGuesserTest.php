@@ -184,9 +184,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
             [
                 'type'       => 'enum',
                 'null_value' => ':empty:',
-                'options'    => [
-                    'class' => 'Test\EnumValue'
-                ]
+                'class'      => 'Test\EnumValue'
             ],
             $guess->getOptions()
         );
@@ -261,9 +259,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
             [
                 'type'       => 'multi_enum',
                 'null_value' => ':empty:',
-                'options'    => [
-                    'class' => 'Test\EnumValue'
-                ]
+                'class'      => 'Test\EnumValue'
             ],
             $guess->getOptions()
         );

@@ -67,9 +67,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                     $options = [
                         'type'       => 'enum',
                         'null_value' => ':empty:',
-                        'options'    => [
-                            'class' => $extendFieldConfig->get('target_entity')
-                        ]
+                        'class'      => $extendFieldConfig->get('target_entity')
                     ];
                 }
                 break;
@@ -79,9 +77,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                     $options = [
                         'type'       => 'multi_enum',
                         'null_value' => ':empty:',
-                        'options'    => [
-                            'class' => $extendFieldConfig->get('target_entity')
-                        ]
+                        'class'      => $extendFieldConfig->get('target_entity')
                     ];
                 }
                 break;

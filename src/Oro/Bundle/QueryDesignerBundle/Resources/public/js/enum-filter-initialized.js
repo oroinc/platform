@@ -38,10 +38,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
     };
 
     return function (filter, fieldData) {
-        var choices = methods.loadEnumChoices(_.last(fieldData).field.related_entity_name),
-            nullValue = null;
+        var className = _.last(fieldData).field.related_entity_name,
+            choices = methods.loadEnumChoices(className),
+            nullValue = null,
+            filterParams = {'class': className};
 
         if (filter.nullValue) {
+            filterParams.null_value = filter.nullValue;
             nullValue = _.find(filter.choices, function (choice) {
                 return choice.value === filter.nullValue;
             });
@@ -50,6 +53,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             choices.unshift(nullValue);
         }
 
+        filter.filterParams = filterParams;
         filter.choices = choices;
     };
 });
