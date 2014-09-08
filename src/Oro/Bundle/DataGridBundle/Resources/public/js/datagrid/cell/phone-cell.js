@@ -1,9 +1,9 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'backgrid',
+    'oro/datagrid/cell/html-cell',
     'orodatagrid/js/datagrid/formatter/phone-formatter'
-], function (Backgrid, PhoneFormatter) {
+], function (HtmlCell, PhoneFormatter) {
     'use strict';
 
     var PhoneCell;
@@ -13,14 +13,11 @@ define([
      *
      * @export  oro/datagrid/cell/phone-cell
      * @class   oro.datagrid.cell.PhoneCell
-     * @extends Backgrid.Cell
+     * @extends oro.datagrid.cell.HtmlCell
      */
-    PhoneCell = Backgrid.Cell.extend({
+    PhoneCell = HtmlCell.extend({
         /** @property */
         className: "phone-cell",
-
-        /** @property */
-        tagName: "td",
 
         /** @property */
         events: {
@@ -31,22 +28,6 @@ define([
          @property {(Backgrid.PhoneFormatter|Object|string)}
          */
         formatter: new PhoneFormatter(),
-
-
-        /**
-         * @override
-         * @inheritDoc
-         * @return {oro.datagrid.cell.PhoneCell}
-         */
-        render: function() {
-            var phoneNumber = this.model.get(this.column.get("name"));
-            var formattedValue = this.formatter.fromRaw(phoneNumber, this.model);
-
-            this.$el.empty();
-            this.$el.html(formattedValue);
-
-            return this;
-        },
 
         /**
          * If don't stop propagation click will select row
