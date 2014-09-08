@@ -59,22 +59,6 @@
             }]
         }] %}
 
-        {% if form.additional is defined and form.additional.children|length > 0 %}
-            {% set additionalData = [] %}
-            {% for value in form.additional %}
-                {% set additionalData = additionalData|merge([form_row(value)]) %}
-            {% endfor %}
-
-            {% set dataBlocks = dataBlocks|merge([{
-                'title': 'Additional'|trans,
-                'subblocks': [{
-                    'title': '',
-                    'useSpan': false,
-                    'data' : additionalData
-                }]
-            }]) %}
-        {% endif %}
-
         {% set data = {
             'formErrors': form_errors(form) ? form_errors(form) : null,
             'dataBlocks': dataBlocks
