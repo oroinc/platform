@@ -5,8 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\Rest\Util\Codes;
@@ -18,7 +17,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * @RouteResource("entity_extend_enum")

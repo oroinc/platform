@@ -77,51 +77,53 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     protected function ensureVirtualFieldsInitialized($className)
     {
-        if (!isset($this->virtualFields[$className])) {
-            $this->virtualFields[$className] = [];
+        if (isset($this->virtualFields[$className])) {
+            return;
+        }
 
-            $metadata         = $this->getManagerForClass($className)->getClassMetadata($className);
-            $associationNames = $metadata->getAssociationNames();
-            foreach ($associationNames as $associationName) {
-                if (!$this->extendConfigProvider->hasConfig($className, $associationName)) {
-                    continue;
-                }
-                $extendFieldConfig = $this->extendConfigProvider->getConfig($className, $associationName);
-                /** @var FieldConfigId $fieldConfigId */
-                $fieldConfigId = $extendFieldConfig->getId();
-                $fieldType     = $fieldConfigId->getFieldType();
-                if ($fieldType === 'enum') {
-                    $this->virtualFields[$className][$associationName] = [
-                        'query' => [
-                            'select' => [
-                                'expr'         => sprintf('target.%s', $extendFieldConfig->get('target_field')),
-                                'return_type'  => $fieldType,
-                                'filter_by_id' => true
-                            ],
-                            'join'   => [
-                                'left' => [
-                                    [
-                                        'join'  => sprintf('entity.%s', $associationName),
-                                        'alias' => 'target'
-                                    ]
+        $this->virtualFields[$className] = [];
+
+        $metadata         = $this->getManagerForClass($className)->getClassMetadata($className);
+        $associationNames = $metadata->getAssociationNames();
+        foreach ($associationNames as $associationName) {
+            if (!$this->extendConfigProvider->hasConfig($className, $associationName)) {
+                continue;
+            }
+            $extendFieldConfig = $this->extendConfigProvider->getConfig($className, $associationName);
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $extendFieldConfig->getId();
+            $fieldType     = $fieldConfigId->getFieldType();
+            if ($fieldType === 'enum') {
+                $this->virtualFields[$className][$associationName] = [
+                    'query' => [
+                        'select' => [
+                            'expr'         => sprintf('target.%s', $extendFieldConfig->get('target_field')),
+                            'return_type'  => $fieldType,
+                            'filter_by_id' => true
+                        ],
+                        'join'   => [
+                            'left' => [
+                                [
+                                    'join'  => sprintf('entity.%s', $associationName),
+                                    'alias' => 'target'
                                 ]
                             ]
                         ]
-                    ];
-                } elseif ($fieldType === 'multiEnum') {
-                    $this->virtualFields[$className][$associationName] = [
-                        'query' => [
-                            'select' => [
-                                'expr'        => sprintf(
-                                    'entity.%s',
-                                    ExtendHelper::getMultipleEnumSnapshotFieldName($associationName)
-                                ),
-                                'return_type'  => $fieldType,
-                                'filter_by_id' => true
-                            ]
+                    ]
+                ];
+            } elseif ($fieldType === 'multiEnum') {
+                $this->virtualFields[$className][$associationName] = [
+                    'query' => [
+                        'select' => [
+                            'expr'        => sprintf(
+                                'entity.%s',
+                                ExtendHelper::getMultipleEnumSnapshotFieldName($associationName)
+                            ),
+                            'return_type'  => $fieldType,
+                            'filter_by_id' => true
                         ]
-                    ];
-                }
+                    ]
+                ];
             }
         }
     }
