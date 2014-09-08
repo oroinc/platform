@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @ORM\Table(name="oro_user_api")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository")
  */
 class UserApi
 {

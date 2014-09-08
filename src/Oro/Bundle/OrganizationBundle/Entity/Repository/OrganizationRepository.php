@@ -98,11 +98,14 @@ class OrganizationRepository extends EntityRepository
 
     /**
      * Returns user organizations by name
+     *
      * @param User   $user
      * @param string $name
+     * @param bool   $useLikeExpr Using expr()->like by default and expr()->eq otherwise
+     *
      * @return Organization[]
      */
-    public function getEnabledUserOrganizationsByName(User $user, $name)
+    public function getEnabledUserOrganizationsByName(User $user, $name, $useLikeExpr = true)
     {
         $qb = $this->createQueryBuilder('org');
         $organizations = $user->getOrganizations();
@@ -111,12 +114,19 @@ class OrganizationRepository extends EntityRepository
             $ids[] = $organization->getId();
         }
 
-        return $qb->select('org')
+        $qb->select('org')
             ->where('org.enabled = true')
-            ->andWhere($qb->expr()->in('org.id', $ids))
-            ->andWhere($qb->expr()->like('org.name', ':orgName'))
-            ->setParameter('orgName', '%' . str_replace(' ', '%', $name) . '%')
-            ->getQuery()
+            ->andWhere($qb->expr()->in('org.id', $ids));
+
+        if ($useLikeExpr) {
+            $qb->andWhere($qb->expr()->like('org.name', ':orgName'))
+                ->setParameter('orgName', '%' . str_replace(' ', '%', $name) . '%');
+        } else {
+            $qb->andWhere($qb->expr()->eq('org.name', ':orgName'))
+                ->setParameter('orgName', $name);
+        }
+
+        return $qb->getQuery()
             ->getResult();
     }
 
