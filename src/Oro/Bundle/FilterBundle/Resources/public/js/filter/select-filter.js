@@ -73,7 +73,7 @@ define([
          *
          * @property
          */
-        minimumWidth: null,
+        cachedMinimumWidth: null,
 
         /**
          * Select widget options
@@ -277,12 +277,12 @@ define([
          * @protected
          */
         _setDropdownWidth: function () {
-            if (!this.minimumWidth) {
-                this.minimumWidth = this.selectWidget.getMinimumDropdownWidth() + 22;
+            if (!this.cachedMinimumWidth) {
+                this.cachedMinimumWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             }
             var widget = this.selectWidget.getWidget(),
                 filterWidth = this.$(this.containerSelector).width(),
-                requiredWidth = Math.max(filterWidth + 24, this.minimumWidth);
+                requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
             widget.find('input[type="search"]').width(requiredWidth - 30);
         },
@@ -315,6 +315,7 @@ define([
         _onSelectChange: function () {
             // set value
             this.applyValue();
+
             // update dropdown
             this.selectWidget.updateDropdownPosition();
         },
@@ -334,7 +335,9 @@ define([
          */
         _onValueUpdated: function (newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
+
             this.selectWidget.multiselect('refresh');
+
             this.$(this.buttonSelector)
                 .toggleClass('filter-default-value', this.isEmpty());
         },

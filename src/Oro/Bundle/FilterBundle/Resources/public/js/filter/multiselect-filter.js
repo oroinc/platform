@@ -3,9 +3,13 @@
 define([
     'underscore',
     'orotranslation/js/translator',
+    'oroui/js/tools',
     './select-filter'
-], function (_, __, SelectFilter) {
+], function (_, __, tools, SelectFilter) {
     'use strict';
+
+    // @const
+    var C_FILTER_ANY = "";
 
     var MultiSelectFilter;
 
@@ -40,6 +44,92 @@ define([
         _onSelectChange: function () {
             MultiSelectFilter.__super__._onSelectChange.apply(this, arguments);
             this._setDropdownWidth();
+        },
+
+
+        /**
+         * Minimal width of dropdown
+         *
+         * @private
+         */
+        minimumDropdownWidth: 120,
+
+        /**
+         * Set design for select dropdown
+         *
+         * @protected
+         */
+        _setDropdownWidth: function () {
+            if (!this.cachedMinimumWidth) {
+                this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth, this.selectWidget.getMinimumDropdownWidth()) + 24;
+            }
+            var widget = this.selectWidget.getWidget(),
+                requiredWidth = this.cachedMinimumWidth;
+            // fix width
+            widget.width(requiredWidth).css({
+                minWidth: requiredWidth,
+                maxWidth: requiredWidth
+            });
+            widget.find('input[type="search"]').width(requiredWidth - 30);
+        },
+
+        /**
+         * Set raw value to filter
+         *
+         * @param value
+         * @return {*}
+         */
+        setValue: function (value) {
+            var oldValue = this.value;
+
+            this.value = this._checkValue(tools.deepClone(value), oldValue);
+
+            // update checkboxes state always
+            this._onValueUpdated(this.value, oldValue);
+            this._updateDOMValue();
+
+            return this;
+        },
+
+        /**
+         * Updates checkboxes when user clicks on ANY ELEMENT
+         */
+        _checkValue: function (newValue, oldValue) {
+            // means that  all checkboxes are unchecked
+            if (newValue.value == null) {
+                newValue.value = [C_FILTER_ANY];
+                return newValue;
+            }
+            // if we have old value
+            // need to check if it has selected "ANY" option
+            if (
+                    oldValue.value == C_FILTER_ANY
+                    || (oldValue.value.indexOf && oldValue.value.indexOf(C_FILTER_ANY) != -1)
+            ) {
+                // need to uncheck it in new value
+                if (newValue.value.length > 1) {
+                    var indexOfAnyFilter = newValue.value.indexOf(C_FILTER_ANY);
+                    if (indexOfAnyFilter != -1) {
+                        newValue.value.splice(indexOfAnyFilter, 1);
+                    }
+                }
+            } else {
+                // if we just selected "ANY" option
+                if (!newValue.value || newValue.value.indexOf(C_FILTER_ANY) != -1) {
+                    // clear other choices
+                    newValue.value = [C_FILTER_ANY];
+                }
+            }
+            return newValue;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _onValueUpdated: function (newValue, oldValue) {
+            SelectFilter.__super__._onValueUpdated.apply(this, arguments);
+
+            this.selectWidget.multiselect('refresh');
         }
     });
 
