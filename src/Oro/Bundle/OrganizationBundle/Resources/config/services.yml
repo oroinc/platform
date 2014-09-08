@@ -26,7 +26,6 @@ parameters:
     oro_organization.entity_config_dumper.extension.class:     Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension
 
     oro_organization.event.business_unit_grid_listener.class:  Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
-    oro_organization.event.entity_listener.class:              Oro\Bundle\OrganizationBundle\Event\EntityListener
 
     oro_organization.autocomplete.organization_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
 
@@ -147,12 +146,6 @@ services:
             - false
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.bu-view-users-grid, method: onBuildAfter }
-
-    oro_organization.event.entity_listener:
-        class: %oro_organization.event.entity_listener.class%
-        tags:
-            - { name: doctrine.event_listener, event: onFlush }
-
     #
     # DataGrid
     #
