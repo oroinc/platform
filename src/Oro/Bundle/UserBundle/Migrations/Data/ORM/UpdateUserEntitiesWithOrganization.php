@@ -28,6 +28,7 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
     {
         $this->update($manager, 'OroUserBundle:User');
         $this->update($manager, 'OroUserBundle:Group');
+        $this->update($manager, 'OroUserBundle:UserApi');
 
         $organization   = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
         $users          = $manager->getRepository('OroUserBundle:User')->findAll();
