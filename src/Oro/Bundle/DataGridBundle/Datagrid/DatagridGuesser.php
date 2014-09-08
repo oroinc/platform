@@ -37,7 +37,7 @@ class DatagridGuesser
     }
 
     /**
-     * Applies all guesses for a column
+     * Merges all guesses with the given column options
      *
      * @param string $class         The fully qualified class name
      * @param string $property      The name of the property to guess for
@@ -52,7 +52,7 @@ class DatagridGuesser
     }
 
     /**
-     * Applies formatting guesses for a column
+     * Merges formatting guesses with the given column options
      *
      * @param string $class         The fully qualified class name
      * @param string $property      The name of the property to guess for
@@ -75,7 +75,7 @@ class DatagridGuesser
     }
 
     /**
-     * Applies sorting guesses for a column
+     * Merges sorting guesses with the given column options
      *
      * @param string $class         The fully qualified class name
      * @param string $property      The name of the property to guess for
@@ -95,7 +95,7 @@ class DatagridGuesser
     }
 
     /**
-     * Applies filtering guesses for a column
+     * Merges filtering guesses with the given column options
      *
      * @param string $class         The fully qualified class name
      * @param string $property      The name of the property to guess for
