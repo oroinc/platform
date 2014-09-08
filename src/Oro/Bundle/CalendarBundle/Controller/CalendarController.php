@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -13,10 +12,12 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class CalendarController extends Controller
 {
