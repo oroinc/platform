@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
@@ -27,28 +28,50 @@ class EntityListener
         $em  = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
 
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            if ($entity instanceof User) {
+                $assignedOrganizations = $entity->getOrganizations();
+                foreach ($assignedOrganizations as $organization) {
+                    if (!$this->isCalendarExists($em, $entity, $organization)) {
+                        $this->createCalendar($em, $uow, $entity, $organization);
+                    }
+                }
+            }
+        }
+
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof User) {
                 $assignedOrganizations = $entity->getOrganizations();
                 foreach ($assignedOrganizations as $organization) {
                     if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        // create a default calendar for assigned organization
-                        $calendar = new Calendar();
-                        $calendar->setOwner($entity);
-                        $calendar->setOrganization($organization);
-                        // connect the calendar to itself
-                        $calendarConnection = new CalendarConnection($calendar);
-                        $calendar->addConnection($calendarConnection);
-
-                        $em->persist($calendar);
-                        $em->persist($calendarConnection);
-                        // can't inject entity manager through constructor because of circular dependency
-                        $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
-                        $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
+                        $this->createCalendar($em, $uow, $entity, $organization);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
+     * @param User          $entity
+     * @param Organization  $organization
+     */
+    protected function createCalendar($em, $uow, $entity, $organization)
+    {
+        // create a default calendar for assigned organization
+        $calendar = new Calendar();
+        $calendar->setOwner($entity);
+        $calendar->setOrganization($organization);
+        // connect the calendar to itself
+        $calendarConnection = new CalendarConnection($calendar);
+        $calendar->addConnection($calendarConnection);
+
+        $em->persist($calendar);
+        $em->persist($calendarConnection);
+        // can't inject entity manager through constructor because of circular dependency
+        $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
+        $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
     }
 
     /**
@@ -62,7 +85,7 @@ class EntityListener
     {
         $calendarRepository = $em->getRepository('OroCalendarBundle:Calendar');
 
-        return (bool) $calendarRepository->findByUserAndOrganization($user->getId(), $organization->getId());
+        return (bool)$calendarRepository->findByUserAndOrganization($user->getId(), $organization->getId());
     }
 
     /**
