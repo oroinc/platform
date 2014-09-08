@@ -12,10 +12,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListener
 {
-    /** @var ClassMetadata */
+    /**
+     * @var ClassMetadata
+     */
     protected $calendarMetadata;
 
-    /** @var ClassMetadata */
+    /**
+     * @var ClassMetadata
+     */
     protected $calendarConnectionMetadata;
 
     /**
@@ -40,41 +44,6 @@ class EntityListener
                 // can't inject entity manager through constructor because of circular dependency
                 $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
                 $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
-            }
-        }
-
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if ($entity instanceof User) {
-                $a = 0;
-
-                $changeSet = $uow->getEntityChangeSet($entity);
-
-                //$entity->getOrganizations()
-                //$mf  = $em->getMetadataFactory();
-                //$meta = $mf->getMetadataFor(get_class($entity));
-
-                //$uow->computeChangeSet($meta, $entity);
-                $changeSet =  $uow->computeChangeSet(
-                    $em->getMetadataFactory()->getMetadataFor(get_class($entity)),
-                    $entity
-                );
-
-
-
-                if (1 != 1) {
-                    // create a default calendar to a new user
-                    $calendar = new Calendar();
-                    $calendar->setOwner($entity);
-                    // connect the calendar to itself
-                    $calendarConnection = new CalendarConnection($calendar);
-                    $calendar->addConnection($calendarConnection);
-
-                    $em->persist($calendar);
-                    $em->persist($calendarConnection);
-                    // can't inject entity manager through constructor because of circular dependency
-                    $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
-                    $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
-                }
             }
         }
     }

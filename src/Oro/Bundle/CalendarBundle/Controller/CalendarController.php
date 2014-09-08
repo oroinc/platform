@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,10 +31,14 @@ class CalendarController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
+        /** @var Organization $organization */
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
+
         $em = $this->getDoctrine()->getManager();
         /** @var CalendarRepository $repo */
         $repo     = $em->getRepository('OroCalendarBundle:Calendar');
-        $calendar = $repo->findByUser($user->getId());
+
+        $calendar = $repo->findByUserAndOrganization($user->getId(), $organization->getId());
 
         return $this->forward(
             'OroCalendarBundle:Calendar:view',
