@@ -48,18 +48,32 @@
         {% set dataBlocks = [{
             'title': 'General'|trans,
             'class': 'active',
-            'subblocks': [
-                {
-                    'title': 'Embedded Form'|trans,
-                    'data': [
-                            form_row(form.title),
-                            form_row(form.formType),
-                            form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
-                            form_row(form.successMessage)
-                        ]
-                }
-            ]
+            'subblocks': [{
+                'title': 'Embedded Form'|trans,
+                'data': [
+                    form_row(form.title),
+                    form_row(form.formType),
+                    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
+                    form_row(form.successMessage)
+                ]
+            }]
         }] %}
+
+        {% if form.additional is defined and form.additional.children|length > 0 %}
+            {% set additionalData = [] %}
+            {% for value in form.additional %}
+                {% set additionalData = additionalData|merge([form_row(value)]) %}
+            {% endfor %}
+
+            {% set dataBlocks = dataBlocks|merge([{
+                'title': 'Additional'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'useSpan': false,
+                    'data' : additionalData
+                }]
+            }]) %}
+        {% endif %}
 
         {% set data = {
             'formErrors': form_errors(form) ? form_errors(form) : null,
