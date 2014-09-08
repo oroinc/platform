@@ -1,6 +1,7 @@
 parameters:
     oro_datagrid.extension.formatter.property.field_property.class:            Oro\Bundle\DataGridBundle\Extension\Formatter\Property\FieldProperty
     oro_datagrid.extension.formatter.property.url_property.class:              Oro\Bundle\DataGridBundle\Extension\Formatter\Property\UrlProperty
+    oro_datagrid.extension.formatter.property.link_property.class:             Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty
     oro_datagrid.extension.formatter.property.twig_property.class:             Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty
     oro_datagrid.extension.formatter.property.translatable_property.class:     Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TranslatableProperty
     oro_datagrid.extension.formatter.property.callback_property.class:         Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty
@@ -20,6 +21,13 @@ services:
             - @router
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: url }
+
+    oro_datagrid.extension.formatter.property.link_property:
+        class: %oro_datagrid.extension.formatter.property.link_property.class%
+        arguments:
+            - @router
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: link }
 
     oro_datagrid.extension.formatter.property.twig_property:
         class: %oro_datagrid.extension.formatter.property.twig_property.class%
