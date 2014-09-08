@@ -40,7 +40,7 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      */
     public function cgetAction()
     {
-        $applyExclusions     = ('1' == $this->getRequest()->query->get('apply-exclusions'));
+        $applyExclusions = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityProvider $provider */
         $provider = $this->get('oro_entity.entity_provider');
@@ -74,10 +74,10 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      */
     public function fieldsAction()
     {
-        $withRelations      = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withUnidirectional = ('1' == $this->getRequest()->query->get('with-unidirectional'));
-        $withVirtualFields  = ('1' == $this->getRequest()->query->get('with-virtual-fields'));
-        $applyExclusions    = ('1' == $this->getRequest()->query->get('apply-exclusions'));
+        $withRelations      = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
+        $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualFields  = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions    = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_entity.entity_field_list_provider');

@@ -14,7 +14,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
  * This event dispatched before datagrid builder starts build datagrid
  * Listeners could apply validation of config and provide changes of config
  */
-class BuildBefore extends Event implements GridEventInterface
+class BuildBefore extends Event implements GridEventInterface, GridConfigurationEventInterface
 {
     const NAME = 'oro_datagrid.datagrid.build.before';
 
@@ -39,7 +39,7 @@ class BuildBefore extends Event implements GridEventInterface
     }
 
     /**
-     * @return DatagridConfiguration
+     * {@inheritDoc}
      */
     public function getConfig()
     {

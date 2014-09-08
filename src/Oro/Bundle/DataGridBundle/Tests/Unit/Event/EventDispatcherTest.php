@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 
+use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
 
 use Oro\Bundle\DataGridBundle\Event\EventDispatcher;
@@ -37,7 +38,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
      * @param array $config
      * @param array $expectedEvents
      */
-    public function testDispatch(array $config, array $expectedEvents)
+    public function testDispatchGridEvent(array $config, array $expectedEvents)
     {
         $config   = DatagridConfiguration::create($config);
         $gridMock = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
@@ -71,5 +72,34 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * @dataProvider eventDataProvider
+     *
+     * @param array $config
+     * @param array $expectedEvents
+     */
+    public function testDispatchGridConfigEvent(array $config, array $expectedEvents)
+    {
+        $config   = DatagridConfiguration::create($config);
+
+        foreach ($expectedEvents as $k => $event) {
+            $this->realDispatcherMock->expects($this->at($k))->method('dispatch')
+                ->with($event);
+        }
+
+        $event = new GridConfigEvent($config);
+        $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
+    }
+    public function testDispatchException()
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
+        );
+        $event = $this->getMockBuilder('Symfony\Component\EventDispatcher\Event')
+            ->disableOriginalConstructor();
+        $this->dispatcher->dispatch($event);
     }
 }

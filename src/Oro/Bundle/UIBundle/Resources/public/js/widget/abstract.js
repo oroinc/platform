@@ -1,7 +1,14 @@
 /* jshint devel:true*/
 /*global define, require*/
-define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 'orotranslation/js/translator', 'jquery.form'
-    ], function (_, Backbone, mediator, LoadingMask, __) {
+define([
+    'underscore',
+    'backbone',
+    'oroui/js/mediator',
+    'oroui/js/loading-mask',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    'jquery.form'
+], function (_, Backbone, mediator, LoadingMask, __, tools) {
     'use strict';
 
     var $ = Backbone.$;
@@ -584,19 +591,13 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
          */
         _onContentLoad: function(content) {
             this.loading = false;
-            try {
-                this.trigger('contentLoad', content, this);
-                this.actionsEl = null;
-                this.actions = {};
-                this.setElement($(content).filter('.widget-content:first'));
-                this._show();
-                mediator.execute('layout:init', this.widget);
-                mediator.trigger('widget:contentLoad', this.widget);
-            } catch (error) {
-                console.warn(error);
-                // Remove state with unrestorable content
-                this.trigger('contentLoadError', this);
-            }
+            this.trigger('contentLoad', content, this);
+            this.actionsEl = null;
+            this.actions = {};
+            this.setElement($(content).filter('.widget-content:first'));
+            this._show();
+            mediator.execute('layout:init', this.widget);
+            mediator.trigger('widget:contentLoad', this.widget);
         },
 
         /**
