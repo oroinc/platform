@@ -219,6 +219,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'frontend_type' => Property::TYPE_HTML,
+                'export_type'   => 'list',
                 'type'          => 'twig',
                 'template'      => 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig',
                 'context'       => [
