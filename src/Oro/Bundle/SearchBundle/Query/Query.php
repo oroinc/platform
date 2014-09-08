@@ -202,7 +202,7 @@ class Query
      *
      * @return Query
      */
-    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_AND, $fieldName, $condition, $fieldValue, $fieldType);
     }
@@ -217,7 +217,7 @@ class Query
      *
      * @return Query
      */
-    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_OR, $fieldName, $condition, $fieldValue, $fieldType);
     }

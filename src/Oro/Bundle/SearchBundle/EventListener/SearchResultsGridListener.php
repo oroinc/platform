@@ -31,7 +31,7 @@ class SearchResultsGridListener
 
             $datasource->getQuery()
                 ->from($searchEntity)
-                ->andWhere(Indexer::TEXT_ALL_DATA_FIELD, '~', $searchString, Query::TYPE_TEXT);
+                ->andWhere(Indexer::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
         }
     }
 }
