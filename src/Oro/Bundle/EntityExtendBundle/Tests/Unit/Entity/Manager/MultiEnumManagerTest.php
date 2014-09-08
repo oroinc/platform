@@ -121,10 +121,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
             ->method('computeChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 
@@ -175,10 +183,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
             ->method('computeChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 
@@ -238,10 +254,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
             ->method('computeChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 

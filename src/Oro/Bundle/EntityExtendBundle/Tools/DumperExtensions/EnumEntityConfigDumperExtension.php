@@ -272,9 +272,6 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 'entity' => [
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
-                ],
-                'importexport' => [
-                    'identity' => true
                 ]
             ]
         );
