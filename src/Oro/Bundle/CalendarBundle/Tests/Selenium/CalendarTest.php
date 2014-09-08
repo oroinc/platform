@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Selenium;
 
+use Oro\Bundle\CalendarBundle\Tests\Selenium\Pages\Calendar;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -18,6 +19,7 @@ class CalendarTest extends Selenium2TestCase
     {
         $eventName = 'Event_'.mt_rand();
         $login = $this->login();
+        /* @var Calendar $login */
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->assertTitle('My Calendar - John Doe')
             ->addEvent()
@@ -38,6 +40,7 @@ class CalendarTest extends Selenium2TestCase
     {
         $newEventTitle = 'Update_' . $eventName;
         $login = $this->login();
+        /* @var Calendar $login */
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->setTitle($newEventTitle)
@@ -56,6 +59,7 @@ class CalendarTest extends Selenium2TestCase
     public function testDeleteEvent($eventName)
     {
         $login = $this->login();
+        /* @var Calendar $login */
         $login->openCalendar('Oro\Bundle\CalendarBundle')
             ->editEvent($eventName)
             ->deleteEvent()

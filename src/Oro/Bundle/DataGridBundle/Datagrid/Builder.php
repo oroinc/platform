@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -18,6 +19,8 @@ class Builder
     const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
     const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
     const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
+    // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
+    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
     /** @var string */
     protected $baseDatagridClass;
@@ -56,6 +59,9 @@ class Builder
      */
     public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
+        $event = new PreBuild($config, $parameters);
+        $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
+
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 

@@ -38,7 +38,7 @@ services:
             - @oro_segment.grid.datagrid_configuration_builder
             - @doctrine
         tags:
-            - { name: oro_datagrid.configuration.provider }
+            - { name: oro_datagrid.configuration.provider, priority: 10 }
 
     oro_segment.filter.segment:
         class: %oro_segment.filter.segment.class%

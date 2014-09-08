@@ -13,6 +13,10 @@ class EntityWithFieldsProvider
     /** @var EntityProvider */
     protected $entityProvider;
 
+    /**
+     * @param EntityFieldProvider $fieldProvider
+     * @param EntityProvider      $entityProvider
+     */
     public function __construct(EntityFieldProvider $fieldProvider, EntityProvider $entityProvider)
     {
         $this->fieldProvider  = $fieldProvider;
@@ -50,8 +54,8 @@ class EntityWithFieldsProvider
                 $translate
             );
 
-            $result[$currentClassName]           = $entityData;
-            $result[$currentClassName]['fields'] = $fields;
+            $entityData['fields']      = $fields;
+            $result[$currentClassName] = $entityData;
         }
 
         return $result;
