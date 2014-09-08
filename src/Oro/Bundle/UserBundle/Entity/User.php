@@ -61,7 +61,8 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *              "group_name"=""
  *          },
  *          "form"={
- *              "form_type"="oro_user_select"
+ *              "form_type"="oro_user_select",
+ *              "grid_name"="users-select-grid"
  *          }
  *      }
  * )
@@ -77,9 +78,9 @@ class User extends ExtendUser implements
     NotificationEmailInterface,
     AdvancedApiUserInterface
 {
-    const ROLE_DEFAULT       = 'ROLE_USER';
+    const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * @ORM\Id
@@ -408,7 +409,7 @@ class User extends ExtendUser implements
     protected $groups;
 
     /**
-     * @ORM\OneToOne(
+     * @ORM\OneToMany(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
      * )
      * @ConfigField(
@@ -541,13 +542,13 @@ class User extends ExtendUser implements
     {
         parent::__construct();
 
-        $this->salt            = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
-        $this->roles           = new ArrayCollection();
-        $this->groups          = new ArrayCollection();
-        $this->statuses        = new ArrayCollection();
-        $this->emails          = new ArrayCollection();
-        $this->businessUnits   = new ArrayCollection();
-        $this->emailOrigins    = new ArrayCollection();
+        $this->salt          = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+        $this->roles         = new ArrayCollection();
+        $this->groups        = new ArrayCollection();
+        $this->statuses      = new ArrayCollection();
+        $this->emails        = new ArrayCollection();
+        $this->businessUnits = new ArrayCollection();
+        $this->emailOrigins  = new ArrayCollection();
     }
 
     /**
@@ -559,14 +560,14 @@ class User extends ExtendUser implements
     public function serialize()
     {
         return serialize(
-            array(
+            [
                 $this->password,
                 $this->salt,
                 $this->username,
                 $this->enabled,
                 $this->confirmationToken,
                 $this->id,
-            )
+            ]
         );
     }
 
@@ -584,7 +585,7 @@ class User extends ExtendUser implements
             $this->enabled,
             $this->confirmationToken,
             $this->id
-        ) = unserialize($serialized);
+            ) = unserialize($serialized);
     }
 
     /**
@@ -786,7 +787,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return UserApi
+     * @return UserApi[]
      */
     public function getApi()
     {
@@ -822,11 +823,12 @@ class User extends ExtendUser implements
     public function isPasswordRequestNonExpired($ttl)
     {
         return $this->getPasswordRequestedAt() instanceof \DateTime
-            && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function setId($id)
@@ -838,6 +840,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $username New username
+     *
      * @return User
      */
     public function setUsername($username)
@@ -849,6 +852,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $email New email value
+     *
      * @return User
      */
     public function setEmail($email)
@@ -860,6 +864,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $firstName [optional] New first name value. Null by default.
+     *
      * @return User
      */
     public function setFirstName($firstName = null)
@@ -871,6 +876,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $lastName [optional] New last name value. Null by default.
+     *
      * @return User
      */
     public function setLastName($lastName = null)
@@ -884,6 +890,7 @@ class User extends ExtendUser implements
      * Set middle name
      *
      * @param string $middleName
+     *
      * @return User
      */
     public function setMiddleName($middleName)
@@ -897,6 +904,7 @@ class User extends ExtendUser implements
      * Set name prefix
      *
      * @param string $namePrefix
+     *
      * @return User
      */
     public function setNamePrefix($namePrefix)
@@ -910,6 +918,7 @@ class User extends ExtendUser implements
      * Set name suffix
      *
      * @param string $nameSuffix
+     *
      * @return User
      */
     public function setNameSuffix($nameSuffix)
@@ -922,6 +931,7 @@ class User extends ExtendUser implements
     /**
      *
      * @param  \DateTime $birthday [optional] New birthday value. Null by default.
+     *
      * @return User
      */
     public function setBirthday(\DateTime $birthday = null)
@@ -933,17 +943,19 @@ class User extends ExtendUser implements
 
     /**
      * @param  bool $enabled User state
+     *
      * @return User
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (boolean) $enabled;
+        $this->enabled = (boolean)$enabled;
 
         return $this;
     }
 
     /**
      * @param string $salt
+     *
      * @return User
      */
     public function setSalt($salt)
@@ -955,6 +967,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $password New encoded password
+     *
      * @return User
      */
     public function setPassword($password)
@@ -966,6 +979,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $password New password as plain string
+     *
      * @return User
      */
     public function setPlainPassword($password)
@@ -979,6 +993,7 @@ class User extends ExtendUser implements
      * Set confirmation token.
      *
      * @param  string $token
+     *
      * @return User
      */
     public function setConfirmationToken($token)
@@ -990,6 +1005,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  \DateTime $time [optional] New password request time. Null by default.
+     *
      * @return User
      */
     public function setPasswordRequestedAt(\DateTime $time = null)
@@ -1001,6 +1017,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  \DateTime $time New login time
+     *
      * @return User
      */
     public function setLastLogin(\DateTime $time)
@@ -1011,7 +1028,8 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  int  $count New login count value
+     * @param  int $count New login count value
+     *
      * @return User
      */
     public function setLoginCount($count)
@@ -1023,6 +1041,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  UserApi $api
+     *
      * @return User
      */
     public function setApi(UserApi $api)
@@ -1034,6 +1053,7 @@ class User extends ExtendUser implements
 
     /**
      * @param \DateTime $createdAt
+     *
      * @return $this
      */
     public function setCreatedAt($createdAt)
@@ -1045,6 +1065,7 @@ class User extends ExtendUser implements
 
     /**
      * @param \DateTime $updatedAt
+     *
      * @return $this
      */
     public function setUpdatedAt($updatedAt)
@@ -1084,7 +1105,8 @@ class User extends ExtendUser implements
     /**
      * Pass a string, get the desired Role object or null
      *
-     * @param  string    $roleName Role name
+     * @param  string $roleName Role name
+     *
      * @return Role|null
      */
     public function getRole($roleName)
@@ -1106,7 +1128,8 @@ class User extends ExtendUser implements
      *
      *         $securityContext->isGranted('ROLE_USER');
      *
-     * @param  Role|string               $role
+     * @param  Role|string $role
+     *
      * @return boolean
      * @throws \InvalidArgumentException
      */
@@ -1122,13 +1145,14 @@ class User extends ExtendUser implements
             );
         }
 
-        return (bool) $this->getRole($roleName);
+        return (bool)$this->getRole($roleName);
     }
 
     /**
      * Adds a Role to the Collection.
      *
      * @param  Role $role
+     *
      * @return User
      */
     public function addRole(Role $role)
@@ -1143,7 +1167,8 @@ class User extends ExtendUser implements
     /**
      * Remove the Role object from collection
      *
-     * @param  Role|string               $role
+     * @param  Role|string $role
+     *
      * @throws \InvalidArgumentException
      */
     public function removeRole($role)
@@ -1166,7 +1191,8 @@ class User extends ExtendUser implements
      * Pass an array or Collection of Role objects and re-set roles collection with new Roles.
      * Type hinted array due to interface.
      *
-     * @param  array|Collection          $roles Array of Role objects
+     * @param  array|Collection $roles Array of Role objects
+     *
      * @return User
      * @throws \InvalidArgumentException
      */
@@ -1190,7 +1216,8 @@ class User extends ExtendUser implements
     /**
      * Directly set the Collection of Roles.
      *
-     * @param  Collection                $collection
+     * @param  Collection $collection
+     *
      * @return User
      * @throws \InvalidArgumentException
      */
@@ -1221,7 +1248,7 @@ class User extends ExtendUser implements
      */
     public function getGroupNames()
     {
-        $names = array();
+        $names = [];
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {
@@ -1233,6 +1260,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $name
+     *
      * @return bool
      */
     public function hasGroup($name)
@@ -1242,6 +1270,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  Group $group
+     *
      * @return User
      */
     public function addGroup(Group $group)
@@ -1255,6 +1284,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  Group $group
+     *
      * @return User
      */
     public function removeGroup(Group $group)
@@ -1278,7 +1308,7 @@ class User extends ExtendUser implements
 
     public function __toString()
     {
-        return (string) $this->getUsername();
+        return (string)$this->getUsername();
     }
 
     /**
@@ -1288,8 +1318,8 @@ class User extends ExtendUser implements
      */
     public function beforeSave()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt  = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt  = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->loginCount = 0;
     }
 
@@ -1325,6 +1355,7 @@ class User extends ExtendUser implements
      * Add Status to User
      *
      * @param  Status $status
+     *
      * @return User
      */
     public function addStatus(Status $status)
@@ -1348,6 +1379,7 @@ class User extends ExtendUser implements
      * Set User Current Status
      *
      * @param  Status $status
+     *
      * @return User
      */
     public function setCurrentStatus(Status $status = null)
@@ -1371,6 +1403,7 @@ class User extends ExtendUser implements
      * Add Email to User
      *
      * @param  Email $email
+     *
      * @return User
      */
     public function addEmail(Email $email)
@@ -1386,6 +1419,7 @@ class User extends ExtendUser implements
      * Delete Email from User
      *
      * @param  Email $email
+     *
      * @return User
      */
     public function removeEmail(Email $email)
@@ -1435,6 +1469,7 @@ class User extends ExtendUser implements
 
     /**
      * @param ArrayCollection $businessUnits
+     *
      * @return User
      */
     public function setBusinessUnits($businessUnits)
@@ -1446,6 +1481,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  BusinessUnit $businessUnit
+     *
      * @return User
      */
     public function addBusinessUnit(BusinessUnit $businessUnit)
@@ -1459,6 +1495,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  BusinessUnit $businessUnit
+     *
      * @return User
      */
     public function removeBusinessUnit(BusinessUnit $businessUnit)
@@ -1538,6 +1575,7 @@ class User extends ExtendUser implements
 
     /**
      * @param BusinessUnit $owningBusinessUnit
+     *
      * @return User
      */
     public function setOwner($owningBusinessUnit)
@@ -1611,6 +1649,7 @@ class User extends ExtendUser implements
      * Add email origin
      *
      * @param EmailOrigin $emailOrigin
+     *
      * @return User
      */
     public function addEmailOrigin(EmailOrigin $emailOrigin)
@@ -1624,6 +1663,7 @@ class User extends ExtendUser implements
      * Delete email origin
      *
      * @param EmailOrigin $emailOrigin
+     *
      * @return User
      */
     public function removeEmailOrigin(EmailOrigin $emailOrigin)

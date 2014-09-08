@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -88,7 +89,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                     $this->callback(
                         function ($event) use ($eventType, $resultFQCN) {
                             $this->isInstanceOf($eventType, $event);
-                            $this->isInstanceOf($resultFQCN, $event->getDatagrid());
+                            if ($event instanceof GridEventInterface) {
+                                $this->isInstanceOf($resultFQCN, $event->getDatagrid());
+                            }
                             return true;
                         }
                     )
@@ -111,6 +114,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     {
         $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid';
         $baseEventList     = [
+            ['oro_datagrid.datagrid.build.pre', 'Oro\Bundle\DataGridBundle\Event\PreBuild'],
             ['oro_datagrid.datagrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
             ['oro_datagrid.datagrid.build.after', 'Oro\Bundle\DataGridBundle\Event\BuildAfter'],
         ];

@@ -8,6 +8,9 @@
             var gridName = {{ gridName|json_encode|raw }};
             mediator.bind('datagrid_create_before', function(options) {
                 if (options.name == gridName) {
+                    {% if multiselect %}
+                    options.multiSelectRowEnabled = true;
+                    {% else %}
                     options.rowClickAction = function(data) {
                         return {
                             run: function() {
@@ -20,6 +23,7 @@
                             }
                         }
                     };
+                    {% endif %}
                 }
             });
         });
