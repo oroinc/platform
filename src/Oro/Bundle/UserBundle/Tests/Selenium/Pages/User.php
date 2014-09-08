@@ -244,14 +244,18 @@ class User extends AbstractPageEntity
                 }
                 $condition .= "normalize-space(text()) = '{$role}'";
             }
-            $this->roles->element(
+            $xpath = $this->roles->element(
                 $this->test->using('xpath')->value("div[label[{$condition}]]/input")
-            )->click();
+            );
+            $this->test->moveto($xpath);
+            $xpath->click();
         } else {
             foreach ($roles as $role) {
-                $this->roles->element(
+                $xpath = $this->roles->element(
                     $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
-                )->click();
+                );
+                $this->test->moveto($xpath);
+                $xpath->click();
             }
         }
 

@@ -187,7 +187,7 @@ define([
                 return;
             }
             var url = this.getLinkWithParameters();
-            mediator.execute('redirectTo', {url: url, redirect: true});
+            mediator.execute('redirectTo', {url: url}, {redirect: true});
         },
 
         _handleAjax: function () {
