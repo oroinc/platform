@@ -259,11 +259,11 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetMultipleEnumSnapshotFieldName()
+    public function testGetMultiEnumSnapshotFieldName()
     {
         $this->assertEquals(
             'testFieldSnapshot',
-            ExtendHelper::getMultipleEnumSnapshotFieldName('testField')
+            ExtendHelper::getMultiEnumSnapshotFieldName('testField')
         );
     }
 

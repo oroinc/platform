@@ -483,7 +483,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPostUpdateForMultipleEnumFields()
+    public function testPostUpdateForMultiEnumFields()
     {
         $entityConfig1 = new Config(new EntityConfigId('extend', 'Test\EnumValue1'));
         $entityConfig1->set('is_extend', true);
@@ -494,7 +494,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 'doctrine' => [
                     'Extend\EnumValue1' => [
                         'fields' => [
-                            ExtendHelper::getMultipleEnumSnapshotFieldName('field2') => [
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field2') => [
                                 'column' => 'field2'
                             ]
                         ]
@@ -538,21 +538,21 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 'doctrine' => [
                     'Extend\EnumValue1' => [
                         'fields' => [
-                            ExtendHelper::getMultipleEnumSnapshotFieldName('field1') => [
-                                'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName('field1'),
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field1') => [
+                                'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName('field1'),
                                 'type'     => 'string',
                                 'nullable' => true,
                                 'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
                             ],
-                            ExtendHelper::getMultipleEnumSnapshotFieldName('field2') => [
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field2') => [
                                 'column' => 'field2'
                             ]
                         ]
                     ]
                 ],
                 'property' => [
-                    ExtendHelper::getMultipleEnumSnapshotFieldName('field1') =>
-                        ExtendHelper::getMultipleEnumSnapshotFieldName('field1')
+                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') =>
+                        ExtendHelper::getMultiEnumSnapshotFieldName('field1')
                 ]
             ],
             $entityConfig1->get('schema')

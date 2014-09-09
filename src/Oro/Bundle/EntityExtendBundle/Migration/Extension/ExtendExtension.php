@@ -290,7 +290,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             // create a column that will contain selected options
             // this column is required to avoid group by clause when multiple enum is shown in a datagrid
             $selfTable->addColumn(
-                $this->nameGenerator->generateMultipleEnumSnapshotColumnName($associationName),
+                $this->nameGenerator->generateMultiEnumSnapshotColumnName($associationName),
                 'string',
                 [
                     'notnull' => false,

@@ -52,9 +52,9 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->doTestPreSetDataForNewEntity($this->type);
     }
 
-    public function testPreSetDataForNewEntityWithMultipleEnum()
+    public function testPreSetDataForNewEntityWithMultiEnum()
     {
-        $this->doTestPreSetDataForNewEntityWithMultipleEnum($this->type);
+        $this->doTestPreSetDataForNewEntityWithMultiEnum($this->type);
     }
 
     /**

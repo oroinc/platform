@@ -117,7 +117,7 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
                         'select' => [
                             'expr'        => sprintf(
                                 'entity.%s',
-                                ExtendHelper::getMultipleEnumSnapshotFieldName($associationName)
+                                ExtendHelper::getMultiEnumSnapshotFieldName($associationName)
                             ),
                             'return_type'  => $fieldType,
                             'filter_by_id' => true

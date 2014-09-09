@@ -98,7 +98,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
-    public function doTestPreSetDataForNewEntityWithMultipleEnum(AbstractType $type)
+    public function doTestPreSetDataForNewEntityWithMultiEnum(AbstractType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
 

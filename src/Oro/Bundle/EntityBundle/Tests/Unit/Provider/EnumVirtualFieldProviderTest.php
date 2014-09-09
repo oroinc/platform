@@ -100,7 +100,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'         => 'entity.' . ExtendHelper::getMultipleEnumSnapshotFieldName('multiEnumField'),
+                    'expr'         => 'entity.' . ExtendHelper::getMultiEnumSnapshotFieldName('multiEnumField'),
                     'return_type'  => 'multiEnum',
                     'filter_by_id' => true
                 ]

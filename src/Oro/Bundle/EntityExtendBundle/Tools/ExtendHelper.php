@@ -220,7 +220,7 @@ class ExtendHelper
      *
      * @return string
      */
-    public static function getMultipleEnumSnapshotFieldName($fieldName)
+    public static function getMultiEnumSnapshotFieldName($fieldName)
     {
         return $fieldName . 'Snapshot';
     }

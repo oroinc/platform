@@ -92,6 +92,6 @@ class MultiEnumManager
      */
     protected function getSnapshotFieldMethodSuffix($fieldName)
     {
-        return Inflector::classify(ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName));
+        return Inflector::classify(ExtendHelper::getMultiEnumSnapshotFieldName($fieldName));
     }
 }

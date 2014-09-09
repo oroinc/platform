@@ -241,7 +241,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      *
      * @return string
      */
-    public static function generateMultipleEnumSnapshotColumnName($associationName)
+    public static function generateMultiEnumSnapshotColumnName($associationName)
     {
         return $associationName . self::SNAPSHOT_COLUMN_SUFFIX;
     }

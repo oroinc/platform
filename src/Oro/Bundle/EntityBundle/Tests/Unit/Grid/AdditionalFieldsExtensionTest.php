@@ -410,7 +410,7 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $fieldType = 'multiEnum';
         $alias     = 'c';
 
-        $snapshotFieldName = ExtendHelper::getMultipleEnumSnapshotFieldName(self::FIELD_NAME);
+        $snapshotFieldName = ExtendHelper::getMultiEnumSnapshotFieldName(self::FIELD_NAME);
 
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

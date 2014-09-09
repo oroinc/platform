@@ -111,7 +111,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $selectExpr     = sprintf('%s as %s', $sorterDataName, $fieldName);
                     break;
                 case 'multiEnum':
-                    $columnDataName = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
+                    $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
                     $sorterDataName = sprintf('%s.%s', $alias, $columnDataName);
                     $selectExpr     = $sorterDataName;
                     break;

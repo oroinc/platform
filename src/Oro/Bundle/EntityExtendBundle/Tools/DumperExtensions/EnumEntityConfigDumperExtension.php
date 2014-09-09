@@ -179,7 +179,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
                     $extendClassName   = $entityConfig->get('extend_class');
                     $fieldName         = $fieldConfigId->getFieldName();
-                    $snapshotFieldName = ExtendHelper::getMultipleEnumSnapshotFieldName($fieldName);
+                    $snapshotFieldName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
 
                     $schema = $entityConfig->get('schema', false, []);
 
@@ -190,7 +190,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     $schema['property'][$snapshotFieldName] = $snapshotFieldName;
 
                     $schema['doctrine'][$extendClassName]['fields'][$snapshotFieldName] = [
-                        'column'   => $this->nameGenerator->generateMultipleEnumSnapshotColumnName($fieldName),
+                        'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
                         'type'     => 'string',
                         'nullable' => true,
                         'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
