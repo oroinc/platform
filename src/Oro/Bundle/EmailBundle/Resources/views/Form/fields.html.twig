@@ -7,7 +7,7 @@
                 new View({
                     el: $('#{{ form.parent.children[depends_on_parent_field].vars.id }}'),
                     target: $('#{{ id }}'),
-                    collection: new Collection()
+                    collection: new Collection('oro_api_get_emailtemplates', 'entityName')
                 });
             });
         })
