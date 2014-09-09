@@ -185,10 +185,6 @@ class Query
 
         $this->from = $entities;
 
-        foreach ($this->from as $index => $fromValue) {
-            $this->from[$index] = self::clearString($fromValue);
-        }
-
         return $this;
     }
 
@@ -235,10 +231,6 @@ class Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
-        if ($fieldType == self::TYPE_TEXT) {
-            $fieldValue = self::clearString($fieldValue);
-        }
-
         $this->options[] = [
             'fieldName'  => $fieldName,
             'condition'  => $condition,

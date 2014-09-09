@@ -1,6 +1,6 @@
 # common test case
 request:
-    query: "from oro_test_item where datetime datetimeValue > 2017-01-01"
+    query: "from oro_test_item where datetime datetimeValue > 2017-01-01 order_by stringValue max_results 100"
 response:
     records_count: 7
     count: 7
@@ -9,24 +9,31 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item3@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item4@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item5@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item6@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item7@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item8@mail.com
+                record_url: http://localhost/search/
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item9@mail.com
+                record_url: http://localhost/search/
     soap:
         data:
             -

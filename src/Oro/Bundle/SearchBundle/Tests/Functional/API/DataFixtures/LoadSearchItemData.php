@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\SearchBundle\Query\Query;
 use Rhumsaa\Uuid\Uuid;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -20,6 +21,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
+    const COUNT = 9;
 
     /**
      * @var ContainerInterface
@@ -40,6 +42,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     public function load(ObjectManager $manager)
     {
         $this->loadItems($manager);
+        $this->ensureItemsLoaded();
     }
 
     /**
@@ -57,7 +60,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function loadItems($manager)
     {
-        for ($ind = 1; $ind < 10; $ind++) {
+        for ($ind = 1; $ind <= self::COUNT; $ind++) {
             //create item
             /** @var $item Item */
             $item = new Item();
@@ -87,5 +90,30 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
         }
 
         $manager->flush();
+    }
+
+    /**
+     * Ensure that items loaded to search index
+     *
+     * @throws \LogicException
+     */
+    protected function ensureItemsLoaded()
+    {
+        $query = new Query();
+        $query->from('oro_test_item');
+
+        $requestCounts = 20;
+        do {
+            $result = $this->container->get('oro_search.search.engine')->search($query);
+            $isLoaded = $result->getRecordsCount() == self::COUNT;
+            if (!$isLoaded) {
+                $requestCounts++;
+                sleep(1);
+            }
+        } while (!$isLoaded && $requestCounts > 0);
+
+        if (!$isLoaded) {
+            throw new \LogicException('Search items are not loaded');
+        }
     }
 }

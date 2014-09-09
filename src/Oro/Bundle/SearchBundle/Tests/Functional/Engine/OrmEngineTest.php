@@ -18,6 +18,10 @@ class OrmEngineTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
+
+        if ($this->getContainer()->getParameter('search_engine_name') != 'orm') {
+            $this->markTestSkipped('Should be tested only with ORM search engine');
+        }
     }
 
     public function testSearchIndexRealTime()
