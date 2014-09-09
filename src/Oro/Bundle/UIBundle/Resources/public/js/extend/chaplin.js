@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
+    'oroui/js/tools',
     'chaplin'
-], function ($, _, Chaplin) {
+], function ($, _, tools, Chaplin) {
     'use strict';
 
     var utils, location;
@@ -80,13 +81,16 @@ define([
      * Fixes issues
      *  - empty hashes (like '#')
      *  - routing full url (containing protocol and host)
+     *  - stops application's navigation if it's an error page
+     *  - process links with redirect options
      * @override
      */
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
-        var el, href, payload;
+        var el, $el, href, options, payload, external, isAnchor, skipRouting, type;
         el = event.currentTarget;
+        $el = $(el);
 
-        if (event.isDefaultPrevented() || $(el).parents('.sf-toolbar').length) {
+        if (event.isDefaultPrevented() || $el.parents('.sf-toolbar').length || tools.isErrorPage()) {
             return;
         }
 
@@ -111,7 +115,49 @@ define([
             return;
         }
 
-        func.call(this, event);
+        /* original Chaplin's openLink code: start */
+        if (utils.modifierKeyPressed(event)) {
+            return;
+        }
+        el = $ ? event.currentTarget : event.delegateTarget;
+        isAnchor = el.nodeName === 'A';
+        href = el.getAttribute('href') || el.getAttribute('data-href') || null;
+        if (!(href != null) || href === '' || href.charAt(0) === '#') {
+            return;
+        }
+        skipRouting = this.settings.skipRouting;
+        type = typeof skipRouting;
+        if (type === 'function' && !skipRouting(href, el) || type === 'string' && ($ ? $(el).is(skipRouting) : Backbone.utils.matchesSelector(el, skipRouting))) {
+            return;
+        }
+        external = isAnchor && this.isExternalLink(el);
+        if (external) {
+            if (this.settings.openExternalToBlank) {
+                event.preventDefault();
+                window.open(href);
+            }
+            return;
+        }
+        /* original Chaplin's openLink code:end */
+
+        // now it's possible to pass redirect options over elements data-options attribute
+        options = $el.data('options') || {};
+        utils.redirectTo({url: href}, options);
+        event.preventDefault();
+    });
+
+    /**
+     * In case it's an error page blocks application's navigation and turns on full redirect
+     * @override
+     */
+    utils.redirectTo = _.wrap(utils.redirectTo, function (func, pathDesc, params, options) {
+        if (typeof pathDesc === 'object' && pathDesc.url != null && tools.isErrorPage()) {
+            options = params || {};
+            options.fullRedirect = true;
+            Chaplin.mediator.execute('redirectTo', pathDesc, options);
+        } else {
+            func.apply(this, _.rest(arguments));
+        }
     });
 
     return Chaplin;
