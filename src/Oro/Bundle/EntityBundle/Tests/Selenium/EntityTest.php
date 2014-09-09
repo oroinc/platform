@@ -94,10 +94,12 @@ class EntityTest extends Selenium2TestCase
     }
 
     /**
+     * @depends testCreateEntity
      * @depends testUpdateEntity
      * @param $entityName
+     * @param $entityUpdateName
      */
-    public function testDeleteEntity($entityName)
+    public function testDeleteEntity($entityName, $entityUpdateName)
     {
         $login = $this->login();
         /** @var ConfigEntities $login */
@@ -106,7 +108,7 @@ class EntityTest extends Selenium2TestCase
             ->deleteEntity(array($entityName), 'Remove')
             ->assertMessage('Item was removed')
             ->open(array($entityName))
-            ->assertTitle($entityName .' - Entity Management - Entities - System')
+            ->assertTitle($entityUpdateName . ' - Entity Management - Entities - System')
             ->updateSchema()
             ->assertMessage('Schema updated')
             ->assertTitle('Entity Management - Entities - System')
