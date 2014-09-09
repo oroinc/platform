@@ -181,7 +181,6 @@ class UserController extends Controller
      */
     protected function view(User $entity, $editRoute = '')
     {
-        $viewProfile = $editRoute ? true : false;
         $output = array(
             'entity' => $entity,
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
@@ -194,8 +193,6 @@ class UserController extends Controller
         if ($editRoute) {
             $output = array_merge($output, array('editRoute' => $editRoute));
         }
-        $output = array_merge($output, array('userApi' => $this->getUserApi($entity), 'viewProfile' => $viewProfile));
-
         return $output;
     }
 
@@ -216,7 +213,7 @@ class UserController extends Controller
         return array(
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
-            'viewProfile' => false
+            'viewProfile' => 1
         );
     }
 
