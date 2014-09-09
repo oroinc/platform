@@ -2,29 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
+use Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 
 class EntitySelectType extends AbstractType
 {
     const NAME = 'oro_entity_select';
 
-    /**
-     * @var OroEntityManager
-     */
-    protected $entityManager;
+    /** @var ConfigManager */
+    protected $cm;
 
     /**
-     * @param OroEntityManager $entityManager
+     * @param ConfigManager $cm
      */
-    public function __construct(OroEntityManager $entityManager)
+    public function __construct(ConfigManager $cm)
     {
-        $this->entityManager = $entityManager;
+        $this->cm = $cm;
     }
 
     /**
@@ -32,19 +31,30 @@ class EntitySelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $vars = array('configs' => $options['configs']);
+        $vars = ['configs' => $options['configs']];
         if ($form->getData()) {
-            $fieldConfig = $this->entityManager->getExtendConfigProvider()->getConfig(
-                $form->getParent()->getData(),
-                $form->getName()
-            );
+            $data = $form->getParent()->getData();
 
-            $fieldName = $fieldConfig->get('target_field');
-            $vars['attr'] = array(
-                'data-selected-data' => json_encode(
-                    array(array($fieldName => FieldAccessor::getValue($form->getData(), $fieldName)))
-                )
-            );
+            $fieldConfig = $this->cm->getProvider('extend')->getConfig($data, $form->getName());
+            if ($form->getData()) {
+                /** @var ConverterInterface|EntitySelectHandler $converter */
+                $converter = $options['converter'];
+                $result    = [];
+
+                if ($converter instanceof EntitySelectHandler) {
+                    $converter->initForEntity($fieldConfig->getId()->getClassName(), $fieldConfig->get('target_field'));
+                }
+
+                if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
+                    foreach ($form->getData() as $item) {
+                        $result[] = $converter->convertItem($item);
+                    }
+                } else {
+                    $result[] = $converter->convertItem($form->getData());
+                }
+
+                $vars['attr'] = ['data-selected-data' => json_encode($result)];
+            }
         }
 
         $view->vars = array_replace_recursive($view->vars, $vars);

@@ -152,7 +152,7 @@ class SearchHandler implements SearchHandlerInterface
     /**
      * @throws \RuntimeException
      */
-    private function checkAllDependenciesInjected()
+    protected function checkAllDependenciesInjected()
     {
         if (!$this->indexer || !$this->entitySearchAlias || !$this->entityRepository || !$this->idFieldName) {
             throw new \RuntimeException('Search handler is not fully configured');
@@ -235,7 +235,7 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|array $item
      * @return mixed
      */
