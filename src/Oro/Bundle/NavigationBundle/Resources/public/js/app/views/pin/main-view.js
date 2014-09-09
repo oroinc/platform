@@ -18,9 +18,7 @@ define([
 
         listen: {
             'add collection': 'onAdd',
-            'remove collection': 'onRemove',
-
-            'toMaximize collection': 'toMaximize'
+            'remove collection': 'onRemove'
         },
 
         createSubViews: function (options) {
@@ -75,19 +73,6 @@ define([
         actualizeAttributes: function (model) {
             model.set('type', 'pinbar');
             model.set('position', 0);
-        },
-
-        /**
-         * Handle item minimize/maximize state change
-         *
-         * @param model
-         */
-        toMaximize: function (model) {
-            var url;
-            url = model.get('url');
-            if (!mediator.execute('compareUrl', url)) {
-                mediator.execute('redirectTo', {url: url}, {cache: true});
-            }
         },
 
         onAdd: function () {

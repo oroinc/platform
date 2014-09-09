@@ -35,7 +35,7 @@
                                         function($, routing, mediator){
                                             $('#dashboard_selector').on('change', function (e) {
                                                 var url = routing.generate('oro_dashboard_open', {id: $(e.currentTarget).val(), change_dashboard: true});
-                                                mediator.execute('redirectTo', {url: url, redirect: true});
+                                                mediator.execute('redirectTo', {url: url}, {redirect: true});
                                             });
                                         });
                                     </script>
