@@ -31,7 +31,7 @@ class SoapSearchApiTest extends WebTestCase
     public function testSearch(array $request, array $response)
     {
         if (array_key_exists('supported_engines', $request)) {
-            $engine = $this->getContainer()->getParameter('search_engine_name');
+            $engine = $this->getContainer()->getParameter('oro_search.engine');
             if (!in_array($engine, $request['supported_engines'])) {
                 $this->markTestIncomplete('Test should not be executed on this engine');
             }

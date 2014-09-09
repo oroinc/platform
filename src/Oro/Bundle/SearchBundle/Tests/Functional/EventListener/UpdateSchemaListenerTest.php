@@ -10,7 +10,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     {
         $this->initClient();
 
-        if ($this->getContainer()->getParameter('search_engine_name') != 'orm') {
+        if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
     }
