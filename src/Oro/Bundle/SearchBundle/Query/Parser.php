@@ -39,7 +39,11 @@ class Parser
     protected $typeOperators = array(
         Query::TYPE_TEXT => array(
             Query::OPERATOR_CONTAINS,
-            Query::OPERATOR_NOT_CONTAINS
+            Query::OPERATOR_NOT_CONTAINS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
         ),
         QUERY::TYPE_INTEGER => array(
             Query::OPERATOR_GREATER_THAN,

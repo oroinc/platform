@@ -1,6 +1,6 @@
 # common test case
 request:
-    query: "from oro_test_item where stringValue !~ item5 order_by stringValue desc"
+    query: "from oro_test_item where stringValue != item5@mail.com order_by stringValue desc"
 response:
     records_count: 8
     count: 8
