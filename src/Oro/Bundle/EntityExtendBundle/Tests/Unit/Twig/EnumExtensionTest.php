@@ -92,15 +92,60 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSortEnum()
+    {
+        $enumValueEntityClass = 'Test\EnumValue';
+
+        $values = [
+            new TestEnumValue('val1', 'Value 1', 2),
+            new TestEnumValue('val2', 'Value 2', 4),
+            new TestEnumValue('val3', 'Value 3', 1),
+            new TestEnumValue('val4', 'Value 4', 3),
+        ];
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with($enumValueEntityClass)
+            ->will($this->returnValue($repo));
+        $repo->expects($this->once())
+            ->method('findAll')
+            ->will($this->returnValue($values));
+
+        $this->assertEquals(
+            ['val1', 'val4', 'val2'],
+            $this->extension->sortEnum(['val2', 'val4', 'val1'], $enumValueEntityClass)
+        );
+        // call one ore time to check local cache
+        $this->assertEquals(
+            ['val3', 'val1', 'val4', 'val2'],
+            $this->extension->sortEnum(['val1', 'val2', 'val3', 'val4'], $enumValueEntityClass)
+        );
+        // call when the list of ids is a string
+        $this->assertEquals(
+            ['val1', 'val4', 'val2'],
+            $this->extension->sortEnum('val1,val2,val4', $enumValueEntityClass)
+        );
+    }
+
     public function testGetFilters()
     {
         $filters = $this->extension->getFilters();
 
-        $this->assertCount(1, $filters);
+        $this->assertCount(2, $filters);
 
         $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('trans_enum', $filters[0]->getName());
+        $this->assertEquals('sort_enum', $filters[0]->getName());
         $callable = $filters[0]->getCallable();
+        $this->assertCount(2, $callable);
+        $this->assertSame($this->extension, $callable[0]);
+        $this->assertEquals('sortEnum', $callable[1]);
+
+        $this->assertInstanceOf('Twig_SimpleFilter', $filters[1]);
+        $this->assertEquals('trans_enum', $filters[1]->getName());
+        $callable = $filters[1]->getCallable();
         $this->assertCount(2, $callable);
         $this->assertSame($this->extension, $callable[0]);
         $this->assertEquals('transEnum', $callable[1]);

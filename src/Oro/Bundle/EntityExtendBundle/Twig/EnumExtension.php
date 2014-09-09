@@ -12,7 +12,14 @@ class EnumExtension extends \Twig_Extension
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var array */
+    /**
+     * @var array
+     *      key   => enum value entity class name
+     *      value => array // values are sorted by priority
+     *          key   => enum value id
+     *          value => enum value name
+     *
+     */
     protected $localCache = [];
 
     /**
@@ -29,8 +36,45 @@ class EnumExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
+            new \Twig_SimpleFilter('sort_enum', [$this, 'sortEnum']),
             new \Twig_SimpleFilter('trans_enum', [$this, 'transEnum']),
         ];
+    }
+
+    /**
+     * Sorts the given enum value identifiers according priorities specified for an enum values
+     *
+     * @param string|string[] $enumValueIds The list of enum value identifiers.
+     *                                      If this parameter is a string it is supposed that ids are
+     *                                      delimited by comma (,).
+     * @param string          $enumValueEntityClassOrEnumCode
+     *
+     * @return string[]
+     */
+    public function sortEnum($enumValueIds, $enumValueEntityClassOrEnumCode)
+    {
+        $ids = $enumValueIds;
+        if ($ids === null) {
+            $ids = [];
+        } elseif (is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        if (empty($ids) || count($ids) === 1) {
+            return $ids;
+        }
+
+        $ids    = array_fill_keys($ids, true);
+        $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
+
+        $result = [];
+        foreach ($values as $id => $name) {
+            if (isset($ids[$id])) {
+                $result[] = $id;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -43,22 +87,40 @@ class EnumExtension extends \Twig_Extension
      */
     public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
     {
+        $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
+
+        return !empty($values[$enumValueId])
+            ? $values[$enumValueId]
+            : $enumValueId;
+    }
+
+    /**
+     * @param $enumValueEntityClassOrEnumCode
+     *
+     * @return array sorted by value priority
+     *      key   => enum value id
+     *      value => enum value name
+     */
+    protected function getEnumValues($enumValueEntityClassOrEnumCode)
+    {
         if (strpos($enumValueEntityClassOrEnumCode, '\\') === false) {
             $enumValueEntityClassOrEnumCode = ExtendHelper::buildEnumValueClassName($enumValueEntityClassOrEnumCode);
         }
 
         if (!isset($this->localCache[$enumValueEntityClassOrEnumCode])) {
-            $this->localCache[$enumValueEntityClassOrEnumCode] = [];
+            $items      = [];
+            $priorities = [];
             /** @var AbstractEnumValue[] $values */
             $values = $this->doctrine->getRepository($enumValueEntityClassOrEnumCode)->findAll();
             foreach ($values as $value) {
-                $this->localCache[$enumValueEntityClassOrEnumCode][$value->getId()] = $value->getName();
+                $items[$value->getId()] = $value->getName();
+                $priorities[]           = $value->getPriority();
             }
+            array_multisort($priorities, $items);
+            $this->localCache[$enumValueEntityClassOrEnumCode] = $items;
         }
 
-        return !empty($this->localCache[$enumValueEntityClassOrEnumCode][$enumValueId])
-            ? $this->localCache[$enumValueEntityClassOrEnumCode][$enumValueId]
-            : $enumValueId;
+        return $this->localCache[$enumValueEntityClassOrEnumCode];
     }
 
     /**
