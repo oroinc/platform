@@ -177,30 +177,16 @@ namespace OroCRM\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class LoadLeadSourceData extends AbstractFixture implements ContainerAwareInterface
+class LoadLeadSourceData extends AbstractFixture
 {
     /** @var array */
     protected $data = [
         'Website'     => true,
         'Direct Mail' => false
     ];
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * @param ObjectManager $manager
