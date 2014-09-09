@@ -2,7 +2,10 @@
     "name": "oro/form-bundle",
     "type": "symfony-bundle",
     "description": "BAP Form Bundle",
-    "keywords": ["BAP", "Form"],
+    "keywords": [
+        "BAP",
+        "Form"
+    ],
     "license": "MIT",
     "require": {
         "php": ">=5.3.3",
@@ -13,10 +16,11 @@
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
-        "oro/ui-bundle": "dev-master"
+        "oro/ui-bundle": "dev-master",
+        "oro/entity-config-bundle": "dev-master"
     },
     "autoload": {
-        "psr-0": { "Oro\\Bundle\\FormBundle": "" }
+        "psr-0": {"Oro\\Bundle\\FormBundle": ""}
     },
     "target-dir": "Oro/Bundle/FormBundle",
     "minimum-stability": "dev",
