@@ -68,6 +68,6 @@ class OrganizationManager
      */
     public function getEnabledUserOrganizationsByName(User $user, $name, $useLikeExpr = true)
     {
-        return $this->getOrganizationRepo()->getEnabledUserOrganizationsByName($user, $name, $useLikeExpr);
+        return $this->getOrganizationRepo()->getEnabledByUserAndName($user, $name, $useLikeExpr);
     }
 }
