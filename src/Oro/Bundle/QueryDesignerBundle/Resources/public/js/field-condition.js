@@ -72,14 +72,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
-            if (filter.init_module) {
-                require([filter.init_module], _.bind(function (initializer) {
-                    initializer(filter, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
-                    this._createFilter(filter);
-                }, this));
-            } else {
-                this._createFilter(filter);
-            }
+            this._createFilter(filter, fieldId);
         },
 
         _getApplicableFilterId: function (conditions) {
@@ -129,11 +122,35 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
         },
 
-        _createFilter: function (options) {
-            var moduleName = mapFilterModuleName(options.type);
+        _createFilter: function (filterOptions, fieldId) {
 
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
+            var moduleName = mapFilterModuleName(filterOptions.type),
+                requires = [moduleName];
+
+            if (filterOptions.init_module) {
+                requires.push(filterOptions.init_module);
+            }
+
+            // show throbber if loading takes more than 100ms
+            var showLoadingTimeout = setTimeout(function () {
+                this.$filterContainer.html("<img src=\"/bundles/orocron/images/loading.gif\" /> Loading...")
+            }.bind(this), 100);
+
+            require(requires, _.bind(function (Filter, optionsInitializer) {
+                if (optionsInitializer) {
+                    optionsInitializer(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
+                    // if filterOptions have a promise - wait until it will be resolved
+                    if (filterOptions.promise && filterOptions.promise.resolved == false) {
+                        filterOptions.promise.whenResolved(function () {
+                            clearTimeout(showLoadingTimeout);
+                            var filter = new (Filter.extend(filterOptions))();
+                            this._appendFilter(filter);
+                        }, this);
+                        return;
+                    }
+                }
+                clearTimeout(showLoadingTimeout);
+                var filter = new (Filter.extend(filterOptions))();
                 this._appendFilter(filter);
             }, this));
         },
