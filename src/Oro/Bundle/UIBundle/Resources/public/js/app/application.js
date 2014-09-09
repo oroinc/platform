@@ -64,6 +64,7 @@ define([
                 query = path.query;
                 path = path.path;
             }
+            path = (path[0] !== '/' ? '/' : '') + path;
             routeUrl = path + (query ? '?' + query : '');
             return routeUrl;
         },

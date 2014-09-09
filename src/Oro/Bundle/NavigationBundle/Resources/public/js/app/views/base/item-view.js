@@ -47,6 +47,13 @@ define([
 
         setActiveItem: function () {
             this.$el.toggleClass('active', this.checkCurrentUrl());
+        },
+
+        getTemplateData: function () {
+            var data = ItemView.__super__.getTemplateData.call(this);
+            // to support previously saved urls without leading slash
+            data.url = (data.url[0] !== '/' ? '/' : '') + data.url;
+            return data;
         }
     });
 
