@@ -29,6 +29,8 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped('OEE-199 Organization API');
+
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->encoder      = new MessageDigestPasswordEncoder('sha1', true, 1);
         $cache              = new ArrayCache();

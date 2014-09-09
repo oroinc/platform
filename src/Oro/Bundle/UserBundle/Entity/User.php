@@ -798,9 +798,9 @@ class User extends ExtendUser implements
     /**
      * {@inheritDoc}
      */
-    public function getApiKey()
+    public function getApiKeys()
     {
-        return $this->api ? $this->getApi()->getApiKey() : uniqid('undefined');
+        return $this->api ? $this->getApi() : uniqid('undefined');
     }
 
     /**

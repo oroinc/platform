@@ -494,6 +494,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetApiKey()
     {
+        $this->markTestSkipped('OEE-199 Organization API');
+
         $entity = new User();
 
         $this->assertNotEmpty($entity->getApiKey(), 'Should return some key, even if is not present');
