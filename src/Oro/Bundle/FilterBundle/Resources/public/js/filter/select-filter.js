@@ -315,7 +315,6 @@ define([
         _onSelectChange: function () {
             // set value
             this.applyValue();
-
             // update dropdown
             this.selectWidget.updateDropdownPosition();
         },
@@ -335,9 +334,7 @@ define([
          */
         _onValueUpdated: function (newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
-
             this.selectWidget.multiselect('refresh');
-
             this.$(this.buttonSelector)
                 .toggleClass('filter-default-value', this.isEmpty());
         },

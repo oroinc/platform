@@ -46,7 +46,6 @@ define([
             this._setDropdownWidth();
         },
 
-
         /**
          * Minimal width of dropdown
          *
@@ -131,6 +130,7 @@ define([
 
             this.selectWidget.multiselect('refresh');
         }
+
     });
 
     return MultiSelectFilter;
