@@ -223,7 +223,7 @@ As it was mentioned above each option set has own table to store available optio
 
 If by some reasons you create system option sets and you have to render it manually the following components can be helpful:
 
- - [TWIG extension](Twig/EnumExtension.php) to translate options. It can be used in the following way: `optionId|trans_enum(enumCode)`.
+ - [TWIG extension](Twig/EnumExtension.php) to sort and translate options. It can be used in the following way: `optionIds|sort_enum(enumCode)`, `optionId|trans_enum(enumCode)`.
  - Symfony form types which can be used to build forms contain option set fields: [EnumChoiceType](Form/Type/EnumChoiceType.php) and [EnumSelectType](Form/Type/EnumSelectType.php).
  - Grid filters: [EnumFilter](Filter/EnumFilter.php) and [MultiEnumFilter](Filter/MultiEnumFilter.php). Some help how to use these filters in `datagrid.yml` and how to configure datagrid formatters for option sets you can find in [ExtendColumnOptionsGuesser](Grid/ExtendColumnOptionsGuesser.php). Please take in account that this class pass the class name as the option set identifier, but you can use the enum code as well.
 
