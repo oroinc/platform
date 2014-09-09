@@ -213,7 +213,7 @@ class UserController extends Controller
         return array(
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
-            'viewProfile' => 1
+            'viewProfile' => true
         );
     }
 
