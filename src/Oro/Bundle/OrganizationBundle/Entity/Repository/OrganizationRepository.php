@@ -105,7 +105,7 @@ class OrganizationRepository extends EntityRepository
      *
      * @return Organization[]
      */
-    public function getEnabledUserOrganizationsByName(User $user, $name, $useLikeExpr = true)
+    public function getEnabledByUserAndName(User $user, $name, $useLikeExpr = true)
     {
         $qb = $this->createQueryBuilder('org');
         $organizations = $user->getOrganizations();
@@ -126,8 +126,7 @@ class OrganizationRepository extends EntityRepository
                 ->setParameter('orgName', $name);
         }
 
-        return $qb->getQuery()
-            ->getResult();
+        return $qb->getQuery()->getResult();
     }
 
     /**

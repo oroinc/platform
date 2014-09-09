@@ -549,6 +549,7 @@ class User extends ExtendUser implements
         $this->emails        = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins  = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
     }
 
     /**

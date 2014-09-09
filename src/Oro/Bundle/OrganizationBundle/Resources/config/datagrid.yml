@@ -33,6 +33,7 @@ datagrid:
                 label: oro.organization.businessunit.email.label
             phone:
                 label: oro.organization.businessunit.phone.label
+                frontend_type: phone
             ownerName:
                 label: oro.organization.businessunit.owner.label
             organizationName:

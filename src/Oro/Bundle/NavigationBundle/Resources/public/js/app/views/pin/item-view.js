@@ -10,16 +10,6 @@ define([
     var PinItemView;
 
     PinItemView = ItemView.extend({
-        events: {
-            'click a': 'toMaximize'
-        },
-
-        toMaximize: function (e) {
-            this.model.collection.trigger('toMaximize', this.model);
-            e.stopPropagation();
-            e.preventDefault();
-        },
-
         remove: function () {
             mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             PinItemView.__super__.remove.call(this);

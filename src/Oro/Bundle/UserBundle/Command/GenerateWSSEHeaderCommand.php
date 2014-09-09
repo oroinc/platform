@@ -21,7 +21,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $this->setDefinition(
             array(
                 new InputArgument('username', InputArgument::REQUIRED, 'The username'),
-                new InputArgument('organization', InputArgument::REQUIRED, 'Organization'),
+                new InputArgument('organization', InputArgument::REQUIRED, 'The Organization'),
             )
         );
     }
@@ -40,18 +40,23 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $username         = $input->getArgument('username');
         $organizationName = $input->getArgument('organization');
         $userManager      = $container->get('oro_user.manager');
+        $user             = $userManager->findUserByUsername($username);
 
-        if (!$user = $userManager->findUserByUsername($username)) {
+        if (!$user) {
             throw new \InvalidArgumentException(sprintf('User "%s" does not exist', $username));
         }
 
-        if (!$organizations = $container->get('oro_organization.organization_manager')
-            ->getEnabledUserOrganizationsByName($user, $organizationName, false)) {
+        $organizations = $container->get('oro_organization.organization_manager')
+            ->getEnabledUserOrganizationsByName($user, $organizationName, false);
+
+        if (!$organizations) {
             throw new \InvalidArgumentException(sprintf('Organization "%s" not found', $organizationName));
         }
-        $organization = reset($organizations);
 
-        if (!$userApi = $userManager->getApi($user, $organization)) {
+        $organization = reset($organizations);
+        $userApi      = $userManager->getApi($user, $organization);
+
+        if (!$userApi) {
             throw new \InvalidArgumentException(sprintf('User "%s" does not yet have an API key generated', $username));
         }
 
