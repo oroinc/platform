@@ -155,6 +155,15 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
     }
 
+    public function testGuessSorterForEnum()
+    {
+        $class    = 'TestClass';
+        $property = 'testProp';
+
+        $guess = $this->guesser->guessSorter($class, $property, 'enum');
+        $this->assertNull($guess);
+    }
+
     public function testGuessFilterForEnum()
     {
         $class    = 'TestClass';
@@ -225,6 +234,21 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
                 'context'       => [
                     'entity_class' => 'Test\EnumValue'
                 ]
+            ],
+            $guess->getOptions()
+        );
+        $this->assertEquals(ColumnGuess::MEDIUM_CONFIDENCE, $guess->getConfidence());
+    }
+
+    public function testGuessSorterForMultiEnum()
+    {
+        $class    = 'TestClass';
+        $property = 'testProp';
+
+        $guess = $this->guesser->guessSorter($class, $property, 'multiEnum');
+        $this->assertEquals(
+            [
+                'disabled' => true
             ],
             $guess->getOptions()
         );
