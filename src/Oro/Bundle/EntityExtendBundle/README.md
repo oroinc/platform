@@ -124,7 +124,7 @@ The option set is a special type of a field which allows to choose one or more o
  - `enum` (named `Select` on UI) - only one option can be selected
  - `multiEnum` (named `Multi-Select` in a code) - several options can be selected
 
-The option sets are quite complex types, but that you can to understand how they work you need to know that both `enum` and `multiEnum` types are based on [relations](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html), the main difference between them is that `enum` type is based on [many-to-one relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-one-unidirectional) however `multiEnum` type is based on [many-to-many relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-many-unidirectional). To add option set field to some entity you can use [ExtendExtension](Migration/Extension/ExtendExtension.php). The following example shows how it can be done:
+The option sets are quite complex types, but to understand how they work you need to know that both `enum` and `multiEnum` types are based on [relations](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html), the main difference between them is that `enum` type is based on [many-to-one relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-one-unidirectional) however `multiEnum` type is based on [many-to-many relation](http://docs.doctrine-project.org/en/2.0.x/reference/association-mapping.html#many-to-many-unidirectional). To add option set field to some entity you can use [ExtendExtension](Migration/Extension/ExtendExtension.php). The following example shows how it can be done:
 
 ``` php
 <?php
@@ -224,7 +224,7 @@ class LoadLeadSourceData extends AbstractFixture implements ContainerAwareInterf
 ```
 
 As you can see in this example we use `buildEnumValueClassName` function to convert the option set code to the class name of an entity responsible to store all options of this option set. It is important because such entities are generated automatically by Oro Platform and you should not use the class name directly.
-Also there are other functions in [ExtendHelper](Migration/Tools/ExtendHelper.php) class which can be helpful when you work with option sets:
+Also there are other functions in [ExtendHelper](Tools/ExtendHelper.php) class which can be helpful when you work with option sets:
 
  - `buildEnumCode` - builds an option set code based on its name.
  - `generateEnumCode` - generates an option set code based on a field for which this option set is created.
