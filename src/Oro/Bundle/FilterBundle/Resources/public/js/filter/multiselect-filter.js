@@ -122,13 +122,13 @@ define([
             return newValue;
         },
 
-        /**
-         * @inheritDoc
-         */
-        _onValueUpdated: function (newValue, oldValue) {
-            SelectFilter.__super__._onValueUpdated.apply(this, arguments);
-
-            this.selectWidget.multiselect('refresh');
+        isEmpty: function () {
+            var value = this.getValue().value;
+            if (!value || value.length == 0)
+                return true;
+            if (value.length == 1 && value[0] == FILTER_EMPTY_VALUE)
+                return true;
+            return false;
         }
 
     });
