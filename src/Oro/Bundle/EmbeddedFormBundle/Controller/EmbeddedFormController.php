@@ -112,6 +112,18 @@ class EmbeddedFormController extends Controller
     }
 
     /**
+     * @Route("info/{id}", name="oro_embedded_form_info", requirements={"id"="[-\d\w]+"})
+     * @AclAncestor("oro_embedded_form_view")
+     * @Template()
+     */
+    public function infoAction(EmbeddedForm $entity)
+    {
+        return array(
+            'entity'  => $entity
+        );
+    }
+
+    /**
      * @param EmbeddedForm $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
