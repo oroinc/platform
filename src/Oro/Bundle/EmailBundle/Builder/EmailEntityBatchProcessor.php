@@ -146,9 +146,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function addOrigin(EmailOrigin $origin)
     {
         $key = $origin->getId();
-        if (isset($this->origins[$key])) {
-            throw new \LogicException(sprintf('The origin %s already exists in the batch.', $origin));
-        }
         $this->origins[$key] = $origin;
     }
 
