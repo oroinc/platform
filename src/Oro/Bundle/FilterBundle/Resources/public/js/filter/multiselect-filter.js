@@ -124,10 +124,12 @@ define([
 
         isEmpty: function () {
             var value = this.getValue().value;
-            if (!value || value.length == 0)
+            if (!value || value.length == 0) {
                 return true;
-            if (value.length == 1 && value[0] == FILTER_EMPTY_VALUE)
+            }
+            if (value.length == 1 && value[0] == FILTER_EMPTY_VALUE) {
                 return true;
+            }
             return false;
         }
 
