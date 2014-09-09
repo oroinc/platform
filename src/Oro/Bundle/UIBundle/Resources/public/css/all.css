@@ -210,3 +210,10 @@
     outline: 0;
     font-weight: bold;
 }
+
+.loading-indicator {
+    display: inline-block;
+    background: url(../img/loader-16.gif);
+    width: 16px;
+    height: 16px;
+}

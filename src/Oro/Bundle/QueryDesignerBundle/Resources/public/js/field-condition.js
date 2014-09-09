@@ -72,14 +72,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
-            if (filter.init_module) {
-                require([filter.init_module], _.bind(function (initializer) {
-                    initializer(filter, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
-                    this._createFilter(filter);
-                }, this));
-            } else {
-                this._createFilter(filter);
-            }
+            this._createFilter(filter, fieldId);
         },
 
         _getApplicableFilterId: function (conditions) {
@@ -129,12 +122,32 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
         },
 
-        _createFilter: function (options) {
-            var moduleName = mapFilterModuleName(options.type);
+        _createFilter: function (filterOptions, fieldId) {
 
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
-                this._appendFilter(filter);
+            var moduleName = mapFilterModuleName(filterOptions.type),
+                requires = [moduleName];
+
+            if (filterOptions.init_module) {
+                requires.push(filterOptions.init_module);
+            }
+
+            // show loading message, if loading takes more than 100ms
+            var showLoadingTimeout = setTimeout(_.bind(function () {
+                this.$filterContainer.html("<span class=\"loading-indicator\"></span> " + __("Loading..."))
+            }, this), 100);
+
+            require(requires, _.bind(function (Filter, optionResolver) {
+                function appendFilter() {
+                    clearTimeout(showLoadingTimeout);
+                    var filter = new (Filter.extend(filterOptions))();
+                    this._appendFilter(filter);
+                }
+                if (optionResolver) {
+                    var promise = optionResolver(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
+                    promise.done(_.bind(appendFilter, this));
+                } else {
+                    appendFilter.call(this);
+                }
             }, this));
         },
 
