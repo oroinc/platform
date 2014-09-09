@@ -9,7 +9,7 @@ define([
     'use strict';
 
     // @const
-    var C_FILTER_EMPTY = "";
+    var FILTER_EMPTY_VALUE = "";
 
     var MultiSelectFilter;
 
@@ -91,32 +91,32 @@ define([
         },
 
         /**
-         * Updates checkboxes when user clicks on ANY ELEMENT
+         * Updates checkboxes when user clicks on element corresponding empty value
          */
         _checkValue: function (newValue, oldValue) {
             // means that  all checkboxes are unchecked
             if (newValue.value == null) {
-                newValue.value = [C_FILTER_EMPTY];
+                newValue.value = [FILTER_EMPTY_VALUE];
                 return newValue;
             }
             // if we have old value
             // need to check if it has selected "EMPTY" option
             if (
-                    oldValue.value == C_FILTER_EMPTY
-                    || (oldValue.value.indexOf && oldValue.value.indexOf(C_FILTER_EMPTY) != -1)
+                    oldValue.value == FILTER_EMPTY_VALUE
+                    || (oldValue.value.indexOf && oldValue.value.indexOf(FILTER_EMPTY_VALUE) != -1)
             ) {
                 // need to uncheck it in new value
                 if (newValue.value.length > 1) {
-                    var indexOfEmptyOption = newValue.value.indexOf(C_FILTER_EMPTY);
+                    var indexOfEmptyOption = newValue.value.indexOf(FILTER_EMPTY_VALUE);
                     if (indexOfEmptyOption != -1) {
                         newValue.value.splice(indexOfEmptyOption, 1);
                     }
                 }
             } else {
                 // if we just selected "EMPTY" option
-                if (!newValue.value || newValue.value.indexOf(C_FILTER_EMPTY) != -1) {
+                if (!newValue.value || newValue.value.indexOf(FILTER_EMPTY_VALUE) != -1) {
                     // clear other choices
-                    newValue.value = [C_FILTER_EMPTY];
+                    newValue.value = [FILTER_EMPTY_VALUE];
                 }
             }
             return newValue;
