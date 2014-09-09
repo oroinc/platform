@@ -94,7 +94,7 @@ class EntityTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testCreateEntity
+     * @depends testUpdateEntity
      * @param $entityName
      */
     public function testDeleteEntity($entityName)

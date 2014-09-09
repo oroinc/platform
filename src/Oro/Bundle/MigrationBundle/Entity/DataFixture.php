@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table("oro_migrations_data")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\MigrationBundle\Entity\Repository\DataFixtureRepository")
  */
 class DataFixture
 {

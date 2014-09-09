@@ -8,6 +8,37 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class ArrayUtils
 {
     /**
+     * Recursively merge arrays.
+     *
+     * Merge two arrays as array_merge_recursive do, but instead of converting values to arrays when keys are same
+     * replaces value from first array with value from second
+     *
+     * @param array $first
+     * @param array $second
+     * @return array
+     */
+    public static function arrayMergeRecursiveDistinct(array $first, array $second)
+    {
+        foreach ($second as $idx => $value) {
+            if (is_integer($idx)) {
+                $first[] = $value;
+            } else {
+                if (!array_key_exists($idx, $first)) {
+                    $first[$idx] = $value;
+                } else {
+                    if (is_array($value)) {
+                        $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                    } else {
+                        $first[$idx] = $value;
+                    }
+                }
+            }
+        }
+
+        return $first;
+    }
+
+    /**
      * Return the values from a single column in the input array
      *
      * http://php.net/manual/en/function.array-column.php
@@ -40,7 +71,7 @@ class ArrayUtils
             }
 
             if ($indexKey) {
-                $index          = $item[$indexKey];
+                $index = $item[$indexKey];
                 $result[$index] = $item[$columnKey];
             } else {
                 $result[] = $item[$columnKey];
@@ -57,11 +88,11 @@ class ArrayUtils
      * Please use this method only if you really need stable sorting because this method is not so fast
      * as native PHP sort functions.
      *
-     * @param array                        $array        The array to be sorted
-     * @param bool                         $reverse      Indicates whether the sorting should be performed
+     * @param array $array The array to be sorted
+     * @param bool $reverse Indicates whether the sorting should be performed
      *                                                   in reverse order
      * @param string|PropertyPathInterface $propertyPath The path of the property by which the array should be sorted
-     * @param int                          $sortingFlags The sorting type. Can be SORT_NUMERIC or SORT_STRING
+     * @param int $sortingFlags The sorting type. Can be SORT_NUMERIC or SORT_STRING
      *                                                   Also SORT_STRING can be combined with SORT_FLAG_CASE to sort
      *                                                   strings case-insensitively
      */
@@ -81,7 +112,7 @@ class ArrayUtils
          */
 
         $stringComparison = 0 !== ($sortingFlags & SORT_STRING);
-        $caseInsensitive  = 0 !== ($sortingFlags & SORT_FLAG_CASE);
+        $caseInsensitive = 0 !== ($sortingFlags & SORT_FLAG_CASE);
 
         $sortable = self::prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive);
         if (!empty($sortable)) {
@@ -102,7 +133,7 @@ class ArrayUtils
     /**
      * @param mixed $a
      * @param mixed $b
-     * @param bool  $stringComparison
+     * @param bool $stringComparison
      *
      * @return int
      */
@@ -120,11 +151,11 @@ class ArrayUtils
     }
 
     /**
-     * @param array                        $array
+     * @param array $array
      * @param string|PropertyPathInterface $propertyPath
-     * @param bool                         $reverse
-     * @param bool                         $stringComparison
-     * @param bool                         $caseInsensitive
+     * @param bool $reverse
+     * @param bool $stringComparison
+     * @param bool $caseInsensitive
      *
      * @return array|null
      *
@@ -132,14 +163,14 @@ class ArrayUtils
      */
     private static function prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive)
     {
-        $propertyAccessor     = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $isSimplePropertyPath = is_string($propertyPath) && !preg_match('/.\[/', $propertyPath);
-        $defaultValue         = $stringComparison ? '' : 0;
-        $needSorting          = $reverse;
+        $defaultValue = $stringComparison ? '' : 0;
+        $needSorting = $reverse;
 
-        $result  = [];
+        $result = [];
         $lastVal = null;
-        $index   = 0;
+        $index = 0;
         foreach ($array as $key => $value) {
             if (is_array($value) && $isSimplePropertyPath) {
                 // get array property directly to speed up
@@ -160,7 +191,7 @@ class ArrayUtils
             if ($lastVal === null) {
                 $lastVal = $val;
             } elseif (0 !== self::compare($lastVal, $val, $stringComparison)) {
-                $lastVal     = $val;
+                $lastVal = $val;
                 $needSorting = true;
             }
         }
@@ -174,8 +205,8 @@ class ArrayUtils
 
     /**
      * @param array $sortable
-     * @param bool  $stringComparison
-     * @param bool  $reverse
+     * @param bool $stringComparison
+     * @param bool $reverse
      *
      * @return array
      */

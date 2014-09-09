@@ -248,7 +248,9 @@ abstract class AbstractPageGrid extends AbstractPage
         }
 
         $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]{$postFix}";
-        return $this->test->byXPath($xpath);
+        $element = $this->test->byXPath($xpath);
+        $this->test->moveto($element);
+        return $element;
     }
 
     /**

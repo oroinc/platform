@@ -12,15 +12,14 @@ class UserSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'configs' => array(
-                    'placeholder' => 'oro.user.form.choose_user',
-                    'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig'
-                ),
+            [
                 'autocomplete_alias' => 'users',
-                'grid_name' => 'users-select-grid'
-            )
+                'configs'            => [
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig'
+                ]
+            ]
         );
     }
 
