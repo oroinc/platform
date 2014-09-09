@@ -178,6 +178,14 @@ define(['jquery', 'underscore'], function ($, _) {
                 }, _.object(requirements, _.toArray(arguments))));
                 callback.call(context || null, modules);
             });
+        },
+
+        /**
+         * Check if current page is an error page (404, 503, 504, etc.)
+         * @returns {boolean}
+         */
+        isErrorPage: function () {
+            return Boolean($('meta[name=error]').length);
         }
     };
 });
