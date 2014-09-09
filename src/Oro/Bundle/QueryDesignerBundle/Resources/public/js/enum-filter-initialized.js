@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
                 successCallback(choices);
             },
             error: function (jqXHR) {
-                messenger.showErrorMessage('error', jqXHR.responseJSON);
+                messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 if (errorCallback)
                     errorCallback(jqXHR);
             }

@@ -132,20 +132,20 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }
 
             // show throbber, if loading takes more than 100ms
-            var showLoadingTimeout = setTimeout(function () {
+            var showLoadingTimeout = setTimeout(_.bind(function () {
                 this.$filterContainer.html("<img src=\"/bundles/orocron/images/loading.gif\" /> " + __("Loading..."))
-            }.bind(this), 100);
+            }, this), 100);
 
             require(requires, _.bind(function (Filter, optionsInitializer) {
                 if (optionsInitializer) {
                     optionsInitializer(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
                     // if filterOptions have a promise - wait until it will be resolved
                     if (filterOptions.promise && filterOptions.promise.state() !== 'resolved') {
-                        filterOptions.promise.then(function () {
+                        filterOptions.promise.then(_.bind(function () {
                             clearTimeout(showLoadingTimeout);
                             var filter = new (Filter.extend(filterOptions))();
                             this._appendFilter(filter);
-                        }.bind(this));
+                        }, this));
                         return;
                     }
                 }
