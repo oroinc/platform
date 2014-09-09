@@ -133,7 +133,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             // show loading message, if loading takes more than 100ms
             var showLoadingTimeout = setTimeout(_.bind(function () {
-                this.$filterContainer.html("<img src=\"/bundles/orocron/images/loading.gif\" /> " + __("Loading..."))
+                this.$filterContainer.html("<span class=\"loading-indicator\"></span> " + __("Loading..."))
             }, this), 100);
 
             require(requires, _.bind(function (Filter, optionResolver) {
