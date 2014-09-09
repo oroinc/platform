@@ -49,7 +49,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $this->uow->expects($this->never())
-            ->method('computeChangeSet');
+            ->method('recomputeSingleEntityChangeSet');
 
         $event = $this->getOnFlushEventArgsMock();
         $this->manager->handleOnFlush($event);
@@ -90,7 +90,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $this->uow->expects($this->never())
-            ->method('computeChangeSet');
+            ->method('recomputeSingleEntityChangeSet');
 
         $event = $this->getOnFlushEventArgsMock();
         $this->manager->handleOnFlush($event);
@@ -121,10 +121,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 
@@ -175,10 +183,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 
@@ -238,10 +254,18 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionDeletions')
             ->will($this->returnValue([]));
 
+        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(get_class($owner))
+            ->will($this->returnValue($metadata));
+
         $this->uow->expects($this->once())
-            ->method('computeChangeSet')
+            ->method('recomputeSingleEntityChangeSet')
             ->with(
-                $this->identicalTo($updatedColl->getTypeClass()),
+                $this->identicalTo($metadata),
                 $owner
             );
 

@@ -14,6 +14,7 @@ parameters:
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
+    oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -23,6 +24,8 @@ parameters:
     oro_form.extension.js_validation.constraints_provider.class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
     oro_form.extension.js_validation.repeated.class:             Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
     oro_form.extension.random_id.class:                          Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension
+
+    oro_form.form_handler.api.class:                             Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
 
 services:
     # Form types
@@ -72,6 +75,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_form.autocomplete.search_registry
+            - @oro_entity_config.provider.form
         tags:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
 
@@ -156,6 +160,7 @@ services:
         class: %oro_form.type.oro_entity_create_or_select_inline.class%
         arguments:
             - @oro_security.security_facade
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
 
@@ -163,3 +168,15 @@ services:
         class: %oro_form.type.link.class%
         tags:
             - { name: form.type, alias: oro_link_type }
+
+    oro_form.type.api:
+        class: %oro_form.type.api.class%
+        tags:
+            - { name: form.type, alias: oro_api_type }
+
+    oro_form.form_handler.api:
+        class: %oro_form.form_handler.api.class%
+        scope: request
+        arguments:
+            - @request
+            - @doctrine.orm.entity_manager

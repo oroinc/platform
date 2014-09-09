@@ -3,10 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+
+use Symfony\Component\Form\AbstractExtension;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
-use Symfony\Component\Form\AbstractExtension;
 
 class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
 {
@@ -16,18 +20,28 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
     protected $em;
 
     /**
-     * @var \Oro\Bundle\FormBundle\Autocomplete\SearchRegistry
+     * @var SearchRegistry
      */
     protected $searchRegistry;
 
     /**
-     * @param EntityManager  $em
-     * @param SearchRegistry $searchRegistry
+     * @var ConfigProviderInterface
      */
-    public function __construct(EntityManager $em, SearchRegistry $searchRegistry)
-    {
-        $this->em = $em;
+    protected $configProvider;
+
+    /**
+     * @param EntityManager           $em
+     * @param SearchRegistry          $searchRegistry
+     * @param ConfigProviderInterface $configProvider
+     */
+    public function __construct(
+        EntityManager $em,
+        SearchRegistry $searchRegistry,
+        ConfigProviderInterface $configProvider
+    ) {
+        $this->em             = $em;
         $this->searchRegistry = $searchRegistry;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -35,9 +49,9 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
      */
     protected function loadTypes()
     {
-        return array(
-            new OroJquerySelect2HiddenType($this->em, $this->searchRegistry),
+        return [
+            new OroJquerySelect2HiddenType($this->em, $this->searchRegistry, $this->configProvider),
             new Select2Type('hidden')
-        );
+        ];
     }
 }

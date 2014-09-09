@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -53,28 +53,23 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->ignoreExtraKeys()
                 ->children()
+                    // defines criteria a field should satisfy in order to use a filter
                     ->arrayNode('applicable')
                         ->requiresAtLeastOneElement()
                         ->prototype('array')
                             ->children()
-                                // field type
-                                ->scalarNode('type')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                // field data type
+                                ->scalarNode('type')->cannotBeEmpty()->end()
                                 // entity name
-                                ->scalarNode('entity')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('entity')->cannotBeEmpty()->end()
                                 // field name
-                                ->scalarNode('field')
-                                    ->cannotBeEmpty()
-                                ->end()
-                                // primary key
-                                ->booleanNode('identifier')
-                                ->end()
+                                ->scalarNode('field')->cannotBeEmpty()->end()
+                                // indicates whether a field should be a primary key or not
+                                ->booleanNode('identifier')->end()
                             ->end()
                         ->end()
                     ->end()
+                    // filter type
                     ->scalarNode('type')
                         ->isRequired()
                         ->validate()
@@ -82,20 +77,23 @@ class Configuration implements ConfigurationInterface
                             ->thenInvalid('Invalid filter type "%s"')
                         ->end()
                     ->end()
+                    // filter options
                     ->arrayNode('options')
                         ->useAttributeAsKey('name')
                         ->prototype('variable')->end()
                     ->end()
+                    // a theme type should be used to render a filter
                     ->scalarNode('template_theme')
                         ->defaultValue('embedded')
                     ->end()
+                    // JS module should be used to initialize a filter. This module should returns the following
+                    // function "function (filter, fieldData)"
                     ->scalarNode('init_module')->end()
+                    // types of queries a filter is available. use "all" if it should be available in any query
                     ->arrayNode('query_type')
                         ->isRequired()
                         ->requiresAtLeastOneElement()
-                        ->prototype('scalar')
-                            ->cannotBeEmpty()
-                        ->end()
+                        ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
                 ->validate()
@@ -131,21 +129,14 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('exclude')
                     ->prototype('array')
                         ->children()
-                            // field type
-                            ->scalarNode('type')
-                                ->cannotBeEmpty()
-                            ->end()
+                            // field data type
+                            ->scalarNode('type')->cannotBeEmpty()->end()
                             // entity name
-                            ->scalarNode('entity')
-                                ->cannotBeEmpty()
-                            ->end()
+                            ->scalarNode('entity')->cannotBeEmpty()->end()
                             // field name
-                            ->scalarNode('field')
-                                ->cannotBeEmpty()
-                            ->end()
-                            // primary key
-                            ->booleanNode('identifier')
-                            ->end()
+                            ->scalarNode('field')->cannotBeEmpty()->end()
+                            // indicates whether a field should be a primary key or not
+                            ->booleanNode('identifier')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -169,29 +160,21 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->ignoreExtraKeys()
                 ->children()
+                    // defines criteria a field should satisfy in order to use a converter
                     ->arrayNode('applicable')
                         ->requiresAtLeastOneElement()
                         ->prototype('array')
                             ->children()
-                                // field type
-                                ->scalarNode('type')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                // field data type
+                                ->scalarNode('type')->cannotBeEmpty()->end()
                                 // parent entity name
-                                ->scalarNode('parent_entity')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('parent_entity')->cannotBeEmpty()->end()
                                 // entity name
-                                ->scalarNode('entity')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('entity')->cannotBeEmpty()->end()
                                 // field name
-                                ->scalarNode('field')
-                                    ->cannotBeEmpty()
-                                ->end()
-                                // primary key
-                                ->booleanNode('identifier')
-                                ->end()
+                                ->scalarNode('field')->cannotBeEmpty()->end()
+                                // indicates whether a field should be a primary key or not
+                                ->booleanNode('identifier')->end()
                             ->end()
                         ->end()
                     ->end()
@@ -200,21 +183,13 @@ class Configuration implements ConfigurationInterface
                         ->prototype('array')
                             ->children()
                                 // function name
-                                ->scalarNode('name')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                 // function return type
                                 // if this attribute is not specified the return type
                                 // is equal to the type of a field this function is applied
-                                ->scalarNode('return_type')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('return_type')->cannotBeEmpty()->end()
                                 // function expression
-                                ->scalarNode('expr')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('expr')->isRequired()->cannotBeEmpty()->end()
                                 // label name for function name
                                 // usually this attribute sets automatically (see ConfigurationPass class) to
                                 // [vendor name].query_designer.converters.[converter name].[function name].name
@@ -222,9 +197,7 @@ class Configuration implements ConfigurationInterface
                                 // if your function overrides existing function (the name of your function
                                 // is the same as the name of existing function) and you want to use a label
                                 // of the overridden function set this attribute to true (boolean)
-                                ->scalarNode('name_label')
-                                    ->isRequired()
-                                ->end()
+                                ->scalarNode('name_label')->isRequired()->end()
                                 // label name for function hint
                                 // usually this attribute sets automatically (see ConfigurationPass class) to
                                 // [vendor name].query_designer.converters.[converter name].[function name].hint
@@ -232,18 +205,15 @@ class Configuration implements ConfigurationInterface
                                 // if your function overrides existing function (the name of your function
                                 // is the same as the name of existing function) and you want to use a label
                                 // of the overridden function set this attribute to true (boolean)
-                                ->scalarNode('hint_label')
-                                    ->isRequired()
-                                ->end()
+                                ->scalarNode('hint_label')->isRequired()->end()
                             ->end()
                         ->end()
                     ->end()
+                    // types of queries a converter is available. use "all" if it should be available in any query
                     ->arrayNode('query_type')
                         ->isRequired()
                         ->requiresAtLeastOneElement()
-                        ->prototype('scalar')
-                            ->cannotBeEmpty()
-                        ->end()
+                        ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end();
@@ -265,29 +235,21 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->ignoreExtraKeys()
                 ->children()
+                    // defines criteria a field should satisfy in order to use an aggregate
                     ->arrayNode('applicable')
                         ->requiresAtLeastOneElement()
                         ->prototype('array')
                             ->children()
-                                // field type
-                                ->scalarNode('type')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                // field data type
+                                ->scalarNode('type')->cannotBeEmpty()->end()
                                 // parent entity name
-                                ->scalarNode('parent_entity')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('parent_entity')->cannotBeEmpty()->end()
                                 // entity name
-                                ->scalarNode('entity')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('entity')->cannotBeEmpty()->end()
                                 // field name
-                                ->scalarNode('field')
-                                    ->cannotBeEmpty()
-                                ->end()
-                                // primary key
-                                ->booleanNode('identifier')
-                                ->end()
+                                ->scalarNode('field')->cannotBeEmpty()->end()
+                                // indicates whether a field should be a primary key or not
+                                ->booleanNode('identifier')->end()
                             ->end()
                         ->end()
                     ->end()
@@ -296,21 +258,13 @@ class Configuration implements ConfigurationInterface
                         ->prototype('array')
                             ->children()
                                 // function name
-                                ->scalarNode('name')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                 // function return type
                                 // if this attribute is not specified the return type
                                 // is equal to the type of a field this function is applied
-                                ->scalarNode('return_type')
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('return_type')->cannotBeEmpty()->end()
                                 // function expression
-                                ->scalarNode('expr')
-                                    ->isRequired()
-                                    ->cannotBeEmpty()
-                                ->end()
+                                ->scalarNode('expr')->isRequired()->cannotBeEmpty()->end()
                                 // label name for function name
                                 // usually this attribute sets automatically (see ConfigurationPass class) to
                                 // [vendor name].query_designer.aggregates.[converter name].[function name].name
@@ -318,9 +272,7 @@ class Configuration implements ConfigurationInterface
                                 // if your function overrides existing function (the name of your function
                                 // is the same as the name of existing function) and you want to use a label
                                 // of the overridden function set this attribute to true (boolean)
-                                ->scalarNode('name_label')
-                                    ->isRequired()
-                                ->end()
+                                ->scalarNode('name_label')->isRequired()->end()
                                 // label name for function hint
                                 // usually this attribute sets automatically (see ConfigurationPass class) to
                                 // [vendor name].query_designer.aggregates.[converter name].[function name].hint
@@ -328,18 +280,15 @@ class Configuration implements ConfigurationInterface
                                 // if your function overrides existing function (the name of your function
                                 // is the same as the name of existing function) and you want to use a label
                                 // of the overridden function set this attribute to true (boolean)
-                                ->scalarNode('hint_label')
-                                    ->isRequired()
-                                ->end()
+                                ->scalarNode('hint_label')->isRequired()->end()
                             ->end()
                         ->end()
                     ->end()
+                    // types of queries a aggregate is available. use "all" if it should be available in any query
                     ->arrayNode('query_type')
                         ->isRequired()
                         ->requiresAtLeastOneElement()
-                        ->prototype('scalar')
-                            ->cannotBeEmpty()
-                        ->end()
+                        ->prototype('scalar')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end()

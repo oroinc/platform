@@ -135,7 +135,6 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     {
         foreach ($schema['addremove'] as $fieldName => $config) {
             $addMethodBody    = [
-                '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
                 'if (!$this->' . $fieldName . '->contains($value)) {',
                 '    $this->' . $fieldName . '->add($value);'
             ];

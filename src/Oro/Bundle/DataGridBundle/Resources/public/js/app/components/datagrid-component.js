@@ -225,7 +225,8 @@ define(function (require) {
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
-                routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
+                routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options,
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions)
             };
         }
     });

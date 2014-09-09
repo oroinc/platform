@@ -477,4 +477,36 @@ class ArrayUtilsTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider mergeDataProvider
+     * @param array $expected
+     * @param array $first
+     * @param array $second
+     */
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    {
+        $this->assertEquals($expected, ArrayUtils::arrayMergeRecursiveDistinct($first, $second));
+    }
+
+    /**
+     * @return array
+     */
+    public function mergeDataProvider()
+    {
+        return array(
+            array(
+                array(
+                    'a',
+                    'b',
+                    'c' => array(
+                        'd' => 'd2',
+                        'e' => 'e1'
+                    )
+                ),
+                array('a', 'c' => array('d' => 'd1', 'e' => 'e1')),
+                array('b', 'c' => array('d' => 'd2'))
+            )
+        );
+    }
 }

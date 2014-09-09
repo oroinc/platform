@@ -23,25 +23,35 @@ class EntityConfigPass implements CompilerPassInterface
             'oro_entity_config',
             new YamlCumulativeFileLoader('Resources/config/entity_config.yml')
         );
-        $resources    = $configLoader->load($container);
+
+        $resources = $configLoader->load($container);
+        $scopes    = [];
         foreach ($resources as $resource) {
-            if (isset($resource->data['oro_entity_config']) && count($resource->data['oro_entity_config'])) {
+            if (!empty($resource->data['oro_entity_config'])) {
                 foreach ($resource->data['oro_entity_config'] as $scope => $config) {
-                    $provider = new Definition('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
-                    $provider->setArguments(
-                        [
-                            new Reference('oro_entity_config.config_manager'),
-                            new Reference('service_container'),
-                            $scope,
-                            $config
-                        ]
-                    );
-
-                    $container->setDefinition('oro_entity_config.provider.' . $scope, $provider);
-
-                    $providerBagDefinition->addMethodCall('addProvider', array($provider));
+                    if (!empty($scopes[$scope])) {
+                        $scopes[$scope] = array_merge_recursive($scopes[$scope], $config);
+                    } else {
+                        $scopes[$scope] = $config;
+                    }
                 }
             }
+        }
+
+        foreach ($scopes as $scope => $config) {
+            $provider = new Definition('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
+            $provider->setArguments(
+                [
+                    new Reference('oro_entity_config.config_manager'),
+                    new Reference('service_container'),
+                    $scope,
+                    $config
+                ]
+            );
+
+            $container->setDefinition('oro_entity_config.provider.' . $scope, $provider);
+
+            $providerBagDefinition->addMethodCall('addProvider', array($provider));
         }
     }
 }
