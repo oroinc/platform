@@ -9,7 +9,7 @@ define([
     'use strict';
 
     // @const
-    var C_FILTER_ANY = "";
+    var C_FILTER_EMPTY = "";
 
     var MultiSelectFilter;
 
@@ -97,27 +97,27 @@ define([
         _checkValue: function (newValue, oldValue) {
             // means that  all checkboxes are unchecked
             if (newValue.value == null) {
-                newValue.value = [C_FILTER_ANY];
+                newValue.value = [C_FILTER_EMPTY];
                 return newValue;
             }
             // if we have old value
-            // need to check if it has selected "ANY" option
+            // need to check if it has selected "EMPTY" option
             if (
-                    oldValue.value == C_FILTER_ANY
-                    || (oldValue.value.indexOf && oldValue.value.indexOf(C_FILTER_ANY) != -1)
+                    oldValue.value == C_FILTER_EMPTY
+                    || (oldValue.value.indexOf && oldValue.value.indexOf(C_FILTER_EMPTY) != -1)
             ) {
                 // need to uncheck it in new value
                 if (newValue.value.length > 1) {
-                    var indexOfAnyFilter = newValue.value.indexOf(C_FILTER_ANY);
-                    if (indexOfAnyFilter != -1) {
-                        newValue.value.splice(indexOfAnyFilter, 1);
+                    var indexOfEmptyOption = newValue.value.indexOf(C_FILTER_EMPTY);
+                    if (indexOfEmptyOption != -1) {
+                        newValue.value.splice(indexOfEmptyOption, 1);
                     }
                 }
             } else {
-                // if we just selected "ANY" option
-                if (!newValue.value || newValue.value.indexOf(C_FILTER_ANY) != -1) {
+                // if we just selected "EMPTY" option
+                if (!newValue.value || newValue.value.indexOf(C_FILTER_EMPTY) != -1) {
                     // clear other choices
-                    newValue.value = [C_FILTER_ANY];
+                    newValue.value = [C_FILTER_EMPTY];
                 }
             }
             return newValue;
