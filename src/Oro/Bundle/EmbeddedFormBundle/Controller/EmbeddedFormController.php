@@ -121,7 +121,7 @@ class EmbeddedFormController extends Controller
             $entity = new EmbeddedForm();
         }
 
-        $form = $this->createForm(new EmbeddedFormType(), $entity);
+        $form = $this->createForm('embedded_form', $entity);
         $form->handleRequest($this->get('request'));
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
@@ -130,21 +130,20 @@ class EmbeddedFormController extends Controller
             $em->persist($entity);
             $em->flush();
 
-
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
             );
 
             return $this->get('oro_ui.router')->actionRedirect(
-                array(
+                [
                     'route' => 'oro_embedded_form_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
+                    'parameters' => ['id' => $entity->getId()],
+                ],
+                [
                     'route' => 'oro_embedded_form_view',
-                    'parameters' => array('id' => $entity->getId()),
-                )
+                    'parameters' => ['id' => $entity->getId()],
+                ]
             );
 
         }

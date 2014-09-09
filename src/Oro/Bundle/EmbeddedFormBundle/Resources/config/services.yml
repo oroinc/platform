@@ -23,3 +23,8 @@ services:
             - @translator
         tags:
             - { name: twig.extension }
+
+    oro_embedded_form.form_type:
+        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
+        tags:
+            - { name: form.type, alias: embedded_form }
