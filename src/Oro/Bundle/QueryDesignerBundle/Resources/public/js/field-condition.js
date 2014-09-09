@@ -131,27 +131,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 requires.push(filterOptions.init_module);
             }
 
-            // show throbber, if loading takes more than 100ms
+            // show loading message, if loading takes more than 100ms
             var showLoadingTimeout = setTimeout(_.bind(function () {
                 this.$filterContainer.html("<img src=\"/bundles/orocron/images/loading.gif\" /> " + __("Loading..."))
             }, this), 100);
 
-            require(requires, _.bind(function (Filter, optionsInitializer) {
-                if (optionsInitializer) {
-                    optionsInitializer(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
-                    // if filterOptions have a promise - wait until it will be resolved
-                    if (filterOptions.promise && filterOptions.promise.state() !== 'resolved') {
-                        filterOptions.promise.then(_.bind(function () {
-                            clearTimeout(showLoadingTimeout);
-                            var filter = new (Filter.extend(filterOptions))();
-                            this._appendFilter(filter);
-                        }, this));
-                        return;
-                    }
+            require(requires, _.bind(function (Filter, optionResolver) {
+                function appendFilter() {
+                    clearTimeout(showLoadingTimeout);
+                    var filter = new (Filter.extend(filterOptions))();
+                    this._appendFilter(filter);
                 }
-                clearTimeout(showLoadingTimeout);
-                var filter = new (Filter.extend(filterOptions))();
-                this._appendFilter(filter);
+                if (optionResolver) {
+                    var promise = optionResolver(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
+                    promise.done(_.bind(appendFilter, this));
+                } else {
+                    appendFilter.call(this);
+                }
             }, this));
         },
 
