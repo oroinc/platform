@@ -213,7 +213,7 @@
 
 .loading-indicator {
     display: inline-block;
-    background: url(../images/loading.gif);
+    background: url(../img/loader-16.gif);
     width: 16px;
     height: 16px;
 }
