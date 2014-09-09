@@ -3,10 +3,11 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @ORM\Table(name="oro_user_api")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository")
  */
 class UserApi
 {
@@ -20,8 +21,8 @@ class UserApi
     /**
      * @var User
      *
-     * @ORM\OneToOne(targetEntity="User", inversedBy="api", fetch="LAZY")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="api", fetch="LAZY")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $user;
 
@@ -31,6 +32,14 @@ class UserApi
      * @ORM\Column(name="api_key", type="string", unique=true, length=255, nullable=false)
      */
     protected $apiKey;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Get id
@@ -98,5 +107,28 @@ class UserApi
     public function generateKey()
     {
         return bin2hex(hash('sha1', uniqid(mt_rand(), true), true));
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return UserApi
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

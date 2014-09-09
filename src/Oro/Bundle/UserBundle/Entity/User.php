@@ -409,7 +409,7 @@ class User extends ExtendUser implements
     protected $groups;
 
     /**
-     * @ORM\OneToOne(
+     * @ORM\OneToMany(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
      * )
      * @ConfigField(
@@ -788,7 +788,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return UserApi
+     * @return UserApi[]
      */
     public function getApi()
     {
