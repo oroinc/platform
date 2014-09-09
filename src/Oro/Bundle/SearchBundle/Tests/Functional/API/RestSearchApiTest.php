@@ -55,7 +55,7 @@ class RestSearchApiTest extends WebTestCase
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
 
-        if (!$result['data']) {
+        if (empty($result['data'])) {
             $result['data'] = [];
         }
 

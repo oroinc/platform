@@ -58,6 +58,10 @@ class SoapSearchApiTest extends WebTestCase
         $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
 
+        if (empty($result['elements']['item'])) {
+            $result['elements']['item'] = [];
+        }
+
         // if only one element
         if (empty($result['elements']['item'][0])) {
             $result['elements']['item'] = array($result['elements']['item']);
