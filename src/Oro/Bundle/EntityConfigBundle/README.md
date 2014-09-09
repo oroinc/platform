@@ -162,7 +162,7 @@ php app/console oro:entity-config:cache:clear --no-warmup
 
 Debugging configuration data
 ----------------------------
-You can uses `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
+You can use `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
 ```bash
 php app/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
 ```
