@@ -152,6 +152,19 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
     }
 
     /**
+     * Set id
+     *
+     * @param int $id
+     * @return Organization
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Set name
      *
      * @param string $name
