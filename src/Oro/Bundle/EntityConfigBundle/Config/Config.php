@@ -43,7 +43,7 @@ class Config implements ConfigInterface
      */
     public function get($code, $strict = false, $default = null)
     {
-        if (isset($this->values[$code])) {
+        if (isset($this->values[$code]) || array_key_exists($code, $this->values)) {
             return $this->values[$code];
         }
 
