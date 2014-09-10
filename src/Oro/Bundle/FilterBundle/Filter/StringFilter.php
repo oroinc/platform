@@ -60,7 +60,7 @@ class StringFilter extends AbstractFilter
             return false;
         }
 
-        $data['type'] = $type;
+        $data['type']  = $type;
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;
@@ -92,22 +92,24 @@ class StringFilter extends AbstractFilter
             case TextFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
-                $eq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+                $emptyString = $ds->expr()->literal('');
+                $eq          = $ds->expr()->eq($fieldName, $emptyString);
 
                 if ($this->isCompositeField($ds, $fieldName)) {
                     $fieldName = $ds->expr()->trim($fieldName);
 
-                    $eq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+                    $eq = $ds->expr()->eq($fieldName, $emptyString);
                 }
 
                 return $ds->expr()->orX($ds->expr()->isNull($fieldName), $eq);
             case FilterUtility::TYPE_NOT_EMPTY:
-                $neq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+                $emptyString = $ds->expr()->literal('');
+                $neq         = $ds->expr()->eq($fieldName, $emptyString);
 
                 if ($this->isCompositeField($ds, $fieldName)) {
                     $fieldName = $ds->expr()->trim($fieldName);
 
-                    $neq = $ds->expr()->neq($fieldName, $ds->expr()->literal(''));
+                    $neq = $ds->expr()->neq($fieldName, $emptyString);
                 }
 
                 return $ds->expr()->andX($ds->expr()->isNotNull($fieldName), $neq);
@@ -124,7 +126,7 @@ class StringFilter extends AbstractFilter
      */
     protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
     {
-        return false !== strpos($ds->getFieldByAlias($fieldName), 'CONCAT');
+        return preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
     }
 
     /**
