@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\PersistentCollection;
-
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
-
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\PersistentCollection;
+
+use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -58,28 +58,28 @@ class WsseAuthProvider extends Provider
         /** @var User $user */
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
-            $secrets = $this->getSecret($user);
-            if ($secrets instanceof PersistentCollection) {
-                /** @var $secrets UserApi[] */
-                foreach ($secrets as $secret) {
+            $secret = $this->getSecret($user);
+            if ($secret instanceof PersistentCollection) {
+                /** @var $secret UserApi[] */
+                foreach ($secret as $userApi) {
                     $isSecretValid = $this->validateDigest(
                         $token->getAttribute('digest'),
                         $token->getAttribute('nonce'),
                         $token->getAttribute('created'),
-                        $secret->getApiKey(),
+                        $userApi->getApiKey(),
                         $this->getSalt($user)
                     );
                     if ($isSecretValid) {
                         $authenticatedToken = new WsseToken($user->getRoles());
                         $authenticatedToken->setUser($user);
-                        $authenticatedToken->setOrganizationContext($secret->getOrganization());
+                        $authenticatedToken->setOrganizationContext($userApi->getOrganization());
                         $authenticatedToken->setAuthenticated(true);
 
                         return $authenticatedToken;
                     }
                 }
             } else {
-                parent::authenticate($token);
+                return parent::authenticate($token);
             }
         }
 

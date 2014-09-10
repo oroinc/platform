@@ -1,26 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: alex
- * Date: 9/9/14
- * Time: 11:08 PM
- */
 
 namespace Oro\Bundle\UserBundle\Security;
 
-
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class WsseToken extends Token implements OrganizationContextTokenInterface
 {
+    /** @var  Organization */
     protected $organization;
 
     /**
-     * Returns organization
-     *
-     * @return Organization
+     * {@inheritdoc}
      */
     public function getOrganizationContext()
     {
@@ -28,9 +21,7 @@ class WsseToken extends Token implements OrganizationContextTokenInterface
     }
 
     /**
-     * Set an organization
-     *
-     * @param Organization $organization
+     * {@inheritdoc}
      */
     public function setOrganizationContext(Organization $organization)
     {

@@ -409,8 +409,10 @@ class User extends ExtendUser implements
     protected $groups;
 
     /**
+     * @var UserApi[]
+     *
      * @ORM\OneToMany(
-     *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
+     *      targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true
      * )
      * @ConfigField(
      *      defaultValues={
@@ -423,7 +425,7 @@ class User extends ExtendUser implements
      *      }
      * )
      */
-    protected $api;
+    protected $apiKeys;
 
     /**
      * @var Status[]
@@ -550,6 +552,7 @@ class User extends ExtendUser implements
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins  = new ArrayCollection();
         $this->organizations = new ArrayCollection();
+        $this->apiKeys       = new ArrayCollection();
     }
 
     /**
@@ -790,17 +793,39 @@ class User extends ExtendUser implements
     /**
      * @return UserApi[]
      */
-    public function getApi()
+    public function getApiKeys()
     {
-        return $this->api;
+        return $this->apiKeys->count() ? $this->apiKeys : uniqid('undefined');
     }
 
     /**
-     * {@inheritDoc}
+     * Add UserApi to User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
      */
-    public function getApiKeys()
+    public function addApiKey(UserApi $api)
     {
-        return $this->api ? $this->getApi() : uniqid('undefined');
+        $this->apiKeys[] = $api;
+
+        $api->setUser($this);
+
+        return $this;
+    }
+
+    /**
+     * Delete UserApi from User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
+     */
+    public function removeApiKey(UserApi $api)
+    {
+        $this->apiKeys->removeElement($api);
+
+        return $this;
     }
 
     /**
@@ -1036,18 +1061,6 @@ class User extends ExtendUser implements
     public function setLoginCount($count)
     {
         $this->loginCount = $count;
-
-        return $this;
-    }
-
-    /**
-     * @param  UserApi $api
-     *
-     * @return User
-     */
-    public function setApi(UserApi $api)
-    {
-        $this->api = $api;
 
         return $this;
     }

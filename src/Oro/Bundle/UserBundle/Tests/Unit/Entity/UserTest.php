@@ -327,18 +327,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($now, $user->getLastLogin());
     }
 
-    public function testApi()
-    {
-        $user = new User;
-        $api  = new UserApi();
-
-        $this->assertNull($user->getApi());
-
-        $user->setApi($api);
-
-        $this->assertEquals($api, $user->getApi());
-    }
-
     public function testUnserialize()
     {
         $user = new User();
@@ -494,18 +482,40 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetApiKey()
     {
-        $this->markTestSkipped('OEE-199 Organization API');
-
+        /** @var User $entity */
         $entity = new User();
 
-        $this->assertNotEmpty($entity->getApiKey(), 'Should return some key, even if is not present');
-        $this->assertNotSame($entity->getApiKey(), $entity->getApiKey(), 'Should return unique random string');
+        $this->assertNotEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
 
-        $apiKey = new UserApi();
-        $apiKey->setApiKey($apiKey->generateKey());
-        $entity->setApi($apiKey);
+        $this->assertNotSame($entity->getApiKeys(), $entity->getApiKeys(), 'Should return unique random string');
 
-        $this->assertSame($apiKey->getApiKey(), $entity->getApiKey(), 'Should delegate call to userApi entity');
+        $organization1 = new Organization();
+        $organization1->setName('test1');
+
+        $organization2 = new Organization();
+        $organization2->setName('test2');
+
+        $apiKey1 = new UserApi();
+        $apiKey1->setApiKey($apiKey1->generateKey());
+        $apiKey1->setOrganization($organization1);
+
+        $apiKey2 = new UserApi();
+        $apiKey2->setApiKey($apiKey2->generateKey());
+        $apiKey2->setOrganization($organization2);
+
+        $entity->addApiKey($apiKey1);
+        $entity->addApiKey($apiKey2);
+
+        $this->assertSame(
+            $apiKey1->getApiKey(),
+            $entity->getApiKeys()[0]->getApiKey(),
+            'Should delegate call to userApi entity'
+        );
+
+        $this->assertEquals(
+            new ArrayCollection([$apiKey1, $apiKey2]),
+            $entity->getApiKeys()
+        );
     }
 
     public function testOrganizations()
