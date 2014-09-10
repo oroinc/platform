@@ -5,7 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
-class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
+abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
     {
