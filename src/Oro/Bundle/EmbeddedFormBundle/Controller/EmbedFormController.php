@@ -6,6 +6,8 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Oro\Bundle\NotificationBundle\Entity\Event;
+use OroCRM\Bundle\ChannelBundle\Event\ContactUsRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -36,7 +38,19 @@ class EmbedFormController extends Controller
         $formManager = $this->get('oro_embedded_form.manager');
         $form        = $formManager->createForm($formEntity->getFormType());
 
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
+            $dataClass = $form->getConfig()->getOption('data_class');
+            $ref = new \ReflectionClass($dataClass);
+            $data = $ref->getConstructor()->getNumberOfRequiredParameters() ? $ref->newInstanceWithoutConstructor() :
+                $ref->newInstance();
+            $form->setData($data);
+            $event = new ContactUsRequestEvent($formEntity, $data);
+            $eventDispatcher = $this->get('event_dispatcher');
+            $eventDispatcher->dispatch('orocrm_channel.contact_request.create', $event);
+        }
+
         $form->handleRequest($request);
+
         if ($form->isValid()) {
             $entity = $form->getData();
             $em->persist($entity);
