@@ -166,4 +166,13 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function literal($literal);
+
+    /**
+     * Creates an instance of TRIM() function, with the given argument.
+     *
+     * @param mixed $x Argument to be used as argument of TRIM() function.
+     *
+     * @return mixed
+     */
+    public function trim($x);
 }

@@ -189,4 +189,12 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     {
         return $this->expr->literal($literal);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function trim($x)
+    {
+        return $this->expr->trim($x);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
@@ -92,18 +93,39 @@ class StringFilter extends AbstractFilter
             case TextFilterType::TYPE_NOT_IN:
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
-                return $ds->expr()->orX(
-                    $ds->expr()->isNull($fieldName),
-                    $ds->expr()->eq($fieldName, $ds->expr()->literal(''))
-                );
+                $eq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+
+                if ($this->isCompositeField($ds, $fieldName)) {
+                    $fieldName = $ds->expr()->trim($fieldName);
+
+                    $eq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+                }
+
+                return $ds->expr()->orX($ds->expr()->isNull($fieldName), $eq);
             case FilterUtility::TYPE_NOT_EMPTY:
-                return $ds->expr()->andX(
-                    $ds->expr()->isNotNull($fieldName),
-                    $ds->expr()->neq($fieldName, $ds->expr()->literal(''))
-                );
+                $neq = $ds->expr()->eq($fieldName, $ds->expr()->literal(''));
+
+                if ($this->isCompositeField($ds, $fieldName)) {
+                    $fieldName = $ds->expr()->trim($fieldName);
+
+                    $neq = $ds->expr()->neq($fieldName, $ds->expr()->literal(''));
+                }
+
+                return $ds->expr()->andX($ds->expr()->isNotNull($fieldName), $neq);
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string                           $fieldName
+     *
+     * @return bool
+     */
+    protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
+    {
+        return false !== strpos($ds->getFieldByAlias($fieldName), 'CONCAT');
     }
 
     /**
