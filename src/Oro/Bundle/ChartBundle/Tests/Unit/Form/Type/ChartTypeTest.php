@@ -8,7 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
-use Oro\Bundle\TestFrameworkBundle\Test\Form\ImmutableFormEventSubscriber;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 class ChartTypeTest extends FormIntegrationTestCase
 {
@@ -38,7 +38,7 @@ class ChartTypeTest extends FormIntegrationTestCase
             ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
             ->getMock();
 
-        $eventListener = new ImmutableFormEventSubscriber($mock);
+        $eventListener = new MutableFormEventSubscriber($mock);
 
         $this->type = new ChartType($this->configProvider);
         $this->type->setEventListener($eventListener);

@@ -27,7 +27,7 @@ use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
-use Oro\Bundle\TestFrameworkBundle\Test\Form\ImmutableFormEventSubscriber;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -49,7 +49,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subscriber = new ImmutableFormEventSubscriber($mock);
+        $subscriber = new MutableFormEventSubscriber($mock);
 
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(

@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\Form;
 
 use \Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ImmutableFormEventSubscriber implements EventSubscriberInterface
+class MutableFormEventSubscriber implements EventSubscriberInterface
 {
 
  protected static $events = [];
