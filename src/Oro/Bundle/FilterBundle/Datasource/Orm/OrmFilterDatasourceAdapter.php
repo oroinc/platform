@@ -111,6 +111,14 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFieldByAlias($fieldName)
+    {
+        return $this->qbTools->getFieldByAlias($fieldName);
+    }
+
+    /**
      * Returns a QueryBuilder object used to modify this data source
      *
      * @return QueryBuilder

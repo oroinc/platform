@@ -58,4 +58,12 @@ interface FilterDatasourceAdapterInterface
      * @return string
      */
     public function generateParameterName($filterName);
+
+    /**
+     * Get field by alias
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getFieldByAlias($fieldName);
 }
