@@ -127,7 +127,6 @@ class CustomEntityType extends AbstractType
                             'target_field'  => $extendConfig->get('target_field'),
                             'properties'    => [$extendConfig->get('target_field')],
                         ];
-                        $options['error_bubbling'] = false;
                         break;
                     case 'oneToMany':
                     case 'manyToMany':
