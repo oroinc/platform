@@ -90,6 +90,12 @@ class EntityLabelBuilderTest extends \PHPUnit_Framework_TestCase
                 'Acme\Bundle\ProductBundle\Document\Product',
                 'sellPrice'
             ],
+            [
+                'acme.entityproduct.sell_price.label',
+                'label',
+                'Acme\Bundle\EntityProductBundle\Document\EntityProduct',
+                'sellPrice'
+            ],
         ];
     }
 }

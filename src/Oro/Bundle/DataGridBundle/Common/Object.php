@@ -138,7 +138,12 @@ class Object implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetGetByPath($path, $default = null)
     {
-        return $this->accessor->getValue($this, $path) ? : $default;
+        $value = $this->accessor->getValue($this, $path);
+        if ($default === null && $value !== null) {
+            return $value;
+        }
+
+        return $value ? : $default;
     }
 
     /**

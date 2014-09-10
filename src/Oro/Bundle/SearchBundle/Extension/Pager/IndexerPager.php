@@ -156,17 +156,4 @@ class IndexerPager
     {
         return $this->getMaxPerPage() && $this->getNbResults() > $this->getMaxPerPage();
     }
-
-    /**
-     * Returns an array of page numbers to use in pagination links.
-     *
-     * @deprecated Should not be used
-     *
-     * @param  integer $nbLinks The maximum number of page numbers to return
-     * @return array
-     */
-    public function getLinks($nbLinks = null)
-    {
-        return array();
-    }
 }

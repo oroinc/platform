@@ -43,88 +43,117 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         );
     }
 
-    public function testSupportsPostUpdate()
-    {
-        $this->configManager->expects($this->never())
-            ->method('getProvider');
-
-        $this->assertFalse(
-            $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
-        );
-    }
-
     public function testSupportsPreUpdate()
     {
-        $config1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
-        $config1->set('owner_type', 'USER');
-        $config2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
-        $config2->set('owner_type', 'USER');
-        $config3 = new Config(new EntityConfigId('ownership', 'Test\Entity3'));
-
-        $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
-        $extendConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
-
-        $this->setTargetEntityConfigsExpectations([$config1, $config2, $config3], [$extendConfig1]);
-
         $this->assertTrue(
             $this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE)
         );
     }
 
-    public function testSupportsPreUpdateNoApplicableTargetEntities()
+    public function testSupportsPostUpdate()
     {
-        $config1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
-        $config1->set('owner_type', 'USER');
-        $config2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
-        $config2->set('owner_type', 'USER');
-        $config3 = new Config(new EntityConfigId('ownership', 'Test\Entity3'));
-
-        $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
-        $extendConfig1->set('owner', ExtendScope::OWNER_SYSTEM);
-
-        $this->setTargetEntityConfigsExpectations([$config1, $config2, $config3], [$extendConfig1]);
-
         $this->assertFalse(
-            $this->extension->supports(ExtendConfigDumper::ACTION_PRE_UPDATE)
+            $this->extension->supports(ExtendConfigDumper::ACTION_POST_UPDATE)
         );
     }
 
     /**
      * @dataProvider preUpdateProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testPreUpdate($ownerType, $getOwnerClassMethodName)
     {
-        $config1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
-        $config1->set('owner_type', $ownerType);
-        $config1->set('owner_field_name', 'owner_field');
-        $config2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
-        $config2->set('owner_type', $ownerType);
-        $config3 = new Config(new EntityConfigId('ownership', 'Test\Entity3'));
-
         $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendConfig1->set('state', ExtendScope::STATE_NEW);
+        // should be skipped because it has empty owner_type
+        $extendConfig2 = new Config(new EntityConfigId('extend', 'Test\Entity2'));
+        $extendConfig2->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendConfig2->set('state', ExtendScope::STATE_NEW);
+        // should be skipped because it has no ownership config
+        $extendConfig3 = new Config(new EntityConfigId('extend', 'Test\Entity3'));
+        $extendConfig3->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendConfig3->set('state', ExtendScope::STATE_NEW);
+        // should be skipped because it is not new entity
+        $extendConfig4 = new Config(new EntityConfigId('extend', 'Test\Entity4'));
+        $extendConfig4->set('owner', ExtendScope::OWNER_CUSTOM);
+        $extendConfig4->set('state', ExtendScope::STATE_UPDATE);
+        // should be skipped because it is not custom entity
+        $extendConfig5 = new Config(new EntityConfigId('extend', 'Test\Entity5'));
+        $extendConfig5->set('owner', ExtendScope::OWNER_SYSTEM);
 
-        $this->setTargetEntityConfigsExpectations([$config1, $config2, $config3], [$extendConfig1]);
+        $ownershipConfig1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
+        $ownershipConfig1->set('owner_type', $ownerType);
+        $ownershipConfig1->set('owner_field_name', 'owner_field');
+        $ownershipConfig2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
+
+        $extendConfigs    = [$extendConfig1, $extendConfig3, $extendConfig3, $extendConfig4, $extendConfig5];
+        $ownershipConfigs = [$ownershipConfig1, $ownershipConfig2];
+
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfigs')
+            ->will($this->returnValue($extendConfigs));
+
+        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ownershipConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use ($ownershipConfigs) {
+                        foreach ($ownershipConfigs as $ownershipConfig) {
+                            if ($ownershipConfig->getId()->getClassName() === $className) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                )
+            );
+        $ownershipConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use ($ownershipConfigs) {
+                        foreach ($ownershipConfigs as $ownershipConfig) {
+                            if ($ownershipConfig->getId()->getClassName() === $className) {
+                                return $ownershipConfig;
+                            }
+                        }
+
+                        throw new RuntimeException(sprintf('No config for "%s".', $className));
+                    }
+                )
+            );
+
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['ownership', $ownershipConfigProvider],
+                        ['extend', $extendConfigProvider],
+                    ]
+                )
+            );
 
         $this->ownershipMetadataProvider->expects($this->once())
             ->method($getOwnerClassMethodName)
             ->will($this->returnValue('Test\Owner'));
 
         $this->relationBuilder->expects($this->once())
-            ->method('addFieldConfig')
+            ->method('addManyToOneRelation')
             ->with(
-                'Test\Entity1',
+                $this->identicalTo($extendConfig1),
+                'Test\Owner',
                 'owner_field',
-                'manyToOne',
+                'id',
                 [
-                    'extend'    => [
-                        'owner'         => ExtendScope::OWNER_SYSTEM,
-                        'state'         => ExtendScope::STATE_NEW,
-                        'extend'        => true,
-                        'target_entity' => 'Test\Owner',
-                        'target_field'  => 'id',
-                        'relation_key'  => 'manyToOne|Test\Entity1|Test\Owner|owner_field',
-                    ],
                     'entity'    => [
                         'label'       => 'oro.custom_entity.owner.label',
                         'description' => 'oro.custom_entity.owner.description',
@@ -140,17 +169,8 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                     ]
                 ]
             );
-        $this->relationBuilder->expects($this->once())
-            ->method('addManyToOneRelation')
-            ->with(
-                'Test\Owner',
-                'Test\Entity1',
-                'owner_field',
-                'manyToOne|Test\Entity1|Test\Owner|owner_field'
-            );
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 
     public function preUpdateProvider()
@@ -160,64 +180,5 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
             ['BUSINESS_UNIT', 'getBusinessUnitClass'],
             ['ORGANIZATION', 'getOrganizationClass'],
         ];
-    }
-
-    /**
-     * @param Config[] $ownershipConfigs
-     * @param Config[] $extendConfigs
-     */
-    protected function setTargetEntityConfigsExpectations(array $ownershipConfigs = [], array $extendConfigs = [])
-    {
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ownershipConfigProvider->expects($this->once())
-            ->method('getConfigs')
-            ->will($this->returnValue($ownershipConfigs));
-
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendConfigProvider->expects($this->any())
-            ->method('hasConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($extendConfigs) {
-                        foreach ($extendConfigs as $extendConfig) {
-                            if ($extendConfig->getId()->getClassName() === $className) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    }
-                )
-            );
-        $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($extendConfigs) {
-                        foreach ($extendConfigs as $extendConfig) {
-                            if ($extendConfig->getId()->getClassName() === $className) {
-                                return $extendConfig;
-                            }
-                        }
-
-                        throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
-                    }
-                )
-            );
-
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['ownership', $ownershipConfigProvider],
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
     }
 }

@@ -78,7 +78,12 @@ form {
   background-color: #f6f5f5;
 }
 
-
+label.disabled {
+  cursor: default;
+}
+.ui-sortable-handle.disabled {
+  cursor: not-allowed;
+}
 
 // Bootstrap - Form
 label, input, button, select, textarea { font-size:13px;}
@@ -2910,7 +2915,7 @@ label.radio.error {
 }
 
 #orocrm_contact_address_form { min-width:400px; }
-.email-holder {
+.float-holder {
   float: left;
   .removeRow {
     margin: 0;

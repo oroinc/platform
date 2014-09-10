@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -28,7 +27,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
         $this->extendConfigProvider = $extendConfigProvider;
-        $this->nameGenerator = $nameGenerator;
+        $this->nameGenerator        = $nameGenerator;
     }
 
     /**
@@ -51,25 +50,28 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             if ($relation['assign'] && $fieldId) {
                 $targetEntity = $relation['target_entity'];
                 /** @var FieldConfigId|null $targetFieldId */
-                $targetFieldId = isset($relation['target_field_id']) && $relation['target_field_id']
-                    ? $relation['target_field_id']
-                    : null;
+                $targetFieldId = !empty($relation['target_field_id']) ? $relation['target_field_id'] : null;
+                $cascade       = !empty($relation['cascade']) ? $relation['cascade'] : [];
 
                 switch ($fieldId->getFieldType()) {
                     case 'manyToOne':
+                        $cascade[] = 'detach';
                         $this->buildManyToOneRelation(
                             $metadataBuilder,
                             $fieldId,
                             $targetEntity,
-                            $targetFieldId
+                            $targetFieldId,
+                            $cascade
                         );
                         break;
                     case 'oneToMany':
+                        $cascade[] = 'detach';
                         $this->buildOneToManyRelation(
                             $metadataBuilder,
                             $fieldId,
                             $targetEntity,
-                            $targetFieldId
+                            $targetFieldId,
+                            $cascade
                         );
                         break;
                     case 'manyToMany':
@@ -78,7 +80,8 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                                 $metadataBuilder,
                                 $fieldId,
                                 $targetEntity,
-                                $targetFieldId
+                                $targetFieldId,
+                                $cascade
                             );
                         } elseif ($targetFieldId) {
                             $this->buildManyToManyTargetSideRelation(
@@ -99,12 +102,14 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
      * @param FieldConfigId|null   $targetFieldId
+     * @param string[]             $cascade
      */
     protected function buildManyToOneRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
         $targetEntity,
-        FieldConfigId $targetFieldId = null
+        FieldConfigId $targetFieldId = null,
+        array $cascade = []
     ) {
         $builder = $metadataBuilder->createManyToOne($fieldId->getFieldName(), $targetEntity);
         if ($targetFieldId) {
@@ -117,12 +122,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             false,
             'SET NULL'
         );
-
-        if ($targetEntity === AttachmentScope::ATTACHMENT_ENTITY) {
-            $builder->cascadePersist();
+        foreach ($cascade as $cascadeType) {
+            $builder->{'cascade' . ucfirst($cascadeType)}();
         }
-
-        $builder->cascadeDetach();
         $builder->build();
     }
 
@@ -131,18 +133,22 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
      * @param FieldConfigId|null   $targetFieldId
+     * @param string[]             $cascade
      */
     protected function buildOneToManyRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
         $targetEntity,
-        FieldConfigId $targetFieldId = null
+        FieldConfigId $targetFieldId = null,
+        array $cascade = []
     ) {
         $builder = $metadataBuilder->createOneToMany($fieldId->getFieldName(), $targetEntity);
         if ($targetFieldId) {
             $builder->mappedBy($targetFieldId->getFieldName());
         }
-        $builder->cascadeDetach();
+        foreach ($cascade as $cascadeType) {
+            $builder->{'cascade' . ucfirst($cascadeType)}();
+        }
         $builder->build();
 
         $extendFieldConfig = $this->extendConfigProvider->getConfigById($fieldId);
@@ -156,12 +162,14 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      * @param FieldConfigId        $fieldId
      * @param string               $targetEntity
      * @param FieldConfigId|null   $targetFieldId
+     * @param string[]             $cascade
      */
     protected function buildManyToManyOwningSideRelation(
         ClassMetadataBuilder $metadataBuilder,
         FieldConfigId $fieldId,
         $targetEntity,
-        FieldConfigId $targetFieldId = null
+        FieldConfigId $targetFieldId = null,
+        array $cascade = []
     ) {
         $builder = $metadataBuilder->createManyToMany($fieldId->getFieldName(), $targetEntity);
         if ($targetFieldId) {
@@ -174,6 +182,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                 $targetEntity
             )
         );
+        foreach ($cascade as $cascadeType) {
+            $builder->{'cascade' . ucfirst($cascadeType)}();
+        }
         $builder->build();
 
         $extendFieldConfig = $this->extendConfigProvider->getConfigById($fieldId);

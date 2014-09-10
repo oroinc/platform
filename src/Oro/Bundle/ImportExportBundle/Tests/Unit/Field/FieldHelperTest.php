@@ -39,7 +39,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->fieldProvider = $this->prepareFieldProvider();
         $this->configProvider = $this->prepareConfigProvider();
 
-        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider, new FieldTypeHelper());
+        $this->helper = new FieldHelper($this->fieldProvider, $this->configProvider, new FieldTypeHelper([]));
     }
 
     /**
@@ -218,13 +218,6 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                 'expected' => true,
                 'field' => array(
                     'relation_type' => 'ref-one',
-                    'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'single relation oneToOne' => array(
-                'expected' => true,
-                'field' => array(
-                    'relation_type' => 'oneToOne',
                     'related_entity_name' => 'TestEntity',
                 ),
             ),

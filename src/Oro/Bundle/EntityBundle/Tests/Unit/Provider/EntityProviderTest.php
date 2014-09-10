@@ -182,7 +182,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                             $this->extendConfig->set('state', ExtendScope::STATE_NEW);
                         }
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendScope::STATE_DELETED);
+                            $this->extendConfig->set('state', ExtendScope::STATE_DELETE);
                         }
                         return $this->extendConfig;
                     }

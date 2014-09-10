@@ -3,13 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\ORM\Query\Expr;
+
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 
 class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
-    /**
-     * @var Expr
-     */
+    /** @var Expr */
     protected $expr;
 
     /**

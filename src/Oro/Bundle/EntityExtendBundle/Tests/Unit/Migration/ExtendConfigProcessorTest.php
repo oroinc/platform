@@ -228,7 +228,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED],
+            ['state' => ExtendScope::STATE_UPDATE],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
@@ -340,7 +340,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                         'type'    => 'string',
                         'configs' => [
                             'extend' => [
-                                'extend' => true
+                                'is_extend' => true
                             ],
                         ]
                     ],
@@ -406,7 +406,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
-        $extendConfigEntity->set('extend', true);
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
@@ -464,7 +463,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['extend' => true, 'is_extend' => true],
+            ['is_extend' => true],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
@@ -499,7 +498,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
-        $extendConfigEntity->set('extend', true);
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
@@ -564,11 +562,11 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['extend' => true, 'is_extend' => true],
+            ['is_extend' => true],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED, 'owner' => ExtendScope::OWNER_CUSTOM],
+            ['state' => ExtendScope::STATE_UPDATE, 'owner' => ExtendScope::OWNER_CUSTOM],
             $extendConfigField->all()
         );
         $this->assertEquals(

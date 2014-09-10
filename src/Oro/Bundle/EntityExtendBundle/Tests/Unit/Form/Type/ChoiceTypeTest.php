@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType;
 
@@ -15,7 +16,10 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new ChoiceType($this->configManager);
+        $this->type = new ChoiceType(
+            new ConfigTypeHelper($this->configManager),
+            $this->configManager
+        );
     }
 
     /**
@@ -45,7 +49,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
             [true, true, ExtendScope::STATE_ACTIVE, false],
             [false, true, ExtendScope::STATE_ACTIVE, true],
             [true, false, ExtendScope::STATE_ACTIVE, true],
-            [true, false, ExtendScope::STATE_UPDATED, false],
+            [true, false, ExtendScope::STATE_UPDATE, false],
         ];
     }
 
