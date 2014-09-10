@@ -59,6 +59,21 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
     /**
      * {@inheritdoc}
      */
+    public function guessSorter($class, $property, $type)
+    {
+        if ($type === 'multiEnum') {
+            return new ColumnGuess(
+                [Property::DISABLED_KEY => true],
+                ColumnGuess::MEDIUM_CONFIDENCE
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function guessFilter($class, $property, $type)
     {
         switch ($type) {
