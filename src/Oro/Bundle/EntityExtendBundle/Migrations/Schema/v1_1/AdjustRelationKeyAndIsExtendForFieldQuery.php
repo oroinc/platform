@@ -57,7 +57,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
         foreach ($classNames as $className) {
             $fieldConfigs        = $this->loadFieldConfigs($logger, $className);
             foreach ($fieldConfigs as $fieldConfig) {
-                $data = unserialize($fieldConfig['data']);
+                $data = $fieldConfig['data'];
                 if (!isset($data['extend'])) {
                     // skip because this field has no any attributes in 'extend' scope
                     continue;
@@ -134,7 +134,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
             $result[$fieldName] = [
                 'id'   => $row['id'],
                 'type' => $row['type'],
-                'data' => $row['data']
+                'data' => $this->connection->convertToPHPValue($row['data'], 'array')
             ];
         }
 
