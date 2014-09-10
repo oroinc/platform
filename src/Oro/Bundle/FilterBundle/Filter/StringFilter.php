@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
