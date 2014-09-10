@@ -346,6 +346,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $rowData = array();
         foreach ($columnData as $value) {
             /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $value */
+            $this->test->moveto($value);
             $rowData[] = $value->text();
         }
         return $rowData;
