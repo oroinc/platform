@@ -7,12 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
+use Oro\Bundle\FormBundle\Entity\PriorityItem;
+
 /**
  * The base class for all entities represent values for a particular enum
  *
  * @ORM\MappedSuperclass
  */
-abstract class AbstractEnumValue implements Translatable
+abstract class AbstractEnumValue implements Translatable, PriorityItem
 {
     /**
      * @var string

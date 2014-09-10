@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -239,6 +240,8 @@ class DynamicFieldsExtension extends \Twig_Extension
             'values' => array()
         );
 
+        $values     = [];
+        $priorities = [];
         /** @var object $item */
         foreach ($collection as $item) {
             $routeParams['id'] = $item->getId();
@@ -248,12 +251,22 @@ class DynamicFieldsExtension extends \Twig_Extension
                 $title[] = $this->propertyAccessor->getValue($item, $fieldName);
             }
 
-            $value['values'][] = array(
+            $values[] = array(
                 'id' => $item->getId(),
                 'link' => $route ? $this->router->generate($route, $routeParams) : false,
                 'title' => implode(' ', $title)
             );
+            if ($item instanceof PriorityItem) {
+                $priorities[] = $item->getPriority();
+            }
         }
+
+        // sort values by priority if needed
+        if (!empty($priorities) && count($priorities) === count($values)) {
+            array_multisort($priorities, $values);
+        }
+
+        $value['values'] = $values;
 
         return $value;
     }
