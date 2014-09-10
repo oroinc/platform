@@ -114,6 +114,7 @@ define(function (require) {
          * @param {Object} [options.exportOptions] Options for export
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.rowActions] Array of row actions prototypes
          * @param {Array<oro.datagrid.action.AbstractAction>} [options.massActions] Array of mass actions prototypes
+         * @param {Boolean} [options.multiSelectRowEnabled] Option for enabling multi select row
          * @param {oro.datagrid.action.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
          * @throws {TypeError} If mandatory options are undefined
          */
@@ -152,7 +153,8 @@ define(function (require) {
             }
 
             opts.columns.push(this._createActionsColumn());
-            if (!_.isEmpty(this.massActions)) {
+
+            if (opts.multiSelectRowEnabled) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
 
@@ -641,9 +643,11 @@ define(function (require) {
          * @private
          */
         _onRemove: function (model) {
-            mediator.trigger('datagrid:removeRow:' + this.name, model);
+            mediator.trigger('datagrid:beforeRemoveRow:' + this.name, model);
 
             this.collection.fetch({reset: true});
+
+            mediator.trigger('datagrid:afterRemoveRow:' + this.name);
         },
 
         /**

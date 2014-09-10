@@ -76,20 +76,20 @@
     @param Segment entity
     @param bool    reloadRequired - is page reload required after run
 #}
-{% macro runButton(entity, reloadRequired = false) %}
+{% macro runButton(entity, reloadRequired = false, skipAcl = false, options = {}) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-    {% if entity.id and resource_granted('EDIT', entity)
+    {% set permission = skipAcl ? true : resource_granted('EDIT', entity) %}
+    {% if entity.id and permission
         and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
     %}
         {{ UI.clientButton({
             'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
             'aCss':   'no-hash run-button btn',
-            'label' : 'oro.segment.action.refresh'|trans,
+            'label' : options.label|default('oro.segment.action.refresh')|trans,
             'iCss':   'icon-refresh',
             'dataAttributes': {
                 'page-component-module': 'orosegment/js/app/components/refresh-button',
-                'page-component-options': {'reloadRequired': reloadRequired}|json_encode,
+                'page-component-options': options|json_encode,
             }
         }) }}
     {% endif %}
@@ -118,17 +118,17 @@
     @param array    entities
     @param array    metadata
 #}
-{% macro initJsWidgets(type, form, entities, metadata) %}
+{% macro initJsWidgets(type, form, entities, metadata, entityFieldsRouteParams = {}) %}
     {{ _self.query_designer_segment_template('segment-template') }}
-    {% set entityFieldsRouteParams = {} %}
     {% set segmentOptions = {
-        valueSource: '#oro_' ~ type ~ '_form_definition',
+        valueSource: '#' ~ type ~ '_form_definition',
         fieldsLoader: {
-            entityChoice: '#oro_' ~ type ~ '_form_entity',
+            entityChoice: '#' ~ type ~ '_form_entity',
             loadingMaskParent: '#' ~ type ~ '-designer',
+            router: 'oro_api_querydesigner_fields_entity',
             routingParams: entityFieldsRouteParams,
             fieldsData: [],
-            confirmMessage: 'oro.' ~ type ~ '.change_entity_confirmation',
+            confirmMessage: type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         filters: {
             criteriaList: '#filter-criteria-list',
@@ -136,7 +136,7 @@
         },
         column: {
             editor: {
-                namePattern: '^oro_' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$'
+                namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$'
             },
             form: '#' ~ type ~ '-column-form',
             itemContainer: '#' ~ type ~ '-column-list .item-container',
@@ -155,24 +155,23 @@
         )}) %}
         {% set segmentOptions = segmentOptions|merge({'fieldsLoader': fieldsLoaderOptions}) %}
     {% endif %}
-    {% if type == 'report' %}
+    {% if type == 'oro_report' %}
         {% set segmentOptions = segmentOptions|merge({'grouping': {
             editor: {
                 mapping: {
                     name: 'oro_report_form[grouping][columnNames]'
                 }
             },
-            form: '#report-grouping-form',
-            itemContainer: '#report-grouping-list .grouping-item-container',
-            itemTemplate: '#report-grouping-item-row'
+            form: '#' ~ type ~ '-grouping-form',
+            itemContainer: '#' ~ type ~ '-grouping-list .grouping-item-container',
+            itemTemplate: '#' ~ type ~ '-grouping-item-row'
         } }) %}
     {% endif %}
-    {% if type == 'segment' %}
+    {% if type == 'oro_segment' %}
         {% set segmentOptions = segmentOptions|merge({'gridFieldChoiceOptions': {
             exclude: ['children']
         } }) %}
     {% endif %}
-
 
     <div data-page-component-module="orosegment/js/app/components/segment-component"
          data-page-component-options="{{ segmentOptions|json_encode }}"></div>
