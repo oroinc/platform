@@ -85,7 +85,7 @@
         </textarea>
     {% endset %}
 
-    {% set leadInformationWidget %}
+    {% set informationWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_embedded_form_info', {id: entity.id}),
@@ -99,7 +99,7 @@
         'subblocks': [
             {
                 'title': 'Details'|trans,
-                'data': [leadInformationWidget]|merge([formDetails])
+                'data': [informationWidget]|merge([formDetails])
             },
             {
                 'title': 'Form Preview'|trans,
