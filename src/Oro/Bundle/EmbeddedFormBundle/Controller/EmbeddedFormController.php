@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+
 use FOS\Rest\Util\Codes;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -15,6 +14,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
 class EmbeddedFormController extends Controller
 {
@@ -147,7 +148,7 @@ class EmbeddedFormController extends Controller
                 $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
+            return $this->get('oro_ui.router')->redirectAfterSave(
                 [
                     'route' => 'oro_embedded_form_update',
                     'parameters' => ['id' => $entity->getId()],
