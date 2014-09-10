@@ -174,6 +174,8 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
             $currentPart    = ceil($passingMinute / $rotateInterval);
         }
 
-        return date('Ymd-H') . '-' . $rotateInterval . '-' . $currentPart . '.log';
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return $date->format('Ymd-H') . '-' . $rotateInterval . '-' . $currentPart . '.log';
     }
 }

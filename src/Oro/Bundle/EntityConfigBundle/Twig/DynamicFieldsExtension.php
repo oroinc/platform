@@ -201,61 +201,34 @@ class DynamicFieldsExtension extends \Twig_Extension
     }
 
     /**
-     * @param Collection $collection
+     * @param Collection        $collection
      * @param ConfigIdInterface $fieldConfig
+     *
      * @return array
      */
     protected function getValueForCollection(Collection $collection, ConfigIdInterface $fieldConfig)
     {
-        $extendConfig = $this->extendProvider->getConfigById($fieldConfig);
+        $extendConfig   = $this->extendProvider->getConfigById($fieldConfig);
         $titleFieldName = $extendConfig->get('target_title');
-        $targetEntity = $extendConfig->get('target_entity');
 
-        /** generate link for related entities collection */
-        $route = false;
-        $routeParams = false;
-        if (class_exists($targetEntity)) {
-            /** @var EntityMetadata $metadata */
-            $metadata = $this->configManager->getEntityMetadata($targetEntity);
-            if ($metadata && $metadata->routeView) {
-                $route = $metadata->routeView;
-                $routeParams = array(
-                    'id' => null
-                );
-            }
-
-            $relationExtendConfig = $this->extendProvider->getConfig($targetEntity);
-            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                $route = $this->entityViewRoute;
-                $routeParams = array(
-                    'entity_id' => str_replace('\\', '_', $targetEntity),
-                    'id' => null
-                );
-            }
-        }
-
-        $value = array(
-            'route' => $route,
-            'route_params' => $routeParams,
-            'values' => array()
-        );
+        $value = $this->getEntityRouteOptions($extendConfig->get('target_entity'));
 
         $values     = [];
         $priorities = [];
         /** @var object $item */
         foreach ($collection as $item) {
-            $routeParams['id'] = $item->getId();
+            $value['route_params']['id'] = $item->getId();
 
-            $title = array();
+            $title = [];
             foreach ($titleFieldName as $fieldName) {
                 $title[] = $this->propertyAccessor->getValue($item, $fieldName);
             }
 
-            $values[] = array(
-                'id' => $item->getId(),
-                'link' => $route ? $this->router->generate($route, $routeParams) : false,
+            $values[] = [
+                'id'    => $item->getId(),
+                'link'  => $value['route'] ? $this->router->generate($value['route'], $value['route_params']) : false,
                 'title' => implode(' ', $title)
-            );
+            ];
             if ($item instanceof PriorityItem) {
                 $priorities[] = $item->getPriority();
             }
@@ -269,6 +242,41 @@ class DynamicFieldsExtension extends \Twig_Extension
         $value['values'] = $values;
 
         return $value;
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return array
+     */
+    protected function getEntityRouteOptions($entityClassName)
+    {
+        $route       = false;
+        $routeParams = false;
+        if (class_exists($entityClassName)) {
+            /** @var EntityMetadata $metadata */
+            $metadata = $this->configManager->getEntityMetadata($entityClassName);
+            if ($metadata && $metadata->routeView) {
+                $route       = $metadata->routeView;
+                $routeParams = [
+                    'id' => null
+                ];
+            }
+
+            $relationExtendConfig = $this->extendProvider->getConfig($entityClassName);
+            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                $route       = $this->entityViewRoute;
+                $routeParams = [
+                    'entity_id' => str_replace('\\', '_', $entityClassName),
+                    'id'        => null
+                ];
+            }
+        }
+
+        return [
+            'route'        => $route,
+            'route_params' => $routeParams
+        ];
     }
 
     /**
