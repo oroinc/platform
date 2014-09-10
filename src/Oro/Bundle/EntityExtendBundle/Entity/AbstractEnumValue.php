@@ -155,11 +155,12 @@ abstract class AbstractEnumValue implements Translatable, PriorityItem
 
     /**
      * Get a human-readable representation of this object.
+     * This method is used for rendering on UI as well
      *
      * @return string
      */
     public function __toString()
     {
-        return $this->id;
+        return $this->name;
     }
 }
