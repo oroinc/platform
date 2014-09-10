@@ -180,7 +180,7 @@ abstract class AbstractEngine implements EngineInterface
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $this->save($entities, true);
-                $entities[] = array();
+                $entities = array();
             }
         }
 
