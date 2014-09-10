@@ -1,7 +1,8 @@
 parameters:
-    oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
-    oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
-    oro_embedded_form.back_link.twig.extension.class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
+    oro.embedded_form.form_type.available_form.class:        Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
+    oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+    oro_embedded_form.back_link.twig.extension.class:        Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
+    oro_embedded_form.form_type.class:                       Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
 services:
     oro_embedded_form.form_type.available_embedded_form:
         class: %oro.embedded_form.form_type.available_form.class%
@@ -25,6 +26,6 @@ services:
             - { name: twig.extension }
 
     oro_embedded_form.form_type:
-        class: Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
+        class: %oro_embedded_form.form_type.class%
         tags:
             - { name: form.type, alias: embedded_form }

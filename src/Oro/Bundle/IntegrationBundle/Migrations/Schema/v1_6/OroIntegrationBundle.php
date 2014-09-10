@@ -3,29 +3,53 @@
 namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension;
+use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroIntegrationBundle implements Migration
+class OroIntegrationBundle implements Migration, ChangeTypeExtensionAwareInterface
 {
     /**
-     * @inheritdoc
+     * @var ChangeTypeExtension
      */
-    public function up(Schema $schema, QueryBag $queries)
+    protected $changeTypeExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChangeTypeExtension(ChangeTypeExtension $changeTypeExtension)
     {
-        self::modifyChannelTable($schema);
+        $this->changeTypeExtension = $changeTypeExtension;
     }
 
     /**
-     * Change oro_integration_channel table
-     *
-     * @param Schema $schema
+     * {@inheritdoc}
      */
-    public static function modifyChannelTable(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->getTable('oro_integration_channel');
-        $table->addColumn('edit_mode', 'integer', ['notnull' => true, 'default' => Channel::EDIT_MODE_ALLOW]);
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_channel',
+            'id',
+            Type::INTEGER
+        );
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_channel_status',
+            'id',
+            Type::INTEGER
+        );
+        $this->changeTypeExtension->changePrimaryKeyType(
+            $schema,
+            $queries,
+            'oro_integration_transport',
+            'id',
+            Type::INTEGER
+        );
     }
 }
