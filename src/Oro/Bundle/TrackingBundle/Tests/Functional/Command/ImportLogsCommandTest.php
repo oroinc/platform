@@ -54,7 +54,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
     public function testFileProcessed()
     {
-        $date = new \DateTime();
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $file = $date->modify('-1 day')->format('Ymd-H') . '-60-1.log';
 
         $this->fs->dumpFile(
@@ -72,7 +72,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
     public function testCurrentFileNotProcessed()
     {
-        $date = new \DateTime();
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $file = $date->format('Ymd-H') . '-60-1.log';
 
         $this->fs->dumpFile(
