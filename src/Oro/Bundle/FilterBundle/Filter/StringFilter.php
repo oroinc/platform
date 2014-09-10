@@ -126,7 +126,7 @@ class StringFilter extends AbstractFilter
      */
     protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
     {
-        return preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
+        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
     }
 
     /**
