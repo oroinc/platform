@@ -44,7 +44,7 @@ class EmbedFormController extends Controller
             $data = $ref->getConstructor()->getNumberOfRequiredParameters() ? $ref->newInstanceWithoutConstructor() :
                 $ref->newInstance();
             $form->setData($data);
-            $event = new ContactUsRequestEvent($formEntity, $data);
+            $event = new ContactUsRequestEvent($data, $formEntity);
             $eventDispatcher = $this->get('event_dispatcher');
             $eventDispatcher->dispatch('orocrm_channel.contact_request.create', $event);
         }
