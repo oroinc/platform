@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -337,10 +338,10 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpEntityConfig(OutputInterface $output, $className, $scope = null, $attrName = null)
     {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
             [$className],
             ['string']
@@ -349,7 +350,7 @@ class DebugCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Class: %s', $row['class_name']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
             $output->writeln('Values:');
-            $this->dumpData($output, unserialize($row['data']), $scope, $attrName);
+            $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
@@ -384,10 +385,10 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function dumpFieldConfig(OutputInterface $output, $className, $fieldName, $scope = null, $attrName = null)
     {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT ec.class_name, fc.* FROM oro_entity_config ec'
             . ' INNER JOIN oro_entity_config_field fc ON fc.entity_id = ec.id'
             . ' WHERE ec.class_name = ? AND fc.field_name = ?',
@@ -400,7 +401,7 @@ class DebugCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Type:  %s', $row['type']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
             $output->writeln('Values:');
-            $this->dumpData($output, unserialize($row['data']), $scope, $attrName);
+            $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
@@ -483,10 +484,10 @@ class DebugCommand extends ContainerAwareCommand
         $scope,
         $attrName = null
     ) {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
             [$className],
             ['string']
@@ -496,14 +497,14 @@ class DebugCommand extends ContainerAwareCommand
         }
 
         foreach ($rows as $row) {
-            $data = unserialize($row['data']);
+            $data = $connection->convertToPHPValue($row['data'], 'array');
             if (empty($attrName)) {
                 unset($data[$scope]);
             } else {
                 unset($data[$scope][$attrName]);
             }
 
-            $em->getConnection()->executeUpdate(
+            $connection->executeUpdate(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -527,10 +528,10 @@ class DebugCommand extends ContainerAwareCommand
         $scope,
         $attrName = null
     ) {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
             . ' INNER JOIN oro_entity_config_field fc ON fc.entity_id = ec.id'
             . ' WHERE ec.class_name = ? AND fc.field_name = ?',
@@ -542,14 +543,14 @@ class DebugCommand extends ContainerAwareCommand
         }
 
         foreach ($rows as $row) {
-            $data = unserialize($row['data']);
+            $data = $connection->convertToPHPValue($row['data'], 'array');
             if (empty($attrName)) {
                 unset($data[$scope]);
             } else {
                 unset($data[$scope][$attrName]);
             }
 
-            $em->getConnection()->executeUpdate(
+            $connection->executeUpdate(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -573,10 +574,10 @@ class DebugCommand extends ContainerAwareCommand
         $attrName,
         $attrVal
     ) {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
             [$className],
             ['string']
@@ -586,10 +587,10 @@ class DebugCommand extends ContainerAwareCommand
         }
 
         foreach ($rows as $row) {
-            $data                    = unserialize($row['data']);
+            $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $em->getConnection()->executeUpdate(
+            $connection->executeUpdate(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -615,10 +616,10 @@ class DebugCommand extends ContainerAwareCommand
         $attrName,
         $attrVal
     ) {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
 
-        $rows = $em->getConnection()->fetchAll(
+        $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
             . ' INNER JOIN oro_entity_config_field fc ON fc.entity_id = ec.id'
             . ' WHERE ec.class_name = ? AND fc.field_name = ?',
@@ -630,10 +631,10 @@ class DebugCommand extends ContainerAwareCommand
         }
 
         foreach ($rows as $row) {
-            $data                    = unserialize($row['data']);
+            $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $em->getConnection()->executeUpdate(
+            $connection->executeUpdate(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
