@@ -90,6 +90,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertExtendOptions($schema, []);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testSchema()
     {
         $schema = new ExtendSchema(
