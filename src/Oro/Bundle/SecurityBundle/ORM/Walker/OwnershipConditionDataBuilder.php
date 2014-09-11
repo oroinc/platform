@@ -247,10 +247,13 @@ class OwnershipConditionDataBuilder
      */
     protected function fillBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
+        // add current user to select this user owned records
+        $result[] = $userId;
+
         foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
             $userIds = $this->treeProvider->getTree()->getUsersAssignedToBU($buId);
             if (!empty($userIds)) {
-                $result = array_merge($result, $userIds);
+                $result = array_unique(array_merge($result, $userIds));
             }
         }
     }
@@ -264,12 +267,15 @@ class OwnershipConditionDataBuilder
      */
     protected function fillSubordinateBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
+        // add current user to select this user owned records
+        $result[] = $userId;
+
         $buIds = [];
         $this->fillSubordinateBusinessUnitIds($userId, $organizationId, $buIds);
         foreach ($buIds as $buId) {
             $userIds = $this->treeProvider->getTree()->getUsersAssignedToBU($buId);
             if (!empty($userIds)) {
-                $result = array_merge($result, $userIds);
+                $result = array_unique(array_merge($result, $userIds));
             }
         }
     }
