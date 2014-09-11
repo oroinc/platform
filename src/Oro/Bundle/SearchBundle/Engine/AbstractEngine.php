@@ -166,8 +166,8 @@ abstract class AbstractEngine implements EngineInterface
     protected function reindexSingleEntity($entityName)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getRepository($entityName);
-        $queryBuilder = $entityManager->createQueryBuilder('entity');
+        $entityManager = $this->registry->getManagerForClass($entityName);
+        $queryBuilder = $entityManager->getRepository($entityName)->createQueryBuilder('entity');
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
@@ -180,12 +180,14 @@ abstract class AbstractEngine implements EngineInterface
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $this->save($entities, true);
+                $entityManager->clear();
                 $entities = array();
             }
         }
 
         if ($itemsCount % static::BATCH_SIZE > 0) {
             $this->save($entities, true);
+            $entityManager->clear();
         }
 
         return $itemsCount;
