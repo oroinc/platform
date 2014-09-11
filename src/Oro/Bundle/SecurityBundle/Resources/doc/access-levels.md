@@ -12,6 +12,10 @@ There are 6 access levels:
  - **User**: Allows to gives a user a permissions to access to own records and records that are shared with the user.
  - **None**: Access denied.
 
+ All the records have additional owner parameter - organization. Then user log into the system, he works in scope of one organization.
+
+ If the record was created in the scope of first organization, user can see this record only with system access level to this entity.
+
 [Examples](./examples.md)
   
 There are several ways to protect the records with access levels.
