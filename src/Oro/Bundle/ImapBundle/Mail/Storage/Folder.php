@@ -6,22 +6,21 @@ use Zend\Mail\Storage\Folder as BaseFolder;
 
 class Folder extends BaseFolder
 {
-    const FLAG_SENT = 'Sent';
-    const FLAG_SPAM = 'Spam';
-    const FLAG_TRASH = 'Trash';
+    const FLAG_SENT   = 'Sent';
+    const FLAG_SPAM   = 'Spam';
+    const FLAG_TRASH  = 'Trash';
     const FLAG_DRAFTS = 'Drafts';
-    const FLAG_INBOX = 'Inbox';
-    const FLAG_ALL = 'All';
+    const FLAG_INBOX  = 'Inbox';
+    const FLAG_ALL    = 'All';
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     public $flags = null;
 
     /**
      * Determines whether this folder is marked by the given flag
      *
      * @param string $flag
+     *
      * @return bool
      */
     public function hasFlag($flag)
