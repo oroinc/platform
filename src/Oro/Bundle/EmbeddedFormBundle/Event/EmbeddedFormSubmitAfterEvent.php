@@ -20,19 +20,11 @@ class EmbeddedFormSubmitAfterEvent extends Event
     /** @var  Form */
     protected $form;
 
-    public function __construct($data, EmbeddedForm $formEntity, $form)
+    public function __construct($data, EmbeddedForm $formEntity, Form $form)
     {
         $this->data = $data;
         $this->formEntity = $formEntity;
         $this->form = $form;
-    }
-
-    /**
-     * @param Object $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
     }
 
     /**
@@ -44,27 +36,11 @@ class EmbeddedFormSubmitAfterEvent extends Event
     }
 
     /**
-     * @param EmbeddedForm $formEntity
-     */
-    public function setFormEntity($formEntity)
-    {
-        $this->formEntity = $formEntity;
-    }
-
-    /**
      * @return EmbeddedForm
      */
     public function getFormEntity()
     {
         return $this->formEntity;
-    }
-
-    /**
-     * @param Form $form
-     */
-    public function setForm($form)
-    {
-        $this->form = $form;
     }
 
     /**

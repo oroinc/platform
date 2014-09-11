@@ -23,27 +23,11 @@ class EmbeddedFormSubmitBeforeEvent extends Event
     }
 
     /**
-     * @param Object $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
      * @return Object
      */
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * @param EmbeddedForm $formEntity
-     */
-    public function setFormEntity($formEntity)
-    {
-        $this->formEntity = $formEntity;
     }
 
     /**
