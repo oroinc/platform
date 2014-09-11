@@ -168,14 +168,8 @@ class OwnershipConditionDataBuilder
             } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
                 if ($metadata->isOrganizationOwned()) {
                     $constraint = $this->getCondition([$this->getOrganizationId()], $metadata);
-                } elseif ($metadata->isBusinessUnitOwned()) {
-                    $buIds = [];
-                    $this->fillOrganizationBusinessUnitIds($this->getUserId(), $buIds);
-                    $constraint = $this->getCondition($buIds, $metadata);
-                } elseif ($metadata->isUserOwned()) {
-                    $userIds = [];
-                    $this->fillOrganizationUserIds($this->getUserId(), $userIds);
-                    $constraint = $this->getCondition($userIds, $metadata);
+                } else {
+                    $constraint = $this->getCondition(null, $metadata, null, true);
                 }
             }
         }
@@ -243,10 +237,13 @@ class OwnershipConditionDataBuilder
      */
     protected function fillBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
+        // add current user to select this user owned records
+        $result[] = $userId;
+
         foreach ($this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
-            $userIds = $this->treeProvider->getTree()->getBusinessUnitUserIds($buId);
+            $userIds = $this->treeProvider->getTree()->getUsersAssignedToBU($buId);
             if (!empty($userIds)) {
-                $result = array_merge($result, $userIds);
+                $result = array_unique(array_merge($result, $userIds));
             }
         }
     }
@@ -260,12 +257,15 @@ class OwnershipConditionDataBuilder
      */
     protected function fillSubordinateBusinessUnitUserIds($userId, $organizationId, array &$result)
     {
+        // add current user to select this user owned records
+        $result[] = $userId;
+
         $buIds = [];
         $this->fillSubordinateBusinessUnitIds($userId, $organizationId, $buIds);
         foreach ($buIds as $buId) {
-            $userIds = $this->treeProvider->getTree()->getBusinessUnitUserIds($buId);
+            $userIds = $this->treeProvider->getTree()->getUsersAssignedToBU($buId);
             if (!empty($userIds)) {
-                $result = array_merge($result, $userIds);
+                $result = array_unique(array_merge($result, $userIds));
             }
         }
     }
@@ -307,28 +307,40 @@ class OwnershipConditionDataBuilder
     /**
      * Gets SQL condition for the given owner id or ids
      *
-     * @param  int|int[]|null    $idOrIds
-     * @param  OwnershipMetadata $metadata
-     * @param  string|null       $columnName
+     * @param int|int[]|null    idOrIds
+     * @param OwnershipMetadata $metadata
+     * @param string|null       $columnName
+     * @param bool              $ignoreOwner
      *
      * @return array|null
      */
-    protected function getCondition($idOrIds, OwnershipMetadata $metadata, $columnName = null)
+    protected function getCondition($idOrIds, OwnershipMetadata $metadata, $columnName = null, $ignoreOwner = false)
     {
-        if (!empty($idOrIds)) {
-            $organizationField = null;
-            $organizationValue = null;
-            if ($metadata->getOrganizationColumnName() && $this->getOrganizationId()) {
-                $organizationField = $metadata->getOrganizationFieldName();
-                $organizationValue = $this->getOrganizationId();
-            }
-            return array(
+        $organizationField = null;
+        $organizationValue = null;
+        if ($metadata->getOrganizationColumnName() && $this->getOrganizationId()) {
+            $organizationField = $metadata->getOrganizationFieldName();
+            $organizationValue = $this->getOrganizationId();
+        }
+
+        if (!$ignoreOwner && !empty($idOrIds)) {
+            return [
                 $this->getColumnName($metadata, $columnName),
                 $idOrIds,
                 $columnName == null ? PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION : PathExpression::TYPE_STATE_FIELD,
                 $organizationField,
-                $organizationValue
-            );
+                $organizationValue,
+                $ignoreOwner
+            ];
+        } elseif ($organizationField && $organizationValue) {
+            return [
+                null,
+                null,
+                null,
+                $organizationField,
+                $organizationValue,
+                $ignoreOwner
+            ];
         }
 
         return null;

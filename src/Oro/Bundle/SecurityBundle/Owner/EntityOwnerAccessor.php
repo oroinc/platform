@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
@@ -65,6 +68,29 @@ class EntityOwnerAccessor
                     );
                 }
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets organization of the given entity
+     *
+     * @param $object
+     * @return object
+     * @throws InvalidEntityException
+     */
+    public function getOrganization($object)
+    {
+        if (!is_object($object)) {
+            throw new InvalidEntityException('$object must be an object.');
+        }
+
+        $result = null;
+        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
+        if ($metadata->getOrganizationFieldName()) {
+            $accessor = PropertyAccess::createPropertyAccessor();
+            $result = $accessor->getValue($object, $metadata->getOrganizationFieldName());
         }
 
         return $result;

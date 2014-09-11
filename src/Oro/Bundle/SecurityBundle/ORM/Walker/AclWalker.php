@@ -120,50 +120,44 @@ class AclWalker extends TreeWalkerAdapter
                 ->identificationVariableDeclarations[$condition->getFromKey()]
                 ->joins[$condition->getJoinKey()];
             if (!($condition instanceof JoinAssociationCondition)) {
-                /** @var JoinAclCondition $condition */
-                $conditionalFactor = $this->getConditionalFactor($condition);
-                $aclConditionalFactors = array($conditionalFactor);
-                $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
-                if ($organizationConditionFactor) {
-                    $aclConditionalFactors[] = $organizationConditionFactor;
-                }
-                if ($join->conditionalExpression instanceof ConditionalPrimary) {
-                    array_unshift($aclConditionalFactors, $join->conditionalExpression);
-                    $join->conditionalExpression = new ConditionalTerm(
-                        $aclConditionalFactors
-                    );
-                } else {
-                    $join->conditionalExpression->conditionalFactors = array_merge(
-                        $join->conditionalExpression->conditionalFactors,
-                        $aclConditionalFactors
-                    );
+                $aclConditionalFactors = [];
+                $this->addConditionFactors($aclConditionalFactors, $condition);
+                if (!empty($aclConditionalFactors)) {
+                    if ($join->conditionalExpression instanceof ConditionalPrimary) {
+                        array_unshift($aclConditionalFactors, $join->conditionalExpression);
+                        $join->conditionalExpression = new ConditionalTerm(
+                            $aclConditionalFactors
+                        );
+                    } else {
+                        $join->conditionalExpression->conditionalFactors = array_merge(
+                            $join->conditionalExpression->conditionalFactors,
+                            $aclConditionalFactors
+                        );
+                    }
                 }
             } else {
-                $fromClause
-                    ->identificationVariableDeclarations[$condition->getFromKey()]
-                    ->joins[$condition->getJoinKey()] = $this->getJoinFromJoinAssociationCondition($join, $condition);
+                $conditionalFactors = [];
+                $this->addConditionFactors($conditionalFactors, $condition);
+                if (!empty($conditionalFactors)) {
+                    $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
+                    $fromClause
+                        ->identificationVariableDeclarations[$condition->getFromKey()]
+                        ->joins[$condition->getJoinKey()] = $join;
+                }
             }
         }
     }
 
-    /**
-     * Generate Join condition for join wothout "on" statement
-     *
-     * @param Join $join
-     * @param JoinAssociationCondition $condition
-     * @return Join
-     */
-    protected function getJoinFromJoinAssociationCondition(Join $join, JoinAssociationCondition $condition)
+    protected function addConditionFactors(&$aclConditionalFactors, AclCondition $condition)
     {
-        $conditionalFactors[] = $this->getConditionalFactor($condition);
-
+        $conditionalFactor = $this->getConditionalFactor($condition);
+        if ($conditionalFactor) {
+            $aclConditionalFactors[] = $conditionalFactor;
+        }
         $organizationConditionFactor = $this->getOrganizationCheckCondition($condition);
         if ($organizationConditionFactor) {
-            $conditionalFactors[] = $organizationConditionFactor;
+            $aclConditionalFactors[] = $organizationConditionFactor;
         }
-
-        $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
-        return $join;
     }
 
     /**
@@ -175,13 +169,8 @@ class AclWalker extends TreeWalkerAdapter
     protected function addAclToWhereClause($AST, array $whereConditions)
     {
         $aclConditionalFactors = [];
-
         foreach ($whereConditions as $whereCondition) {
-            $aclConditionalFactors[] = $this->getConditionalFactor($whereCondition);
-            $organizationConditionFactor = $this->getOrganizationCheckCondition($whereCondition);
-            if ($organizationConditionFactor) {
-                $aclConditionalFactors[] = $organizationConditionFactor;
-            }
+            $this->addConditionFactors($aclConditionalFactors, $whereCondition);
         }
 
         if (!empty($aclConditionalFactors)) {
@@ -221,6 +210,10 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getConditionalFactor(AclCondition $condition)
     {
+        if ($condition->isIgnoreOwner()) {
+            return null;
+        }
+
         if ($condition->getValue() == null && $condition->getEntityField() == null) {
             $expression = $this->getAccessDeniedExpression();
         } else {
@@ -263,8 +256,7 @@ class AclWalker extends TreeWalkerAdapter
                 $whereCondition->getOrganizationField()
             );
 
-            $pathExpression->type = $whereCondition->getPathExpressionType();
-
+            $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
             $leftExpression = new ArithmeticExpression();
             $leftExpression->simpleArithmeticExpression = $pathExpression;
             $rightExpression = new ArithmeticExpression();

@@ -11,9 +11,6 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
 /**
  * This class implements OwnershipDecisionMakerInterface interface and allows to make ownership related
  * decisions using the tree of owners.
@@ -142,10 +139,11 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
         if ($metadata->isOrganizationOwned()) {
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds);
-        } elseif ($metadata->isBusinessUnitOwned()) {
-            return in_array($tree->getBusinessUnitOrganizationId($ownerId), $allowedOrganizationIds);
-        } elseif ($metadata->isUserOwned()) {
-            return in_array($tree->getUserOrganizationId($ownerId), $allowedOrganizationIds);
+        } else {
+            return in_array(
+                $this->getObjectId($this->entityOwnerAccessor->getOrganization($domainObject)),
+                $allowedOrganizationIds
+            );
         }
 
         return false;
@@ -190,14 +188,14 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         if ($metadata->isBusinessUnitOwned()) {
             return $this->isUserBusinessUnit($this->getObjectId($user), $ownerId, $deep, $organizationId);
         } elseif ($metadata->isUserOwned()) {
-            $businessUnitId = $tree->getUserBusinessUnitId($ownerId);
-            if ($businessUnitId === null) {
+            $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
+            if (empty($ownerBusinessUnitIds)) {
                 return false;
             }
 
-            return $this->isUserBusinessUnit(
+            return $this->isUserBusinessUnits(
                 $this->getObjectId($user),
-                $tree->getUserBusinessUnitId($ownerId),
+                $ownerBusinessUnitIds,
                 $deep,
                 $organizationId
             );
@@ -211,13 +209,13 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
      */
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
-        /**
-         * @var $user User
-         */
-        /**
-         * @var $organization Organization
-         */
-        if ($organization && !$user->getOrganizations()->contains($organization)) {
+        $userId = $this->getObjectId($user);
+        if ($organization
+            && !in_array(
+                $this->getObjectId($organization),
+                $this->treeProvider->getTree()->getUserOrganizationIds($userId)
+            )
+        ) {
             return false;
         }
 
@@ -232,7 +230,40 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         if ($metadata->isUserOwned()) {
             $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
 
-            return $this->getObjectId($user) === $ownerId;
+            return $userId === $ownerId;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether the given user has a relation to the given business unit
+     *
+     * @param  int|string      $userId
+     * @param  int|string|null $ownerBusinessUnitIds
+     * @param  bool            $deep Specify whether subordinate business units should be checked. Defaults to false.
+     * @param  int|null        $organizationId
+     * @return bool
+     */
+    protected function isUserBusinessUnits($userId, $ownerBusinessUnitIds, $deep = false, $organizationId = null)
+    {
+        $userBusinessUnitIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        $familiarBusinessUnits = array_intersect($userBusinessUnitIds, $ownerBusinessUnitIds);
+        if (!empty($familiarBusinessUnits)) {
+
+            return true;
+        }
+        if ($deep) {
+            foreach ($userBusinessUnitIds as $buId) {
+                $familiarBusinessUnits = array_intersect(
+                    $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
+                    $ownerBusinessUnitIds
+                );
+                if (!empty($familiarBusinessUnits)) {
+
+                    return true;
+                }
+            }
         }
 
         return false;

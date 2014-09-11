@@ -83,6 +83,15 @@ class OwnerTree
     protected $businessUnitUserIds;
 
     /**
+     * An associative array to store users belong to a assigned business unit
+     * key = businessUnitId
+     * value = array of userId
+     *
+     * @var array
+     */
+    protected $assignedBusinessUnitUserIds;
+
+    /**
      * An associative array to store business units belong to an organization
      * key = organizationId
      * value = array of businessUnitId
@@ -382,6 +391,17 @@ class OwnerTree
     }
 
     /**
+     * @param $buId
+     * @return array
+     */
+    public function getUsersAssignedToBU($buId)
+    {
+        return isset($this->assignedBusinessUnitUserIds[$buId])
+            ? $this->assignedBusinessUnitUserIds[$buId]
+            : array();
+    }
+
+    /**
      * Add a business unit to the given user
      *
      * @param  int|string $userId
@@ -395,6 +415,10 @@ class OwnerTree
             throw new \LogicException(sprintf('First call addUser for userId: %s.', (string)$userId));
         }
         if ($businessUnitId !== null) {
+            if (!isset($this->assignedBusinessUnitUserIds[$businessUnitId])) {
+                $this->assignedBusinessUnitUserIds[$businessUnitId] = [];
+            }
+            $this->assignedBusinessUnitUserIds[$businessUnitId][] = $userId;
             $this->userBusinessUnitIds[$userId][] = $businessUnitId;
             if (!isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])) {
                 $this->userOrganizationBusinessUnitIds[$userId][$organizationId] = [];
@@ -428,5 +452,6 @@ class OwnerTree
         $this->userBusinessUnitIds = array();
         $this->businessUnitUserIds = array();
         $this->userOrganizationBusinessUnitIds = array();
+        $this->assignedBusinessUnitUserIds = array();
     }
 }

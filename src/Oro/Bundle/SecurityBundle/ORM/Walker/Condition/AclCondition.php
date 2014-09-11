@@ -37,12 +37,18 @@ class AclCondition
     protected $organizationValue;
 
     /**
+     * @var bool
+     */
+    protected $ignoreOwner;
+
+    /**
      * @param string $entityAlias
      * @param string $entityField
      * @param mixed  $value
      * @param int    $pathExpressionType
      * @param string $organizationField
      * @param int    $organizationValue
+     * @param bool   $ignoreOwner
      */
     public function __construct(
         $entityAlias,
@@ -50,7 +56,8 @@ class AclCondition
         $value = null,
         $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
         $organizationField = null,
-        $organizationValue = null
+        $organizationValue = null,
+        $ignoreOwner = false
     ) {
         $this->entityAlias        = $entityAlias;
         $this->entityField        = $entityField;
@@ -58,6 +65,7 @@ class AclCondition
         $this->pathExpressionType = $pathExpressionType;
         $this->organizationField  = $organizationField;
         $this->organizationValue  = $organizationValue;
+        $this->ignoreOwner        = $ignoreOwner;
     }
 
     /**
@@ -138,5 +146,21 @@ class AclCondition
     public function getOrganizationValue()
     {
         return $this->organizationValue;
+    }
+
+    /**
+     * @param boolean $ignoreOwner
+     */
+    public function setIgnoreOwner($ignoreOwner)
+    {
+        $this->ignoreOwner = $ignoreOwner;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIgnoreOwner()
+    {
+        return $this->ignoreOwner;
     }
 }
