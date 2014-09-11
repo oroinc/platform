@@ -74,7 +74,7 @@ services:
         tags:
             - { name: form.type_guesser, priority: 20 }
 
-    oro_entityg.form.guesser.doctrine_type:
+    oro_entity.form.guesser.doctrine_type:
         class: %oro_entity.form.guesser.doctrine_type.class%
         arguments:
             - @doctrine

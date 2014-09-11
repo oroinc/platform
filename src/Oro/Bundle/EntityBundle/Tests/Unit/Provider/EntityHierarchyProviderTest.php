@@ -6,7 +6,10 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 class EntityHierarchyProviderTest extends OrmTestCase
@@ -29,30 +32,51 @@ class EntityHierarchyProviderTest extends OrmTestCase
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
 
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityIds = [
-            new EntityConfigId('entity', self::ENTITY_NAMESPACE . '\TestEntity1'),
-            new EntityConfigId('entity', self::ENTITY_NAMESPACE . '\TestEntity2'),
-            new EntityConfigId('entity', self::ENTITY_NAMESPACE . '\TestEntity3'),
+        $config1 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity1'));
+        $config2 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity2'));
+        $config3 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity3'));
+
+        $newCustomEntityConfig = new Config(
+            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity4')
+        );
+        $newCustomEntityConfig->set('state', ExtendScope::STATE_NEW);
+
+        $toBeDeletedCustomEntityConfig = new Config(
+            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity5')
+        );
+        $toBeDeletedCustomEntityConfig->set('state', ExtendScope::STATE_DELETE);
+
+        $deletedCustomEntityConfig = new Config(
+            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity6')
+        );
+        $deletedCustomEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
+        $deletedCustomEntityConfig->set('is_deleted', true);
+
+        $entityConfigs = [
+            $config1,
+            $config2,
+            $config3,
+            $newCustomEntityConfig,
+            $toBeDeletedCustomEntityConfig,
+            $deletedCustomEntityConfig
         ];
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfigs')
+            ->will($this->returnValue($entityConfigs));
+
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager->expects($this->once())
-            ->method('getEntityManager')
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->returnValue($em));
-        $entityConfigProvider->expects($this->once())
-            ->method('getIds')
-            ->will($this->returnValue($entityIds));
-        $entityConfigProvider->expects($this->once())
-            ->method('getConfigManager')
-            ->will($this->returnValue($configManager));
 
-        $this->provider = new EntityHierarchyProvider($entityConfigProvider);
+        $this->provider = new EntityHierarchyProvider($extendConfigProvider, $doctrine);
     }
 
     public function testGetHierarchy()

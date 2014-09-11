@@ -4,7 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\DefaultTranslator;
+use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Validator;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -25,25 +31,42 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->testConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->testConfigProvider = $this->getConfigProviderMock();
 
         parent::setUp();
     }
 
     protected function getExtensions()
     {
-        $configExtension = new ConfigExtension();
+        $validator = new Validator(
+            new ClassMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory(),
+            new DefaultTranslator()
+        );
 
         return [
             new PreloadedExtension(
                 [],
-                [$configExtension->getExtendedType() => [$configExtension]]
+                [
+                    'form' => [
+                        new FormTypeValidatorExtension($validator),
+                        new ConfigExtension()
+                    ]
+                ]
             )
         ];
     }
 
+    /**
+     * @param string                                     $formName
+     * @param AbstractType                               $formType
+     * @param array                                      $options
+     * @param \PHPUnit_Framework_MockObject_MockObject[] $configProviders
+     * @param mixed                                      $newVal
+     * @param mixed                                      $oldVal
+     * @param string                                     $state
+     * @param bool                                       $isSetStateExpected
+     */
     protected function doTestSubmit(
         $formName,
         AbstractType $formType,
@@ -71,9 +94,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $extendConfigId = new EntityConfigId('extend', 'Test\Entity');
         $extendConfig   = new Config($extendConfigId);
         $extendConfig->set('state', $state);
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->getConfigProviderMock();
         $extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with('Test\Entity')
@@ -83,7 +104,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->with($config->getId())
             ->will($this->returnValue($config));
 
-        $configProviders['test']   = $this->testConfigProvider;
+        $this->setConfigProvidersForSubmitTest($configProviders);
         $configProviders['extend'] = $extendConfigProvider;
 
         $configProvidersMap = [];
@@ -96,24 +117,43 @@ class AbstractConfigTypeTestCase extends TypeTestCase
 
         $expectedExtendConfig = new Config($extendConfigId);
         if ($isSetStateExpected) {
-            $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATED);
-            $extendConfigProvider->expects($this->once())
+            $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATE);
+            $this->configManager->expects($this->once())
                 ->method('persist')
                 ->with($expectedExtendConfig);
-            $extendConfigProvider->expects($this->once())
-                ->method('flush');
         } else {
             $expectedExtendConfig->set('state', $state);
-            $extendConfigProvider->expects($this->never())
+            $this->configManager->expects($this->never())
                 ->method('persist');
-            $extendConfigProvider->expects($this->never())
+        }
+
+        // flush should be never called
+        foreach ($configProviders as $configProvider) {
+            $configProvider->expects($this->never())
                 ->method('flush');
         }
+        $this->configManager->expects($this->never())
+            ->method('flush');
 
         $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
         $form->submit($newVal);
 
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedExtendConfig, $extendConfig);
+    }
+
+    protected function setConfigProvidersForSubmitTest(array &$configProviders)
+    {
+        $configProviders['test'] = $this->testConfigProvider;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getConfigProviderMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

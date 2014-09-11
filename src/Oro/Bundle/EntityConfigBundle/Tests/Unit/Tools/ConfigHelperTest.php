@@ -49,56 +49,56 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'oro.somesomeclass.entity_label',
+                'oro.some.someclass.entity_label',
                 'entity',
                 'label',
                 'Oro\SomeBundle\SomeClass',
                 null
             ],
             [
-                'oro.somesomeclass.entity_test_label',
+                'oro.some.someclass.entity_test_label',
                 'test',
                 'label',
                 'Oro\SomeBundle\SomeClass',
                 null
             ],
             [
-                'oro.somesomeclass.entity_plural_label',
+                'oro.some.someclass.entity_plural_label',
                 'entity',
                 'plural_label',
                 'Oro\SomeBundle\SomeClass',
                 null
             ],
             [
-                'oro.somesomeclass.entity_test_plural_label',
+                'oro.some.someclass.entity_test_plural_label',
                 'test',
                 'plural_label',
                 'Oro\SomeBundle\SomeClass',
                 null
             ],
             [
-                'oro.somesomeclass.some_field.label',
+                'oro.some.someclass.some_field.label',
                 'entity',
                 'label',
                 'Oro\SomeBundle\SomeClass',
                 'someField'
             ],
             [
-                'oro.somesomeclass.some_field.test_label',
+                'oro.some.someclass.some_field.test_label',
                 'test',
                 'label',
                 'Oro\SomeBundle\SomeClass',
                 'someField'
             ],
             [
-                'oro.somesomeclass.some_field.plural_label',
+                'oro.some.someclass.some_field.plural_label',
                 'entity',
                 'plural_label',
                 'Oro\SomeBundle\SomeClass',
                 'someField'
             ],
             [
-                'oro.somesomeclass.some_field.test_plural_label',
+                'oro.some.someclass.some_field.test_plural_label',
                 'test',
                 'plural_label',
                 'Oro\SomeBundle\SomeClass',

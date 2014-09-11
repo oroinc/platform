@@ -71,8 +71,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             $className     = $eventConfig->getId()->getClassName();
             $entityConfig  = $configManager->getProvider($scope)->getConfig($className);
 
-            if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETED])) {
-                $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+            if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {
+                $entityConfig->set('state', ExtendScope::STATE_UPDATE);
                 $configManager->persist($entityConfig);
             }
         }

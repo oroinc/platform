@@ -90,7 +90,7 @@ class FieldGenerator
         }
 
         // update entity config
-        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+        $entityConfig->set('state', ExtendScope::STATE_UPDATE);
         $entityConfig->set('upgradeable', true);
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
@@ -135,7 +135,7 @@ class FieldGenerator
         $extendFieldConfig = $extendConfigProvider->getConfig($entityClass, $fieldName);
         $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
-        $extendFieldConfig->set('extend', true);
+        $extendFieldConfig->set('is_extend', true);
         $extendFieldConfig->set('target_entity', $targetEntity);
         $extendFieldConfig->set('target_field', $targetField);
         $extendFieldConfig->set(

@@ -17,8 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class FileConfigType extends AbstractType
 {
-    const NAME              = 'oro_attachment_file_config';
-    const ATTACHMENT_ENTITY = 'Oro\Bundle\AttachmentBundle\Entity\File';
+    const NAME = 'oro_attachment_file_config';
 
     /** @var ConfigProvider */
     protected $extendConfigProvider;
@@ -49,14 +48,14 @@ class FileConfigType extends AbstractType
                     $configId->getClassName(),
                     $configId->getFieldName(),
                     'manyToOne',
-                    self::ATTACHMENT_ENTITY
+                    'Oro\Bundle\AttachmentBundle\Entity\File'
                 );
 
                 /** @var Config $entityExtendConfig */
                 $entityExtendConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
                 if ($this->isApplicable($entityExtendConfig, $relationKey)) {
                     if ($entityExtendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATED);
+                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATE);
 
                         $this->extendConfigProvider->persist($entityExtendConfig);
                         $this->extendConfigProvider->flush();

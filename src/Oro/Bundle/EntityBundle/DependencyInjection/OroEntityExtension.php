@@ -19,16 +19,22 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->loadEntityConfigs($container);
         $this->loadHiddenFieldConfigs($container);
 
         $configuration = new Configuration();
-        $this->processConfiguration($configuration, $configs);
+        array_unshift(
+            $configs,
+            $this->loadEntityConfigs($container)
+        );
+        $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('orm.yml');
         $loader->load('form_type.yml');
         $loader->load('services.yml');
+
+        $container->setParameter('oro_entity.exclusions', $config['exclusions']);
+        $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
     }
 
     /**
@@ -40,7 +46,7 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
     {
         $dbDriver = $container->getParameter('database_driver');
         if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-            $doctrineConfig = $container->getExtensionConfig('doctrine');
+            $doctrineConfig            = $container->getExtensionConfig('doctrine');
             $doctrineConnectionOptions = array();
             foreach ($doctrineConfig as $config) {
                 if (isset($config['dbal']['connections'])) {
@@ -51,7 +57,7 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
                         );
                         // Add support of "oid" and "name" Db types for EnterpriseDB
                         $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = array(
-                            'oid' => 'integer',
+                            'oid'  => 'integer',
                             'name' => 'string'
                         );
                     }
@@ -65,6 +71,8 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
      * Loads configuration of entity
      *
      * @param ContainerBuilder $container
+     *
+     * @return array
      */
     protected function loadEntityConfigs(ContainerBuilder $container)
     {
@@ -91,8 +99,10 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             }
         }
 
-        $container->setParameter('oro_entity.virtual_fields', $virtualFields);
-        $container->setParameter('oro_entity.exclusions', $exclusions);
+        return [
+            'exclusions'     => $exclusions,
+            'virtual_fields' => $virtualFields
+        ];
     }
 
     /**
