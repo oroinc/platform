@@ -11,6 +11,9 @@ oro:
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template:                   "Choose a template..."
 
+        system_configuration:
+            email_configuration: Email Configuration
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
