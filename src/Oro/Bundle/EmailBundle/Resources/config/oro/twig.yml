@@ -1,2 +1,2 @@
 bundles:
-    - OroFormBundle:Form:fields.html.twig
+    - OroEmailBundle:Form:fields.html.twig
