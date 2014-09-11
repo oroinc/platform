@@ -83,9 +83,8 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $output->writeln('Authorization: WSSE profile="UsernameToken"');
         $output->writeln(
             sprintf(
-                'X-WSSE: UsernameToken Username="%s", Organization="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
+                'X-WSSE: UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
                 $username,
-                $organization,
                 $passwordDigest,
                 $nonce,
                 $created

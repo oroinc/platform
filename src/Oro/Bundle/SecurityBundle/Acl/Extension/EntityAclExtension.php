@@ -9,7 +9,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -460,7 +460,7 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         $organization = null;
-        if ($securityToken instanceof UsernamePasswordOrganizationToken) {
+        if ($securityToken instanceof OrganizationContextTokenInterface) {
             $organization = $securityToken->getOrganizationContext();
         }
 

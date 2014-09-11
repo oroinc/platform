@@ -3,11 +3,13 @@
 namespace Oro\Bundle\SecurityBundle;
 
 use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SecurityFacade
@@ -193,7 +195,7 @@ class SecurityFacade
     public function getOrganization()
     {
         $token = $this->securityContext->getToken();
-        if ($token instanceof UsernamePasswordOrganizationToken) {
+        if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext();
         }
 
