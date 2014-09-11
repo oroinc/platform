@@ -130,7 +130,7 @@ class FieldHelper
             $this->isRelation($field)
             && in_array(
                 $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
-                array('ref-one', 'oneToOne', 'manyToOne')
+                array('ref-one', 'manyToOne')
             );
     }
 

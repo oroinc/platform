@@ -188,7 +188,7 @@ class ConfigEntityGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $entityConfig->set('state', ExtendScope::STATE_DELETED);
+        $entityConfig->set('state', ExtendScope::STATE_DELETE);
 
         $configManager->persist($entityConfig);
         $configManager->flush();
@@ -227,7 +227,7 @@ class ConfigEntityGridController extends Controller
 
         $entityConfig->set(
             'state',
-            class_exists($entity->getClassName()) ? ExtendScope::STATE_UPDATED : ExtendScope::STATE_NEW
+            class_exists($entity->getClassName()) ? ExtendScope::STATE_UPDATE : ExtendScope::STATE_NEW
         );
 
         $configManager->persist($entityConfig);

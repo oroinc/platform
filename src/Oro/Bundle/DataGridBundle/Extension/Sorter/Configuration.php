@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode(PropertyInterface::DATA_NAME_KEY)->isRequired()->end()
+                            ->booleanNode(PropertyInterface::DISABLED_KEY)->end()
                             ->variableNode('apply_callback')->end()
                         ->end()
                     ->end()

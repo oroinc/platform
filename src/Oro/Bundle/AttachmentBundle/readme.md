@@ -44,7 +44,7 @@ Access to files and images takes from entity, where this field types assigned. T
 
 ##Migration Extension usage example
 
-It is possible to create attachment field via migrations with help of AttachmentExtension. For example:
+It is possible to create image or file field via migrations with help of AttachmentExtension. For example:
 
 ```
 <?php
@@ -76,15 +76,14 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->attachmentExtension->addAttachmentRelation(
+        $this->attachmentExtension->addImageRelation(
             $schema,
             'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
             'new_field_name', // field name
-            'image', // type of attachment field, e.g. "file' OR "image"
             [], //additional options for relation
-            7, // max allowed file size for upload, can be omitted, by default 1
-            100, // thumbnail width in PX, applicable only for "image", can be omitted, by default 32
-            100 // thumbnail height in PX, applicable only for "image", can be omitted, by default 32
+            7, // max allowed file size in megabytes, can be omitted, by default 1 Mb
+            100, // thumbnail width in pixels, can be omitted, by default 32
+            100 // thumbnail height in pixels, can be omitted, by default 32
         );
     }
 }
@@ -125,8 +124,8 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
         $this->attachmentExtension->addAttachmentAssociation(
             $schema,
             'entity_table_name', // entity table, e.g. oro_user, orocrm_contact etc.
-            $allowedMimeTypes = [], // optional, allowed mime types for entity, if empty - global configuration will be used
-            $maxsize = 1 // optional, max allowed file size for upload, in MB, by default 1
+            [], // optional, allowed MIME types of attached files, if empty - global configuration will be used
+            2 // optional, max allowed file size in megabytes, by default 1 Mb
         );
     }
 }

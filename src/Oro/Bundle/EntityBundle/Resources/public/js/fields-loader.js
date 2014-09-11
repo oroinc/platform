@@ -119,7 +119,7 @@ define([
                 entity.fieldsIndex = {};
                 $.each(entity.fields, function () {
                     var field = this;
-                    if (field.related_entity_name) {
+                    if (field.relation_type && field.related_entity_name) {
                         field.related_entity = data[field.related_entity_name];
                         delete field.related_entity_name;
                     }

@@ -54,6 +54,8 @@ class TranslationRepository extends EntityRepository
      * @param string $locale
      * @param string $domain
      * @param int    $scope
+     *
+     * @return Translation
      */
     public function saveValue(
         $key,
@@ -75,6 +77,8 @@ class TranslationRepository extends EntityRepository
             $translationValue->setValue($value);
         }
         $this->getEntityManager()->persist($translationValue);
+
+        return $translationValue;
     }
 
     /**

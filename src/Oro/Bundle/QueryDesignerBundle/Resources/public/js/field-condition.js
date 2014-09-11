@@ -70,8 +70,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
         _renderFilter: function (fieldId) {
             var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
-                filterId = this._getApplicableFilterId(conditions);
-            this._createFilter(this.options.filters[filterId]);
+                filterId = this._getApplicableFilterId(conditions),
+                filter = this.options.filters[filterId];
+            this._createFilter(filter, fieldId);
         },
 
         _getApplicableFilterId: function (conditions) {
@@ -121,12 +122,32 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             });
         },
 
-        _createFilter: function (options) {
-            var moduleName = mapFilterModuleName(options.type);
+        _createFilter: function (filterOptions, fieldId) {
 
-            require([moduleName], _.bind(function (Filter) {
-                var filter = new (Filter.extend(options))();
-                this._appendFilter(filter);
+            var moduleName = mapFilterModuleName(filterOptions.type),
+                requires = [moduleName];
+
+            if (filterOptions.init_module) {
+                requires.push(filterOptions.init_module);
+            }
+
+            // show loading message, if loading takes more than 100ms
+            var showLoadingTimeout = setTimeout(_.bind(function () {
+                this.$filterContainer.html("<span class=\"loading-indicator\">" + __("Loading...") + "</span>")
+            }, this), 100);
+
+            require(requires, _.bind(function (Filter, optionResolver) {
+                function appendFilter() {
+                    clearTimeout(showLoadingTimeout);
+                    var filter = new (Filter.extend(filterOptions))();
+                    this._appendFilter(filter);
+                }
+                if (optionResolver) {
+                    var promise = optionResolver(filterOptions, this.$fieldChoice.fieldChoice('splitFieldId', fieldId));
+                    promise.done(_.bind(appendFilter, this));
+                } else {
+                    appendFilter.call(this);
+                }
             }, this));
         },
 
@@ -151,10 +172,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             if (!this.filter.isEmptyValue()) {
                 value = {
                     columnName: this.element.find('input.select').select2('val'),
-                    criterion: {
-                        filter: this.filter.type,
-                        data: this.filter.getValue()
-                    }
+                    criterion: this._getFilterCriterion()
                 };
             } else {
                 value = {};
@@ -162,6 +180,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
 
             this.element.data('value', value);
             this.element.trigger('changed');
+        },
+
+        _getFilterCriterion: function () {
+            var data = this.filter.getValue();
+
+            if (this.filter.filterParams) {
+                data.params = this.filter.filterParams;
+            }
+
+            return {
+                filter: this.filter.name,
+                data: data
+            };
         },
 
         selectField: function (name) {

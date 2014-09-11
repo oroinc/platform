@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @deprecated since 1.4. Will be removed in 2.0
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository")
  * @ORM\Table(name="oro_entity_config_optset_rel")
  * @ORM\HasLifecycleCallbacks
