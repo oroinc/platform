@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysConstraint;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 
 class UniqueKeyCollectionType extends AbstractType
 {
@@ -60,7 +60,7 @@ class UniqueKeyCollectionType extends AbstractType
                 'prototype'      => true,
                 'prototype_name' => 'tag__name__',
                 'label'          => false,
-                'constraints'    => [new UniqueKeysConstraint()]
+                'constraints'    => [new UniqueKeys()]
             )
         );
     }

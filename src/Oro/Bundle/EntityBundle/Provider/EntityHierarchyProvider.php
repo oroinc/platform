@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * This class allows to get parent entities/mapped superclasses for any configurable entity
@@ -12,17 +14,22 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 class EntityHierarchyProvider
 {
     /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    protected $extendConfigProvider;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var array */
     protected $hierarchy;
 
     /**
-     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider  $extendConfigProvider
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(ConfigProvider $entityConfigProvider)
+    public function __construct(ConfigProvider $extendConfigProvider, ManagerRegistry $doctrine)
     {
-        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
+        $this->doctrine             = $doctrine;
     }
 
     /**
@@ -60,15 +67,34 @@ class EntityHierarchyProvider
         if (null === $this->hierarchy) {
             $this->hierarchy = [];
 
-            $em       = $this->entityConfigProvider->getConfigManager()->getEntityManager();
-            $entities = $this->entityConfigProvider->getIds();
-            foreach ($entities as $entity) {
-                $className = $entity->getClassName();
-                $parents   = [];
-                $this->loadParents($parents, $className, $em);
-                if ($parents) {
-                    $this->hierarchy[$className] = $parents;
+            $entityConfigs = $this->extendConfigProvider->getConfigs();
+            foreach ($entityConfigs as $entityConfig) {
+                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
+                    continue;
                 }
+                if ($entityConfig->is('is_deleted')) {
+                    continue;
+                }
+
+                $className = $entityConfig->getId()->getClassName();
+                $parents   = [];
+                $this->loadParents($parents, $className);
+                if (empty($parents)) {
+                    continue;
+                }
+
+                // remove proxies if they are in list of parents
+                $parents = array_filter(
+                    $parents,
+                    function ($parentClassName) {
+                        return strpos($parentClassName, ExtendConfigDumper::ENTITY) !== 0;
+                    }
+                );
+                if (empty($parents)) {
+                    continue;
+                }
+
+                $this->hierarchy[$className] = $parents;
             }
         }
     }
@@ -76,16 +102,16 @@ class EntityHierarchyProvider
     /**
      * Finds parent doctrine entities for given entity class name
      *
-     * @param array         $result
-     * @param string        $className
-     * @param EntityManager $em
+     * @param array  $result
+     * @param string $className
      */
-    protected function loadParents(array &$result, $className, EntityManager $em)
+    protected function loadParents(array &$result, $className)
     {
         $reflection  = new \ReflectionClass($className);
         $parentClass = $reflection->getParentClass();
         if ($parentClass) {
             $parentClassName = $parentClass->getName();
+            $em              = $this->doctrine->getManagerForClass($className);
             if (!$em->getMetadataFactory()->isTransient($parentClassName)) {
                 $result[] = $parentClassName;
             }

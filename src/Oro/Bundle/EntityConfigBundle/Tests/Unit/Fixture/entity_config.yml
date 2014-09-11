@@ -9,7 +9,6 @@ oro_entity_config:
                 enabled:
                     options:
                         default_value:      true
-                        is_bool:            true
                     grid:
                         type:               boolean
                         label:              'Show in Datagrid'
@@ -49,7 +48,6 @@ oro_entity_config:
                 enabled:
                     options:
                         default_value:      true
-                        is_bool:            true
                     grid:
                         type:               boolean
                         label:              'Show in Datagrid'
@@ -69,7 +67,6 @@ oro_entity_config:
                 is_searchable:
                     options:
                         default_value:      false
-                        is_bool:            true
                     grid:
                         type:               boolean
                         label:              'Datagrid search'
@@ -89,7 +86,6 @@ oro_entity_config:
                 is_filtrableble:
                     options:
                         default_value:      false
-                        is_bool:            true
                     grid:
                         type:               boolean
                         label:              'Datagrid filter'

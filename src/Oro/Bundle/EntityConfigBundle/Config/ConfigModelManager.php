@@ -301,23 +301,27 @@ class ConfigModelManager
 
     /**
      * @param string|null $className
+     * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
+     *
      * @return AbstractConfigModel[]
      */
-    public function getModels($className = null)
+    public function getModels($className = null, $withHidden = false)
     {
         $result = [];
 
         if ($className) {
             $this->ensureFieldLocalCacheWarmed($className);
+            /** @var FieldConfigModel $model */
             foreach ($this->fieldLocalCache[$className] as $model) {
-                if ($model) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
         } else {
             $this->ensureEntityLocalCacheWarmed();
+            /** @var EntityConfigModel $model */
             foreach ($this->entityLocalCache as $model) {
-                if ($model) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }

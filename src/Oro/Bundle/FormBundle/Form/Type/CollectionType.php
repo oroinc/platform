@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
@@ -29,9 +30,10 @@ class CollectionType extends AbstractType
     {
         $view->vars = array_replace(
             $view->vars,
-            array(
+            [
+                'handle_primary'       => $options['handle_primary'],
                 'show_form_when_empty' => $options['show_form_when_empty']
-            )
+            ]
         );
     }
 
@@ -41,17 +43,25 @@ class CollectionType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'prototype' => true,
-                'prototype_name' => '__name__',
+            [
+                'allow_add'            => true,
+                'allow_delete'         => true,
+                'by_reference'         => false,
+                'prototype'            => true,
+                'prototype_name'       => '__name__',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'handle_primary'       => true,
                 'show_form_when_empty' => true
-            )
+            ]
         );
-        $resolver->setRequired(array('type'));
+        $resolver->setRequired(['type']);
+        $resolver->setNormalizers(
+            [
+                'show_form_when_empty' => function (Options $options, $value) {
+                    return !$options['allow_add'] ? false : $value;
+                }
+            ]
+        );
     }
 
     /**

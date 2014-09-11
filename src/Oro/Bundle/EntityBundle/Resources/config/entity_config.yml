@@ -38,7 +38,7 @@ oro_entity_config:
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
-                        type:               oro_entity_extend_text
+                        type:               text
                         options:
                             block:          general
                             required:       true
@@ -52,7 +52,7 @@ oro_entity_config:
                             min:            2
                             max:            50
                     form:
-                        type:               oro_entity_extend_text
+                        type:               text
                         options:
                             block:          general
                             required:       true
@@ -95,12 +95,12 @@ oro_entity_config:
                         label:              'Label'
                         filter_type:        string
                         required:           true
-                        sortable:           true
+                        sortable:           false
                         filterable:         false
                         show_filter:        false
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
-                        type:               oro_entity_extend_text
+                        type:               text
                         options:
                             block:          general
                             required:       true
@@ -125,7 +125,7 @@ oro_entity_config:
                     options:
                         require_schema_update: true
                         default_value:      true
-                        allowed_type:       [string,integer,smallint,bigint,boolean,decimal,date,float,money,percent]
+                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
                             config_id:
                                 scope:      extend
@@ -139,6 +139,22 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          'Show on grid'
+                show_filter:
+                    options:
+                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
+
+                    form:
+                        type:               choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          'Show grid filter'
 
     form:
         entity:
@@ -170,7 +186,7 @@ oro_entity_config:
                             value:          Custom
 
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
@@ -190,7 +206,7 @@ oro_entity_config:
                             value:          Custom
 
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
@@ -201,7 +217,7 @@ oro_entity_config:
         entity:
             items:
                 # it allows to group entities. An entity can be included in several groups
-                groups: # array
+                groups: # array of strings
                     options: []
 
     dictionary:
@@ -209,5 +225,6 @@ oro_entity_config:
             items:
                 # specify the list of fields for which the virtual fields can be created
                 # if not specified the virtual fields are created for all fields, except identifier ones
-                virtual_fields: # array
-                    options: []
+                virtual_fields: # array of strings
+                    options:
+                        auditable:          false

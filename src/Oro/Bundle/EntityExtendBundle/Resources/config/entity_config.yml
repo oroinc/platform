@@ -96,6 +96,19 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # the table name for custom entity. This is optional attribute.
+                # If it is not specified the table name is generated automatically.
+                table:
+                    options:
+                        auditable:          false
+
+                # the parent class name. Usually you do not need to specify this attribute because
+                # for regular extend and custom entities it is calculated automatically.
+                # An example of entity where this attribute is used is EnumValue
+                inherit:
+                    options:
+                        auditable:          false
+
                 schema:
                     options:
                         auditable:          false
@@ -121,12 +134,12 @@ oro_entity_config:
                     name:                   'Manage unique keys'
                     route:                  'oro_entityextend_entity_unique_key'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Create field'
                     route:                  'oro_entityextend_field_create'
                     entity_id:              true
-                    filter:                 { is_extend: true }
+                    filter:                 { is_extend: true, mode: 'default' }
                 -
                     name:                   'Update schema'
                     route:                  'oro_entityextend_update'
@@ -166,11 +179,6 @@ oro_entity_config:
                         show_filter:        false
 
                 is_extend:
-                    options:
-                        default_value:      false
-                        auditable:          false
-
-                extend:
                     options:
                         default_value:      false
                         auditable:          false
@@ -277,46 +285,57 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
 
+                # the relation key in the following format:
+                # relation_type|owning_entity|target_entity|field_name_in_owning_entity
+                # the relation key can be builded by ExtendHelper::buildRelationKey method
                 relation_key: # string
                     options:
                         auditable:          false
 
-                # indicated whether the relation has the default value or not
-                # for example regular many-to-many or one-to-many have the default value,
-                # but you can create them without the default value
+                # indicated whether a relation has the default value or not
+                # applicable only to many-to-many or one-to-many relations
+                # if not specified or FALSE a relation will have a default value
                 without_default: # bool
                     options:
                         auditable:          false
 
-                target_entity:
+                # the target entity class name
+                target_entity: # string
                     options:
                         auditable:          false
 
-                target_field:
+                # the field name in the target entity that is used to show related entity
+                # this attribute is applicable to many-to-one relations
+                target_field: # string
                     options:
                         auditable:          false
 
-                target_grid:
+                # the list of field names in the target entity that is used to show related entity in a grid
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_grid: # array of strings
                     options:
                         auditable:          false
 
-                target_title:
+                # the list of field names in the target entity that is used to show a title of related entity
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_title: # array of strings
                     options:
                         auditable:          false
 
-                target_detailed:
+                # the list of field names in the target entity that is used to show detailed info about related entity
+                # this attribute is applicable to many-to-many and one-to-many relations
+                target_detailed: # array of strings
                     options:
                         auditable:          false
 
-                #
                 # OptionSet form type fields
-                #
+                # @deprecated since 1.4, will be removed in 2.0
                 set_expanded:
                     options:
                         allowed_type:       [optionSet]
                         create_only:        true
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             required:       false
                             choices:        ['No', 'Yes']
@@ -327,6 +346,7 @@ oro_entity_config:
                             block:          general
                             subblock:       properties
 
+                # @deprecated since 1.4, will be removed in 2.0
                 set_options:
                     options:
                         allowed_type:       [optionSet]
@@ -340,3 +360,107 @@ oro_entity_config:
                             subblock:       properties
                             type:           oro_entity_option_set
                             tooltip:        oro.entity_extend.field.option_set.option.tooltip
+
+
+    enum:
+        entity:
+            items:
+                # the unique identifier of this enum
+                code: # string
+                    options:
+                        auditable:          false
+
+                # indicates whether this enum is public or not
+                # public enums can be used in any extendable entity, it means that you can
+                # create a field of this enum type in any entity
+                # private enums cannot be reused
+                public: # boolean
+                    options: []
+
+                # indicates whether several options can be selected for this enum
+                # or it supports only one selected option
+                multiple: # boolean
+                    options:
+                        auditable:          false
+
+                # this attribute can be used to prohibit changing the list of enum values and
+                # public flag
+                # it means that values cannot be added or deleted, but it is still possible
+                # to update name of existing values, reorder them and change default values
+                # examples of possible values:
+                #   false or empty array - no any restrictions
+                #   true - means that all constraints are applied, so it will not be allowed to add/delete options and change 'public' flag
+                #   ['add', 'delete', 'public']  - the same as true; it will not be allowed to add/delete options and change 'public' flag
+                #   ['delete'] - it is not allowed to delete options, but new options can be added and 'public' can be changed
+                immutable: # boolean or array
+                    options:
+                        auditable:          false
+
+        field:
+            items:
+                # the unique identifier of an enum linked to a field
+                enum_code: # string
+                    options:
+                        auditable:          false
+
+                # the locale name in which an enum name and options labels are entered
+                # this is a temprary attribute is used to allow create an enum on a field edit page
+                # as part of schema update procedure a value of this attribute is removed
+                enum_locale: # string
+                    options:
+                        auditable:          false
+
+                # the name of an enum linked to a field
+                # this is a temprary attribute is used to allow create an enum on a field edit page
+                # a value of this attribute is used as a label for an entity is used to store enum values
+                # and then as part of field reference update procedure it is removed
+                enum_name: # string
+                    options:
+                        allowed_type:       [enum, multiEnum]
+                        auditable:          false
+                    # todo: this works properly, but we temporaty disable it untill a decision about UI is taken
+                    #form:
+                    #    type:               oro_entity_extend_enum_name
+                    #    options:
+                    #        block:          general
+                    #        subblock:       properties
+                    #        required:       true
+                    #        label:          oro.entity_extend.enum_name
+                    #        tooltip:        oro.entity_extend.enum_name.tooltip
+
+                # indicates whether an enum is public or not
+                # this is a temprary attribute is used to allow create/edit an enum on a field edit page
+                # as part of schema update procedure a value of this attribute is moved to entity.enum.public attribure
+                # this flag cannot be changed for system enums (owner='system')
+                enum_public: # boolean
+                    options:
+                        allowed_type:       [enum, multiEnum]
+                        auditable:          false
+                    # todo: this works properly, but we temporaty disable it untill a decision about UI is taken
+                    #form:
+                    #    type:               oro_entity_extend_enum_public
+                    #    options:
+                    #        block:          general
+                    #        subblock:       properties
+                    #        required:       false
+                    #        choices:        ['No', 'Yes']
+                    #        empty_value:    false
+                    #        label:          oro.entity_extend.enum_public
+                    #        tooltip:        oro.entity_extend.enum_public.tooltip
+
+                # the list of enum values
+                # this is a temprary attribute is used to allow create/edit an enum on a field edit page
+                # as part of schema update procedure a value of this attribute is moved to a table
+                # is used to store enum values
+                enum_options: # array
+                    options:
+                        allowed_type:       [enum, multiEnum]
+                        auditable:          false
+                    form:
+                        type:               oro_entity_extend_enum_value_collection
+                        options:
+                            block:          general
+                            subblock:       properties
+                            required:       false
+                            label:          oro.entity_extend.enum_options
+                            tooltip:        oro.entity_extend.enum_options.tooltip

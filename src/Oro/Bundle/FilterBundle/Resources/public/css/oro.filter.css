@@ -28,6 +28,13 @@
     display: none;
 }
 
+.multiselect-filter-widget, .filter-select.filter-default-value .multiselect-filter-widget {
+    display: inline-block;
+}
+.multiselect-filter-placeholder, .filter-select.filter-default-value .multiselect-filter-placeholder {
+    display: none;
+}
+
 .filter-box .btn-group [class^='icon-'] {
   padding-top:2px;
   vertical-align:middle;
