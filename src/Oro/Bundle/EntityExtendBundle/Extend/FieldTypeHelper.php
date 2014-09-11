@@ -2,27 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
-/**
- * This class should help with detecting relation field types
- *
- * TODO: implement type mapping via configuration yamls
- */
 class FieldTypeHelper
 {
-    protected $typeMap = [
-        'manyToOne' => [
-            'file',
-            'image'
-        ]
-    ];
+    /**
+     * @var string[]
+     *      key   = data type name
+     *      value = underlying data type
+     */
+    protected $underlyingTypesMap;
 
-    protected $realRelationTypes = [
-        'ref-one',
-        'ref-many',
-        'manyToOne',
-        'oneToMany',
-        'manyToMany'
-    ];
+    /**
+     * @param string[] $underlyingTypesMap key = data type name, value = underlying data type
+     */
+    public function __construct($underlyingTypesMap)
+    {
+        $this->underlyingTypesMap = $underlyingTypesMap;
+    }
 
     /**
      * @param string $type
@@ -31,24 +26,10 @@ class FieldTypeHelper
      */
     public function getUnderlyingType($type)
     {
-        foreach ($this->typeMap as $key => $value) {
-            if (in_array($type, $value)) {
-                return $key;
-            }
+        if (!isset($this->underlyingTypesMap[$type])) {
+            return $type;
         }
 
-        return $type;
-    }
-
-    /**
-     * Check if relation is real relation
-     *
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function isRealRelation($type)
-    {
-        return in_array($type, $this->realRelationTypes);
+        return $this->underlyingTypesMap[$type];
     }
 }

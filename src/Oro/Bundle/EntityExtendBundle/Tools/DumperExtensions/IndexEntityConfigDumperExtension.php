@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -11,12 +12,17 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager   $configManager
+     * @param FieldTypeHelper $fieldTypeHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, FieldTypeHelper $fieldTypeHelper)
     {
-        $this->configManager = $configManager;
+        $this->configManager   = $configManager;
+        $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
     /**
@@ -34,11 +40,11 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
         $targetEntityConfigs = $this->configManager->getProvider('extend')->getConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {
-            if ($this->isExtend($targetEntityConfig)) {
+            if ($targetEntityConfig->is('is_extend')) {
                 $indices = $targetEntityConfig->has('index')
                     ? $targetEntityConfig->get('index')
                     : [];
@@ -65,11 +71,15 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
         $hasChanges   = false;
         $fieldConfigs = $this->configManager->getProvider('extend')->getConfigs($targetEntityClass);
         foreach ($fieldConfigs as $fieldConfig) {
-            if ($this->isExtend($fieldConfig)) {
-                $className = $fieldConfig->getId()->getClassName();
-                $fieldName = $fieldConfig->getId()->getFieldName();
-                if ($this->isIndexRequired($className, $fieldName)) {
+            if ($fieldConfig->is('is_extend')) {
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $fieldConfig->getId();
+                $fieldName = $fieldConfigId->getFieldName();
+                $fieldType = $fieldConfigId->getFieldType();
+                if ($this->isIndexRequired($fieldConfigId->getClassName(), $fieldName, $fieldType)) {
                     if (!isset($indices[$fieldName]) || !$indices[$fieldName]) {
+                        // TODO: need to be changed to fieldName => columnName
+                        // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
                         $indices[$fieldName] = true;
                         $hasChanges          = true;
                     }
@@ -84,25 +94,22 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     }
 
     /**
-     * @param ConfigInterface $extendConfig
-     *
-     * @return bool
-     */
-    protected function isExtend($extendConfig)
-    {
-        return $extendConfig->is('is_extend') || $extendConfig->is('extend');
-    }
-
-    /**
      * Determines whether the index for the given field is needed or not
      *
      * @param string $className
      * @param string $fieldName
+     * @param string $fieldType
      *
      * @return bool
      */
-    protected function isIndexRequired($className, $fieldName)
+    protected function isIndexRequired($className, $fieldName, $fieldType)
     {
+        $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
+        if (in_array($underlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+            // relation fields already have an index
+            return false;
+        }
+
         $result = false;
 
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');

@@ -486,7 +486,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $entity = new User();
 
         $this->assertNotEmpty($entity->getApiKey(), 'Should return some key, even if is not present');
-        $this->assertNotSame($entity->getApiKey(), $entity->getApiKey(), 'Should return unique random string');
+        $key1 = $entity->getApiKey();
+        usleep(1); // need because 'uniqid' generates a unique identifier based on the current time in microseconds
+        $this->assertNotSame($key1, $entity->getApiKey(), 'Should return unique random string');
 
         $apiKey = new UserApi();
         $apiKey->setApiKey($apiKey->generateKey());

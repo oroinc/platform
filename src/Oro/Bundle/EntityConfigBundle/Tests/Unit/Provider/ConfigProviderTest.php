@@ -27,7 +27,7 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ConfigManager
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $configManager;
 
@@ -97,10 +97,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $entityConfigIdWithOtherScope = new EntityConfigId('otherScope', DemoEntity::ENTITY_NAME);
-        $fieldConfigIdWithOtherScope  = new FieldConfigId('otherScope', DemoEntity::ENTITY_NAME, 'testField', 'string');
 
-        $this->assertEquals($entityConfigId, $this->configProvider->copyId($entityConfigIdWithOtherScope));
-        $this->assertEquals($fieldConfigId, $this->configProvider->copyId($fieldConfigIdWithOtherScope));
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfigById($entityConfigIdWithOtherScope));
     }
 
@@ -146,33 +143,64 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->clearCache(DemoEntity::ENTITY_NAME);
     }
 
-    public function testGetConfigs()
+    public function testGetIds()
     {
-        $this->configManager
-            ->expects($this->exactly(4))
+        $this->configManager->expects($this->once())
             ->method('getIds')
-            ->with('testScope', DemoEntity::ENTITY_NAME)
+            ->with('testScope', DemoEntity::ENTITY_NAME, false)
             ->will($this->returnValue(array($this->entityConfig->getId())));
 
         $this->assertEquals(
             array($this->entityConfig->getId()),
             $this->configProvider->getIds(DemoEntity::ENTITY_NAME)
         );
+    }
+
+    public function testGetIdsWithHidden()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->with('testScope', DemoEntity::ENTITY_NAME, true)
+            ->will($this->returnValue(array($this->entityConfig->getId())));
+
+        $this->assertEquals(
+            array($this->entityConfig->getId()),
+            $this->configProvider->getIds(DemoEntity::ENTITY_NAME, true)
+        );
+    }
+
+    public function testGetConfigs()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with('testScope', DemoEntity::ENTITY_NAME, false)
+            ->will($this->returnValue(array($this->entityConfig)));
 
         $this->assertEquals(
             array($this->entityConfig),
             $this->configProvider->getConfigs(DemoEntity::ENTITY_NAME)
         );
+    }
+
+    public function testGetConfigsWithHidden()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with('testScope', DemoEntity::ENTITY_NAME, true)
+            ->will($this->returnValue(array($this->entityConfig)));
 
         $this->assertEquals(
-            array(),
-            $this->configProvider->filter(
-                function (ConfigInterface $config) {
-                    return $config->getId()->getScope() == 'wrongScope';
-                },
-                DemoEntity::ENTITY_NAME
-            )
+            array($this->entityConfig),
+            $this->configProvider->getConfigs(DemoEntity::ENTITY_NAME, true)
         );
+    }
+
+    public function testMap()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with('testScope', DemoEntity::ENTITY_NAME, false)
+            ->will($this->returnValue(array($this->entityConfig)));
 
         $entityConfig = new Config(new EntityConfigId('testScope', DemoEntity::ENTITY_NAME));
         $entityConfig->set('key', 'value');
@@ -181,6 +209,24 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             $this->configProvider->map(
                 function (ConfigInterface $config) {
                     return $config->set('key', 'value');
+                },
+                DemoEntity::ENTITY_NAME
+            )
+        );
+    }
+
+    public function testFilter()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getConfigs')
+            ->with('testScope', DemoEntity::ENTITY_NAME, false)
+            ->will($this->returnValue(array($this->entityConfig)));
+
+        $this->assertEquals(
+            array(),
+            $this->configProvider->filter(
+                function (ConfigInterface $config) {
+                    return $config->getId()->getScope() == 'wrongScope';
                 },
                 DemoEntity::ENTITY_NAME
             )

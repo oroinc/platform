@@ -101,7 +101,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
                         continue;
                     }
                 }
-                $data = unserialize($fieldConfig['data']);
+                $data = $fieldConfig['data'];
                 if (isset($data['email']['available_in_template']) && $data['email']['available_in_template']) {
                     // skip because the value is already TRUE
                     continue;
@@ -166,7 +166,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
             $result[$fieldName] = [
                 'id'   => $row['id'],
                 'type' => $row['type'],
-                'data' => $row['data']
+                'data' => $this->connection->convertToPHPValue($row['data'], 'array')
             ];
         }
 
@@ -191,7 +191,7 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         $result = [];
         $rows   = $this->connection->fetchAll($sql, $params, $types);
         foreach ($rows as $row) {
-            $diff = unserialize($row['diff']);
+            $diff = $this->connection->convertToPHPValue($row['diff'], 'array');
             if (isset($diff['available_in_template'])) {
                 $fieldName = $row['field_name'];
                 if (!isset($result[$fieldName])) {

@@ -1,6 +1,12 @@
 parameters:
     oro_entity_config.type.config.class:                    Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType
     oro_entity_config.extension.config.class:               Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension
+    oro_entity_config.config_type_helper.class:             Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper
+
+    oro_entity_config.type.integer.class:                   Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
+    oro_entity_config.type.text.class:                      Oro\Bundle\EntityConfigBundle\Form\Type\TextType
+    oro_entity_config.type.textarea.class:                  Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType
+    oro_entity_config.type.choice.class:                    Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
 
 services:
     oro_entity_config.type.config:
@@ -16,3 +22,37 @@ services:
         class: %oro_entity_config.extension.config.class%
         tags:
             - { name: form.type_extension, alias: form }
+
+    oro_entity_config.config_type_helper:
+        class: %oro_entity_config.config_type_helper.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
+    oro_entity_config.type.integer:
+        class: %oro_entity_config.type.integer.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_config_integer }
+
+    oro_entity_config.type.text:
+        class: %oro_entity_config.type.text.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_config_text }
+
+    oro_entity_config.type.textarea:
+        class: %oro_entity_config.type.textarea.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_config_textarea }
+
+    oro_entity_config.type.choice:
+        class: %oro_entity_config.type.choice.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_config_choice }

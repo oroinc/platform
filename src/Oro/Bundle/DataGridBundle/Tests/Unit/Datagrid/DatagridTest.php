@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 
 class DatagridTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +25,8 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
 
         $this->parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
 
-        $this->grid = new Datagrid(self::TEST_NAME, $this->acceptor, $this->parameters);
+        $this->grid = new Datagrid(self::TEST_NAME, DatagridConfiguration::create([]), $this->parameters);
+        $this->grid->setAcceptor($this->acceptor);
     }
 
     protected function tearDown()

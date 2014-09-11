@@ -134,7 +134,7 @@ class EntityProvider
 
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
             )
             ) {
                 $this->addEntity(

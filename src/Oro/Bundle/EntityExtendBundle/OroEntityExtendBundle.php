@@ -9,6 +9,7 @@ use Symfony\Component\Process\Process;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
@@ -44,6 +45,7 @@ class OroEntityExtendBundle extends Bundle
 
         $this->ensureInitialized();
 
+        $container->addCompilerPass(new EntityExtendPass());
         $container->addCompilerPass(new ConfigLoaderPass());
         $container->addCompilerPass(new EntityManagerPass());
         $container->addCompilerPass(new EntityMetadataBuilderPass());

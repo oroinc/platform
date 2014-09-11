@@ -11,7 +11,7 @@ oro_entity_config:
                 header:
                     options: []
                     form:
-                        type:               oro_entity_extend_text
+                        type:               text
                         options:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
@@ -31,20 +31,9 @@ oro_entity_config:
                 # is filed will be used to find existing entity
                 identity:
                     options:
-                        allowed_type: 
-                            - string
-                            - integer
-                            - smallint
-                            - bigint
-                            - boolean
-                            - decimal
-                            - date
-                            - text
-                            - float
-                            - money
-                            - percent
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             label:          oro.importexport.entity_config.identity.label
                             choices:
@@ -57,7 +46,7 @@ oro_entity_config:
                 excluded:
                     options: []
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             label:          oro.importexport.entity_config.excluded.label
                             choices:
@@ -71,7 +60,7 @@ oro_entity_config:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:
@@ -85,5 +74,5 @@ oro_entity_config:
                 # is relation field should be processed as scalar value when exporting data
                 process_as_scalar:
                     options:
-                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany, file, image]
+                        allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                         default_value:      false

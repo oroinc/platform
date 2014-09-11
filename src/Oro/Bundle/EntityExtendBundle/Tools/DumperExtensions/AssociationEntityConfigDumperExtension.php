@@ -40,7 +40,7 @@ abstract class AssociationEntityConfigDumperExtension extends AbstractAssociatio
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();
         $entityClass         = $this->getAssociationEntityClass();
