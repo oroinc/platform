@@ -24,9 +24,6 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
-/**
- * @todo the implemented synchronization algorithm is just a demo and it will be fixed soon
- */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     const EMAIL_ADDRESS_BATCH_SIZE = 100;
@@ -89,36 +86,48 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $this->log->notice(sprintf('Loading emails from "%s" folder ...', $folderName));
             foreach ($emailAddressBatches as $emailAddressBatch) {
-                // build a search query
-                $sqb = $this->manager->getSearchQueryBuilder();
-                if ($origin->getSynchronizedAt()
-                    && $folder->getSynchronizedAt()
-                    && !$emailAddressBatch['needFullSync']
-                ) {
-                    $sqb->sent($folder->getSynchronizedAt());
-                }
-
-                $sqb->openParenthesis();
-
-                $sqb->openParenthesis();
-                $this->addEmailAddressesToSearchQueryBuilder($sqb, 'from', $emailAddressBatch['items']);
-                $sqb->closeParenthesis();
-
-                $sqb->openParenthesis();
-                $this->addEmailAddressesToSearchQueryBuilder($sqb, 'to', $emailAddressBatch['items']);
-                $sqb->orOperator();
-                $this->addEmailAddressesToSearchQueryBuilder($sqb, 'cc', $emailAddressBatch['items']);
-                // not all IMAP servers support search by BCC, for example imap-mail.outlook.com does not
-                //$sqb->orOperator();
-                //$this->addEmailAddressesToSearchQueryBuilder($sqb, 'bcc', $emailAddressBatch['items']);
-                $sqb->closeParenthesis();
-
-                $sqb->closeParenthesis();
+                $needFullSync = $emailAddressBatch['needFullSync'] && !$folder->getSynchronizedAt();
 
                 // load emails using this search query
-                $this->loadEmails($imapFolder, $sqb->get());
+                $query = $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items']);
+                $this->loadEmails($imapFolder, $query);
             }
         }
+    }
+
+    /**
+     * @param EmailFolder    $folder
+     * @param bool           $needFullSync
+     * @param EmailAddress[] $emailAddresses
+     *
+     * @return SearchQuery
+     */
+    protected function getSearchQuery(EmailFolder $folder, $needFullSync, array $emailAddresses)
+    {
+        $sqb = $this->manager->getSearchQueryBuilder();
+        if (false == $needFullSync) {
+            $sqb->sent($folder->getSynchronizedAt());
+        }
+
+        if ($folder->getType() === EmailFolder::SENT) {
+            $sqb->openParenthesis();
+            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'to', $emailAddresses);
+            $sqb->orOperator();
+            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'cc', $emailAddresses);
+
+            // not all IMAP servers support search by BCC, for example imap-mail.outlook.com does not
+            //$sqb->orOperator();
+            //$this->addEmailAddressesToSearchQueryBuilder($sqb, 'bcc', $emailAddresses);
+
+            $sqb->closeParenthesis();
+        } else {
+            $sqb->openParenthesis();
+            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'from', $emailAddresses);
+            $sqb->closeParenthesis();
+        }
+
+
+        return $sqb->get();
     }
 
     /**
