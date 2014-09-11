@@ -100,6 +100,28 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testPreSubmitWithIgnorePrimaryBehaviour()
+    {
+        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form->expects($this->once())->method('getConfig')
+            ->will($this->returnValue($formConfig));
+        $formConfig->expects($this->once())->method('getOption')
+            ->with('handle_primary')
+            ->will($this->returnValue(false));
+
+        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->once())->method('getForm')
+            ->will($this->returnValue($form));
+        $event->expects($this->once())->method('getData')
+            ->will($this->returnValue([['field1' => 'test']]));
+        $event->expects($this->never())->method('setData');
+
+        $this->subscriber->preSubmit($event);
+    }
+
     /**
      * @dataProvider preSubmitDataProvider
      *
@@ -110,7 +132,13 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreSubmit(array $data, array $expected, $checkIsNew = false, $parentDataId = null)
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form->expects($this->once())->method('getConfig')
+            ->will($this->returnValue($formConfig));
+        $formConfig->expects($this->once())->method('getOption')
+            ->with('handle_primary')
+            ->will($this->returnValue(true));
 
         if ($checkIsNew) {
             $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');

@@ -9,13 +9,17 @@ class ConfigExtension extends AbstractTypeExtension
 {
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('config_id'));
+        // config_is_new is true if a new entity or field is created
+        // note that this option is false if entity or field is edited even if its state is New
+        // (extend.state is ExtendScope::STATE_NEW)
+        $resolver->setOptional(['config_id', 'config_is_new']);
         $resolver->setAllowedTypes(
-            array('config_id' => array(
-                'Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId',
-                'Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId'
-            )
-            )
+            [
+                'config_id' => [
+                    'Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId',
+                    'Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId'
+                ]
+            ]
         );
     }
 

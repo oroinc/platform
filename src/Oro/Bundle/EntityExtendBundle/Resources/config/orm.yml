@@ -3,6 +3,7 @@ parameters:
     oro_entity_extend.entity_metadata_builder.relations.class:  Oro\Bundle\EntityExtendBundle\ORM\RelationMetadataBuilder
     oro_entity_extend.entity_metadata_builder.indices.class:    Oro\Bundle\EntityExtendBundle\ORM\IndexMetadataBuilder
     oro_entity_extend.listener.entity_listener.class:           Oro\Bundle\EntityExtendBundle\EventListener\DoctrineListener
+    oro_entity_extend.manager.multi_enum_entity.class:          Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager
 
 services:
     oro_entity_extend.entity_metadata_builder:
@@ -34,5 +35,10 @@ services:
         class: %oro_entity_extend.listener.entity_listener.class%
         arguments:
             - @oro_entity_extend.link.entity_metadata_builder
+            - @oro_entity_extend.manager.multi_enum_entity
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+
+    oro_entity_extend.manager.multi_enum_entity:
+        class: %oro_entity_extend.manager.multi_enum_entity.class%

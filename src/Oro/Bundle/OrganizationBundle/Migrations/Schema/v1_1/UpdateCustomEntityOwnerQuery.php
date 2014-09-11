@@ -57,7 +57,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
             if (strpos($row['class_name'], 'Extend\\Entity\\') !== 0) {
                 continue;
             }
-            $data = unserialize($row['data']);
+            $data = $this->connection->convertToPHPValue($row['data'], 'array');
             if (isset($data['entity']['label']) && $data['entity']['label'] === 'Owner') {
                 $data['entity']['label']       = self::NEW_OWNER_LABEL;
                 $data['entity']['description'] = self::NEW_OWNER_DESCRIPTION;

@@ -26,6 +26,7 @@ interface PropertyInterface
     const METADATA_NAME_KEY = 'name';
     const METADATA_TYPE_KEY = 'type';
 
+    const DISABLED_KEY      = 'disabled';
     const TYPE_KEY          = 'type';
     const NAME_KEY          = 'name';
     const DATA_NAME_KEY     = 'data_name';

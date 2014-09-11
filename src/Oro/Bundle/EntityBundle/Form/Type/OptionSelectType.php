@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -16,11 +15,15 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSelectType extends AbstractType
 {
     const NAME   = 'oro_option_select';

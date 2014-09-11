@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
@@ -55,7 +56,8 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
             $this->virtualFieldProvider,
-            $this->doctrine
+            $this->doctrine,
+            new DatagridGuesserMock()
         );
 
         $builder->setConfigManager($this->configManager);

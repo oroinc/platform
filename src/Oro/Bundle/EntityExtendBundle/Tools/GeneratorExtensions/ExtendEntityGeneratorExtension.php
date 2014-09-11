@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
+use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
 
 use Doctrine\Common\Inflector\Inflector;
@@ -26,11 +27,10 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     public function generate(array $schema, PhpClass $class)
     {
-        if ($schema['type'] === 'Extend') {
-            if (!empty($schema['inherit'])) {
-                $class->setParentClassName($schema['inherit']);
-            }
-        } else {
+        if (!empty($schema['inherit'])) {
+            $class->setParentClassName($schema['inherit']);
+        } elseif ($schema['type'] === 'Custom') {
+            // generate 'id' property and '__toString' method only for Custom entity without inheritance
             $class->setProperty(PhpProperty::create('id')->setVisibility('protected'));
             $class->setMethod($this->generateClassMethod('getId', 'return $this->id;'));
 
@@ -52,23 +52,30 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
      */
     protected function generateConstructor(array $schema, PhpClass $class)
     {
+        $constructorParams = [];
         $constructorBody = [];
         if (!empty($schema['inherit'])) {
             $parent = new \ReflectionClass($schema['inherit']);
-            if ($parent->getConstructor()) {
-                $constructorBody[] = 'parent::__construct();';
+            $parentConstructor = $parent->getConstructor();
+            if ($parentConstructor) {
+                $params        = $parentConstructor->getParameters();
+                $callParamsDef = [];
+                foreach ($params as $param) {
+                    $constructorParams[] = PhpParameter::fromReflection($param);
+                    $callParamsDef[] = '$' . $param->getName();
+                }
+
+                $constructorBody[] = sprintf('parent::__construct(%s);', implode(', ', $callParamsDef));
             }
         }
         foreach ($schema['addremove'] as $fieldName => $config) {
             $constructorBody[] = '$this->' . $fieldName . ' = new \Doctrine\Common\Collections\ArrayCollection();';
         }
-        $class
-            ->setMethod(
-                $this->generateClassMethod(
-                    '__construct',
-                    implode("\n", $constructorBody)
-                )
-            );
+        $constructor = $this->generateClassMethod('__construct', implode("\n", $constructorBody));
+        foreach ($constructorParams as $constructorParam) {
+            $constructor->addParameter($constructorParam);
+        }
+        $class->setMethod($constructor);
     }
 
     /**
@@ -128,7 +135,6 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     {
         foreach ($schema['addremove'] as $fieldName => $config) {
             $addMethodBody    = [
-                '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
                 'if (!$this->' . $fieldName . '->contains($value)) {',
                 '    $this->' . $fieldName . '->add($value);'
             ];

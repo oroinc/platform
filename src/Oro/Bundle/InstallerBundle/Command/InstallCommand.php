@@ -386,13 +386,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     {
         $output->writeln('<info>Setting up database.</info>');
 
-        $commandExecutor->runCommand(
-            'oro:migration:load',
-            [
-                '--force'             => true,
-                '--process-isolation' => true,
-            ]
-        )
+        $commandExecutor
+            ->runCommand(
+                'oro:migration:load',
+                [
+                    '--force'             => true,
+                    '--process-isolation' => true,
+                ]
+            )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 [
