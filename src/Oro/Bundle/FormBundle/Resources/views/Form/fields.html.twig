@@ -219,6 +219,15 @@
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
         ],
         function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
+            {% set selectionUrl = null %}
+            {% if form.vars.grid_url is defined and form.vars.grid_url %}
+                {% set selectionUrl = form.vars.grid_url %}
+            {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
+                {% set selectionUrl = form.vars.selection_url %}
+            {% endif %}
+            {% set selectionRouteName = form.vars.selection_route|default(null) %}
+            {% set selectionRouteParameters = form.vars.selection_route_parameters|default({}) %}
+
             var widget = new MultipleEntity({
                 el: '#{{ id }}-container',
                 template: EntitiesTpl,
@@ -227,7 +236,9 @@
                 removedElement: '#{{ id }}_removed',
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
-                selectionUrl: {{ form.vars.grid_url|json_encode|raw }},
+                selectionUrl: {{ selectionUrl|json_encode|raw }},
+                selectionRouteName: {{ selectionRouteName|json_encode|raw }},
+                selectionRouteParams: {{ selectionRouteParameters|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                 allowAction: {{ form.vars.allow_action|json_encode|raw }},
                 collection: new MultipleEntityCollection(),
                 selectorWindowTitle: {{ form.vars.selector_window_title|trans|json_encode|raw }}
@@ -237,6 +248,10 @@
                 data.push(new MultipleEntityModel({{ element|json_encode|raw }}));
             {% endfor %}
             widget.getCollection().reset(data);
+
+            {% if form.vars.extra_config is defined and form.vars.extra_config %}
+                {{ block('oro_multiple_entity_js_' ~ form.vars.extra_config) }}
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -648,7 +663,7 @@
                         $('#{{ id }}-el'),
                         $('#{{ id }}'),
                         {{ label|trans|json_encode|raw }},
-                        {{ urlParts|json_encode|raw }},
+                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                         {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
                         {{ form.vars.create_enabled|default(false)|json_encode|raw }}
                     );

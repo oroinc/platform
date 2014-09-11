@@ -59,7 +59,7 @@
                         $('#{{ id }}-el'),
                         $('#{{ id }}'),
                         {{ label|trans|json_encode|raw }},
-                        {{ urlParts|json_encode|raw }},
+                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                         {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
                         {{ form.vars.create_enabled|default(false)|json_encode|raw }}
                 );

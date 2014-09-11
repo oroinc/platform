@@ -83,6 +83,12 @@ function (routing, DialogWidget, widgetManager, __) {
             },
             setUrlParts: function (newParts) {
                 urlParts = newParts
+            },
+            setSelection: function (value) {
+                selectorEl.select2('val', value);
+            },
+            getSelection: function () {
+                return selectorEl.select2('val');
             }
         };
 
