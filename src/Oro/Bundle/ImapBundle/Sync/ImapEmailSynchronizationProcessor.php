@@ -87,10 +87,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->log->notice(sprintf('Loading emails from "%s" folder ...', $folderName));
             foreach ($emailAddressBatches as $emailAddressBatch) {
                 $needFullSync = $emailAddressBatch['needFullSync'] && !$folder->getSynchronizedAt();
-
-                // load emails using this search query
-                $query = $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items']);
-                $this->loadEmails($imapFolder, $query);
+                
+                $this->loadEmails(
+                    $imapFolder,
+                    $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items'])
+                );
             }
         }
     }
