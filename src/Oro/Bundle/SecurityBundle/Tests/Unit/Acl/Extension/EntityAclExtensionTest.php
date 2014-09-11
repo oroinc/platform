@@ -112,6 +112,15 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
          *                                     +-bu411
          *                                       |
          *                                       +-user411
+         *
+         * user1 user2 user3 user31 user4 user411
+         *
+         * org1  org2  org3  org3   org4  org4
+         * org2        org2
+         *
+         * bu1   bu2   bu3   bu31   bu4   bu411
+         * bu2         bu2
+         *
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);
@@ -141,10 +150,23 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUser('user41', 'bu41');
         $this->tree->addUser('user411', 'bu411');
 
-        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu3');
-        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
-
+        $this->tree->addUserOrganization('user1', 'org1');
+        $this->tree->addUserOrganization('user1', 'org2');
+        $this->tree->addUserOrganization('user2', 'org2');
+        $this->tree->addUserOrganization('user3', 'org2');
+        $this->tree->addUserOrganization('user3', 'org3');
+        $this->tree->addUserOrganization('user31', 'org3');
         $this->tree->addUserOrganization('user4', 'org4');
+        $this->tree->addUserOrganization('user411', 'org4');
+
+        $this->tree->addUserBusinessUnit('user1', 'org1', 'bu1');
+        $this->tree->addUserBusinessUnit('user1', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user2', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user3', 'org3', 'bu3');
+        $this->tree->addUserBusinessUnit('user3', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
+        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
+        $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
     }
 
     /**
@@ -285,17 +307,17 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             if (is_a($owner, $this->metadataProvider->getOrganizationClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
+                    new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id', 'organization')
                 );
             } elseif (is_a($owner, $this->metadataProvider->getBusinessUnitClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
+                    new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
                 );
             } elseif (is_a($owner, $this->metadataProvider->getUserClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('USER', 'owner', 'owner_id')
+                    new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
                 );
             }
         }
@@ -441,13 +463,6 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->user31 = new User('user31', $this->bu31);
         $this->user4 = new User('user4', $this->bu4);
         $this->user411 = new User('user411', $this->bu411);
-
-        $this->user1->setOrganizations(new ArrayCollection([]));
-        $this->user2->setOrganizations(new ArrayCollection([$this->org2]));
-        $this->user3->setOrganizations(new ArrayCollection([$this->org3]));
-        $this->user31->setOrganizations(new ArrayCollection([$this->org3]));
-        $this->user4->setOrganizations(new ArrayCollection([$this->org4]));
-        $this->user411->setOrganizations(new ArrayCollection([$this->org4]));
 
         return array(
             array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, null, true),
@@ -595,7 +610,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->user4,
                 $this->org4,
                 new TestEntity(1, $this->user3, $this->org4),
-                true
+                false
             ),
             array(
                 EntityMaskBuilder::MASK_VIEW_LOCAL,
@@ -623,7 +638,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 $this->user4,
                 $this->org4,
                 new TestEntity(1, $this->user3, $this->org3),
-                true
+                false
             ),
             array(
                 EntityMaskBuilder::MASK_VIEW_BASIC,

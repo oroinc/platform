@@ -249,9 +249,10 @@ class AclHelper
         }
 
         if ($resultData && is_array($resultData)) {
-            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = null;
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                    = $resultData;
             }
 
             return new JoinAssociationCondition(
@@ -261,6 +262,7 @@ class AclHelper
                 $pathExpressionType,
                 $organizationField,
                 $organizationValue,
+                $ignoreOwner,
                 $targetEntity,
                 $this->getJoinConditions($associationMapping)
             );
@@ -295,9 +297,10 @@ class AclHelper
         }
 
         if ($resultData === null || !empty($resultData)) {
-            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue= null;
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                    = $resultData;
             }
             if ($isJoin) {
                 return new JoinAclCondition(
@@ -306,7 +309,8 @@ class AclHelper
                     $value,
                     $pathExpressionType,
                     $organizationField,
-                    $organizationValue
+                    $organizationValue,
+                    $ignoreOwner
                 );
             } else {
                 return new AclCondition(
@@ -315,7 +319,8 @@ class AclHelper
                     $value,
                     $pathExpressionType,
                     $organizationField,
-                    $organizationValue
+                    $organizationValue,
+                    $ignoreOwner
                 );
             }
         }
@@ -341,11 +346,11 @@ class AclHelper
      */
     protected function getJoinConditions(array $associationMapping)
     {
-        $targetEntity          = $associationMapping['targetEntity'];
-        $type                  = $associationMapping['type'];
-        $targetEntityMetadata  = $this->em->getClassMetadata($targetEntity);
+        $targetEntity = $associationMapping['targetEntity'];
+        $type = $associationMapping['type'];
+        $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
         $joinConditionsColumns = [];
-        $joinConditions        = [];
+        $joinConditions = [];
 
         switch ($type) {
             case ClassMetadataInfo::ONE_TO_ONE:
@@ -366,7 +371,7 @@ class AclHelper
                 $joinConditions[] = $joinConditionsColumn;
             } else {
                 $joinConditions[] = $targetEntityMetadata
-                        ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
+                    ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
             }
         }
 

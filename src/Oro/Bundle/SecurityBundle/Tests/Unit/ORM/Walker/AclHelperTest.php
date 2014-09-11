@@ -99,14 +99,16 @@ class AclHelperTest extends OrmTestCase
                         [1, 2, 3],
                         PathExpression::TYPE_STATE_FIELD,
                         null,
-                        null
+                        null,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
                         'user',
                         [1],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        false
                     ]
                 ],
                 'resultHelper1',
@@ -122,7 +124,8 @@ class AclHelperTest extends OrmTestCase
                         [1],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        true
                     ]
                 ],
                 'resultHelper2',
@@ -137,28 +140,32 @@ class AclHelperTest extends OrmTestCase
                         [3, 2, 1],
                         PathExpression::TYPE_STATE_FIELD,
                         null,
-                        null
+                        null,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
                         'user',
                         [10],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
                         'article',
                         [100],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
                         'user',
                         [150],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        false
                     ]
                 ],
                 'resultHelper3',
@@ -174,14 +181,16 @@ class AclHelperTest extends OrmTestCase
                         [10],
                         PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
                         'organization',
-                        1
+                        1,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
                         PathExpression::TYPE_STATE_FIELD,
                         null,
-                        null
+                        null,
+                        false
                     ],
                 ],
                 'resultHelper4',
@@ -288,12 +297,8 @@ class AclHelperTest extends OrmTestCase
         $this->assertNull($resultAst->whereClause);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
         $conditionalFactors = $join->conditionalExpression->conditionalFactors;
-        $this->assertCount(2, $conditionalFactors);
+        $this->assertCount(1, $conditionalFactors);
         $expression = $conditionalFactors[0]->simpleConditionalExpression;
-        $this->assertEquals([1], $this->collectLiterals($expression->literals));
-        $this->assertEquals('user', $expression->expression->simpleArithmeticExpression->field);
-        $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
-        $expression = $conditionalFactors[1]->simpleConditionalExpression;
         $this->assertEquals(1, $expression->rightExpression->simpleArithmeticExpression->value);
         $this->assertEquals('organization', $expression->leftExpression->simpleArithmeticExpression->field);
         $this->assertEquals('address', $expression->leftExpression->simpleArithmeticExpression->identificationVariable);

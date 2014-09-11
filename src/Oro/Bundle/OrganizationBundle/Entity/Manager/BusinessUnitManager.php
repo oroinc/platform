@@ -99,21 +99,12 @@ class BusinessUnitManager
             }
 
             if (!empty($resultBuIds)) {
-                $assignedUser = $this->getUserRepo()->find($userId);
-                $organizationId = $organization->getId();
-                $businessUnits = $assignedUser->getBusinessUnits();
-                $assignedBU = $businessUnits->filter(
-                    function (BusinessUnit $bu) use ($resultBuIds, $organizationId) {
-                        return ($bu->getOrganization()->getId() === $organizationId
-                            && in_array(
-                                $bu->getId(),
-                                $resultBuIds
-                            )
-                        );
-                    }
+                $newUserBuIds = $treeProvider->getTree()->getUserBusinessUnitIds(
+                    $userId,
+                    $organization->getId()
                 );
-
-                return $assignedBU->count() > 0;
+                $intersectBUIds = array_intersect($resultBuIds, $newUserBuIds);
+                return !empty($intersectBUIds);
             }
         }
 
