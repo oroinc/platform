@@ -180,7 +180,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
                 });
                 this.selectorDialog.on('completeSelection', _.bind(this.processSelectedEntities, this));
                 this.selectorDialog.render();
-            }src/OroCRM/Bundle/ContactUsBundle/Tests/Unit/Form/Type/ContactRequestTypeTest.php
+            }
         },
 
         _getSelectionWidgetUrl: function() {
