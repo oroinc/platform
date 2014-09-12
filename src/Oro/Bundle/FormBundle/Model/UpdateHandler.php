@@ -67,10 +67,24 @@ class UpdateHandler
     ) {
         if ($formHandler) {
             if (method_exists($formHandler, 'process') && $formHandler->process($entity)) {
-                return $this->processSave($form, $entity, $saveAndStayRoute, $saveAndCloseRoute, $saveMessage);
+                return $this->processSave(
+                    $form,
+                    $entity,
+                    $saveAndStayRoute,
+                    $saveAndCloseRoute,
+                    $saveMessage,
+                    $resultCallback
+                );
             }
         } elseif ($this->saveForm($form, $entity)) {
-            return $this->processSave($form, $entity, $saveAndStayRoute, $saveAndCloseRoute, $saveMessage);
+            return $this->processSave(
+                $form,
+                $entity,
+                $saveAndStayRoute,
+                $saveAndCloseRoute,
+                $saveMessage,
+                $resultCallback
+            );
         }
 
         return $this->getResult($entity, $form, $resultCallback);
@@ -94,7 +108,7 @@ class UpdateHandler
         if (!array_key_exists('entity', $result)) {
             $result['entity'] = $entity;
         }
-        $result['isWidgetContext'] = (bool) $this->request->get('_wid', false);
+        $result['isWidgetContext'] = (bool)$this->request->get('_wid', false);
 
         return $result;
     }
@@ -129,6 +143,7 @@ class UpdateHandler
      * @param array|callable $saveAndStayRoute
      * @param array|callable $saveAndCloseRoute
      * @param string $saveMessage
+     * @param callback|null $resultCallback
      * @return array|RedirectResponse
      */
     protected function processSave(
@@ -136,15 +151,13 @@ class UpdateHandler
         $entity,
         $saveAndStayRoute,
         $saveAndCloseRoute,
-        $saveMessage
+        $saveMessage,
+        $resultCallback = null
     ) {
         if ($this->request->get('_wid')) {
-            return array(
-                'form'   => $form->createView(),
-                'entity' => $entity,
-                'savedId' => $this->doctrineHelper->getSingleEntityIdentifier($entity),
-                'isWidgetContext' => (bool) $this->request->get('_wid')
-            );
+            $result = $this->getResult($entity, $form, $resultCallback);
+            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            return $result;
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);
             if (is_callable($saveAndStayRoute)) {

@@ -237,17 +237,18 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             return $saveAndCloseRoute;
         };
         $called = false;
-        $resultCallback = function () use (&$called) {
+        $expectedForm = $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $resultCallback = function () use (&$called, $expectedForm) {
             $called = true;
-            $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-            return array('form' => $form, 'test' => 1);
+            return array('form' => $expectedForm, 'test' => 1);
         };
 
         $expected = $this->assertSaveData($form, $entity);
         $expected['savedId'] = 1;
+        $expected['test'] = 1;
+        $expected['form'] = $expectedForm;
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -313,7 +314,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $formView = $this->getMockBuilder('Symfony\Component\Form\FormView')
             ->disableOriginalConstructor()
             ->getMock();
-        $form->expects($this->once())
+        $form->expects($this->any())
             ->method('createView')
             ->will($this->returnValue($formView));
 
