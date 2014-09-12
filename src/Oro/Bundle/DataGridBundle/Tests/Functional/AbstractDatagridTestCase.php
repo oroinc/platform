@@ -47,4 +47,3 @@ abstract class AbstractDatagridTestCase extends WebTestCase
         $this->assertCount((int) $requestData['expectedResultCount'], $result['data']);
     }
 }
-
