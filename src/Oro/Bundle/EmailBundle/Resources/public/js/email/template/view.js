@@ -24,7 +24,9 @@ define(['jquery', 'underscore', 'backbone'
             this.target = options.target;
 
             this.listenTo(this.collection, 'reset', this.render);
-            this.selectionChanged();
+            if (!$(this.target).val()) {
+                this.selectionChanged();
+            }
         },
 
         /**
