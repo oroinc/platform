@@ -25,11 +25,19 @@ class SoapSearchApiTest extends WebTestCase
     /**
      * @param array $request
      * @param array $response
-     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @dataProvider searchDataProvider
      */
     public function testSearch(array $request, array $response)
     {
+        if (array_key_exists('supported_engines', $request)) {
+            $engine = $this->getContainer()->getParameter('oro_search.engine');
+            if (!in_array($engine, $request['supported_engines'])) {
+                $this->markTestIncomplete('Test should not be executed on this engine');
+            }
+            unset($request['supported_engines']);
+        }
+
         if (is_null($request['search'])) {
             $request['search'] ='';
         }
@@ -49,18 +57,26 @@ class SoapSearchApiTest extends WebTestCase
 
         $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
-        if (isset($response['soap']['item']) && is_array($response['soap']['item'])) {
-            foreach ($response['soap']['item'] as $key => $object) {
-                foreach ($object as $property => $value) {
-                    if (isset($result['elements']['item'][0])) {
-                        $this->assertEquals($value, $result['elements']['item'][$key][$property]);
-                    } else {
-                        $this->assertEquals($value, $result['elements']['item'][$property]);
-                    }
 
-                }
+        if (empty($result['elements']['item'])) {
+            $result['elements']['item'] = [];
+        }
+
+        // if only one element
+        if (empty($result['elements']['item'][0])) {
+            $result['elements']['item'] = array($result['elements']['item']);
+        }
+
+        // remove ID references
+        $recordsRequired = !empty($response['soap']['item'][0]['recordTitle']);
+        foreach (array_keys($result['elements']['item']) as $key) {
+            unset($result['elements']['item'][$key]['recordId']);
+            if (!$recordsRequired) {
+                unset($result['elements']['item'][$key]['recordTitle']);
             }
         }
+
+        $this->assertResultHasItems($response['soap']['item'], $result['elements']['item']);
     }
 
     /**
@@ -71,5 +87,16 @@ class SoapSearchApiTest extends WebTestCase
     public function searchDataProvider()
     {
         return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+    }
+
+    /**
+     * @param array $items
+     * @param array $result
+     */
+    protected function assertResultHasItems(array $items, array $result)
+    {
+        foreach ($items as $item) {
+            $this->assertContains($item, $result);
+        }
     }
 }

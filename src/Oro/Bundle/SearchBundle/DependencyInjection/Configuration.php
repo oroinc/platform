@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Query;
 
 class Configuration implements ConfigurationInterface
 {
@@ -21,7 +22,12 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_search');
 
-        $targetTypes   = array('text', 'decimal', 'integer', 'datetime');
+        $targetTypes   = array(
+            Query::TYPE_TEXT,
+            Query::TYPE_DECIMAL,
+            Query::TYPE_INTEGER,
+            Query::TYPE_DATETIME
+        );
         $relationTypes = array(
             Indexer::RELATION_ONE_TO_ONE,
             Indexer::RELATION_ONE_TO_MANY,
