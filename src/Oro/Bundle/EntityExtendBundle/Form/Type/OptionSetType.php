@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * @deprecated since 1.4. Will be removed in 2.0
+ */
 class OptionSetType extends AbstractType
 {
     /**

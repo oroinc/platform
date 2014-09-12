@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 class ExtendOptionsManager
 {
     const ENTITY_CLASS_OPTION = '_entity_class';
+    const FIELD_NAME_OPTION   = '_field';
     const TYPE_OPTION         = '_type';
     const MODE_OPTION         = '_mode';
     const TARGET_OPTION       = '_target';

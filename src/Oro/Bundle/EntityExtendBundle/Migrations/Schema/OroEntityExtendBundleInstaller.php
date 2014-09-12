@@ -3,22 +3,24 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0\RenameExtendTablesAndColumns;
+use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1\OroEntityExtendBundle as OroEntityExtendBundle11;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implements Installation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -26,5 +28,7 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
         if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
             parent::up($schema, $queries);
         }
+
+        OroEntityExtendBundle11::oroEnumValueTransTable($schema);
     }
 }

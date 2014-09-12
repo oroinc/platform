@@ -6,12 +6,31 @@ parameters:
     oro_entity_extend.type.option_set.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetType
     oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
 
+    oro_entity_extend.type.integer.class:                       Oro\Bundle\EntityExtendBundle\Form\Type\IntegerType
     oro_entity_extend.type.text.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\TextType
+    oro_entity_extend.type.textarea.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType
     oro_entity_extend.type.choice.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
+
+    oro_entity_extend.association_type_helper.class:            Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper
     oro_entity_extend.type.association_choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
     oro_entity_extend.type.multiple_association_choice.class:   Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType
+    oro_entity_extend.type.association.integer.class:           Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
+    oro_entity_extend.type.association.text.class:              Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
+    oro_entity_extend.type.association.textarea.class:          Oro\Bundle\EntityExtendBundle\Form\Type\TextareaAssociationPropertyType
+    oro_entity_extend.type.association.choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType
 
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
+
+    oro_entity_extend.enum_type_helper.class:                   Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper
+    oro_entity_extend.type.enum_value.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType
+    oro_entity_extend.type.enum_value_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
+    oro_entity_extend.type.enum_name.class:                     Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType
+    oro_entity_extend.type.enum_public.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType
+    oro_entity_extend.entity_config_type.extension.enum.class:  Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension
+    oro_entity_extend.type.enum_choice.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType
+    oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
+    oro_entity_extend.type.enum_filter.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType
+
 services:
     oro_entity_extend.type.entity:
         class:                                                  %oro_entity_extend.type.entity.class%
@@ -48,34 +67,92 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_option_set_collection }
 
+    oro_entity_extend.type.integer:
+        class: %oro_entity_extend.type.integer.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_integer }
+
     oro_entity_extend.type.text:
         class: %oro_entity_extend.type.text.class%
         arguments:
+            - @oro_entity_config.config_type_helper
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_text }
 
+    oro_entity_extend.type.textarea:
+        class: %oro_entity_extend.type.textarea.class%
+        arguments:
+            - @oro_entity_config.config_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_textarea }
+
     oro_entity_extend.type.choice:
         class: %oro_entity_extend.type.choice.class%
         arguments:
+            - @oro_entity_config.config_type_helper
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_choice }
 
-    oro_entity_extend.type.association_choice:
-        class: %oro_entity_extend.type.association_choice.class%
+    oro_entity_extend.association_type_helper:
+        class: %oro_entity_extend.association_type_helper.class%
+        public: false
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity.orm.entity_class_resolver
+
+    oro_entity_extend.type.association_choice:
+        class: %oro_entity_extend.type.association_choice.class%
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_association_choice }
 
     oro_entity_extend.type.multiple_association_choice:
         class: %oro_entity_extend.type.multiple_association_choice.class%
         arguments:
+            - @oro_entity_extend.association_type_helper
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_extend_multiple_association_choice }
+
+    oro_entity_extend.type.association.integer:
+        class: %oro_entity_extend.type.association.integer.class%
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_integer }
+
+    oro_entity_extend.type.association.text:
+        class: %oro_entity_extend.type.association.text.class%
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_text }
+
+    oro_entity_extend.type.association.textarea:
+        class: %oro_entity_extend.type.association.textarea.class%
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_textarea }
+
+    oro_entity_extend.type.association.choice:
+        class: %oro_entity_extend.type.association.choice.class%
+        arguments:
+            - @oro_entity_extend.association_type_helper
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_entity_extend_association_property_choice }
 
     oro_entity_extend.type.unique_key_collection_type:
         class: %oro_entity_extend.type.unique_key_collection_type.class%
@@ -84,3 +161,69 @@ services:
             - @oro_entity_config.provider.entity
         tags:
             - { name: form.type, alias: oro_entity_extend_unique_key_collection_type }
+
+    oro_entity_extend.enum_type_helper:
+        class: %oro_entity_extend.enum_type_helper.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
+    oro_entity_extend.type.enum_value:
+        class: %oro_entity_extend.type.enum_value.class%
+        tags:
+            - { name: form.type, alias: oro_entity_extend_enum_value }
+
+    oro_entity_extend.type.enum_value_collection:
+        class: %oro_entity_extend.type.enum_value_collection.class%
+        arguments:
+            - @oro_entity_extend.enum_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_extend_enum_value_collection }
+
+    oro_entity_extend.type.enum_name:
+        class: %oro_entity_extend.type.enum_name.class%
+        arguments:
+            - @oro_entity_extend.enum_type_helper
+            - @oro_entity_extend.db_id_name_generator
+        tags:
+            - { name: form.type, alias: oro_entity_extend_enum_name }
+
+    oro_entity_extend.type.enum_public:
+        class: %oro_entity_extend.type.enum_public.class%
+        arguments:
+            - @oro_entity_extend.enum_type_helper
+        tags:
+            - { name: form.type, alias: oro_entity_extend_enum_public }
+
+    oro_entity_extend.entity_config_type.extension.enum:
+        class: %oro_entity_extend.entity_config_type.extension.enum.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_entity_extend.enum_synchronizer
+        tags:
+            - { name: form.type_extension, alias: oro_entity_config_type }
+
+    oro_entity_extend.type.enum_choice:
+        class: %oro_entity_extend.type.enum_choice.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_enum_choice }
+
+    oro_entity_extend.type.enum_select:
+        class: %oro_entity_extend.type.enum_select.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_enum_select }
+
+    oro_entity_extend.type.enum_filter:
+        class: %oro_entity_extend.type.enum_filter.class%
+        arguments:
+            - @translator
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_enum_filter }

@@ -1,6 +1,6 @@
 query_designer:
     grouping:
-        exclude: [{type: text}, {type: array}, {type: object}]
+        exclude: [{type: text}, {type: array}, {type: json_array}, {type: simple_array}, {type: object}, {type: multiEnum}]
 
     filters:
         string:
@@ -26,4 +26,24 @@ query_designer:
         percent:
             applicable: [{type: percent}]
             type:       percent
+            query_type: [all]
+        enum:
+            applicable: [{type: enum}]
+            type:       enum
+            options:
+                null_value: ':empty:'
+                populate_default: true
+                default_value: Any
+                class: ''
+            init_module: oroquerydesigner/js/enum-filter-initialized
+            query_type: [all]
+        multiEnum:
+            applicable: [{type: multiEnum}]
+            type:       multi_enum
+            options:
+                null_value: ':empty:'
+                populate_default: true
+                default_value: Any
+                class: ''
+            init_module: oroquerydesigner/js/enum-filter-initialized
             query_type: [all]

@@ -27,7 +27,7 @@ abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAs
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();
         foreach ($targetEntityConfigs as $targetEntityConfig) {

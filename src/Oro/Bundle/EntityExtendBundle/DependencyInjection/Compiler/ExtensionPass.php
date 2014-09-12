@@ -19,14 +19,13 @@ class ExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::GENERATOR_NAME)) {
-            return;
+        $linkedServices = [];
+        if ($container->hasDefinition(self::DUMPER_NAME)) {
+            $linkedServices[self::DUMPER_NAME] = self::DUMPER_TAG;
         }
-
-        $linkedServices = [
-            self::GENERATOR_NAME => self::GENERATOR_TAG,
-            self::DUMPER_NAME    => self::DUMPER_TAG,
-        ];
+        if ($container->hasDefinition(self::GENERATOR_NAME)) {
+            $linkedServices[self::GENERATOR_NAME] = self::GENERATOR_TAG;
+        }
 
         foreach ($linkedServices as $serviceName => $extensionName) {
             $serviceDefinition = $container->getDefinition($serviceName);
@@ -34,8 +33,8 @@ class ExtensionPass implements CompilerPassInterface
 
             foreach ($taggedServices as $id => $tagAttributes) {
                 $params = [new Reference($id)];
-                if (!empty($tagAttributes['priority'])) {
-                    $params[] = (int) $tagAttributes['priority'];
+                if (!empty($tagAttributes[0]['priority'])) {
+                    $params[] = (int) $tagAttributes[0]['priority'];
                 }
 
                 $serviceDefinition->addMethodCall('addExtension', $params);

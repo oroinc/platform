@@ -85,15 +85,6 @@ interface PagerInterface
     public function getFirstPage();
 
     /**
-     * Returns an array of page numbers to use in pagination links.
-     *
-     * @param  integer $nbLinks The maximum number of page numbers to return
-     *
-     * @return array
-     */
-    public function getLinks($nbLinks = null);
-
-    /**
      * @return boolean
      */
     public function haveToPaginate();

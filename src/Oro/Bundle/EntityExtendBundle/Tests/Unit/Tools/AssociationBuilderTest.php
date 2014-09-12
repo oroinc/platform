@@ -40,7 +40,14 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             [$this->configManager, $this->relationBuilder]
         );
 
-        $targetEntityConfig = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS)
+            ->will($this->returnValue($sourceEntityExtendConfig));
 
         $entityConfigProvider = $this->getConfigProviderMock();
         $entityConfigProvider->expects($this->once())
@@ -53,6 +60,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
+                        ['extend', $extendConfigProvider],
                         ['entity', $entityConfigProvider]
                     ]
                 )
@@ -64,22 +72,17 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['id']));
 
         $this->relationBuilder->expects($this->once())
-            ->method('addFieldConfig')
+            ->method('addManyToManyRelation')
             ->with(
-                self::SOURCE_CLASS,
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
                 'target_entity_98c95332',
-                'manyToMany',
+                ['id'],
+                ['id'],
+                ['id'],
                 [
                     'extend' => [
-                        'owner'           => 'System',
-                        'state'           => 'New',
-                        'extend'          => true,
                         'without_default' => true,
-                        'relation_key'    => 'manyToMany|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332',
-                        'target_entity'   => self::TARGET_CLASS,
-                        'target_grid'     => ['id'],
-                        'target_title'    => ['id'],
-                        'target_detailed' => ['id'],
                     ],
                     'entity' => [
                         'label'       => 'test.targetentity.target_entity_98c95332.label',
@@ -94,15 +97,6 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->relationBuilder->expects($this->once())
-            ->method('addManyToManyRelation')
-            ->with(
-                self::TARGET_CLASS,
-                self::SOURCE_CLASS,
-                'target_entity_98c95332',
-                'manyToMany|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
-            );
-
         $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
@@ -115,7 +109,14 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             [$this->configManager, $this->relationBuilder]
         );
 
-        $targetEntityConfig = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS)
+            ->will($this->returnValue($sourceEntityExtendConfig));
 
         $entityConfigProvider = $this->getConfigProviderMock();
         $entityConfigProvider->expects($this->once())
@@ -128,6 +129,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
+                        ['extend', $extendConfigProvider],
                         ['entity', $entityConfigProvider]
                     ]
                 )
@@ -139,20 +141,13 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['id']));
 
         $this->relationBuilder->expects($this->once())
-            ->method('addFieldConfig')
+            ->method('addManyToOneRelation')
             ->with(
-                self::SOURCE_CLASS,
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
                 'target_entity_98c95332',
-                'manyToOne',
+                'id',
                 [
-                    'extend' => [
-                        'owner'         => 'System',
-                        'state'         => 'New',
-                        'extend'        => true,
-                        'target_entity' => self::TARGET_CLASS,
-                        'target_field'  => 'id',
-                        'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332',
-                    ],
                     'entity' => [
                         'label'       => 'test.targetentity.target_entity_98c95332.label',
                         'description' => 'test.targetentity.target_entity_98c95332.description',
@@ -164,15 +159,6 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                         'is_enabled' => false
                     ]
                 ]
-            );
-
-        $this->relationBuilder->expects($this->once())
-            ->method('addManyToOneRelation')
-            ->with(
-                self::TARGET_CLASS,
-                self::SOURCE_CLASS,
-                'target_entity_98c95332',
-                'manyToOne|Test\SourceEntity|Test\TargetEntity|target_entity_98c95332'
             );
 
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);

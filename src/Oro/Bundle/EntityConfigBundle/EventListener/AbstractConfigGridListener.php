@@ -333,35 +333,23 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     public function getActionConfigurationClosure($filters, $actions)
     {
         return function (ResultRecord $record) use ($filters, $actions) {
-            if ($record->getValue('mode') == ConfigModelManager::MODE_READONLY) {
-                $actions = array_map(
-                    function () {
-                        return false;
-                    },
-                    $actions
-                );
-
-                $actions['update']   = false;
-                $actions['rowClick'] = false;
-            } else {
-                foreach ($filters as $action => $filter) {
-                    foreach ($filter as $key => $value) {
-                        if (is_array($value)) {
-                            $error = true;
-                            foreach ($value as $v) {
-                                if ($record->getValue($key) == $v) {
-                                    $error = false;
-                                }
+            foreach ($filters as $action => $filter) {
+                foreach ($filter as $key => $value) {
+                    if (is_array($value)) {
+                        $error = true;
+                        foreach ($value as $v) {
+                            if ($record->getValue($key) == $v) {
+                                $error = false;
                             }
-                            if ($error) {
-                                $actions[$action] = false;
-                                break;
-                            }
-                        } else {
-                            if ($record->getValue($key) != $value) {
-                                $actions[$action] = false;
-                                break;
-                            }
+                        }
+                        if ($error) {
+                            $actions[$action] = false;
+                            break;
+                        }
+                    } else {
+                        if ($record->getValue($key) != $value) {
+                            $actions[$action] = false;
+                            break;
                         }
                     }
                 }
@@ -385,6 +373,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($providers as $provider) {
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
+                if (!isset($item['grid'])) {
+                    continue;
+                }
+
                 $alias     = $joinAlias . $provider->getScope() . '_' . $code;
                 $fieldName = $provider->getScope() . '_' . $code;
 

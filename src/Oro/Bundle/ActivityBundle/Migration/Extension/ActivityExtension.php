@@ -82,8 +82,6 @@ class ActivityExtension implements ExtendExtensionAwareInterface
             $targetGridColumnNames,
             [
                 'extend' => [
-                    'owner'           => ExtendScope::OWNER_SYSTEM,
-                    'is_extend'       => true,
                     'without_default' => true
                 ]
             ]
