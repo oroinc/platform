@@ -129,11 +129,7 @@ class SearchHandler implements SearchHandlerInterface
         $perPage += 1;
 
         if ($searchById) {
-            $items = [
-                $this->objectManager
-                    ->getRepository($this->entityName)
-                    ->find($query)
-            ];
+            $items = $this->findById($query);
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
@@ -202,6 +198,23 @@ class SearchHandler implements SearchHandlerInterface
 
         return $ids;
     }
+
+    /**
+     * Get search results data by id
+     *
+     * @param int $query
+     *
+     * @return array
+     */
+    protected function findById($query)
+    {
+        $items = [
+            $this->entityRepository->find($query)
+        ];
+
+        return $items;
+    }
+
 
     /**
      * @param array $items
