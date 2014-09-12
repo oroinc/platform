@@ -66,8 +66,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         // get a list of emails belong to any object, for example an user or a contacts
         $emailAddressBatches = $this->getKnownEmailAddressBatches($origin->getSynchronizedAt());
 
+        $folders = $this->syncFolders($origin);
+
         // iterate through all folders and do a synchronization of emails for each one
-        $folders = $this->getFolders($origin);
         foreach ($folders as $folder) {
             // register the current folder in the entity builder
             $this->emailEntityBuilder->setFolder($folder);
@@ -153,6 +154,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Gets a list of email addresses which have an owner and splits them into batches
      *
      * @param \DateTime|null $lastSyncTime
+     *
      * @return array
      *                 key = index
      *                 value = array
@@ -186,50 +188,43 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Gets a list of folders to be synchronized
      *
      * @param EmailOrigin $origin
+     *
      * @return EmailFolder[]
      */
-    protected function getFolders(EmailOrigin $origin)
+    protected function syncFolders(EmailOrigin $origin)
     {
+        // load existing folders for $origin
         $this->log->notice('Loading folders ...');
 
         $repo    = $this->em->getRepository('OroEmailBundle:EmailFolder');
-        $query   = $repo->createQueryBuilder('f')
+        $folders = $repo->createQueryBuilder('f')
             ->where('f.origin = ?1')
             ->orderBy('f.name')
             ->setParameter(1, $origin)
-            ->getQuery();
-        $folders = $query->getResult();
+            ->getQuery()
+            ->getResult();
 
         $this->log->notice(sprintf('Loaded %d folder(s).', count($folders)));
 
-        $this->ensureFoldersInitialized($folders, $origin);
-
-        return $folders;
-    }
-
-    /**
-     * Check the given folders and if needed correct them
-     *
-     * @param EmailFolder[] $folders
-     * @param EmailOrigin   $origin
-     */
-    protected function ensureFoldersInitialized(array &$folders, EmailOrigin $origin)
-    {
-        if (!empty($folders) && count($folders) >= 2) {
-            return;
-        }
-
+        // get folders from mail server
         $this->log->notice('Retrieving folders from an email server ...');
         $srcFolders = $this->manager->getFolders(null, true);
         $this->log->notice(sprintf('Retrieved %d folder(s).', count($srcFolders)));
 
+        // sync
         foreach ($srcFolders as $srcFolder) {
+            if ($srcFolder->hasFlag([Folder::FLAG_DRAFTS, Folder::FLAG_SPAM, Folder::FLAG_TRASH])) {
+                continue;
+            }
+
             $type = null;
             if ($srcFolder->hasFlag(Folder::FLAG_INBOX)) {
                 $type = EmailFolder::INBOX;
             } elseif ($srcFolder->hasFlag(Folder::FLAG_SENT)) {
                 $type = EmailFolder::SENT;
             }
+
+            $this->log->notice(sprintf('Found folder type "%s" ...', join(', ', $srcFolder->flags)));
 
             if ($type !== null) {
                 $globalName = $srcFolder->getGlobalName();
@@ -257,6 +252,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         $this->em->flush();
+
+        return $folders;
     }
 
     /**
@@ -265,6 +262,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param EmailFolder[] $folders
      * @param string        $folderType
      * @param string        $folderGlobalName
+     *
      * @return bool
      */
     protected function isFolderExist(array &$folders, $folderType, $folderGlobalName)
@@ -284,6 +282,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * Gets ImapEmailFolder entity connected to the given EmailFolder entity
      *
      * @param EmailFolder $folder
+     *
      * @return ImapEmailFolder
      */
     protected function getImapFolder(EmailFolder $folder)
@@ -362,7 +361,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails
         );
 
-        $folder = $imapFolder->getFolder();
+        $folder       = $imapFolder->getFolder();
         $repo         = $this->em->getRepository('OroImapBundle:ImapEmail');
         $imapDataRows = $repo->createQueryBuilder('e')
             ->select('e.uid, se.id')
@@ -414,7 +413,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 if (!isset($newImapIds[$src->getMessageId()])) {
                     $newImapIds[$src->getMessageId()] = [];
                 }
-                $uid = $src->getId()->getUid();
+                $uid                                    = $src->getId()->getUid();
                 $newImapIds[$src->getMessageId()][$uid] = $uid;
 
                 $this->log->notice(sprintf('The "%s" email was persisted.', $src->getSubject()));
