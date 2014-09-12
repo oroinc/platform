@@ -1,6 +1,7 @@
 datagrid:
     custom-entity-grid:
         options:
+            base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
             entityHint: entity
         source:
             acl_resource: ~
@@ -9,26 +10,26 @@ datagrid:
                 select:
                     - ce.id
                 from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
+                    - { table: ENTITY_NAME, alias: ce }
         columns: # no static columns
             id: {renderable: false} #required because of OrmSorterExtension
         properties:
             id: ~
             update_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_update
                 params:
                     - id
             view_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_view
                 params:
                     - id
             delete_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_delete
                 params:
                     - id
@@ -50,8 +51,12 @@ datagrid:
                 label: Delete
                 icon: trash
                 link: delete_link
-        sorters: { columns: { id: { data_name: ce.id } } }
-        filters: ~
+        sorters:
+            columns:
+                id:
+                    data_name: ce.id
+        filters:
+            columns: []
 
     entity-relation-grid:
         options:
@@ -67,11 +72,6 @@ datagrid:
         source:
             acl_resource: ~
             type: orm
-            query:
-                select:
-                    - ce.id
-                from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
         columns:
             assigned:
                 frontend_type: boolean

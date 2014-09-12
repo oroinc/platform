@@ -168,7 +168,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     {
         if (version_compare(phpversion(), '5.5.16', '>=')) {
             $this->markTestSkipped(
-                'Skip test due to problem with passing on PHP version 5.5.16. Needs investigation.'
+                'Skip test due to problem with passing it on PHP version 5.5.16.'
             );
         }
 

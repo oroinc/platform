@@ -71,8 +71,8 @@ class ExtendTable extends TableWithNameGenerator
         }
 
         if (null !== $oroOptions && isset($oroOptions['extend'])) {
-            if (!isset($oroOptions['extend']['extend'])) {
-                $oroOptions['extend']['extend'] = true;
+            if (!isset($oroOptions['extend']['is_extend'])) {
+                $oroOptions['extend']['is_extend'] = true;
             }
             $options['notnull'] = false;
         }
@@ -80,7 +80,9 @@ class ExtendTable extends TableWithNameGenerator
         $column = parent::addColumn($columnName, $typeName, $options);
 
         if (null !== $oroOptions) {
-            $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
+            if (empty($oroOptions[ExtendOptionsManager::TYPE_OPTION])) {
+                $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
+            }
             $column->setOptions([OroOptions::KEY => $oroOptions]);
         }
 

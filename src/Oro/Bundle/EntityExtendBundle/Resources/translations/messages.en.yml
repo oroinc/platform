@@ -2,6 +2,9 @@
 "It may take few minutes...": "It may take few minutes..."
 oro:
     entity_extend:
+        datagrid:
+            enum:
+                filter.empty:       None
         form:
             data_type_group:
                 fields:             Fields
@@ -16,6 +19,8 @@ oro:
                 boolean:            Boolean
                 decimal:            Decimal
                 date:               Date
+                datetime:           DateTime
+                time:               Time
                 text:               Text
                 float:              Float
                 money:              Currency
@@ -23,12 +28,21 @@ oro:
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many
-                optionSet:          Option set
+                optionSet:          Option Set (deprecated)
+                enum:               Select
+                multiEnum:          Multi-Select
 
                 ref-one:            System relation
                 ref-many:           System relation
+                array:              Binary
+                json_array:         Binary
+                simple_array:       Binary
+                object:             Binary
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
+        enum_name:    Option Set Name
+        enum_public:  Public
+        enum_options: Options
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
@@ -49,3 +63,14 @@ oro:
                 message:
                     saved: "Field saved"
         unique_keys: Unique Keys
+
+    entityextend:
+        enumvalue:
+            id.label:               Id
+            id.description:         The unique identifier of the option
+            name.label:             Name
+            name.description:       The option name
+            priority.label:         Priority
+            priority.description:   A number is used to sort options
+            default.label:          Is Default
+            default.description:    Determines if this option is selected by default for new records

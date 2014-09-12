@@ -88,7 +88,10 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     /**
      * @param mixed       $val
      * @param array       $options
+     *
      * @return string|null
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {
@@ -122,7 +125,10 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                     }
                     break;
                 case PropertyInterface::TYPE_HTML:
-                    $val = $this->formatHtmlFrontendType($val);
+                    $val = $this->formatHtmlFrontendType(
+                        $val,
+                        isset($options['export_type']) ? $options['export_type'] : null
+                    );
                     break;
             }
         }
@@ -134,17 +140,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * Converts HTML to its string representation
      *
      * @param string $val
+     * @param string $exportType
+     *
      * @return string
      */
-    protected function formatHtmlFrontendType($val)
+    protected function formatHtmlFrontendType($val, $exportType)
     {
-        return trim(
+        $result = trim(
             str_replace(
                 "\xC2\xA0", // non-breaking space (&nbsp;)
                 ' ',
                 html_entity_decode(strip_tags($val))
             )
         );
+        if ($exportType === 'list') {
+            $result = preg_replace('/\s*\n\s*/', ';', $result);
+        }
+
+        return $result;
     }
 
     /**

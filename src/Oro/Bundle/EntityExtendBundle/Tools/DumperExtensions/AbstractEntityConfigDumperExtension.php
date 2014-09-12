@@ -2,34 +2,28 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
 abstract class AbstractEntityConfigDumperExtension
 {
     /**
-     * @param string $actionType preUpdate or postUpdate
+     * Returns TRUE if this class supports the given action type.
      *
-     * @return mixed
+     * @param string $actionType Can be any of ExtendConfigDumper::ACTION_*
+     *
+     * @return bool
      */
     abstract public function supports($actionType);
 
     /**
-     * Entities configs for extend scope,
-     * optionally can be overridden in child, can change extend config
-     *
-     * @param array|ConfigInterface[] $extendConfigs
+     * Performs modifications of entity configs before entity schema is generated
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
     }
 
     /**
-     * Entities configs for extend scope,
-     * optionally can be overridden in child, can change extend config
-     *
-     * @param array|ConfigInterface[] $extendConfigs
+     * Performs modifications of entity configs after entity schema is generated
      */
-    public function postUpdate(array &$extendConfigs)
+    public function postUpdate()
     {
     }
 }

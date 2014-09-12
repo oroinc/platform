@@ -76,7 +76,7 @@
     @param Segment entity
     @param bool    reloadRequired - is page reload required after run
 #}
-{% macro runButton(entity, reloadRequired = false, skipAcl = false, label = 'oro.segment.action.refresh') %}
+{% macro runButton(entity, reloadRequired = false, skipAcl = false, options = {}) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set permission = skipAcl ? true : resource_granted('EDIT', entity) %}
     {% if entity.id and permission
@@ -85,11 +85,11 @@
         {{ UI.clientButton({
             'dataUrl': path('oro_api_post_segment_run', { 'id': entity.id }) ,
             'aCss':   'no-hash run-button btn',
-            'label' : label|trans,
+            'label' : options.label|default('oro.segment.action.refresh')|trans,
             'iCss':   'icon-refresh',
             'dataAttributes': {
                 'page-component-module': 'orosegment/js/app/components/refresh-button',
-                'page-component-options': {'reloadRequired': reloadRequired}|json_encode,
+                'page-component-options': options|json_encode,
             }
         }) }}
     {% endif %}

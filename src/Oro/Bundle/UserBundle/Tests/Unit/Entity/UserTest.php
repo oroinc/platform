@@ -4,16 +4,17 @@ namespace Oro\Bundle\UserBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\Email;
+
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -486,8 +487,9 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $entity = new User();
 
         $this->assertNotEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
-
-        $this->assertNotSame($entity->getApiKeys(), $entity->getApiKeys(), 'Should return unique random string');
+        $key1 = $entity->getApiKeys();
+        usleep(1); // need because 'uniqid' generates a unique identifier based on the current time in microseconds
+        $this->assertNotSame($key1, $entity->getApiKeys(), 'Should return unique random string');
 
         $organization1 = new Organization();
         $organization1->setName('test1');

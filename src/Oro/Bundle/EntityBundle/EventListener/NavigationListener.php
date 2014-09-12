@@ -60,7 +60,7 @@ class NavigationListener
                     && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
                     && $extendConfig->in(
                         'state',
-                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());

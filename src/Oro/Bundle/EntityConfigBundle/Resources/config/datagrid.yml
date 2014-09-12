@@ -79,8 +79,16 @@ datagrid:
                     - cf.fieldName
                     - cf.type
                     - cf.mode
+                    - ce.id as entity_id
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                join:
+                    inner:
+                        - { join: cf.entity, alias: ce }
+                where:
+                    and:
+                        - ce.id = :entity_id
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
 
         columns:
             fieldName:
@@ -88,7 +96,9 @@ datagrid:
                 frontend_type: string
             type:
                 label: oro.entity_config.field_config.type.label
-                frontend_type: string
+                frontend_type: html
+                type: twig
+                template: OroEntityConfigBundle:Config:fieldType.html.twig
 
         properties:
             update_link:
@@ -108,8 +118,6 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
-                type:
-                    data_name: cf.type
         filters: ~
 
     # Audit entity log grid

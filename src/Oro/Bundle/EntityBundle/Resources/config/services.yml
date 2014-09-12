@@ -1,10 +1,11 @@
 parameters:
     oro_entity.listener.navigation_listener.class:                 Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.owner.entity_config_subscriber.class:               Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
-    oro_entity.datagrid.extension.class:                           Oro\Bundle\EntityBundle\Grid\ExtendExtension
+    oro_entity.datagrid.extension.dynamic_fields.class:            Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension
+    oro_entity.datagrid.extension.additional_fields.class:         Oro\Bundle\EntityBundle\Grid\AdditionalFieldsExtension
     oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
-    oro_entity.event_listener.custom_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
-    oro_entity.event_listener.relation_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\RelationEntityGridListener
+    oro_entity.event_listener.custom_entity_grid_listener.class:   Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
+    oro_entity.event_listener.entity_relation_grid_listener.class: Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.exclusion_provider.class:                           Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
@@ -12,6 +13,7 @@ parameters:
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
     oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
+    oro_entity.virtual_field_provider.enum.class:                  Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
@@ -50,10 +52,21 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    oro_entity.datagrid.extension:
-        class: %oro_entity.datagrid.extension.class%
+    oro_entity.datagrid.extension.dynamic_fields:
+        class: %oro_entity.datagrid.extension.dynamic_fields.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_datagrid.datagrid.guesser
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_entity.datagrid.extension.additional_fields:
+        class: %oro_entity.datagrid.extension.additional_fields.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_datagrid.datagrid.guesser
         tags:
             - { name: oro_datagrid.extension }
 
@@ -62,27 +75,22 @@ services:
         arguments:
             - @oro_entity.entity_provider
 
-    oro_entity.event_listener.custom_entity_grid_subscriber:
-        class: %oro_entity.event_listener.custom_entity_grid_subscriber.class%
+    oro_entity.event_listener.custom_entity_grid_listener:
+        class: %oro_entity.event_listener.custom_entity_grid_listener.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
             - @router
-        calls:
-            - [setRequest, [@?request=]]
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
 
-    oro_entity.event_listener.relation_entity_grid_subscriber:
-        class: %oro_entity.event_listener.relation_entity_grid_subscriber.class%
+    oro_entity.event_listener.entity_relation_grid_listener:
+        class: %oro_entity.event_listener.entity_relation_grid_listener.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
-            - @router
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entity-relation-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entity-relation-grid, method: onBuildAfter }
 
     oro_entity.entity_provider.abstract:
         abstract: true
@@ -104,6 +112,7 @@ services:
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
+            - @oro_entity_extend.extend.field_type_helper
             - @doctrine
             - @translator
             - %oro_entity.hidden_fields%
@@ -136,10 +145,17 @@ services:
             - @oro_entity_config.provider.dictionary
             - @doctrine
 
+    oro_entity.virtual_field_provider.enum:
+        class: %oro_entity.virtual_field_provider.enum.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @doctrine
+
     oro_entity.entity_hierarchy_provider:
         class: %oro_entity.entity_hierarchy_provider.class%
         arguments:
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.extend
+            - @doctrine
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%

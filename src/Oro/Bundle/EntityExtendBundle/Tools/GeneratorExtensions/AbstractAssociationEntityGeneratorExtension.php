@@ -69,13 +69,13 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      */
     protected function isSupportedRelation(array $relationData)
     {
-        /** @var FieldConfigId $fieldConfig */
-        $fieldConfig = $relationData['field_id'];
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $relationData['field_id'];
 
         return
-            $fieldConfig instanceof FieldConfigId
-            && $fieldConfig->getFieldType() === $this->getAssociationType()
-            && $fieldConfig->getFieldName() === ExtendHelper::buildAssociationName(
+            $fieldConfigId instanceof FieldConfigId
+            && $fieldConfigId->getFieldType() === $this->getAssociationType()
+            && $fieldConfigId->getFieldName() === ExtendHelper::buildAssociationName(
                 $relationData['target_entity'],
                 $this->getAssociationKind()
             );

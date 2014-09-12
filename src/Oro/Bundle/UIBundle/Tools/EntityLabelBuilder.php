@@ -93,15 +93,15 @@ class EntityLabelBuilder
         //  Acme\Bundle\TestBundle\Other\Product    -> Acme\Test\Other\Product
         //  Acme\Bundle\TestBundle\Product          -> Acme\Test\Product
         $className = str_replace(
-            ['bundle\\entity', 'bundle\\document', 'bundle\\model', 'bundle\\'],
-            '',
+            ['bundle\\entity\\', 'bundle\\document\\', 'bundle\\model\\', 'bundle\\'],
+            '\\',
             strtolower($className)
         );
 
         // split the class name to parts
         $items = array_filter(explode('\\', str_replace("_", "", $className)));
 
-        // remove duplicates:
+        // remove duplicates
         $result = [];
         foreach ($items as $item) {
             if (!in_array($item, $result)) {

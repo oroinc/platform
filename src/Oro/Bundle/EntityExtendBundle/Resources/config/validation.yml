@@ -10,11 +10,11 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
             - NotBlank: ~
             - Regex:
                 pattern: "/^[a-z]+[a-z0-9_]*$/"
-                message: This value should contains only lower alphabetic symbols, underscore and numbers
+                message: "This value should contain only lower case alphabetic symbols, underscore and numbers."
             - Regex:
                 pattern: "/^id$/i"
                 match:   false
-                message: The '{{ value }}' cannot be used as field name
+                message: "The '{{ value }}' cannot be used as a field name."
             - oro_entity_extend:NotSqlKeyword: ~
         type:
             - NotBlank: ~
@@ -28,6 +28,6 @@ Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
             - NotBlank:  ~
             - Regex:
                 pattern: "/^[a-z]+[a-z0-9]*$/i"
-                message: This value should contains only lower/upper alphabetic symbols and numbers
+                message: "This value should contain only alphabetic symbols and numbers."
             - oro_entity_extend:NotSqlKeyword: {groups: Sql}
             - oro_entity_extend:NotPhpKeyword: {groups: Php}
