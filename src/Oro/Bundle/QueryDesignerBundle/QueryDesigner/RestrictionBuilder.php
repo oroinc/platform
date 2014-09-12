@@ -47,8 +47,13 @@ class RestrictionBuilder implements RestrictionBuilderInterface
             } else {
                 $operator = array_pop($operatorStack);
 
+                $params = [];
+                if (isset($item['filterData']['params'])) {
+                    $params = $item['filterData']['params'];
+                    unset($item['filterData']['params']);
+                }
                 /** @var FilterInterface $filter */
-                $filter = $this->getFilterObject($item['filter'], $item['column']);
+                $filter = $this->getFilterObject($item['filter'], $item['column'], $params);
 
                 $form = $filter->getForm();
                 if (!$form->isSubmitted()) {
@@ -68,18 +73,13 @@ class RestrictionBuilder implements RestrictionBuilderInterface
      *
      * @param string $name       A filter name.
      * @param string $columnName A column name this filter should be applied.
-     * @param string $operator   A filter operator. Can be "OR" or "AND".
+     * @param array  $params     The filter parameters.
      *
      * @return FilterInterface
      */
-    protected function getFilterObject($name, $columnName, $operator = null)
+    protected function getFilterObject($name, $columnName, array $params = [])
     {
-        $params = [
-            FilterUtility::DATA_NAME_KEY => $columnName
-        ];
-        if ($operator !== null) {
-            $params[FilterUtility::CONDITION_KEY] = $operator;
-        }
+        $params[FilterUtility::DATA_NAME_KEY] = $columnName;
 
         return $this->manager->createFilter($name, $params);
     }

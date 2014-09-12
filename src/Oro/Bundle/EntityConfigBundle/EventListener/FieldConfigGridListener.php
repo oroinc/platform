@@ -8,7 +8,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 class FieldConfigGridListener extends AbstractConfigGridListener
@@ -49,12 +48,7 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     protected function prepareQuery(QueryBuilder $query, $rootAlias, $alias, $itemsType)
     {
-        $entityId = $this->parameters->get(self::ENTITY_PARAM, 0);
-
-        $query->where($rootAlias.'.mode <> :mode');
-        $query->setParameter('mode', ConfigModelManager::MODE_HIDDEN);
-        $query->innerJoin($rootAlias.'.entity', 'ce', 'WITH', 'ce.id=' . $entityId);
-        $query->addSelect('ce.id as entity_id');
+        $query->setParameter('entity_id', $this->parameters->get(self::ENTITY_PARAM, 0));
 
         return parent::prepareQuery($query, $rootAlias, $alias, $itemsType);
     }

@@ -31,8 +31,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
         $doctrine         = $this->getDoctrine(
             [
-                $en => ['column1' => 'string'],
-                $en => ['column2' => 'string']
+                $en => ['column1' => 'string', 'column2' => 'string']
             ]
         );
         $functionProvider = $this->getFunctionProvider(
@@ -74,7 +73,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                         'column2(Count,string,aggregates)' => 'c2'
                     ],
                 ],
-                'hints' => [
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
@@ -222,6 +221,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'rc4'     => ['nullable' => true]
                 ],
                 $en2 => ['column3' => 'float'],
+                $en3 => ['column5' => 'string'],
             ]
         );
 
@@ -295,7 +295,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                         ]
                     ]
                 ],
-                'hints' => [
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',

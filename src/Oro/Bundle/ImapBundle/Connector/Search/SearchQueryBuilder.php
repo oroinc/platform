@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
-use \Closure;
-
 class SearchQueryBuilder extends AbstractSearchQueryBuilder
 {
     /**
@@ -19,8 +17,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by FROM field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function from($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -32,8 +31,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by TO field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function to($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -45,8 +45,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by CC field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function cc($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -58,8 +59,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by BCC field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function bcc($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -71,8 +73,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by TO, CC, or BCC fields.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function participants($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -84,8 +87,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by SUBJECT field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function subject($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -97,8 +101,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by BODY field.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function body($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -110,8 +115,9 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
     /**
      * Search by the attachment file name.
      *
-     * @param string|Closure $value
-     * @param int $match The match type. One of SearchQueryMatch::* values
+     * @param string|\Closure $value
+     * @param int             $match The match type. One of SearchQueryMatch::* values
+     *
      * @return $this
      */
     public function attachment($value, $match = SearchQueryMatch::DEFAULT_MATCH)
@@ -125,6 +131,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
      *
      * @param string $fromValue
      * @param string $toValue
+     *
      * @return $this
      */
     public function sent($fromValue = null, $toValue = null)
@@ -138,6 +145,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
      *
      * @param string $fromValue
      * @param string $toValue
+     *
      * @return $this
      */
     public function received($fromValue = null, $toValue = null)
@@ -158,7 +166,7 @@ class SearchQueryBuilder extends AbstractSearchQueryBuilder
 
     private function processField($name, $value, $match)
     {
-        if ($value instanceof Closure) {
+        if ($value instanceof \Closure) {
             $exprBuilder = new SearchQueryValueBuilder($this->query->newInstance());
             call_user_func($value, $exprBuilder);
             $value = $exprBuilder->get();

@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -38,16 +39,24 @@ class DatagridConfigurationBuilder
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
+     * @param DatagridGuesser               $datagridGuesser
+     *
      * @throws InvalidConfigurationException
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        DatagridGuesser $datagridGuesser
     ) {
         $this->doctrine = $doctrine;
 
-        $this->converter = new DatagridConfigurationQueryConverter($functionProvider, $virtualFieldProvider, $doctrine);
+        $this->converter = new DatagridConfigurationQueryConverter(
+            $functionProvider,
+            $virtualFieldProvider,
+            $doctrine,
+            $datagridGuesser
+        );
     }
 
     /**
@@ -70,6 +79,8 @@ class DatagridConfigurationBuilder
      * Return a datagrid configuration
      *
      * @return DatagridConfiguration
+     *
+     * @throws \InvalidArgumentException
      */
     public function getConfiguration()
     {

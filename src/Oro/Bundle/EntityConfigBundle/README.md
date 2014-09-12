@@ -145,15 +145,6 @@ If you need to use the entity configuration in your entity repository you can ju
  - Events::NEW_FIELD_CONFIG     - This event is raised when a new configurable entity field is found and we are going to add its metadata to the database.
  - Events::PRE_PERSIST_CONFIG   - This event is raised just before new or changed configuration data is persisted in to the database.
 
-Initialize configuration data
------------------------------
-The following command can be used to initialize all configurable entities:
-```bash
-php app/console oro:entity-config:init
-```
-This command iterates through all entities and configs files and loads entity metadata into the database.
-This command is executed during the installation process and usually you do not need to execute it manually.
-
 Update configuration data
 -------------------------
 The following command can be used to update configurable entities:
@@ -167,4 +158,11 @@ Clearing up the cache
 The following command removes all data related to configurable entities from the application cache:
 ```bash
 php app/console oro:entity-config:cache:clear --no-warmup
+```
+
+Debugging configuration data
+----------------------------
+You can use `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
+```bash
+php app/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
 ```

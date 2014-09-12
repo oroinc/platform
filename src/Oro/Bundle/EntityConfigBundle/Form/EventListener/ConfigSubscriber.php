@@ -58,7 +58,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            FormEvents::POST_SUBMIT  => 'postSubmit',
+            FormEvents::POST_SUBMIT  => ['postSubmit', -10],
             FormEvents::PRE_SET_DATA => 'preSetData'
         );
     }
