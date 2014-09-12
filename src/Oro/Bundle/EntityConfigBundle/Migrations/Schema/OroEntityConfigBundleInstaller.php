@@ -44,14 +44,14 @@ class OroEntityConfigBundleInstaller implements Installation
             $schema->getTable('oro_entity_config'),
             ['entity_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addIndex(['field_id'], 'IDX_256E3E9B443707B0');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_entity_config_field'),
             ['field_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addIndex(
             ['scope', 'code', 'value', 'entity_id'],

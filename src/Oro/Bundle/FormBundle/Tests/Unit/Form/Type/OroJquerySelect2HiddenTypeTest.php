@@ -330,6 +330,26 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testDefaultFormOptions()
+    {
+        $options = [
+            'converter'    => $this->getMockConverter(),
+            'entity_class' => '\stdClass',
+            'configs'      => ['route_name' => 'custom']
+        ];
+        $this->type->expects($this->once())->method('createDefaultTransformer')
+            ->will($this->returnValue($this->getMockEntityToIdTransformer()));
+
+        $form = $this->factory->create($this->type, null, $options);
+
+        $expectedOptions = [
+            'error_bubbling' => false
+        ];
+        foreach ($expectedOptions as $optionName => $optionValue) {
+            $this->assertSame($optionValue, $form->getConfig()->getOption($optionName));
+        }
+    }
+
     /**
      * Create mock entity by id property name and value
      *

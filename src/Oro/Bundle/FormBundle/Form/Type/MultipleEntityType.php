@@ -96,14 +96,18 @@ class MultipleEntityType extends AbstractType
         $resolver->setRequired(['class']);
         $resolver->setDefaults(
             [
-                'add_acl_resource'      => null,
-                'class'                 => null,
-                'default_element'       => null,
-                'extend'                => false,
-                'grid_url'              => null,
-                'initial_elements'      => null,
-                'mapped'                => false,
-                'selector_window_title' => null,
+                'add_acl_resource'           => null,
+                'class'                      => null,
+                'default_element'            => null,
+                'extend'                     => false,
+                'initial_elements'           => null,
+                'mapped'                     => false,
+                'selector_window_title'      => null,
+                'extra_config'               => null,
+                'grid_url'                   => null, // deprecated
+                'selection_url'              => null,
+                'selection_route'            => null,
+                'selection_route_parameters' => [],
             ]
         );
     }
@@ -113,7 +117,11 @@ class MultipleEntityType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $this->setOptionToView($view, $options, 'grid_url');
+        $this->setOptionToView($view, $options, 'extra_config');
+        $this->setOptionToView($view, $options, 'grid_url'); // deprecated
+        $this->setOptionToView($view, $options, 'selection_url');
+        $this->setOptionToView($view, $options, 'selection_route');
+        $this->setOptionToView($view, $options, 'selection_route_parameters');
         $this->setOptionToView($view, $options, 'initial_elements');
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');

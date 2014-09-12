@@ -6,13 +6,16 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\NotificationBundle\Entity\Event;
+use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
+use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
@@ -36,7 +39,26 @@ class EmbedFormController extends Controller
         $formManager = $this->get('oro_embedded_form.manager');
         $form        = $formManager->createForm($formEntity->getFormType());
 
-        $form->handleRequest($request);
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
+            $dataClass = $form->getConfig()->getOption('data_class');
+            if (isset($dataClass) && class_exists($dataClass)) {
+                $ref = new \ReflectionClass($dataClass);
+                $data = $ref->getConstructor()->getNumberOfRequiredParameters() ?
+                    $ref->newInstanceWithoutConstructor() :
+                    $ref->newInstance();
+                $form->setData($data);
+            } else {
+                $data = [];
+            }
+            $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
+            $eventDispatcher = $this->get('event_dispatcher');
+            $eventDispatcher->dispatch(EmbeddedFormSubmitBeforeEvent::EVENT_NAME, $event);
+            $form->submit($request);
+
+            $event = new EmbeddedFormSubmitAfterEvent($data, $formEntity, $form);
+            $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);
+        }
+
         if ($form->isValid()) {
             $entity = $form->getData();
             $em->persist($entity);
