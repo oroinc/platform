@@ -174,7 +174,7 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
                 });
                 this.selectorDialog.on('completeSelection', _.bind(this.processSelectedEntities, this));
                 this.selectorDialog.render();
-            }
+            }src/OroCRM/Bundle/ContactUsBundle/Tests/Unit/Form/Type/ContactRequestTypeTest.php
         },
 
         processSelectedEntities: function (added, addedModels, removed) {
