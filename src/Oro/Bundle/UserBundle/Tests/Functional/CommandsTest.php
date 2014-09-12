@@ -38,7 +38,8 @@ class CommandsTest extends WebTestCase
             array(
                 'command' => $command->getName(),
                 '--env' => $kernel->getEnvironment(),
-                'username' => 'admin'
+                'username' => 'admin',
+                'organization' => 'TestOrg'
             )
         );
 

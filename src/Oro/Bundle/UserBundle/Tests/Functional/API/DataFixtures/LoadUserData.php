@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,9 +35,13 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->findBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
 
         $user = $userManager->createUser();
-        $api = new UserApi();
 
+        $organizationManager = $this->container->get('oro_organization.organization_manager');
+        $org = $organizationManager->getOrganizationRepo()->getFirst();
+
+        $api = new UserApi();
         $api->setApiKey('user_api_key')
+            ->setOrganization($org)
             ->setUser($user);
 
         $user
@@ -46,7 +51,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setLastName('User')
             ->addRole($role[0])
             ->setEmail('simple@example.com')
-            ->setApi($api)
+            ->addOrganization($org)
+            ->addApiKey($api)
             ->setSalt('');
 
         $userManager->updateUser($user);

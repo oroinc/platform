@@ -12,7 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 
 class Client extends BaseClient
 {
-    const LOCAL_URL = 'http://localhost';
+    //const LOCAL_URL = 'http://localhost';
+    const LOCAL_URL = 'http://test.local';
 
     /**
      * @var PDOConnection

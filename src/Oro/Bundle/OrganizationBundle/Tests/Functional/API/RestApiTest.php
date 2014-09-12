@@ -24,13 +24,12 @@ class RestApiTest extends WebTestCase
             'email' => 'email@email.localhost',
             'fax' => '321-321-321',
             'appendUsers' => array(1),
-            'owner' => '1',
+            //'owner' => '1',
         )
     );
 
     protected function setUp()
     {
-        $this->markTestIncomplete("Test should be fixed in OEE-257 task");
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
