@@ -186,12 +186,15 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         _getSelectionWidgetUrl: function() {
             var url = this.options.selectionUrl
                 || routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams),
-                separator = url.indexOf('?') > -1 ? '&' : '?';
+                separator = url.indexOf('?') > -1 ? '&' : '?',
+                added = this.$addedEl.val(),
+                removed = this.$removedEl.val(),
+                defaultEl = this.$defaultEl.val();
 
             return url + separator
-                + 'added=' + this.$addedEl.val()
-                + '&removed=' + this.$removedEl.val()
-                + '&default=' + this.$defaultEl.val();
+                + 'added=' + (added || '')
+                + '&removed=' + (removed || '')
+                + '&default=' + (defaultEl || '') ;
         },
 
         processSelectedEntities: function (added, addedModels, removed) {
