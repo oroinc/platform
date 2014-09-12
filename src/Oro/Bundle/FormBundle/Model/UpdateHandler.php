@@ -49,10 +49,11 @@ class UpdateHandler
     /**
      * @param object $entity
      * @param FormInterface $form
-     * @param array|callable $saveAndStayRoute
-     * @param array|callable $saveAndCloseRoute
+     * @param callable $saveAndStayRoute
+     * @param callable $saveAndCloseRoute
      * @param string $saveMessage
-     * @param null $formHandler
+     * @param null|object $formHandler
+     * @param callable|null $resultCallback
      * @return array|RedirectResponse
      */
     public function handleUpdate(
@@ -61,7 +62,8 @@ class UpdateHandler
         $saveAndStayRoute,
         $saveAndCloseRoute,
         $saveMessage,
-        $formHandler = null
+        $formHandler = null,
+        $resultCallback = null
     ) {
         if ($formHandler) {
             if (method_exists($formHandler, 'process') && $formHandler->process($entity)) {
@@ -71,11 +73,30 @@ class UpdateHandler
             return $this->processSave($form, $entity, $saveAndStayRoute, $saveAndCloseRoute, $saveMessage);
         }
 
-        return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-            'isWidgetContext' => (bool) $this->request->get('_wid', false)
-        );
+        return $this->getResult($entity, $form, $resultCallback);
+    }
+
+    /**
+     * @param object $entity
+     * @param FormInterface $form
+     * @param callable|null $resultCallback
+     * @return array
+     */
+    protected function getResult($entity, FormInterface $form, $resultCallback = null)
+    {
+        if (is_callable($resultCallback)) {
+            $result = call_user_func($resultCallback, $entity, $form, $this->request);
+        } else {
+            $result = array(
+                'form' => $form->createView()
+            );
+        }
+        if (!array_key_exists('entity', $result)) {
+            $result['entity'] = $entity;
+        }
+        $result['isWidgetContext'] = (bool) $this->request->get('_wid', false);
+
+        return $result;
     }
 
     /**

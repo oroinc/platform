@@ -178,6 +178,38 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testResultCallback()
+    {
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entity = new \stdClass();
+
+        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
+            ->getMock();
+        $handler->expects($this->once())
+            ->method('process')
+            ->with($entity)
+            ->will($this->returnValue(true));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue(1));
+
+        $expected = $this->assertSaveData($form, $entity);
+        $expected['savedId'] = 1;
+
+        $result = $this->handler->handleUpdate(
+            $entity,
+            $form,
+            array('route' => 'test_update'),
+            array('route' => 'test_view'),
+            'Saved',
+            $handler
+        );
+        $this->assertEquals($expected, $result);
+    }
+
     public function testSaveHandlerRouteCallback()
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
@@ -204,6 +236,15 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $saveAndCloseCallback = function () use ($saveAndCloseRoute) {
             return $saveAndCloseRoute;
         };
+        $called = false;
+        $resultCallback = function () use (&$called) {
+            $called = true;
+            $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+            return array('form' => $form, 'test' => 1);
+        };
 
         $expected = $this->assertSaveData($form, $entity);
         $expected['savedId'] = 1;
@@ -214,8 +255,10 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             $saveAndStayCallback,
             $saveAndCloseCallback,
             'Saved',
-            $handler
+            $handler,
+            $resultCallback
         );
+        $this->assertTrue($called);
         $this->assertEquals($expected, $result);
     }
 
