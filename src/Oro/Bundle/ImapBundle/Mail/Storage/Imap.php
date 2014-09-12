@@ -213,7 +213,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         $this->currentFolder = $globalName;
-        $selectResponse = $this->protocol->select(
+        $selectResponse = $this->protocol->examine(
             mb_convert_encoding((string)$this->currentFolder, 'UTF7-IMAP', 'UTF-8')
         );
         if (!$selectResponse) {

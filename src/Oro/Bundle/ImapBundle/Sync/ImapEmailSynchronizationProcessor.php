@@ -189,34 +189,34 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param EmailOrigin $origin
      *
-     * @return EmailFolder[]
+     * @return ImapEmailFolder[]
      */
     protected function syncFolders(EmailOrigin $origin)
     {
         // load existing folders for $origin
         $this->log->notice('Loading folders ...');
 
-        $repo    = $this->em->getRepository('OroEmailBundle:EmailFolder');
-        $folders = $repo->createQueryBuilder('f')
+        $repo    = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $imapFolders = $repo->createQueryBuilder('ifo')
+            ->leftJoin('ifo.folder', 'f')
             ->where('f.origin = ?1')
             ->orderBy('f.name')
             ->setParameter(1, $origin)
             ->getQuery()
             ->getResult();
 
-        $this->log->notice(sprintf('Loaded %d folder(s).', count($folders)));
+        $this->log->notice(sprintf('Loaded %d folder(s).', count($imapFolders)));
 
         // get folders from mail server
         $this->log->notice('Retrieving folders from an email server ...');
         $srcFolders = $this->manager->getFolders(null, true);
         $this->log->notice(sprintf('Retrieved %d folder(s).', count($srcFolders)));
 
-        // sync
-        foreach ($srcFolders as $srcFolder) {
-            if ($srcFolder->hasFlag([Folder::FLAG_DRAFTS, Folder::FLAG_SPAM, Folder::FLAG_TRASH])) {
-                continue;
-            }
 
+        $srcFolders = $this->loadSourceFolders();
+
+        // sync
+        foreach ($srcFolders as $uidValidity => $srcFolder) {
             $type = null;
             if ($srcFolder->hasFlag(Folder::FLAG_INBOX)) {
                 $type = EmailFolder::INBOX;
@@ -228,7 +228,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             if ($type !== null) {
                 $globalName = $srcFolder->getGlobalName();
-                if ($this->isFolderExist($folders, $type, $globalName)) {
+                if ($this->isFolderExist($imapFolders, $globalName, $srcFolder->getGlobalName())) {
                     continue;
                 }
 
@@ -241,35 +241,64 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     ->setType($type);
 
                 $origin->addFolder($folder);
-
-                $this->em->persist($origin);
                 $this->em->persist($folder);
-
-                $folders[] = $folder;
+                $imapFolders[] = $folder;
 
                 $this->log->notice(sprintf('The "%s" folder was persisted.', $globalName));
             }
         }
 
+        $this->em->persist($origin);
         $this->em->flush();
 
-        return $folders;
+        return $imapFolders;
+    }
+
+    /**
+     * Get folders from mail server
+     */
+    protected function loadSourceFolders()
+    {
+        $this->log->notice('Retrieving folders from an email server ...');
+        $srcFolders = $this->manager->getFolders(null, true);
+        $this->log->notice(sprintf('Retrieved %d folder(s).', count($srcFolders)));
+
+        $filteredFolders = [];
+        foreach ($srcFolders as $srcFolder) {
+            if ($srcFolder->hasFlag([Folder::FLAG_DRAFTS, Folder::FLAG_SPAM, Folder::FLAG_TRASH])) {
+                continue;
+            }
+
+            $this->manager->selectFolder($srcFolder->getGlobalName());
+            $uidValidity = $this->manager->getUidValidity();
+
+            $filteredFolders[$uidValidity] = $srcFolder;
+        }
+
+        $this->log->notice(sprintf('Retrieved %d folder(s).', count($filteredFolders)));
+        return $filteredFolders;
     }
 
     /**
      * Checks if the folder exists in the given list
      *
-     * @param EmailFolder[] $folders
-     * @param string        $folderType
-     * @param string        $folderGlobalName
+     * @param ImapEmailFolder[] $imapFolders
+     * @param string            $folderGlobalName
      *
      * @return bool
      */
-    protected function isFolderExist(array &$folders, $folderType, $folderGlobalName)
+    protected function isFolderExist(array &$imapFolders, $folderGlobalName)
     {
-        $exists = false;
-        foreach ($folders as $folder) {
-            if ($folder->getType() === $folderType && $folder->getFullName() === $folderGlobalName) {
+        $exists     = false;
+        $isUIDEqual = false;
+
+        foreach ($imapFolders as $imapFolder) {
+            $this->manager->selectFolder($folderName);
+
+            $folder = $imapFolder->getFolder();
+            $isNamesEqual = $folder->getFullName() === $folderGlobalName;
+            $isUIDEqual   = $imapFolder->getUidValidity() ===
+            if ($folder->getFullName() === $folderGlobalName) {
                 $exists = true;
                 break;
             }
