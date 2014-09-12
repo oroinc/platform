@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Event;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 class EmbeddedFormSubmitAfterEvent extends Event
 {
@@ -17,14 +17,14 @@ class EmbeddedFormSubmitAfterEvent extends Event
     /** @var  EmbeddedForm */
     protected $formEntity;
 
-    /** @var  Form */
+    /** @var  FormInterface */
     protected $form;
 
-    public function __construct($data, EmbeddedForm $formEntity, Form $form)
+    public function __construct($data, EmbeddedForm $formEntity, FormInterface $form)
     {
-        $this->data = $data;
+        $this->data       = $data;
         $this->formEntity = $formEntity;
-        $this->form = $form;
+        $this->form       = $form;
     }
 
     /**
@@ -44,7 +44,7 @@ class EmbeddedFormSubmitAfterEvent extends Event
     }
 
     /**
-     * @return Form
+     * @return FormInterface
      */
     public function getForm()
     {

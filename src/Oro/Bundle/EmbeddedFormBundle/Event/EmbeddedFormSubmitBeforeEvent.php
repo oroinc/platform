@@ -18,7 +18,7 @@ class EmbeddedFormSubmitBeforeEvent extends Event
 
     public function __construct($data, EmbeddedForm $formEntity)
     {
-        $this->data = $data;
+        $this->data       = $data;
         $this->formEntity = $formEntity;
     }
 

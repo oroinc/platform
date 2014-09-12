@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Event;
 
-
-
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
-use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 
 class EmbeddedFormSubmitAfterEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,4 +28,3 @@ class EmbeddedFormSubmitAfterEventTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($form, $event->getForm());
     }
 }
- 
