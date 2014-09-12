@@ -16,8 +16,8 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 abstract class AbstractEmailSynchronizer
 {
     const SYNC_CODE_IN_PROCESS = 1;
-    const SYNC_CODE_FAILURE = 2;
-    const SYNC_CODE_SUCCESS = 3;
+    const SYNC_CODE_FAILURE    = 2;
+    const SYNC_CODE_SUCCESS    = 3;
 
     /**
      * @var LoggerInterface
