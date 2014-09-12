@@ -50,13 +50,14 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         $optionKey = 'testKey';
 
         $formConfigMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfigMock->expects($this->exactly(2))
+        $formConfigMock->expects($this->exactly(3))
             ->method('getOption')
             ->will(
                 $this->returnValueMap(
                     array(
                         array('depends_on_parent_field', null, $optionKey),
                         array('data_route', null, 'test'),
+                        array('data_route_parameter', null, 'id'),
                     )
                 )
             );
@@ -75,5 +76,7 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($optionKey, $formView->vars['depends_on_parent_field']);
         $this->assertArrayHasKey('data_route', $formView->vars);
         $this->assertEquals('test', $formView->vars['data_route']);
+        $this->assertArrayHasKey('data_route_parameter', $formView->vars);
+        $this->assertEquals('id', $formView->vars['data_route_parameter']);
     }
 }
