@@ -86,9 +86,14 @@ class ResponseHistoryListener
             $routeParameters = $request->get('_route_params');
             unset($routeParameters['id']);
 
+            $entityId = filter_var($request->get('id'), FILTER_VALIDATE_INT);
+            if (false === $entityId) {
+                $entityId = null;
+            }
+
             $postArray['route']           = $request->get('_route');
             $postArray['routeParameters'] = $routeParameters;
-            $postArray['entityId']        = $request->get('id');
+            $postArray['entityId']        = (int)$entityId;
 
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
