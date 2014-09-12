@@ -66,11 +66,12 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             )
             ->setSalt('');
 
-        $api   = new UserApi();
-        if (!$admin->getApi()) {
+        if (!is_object($admin->getApiKeys())) {
+            $api   = new UserApi();
             $api->setApiKey('admin_api_key')
-                ->setUser($admin);
-            $admin->setApi($api);
+                ->setUser($admin)
+                ->setOrganization($organization);
+            $admin->addApiKey($api);
         }
 
         $this->addReference('default_user', $admin);
