@@ -9,6 +9,10 @@ class UpdateSchemaListenerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
+
+        if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
+            $this->markTestSkipped('Should be tested only with ORM search engine');
+        }
     }
 
     /**

@@ -60,11 +60,6 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $indexListener = $this->getContainer()->get('oro_search.index_listener');
-        if ($indexListener instanceof OrmIndexListener) {
-            $indexListener->setEnabled(false);
-        }
-
         $fixtures = null;
         try {
             $fixtures = $this->getFixtures($input, $output);
@@ -82,9 +77,6 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
                 $this->processFixtures($input, $output, $fixtures);
             }
         }
-
-        $searchEngine = $this->getContainer()->get('oro_search.search.engine');
-        $searchEngine->reindex();
 
         return 0;
     }
