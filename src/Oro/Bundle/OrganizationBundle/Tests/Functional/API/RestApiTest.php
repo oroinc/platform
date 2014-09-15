@@ -30,6 +30,7 @@ class RestApiTest extends WebTestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped('OEE-26');
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
