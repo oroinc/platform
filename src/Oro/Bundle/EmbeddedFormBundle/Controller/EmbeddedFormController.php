@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+
 use FOS\Rest\Util\Codes;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -15,6 +14,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
 class EmbeddedFormController extends Controller
 {
@@ -112,6 +113,18 @@ class EmbeddedFormController extends Controller
     }
 
     /**
+     * @Route("info/{id}", name="oro_embedded_form_info", requirements={"id"="[-\d\w]+"})
+     * @AclAncestor("oro_embedded_form_view")
+     * @Template()
+     */
+    public function infoAction(EmbeddedForm $entity)
+    {
+        return array(
+            'entity'  => $entity
+        );
+    }
+
+    /**
      * @param EmbeddedForm $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -121,7 +134,7 @@ class EmbeddedFormController extends Controller
             $entity = new EmbeddedForm();
         }
 
-        $form = $this->createForm(new EmbeddedFormType(), $entity);
+        $form = $this->createForm('embedded_form', $entity);
         $form->handleRequest($this->get('request'));
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
@@ -130,21 +143,20 @@ class EmbeddedFormController extends Controller
             $em->persist($entity);
             $em->flush();
 
-
             $this->get('session')->getFlashBag()->add(
                 'success',
                 $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                [
                     'route' => 'oro_embedded_form_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
+                    'parameters' => ['id' => $entity->getId()],
+                ],
+                [
                     'route' => 'oro_embedded_form_view',
-                    'parameters' => array('id' => $entity->getId()),
-                )
+                    'parameters' => ['id' => $entity->getId()],
+                ]
             );
 
         }

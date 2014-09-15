@@ -55,6 +55,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     /**
      * Options:
      * - grid_name - name of grid that will be used for entity selection
+     * - grid_parameters - parameters need to be passed to grid request
+     * - grid_render_parameters - render parameters need to be set for grid rendering
      * - existing_entity_grid_id - grid row field name used as entity identifier
      * - create_enabled - enables new entity creation
      * - create_acl - ACL resource used to determine that create is allowed, by default CREATE for entity used
@@ -72,7 +74,9 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                 'create_acl'                   => null,
                 'create_form_route'            => null,
                 'create_form_route_parameters' => [],
-                'grid_name'                    => null
+                'grid_name'                    => null,
+                'grid_parameters'              => [],
+                'grid_render_parameters'       => []
             ]
         );
 
@@ -117,6 +121,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['grid_name']                    = $options['grid_name'];
+        $view->vars['grid_parameters']              = $options['grid_parameters'];
+        $view->vars['grid_render_parameters']       = $options['grid_render_parameters'];
         $view->vars['existing_entity_grid_id']      = $options['existing_entity_grid_id'];
         $view->vars['create_enabled']               = $options['create_enabled'];
         $view->vars['create_form_route']            = $options['create_form_route'];

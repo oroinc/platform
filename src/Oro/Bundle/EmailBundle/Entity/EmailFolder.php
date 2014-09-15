@@ -3,14 +3,20 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use JMS\Serializer\Annotation as JMS;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
  * Email Folder
  *
- * @ORM\Table(name="oro_email_folder")
+ * @ORM\Table(
+ *      name="oro_email_folder",
+ *      indexes={@Index(name="email_folder_outdated_at_idx", columns={"outdated_at"})}
+ * )
  * @ORM\Entity
  */
 class EmailFolder
@@ -82,6 +88,13 @@ class EmailFolder
      */
     protected $synchronizedAt;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
+     */
+    protected $outdatedAt;
+
     public function __construct()
     {
         $this->emails = new ArrayCollection();
@@ -111,6 +124,7 @@ class EmailFolder
      * Set folder name
      *
      * @param string $name
+     *
      * @return $this
      */
     public function setName($name)
@@ -134,6 +148,7 @@ class EmailFolder
      * Set full name of this folder
      *
      * @param string $fullName
+     *
      * @return $this
      */
     public function setFullName($fullName)
@@ -157,6 +172,7 @@ class EmailFolder
      * Set folder type
      *
      * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     *
      * @return $this
      */
     public function setType($type)
@@ -180,6 +196,7 @@ class EmailFolder
      * Set email folder origin
      *
      * @param EmailOrigin $origin
+     *
      * @return $this
      */
     public function setOrigin(EmailOrigin $origin)
@@ -203,6 +220,7 @@ class EmailFolder
      * Add email
      *
      * @param  Email $email
+     *
      * @return $this
      */
     public function addEmail(Email $email)
@@ -226,6 +244,7 @@ class EmailFolder
      * Set date/time when emails in this folder were synchronized
      *
      * @param \DateTime $synchronizedAt
+     *
      * @return EmailOrigin
      */
     public function setSynchronizedAt($synchronizedAt)
@@ -233,6 +252,34 @@ class EmailFolder
         $this->synchronizedAt = $synchronizedAt;
 
         return $this;
+    }
+
+    /**
+     * @param \DateTime $outdatedAt
+     *
+     * @return $this
+     */
+    public function setOutdatedAt($outdatedAt = null)
+    {
+        $this->outdatedAt = $outdatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getOutdatedAt()
+    {
+        return $this->outdatedAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutdated()
+    {
+        return is_null($this->outdatedAt);
     }
 
     /**

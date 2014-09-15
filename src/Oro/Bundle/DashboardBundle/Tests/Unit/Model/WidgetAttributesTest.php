@@ -6,21 +6,17 @@ use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var WidgetAttributes
-     */
+    /** @var WidgetAttributes */
     protected $target;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $resolver;
 
     protected function setUp()
     {
@@ -32,20 +28,22 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->target = new WidgetAttributes($this->configProvider, $this->securityFacade);
+        $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+
+        $this->target = new WidgetAttributes($this->configProvider, $this->securityFacade, $this->resolver);
     }
 
     public function testGetWidgetAttributesForTwig()
     {
         $expectedWidgetName = 'widget_name';
-        $configs = array(
+        $configs            = [
             'route'            => 'sample route',
             'route_parameters' => 'sample params',
             'acl'              => 'view_acl',
-            'items'            => array(),
+            'items'            => [],
             'test-param'       => 'param'
-        );
-        $expected = array('widgetName' => $expectedWidgetName, 'widgetTestParam' => 'param');
+        ];
+        $expected           = ['widgetName' => $expectedWidgetName, 'widgetTestParam' => 'param'];
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
             ->with($expectedWidgetName)
@@ -58,26 +56,52 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgetItems()
     {
         $expectedWidgetName = 'widget_name';
-        $notAllowedAcl = 'invalid_acl';
-        $allowedAcl = 'valid_acl';
-        $expectedItem = 'expected_item';
-        $expectedValue = array('label' => 'test label', 'acl' => $allowedAcl);
-        $notGrantedItem = 'not_granted_item';
-        $notGrantedValue = array('label' => 'not granted label', 'acl' => $notAllowedAcl);
-        $configs = array(
-            $expectedItem => $expectedValue,
-            $notGrantedItem => $notGrantedValue
-        );
-        unset($expectedValue['acl']);
-        $expected = array($expectedItem => $expectedValue);
+        $notAllowedAcl      = 'invalid_acl';
+        $allowedAcl         = 'valid_acl';
+        $expectedItem       = 'expected_item';
+        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl];
+        $notGrantedItem     = 'not_granted_item';
+        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl];
+        $applicableItem     = 'applicable_item';
+        $applicable         = ['label' => 'applicable is set and resolved to true', 'applicable' => '@true'];
+        $notApplicableItem  = 'not_applicable_item';
+        $notApplicable      = ['label' => 'applicable is set and resolved to false', 'applicable' => '@false'];
+        $configs            = [
+            $expectedItem      => $expectedValue,
+            $notGrantedItem    => $notGrantedValue,
+            $applicableItem    => $applicable,
+            $notApplicableItem => $notApplicable
+        ];
+
         $this->configProvider->expects($this->once())
             ->method('getWidgetConfig')
             ->with($expectedWidgetName)
-            ->will($this->returnValue(array('items' => $configs)));
+            ->will($this->returnValue(['items' => $configs]));
 
-        $map = array(array($notAllowedAcl, null, false), array($allowedAcl, null, true));
-        $this->securityFacade->expects($this->exactly(2))->method('isGranted')->will($this->returnValueMap($map));
+        $this->securityFacade->expects($this->exactly(2))
+            ->method('isGranted')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [['@true'], [], true],
+                        [$allowedAcl, null, true]
+                    ]
+                )
+            );
+        $this->resolver->expects($this->exactly(2))
+            ->method('resolve')
+            ->will(
+                $this->returnValueMap(
+                    [
 
-        $this->assertEquals($expected, $this->target->getWidgetItems($expectedWidgetName));
+                        [['@false'], [], [false]],
+                        [['@true'], [], [true]],
+                    ]
+                )
+            );
+
+        $result = $this->target->getWidgetItems($expectedWidgetName);
+        $this->assertArrayHasKey($applicableItem, $result);
+        $this->assertArrayHasKey($expectedItem, $result);
     }
 }
