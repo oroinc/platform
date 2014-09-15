@@ -1,0 +1,5 @@
+oro_system_configuration:
+    groups:
+        email_configuration:
+            icon:  icon-envelope
+            title: oro.email.system_configuration.email_configuration
