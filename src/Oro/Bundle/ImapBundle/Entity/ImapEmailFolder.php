@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 /**
@@ -13,6 +14,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
  */
 class ImapEmailFolder
 {
+    const FLAG_OUTDATED   = 'outdated';
+
     /**
      * @var integer
      *
