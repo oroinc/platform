@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextType;
 
@@ -15,7 +16,10 @@ class TextTypeTest extends AbstractConfigTypeTestCase
     {
         parent::setUp();
 
-        $this->type = new TextType($this->configManager);
+        $this->type = new TextType(
+            new ConfigTypeHelper($this->configManager),
+            $this->configManager
+        );
     }
 
     /**
@@ -45,7 +49,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
             ['', 'old', ExtendScope::STATE_ACTIVE, true],
             ['new', '', ExtendScope::STATE_ACTIVE, true],
             ['new', 'old', ExtendScope::STATE_ACTIVE, true],
-            ['new', 'old', ExtendScope::STATE_UPDATED, false],
+            ['new', 'old', ExtendScope::STATE_UPDATE, false],
         ];
     }
 

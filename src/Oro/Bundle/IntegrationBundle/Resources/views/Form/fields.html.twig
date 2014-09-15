@@ -38,36 +38,7 @@
     {% endif %}
 
     {{ form_rest(form) }}
-    <script type="text/javascript">
-        require(['orointegration/js/channel-view'], function (ChannelView) {
-            "use strict";
 
-            $(function () {
-                var options = {
-                    formSelector:          '#{{ form.vars.id }}',
-                    typeSelector:          '#{{ form.type.vars.id }}',
-                    transportTypeSelector: '#{{ form.transportType.vars.id }}',
-                    fieldsSets:            {
-                        type:          [
-                            {{ form.type.vars.full_name|json_encode|raw }},
-                            {{ form.name.vars.full_name|json_encode|raw }},
-                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
-                            {{ form.organization.vars.full_name|json_encode|raw }},
-                            {{ form._token.vars.full_name|json_encode|raw }}
-                        ],
-                        transportType: [
-                            {{ form.type.vars.full_name|json_encode|raw }},
-                            {{ form.name.vars.full_name|json_encode|raw }},
-                            {{ form.defaultUserOwner.vars.full_name|json_encode|raw }},
-                            {{ form.transportType.vars.full_name|json_encode|raw }},
-                            {{ form.organization.vars.full_name|json_encode|raw }},
-                            {{ form._token.vars.full_name|json_encode|raw }}
-                        ]
-                    }
-                };
-
-                new ChannelView(options);
-            });
-        });
-    </script>
+    {% import 'OroIntegrationBundle:Form:javascript.html.twig' as jsRenderer %}
+    {{ jsRenderer.renderIntegrationFormJS(form) }}
 {% endblock %}

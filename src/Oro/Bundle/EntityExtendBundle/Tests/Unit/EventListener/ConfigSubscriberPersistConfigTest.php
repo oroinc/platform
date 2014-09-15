@@ -94,7 +94,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
         /** @var ConfigManager $cm */
         $cm = $this->event->getConfigManager();
         $this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATED])],
+            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATE])],
             'persistConfigs',
             $cm
         );

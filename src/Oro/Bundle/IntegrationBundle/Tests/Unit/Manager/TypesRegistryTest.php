@@ -62,10 +62,10 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                self::CHANNEL_TYPE_ONE => '{"label":"oro.type1.label","icon":"bundles\/acmedemo\/img\/logo.png"}',
-                self::CHANNEL_TYPE_TWO => '{"label":"oro.type2.label"}'
+                self::CHANNEL_TYPE_ONE => ["label" => "oro.type1.label", "icon" => "bundles/acmedemo/img/logo.png"],
+                self::CHANNEL_TYPE_TWO => ["label" => "oro.type2.label"],
             ],
-            $this->typesRegistry->getAvailableIntegrationTypesDetailedChoiceList()
+            $this->typesRegistry->getAvailableIntegrationTypesDetailedData()
         );
     }
 

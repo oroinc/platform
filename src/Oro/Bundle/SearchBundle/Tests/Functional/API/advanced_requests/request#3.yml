@@ -1,8 +1,6 @@
 # common test case
 request:
-    query: "from oro_test_item where integer integerValue <= 5000"
-    offset: ~
-    max_results: ~
+    query: "from oro_test_item where integer integerValue <= 5000 order_by stringValue max_results 100"
 response:
     records_count: 5
     count: 5
@@ -11,3 +9,42 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item2@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item3@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item4@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item5@mail.com
+                record_url: http://localhost/search/
+    soap:
+        data:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item1@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item2@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item3@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item4@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item5@mail.com
+                recordUrl: http://localhost/search/

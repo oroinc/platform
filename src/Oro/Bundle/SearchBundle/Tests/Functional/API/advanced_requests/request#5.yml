@@ -1,8 +1,6 @@
 # common test case
 request:
-    query: "from oro_test_item where decimal floatValue != 10.50"
-    offset: ~
-    max_results: ~
+    query: "from oro_test_item where decimal floatValue != 10.50 order_by stringValue max_results 100"
 response:
     records_count: 8
     count: 8
@@ -10,6 +8,67 @@ response:
         data:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                record_id: 1
-                record_title: sku-0
-                record_url: http://localhost.com/app_test.php/search/product/1
+                record_string: item1@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item2@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item3@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item4@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item6@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item7@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item8@mail.com
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item9@mail.com
+                record_url: http://localhost/search/
+    soap:
+        data:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item1@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item2@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item3@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item4@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item6@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item7@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item8@mail.com
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item9@mail.com
+                recordUrl: http://localhost/search/

@@ -157,6 +157,7 @@ class UpdateHandler
         if ($this->request->get('_wid')) {
             $result = $this->getResult($entity, $form, $resultCallback);
             $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
             return $result;
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);

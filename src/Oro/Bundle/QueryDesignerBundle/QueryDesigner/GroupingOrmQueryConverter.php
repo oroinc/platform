@@ -94,7 +94,7 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         array $filterData
     ) {
         $filter = [
-            'column'     => $columnExpr,
+            'column'     => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnExpr),
             'filter'     => $filterName,
             'filterData' => $filterData
         ];
@@ -124,30 +124,31 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     }
 
     /**
-     * Get filter type for given field type
+     * @param string $entityClassName
+     * @param string $tableAlias
+     * @param string $fieldName
+     * @param string $columnExpr
      *
-     * @param string $fieldType
      * @return string
      */
-    protected function getFilterType($fieldType)
-    {
-        switch ($fieldType) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-            case 'decimal':
-            case 'float':
-            case 'money':
-                return 'number';
-            case 'percent':
-                return 'percent';
-            case 'boolean':
-                return 'boolean';
-            case 'date':
-            case 'datetime':
-                return 'datetime';
+    protected function getFilterByExpr(
+        $entityClassName,
+        $tableAlias,
+        $fieldName,
+        $columnExpr
+    ) {
+        $filterById = false;
+        if ($this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
+            $key = sprintf('%s::%s', $entityClassName, $fieldName);
+            if (isset($this->virtualColumnOptions[$key]['filter_by_id'])) {
+                if ($this->virtualColumnOptions[$key]['filter_by_id']) {
+                    $filterById = true;
+                };
+            }
         }
 
-        return 'string';
+        return $filterById
+            ? sprintf('%s.%s', $tableAlias, $fieldName)
+            : $columnExpr;
     }
 }

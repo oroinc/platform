@@ -60,6 +60,8 @@ class FormOptionsAssembler extends AbstractAssembler
             $this->assertAttributeExists($attributeName, $owner, $ownerName);
         }
 
+        $options['attribute_fields'] = $this->passConfiguration($attributeFields);
+
         if (!empty($options['attribute_default_values'])) {
             $value = $options['attribute_default_values'];
             if (!is_array($value)) {

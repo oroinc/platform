@@ -98,7 +98,7 @@ define(['underscore'
             var sFields = '';
             var sRelations = '';
             _.each(fields, _.bind(function (field) {
-                if (_.isUndefined(field['related_entity_name'])) {
+                if (_.isUndefined(field['relation_type'])) {
                     if (_.isUndefined(this.exclude)
                         || !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
                         sFields += this.optionTemplate(field);

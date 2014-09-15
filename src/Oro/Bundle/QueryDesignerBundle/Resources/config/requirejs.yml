@@ -8,3 +8,5 @@ config:
 
         'oroquerydesigner/js/app/components/column-form': 'bundles/oroquerydesigner/js/app/components/column-form.js'
         'oroquerydesigner/js/app/components/condition-builder': 'bundles/oroquerydesigner/js/app/components/condition-builder.js'
+
+        'oroquerydesigner/js/enum-filter-initialized': 'bundles/oroquerydesigner/js/enum-filter-initialized.js'

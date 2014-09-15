@@ -1,11 +1,12 @@
 parameters:
     oro_filter.extension.orm_filter.class:      Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
+    oro_filter.datagrid.column_options_guesser.class: Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser
     oro_filter.provider.datevarsprovider.class: Oro\Bundle\FilterBundle\Provider\DateModifierProvider
     oro_filter.expression.date.compiler.class:  Oro\Bundle\FilterBundle\Expression\Date\Compiler
     oro_filter.expression.date.lexer.class:     Oro\Bundle\FilterBundle\Expression\Date\Lexer
     oro_filter.expression.date.parser.class:    Oro\Bundle\FilterBundle\Expression\Date\Parser
-
-    oro_filter.event_listener.disabled_filters.class: Oro\Bundle\FilterBundle\EventListener\DisabledFiltersListener
+    oro_filter.builder.many_relation.class:     Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder
+    oro_filter.builder.many_relation.orm.class: Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder
 
 services:
     oro_filter.extension.orm_filter:
@@ -14,6 +15,11 @@ services:
             - @translator
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_filter.datagrid.column_options_guesser:
+        class: %oro_filter.datagrid.column_options_guesser.class%
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
 
     oro_filter.provider.datemodifierprovider:
         class: %oro_filter.provider.datevarsprovider.class%
@@ -34,3 +40,13 @@ services:
         arguments:
             - @oro_filter.expression.date.lexer
             - @oro_filter.expression.date.parser
+
+    oro_filter.builder.many_relation:
+        class: %oro_filter.builder.many_relation.class%
+        calls:
+            - [addBuilder, [@oro_filter.builder.many_relation.orm]]
+
+    oro_filter.builder.many_relation.orm:
+        class: %oro_filter.builder.many_relation.orm.class%
+        arguments:
+            - @doctrine

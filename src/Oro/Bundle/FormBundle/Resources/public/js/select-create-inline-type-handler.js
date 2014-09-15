@@ -1,6 +1,6 @@
 /* global define */
-define(['oro/dialog-widget', 'oroui/js/widget-manager', 'orotranslation/js/translator', 'jquery.select2'],
-function (DialogWidget, widgetManager, __) {
+define(['routing', 'oro/dialog-widget', 'oroui/js/widget-manager', 'orotranslation/js/translator', 'jquery.select2'],
+function (routing, DialogWidget, widgetManager, __) {
     'use strict';
 
     /**
@@ -10,17 +10,16 @@ function (DialogWidget, widgetManager, __) {
     return function (container,
         selectorEl,
         label,
-        gridUrl,
+        urlParts,
         existingEntityGridId,
-        createEnabled,
-        entityCreateUrl
+        createEnabled
     ) {
         var handleGridSelect = function (e) {
             e.preventDefault();
 
             var entitySelectDialog = new DialogWidget({
                 title: __('Select {{ entity }}', {'entity': label}),
-                url: gridUrl,
+                url: routing.generate(urlParts.grid.route, urlParts.grid.parameters),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {
@@ -53,7 +52,7 @@ function (DialogWidget, widgetManager, __) {
 
             var entityCreateDialog = new DialogWidget({
                 title: __('Create {{ entity }}', {'entity': label}),
-                url: entityCreateUrl,
+                url: routing.generate(urlParts.create.route, urlParts.create.parameters),
                 stateEnabled: false,
                 incrementalPosition: false,
                 dialogOptions: {
@@ -77,5 +76,22 @@ function (DialogWidget, widgetManager, __) {
         if (createEnabled) {
             container.find('.entity-create-btn').on('click', handleCreate);
         }
+
+        var configurator = {
+            getUrlParts: function () {
+                return urlParts;
+            },
+            setUrlParts: function (newParts) {
+                urlParts = newParts
+            },
+            setSelection: function (value) {
+                selectorEl.select2('val', value);
+            },
+            getSelection: function () {
+                return selectorEl.select2('val');
+            }
+        };
+
+        return configurator;
     };
 });

@@ -215,6 +215,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+
         $entity = new \stdClass();
 
         $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
@@ -237,7 +238,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             return $saveAndCloseRoute;
         };
         $called = false;
-        $expectedForm = $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $expectedForm = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
         $resultCallback = function () use (&$called, $expectedForm) {

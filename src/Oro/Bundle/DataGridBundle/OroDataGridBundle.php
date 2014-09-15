@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionsPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\MassActionsPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\FormattersPass;
 use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ConfigurationPass;
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\GuessPass;
 
 class OroDataGridBundle extends Bundle
 {
@@ -23,5 +24,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new FormattersPass());
         $container->addCompilerPass(new ActionsPass());
         $container->addCompilerPass(new MassActionsPass());
+        $container->addCompilerPass(new GuessPass());
     }
 }

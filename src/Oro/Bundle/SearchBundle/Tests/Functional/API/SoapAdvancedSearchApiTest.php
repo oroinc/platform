@@ -30,7 +30,20 @@ class SoapAdvancedSearchApiTest extends WebTestCase
     {
         $result = $this->soapClient->advancedSearch($request['query']);
         $result = $this->valueToArray($result);
+        $this->assertEquals($response['records_count'], $result['recordsCount']);
         $this->assertEquals($response['count'], $result['count']);
+
+        // if only one element
+        if (empty($result['elements']['item'][0])) {
+            $result['elements']['item'] = array($result['elements']['item']);
+        }
+
+        // remove ID references
+        foreach (array_keys($result['elements']['item']) as $key) {
+            unset($result['elements']['item'][$key]['recordId']);
+        }
+
+        $this->assertSame($response['soap']['data'], $result['elements']['item']);
     }
 
     /**

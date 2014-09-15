@@ -4,7 +4,11 @@
 {% form_theme form with ['OroIntegrationBundle:Form:fields.html.twig'] %}
 
 {% set entity = form.vars.value %}
-{% set formAction = entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create') %}
+{% set isEditModeDissalow = entity.getEditMode == constant('Oro\\Bundle\\IntegrationBundle\\Entity\\Channel::EDIT_MODE_DISALLOW') %}
+{% set formAction = formAction is defined
+    ? formAction
+    : (entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create'))
+%}
 
 {% if entity.id %}
     {% oro_title_set({params : {"%integration.name%": entity.name } }) %}
@@ -12,21 +16,19 @@
 
 {% block breadcrumbs %}
     {{ parent() }}
-    <div class="status-enabled pull-left">
+    <div class="pull-left">
         {% if entity.enabled %}
             <div class="badge badge-enabled status-enabled">
-                <i class="icon-status-enabled icon-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}
-            </div>
+                <i class="icon-status-enabled icon-circle"></i>{{ 'oro.integration.integration.enabled.active.label'|trans }}</div>
         {% else %}
-            <div class="badge badge-enabled status-disabled">
-                <i class="icon-status-disabled icon-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}
-            </div>
+            <div class="badge badge-disabled status-disabled">
+                <i class="icon-status-disabled icon-circle"></i>{{ 'oro.integration.integration.enabled.inactive.label'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('DELETE', entity) %}
+    {% if entity.id and resource_granted('DELETE', entity) and not isEditModeDissalow %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_integration', {'id': entity.id}),
             'dataRedirect': path('oro_integration_index'),
@@ -43,13 +45,15 @@
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
     {% if entity.id %}
-        {% set toogleStatusLabel = entity.enabled == true ? 'oro.integration.deactivate': 'oro.integration.activate' %}
-        {{ UI.button({
-            'path': path('oro_integration_toggle', {'id': entity.id}),
-            'title' : toogleStatusLabel|trans,
-            'label' : toogleStatusLabel|trans,
-        }) }}
-        {{ UI.buttonSeparator() }}
+        {% if not isEditModeDissalow %}
+            {% set toogleStatusLabel = entity.enabled == true ? 'oro.integration.deactivate': 'oro.integration.activate' %}
+            {{ UI.button({
+                'path': path('oro_integration_toggle', {'id': entity.id}),
+                'title' : toogleStatusLabel|trans,
+                'label' : toogleStatusLabel|trans,
+            }) }}
+            {{ UI.buttonSeparator() }}
+        {% endif %}
 
         {% if entity.enabled == true %}
             {{ UI.clientButton({
@@ -111,7 +115,7 @@
         }]) %}
     {% endif %}
 
-    {% if entity.id %}
+    {% if entity.id and isWidgetContext|default(false) is sameas(false) %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Statuses'|trans,
                 'subblocks': [{
