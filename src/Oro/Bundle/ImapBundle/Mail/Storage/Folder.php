@@ -19,21 +19,35 @@ class Folder extends BaseFolder
     /**
      * Determines whether this folder is marked by the given flag
      *
-     * @param string $flag
+     * @param string|array $flags one flag or an array with multiple flags
      *
      * @return bool
      */
-    public function hasFlag($flag)
+    public function hasFlag($flags)
     {
         if (empty($this->flags)) {
             return false;
         }
 
-        if (!(strpos($flag, '\\') === 0)) {
-            $flag = '\\' . $flag;
+        if (false == is_array($flags)) {
+            $flags = [$flags];
         }
 
-        return in_array($flag, $this->flags);
+        $flags = array_map(
+            function ($item) {
+                if (false === strpos($item, '\\')) {
+                    $item = '\\' . $item;
+                }
+                return $item;
+            },
+            $flags
+        );
+
+        if (count($flags) > 1) {
+            return count(array_intersect($this->flags, $flags)) > 0;
+        } else {
+            return in_array($flags[0], $this->flags);
+        }
     }
 
     /**
