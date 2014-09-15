@@ -354,6 +354,92 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         $this->emailEntityBuilder->removeEmails();
 
+        $folder       = $imapFolder->getFolder();
+        $existingUids = $this->getExistingUids($emails, $folder->getId());
+
+        $existingOutdatedEmails = $this->getOutdatedEmails(
+            $this->getNewMessageIds($emails, $existingUids),
+            $folder->getOrigin()->getId()
+        );
+
+        foreach ($emails as $email) {
+            if (in_array($email->getId()->getUid(), $existingUids)) {
+                $this->log->notice(
+                    sprintf(
+                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+                continue;
+            }
+
+            /** @var ImapEmail[] $outdatedImapEmails */
+            $outdatedImapEmails = $this->findExistingOutdatedEmails($email, $existingOutdatedEmails);
+            if (empty($outdatedImapEmails)) {
+                $this->log->notice(
+                    sprintf('Persisting "%s" email (UID: %d) ...', $email->getSubject(), $email->getId()->getUid())
+                );
+
+                $emailEntity = $this->addEmail($email, $folder);
+                $uid         = $email->getId()->getUid();
+                $imapEmail   = $this->createImapEmail($uid, $emailEntity, $imapFolder);
+                $this->em->persist($imapEmail);
+
+                $this->log->notice(sprintf('The "%s" email was persisted.', $email->getSubject()));
+            } else {
+                $i = 0;
+                foreach ($outdatedImapEmails as $outdatedImapEmail) {
+                    if ($i === 0) {
+                        $outdatedImapEmail->getImapFolder()->setFolder($folder);
+                    } else {
+                        $this->em->remove($outdatedImapEmail);
+                    }
+                    $i++;
+                }
+            }
+        }
+
+        $this->emailEntityBuilder->getBatch()->persist($this->em);
+
+        $this->em->flush();
+    }
+
+    /**
+     * @param Email       $email
+     * @param EmailFolder $folder
+     *
+     * @return EmailEntity
+     */
+    protected function addEmail(Email $email, EmailFolder $folder)
+    {
+        $emailEntity = $this->emailEntityBuilder->email(
+            $email->getSubject(),
+            $email->getFrom(),
+            $email->getToRecipients(),
+            $email->getSentAt(),
+            $email->getReceivedAt(),
+            $email->getInternalDate(),
+            $email->getImportance(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+        $emailEntity->addFolder($folder);
+        $emailEntity->setMessageId($email->getMessageId());
+        $emailEntity->setXMessageId($email->getXMessageId());
+        $emailEntity->setXThreadId($email->getXThreadId());
+
+        return $emailEntity;
+    }
+
+    /**
+     * @param Email[] $emails
+     * @param int     $folderId
+     *
+     * @return int[] array if UIDs
+     */
+    protected function getExistingUids(array $emails, $folderId)
+    {
         $uids = array_map(
             function ($el) {
                 /** @var Email $el */
@@ -362,119 +448,109 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails
         );
 
-        $folder = $imapFolder->getFolder();
-        $repo         = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $imapDataRows = $repo->createQueryBuilder('e')
-            ->select('e.uid, se.id')
+        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $rows = $repo->createQueryBuilder('e')
+            ->select('e.uid')
             ->innerJoin('e.email', 'se')
             ->innerJoin('se.folders', 'sf')
             ->where('sf.id = :folderId AND e.uid IN (:uids)')
-            ->setParameter('folderId', $folder->getId())
+            ->setParameter('folderId', $folderId)
             ->setParameter('uids', $uids)
             ->getQuery()
             ->getResult();
 
-        $existingUids = array_map(
-            function ($el) {
-                return $el['uid'];
-            },
-            $imapDataRows
-        );
-
-        $existingEmailIds = array_map(
-            function ($el) {
-                return $el['id'];
-            },
-            $imapDataRows
-        );
-
-        $newImapIds = [];
-        foreach ($emails as $src) {
-            if (!in_array($src->getId()->getUid(), $existingUids)) {
-                $this->log->notice(
-                    sprintf('Persisting "%s" email (UID: %d) ...', $src->getSubject(), $src->getId()->getUid())
-                );
-
-                $email = $this->emailEntityBuilder->email(
-                    $src->getSubject(),
-                    $src->getFrom(),
-                    $src->getToRecipients(),
-                    $src->getSentAt(),
-                    $src->getReceivedAt(),
-                    $src->getInternalDate(),
-                    $src->getImportance(),
-                    $src->getCcRecipients(),
-                    $src->getBccRecipients()
-                );
-                $email->addFolder($folder);
-                $email->setMessageId($src->getMessageId());
-                $email->setXMessageId($src->getXMessageId());
-                $email->setXThreadId($src->getXThreadId());
-
-                if (!isset($newImapIds[$src->getMessageId()])) {
-                    $newImapIds[$src->getMessageId()] = [];
-                }
-                $uid = $src->getId()->getUid();
-                $newImapIds[$src->getMessageId()][$uid] = $uid;
-
-                $this->log->notice(sprintf('The "%s" email was persisted.', $src->getSubject()));
-            } else {
-                $this->log->notice(
-                    sprintf(
-                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                        $src->getSubject(),
-                        $src->getId()->getUid()
-                    )
-                );
-            }
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $row['uid'];
         }
 
-        $this->emailEntityBuilder->getBatch()->persist($this->em);
-        $this->linkEmailsToImapEmails($emails, $newImapIds, $existingEmailIds, $imapFolder);
-        $this->em->flush();
+        return $result;
     }
 
     /**
-     * @param Email[]|array   $emails
-     * @param array           $newImapIds
-     * @param array           $existingEmailIds
-     * @param ImapEmailFolder $imapFolder
+     * @param string[] $messageIds
+     * @param int      $originId
+     *
+     * @return ImapEmail[]
      */
-    protected function linkEmailsToImapEmails(
-        array $emails,
-        array $newImapIds,
-        array $existingEmailIds,
-        ImapEmailFolder $imapFolder
-    ) {
-        /** @var EmailEntity[] $oEmails */
-        $oEmails = $this->getEmailsByMessageId(
-            $this->emailEntityBuilder->getBatch()->getEmails()
-        );
+    protected function getOutdatedEmails($messageIds, $originId)
+    {
+        if (empty($messageIds)) {
+            return [];
+        }
 
-        foreach ($emails as $emailDTO) {
-            if (empty($newImapIds[$emailDTO->getMessageId()])) {
-                // email was skipped
-                continue;
-            }
+        $repo = $this->em->getRepository('OroImapBundle:ImapEmail');
+        $imapEmails = $repo->createQueryBuilder('e')
+            ->select('e, se, f, sf')
+            ->innerJoin('e.imapFolder', 'f')
+            ->innerJoin('e.email', 'se')
+            ->innerJoin('se.folders', 'sf')
+            ->innerJoin('sf.origin', 'o')
+            ->where('o.id = :originId AND sf.outdatedAt IS NOT NULL AND e.messageId IN (:messageIds)')
+            ->setParameter('messageIds', $messageIds)
+            ->setParameter('originId', $originId)
+            ->getQuery()
+            ->getResult();
 
-            /** @var EmailEntity $email */
-            $email = $oEmails[$emailDTO->getMessageId()];
-            if (in_array($email->getId(), $existingEmailIds)) {
-                continue;
-            }
 
-            /** @var int[] $newImapIdArray */
-            $newImapIdArray = $newImapIds[$emailDTO->getMessageId()];
+        return $imapEmails;
+    }
 
-            foreach ($newImapIdArray as $newImapId) {
-                $imapEmail = new ImapEmail();
-                $imapEmail
-                    ->setUid($newImapId)
-                    ->setEmail($email)
-                    ->setImapFolder($imapFolder);
-
-                $this->em->persist($imapEmail);
+    /**
+     * @param Email       $email
+     * @param ImapEmail[] $existingOutdatedEmails
+     *
+     * @return ImapEmail[]
+     */
+    protected function findExistingOutdatedEmails(Email $email, array $existingOutdatedEmails)
+    {
+        $foundEmails = [];
+        foreach ($existingOutdatedEmails as $existingOutdatedEmail) {
+            if ($existingOutdatedEmail->getEmail()->getMessageId() === $email->getMessageId()) {
+                $foundEmails[$existingOutdatedEmail->getEmail()->getId()][] = $existingOutdatedEmail;
             }
         }
+
+        if (empty($foundEmails)) {
+            return [];
+        }
+
+        return reset($foundEmails);
+    }
+
+    /**
+     * @param Email[] $emails
+     * @param array   $existingUids
+     *
+     * @return string[]
+     */
+    protected function getNewMessageIds(array $emails, array $existingUids)
+    {
+        $result = [];
+        foreach ($emails as $email) {
+            if (!in_array($email->getId()->getUid(), $existingUids)) {
+                $result[] = $email->getMessageId();
+            }
+
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int             $uid
+     * @param EmailEntity     $email
+     * @param ImapEmailFolder $imapFolder
+     * @return ImapEmail
+     */
+    protected function createImapEmail($uid, EmailEntity $email, ImapEmailFolder $imapFolder)
+    {
+        $imapEmail = new ImapEmail();
+        $imapEmail
+            ->setUid($uid)
+            ->setEmail($email)
+            ->setImapFolder($imapFolder);
+
+        return $imapEmail;
     }
 }
