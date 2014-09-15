@@ -33,9 +33,12 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
         $organization   = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
         $users          = $manager->getRepository('OroUserBundle:User')->findAll();
         foreach ($users as $user) {
-            $user->setOrganizations(new ArrayCollection(array($organization)));
-            $manager->persist($user);
+            if (!$user->hasOrganization($organization)) {
+                $user->addOrganization($organization);
+                $manager->persist($user);
+            }
         }
+
         $manager->flush();
     }
 }
