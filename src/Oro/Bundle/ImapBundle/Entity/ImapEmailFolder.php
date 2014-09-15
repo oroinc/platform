@@ -10,12 +10,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
  * IMAP Email
  *
  * @ORM\Table(name="oro_email_folder_imap")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository")
  */
 class ImapEmailFolder
 {
-    const FLAG_OUTDATED   = 'outdated';
-
     /**
      * @var integer
      *
@@ -64,6 +62,7 @@ class ImapEmailFolder
      * Set related email object
      *
      * @param EmailFolder $folder
+     *
      * @return ImapEmailFolder
      */
     public function setFolder(EmailFolder $folder)
@@ -87,7 +86,8 @@ class ImapEmailFolder
      * Set email UIDVALIDITY
      *
      * @param int $uidValidity
-     * @return ImapEmail
+     *
+     * @return ImapEmailFolder
      */
     public function setUidValidity($uidValidity)
     {

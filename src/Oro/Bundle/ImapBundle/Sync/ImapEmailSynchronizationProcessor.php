@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 
 use Psr\Log\LoggerInterface;
@@ -121,7 +120,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $sqb->closeParenthesis();
         }
 
-
         return $sqb->get();
     }
 
@@ -189,15 +187,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         // load existing folders for $origin
         $this->log->notice('Loading existing folders ...');
 
-        $repo    = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-        $imapFolders = $repo->createQueryBuilder('ifo')
-            ->leftJoin('ifo.folder', 'f')
-            ->where('f.origin = ?0 AND f.type <> ?1')
-            ->orderBy('f.name')
-            ->setParameter(0, $origin)
-            ->setParameter(1, ImapEmailFolder::FLAG_OUTDATED)
-            ->getQuery()
-            ->getResult();
+        $imapFolders = $this->em
+            ->getRepository('OroImapBundle:ImapEmailFolder')
+            ->getFoldersByOrigin($origin);
 
         $this->log->notice(sprintf('Loaded %d existing folder(s).', count($imapFolders)));
 
@@ -214,7 +206,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     $type = EmailFolder::SENT;
                     break;
                 default:
-                    $type = 'folder';
+                    $type = EmailFolder::OTHER;
             }
 
             $globalName         = $srcFolder->getGlobalName();
@@ -251,8 +243,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {
             // mark as outdated not processed folder
-            if ($imapFolder->getId() && false === in_array($imapFolder->getId(), $processedIds)) {
-                $imapFolder->getFolder()->setType(ImapEmailFolder::FLAG_OUTDATED);
+            $isOutdated = $imapFolder->getId() && false === in_array($imapFolder->getId(), $processedIds);
+            if ($isOutdated) {
+                $imapFolder->getFolder()->setOutdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
                 $this->em->persist($imapFolder->getFolder());
             }
         }
