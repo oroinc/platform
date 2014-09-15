@@ -36,12 +36,11 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user = $userManager->createUser();
 
-        $organizationManager = $this->container->get('oro_organization.organization_manager');
-        $org = $organizationManager->getOrganizationRepo()->getFirst();
+        $organization = $this->getReference('default_organization');
 
         $api = new UserApi();
         $api->setApiKey('user_api_key')
-            ->setOrganization($org)
+            ->setOrganization($organization)
             ->setUser($user);
 
         $user
@@ -51,7 +50,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setLastName('User')
             ->addRole($role[0])
             ->setEmail('simple@example.com')
-            ->addOrganization($org)
+            ->setOrganization($organization)
+            ->addOrganization($organization)
             ->addApiKey($api)
             ->setSalt('');
 

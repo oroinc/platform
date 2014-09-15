@@ -51,7 +51,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
                 ->addRole($role);
         }
 
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $this->getReference('default_organization');
 
         $admin->setPlainPassword('admin')
             ->setFirstname('John')
@@ -60,7 +60,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             ->setOwner($unit)
             ->addGroup($group)
             ->setOrganization($organization)
-            ->setOrganizations(new ArrayCollection(array($organization)))
+            ->addOrganization($organization)
             ->setBusinessUnits(
                 new ArrayCollection(array($unit))
             )
