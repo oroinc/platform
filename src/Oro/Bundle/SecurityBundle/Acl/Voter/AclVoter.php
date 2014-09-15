@@ -17,7 +17,8 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterf
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -194,7 +195,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $object = $this->object;
         $token = $this->securityToken;
 
-        if ($token instanceof UsernamePasswordOrganizationToken
+        if ($token instanceof OrganizationContextTokenInterface
             && $result === self::ACCESS_GRANTED
             && $this->extension instanceof EntityAclExtension
             && is_object($object)

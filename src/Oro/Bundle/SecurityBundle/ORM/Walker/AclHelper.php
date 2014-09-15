@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -26,7 +27,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 class AclHelper
 {
     const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
-    const ORO_EMAIL_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
      * @var OwnershipConditionDataBuilder
@@ -46,6 +47,35 @@ class AclHelper
     public function __construct(OwnershipConditionDataBuilder $builder)
     {
         $this->builder = $builder;
+    }
+
+    /**
+     * Add ACL checks to Criteria
+     *
+     * @param string   $className
+     * @param Criteria $criteria
+     * @param string   $permission
+     * @return Criteria
+     */
+    public function applyAclToCriteria($className, Criteria $criteria, $permission)
+    {
+        $conditionData = $this->builder->getAclConditionData($className, $permission);
+        if (!empty($conditionData)) {
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
+            list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                = $conditionData;
+            if (!is_null($organizationField) && !is_null($organizationValue)) {
+                $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
+            }
+            if (!$ignoreOwner && !empty($value)) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+                $criteria->andWhere(Criteria::expr()->in($entityField, $value));
+            }
+        }
+
+        return $criteria;
     }
 
     /**
@@ -244,7 +274,7 @@ class AclHelper
         }
 
         $resultData = null;
-        if (!in_array($targetEntity, [self::ORO_EMAIL_CLASS])) {
+        if (!in_array($targetEntity, [self::ORO_USER_CLASS])) {
             $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
         }
 
@@ -291,7 +321,7 @@ class AclHelper
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 
         $resultData = null;
-        $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_EMAIL_CLASS]);
+        $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_USER_CLASS]);
         if (!$isUserTable || ($isSubRequest === false && $rangeVariableDeclaration->isRoot)) {
             $resultData = $this->builder->getAclConditionData($entityName, $permission);
         }

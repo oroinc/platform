@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class OrganizationBasicAuthenticationListener
@@ -72,7 +73,7 @@ class OrganizationBasicAuthenticationListener
         }
 
         if (null !== $token = $this->securityContext->getToken()) {
-            if ($token instanceof UsernamePasswordOrganizationToken
+            if ($token instanceof OrganizationContextTokenInterface
                 && $token->isAuthenticated()
                 && $token->getUsername() === $username
             ) {

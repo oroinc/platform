@@ -119,6 +119,14 @@ class Acl implements \Serializable
     }
 
     /**
+     * @param string $class
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+    }
+
+    /**
      * Gets ACL permission name
      *
      * @return string

@@ -6,18 +6,14 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class ContextListener
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     protected $context;
 
-    /**
-     * @var OrganizationManager
-     */
+    /** @var OrganizationManager */
     protected $manager;
 
     /**
@@ -38,7 +34,7 @@ class ContextListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $token = $this->context->getToken();
-        if ($token instanceof UsernamePasswordOrganizationToken) {
+        if ($token instanceof OrganizationContextTokenInterface) {
             $token->setOrganizationContext(
                 $this->manager->getOrganizationById($token->getOrganizationContext()->getId())
             );

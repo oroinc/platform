@@ -43,4 +43,12 @@ class UserApiTest extends \PHPUnit_Framework_TestCase
     {
         return $this->api;
     }
+
+    public function testOrganization()
+    {
+        $this->assertNull($this->api->getOrganization());
+        $value = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->assertEquals($this->api, $this->api->setOrganization($value));
+        $this->assertEquals($value, $this->api->getOrganization());
+    }
 }

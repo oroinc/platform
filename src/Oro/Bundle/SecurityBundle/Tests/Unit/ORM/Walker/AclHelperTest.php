@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -33,6 +34,47 @@ class AclHelperTest extends OrmTestCase
      * @var AclWalker
      */
     protected $walker;
+
+    public function testApplyAclToCriteria()
+    {
+        $conditionBuilder = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+        $conditionBuilder->expects($this->any())
+            ->method('getAclConditionData')
+            ->will(
+                $this->returnValue(
+                    [
+                        'owner',
+                        1,
+                        4,
+                        'organization',
+                        10,
+                        false
+                    ]
+                )
+            );
+        $criteria = new Criteria();
+        $helper = new AclHelper($conditionBuilder);
+
+        $result = $helper->applyAclToCriteria('oroTestClass', $criteria, 'TEST_PERMISSION');
+        $whereExpression = $result->getWhereExpression();
+        $this->assertEquals('AND', $whereExpression->getType());
+        $expressions = $whereExpression->getExpressionList();
+        $this->assertEquals(2, count($expressions));
+
+        $firstExpr = $expressions[0];
+        $this->assertEquals('organization', $firstExpr->getField());
+        $this->assertEquals('IN', $firstExpr->getOperator());
+        $this->assertEquals([10], $firstExpr->getValue()->getValue());
+
+        $secondExpr = $expressions[1];
+        $this->assertEquals('owner', $secondExpr->getField());
+        $this->assertEquals('IN', $secondExpr->getOperator());
+        $this->assertEquals([1], $secondExpr->getValue()->getValue());
+    }
 
     /**
      * @dataProvider dataProvider

@@ -10,11 +10,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UserController extends Controller
 {
@@ -58,24 +60,20 @@ class UserController extends Controller
 
     /**
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
-     * @AclAncestor("oro_user_user_update")
      */
     public function apigenAction(User $user)
     {
-        if (!$api = $user->getApi()) {
-            $api = new UserApi();
-        }
+        $em      = $this->getDoctrine()->getManager();
+        $userApi = $this->getUserApi($user);
+        $userApi->setApiKey($userApi->generateKey())
+            ->setUser($user)
+            ->setOrganization($this->getOrganization());
 
-        $api->setApiKey($api->generateKey())
-            ->setUser($user);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->persist($api);
+        $em->persist($userApi);
         $em->flush();
 
         return $this->getRequest()->isXmlHttpRequest()
-            ? new JsonResponse($api->getApiKey())
+            ? new JsonResponse($userApi->getApiKey())
             : $this->forward('OroUserBundle:User:view', array('user' => $user));
     }
 
@@ -195,7 +193,6 @@ class UserController extends Controller
         if ($editRoute) {
             $output = array_merge($output, array('editRoute' => $editRoute));
         }
-
         return $output;
     }
 
@@ -214,7 +211,38 @@ class UserController extends Controller
     public function infoAction(User $user)
     {
         return array(
-            'entity'  => $user
+            'entity'      => $user,
+            'userApi'     => $this->getUserApi($user),
+            'viewProfile' => true
         );
+    }
+
+    /**
+     * Returns current UserApi or creates new one
+     *
+     * @param User $user
+     *
+     * @return UserApi
+     */
+    protected function getUserApi(User $user)
+    {
+        $userManager  = $this->get('oro_user.manager');
+        if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
+            $userApi = new UserApi();
+        }
+
+        return $userApi;
+    }
+
+    /**
+     * Returns current organization
+     *
+     * @return Organization
+     */
+    protected function getOrganization()
+    {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->get('security.context')->getToken();
+        return $token->getOrganizationContext();
     }
 }

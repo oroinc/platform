@@ -4,16 +4,17 @@ namespace Oro\Bundle\UserBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\Email;
+
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -327,18 +328,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($now, $user->getLastLogin());
     }
 
-    public function testApi()
-    {
-        $user = new User;
-        $api  = new UserApi();
-
-        $this->assertNull($user->getApi());
-
-        $user->setApi($api);
-
-        $this->assertEquals($api, $user->getApi());
-    }
-
     public function testUnserialize()
     {
         $user = new User();
@@ -494,18 +483,41 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetApiKey()
     {
+        /** @var User $entity */
         $entity = new User();
 
-        $this->assertNotEmpty($entity->getApiKey(), 'Should return some key, even if is not present');
-        $key1 = $entity->getApiKey();
+        $this->assertNotEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
+        $key1 = $entity->getApiKeys();
         usleep(1); // need because 'uniqid' generates a unique identifier based on the current time in microseconds
-        $this->assertNotSame($key1, $entity->getApiKey(), 'Should return unique random string');
+        $this->assertNotSame($key1, $entity->getApiKeys(), 'Should return unique random string');
 
-        $apiKey = new UserApi();
-        $apiKey->setApiKey($apiKey->generateKey());
-        $entity->setApi($apiKey);
+        $organization1 = new Organization();
+        $organization1->setName('test1');
 
-        $this->assertSame($apiKey->getApiKey(), $entity->getApiKey(), 'Should delegate call to userApi entity');
+        $organization2 = new Organization();
+        $organization2->setName('test2');
+
+        $apiKey1 = new UserApi();
+        $apiKey1->setApiKey($apiKey1->generateKey());
+        $apiKey1->setOrganization($organization1);
+
+        $apiKey2 = new UserApi();
+        $apiKey2->setApiKey($apiKey2->generateKey());
+        $apiKey2->setOrganization($organization2);
+
+        $entity->addApiKey($apiKey1);
+        $entity->addApiKey($apiKey2);
+
+        $this->assertSame(
+            $apiKey1->getApiKey(),
+            $entity->getApiKeys()[0]->getApiKey(),
+            'Should delegate call to userApi entity'
+        );
+
+        $this->assertEquals(
+            new ArrayCollection([$apiKey1, $apiKey2]),
+            $entity->getApiKeys()
+        );
     }
 
     public function testOrganizations()
