@@ -16,7 +16,8 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
-            itemTemplate: null
+            itemTemplate: null,
+            sorting: true
         },
 
         _create: function () {
@@ -59,6 +60,10 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
         },
 
         _initSorting: function () {
+            if (!this.options.sorting) {
+                return;
+            }
+
             this.element.sortable({
                 cursor: 'move',
                 delay : 25,
@@ -111,7 +116,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
-            this.element.sortable('refresh');
+            if (this.options.sorting) {
+                this.element.sortable('refresh');
+            }
 
             mediator.trigger(
                 'items-manager:table:add:' + this._getIdentifier(),

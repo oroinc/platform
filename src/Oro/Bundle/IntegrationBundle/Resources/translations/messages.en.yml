@@ -56,6 +56,7 @@ oro:
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
             default_user_owner.label:       Default owner
+            edit_mode.label:                Edit mode
         integration_status:
             competed.label:  Completed
             failed.label:    Failed

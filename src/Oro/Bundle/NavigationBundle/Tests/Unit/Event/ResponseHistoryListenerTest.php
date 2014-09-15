@@ -202,10 +202,17 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('GET'));
 
-        $this->request->expects($this->once())
+        $this->request->expects($this->any())
             ->method('get')
-            ->with('_route')
-            ->will($this->returnValue('test_route'));
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array('_route', 'test_route'),
+                        array('_route_params', array()),
+                        array('id', 1),
+                    )
+                )
+            );
 
         return $this->request;
     }

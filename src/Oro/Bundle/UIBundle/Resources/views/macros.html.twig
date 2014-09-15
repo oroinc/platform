@@ -759,6 +759,8 @@
             {% elseif (ownerType == 'BUSINESS_UNIT') %}
                 {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
                 {% set ownerName = entity.owner.name %}
+            {% elseif (ownerType == 'ORGANIZATION') %}
+                {% set ownerName = entity.owner.name %}
             {% endif %}
             {% if ownerName is defined %}
                 {{ 'oro.ui.owner'|trans }}:

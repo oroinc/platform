@@ -48,17 +48,15 @@
         {% set dataBlocks = [{
             'title': 'General'|trans,
             'class': 'active',
-            'subblocks': [
-                {
-                    'title': 'Embedded Form'|trans,
-                    'data': [
-                            form_row(form.title),
-                            form_row(form.formType),
-                            form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
-                            form_row(form.successMessage)
-                        ]
-                }
-            ]
+            'subblocks': [{
+                'title': 'Embedded Form'|trans,
+                'data': [
+                    form_row(form.title),
+                    form_row(form.formType),
+                    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
+                    form_row(form.successMessage)
+                ]
+            }]
         }] %}
 
         {% set data = {
