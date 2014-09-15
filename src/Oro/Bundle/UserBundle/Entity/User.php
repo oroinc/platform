@@ -1559,11 +1559,22 @@ class User extends ExtendUser implements
      */
     public function removeOrganization(Organization $organization)
     {
-        if ($this->getOrganizations()->contains($organization)) {
+        if ($this->hasOrganization($organization)) {
             $this->getOrganizations()->removeElement($organization);
         }
 
         return $this;
+    }
+
+    /**
+     *
+     *
+     * @param Organization $organization
+     * @return bool
+     */
+    public function hasOrganization(Organization $organization)
+    {
+        return $this->getOrganizations()->contains($organization);
     }
 
     /**
