@@ -22,6 +22,17 @@ class ChoiceFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
+    public function init($name, array $params)
+    {
+        if (isset($params['null_value'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['null_value'] = $params['null_value'];
+        }
+        parent::init($name, $params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $data = $this->parseData($data);
@@ -104,6 +115,12 @@ class ChoiceFilter extends AbstractFilter
         $metadata                    = parent::getMetadata();
         $metadata['choices']         = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];
+        if (!empty($formView->vars['default_value'])) {
+            $metadata['placeholder'] = $formView->vars['default_value'];
+        }
+        if (!empty($formView->vars['null_value'])) {
+            $metadata['nullValue'] = $formView->vars['null_value'];
+        }
 
         if ($fieldView->vars['multiple']) {
             $metadata[FilterUtility::TYPE_KEY] = 'multichoice';

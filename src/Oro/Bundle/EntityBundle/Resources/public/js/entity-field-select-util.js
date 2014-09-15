@@ -166,7 +166,7 @@ define(['underscore'
                             delete data[key];
                         }
                     }
-                } else if (!_.isUndefined(item['related_entity_name'])) {
+                } else if (!_.isUndefined(item['relation_type'])) {
                     // related field
                     if (!_.isUndefined(item['children'])) {
                         this._filterData(item.children);
@@ -195,7 +195,7 @@ define(['underscore'
                 var fieldId = (null !== parentFieldId)
                     ? parentFieldId + '+' + entityName + '::' + field.name
                     : field.name;
-                if (_.isUndefined(field['related_entity_name'])) {
+                if (_.isUndefined(field['relation_type'])) {
                     if (_.isUndefined(this.exclude)
                         || !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
                         result.push(_.extend({

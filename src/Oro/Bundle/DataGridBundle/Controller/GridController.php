@@ -42,7 +42,8 @@ class GridController extends Controller
         return array(
             'gridName'     => $gridName,
             'params'       => $this->getRequest()->get('params', array()),
-            'renderParams' => $this->getRequest()->get('renderParams', array())
+            'renderParams' => $this->getRequest()->get('renderParams', array()),
+            'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
         );
     }
 

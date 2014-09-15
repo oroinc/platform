@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -18,6 +19,8 @@ class Builder
     const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
     const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
     const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
+    // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
+    const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
     /** @var string */
     protected $baseDatagridClass;
@@ -56,30 +59,20 @@ class Builder
      */
     public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
+        $event = new PreBuild($config, $parameters);
+        $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
+
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
 
-        /** @var Acceptor $acceptor */
-        $acceptor = new $this->acceptorClass();
-        $acceptor->setConfig($config);
-
-        foreach ($this->extensions as $extension) {
-            /**
-             * ATTENTION: extension object should be cloned cause it can contain some state
-             */
-            $extension = clone $extension;
-            $extension->setParameters($parameters);
-
-            if ($extension->isApplicable($config)) {
-                $acceptor->addExtension($extension);
-            }
-        }
-
         /** @var DatagridInterface $datagrid */
-        $datagrid = new $class($name, $acceptor, $parameters);
+        $datagrid = new $class($name, $config, $parameters);
 
         $event = new BuildBefore($datagrid, $config);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
+
+        $acceptor = $this->createAcceptor($config, $parameters);
+        $datagrid->setAcceptor($acceptor);
 
         $this->buildDataSource($datagrid, $config);
         $acceptor->processConfiguration();
@@ -119,6 +112,33 @@ class Builder
         $this->extensions[] = $extension;
 
         return $this;
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param ParameterBag          $parameters
+     *
+     * @return Acceptor
+     */
+    protected function createAcceptor(DatagridConfiguration $config, ParameterBag $parameters)
+    {
+        /** @var Acceptor $acceptor */
+        $acceptor = new $this->acceptorClass();
+        $acceptor->setConfig($config);
+
+        foreach ($this->extensions as $extension) {
+            /**
+             * ATTENTION: extension object should be cloned cause it can contain some state
+             */
+            $extension = clone $extension;
+            $extension->setParameters($parameters);
+
+            if ($extension->isApplicable($config)) {
+                $acceptor->addExtension($extension);
+            }
+        }
+
+        return $acceptor;
     }
 
     /**

@@ -20,7 +20,6 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
 
     public function addRel2($value)
     {
-        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
         if (!$this->rel_2->contains($value)) {
             $this->rel_2->add($value);
             $value->addTarget2($this);
@@ -29,7 +28,6 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
 
     public function addRel1($value)
     {
-        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
         if (!$this->rel1->contains($value)) {
             $this->rel1->add($value);
             $value->setTarget1($this);

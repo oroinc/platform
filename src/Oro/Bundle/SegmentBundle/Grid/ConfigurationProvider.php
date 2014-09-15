@@ -18,8 +18,8 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var DatagridConfiguration */
-    private $configuration = null;
+    /** @var DatagridConfiguration[] */
+    private $configuration = [];
 
     /**
      * Constructor
@@ -48,7 +48,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
      */
     public function getConfiguration($gridName)
     {
-        if (null === $this->configuration) {
+        if (empty($this->configuration[$gridName])) {
             $id                = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
             $segment           = $segmentRepository->find($id);
@@ -56,10 +56,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
             $this->builder->setGridName($gridName);
             $this->builder->setSource($segment);
 
-            $this->configuration = $this->builder->getConfiguration();
+            $this->configuration[$gridName] = $this->builder->getConfiguration();
         }
 
-        return $this->configuration;
+        return $this->configuration[$gridName];
     }
 
     /**

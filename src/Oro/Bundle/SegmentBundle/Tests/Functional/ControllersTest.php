@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -75,7 +76,7 @@ class ControllersTest extends WebTestCase
             $this->assertEmptyResponseStatusCodeEquals($result, 204);
         }
 
-        $response = $this->client->requestGrid("oro_segment_grid_{$id}");
+        $response = $this->client->requestGrid(Segment::GRID_PREFIX . $id);
 
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
@@ -122,7 +123,7 @@ class ControllersTest extends WebTestCase
             $this->assertEmptyResponseStatusCodeEquals($result, 204);
         }
 
-        $response = $response = $this->client->requestGrid("oro_segment_grid_{$id}");
+        $response = $response = $this->client->requestGrid(Segment::GRID_PREFIX . $id);
 
         $result = $this->getJsonResponseContent($response, 200);
         $data = $result['data'];
@@ -164,7 +165,7 @@ class ControllersTest extends WebTestCase
             $this->getUrl(
                 'oro_datagrid_export_action',
                 array_merge(
-                    array('gridName' =>"oro_segment_grid_{$id}", "format" => 'csv'),
+                    array('gridName' => Segment::GRID_PREFIX . $id, "format" => 'csv'),
                     $filter
                 )
             )

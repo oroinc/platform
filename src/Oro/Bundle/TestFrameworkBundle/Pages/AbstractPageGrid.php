@@ -248,7 +248,9 @@ abstract class AbstractPageGrid extends AbstractPage
         }
 
         $xpath = "{$this->gridPath}//table/tbody/tr[{$xpath}]{$postFix}";
-        return $this->test->byXPath($xpath);
+        $element = $this->test->byXPath($xpath);
+        $this->test->moveto($element);
+        return $element;
     }
 
     /**
@@ -344,6 +346,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $rowData = array();
         foreach ($columnData as $value) {
             /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $value */
+            $this->test->moveto($value);
             $rowData[] = $value->text();
         }
         return $rowData;

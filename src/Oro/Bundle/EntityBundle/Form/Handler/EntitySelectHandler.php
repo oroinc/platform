@@ -2,72 +2,46 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Handler;
 
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
-use Oro\Bundle\EntityBundle\Form\Type\EntitySelectType;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
-
-use Oro\Bundle\SearchBundle\Engine\Indexer;
-
-class EntitySelectHandler implements SearchHandlerInterface
+class EntitySelectHandler extends SearchHandler
 {
-    /**
-     * @var OroEntityManager
-     */
-    protected $entityManager;
+    /** @var array */
+    protected $defaultPropertySet = ['text'];
 
-    /**
-     * @var string
-     */
-    protected $entityName;
+    /** @var string */
+    protected $currentField;
 
-    /**
-     * @var string
-     */
-    protected $fieldName;
+    /** @var ManagerRegistry */
+    protected $registry;
 
-    /**
-     * @var array
-     */
-    protected $properties = array('id', 'text');
-
-    /**
-     * @var bool
-     */
-    private $hasMore;
-
-    /**
-     * @param OroEntityManager $entityManager
-     */
-    public function __construct(OroEntityManager $entityManager)
+    public function __construct()
     {
-        $this->entityManager = $entityManager;
+        // give some values in order to prevent warnings
+        parent::__construct(false, []);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertItem($item)
+    public function initDoctrinePropertiesByManagerRegistry(ManagerRegistry $managerRegistry)
     {
-        $result = array();
+        $this->registry = $managerRegistry;
+    }
 
-        if ($this->entityName && $this->fieldName) {
-            $result[$this->fieldName] = $this->getPropertyValue($this->fieldName, $item);
+    /**
+     * @param string $entityName  Entity name to prepare search handler for
+     * @param string $targetField Entity field to search by and include to search results
+     */
+    public function initForEntity($entityName, $targetField)
+    {
+        $this->entityName = str_replace('_', '\\', $entityName);
+        $this->initDoctrinePropertiesByEntityManager($this->registry->getManagerForClass($this->entityName));
 
-            foreach ($this->properties as $property) {
-                $result[$property] = $this->getPropertyValue($property, $item);
-            }
-        }
-
-        return $result;
+        $this->properties   = array_unique(array_merge($this->defaultPropertySet, [$targetField]));
+        $this->currentField = $targetField;
     }
 
     /**
@@ -76,98 +50,37 @@ class EntitySelectHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage, $searchById = false)
     {
         list($query, $targetEntity, $targetField) = explode(',', $query);
+        $this->initForEntity($targetEntity, $targetField);
 
-        $this->entityName = str_replace('_', '\\', $targetEntity);
-
-        $this->fieldName  = $targetField;
-
-        return $this->formatResult($this->searchEntities($query, $targetField));
+        return parent::search($query, $page, $perPage, $searchById);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProperties()
+    protected function searchEntities($search, $firstResult, $maxResults)
     {
-        return $this->properties;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityName()
-    {
-        return $this->entityName;
-    }
-
-    /**
-     * Search and return entities
-     *
-     * @param $search
-     * @param $targetField
-     * @return array
-     */
-    protected function searchEntities($search, $targetField)
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->entityManager->getRepository($this->entityName)->createQueryBuilder('e');
+        $queryBuilder = $this->entityRepository->createQueryBuilder('e');
 
         $queryBuilder->where(
             $queryBuilder->expr()->like(
-                'e.' . $targetField,
+                'e.' . $this->currentField,
                 $queryBuilder->expr()->literal($search . '%')
             )
         );
+        $queryBuilder->setMaxResults($maxResults);
+        $queryBuilder->setFirstResult($firstResult);
 
         return $queryBuilder->getQuery()->getArrayResult();
     }
 
     /**
-     * @param array $items
-     * @return array
+     * @throws \RuntimeException
      */
-    protected function formatResult(array $items)
+    protected function checkAllDependenciesInjected()
     {
-        return array(
-            'results' => $this->convertItems($items),
-            'more'    => $this->hasMore
-        );
-    }
-
-    /**
-     * @param array $items
-     * @return array
-     */
-    protected function convertItems(array $items)
-    {
-        $result = array();
-        foreach ($items as $item) {
-            $result[] = $this->convertItem($item);
+        if (!$this->properties || !$this->currentField || !$this->entityRepository || !$this->idFieldName) {
+            throw new \RuntimeException('Search handler is not fully configured');
         }
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     * @param object|array $item
-     * @return mixed
-     */
-    protected function getPropertyValue($name, $item)
-    {
-        $result = null;
-
-        if (is_object($item)) {
-            $method = 'get' . str_replace(' ', '', str_replace('_', ' ', ucwords($name)));
-            if (method_exists($item, $method)) {
-                $result = $item->$method();
-            } elseif (isset($item->$name)) {
-                $result = $item->$name;
-            }
-        } elseif (is_array($item) && array_key_exists($name, $item)) {
-            $result = $item[$name];
-        }
-
-        return $result;
     }
 }

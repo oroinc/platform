@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 
 class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 {
@@ -11,6 +12,11 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityFacade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $config;
 
     /**
      * @var OroEntitySelectOrCreateInlineType
@@ -24,7 +30,32 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formType = new OroEntitySelectOrCreateInlineType($this->securityFacade);
+
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager
+            ->expects($this->any())
+            ->method('getProvider')
+            ->will($this->returnValue($provider));
+
+        $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+
+        $provider
+            ->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->config));
+
+        $this->formType = new OroEntitySelectOrCreateInlineType(
+            $this->securityFacade,
+            $configManager
+        );
     }
 
     /**
@@ -35,7 +66,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
+        $metadata      = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
         $metadata->expects($this->any())
@@ -44,49 +75,52 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->will($this->returnValue($metadata));
-        $searchRegistry = $this->getMockBuilder('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry')
+
+        $handler        = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+        $searchRegistry = $this
+            ->getMockBuilder('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        return array(
-            new EntitySelectOrCreateInlineFormExtension($entityManager, $searchRegistry)
-        );
-    }
+        $handler
+            ->expects($this->any())
+            ->method('getProperties')
+            ->will($this->returnValue([]));
 
-    /**
-     * @dataProvider requiredOptionsDataProvider
-     * @param array $inputOptions
-     * @param string $exceptionMessage
-     */
-    public function testRequiredOptions(array $inputOptions, $exceptionMessage)
-    {
-        $this->setExpectedException(
-            'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
-            $exceptionMessage
-        );
-        $form = $this->factory->create($this->formType, null, $inputOptions);
-        $form->submit(null);
-    }
+        $searchRegistry
+            ->expects($this->any())
+            ->method('getSearchHandler')
+            ->will($this->returnValue($handler));
 
-    /**
-     * @return array
-     */
-    public function requiredOptionsDataProvider()
-    {
-        return array(
-            array(
-                array(),
-                'The required option "grid_name" is missing.'
+        $configManager = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $config        = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+
+        $configManager
+            ->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($config));
+
+        $config
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue('value'));
+
+        return [
+            new EntitySelectOrCreateInlineFormExtension(
+                $entityManager,
+                $searchRegistry,
+                $configManager
             )
-        );
+        ];
     }
 
     /**
      * @dataProvider formTypeDataProvider
+     *
      * @param array $inputOptions
      * @param array $expectedOptions
-     * @param bool $aclAllowed
-     * @param bool $aclExpectedToCall
+     * @param bool  $aclAllowed
+     * @param bool  $aclExpectedToCall
      * @param array $expectedViewVars
      */
     public function testExecute(
@@ -94,8 +128,23 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         array $expectedOptions,
         $aclAllowed,
         $aclExpectedToCall,
-        array $expectedViewVars = array()
+        array $expectedViewVars = []
     ) {
+        $this->config
+            ->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnCallback(
+                    function ($argument) use ($inputOptions) {
+                        if (array_key_exists($argument, $inputOptions)) {
+                            return $inputOptions[$argument];
+                        }
+
+                        return null;
+                    }
+                )
+            );
+
         if ($aclExpectedToCall) {
             if (!empty($expectedOptions['create_acl'])) {
                 $this->securityFacade->expects($this->once())
@@ -138,162 +187,168 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
      */
     public function formTypeDataProvider()
     {
-        return array(
-            'create disabled' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+        $converter = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
+
+        return [
+            'create disabled'                   => [
+                [
+                    'grid_name'      => 'test',
+                    'converter'      => $converter,
+                    'entity_class'   => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'        => [
                         'route_name' => 'test'
-                    ),
+                    ],
                     'create_enabled' => false
-                ),
-                array(
-                    'grid_name' => 'test',
+                ],
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_enabled' => false
-                ),
+                    'create_enabled'          => false
+                ],
                 false,
                 false,
-                array(
-                    'grid_name' => 'test',
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_enabled' => false
-                )
-            ),
-            'create no route' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+                    'create_enabled'          => false
+                ]
+            ],
+            'create no route'                   => [
+                [
+                    'grid_name'      => 'test',
+                    'converter'      => $converter,
+                    'entity_class'   => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'        => [
                         'route_name' => 'test'
-                    ),
+                    ],
                     'create_enabled' => true
-                ),
-                array(
-                    'grid_name' => 'test',
+                ],
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_enabled' => false
-                ),
+                    'create_enabled'          => false
+                ],
                 false,
                 false,
-                array(
-                    'grid_name' => 'test',
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_enabled' => false
-                )
-            ),
-            'create has route disabled' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+                    'create_enabled'          => false
+                ]
+            ],
+            'create has route disabled'         => [
+                [
+                    'grid_name'         => 'test',
+                    'converter'         => $converter,
+                    'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'           => [
                         'route_name' => 'test'
-                    ),
-                    'create_enabled' => false,
+                    ],
+                    'create_enabled'    => false,
                     'create_form_route' => 'test',
-                ),
-                array(
-                    'grid_name' => 'test',
+                ],
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => false
-                ),
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => false
+                ],
                 false,
                 false,
-                array(
-                    'grid_name' => 'test',
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => false
-                )
-            ),
-            'create enabled acl disallowed' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => false
+                ]
+            ],
+            'create enabled acl disallowed'     => [
+                [
+                    'grid_name'         => 'test',
+                    'converter'         => $converter,
+                    'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'           => [
                         'route_name' => 'test'
-                    ),
-                    'create_enabled' => true,
+                    ],
+                    'create_enabled'    => true,
                     'create_form_route' => 'test',
-                ),
-                array(
-                    'grid_name' => 'test',
+                ],
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => false
-                ),
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => false
+                ],
                 false,
                 true,
-                array(
-                    'grid_name' => 'test',
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => false
-                )
-            ),
-            'create enabled acl allowed' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => false
+                ]
+            ],
+            'create enabled acl allowed'        => [
+                [
+                    'grid_name'         => 'test',
+                    'converter'         => $converter,
+                    'entity_class'      => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'           => [
                         'route_name' => 'test'
-                    ),
-                    'create_enabled' => true,
+                    ],
+                    'create_enabled'    => true,
                     'create_form_route' => 'test',
-                ),
-                array(
-                    'grid_name' => 'test',
+                ],
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => true
-                ),
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => true
+                ],
                 true,
                 true,
-                array(
-                    'grid_name' => 'test',
+                [
+                    'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => true
-                )
-            ),
-            'create enabled acl allowed custom' => array(
-                array(
-                    'grid_name' => 'test',
-                    'converter' => $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'),
-                    'entity_class' => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
-                    'configs' => array(
+                    'create_form_route'       => 'test',
+                    'create_enabled'          => true
+                ]
+            ],
+            'create enabled acl allowed custom' => [
+                [
+                    'grid_name'                    => 'test',
+                    'grid_parameters'              => ['testParam1' => 1],
+                    'grid_render_parameters'       => ['testParam2' => 2],
+                    'converter'                    => $converter,
+                    'entity_class'                 => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
+                    'configs'                      => [
                         'route_name' => 'test'
-                    ),
-                    'create_enabled' => true,
-                    'create_form_route' => 'test',
-                    'create_form_route_parameters' => array('name' => 'US'),
-                    'create_acl' => 'acl',
-                ),
-                array(
-                    'grid_name' => 'test',
-                    'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => true,
-                    'create_acl' => 'acl',
-                    'create_form_route_parameters' => array('name' => 'US'),
-                ),
+                    ],
+                    'create_enabled'               => true,
+                    'create_form_route'            => 'test',
+                    'create_form_route_parameters' => ['name' => 'US'],
+                    'create_acl'                   => 'acl',
+                ],
+                [
+                    'grid_name'                    => 'test',
+                    'grid_parameters'              => ['testParam1' => 1],
+                    'grid_render_parameters'       => ['testParam2' => 2],
+                    'existing_entity_grid_id'      => 'id',
+                    'create_form_route'            => 'test',
+                    'create_enabled'               => true,
+                    'create_acl'                   => 'acl',
+                    'create_form_route_parameters' => ['name' => 'US'],
+                ],
                 true,
                 true,
-                array(
-                    'grid_name' => 'test',
-                    'existing_entity_grid_id' => 'id',
-                    'create_form_route' => 'test',
-                    'create_enabled' => true,
-                    'create_form_route_parameters' => array('name' => 'US'),
-                )
-            ),
-        );
+                [
+                    'grid_name'                    => 'test',
+                    'existing_entity_grid_id'      => 'id',
+                    'create_form_route'            => 'test',
+                    'create_enabled'               => true,
+                    'create_form_route_parameters' => ['name' => 'US'],
+                ]
+            ],
+        ];
     }
 }

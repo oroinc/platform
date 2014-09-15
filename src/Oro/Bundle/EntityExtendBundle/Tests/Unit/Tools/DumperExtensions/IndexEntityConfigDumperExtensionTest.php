@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension;
 
@@ -22,7 +23,10 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new IndexEntityConfigDumperExtension($this->configManager);
+        $this->extension = new IndexEntityConfigDumperExtension(
+            $this->configManager,
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+        );
     }
 
     public function testSupportsPreUpdate()
@@ -59,8 +63,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 
     public function testPreUpdateForEntityWithIsExtendAndFieldWithExtendButInvisibleInGrid()
@@ -69,8 +72,8 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $config->set('is_extend', true);
         $config->set('index', []);
 
-        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
-        $fieldConfig->set('extend', true);
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
+        $fieldConfig->set('is_extend', true);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -110,8 +113,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 
     public function testPreUpdateForEntityWithIsExtendAndNotExtendField()
@@ -120,7 +122,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $config->set('is_extend', true);
         $config->set('index', []);
 
-        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -156,18 +158,17 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 
     public function testPreUpdateForEntityWithExtendAndFieldWithExtendButInvisibleInGrid()
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config->set('extend', true);
+        $config->set('is_extend', true);
         $config->set('index', []);
 
-        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
-        $fieldConfig->set('extend', true);
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
+        $fieldConfig->set('is_extend', true);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -207,21 +208,20 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 
     public function testPreUpdateForNewIndexedField()
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config->set('extend', true);
+        $config->set('is_extend', true);
         $config->set('index', []);
 
-        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
-        $fieldConfig->set('extend', true);
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
+        $fieldConfig->set('is_extend', true);
 
         $datagridFieldConfig = new Config(
-            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1')
+            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
         $datagridFieldConfig->set('is_visible', true);
 
@@ -268,8 +268,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->identicalTo($config));
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
 
         $this->assertEquals(
             ['field1' => true],
@@ -277,17 +276,68 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider preUpdateForRelationsProvider
+     */
+    public function testPreUpdateForRelations($fieldType)
+    {
+        $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
+        $config->set('is_extend', true);
+        $config->set('index', []);
+
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', $fieldType));
+        $fieldConfig->set('is_extend', true);
+
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfigs')
+            ->will(
+                $this->returnCallback(
+                    function ($className) use ($config, $fieldConfig) {
+                        if (empty($className)) {
+                            return [$config];
+                        }
+
+                        return [$fieldConfig];
+                    }
+                )
+            );
+
+        $this->configManager->expects($this->never())
+            ->method('persist');
+
+        $this->extension->preUpdate();
+    }
+
+    public function preUpdateForRelationsProvider()
+    {
+        return [
+            ['manyToOne'],
+            ['oneToMany'],
+            ['manyToMany'],
+            ['enum'],
+            ['multiEnum'],
+        ];
+    }
+
     public function testPreUpdateForRemoveIndexedField()
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity'));
-        $config->set('extend', true);
+        $config->set('is_extend', true);
         $config->set('index', ['field1' => true]);
 
-        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
-        $fieldConfig->set('extend', true);
+        $fieldConfig = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
+        $fieldConfig->set('is_extend', true);
 
         $datagridFieldConfig = new Config(
-            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1')
+            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -334,8 +384,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->identicalTo($config));
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
 
         $this->assertFalse(
             $config->has('index')
@@ -345,20 +394,20 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     public function testPreUpdateForNoChanges()
     {
         $config = new Config(new EntityConfigId('extend', 'Test\Entity1'));
-        $config->set('extend', true);
+        $config->set('is_extend', true);
         $config->set('index', ['field1' => true]);
 
-        $fieldConfig1 = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1'));
-        $fieldConfig1->set('extend', true);
-        $fieldConfig2 = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field2'));
-        $fieldConfig2->set('extend', true);
+        $fieldConfig1 = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field1', 'string'));
+        $fieldConfig1->set('is_extend', true);
+        $fieldConfig2 = new Config(new FieldConfigId('extend', $config->getId()->getClassName(), 'field2', 'string'));
+        $fieldConfig2->set('is_extend', true);
 
         $datagridFieldConfig1= new Config(
-            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1')
+            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
         $datagridFieldConfig1->set('is_visible', true);
         $datagridFieldConfig2= new Config(
-            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2')
+            new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2', 'string')
         );
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -412,7 +461,6 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $extendConfigs = [];
-        $this->extension->preUpdate($extendConfigs);
+        $this->extension->preUpdate();
     }
 }

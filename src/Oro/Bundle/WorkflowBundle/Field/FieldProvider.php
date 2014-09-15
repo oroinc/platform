@@ -41,25 +41,36 @@ class FieldProvider extends EntityFieldProvider
         $applyExclusions = false;
         parent::addFields($result, $className, $em, $withVirtualFields, $applyExclusions, $translate);
 
-        // only configurable entities are supported
-        if ($this->entityConfigProvider->hasConfig($className)) {
-            $metadata = $em->getClassMetadata($className);
+        $metadata = $em->getClassMetadata($className);
 
-            // add single association fields
-            foreach ($metadata->getAssociationNames() as $associationName) {
-                if (!$this->isWorkflowField($associationName)
-                    && $metadata->isSingleValuedAssociation($associationName)
-                ) {
-                    $fieldLabel = $this->getFieldLabel($className, $associationName);
-                    $this->addField(
-                        $result,
-                        $associationName,
-                        null,
-                        $fieldLabel,
-                        false,
-                        $translate
-                    );
+        // add single association fields
+        foreach ($metadata->getAssociationNames() as $associationName) {
+            if (!$this->isWorkflowField($associationName)
+                && $metadata->isSingleValuedAssociation($associationName)
+            ) {
+                if (isset($result[$associationName])) {
+                    // skip because a field with this name is already added, it could be a virtual field
+                    continue;
                 }
+                if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $associationName)) {
+                    // skip non configurable relation
+                    continue;
+                }
+                if ($this->isIgnoredField($metadata, $associationName)) {
+                    continue;
+                }
+                if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $associationName)) {
+                    continue;
+                }
+
+                $this->addField(
+                    $result,
+                    $associationName,
+                    $this->getRelationFieldType($className, $associationName),
+                    $this->getFieldLabel($className, $associationName),
+                    false,
+                    $translate
+                );
             }
         }
     }

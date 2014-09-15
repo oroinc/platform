@@ -79,7 +79,7 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->indexer = $indexer;
         if (empty($config[$this->entityName]['alias'])) {
-            throw new \RuntimeException("Cannot init entity search alias.");
+            throw new \RuntimeException(sprintf('Cannot init search alias for entity "%s".', $this->entityName));
         }
         $this->entitySearchAlias = $config[$this->entityName]['alias'];
     }
@@ -129,11 +129,7 @@ class SearchHandler implements SearchHandlerInterface
         $perPage += 1;
 
         if ($searchById) {
-            $items = [
-                $this->objectManager
-                    ->getRepository($this->entityName)
-                    ->find($query)
-            ];
+            $items = $this->findById($query);
         } else {
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
@@ -152,7 +148,7 @@ class SearchHandler implements SearchHandlerInterface
     /**
      * @throws \RuntimeException
      */
-    private function checkAllDependenciesInjected()
+    protected function checkAllDependenciesInjected()
     {
         if (!$this->indexer || !$this->entitySearchAlias || !$this->entityRepository || !$this->idFieldName) {
             throw new \RuntimeException('Search handler is not fully configured');
@@ -204,6 +200,23 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
+     * Get search results data by id
+     *
+     * @param int $query
+     *
+     * @return array
+     */
+    protected function findById($query)
+    {
+        $items = [
+            $this->entityRepository->find($query)
+        ];
+
+        return $items;
+    }
+
+
+    /**
      * @param array $items
      * @return array
      */
@@ -235,7 +248,7 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|array $item
      * @return mixed
      */

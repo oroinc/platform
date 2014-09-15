@@ -15,6 +15,8 @@ class Translation
 {
     const ENTITY_NAME = 'OroTranslationBundle:Translation';
 
+    const DEFAULT_LOCALE = 'en';
+
     const SCOPE_SYSTEM = 1;
     const SCOPE_UI     = 2;
 

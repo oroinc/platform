@@ -7,6 +7,7 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
@@ -15,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -46,24 +48,32 @@ class WorkflowAttributesType extends AbstractType
     protected $requiredAttributesListener;
 
     /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param AttributeGuesser $attributeGuesser,
-     * @param DefaultValuesListener $defaultValuesListener
-     * @param InitActionsListener $initActionsListener
+     * @var ContextAccessor
+     */
+    protected $contextAccessor;
+
+    /**
+     * @param WorkflowRegistry           $workflowRegistry
+     * @param AttributeGuesser           $attributeGuesser ,
+     * @param DefaultValuesListener      $defaultValuesListener
+     * @param InitActionsListener        $initActionsListener
      * @param RequiredAttributesListener $requiredAttributesListener
+     * @param ContextAccessor            $contextAccessor
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         AttributeGuesser $attributeGuesser,
         DefaultValuesListener $defaultValuesListener,
         InitActionsListener $initActionsListener,
-        RequiredAttributesListener $requiredAttributesListener
+        RequiredAttributesListener $requiredAttributesListener,
+        ContextAccessor $contextAccessor
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
         $this->defaultValuesListener = $defaultValuesListener;
         $this->initActionsListener = $initActionsListener;
         $this->requiredAttributesListener = $requiredAttributesListener;
+        $this->contextAccessor = $contextAccessor;
     }
 
     /**
@@ -200,6 +210,14 @@ class WorkflowAttributesType extends AbstractType
         if ($options['disable_attribute_fields']) {
             $attributeOptions['options']['disabled'] = true;
         }
+
+        $contextAccessor = $this->contextAccessor;
+        array_walk_recursive(
+            $attributeOptions,
+            function (&$leaf) use ($options, $contextAccessor) {
+                $leaf = $contextAccessor->getValue($options['workflow_item'], $leaf);
+            }
+        );
 
         return $attributeOptions;
     }

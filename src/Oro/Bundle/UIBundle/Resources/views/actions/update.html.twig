@@ -7,14 +7,14 @@
 {% set entity = entity is defined ? entity : null %}
 
 {% block content %}
-    {% if isWidgetContext and savedId is defined and savedId %}
+    {% if isWidgetContext and savedData is defined and savedData %}
         <script type="text/javascript">
             require(['oroui/js/widget-manager'],
             function(widgetManager) {
                 widgetManager.getWidgetInstance(
                     {{ app.request.get('_wid')|json_encode|raw }},
                     function (widget) {
-                        widget.trigger('formSave', {{ savedId|json_encode|raw }});
+                        widget.trigger('formSave', {{ savedData|json_encode|raw }});
                     }
                 );
             });

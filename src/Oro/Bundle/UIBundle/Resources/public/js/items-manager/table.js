@@ -16,7 +16,8 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
-            itemTemplate: null
+            itemTemplate: null,
+            sorting: true
         },
 
         _create: function () {
@@ -59,6 +60,10 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
         },
 
         _initSorting: function () {
+            if (!this.options.sorting) {
+                return;
+            }
+
             this.element.sortable({
                 cursor: 'move',
                 delay : 25,
@@ -111,28 +116,49 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, 
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
-            this.element.sortable('refresh');
+            if (this.options.sorting) {
+                this.element.sortable('refresh');
+            }
 
-            mediator.trigger('items-manager:table:add:' + this._getIdentifier(), this.options.collection);
+            mediator.trigger(
+                'items-manager:table:add:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
 
-            mediator.trigger('items-manager:table:change:' + this._getIdentifier(), this.options.collection);
+            mediator.trigger(
+                'items-manager:table:change:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').remove();
 
-            mediator.trigger('items-manager:table:remove:' + this._getIdentifier(), this.options.collection);
+            mediator.trigger(
+                'items-manager:table:remove:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onResetCollection: function () {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
 
-            mediator.trigger('items-manager:table:reset:' + this._getIdentifier(), this.options.collection);
+            mediator.trigger(
+                'items-manager:table:reset:' + this._getIdentifier(),
+                this.options.collection,
+                this.element
+            );
         },
 
         _renderModel: function (model) {

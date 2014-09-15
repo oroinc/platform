@@ -3,12 +3,17 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\ORM\Query\Expr;
+
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 
 class OrmExpressionBuilder implements ExpressionBuilderInterface
 {
+    /** @var Expr */
     protected $expr;
 
+    /**
+     * @param Expr $expr
+     */
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;
@@ -174,5 +179,21 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
         */
 
         return new Expr\Comparison($x, 'NOT LIKE', $withParam ? ':' . $y : $y);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function literal($literal)
+    {
+        return $this->expr->literal($literal);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function trim($x)
+    {
+        return $this->expr->trim($x);
     }
 }

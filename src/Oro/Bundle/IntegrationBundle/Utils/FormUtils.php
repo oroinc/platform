@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
+use Doctrine\Common\Collections\Criteria;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -49,10 +51,13 @@ class FormUtils
      */
     public static function wasSyncedAtLeastOnce(Integration $integration)
     {
-        return $integration->getStatuses()->exists(
-            function ($key, Status $status) {
-                return intval($status->getCode()) === Status::STATUS_COMPLETED;
-            }
-        );
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq("code", Status::STATUS_COMPLETED))
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+
+        $completedStatuses = $integration->getStatuses()->matching($criteria);
+
+        return false === $completedStatuses->isEmpty();
     }
 }

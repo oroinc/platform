@@ -133,6 +133,19 @@ class PdoPgsql extends BaseDriver
     /**
      * {@inheritdoc}
      */
+    protected function addOrderBy(Query $query, QueryBuilder $qb)
+    {
+        parent::addOrderBy($query, $qb);
+
+        // all columns from order part must be in select
+        if ($query->getOrderBy()) {
+            $qb->addSelect('orderTable.value');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
         $query = parent::getTruncateQuery($dbPlatform, $tableName);

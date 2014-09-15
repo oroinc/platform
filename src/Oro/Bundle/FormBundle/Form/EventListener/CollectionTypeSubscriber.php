@@ -58,12 +58,8 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @var FormInterface $child */
-        foreach ($event->getForm() as $child) {
-            $dataClass = $child->getConfig()->getDataClass();
-            if ($dataClass && !in_array('Oro\\Bundle\\FormBundle\\Entity\\PrimaryItem', class_implements($dataClass))) {
-                return;
-            }
+        if (!$this->hasPrimaryBehaviour($event)) {
+            return;
         }
 
         $notEmptyItems = array();
@@ -85,6 +81,27 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
         }
 
         $event->setData($items);
+    }
+
+    /**
+     * @param FormEvent $event
+     *
+     * @return bool
+     */
+    protected function hasPrimaryBehaviour(FormEvent $event)
+    {
+        if (!$event->getForm()->getConfig()->getOption('handle_primary')) {
+            return false;
+        }
+        /** @var FormInterface $child */
+        foreach ($event->getForm() as $child) {
+            $dataClass = $child->getConfig()->getDataClass();
+            if ($dataClass && !in_array('Oro\\Bundle\\FormBundle\\Entity\\PrimaryItem', class_implements($dataClass))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function isParentFormDataNew(FormInterface $form)

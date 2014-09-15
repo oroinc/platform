@@ -41,6 +41,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
+    const EDIT_MODE_ALLOW = 3;
+    const EDIT_MODE_RESTRICTED = 2;
+    const EDIT_MODE_DISALLOW = 1;
+
     /**
      * @var integer
      *
@@ -125,11 +129,23 @@ class Channel
      *
      * Cascade persisting is not used due to lots of detach/merge
      * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Status",
-     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel"
+     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel", fetch="EXTRA_LAZY"
      * )
      * @ORM\OrderBy({"date" = "DESC"})
      */
     protected $statuses;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(
+     *     name="edit_mode",
+     *     type="integer",
+     *     nullable=false,
+     *     options={"default"=\Oro\Bundle\IntegrationBundle\Entity\Channel::EDIT_MODE_ALLOW})
+     * )
+     */
+    protected $editMode;
 
     public function __construct()
     {
@@ -137,6 +153,7 @@ class Channel
         $this->synchronizationSettings = ConfigObject::create([]);
         $this->mappingSettings         = ConfigObject::create([]);
         $this->enabled                 = true;
+        $this->editMode                = self::EDIT_MODE_ALLOW;
     }
 
     /**
@@ -380,5 +397,21 @@ class Channel
     public function getEnabled()
     {
         return $this->enabled;
+    }
+
+    /**
+     * @param int $editMode
+     */
+    public function setEditMode($editMode)
+    {
+        $this->editMode = $editMode;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEditMode()
+    {
+        return $this->editMode;
     }
 }
