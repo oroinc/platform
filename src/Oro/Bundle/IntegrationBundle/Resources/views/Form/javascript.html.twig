@@ -9,8 +9,7 @@
     {% set fieldsToSendOnTypeChange = [
         form.type.vars.full_name,
         form.name.vars.full_name,
-        form.defaultUserOwner.vars.full_name,
-        form.organization.vars.full_name
+        form.defaultUserOwner.vars.full_name
     ] %}
     {% if csrfTokenFieldFillName is defined %}
         {% set fieldsToSendOnTypeChange = fieldsToSendOnTypeChange|merge([csrfTokenFieldFillName]) %}

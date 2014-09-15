@@ -142,6 +142,7 @@ services:
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
@@ -155,7 +156,7 @@ services:
     # Email template API
     oro_email.manager.emailtemplate.api:
         class: %oro_email.manager.emailtemplate.api.class%
-        parent: oro_soap.managet.entity_manager.abstract
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.emailtemplate.entity.class%
             - @doctrine.orm.entity_manager
