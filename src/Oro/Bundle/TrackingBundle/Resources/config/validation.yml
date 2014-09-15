@@ -30,9 +30,6 @@ Oro\Bundle\TrackingBundle\Entity\TrackingEvent:
             - NotBlank: ~
             - Length:
                 max: 255
-        title:
-            - Length:
-                max: 255
         loggedAt:
             - NotBlank: ~
 

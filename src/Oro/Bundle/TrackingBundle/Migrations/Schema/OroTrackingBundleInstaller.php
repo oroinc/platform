@@ -17,7 +17,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -68,7 +68,7 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);
         $table->addColumn('url', 'string', ['length' => 255]);
-        $table->addColumn('title', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('title', 'text', ['notnull' => false]);
         $table->addColumn('code', 'string', ['notnull' => false, 'length' => 255]);
         $table->addIndex(['logged_at'], 'event_loggedat_idx', []);
         $table->addIndex(['code'], 'code_idx', []);
