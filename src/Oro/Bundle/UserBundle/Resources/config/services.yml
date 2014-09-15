@@ -30,6 +30,7 @@ services:
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
+        parent: oro_soap.managet.entity_manager.abstract
         arguments:
             - %oro_user.entity.class%
             - @doctrine.orm.entity_manager
@@ -79,6 +80,7 @@ services:
 
     oro_user.role_manager.api:
         class: %oro_user.role.manager.api.class%
+        parent: oro_soap.managet.entity_manager.abstract
         arguments:
             - %oro_user.role.entity.class%
             - @doctrine.orm.entity_manager
@@ -89,6 +91,7 @@ services:
 
     oro_user.group_manager.api:
         class: %oro_user.group.manager.api.class%
+        parent: oro_soap.managet.entity_manager.abstract
         arguments:
             - %oro_user.group.entity.class%
             - @doctrine.orm.entity_manager

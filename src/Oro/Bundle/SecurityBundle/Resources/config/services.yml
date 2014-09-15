@@ -58,6 +58,8 @@ parameters:
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
 
+    oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
+
 services:
     oro_security.security_facade:
         class: %oro_security.security_facade.class%
@@ -65,6 +67,7 @@ services:
             - @security.context
             - @oro_security.acl.annotation_provider
             - @oro_security.acl.object_identity_factory
+            - @oro_entity.orm.entity_class_resolver
             - @logger
         tags:
             - { name: monolog.logger, channel: security }
@@ -422,3 +425,14 @@ services:
             - @oro_organization.organization_manager
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_security.listener.api_listener:
+          class: %oro_security.listener.api_listener.class%
+          arguments:
+              - @request
+              - @oro_security.security_facade
+              - @oro_security.acl_helper
+          scope: request
+          tags:
+              - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
+              - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }

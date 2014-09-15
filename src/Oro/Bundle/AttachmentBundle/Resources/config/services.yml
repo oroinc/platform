@@ -26,6 +26,7 @@ services:
 
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
+        parent: oro_soap.managet.entity_manager.abstract
         arguments:
             - %oro_attachment.entity.class%
             - @doctrine.orm.entity_manager
