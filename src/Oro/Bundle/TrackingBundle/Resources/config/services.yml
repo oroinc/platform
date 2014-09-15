@@ -36,7 +36,7 @@ services:
 
     oro_tracking.tracking_website.manager.api:
         class: %oro_tracking.tracking_website.manager.api.class%
-        parent: oro_soap.managet.entity_manager.abstract
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_tracking.tracking_website.class%
             - @doctrine.orm.entity_manager

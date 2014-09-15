@@ -102,21 +102,18 @@ class OrganizationRepository extends EntityRepository
      * @param User   $user
      * @param string $name
      * @param bool   $useLikeExpr Using expr()->like by default and expr()->eq otherwise
+     * @param bool   $singleResult If we expected only one result
      *
      * @return Organization[]
      */
-    public function getEnabledByUserAndName(User $user, $name, $useLikeExpr = true)
+    public function getEnabledByUserAndName(User $user, $name, $useLikeExpr = true, $singleResult = false)
     {
         $qb = $this->createQueryBuilder('org');
-        $organizations = $user->getOrganizations();
-        $ids = [];
-        foreach ($organizations as $organization) {
-            $ids[] = $organization->getId();
-        }
-
         $qb->select('org')
+            ->join('org.users', 'user')
             ->where('org.enabled = true')
-            ->andWhere($qb->expr()->in('org.id', $ids));
+            ->andWhere('user.id = :user')
+            ->setParameter('user', $user);
 
         if ($useLikeExpr) {
             $qb->andWhere($qb->expr()->like('org.name', ':orgName'))
@@ -126,7 +123,9 @@ class OrganizationRepository extends EntityRepository
                 ->setParameter('orgName', $name);
         }
 
-        return $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+
+        return $singleResult ? $query->getOneOrNullResult() : $query->getResult();
     }
 
     /**

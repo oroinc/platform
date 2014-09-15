@@ -46,18 +46,24 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('User "%s" does not exist', $username));
         }
 
-        $organizations = $container->get('oro_organization.organization_manager')
-            ->getEnabledUserOrganizationsByName($user, $organizationName, false);
-
-        if (!$organizations) {
+        $organization = $container->get('oro_organization.organization_manager')->getEnabledUserOrganizationByName(
+            $user,
+            $organizationName,
+            false
+        );
+        if (!$organization) {
             throw new \InvalidArgumentException(sprintf('Organization "%s" not found', $organizationName));
         }
 
-        $organization = reset($organizations);
-        $userApi      = $userManager->getApi($user, $organization);
-
+        $userApi  = $userManager->getApi($user, $organization);
         if (!$userApi) {
-            throw new \InvalidArgumentException(sprintf('User "%s" does not yet have an API key generated', $username));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'User "%s" does not yet have an API key generated for organization "%s"',
+                    $username,
+                    $organizationName
+                )
+            );
         }
 
         $created = date('c');
