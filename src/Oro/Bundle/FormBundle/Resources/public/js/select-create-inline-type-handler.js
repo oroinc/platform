@@ -64,7 +64,7 @@ function (routing, DialogWidget, widgetManager, __) {
             });
 
             var processSelectedEntities = function (id) {
-                selectorEl.select2('val', id);
+                selectorEl.select2('val', id, true);
                 entityCreateDialog.remove();
             };
 
