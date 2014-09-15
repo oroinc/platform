@@ -1,0 +1,11 @@
+<%
+    var data = $(element).data(),
+        background;
+    if (data.icon) {
+        background = 'style="background: url(' + data.icon + ') no-repeat;"';
+    } else {
+        background = 'style="display: none;"';
+    }
+%>
+<span class="aware-icon-block aware-icon-block-text aware-icon-block-selected" <%= background %> ></span>
+<span class="aware-icon-block-text"><%= highlight(text) %></span>

@@ -79,8 +79,8 @@ class Query
     /**
      * @var string
      */
-
     protected $orderDirection;
+
     /**
      * @var array
      */
@@ -185,10 +185,6 @@ class Query
 
         $this->from = $entities;
 
-        foreach ($this->from as $index => $fromValue) {
-            $this->from[$index] = self::clearString($fromValue);
-        }
-
         return $this;
     }
 
@@ -202,7 +198,7 @@ class Query
      *
      * @return Query
      */
-    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_AND, $fieldName, $condition, $fieldValue, $fieldType);
     }
@@ -217,7 +213,7 @@ class Query
      *
      * @return Query
      */
-    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_OR, $fieldName, $condition, $fieldValue, $fieldType);
     }
@@ -235,10 +231,6 @@ class Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
-        if ($fieldType == self::TYPE_TEXT) {
-            $fieldValue = self::clearString($fieldValue);
-        }
-
         $this->options[] = [
             'fieldName'  => $fieldName,
             'condition'  => $condition,
@@ -355,7 +347,7 @@ class Query
      *
      * @return Query
      */
-    public function setOrderBy($fieldName, $direction = 'ASC', $type = self::TYPE_TEXT)
+    public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
     {
         $this->orderBy        = $fieldName;
         $this->orderDirection = $direction;
@@ -367,7 +359,7 @@ class Query
     /**
      * Get order by field
      *
-     * @return array
+     * @return string
      */
     public function getOrderBy()
     {

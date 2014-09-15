@@ -77,7 +77,15 @@ class SearchResultsExtension extends AbstractExtension
                 $entityName = $record->getValue('entityName');
                 $recordId   = $record->getValue('recordId');
                 if ($entityName && $recordId) {
-                    return new ResultItem($this->em, $entityName, $recordId);
+                    return new ResultItem(
+                        $this->em,
+                        $entityName,
+                        $recordId,
+                        null,
+                        null,
+                        null,
+                        $this->mapper->getEntityConfig($entityName)
+                    );
                 }
 
                 return null;
@@ -88,29 +96,19 @@ class SearchResultsExtension extends AbstractExtension
         $entities = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
-        /** @var ResultItem $row */
-        foreach ($rows as $row) {
-            $entityName = $row->getEntityName();
-            $entityId   = $row->getRecordId();
+        /** @var ResultItem $item */
+        foreach ($rows as $item) {
+            $entityName = $item->getEntityName();
+            $entityId   = $item->getRecordId();
             if (!isset($entities[$entityName][$entityId])) {
                 continue;
             }
 
             $entity = $entities[$entityName][$entityId];
 
-            $item = new ResultItem(
-                $this->em,
-                $entityName,
-                $entityId,
-                null,
-                null,
-                null,
-                $this->mapper->getEntityConfig($entityName)
-            );
+            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
 
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
-
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
         }
 
         // set results

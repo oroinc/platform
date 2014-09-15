@@ -72,7 +72,12 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->createAttribute('attribute_two'),
         );
 
-        $this->configurationPass->expects($this->once())
+        $this->configurationPass->expects($this->at(0))
+            ->method('passConfiguration')
+            ->with($options['attribute_fields'])
+            ->will($this->returnValue($expectedOptions['attribute_fields']));
+
+        $this->configurationPass->expects($this->at(1))
             ->method('passConfiguration')
             ->with($options['attribute_default_values'])
             ->will($this->returnValue($expectedOptions['attribute_default_values']));

@@ -159,6 +159,7 @@ abstract class BaseDriver
     protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
@@ -168,7 +169,7 @@ abstract class BaseDriver
         }
         $whereExpr = $searchCondition['type'] . ' (' . $searchString . ')';
 
-        $this->setFieldValueStringParameter($qb, $index, $searchCondition['fieldValue'], $searchCondition['condition']);
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
 
         if ($useFieldName) {
             $qb->setParameter('field' . $index, $searchCondition['fieldName']);
@@ -179,6 +180,23 @@ abstract class BaseDriver
         }
 
         return $whereExpr;
+    }
+
+    /**
+     * @param array|string $fieldValue
+     * @return array|string
+     */
+    protected function filterTextFieldValue($fieldValue)
+    {
+        if (is_string($fieldValue)) {
+            $fieldValue = Query::clearString($fieldValue);
+        } elseif (is_array($fieldValue)) {
+            foreach ($fieldValue as $key => $value) {
+                $fieldValue[$key] = Query::clearString($value);
+            }
+        }
+
+        return $fieldValue;
     }
 
     /**

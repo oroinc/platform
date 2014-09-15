@@ -274,11 +274,13 @@ class Orm extends AbstractEngine
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $entityManager->flush();
+                $entityManager->clear();
             }
         }
 
         if ($itemsCount % static::BATCH_SIZE > 0) {
             $entityManager->flush();
+            $entityManager->clear();
         }
     }
 
