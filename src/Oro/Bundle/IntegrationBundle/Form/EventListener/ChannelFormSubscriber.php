@@ -13,7 +13,6 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\SettingsProvider;
-use Oro\Bundle\IntegrationBundle\Utils\FormUtils as IntegrationFormUtils;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
 
 class ChannelFormSubscriber implements EventSubscriberInterface
@@ -299,9 +298,13 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (IntegrationFormUtils::wasSyncedAtLeastOnce($integration)) {
+        if ($integration->getEditMode() !== Integration::EDIT_MODE_ALLOW) {
             // disable type field
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
+        }
+
+        if (Integration::EDIT_MODE_DISALLOW === $integration->getEditMode()) {
+            FormUtils::replaceField($form, 'connectors', ['disabled' => true, 'attr' => ['class' => 'hide']]);
         }
     }
 }

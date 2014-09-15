@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
+use Symfony\Component\Form\FormView;
+
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class FormUtilsTest extends \PHPUnit_Framework_TestCase
@@ -65,6 +67,46 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
                 ['auto_initialize' => false],
                 [],
                 ['required']
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider viewVariablesProvider
+     *
+     * @param array        $vars
+     * @param string|array $classToAppend
+     * @param array        $expectedVars
+     */
+    public function testAddClass($vars, $classToAppend, $expectedVars)
+    {
+        $formView       = new FormView();
+        $formView->vars = $vars;
+
+        FormUtils::appendClass($formView, $classToAppend);
+        $this->assertSame($expectedVars, $formView->vars);
+    }
+
+    /**
+     * @return array
+     */
+    public function viewVariablesProvider()
+    {
+        return [
+            'add single class'            => [
+                '$vars'          => [],
+                '$classToAppend' => 'singleClass',
+                '$expectedVars'  => ['attr' => ['class' => 'singleClass']]
+            ],
+            'add multiple classes'        => [
+                '$vars'          => [],
+                '$classToAppend' => ['1stClass', '2ndClass'],
+                '$expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass']]
+            ],
+            'should append, not override' => [
+                '$vars'          => ['attr' => ['class' => '1stClass'], 'another' => 'not overridden'],
+                '$classToAppend' => ['2ndClass'],
+                '$expectedVars'  => ['attr' => ['class' => '1stClass 2ndClass'], 'another' => 'not overridden']
             ]
         ];
     }

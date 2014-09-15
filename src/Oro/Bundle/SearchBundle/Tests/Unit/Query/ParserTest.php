@@ -51,17 +51,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Query::KEYWORD_OR, $searchCondition[1]['type']);
 
         $query = $parser->getQueryFromString(
-            'description ~ description order_by integer count desc '
+            'description ~ description order_by integer count desc'
         );
         $from = $query->getFrom();
         $this->assertEquals('*', $from[0]);
+        $this->assertEquals('count', $query->getOrderBy());
         $this->assertEquals(Query::TYPE_INTEGER, $query->getOrderType());
+        $this->assertEquals(Query::ORDER_DESC, $query->getOrderDirection());
 
         $query = $parser->getQueryFromString(
-            'from product where decimal price > 10'
+            'from product where decimal price > 10 order_by name max_results 10 offset 5'
         );
         $from = $query->getFrom();
         $this->assertEquals('product', $from[0]);
+        $this->assertEquals('name', $query->getOrderBy());
+        $this->assertEquals(Query::TYPE_TEXT, $query->getOrderType());
+        $this->assertEquals(Query::ORDER_ASC, $query->getOrderDirection());
+        $this->assertEquals(10, $query->getMaxResults());
+        $this->assertEquals(5, $query->getFirstResult());
 
         $this->setExpectedException('InvalidArgumentException');
         $parser->getQueryFromString(

@@ -13,6 +13,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 /**
  * @RouteResource("integration")
@@ -39,13 +40,21 @@ class IntegrationController extends FOSRestController
      */
     public function deleteAction($id)
     {
-        $entity   = $this->getManager()->find($id);
+        /** @var Integration $entity */
+        $entity = $this->getManager()->find($id);
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
-        if (!$this->get('oro_integration.delete_manager')->delete($entity)) {
+
+        if ($entity->getEditMode() === $entity::EDIT_MODE_DISALLOW) {
+            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+        }
+
+        $result = $this->get('oro_integration.delete_manager')->delete($entity);
+        if (!$result) {
             return $this->handleView($this->view(null, Codes::HTTP_INTERNAL_SERVER_ERROR));
         }
+
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
 

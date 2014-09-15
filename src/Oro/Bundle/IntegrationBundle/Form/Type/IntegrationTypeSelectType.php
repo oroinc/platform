@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class IntegrationTypeSelectType extends AbstractType
@@ -16,21 +16,16 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /** @var CoreAssetsHelper */
     protected $assetHelper;
 
     /**
-     * @param TypesRegistry       $registry
-     * @param TranslatorInterface $translator
-     * @param CoreAssetsHelper    $assetHelper
+     * @param TypesRegistry    $registry
+     * @param CoreAssetsHelper $assetHelper
      */
-    public function __construct(TypesRegistry $registry, TranslatorInterface $translator, CoreAssetsHelper $assetHelper)
+    public function __construct(TypesRegistry $registry, CoreAssetsHelper $assetHelper)
     {
-        $this->registry = $registry;
-        $this->translator = $translator;
+        $this->registry    = $registry;
         $this->assetHelper = $assetHelper;
     }
 
@@ -39,23 +34,13 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $isChoiceList = $options['choice_list']->getRemainingViews();
+        $choices = $options['choice_list']->getRemainingViews();
 
-        $this->rebuildChoiceList($isChoiceList);
-
-        if (empty($isChoiceList)) {
+        if (empty($choices)) {
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
         }
 
-        $vars = ['configs' => $options['configs']];
-
-        if ($form->getData()) {
-            $vars['attr'] = [
-                'data-selected-data' => json_encode([['id' => $form->getData(), 'text' => $form->getData()]])
-            ];
-        }
-
-        $view->vars = array_replace_recursive($view->vars, $vars);
+        $view->vars = array_replace_recursive($view->vars, ['configs' => $options['configs']]);
     }
 
     /**
@@ -66,10 +51,11 @@ class IntegrationTypeSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'empty_value' => '',
+                'choices'     => $this->getChoices(),
                 'configs'     => [
                     'placeholder'             => 'oro.form.choose_value',
-                    'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:select/result.html.twig',
-                    'selection_template_twig' => 'OroIntegrationBundle:Autocomplete:select/selection.html.twig',
+                    'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:type/result.html.twig',
+                    'selection_template_twig' => 'OroIntegrationBundle:Autocomplete:type/selection.html.twig',
                 ]
             ]
         );
@@ -92,19 +78,22 @@ class IntegrationTypeSelectType extends AbstractType
     }
 
     /**
-     * @param array $choiceList
-     *
-     * @return boolean
+     * @return array
      */
-    protected function rebuildChoiceList(array $choiceList)
+    protected function getChoices()
     {
-        foreach ($choiceList as $row) {
-            $data = json_decode($row->label, 1);
-            $data['label'] = $this->translator->trans($data['label']);
+        $choices     = [];
+        $choicesData = $this->registry->getAvailableIntegrationTypesDetailedData();
+
+        foreach ($choicesData as $typeName => $data) {
+            $attributes = [];
             if (!empty($data['icon'])) {
-                $data['icon'] = $this->assetHelper->getUrl($data['icon']);
+                $attributes['data-icon'] = $this->assetHelper->getUrl($data['icon']);
             }
-            $row->label = json_encode($data);
+
+            $choices[$typeName] = new ChoiceListItem($data['label'], $attributes);
         }
+
+        return $choices;
     }
 }
