@@ -317,6 +317,8 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             'create enabled acl allowed custom' => [
                 [
                     'grid_name'                    => 'test',
+                    'grid_parameters'              => ['testParam1' => 1],
+                    'grid_render_parameters'       => ['testParam2' => 2],
                     'converter'                    => $converter,
                     'entity_class'                 => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
                     'configs'                      => [
@@ -329,6 +331,8 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                 ],
                 [
                     'grid_name'                    => 'test',
+                    'grid_parameters'              => ['testParam1' => 1],
+                    'grid_render_parameters'       => ['testParam2' => 2],
                     'existing_entity_grid_id'      => 'id',
                     'create_form_route'            => 'test',
                     'create_enabled'               => true,

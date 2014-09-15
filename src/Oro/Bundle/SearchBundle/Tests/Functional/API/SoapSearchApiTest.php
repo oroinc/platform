@@ -25,7 +25,7 @@ class SoapSearchApiTest extends WebTestCase
     /**
      * @param array $request
      * @param array $response
-     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @dataProvider searchDataProvider
      */
     public function testSearch(array $request, array $response)

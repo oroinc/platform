@@ -219,6 +219,15 @@
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
         ],
         function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
+            {% set selectionUrl = null %}
+            {% if form.vars.grid_url is defined and form.vars.grid_url %}
+                {% set selectionUrl = form.vars.grid_url %}
+            {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
+                {% set selectionUrl = form.vars.selection_url %}
+            {% endif %}
+            {% set selectionRouteName = form.vars.selection_route|default(null) %}
+            {% set selectionRouteParameters = form.vars.selection_route_parameters|default({}) %}
+
             var widget = new MultipleEntity({
                 el: '#{{ id }}-container',
                 template: EntitiesTpl,
@@ -227,7 +236,9 @@
                 removedElement: '#{{ id }}_removed',
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
-                selectionUrl: {{ form.vars.grid_url|json_encode|raw }},
+                selectionUrl: {{ selectionUrl|json_encode|raw }},
+                selectionRouteName: {{ selectionRouteName|json_encode|raw }},
+                selectionRouteParams: {{ selectionRouteParameters|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                 allowAction: {{ form.vars.allow_action|json_encode|raw }},
                 collection: new MultipleEntityCollection(),
                 selectorWindowTitle: {{ form.vars.selector_window_title|trans|json_encode|raw }}
@@ -237,6 +248,10 @@
                 data.push(new MultipleEntityModel({{ element|json_encode|raw }}));
             {% endfor %}
             widget.getCollection().reset(data);
+
+            {% if form.vars.extra_config is defined and form.vars.extra_config %}
+                {{ block('oro_multiple_entity_js_' ~ form.vars.extra_config) }}
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -606,13 +621,14 @@
         <div class="input-append">
             {{ form_widget(form) }}
             <button class="add-on btn entity-select-btn"><i class="icon-align-justify"></i></button>
-        </div>
 
-        {% if form.vars.create_enabled %}
-            <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
-        {% endif %}
+            {% if form.vars.create_enabled %}
+                <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+            {% endif %}
+        </div>
     </div>
 
+    {% set _block = false %}
     {% if configs.extra_config is defined and configs.extra_config %}
         {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
     {% endif %}
@@ -621,24 +637,38 @@
     {% else %}
         <script type="text/javascript">
             require(['jquery', 'oroform/js/select-create-inline-type-handler'],
-                function ($, handler) {
-                    $(function() {
-                        // Initialize handler
-                        {% set createFormUrl = form.vars.create_enabled
-                            ? path(form.vars.create_form_route, form.vars.create_form_route_parameters)
-                            : null
-                        %}
-                        handler(
-                            $('#{{ id }}-el'),
-                            $('#{{ id }}'),
-                            {{ label|trans|json_encode|raw }},
-                            {{ path('oro_datagrid_widget', {'gridName': form.vars.grid_name})|json_encode|raw }},
-                            {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
-                            {{ form.vars.create_enabled|default(false)|json_encode|raw }},
-                            {{ createFormUrl|json_encode|raw }}
-                        );
-                    });
+            function ($, handler) {
+                $(function() {
+                    {% set urlParts = {
+                        grid: {
+                            route: 'oro_datagrid_widget',
+                            parameters: {
+                                gridName     : form.vars.grid_name,
+                                params       : form.vars.grid_parameters,
+                                renderParams : form.vars.grid_render_parameters
+                            }
+                        }
+                    } %}
+
+                    {% if form.vars.create_enabled|default(false) is sameas(true) %}
+                        {% set urlParts = urlParts|merge({
+                            create: {
+                                route:      form.vars.create_form_route,
+                                parameters: form.vars.create_form_route_parameters
+                            }
+                        }) %}
+                    {% endif %}
+
+                    handler(
+                        $('#{{ id }}-el'),
+                        $('#{{ id }}'),
+                        {{ label|trans|json_encode|raw }},
+                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
+                        {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
+                        {{ form.vars.create_enabled|default(false)|json_encode|raw }}
+                    );
                 });
+            });
         </script>
     {% endif %}
 {% endblock %}

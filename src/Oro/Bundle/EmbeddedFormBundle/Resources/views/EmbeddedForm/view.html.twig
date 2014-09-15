@@ -85,28 +85,37 @@
         </textarea>
     {% endset %}
 
+    {% set informationWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_embedded_form_info', {id: entity.id}),
+            'title': ''
+        }) }}
+    {% endset %}
+
     {% set dataBlocks = [{
         'title': 'General'|trans,
         'class': 'active',
         'subblocks': [
             {
                 'title': 'Details'|trans,
-    'data': [formDetails]
-    },
+                'data': [informationWidget]|merge([formDetails])
+            },
             {
-    'title': 'Form Preview'|trans,
-    'data': [formPreview]
-    }
-    ]
-    },{
-    'title': 'Get code'|trans,
-    'subblocks': [
-    {
-    'title': 'Code'|trans,
-    'data': [getCode]
-    }
+                'title': 'Form Preview'|trans,
+                'data': [formPreview]
+            }
         ]
-    }] %}
+    },
+    {
+        'title': 'Get code'|trans,
+        'subblocks': [{
+            'title': 'Code'|trans,
+            'data': [getCode]
+        }]
+    }]
+    %}
+
     {% set data = {
         'dataBlocks': dataBlocks
     } %}

@@ -2,35 +2,40 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\Config\Resolver\ResolverInterface;
 
 class WidgetAttributes
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var ResolverInterface */
+    protected $resolver;
+
     /**
-     * @param ConfigProvider $configProvider
-     * @param SecurityFacade $securityFacade
+     * @param ConfigProvider    $configProvider
+     * @param SecurityFacade    $securityFacade
+     * @param ResolverInterface $resolver
      */
-    public function __construct(ConfigProvider $configProvider, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        ConfigProvider $configProvider,
+        SecurityFacade $securityFacade,
+        ResolverInterface $resolver
+    ) {
         $this->configProvider = $configProvider;
         $this->securityFacade = $securityFacade;
+        $this->resolver       = $resolver;
     }
 
     /**
      * Returns widget attributes with attribute name converted to use in widget's TWIG template
      *
      * @param string $widgetName The name of widget
+     *
      * @return array
      */
     public function getWidgetAttributesForTwig($widgetName)
@@ -60,21 +65,32 @@ class WidgetAttributes
      * Returns a list of items for the given widget
      *
      * @param string $widgetName The name of widget
+     *
      * @return array
      */
     public function getWidgetItems($widgetName)
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
-        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
+        $securityFacade = $this->securityFacade;
+        $resolver       = $this->resolver;
 
-        foreach ($items as $itemName => &$item) {
-            if (!isset($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
-                unset($item['acl']);
-            } else {
-                unset($items[$itemName]);
+        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
+        $items = array_filter(
+            $items,
+            function (&$item) use ($securityFacade, $resolver) {
+                $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
+                $applicable    = true;
+                if (isset($item['applicable'])) {
+                    $resolved   = $resolver->resolve([$item['applicable']]);
+                    $applicable = reset($resolved);
+                }
+
+                unset ($item['acl'], $item['applicable']);
+
+                return $accessGranted && $applicable;
             }
-        }
+        );
 
         return $items;
     }
