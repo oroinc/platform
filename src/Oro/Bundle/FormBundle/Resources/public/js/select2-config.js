@@ -145,7 +145,7 @@ define(['jquery', 'underscore'
                         if (typeof select2AjaxOptions.results == 'function') {
                             response = select2AjaxOptions.results.call(select2Obj, response, 1);
                         }
-                        if (typeof response.results != 'undefined' && response.results.length > 0) {
+                        if (typeof response.results != 'undefined') {
                             handleResults(response.results);
                         }
                     }
