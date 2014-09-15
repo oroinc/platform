@@ -15,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class RecordOwnerDataListener
 {
@@ -67,7 +67,7 @@ class RecordOwnerDataListener
                 if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
                     $owner = $user;
                 } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
-                    && $token instanceof UsernamePasswordOrganizationToken
+                    && $token instanceof OrganizationContextTokenInterface
                 ) {
                     $owner = $token->getOrganizationContext();
                 }
@@ -89,7 +89,7 @@ class RecordOwnerDataListener
      */
     protected function setDefaultOrganization(TokenInterface $token, ConfigInterface $config, $entity)
     {
-        if ($token instanceof UsernamePasswordOrganizationToken && $config->has('organization_field_name')) {
+        if ($token instanceof OrganizationContextTokenInterface && $config->has('organization_field_name')) {
             $accessor = PropertyAccess::createPropertyAccessor();
             $fieldName = $config->get('organization_field_name');
             if (!$accessor->getValue($entity, $fieldName)) {

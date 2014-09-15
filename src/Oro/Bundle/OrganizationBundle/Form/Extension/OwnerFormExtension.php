@@ -19,10 +19,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -30,6 +28,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -500,7 +499,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getOrganizationContextId()
     {
         $token = $this->securityContext->getToken();
-        if ($token instanceof UsernamePasswordOrganizationToken) {
+        if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext()->getId();
         }
 

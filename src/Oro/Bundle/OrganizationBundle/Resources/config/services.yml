@@ -54,6 +54,7 @@ services:
     #
     oro_organization.organization.manager.api:
         class: %oro_organization.organization.manager.api.class%
+        parent: oro_soap.managet.entity_manager.abstract
         arguments:
             - %oro_organization.organization.entity.class%
             - @doctrine.orm.entity_manager

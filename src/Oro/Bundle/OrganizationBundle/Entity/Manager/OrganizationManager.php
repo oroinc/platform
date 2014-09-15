@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationManager
 {
@@ -56,5 +57,17 @@ class OrganizationManager
         if ($flush) {
             $this->em->flush();
         }
+    }
+
+    /**
+     * @param User   $user
+     * @param string $name Organization name
+     * @param bool   $useLikeExpr Using expr()->like by default and expr()->eq otherwise
+     *
+     * @return Organization[]
+     */
+    public function getEnabledUserOrganizationsByName(User $user, $name, $useLikeExpr = true)
+    {
+        return $this->getOrganizationRepo()->getEnabledByUserAndName($user, $name, $useLikeExpr);
     }
 }
