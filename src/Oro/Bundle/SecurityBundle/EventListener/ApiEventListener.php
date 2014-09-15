@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Oro\Bundle\SoapBundle\Event\DeleteBefore;
-use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Bundle\SoapBundle\Event\FindAfter;
+use Oro\Bundle\SoapBundle\Event\GetListBefore;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SoapBundle\Event\GetListBefore;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ApiEventListener
 {

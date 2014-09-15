@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-
 use Doctrine\Common\Collections\Criteria;
+
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\SecurityBundle\EventListener\ApiEventListener;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
-use Symfony\Component\HttpFoundation\Request;
 
 class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
 {

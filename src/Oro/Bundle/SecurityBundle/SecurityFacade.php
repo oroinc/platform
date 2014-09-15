@@ -255,7 +255,7 @@ class SecurityFacade
      *
      * @param Request $request
      * @param         $object
-     * @return int -1 if no access, 0 if can't decide, 1 is access is granted
+     * @return int -1 if no access, 0 if can't decide, 1 if access is granted
      */
     public function isRequestObjectIsGranted(Request $request, $object)
     {
