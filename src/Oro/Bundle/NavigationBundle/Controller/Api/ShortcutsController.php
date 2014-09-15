@@ -9,8 +9,10 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\Rest\Util\Codes;
+
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Knp\Menu\ItemInterface;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -54,6 +56,7 @@ class ShortcutsController extends FOSRestController
     /**
      * @param ItemInterface $items
      * @param $query
+     *
      * @return array
      */
     protected function getResults(ItemInterface $items, $query)
@@ -65,7 +68,7 @@ class ShortcutsController extends FOSRestController
         $result = array();
         /** @var $item ItemInterface */
         foreach ($iterator as $item) {
-            if ($item->getExtra('isAllowed') && !in_array($item->getUri(), $this->uris) && $item->getUri() !== '#') {
+            if ($this->isItemAllowed($item)) {
                 $key = $translator->trans($item->getLabel());
                 if (strpos(strtolower($key), strtolower($query)) !== false) {
                     $result[$key] = array('url' => $item->getUri());
@@ -75,5 +78,20 @@ class ShortcutsController extends FOSRestController
         }
 
         return $result;
+    }
+
+    /**
+     * @param ItemInterface $item
+     *
+     * @return bool
+     */
+    protected function isItemAllowed(ItemInterface $item)
+    {
+        return (
+            $item->getExtra('isAllowed')
+            && !in_array($item->getUri(), $this->uris)
+            && $item->getUri() !== '#'
+            && $item->isDisplayed()
+        );
     }
 }

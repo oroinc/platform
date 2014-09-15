@@ -28,7 +28,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $adapter;
+    protected $engine;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -94,10 +94,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->adapter = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\AbstractEngine')
-            ->disableOriginalConstructor()
-            ->setMethods(array('search'))
-            ->getMockForAbstractClass();
+        $this->engine = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
 
         $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
             ->disableOriginalConstructor()
@@ -135,7 +132,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
         $this->indexService = new Indexer(
             $this->entityManager,
-            $this->adapter,
+            $this->engine,
             $this->mapper,
             $this->securityProvider
         );
@@ -157,7 +154,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $resultItem = new Item($this->entityManager);
         $searchResults = array($resultItem);
 
-        $this->adapter->expects($this->once())
+        $this->engine->expects($this->once())
             ->method('search')
             ->will(
                 $this->returnCallback(
@@ -237,7 +234,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     {
         $searchResults = array('one', 'two', 'three');
 
-        $this->adapter->expects($this->any())
+        $this->engine->expects($this->any())
             ->method('search')
             ->will(
                 $this->returnCallback(
@@ -264,7 +261,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     {
         $searchResults = array('one', 'two', 'three');
 
-        $this->adapter->expects($this->any())
+        $this->engine->expects($this->any())
             ->method('search')
             ->will(
                 $this->returnCallback(

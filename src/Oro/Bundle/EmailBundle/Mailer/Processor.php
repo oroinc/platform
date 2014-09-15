@@ -39,6 +39,9 @@ class Processor
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
 
+    /** @var array */
+    protected $origins = array();
+
     /**
      * @param DoctrineHelper       $doctrineHelper
      * @param \Swift_Mailer        $mailer
@@ -131,29 +134,33 @@ class Processor
      */
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
-        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-            $this->getEntityManager(),
-            $this->emailAddressHelper->extractPureEmailAddress($email)
-        );
-
-        if ($emailOwner instanceof User) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                function ($item) {
-                    return $item instanceof InternalEmailOrigin;
-                }
+        $originKey = $originName . $email;
+        if (!array_key_exists($originKey, $this->origins)) {
+            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+                $this->getEntityManager(),
+                $this->emailAddressHelper->extractPureEmailAddress($email)
             );
 
-            $origin = $origins->isEmpty() ? null : $origins->first();
-            if ($origin == null) {
-                $origin = $this->createUserInternalOrigin($emailOwner);
+            if ($emailOwner instanceof User) {
+                $origins = $emailOwner->getEmailOrigins()->filter(
+                    function ($item) {
+                        return $item instanceof InternalEmailOrigin;
+                    }
+                );
+
+                $origin = $origins->isEmpty() ? null : $origins->first();
+                if ($origin == null) {
+                    $origin = $this->createUserInternalOrigin($emailOwner);
+                }
+            } else {
+                $origin = $this->getEntityManager()
+                    ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                    ->findOneBy(array('internalName' => $originName));
             }
-        } else {
-            $origin = $this->getEntityManager()
-                ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                ->findOneBy(array('internalName' => $originName));
+            $this->origins[$originKey] = $origin;
         }
 
-        return $origin;
+        return $this->origins[$originKey];
     }
 
     /**

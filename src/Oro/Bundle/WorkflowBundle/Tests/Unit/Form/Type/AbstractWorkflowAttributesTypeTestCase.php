@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
@@ -140,7 +141,8 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
             $attributeGuesser,
             $defaultValuesListener,
             $initActionListener,
-            $requiredAttributesListener
+            $requiredAttributesListener,
+            new ContextAccessor()
         );
     }
 

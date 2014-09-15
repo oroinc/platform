@@ -98,6 +98,20 @@ class ResponseHistoryListener
             ->findOneBy($postArray);
 
         if (!$historyItem) {
+            $routeParameters = $request->get('_route_params');
+            unset($routeParameters['id']);
+
+            $entityId = filter_var($request->get('id'), FILTER_VALIDATE_INT);
+            if (false !== $entityId) {
+                $entityId = (int)$entityId;
+            } else {
+                $entityId = null;
+            }
+
+            $postArray['route']           = $request->get('_route');
+            $postArray['routeParameters'] = $routeParameters;
+            $postArray['entityId']        = $entityId;
+
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
                 NavigationHistoryItem::NAVIGATION_HISTORY_ITEM_TYPE,
