@@ -1,16 +1,24 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oroui/js/modal', './abstract-action'
-    ], function (_, messenger, __, Modal, AbstractAction) {
+define([
+    'underscore',
+    'oroui/js/messenger',
+    'orotranslation/js/translator',
+    'oroui/js/modal',
+    './abstract-action'
+], function (_, messenger, __, Modal, AbstractAction) {
     'use strict';
+
+    var MassAction;
 
     /**
      * Basic mass action class.
      *
-     * @export  orodatagrid/js/datagrid/action/mass-action
-     * @class   orodatagrid.datagrid.action.MassAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/mass-action
+     * @class   oro.datagrid.action.MassAction
+     * @extends oro.datagrid.action.AbstractAction
      */
-    return AbstractAction.extend({
+    MassAction = AbstractAction.extend({
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Mass Action Confirmation',
@@ -22,8 +30,11 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
         },
 
         initialize: function (options) {
-            AbstractAction.prototype.initialize.apply(this, arguments);
-            this.route_parameters = _.extend(this.route_parameters, {gridName: this.datagrid.name, actionName: this.name});
+            MassAction.__super__.initialize.apply(this, arguments);
+            _.extend(this.route_parameters, {
+                gridName: this.datagrid.name,
+                actionName: this.name
+            });
         },
 
         /**
@@ -34,7 +45,7 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
             } else {
-                AbstractAction.prototype.execute.call(this);
+                MassAction.__super__.execute.call(this);
             }
         },
 
@@ -64,7 +75,9 @@ define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oro
 
         _onAjaxSuccess: function (data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
-            AbstractAction.prototype._onAjaxSuccess.apply(this, arguments);
+            MassAction.__super__._onAjaxSuccess.apply(this, arguments);
         }
     });
+
+    return MassAction;
 });

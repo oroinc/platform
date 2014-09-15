@@ -3,7 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
@@ -27,7 +29,7 @@ class SearchIndexRepository extends EntityRepository
     /**
      * Search query to index
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return array
      */
@@ -39,7 +41,7 @@ class SearchIndexRepository extends EntityRepository
     /**
      * Get count of records without limit parameters in query
      *
-     * @param \Oro\Bundle\SearchBundle\Query\Query $query
+     * @param Query $query
      *
      * @return integer
      */
@@ -59,6 +61,14 @@ class SearchIndexRepository extends EntityRepository
     }
 
     /**
+     * Truncate all search index tables
+     */
+    public function truncateIndex()
+    {
+        $this->getDriverRepo()->truncateIndex();
+    }
+
+    /**
      * Get driver repository
      *
      * @return \Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver
@@ -74,5 +84,66 @@ class SearchIndexRepository extends EntityRepository
         }
 
         return $this->driverRepo;
+    }
+
+    /**
+     * Returns array of search items in following format:
+     * array(
+     *      '<entityClass>' => array(
+     *          <entityIdentifier> => <instance of OroSearchBundle:Item>,
+     *          ...
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $entities
+     * @return array
+     */
+    public function getItemsForEntities(array $entities)
+    {
+        if (!$entities) {
+            return array();
+        }
+
+        $entityManager = $this->getEntityManager();
+
+        $identifiers = array();
+        foreach ($entities as $entity) {
+            $class = ClassUtils::getClass($entity);
+            $ids   = $entityManager->getClassMetadata($class)->getIdentifierValues($entity);
+
+            if (!empty($ids)) {
+                $identifiers[$class][] = current($ids);
+            }
+        }
+
+        if (!$identifiers) {
+            return array();
+        }
+
+        $queryBuilder = $this->createQueryBuilder('item');
+        $parameterCounter = 0;
+
+        foreach ($identifiers as $class => $entityIds) {
+            $parameterName = 'class_' . $parameterCounter;
+            $parameterCounter++;
+
+            $entityCondition = 'item.entity = :' . $parameterName . ' AND ' .
+                $queryBuilder->expr()->in('item.recordId', $entityIds);
+            $queryBuilder->orWhere($entityCondition)
+                ->setParameter($parameterName, $class);
+        }
+
+        /** @var Item[] $items */
+        $items = $queryBuilder->getQuery()->getResult();
+
+        $groupedItems = array();
+        foreach ($items as $item) {
+            $class = $item->getEntity();
+            $id    = $item->getRecordId();
+            $groupedItems[$class][$id] = $item;
+        }
+
+        return $groupedItems;
     }
 }

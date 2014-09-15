@@ -1,5 +1,2 @@
-services:
-    oro_requirejs.cache:
-          parent: oro.cache.abstract
-          calls:
-              - [ setNamespace, [ "oro_requirejs.cache" ] ]
+oro_require_js:
+    cache_impl: oro_requirejs.cache

@@ -1,9 +1,15 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['backbone', 'backgrid', '../actions-panel'
-    ], function (Backbone, Backgrid, ActionsPanel) {
+define([
+    'underscore',
+    'backbone',
+    'backgrid',
+    '../actions-panel'
+], function (_, Backbone, Backgrid, ActionsPanel) {
     "use strict";
 
-    var $ = Backbone.$;
+    var $, ActionHeaderCell;
+    $ = Backbone.$;
 
     /**
      *
@@ -12,7 +18,7 @@ define(['backbone', 'backgrid', '../actions-panel'
      * @class   orodatagrid.datagrid.headerCell.ActionHeaderCell
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    ActionHeaderCell = Backbone.View.extend({
         /** @property */
         className: 'action-column',
 
@@ -35,11 +41,24 @@ define(['backbone', 'backgrid', '../actions-panel'
                 this.column = new Backgrid.Column(this.column);
             }
 
+            this.subviews = [];
             this.createActionsPanel();
 
             datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.actionsPanel;
+            delete this.column;
+            ActionHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
         createActionsPanel: function () {
@@ -55,6 +74,8 @@ define(['backbone', 'backgrid', '../actions-panel'
 
             this.actionsPanel = new ActionsPanel();
             this.actionsPanel.setActions(actions);
+
+            this.subviews.push(this.actionsPanel);
         },
 
         render: function () {
@@ -79,4 +100,6 @@ define(['backbone', 'backgrid', '../actions-panel'
             this.$(this.options.controls).addClass('disabled');
         }
     });
+
+    return ActionHeaderCell;
 });

@@ -45,6 +45,8 @@ workflows:
                     class: foo
                 form_type: custom_workflow_transition
                 display_type: page
+                page_template: Workflow:Test:pageTemplate.html.twig
+                dialog_template: Workflow:Test:dialogTemplate.html.twig
                 form_options:
                     attribute_fields:
                         first_attribute:

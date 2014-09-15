@@ -44,12 +44,10 @@ abstract class AbstractMapper
      */
     public function getEntityMapParameter($entity, $parameter, $defaultValue = false)
     {
-        if ($this->getEntityConfig($entity)) {
-            $entityConfig = $this->getEntityConfig($entity);
+        $entityConfig = $this->getEntityConfig($entity);
 
-            if (isset($entityConfig[$parameter])) {
-                return $entityConfig[$parameter];
-            }
+        if ($entityConfig && isset($entityConfig[$parameter])) {
+            return $entityConfig[$parameter];
         }
 
         return $defaultValue;
@@ -127,7 +125,8 @@ abstract class AbstractMapper
                     if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
                         $objectData[$fieldConfig['target_type']][$targetField] = '';
                     }
-                    $objectData[$fieldConfig['target_type']][$targetField] .= $value . ' ';
+
+                    $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
                 }
 
                 $textAllDataField = '';
@@ -135,11 +134,8 @@ abstract class AbstractMapper
                     $textAllDataField = $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD];
                 }
 
-                $textAllDataField .= sprintf(
-                    '%s %s ',
-                    $value,
-                    Query::clearString($value)
-                );
+                $clearedValue = Query::clearString($value);
+                $textAllDataField .= sprintf(' %s %s ', $value, $clearedValue);
 
                 $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = implode(
                     Query::DELIMITER,
@@ -150,6 +146,8 @@ abstract class AbstractMapper
                         )
                     )
                 );
+
+                $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
             }
         }
 

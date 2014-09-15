@@ -63,15 +63,55 @@ class AbstractEmailTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider isEqualDataProvider
+     *
+     * @param AbstractEmail $first
+     * @param mixed $second
+     * @param bool $expectedResult
+     */
+    public function testIsEqual(AbstractEmail $first, $second, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, $first->isEqual($second));
+    }
+
+    /**
+     * @return array
+     */
+    public function isEqualDataProvider()
+    {
+        $emailEmpty   = $this->createEmail();
+        $emailAddress = $this->createEmail('a@a.a');
+
+        return array(
+            'both empty'           => array($emailEmpty, $emailEmpty, true),
+            'one empty one unset'  => array($emailEmpty, null, false),
+            'one empty'            => array($this->createEmail(100), $emailEmpty, false),
+            'both with same id'    => array($this->createEmail('a@a.a', 100), $this->createEmail('b@b.b', 100), true),
+            'equals not empty'     => array($emailAddress, $emailAddress, true),
+            'not equals not empty' => array($emailAddress, $this->createEmail('b@b.b'), false),
+        );
+    }
+
+    /**
      * @param string|null $email
+     * @param int $id
      * @return AbstractEmail|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createEmail($email = null)
+    protected function createEmail($email = null, $id = null)
     {
         $arguments = array();
+
         if ($email) {
             $arguments[] = $email;
         }
-        return $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractEmail', $arguments);
+
+        /** @var AbstractEmail $email */
+        $email = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractEmail', $arguments);
+
+        if ($id) {
+            $email->setId($id);
+        }
+
+        return $email;
     }
 }

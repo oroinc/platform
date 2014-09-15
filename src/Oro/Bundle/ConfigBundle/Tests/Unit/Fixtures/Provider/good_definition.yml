@@ -1,30 +1,39 @@
 oro_system_configuration:
     fields:
         some_field:
+            data_type: string
             type: text
             options: []
 
         some_another_field:
+            data_type: string
             type: choice
+
+        some_ui_only_field:
+            ui_only: true
+            type: text
+
+        some_api_only_field:
+            data_type: integer
 
     groups:
         first_group:
             title: 'First group'
 
         second_group:
-          title: 'Second group'
+            title: 'Second group'
 
         third_group:
-          title: 'Third group'
+            title: 'Third group'
 
         fourth_group:
-          title: 'Fourth group'
+            title: 'Fourth group'
 
         another_branch_first:
-          title: 'Another branch first group'
+            title: 'Another branch first group'
 
         another_branch_second:
-          title: 'Another branch second group'
+            title: 'Another branch second group'
 
 
     tree:
@@ -46,3 +55,10 @@ oro_system_configuration:
                                 children:
                                     another_branch_second:
                                         children: []
+
+    api_tree:
+        section1:
+            some_field: ~
+            some_api_only_field: ~
+            section11:
+                some_another_field: ~

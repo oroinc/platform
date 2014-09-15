@@ -244,6 +244,12 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->scalarNode('page_template')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('dialog_template')
+                        ->defaultNull()
+                    ->end()
                 ->end()
                 ->validate()
                     ->always(

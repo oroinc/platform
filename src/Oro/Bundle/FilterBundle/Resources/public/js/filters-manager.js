@@ -1,9 +1,18 @@
-/*jshint devel: true, multistr: true*/
+/*jshint devel:true, multistr:true*/
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools',
-        './multiselect-decorator', './datafilter-wrapper'
-    ], function ($, _, Backbone, mediator, tools, MultiselectDecorator, filterWrapper) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'oroui/js/mediator',
+    'oroui/js/tools',
+    './multiselect-decorator',
+    './datafilter-wrapper'
+], function ($, _, Backbone, mediator, tools, MultiselectDecorator, filterWrapper) {
     'use strict';
+
+    var FiltersManager;
 
     /**
      * View that represents all grid filters
@@ -16,7 +25,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
      * @event updateFilter  on update data of specific filter
      * @event disableFilter on disable specific filter
      */
-    return Backbone.View.extend({
+    FiltersManager = Backbone.View.extend({
         /**
          * List of filter objects
          *
@@ -88,33 +97,45 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
                     _.extend(filter, filterWrapper);
                 }
 
-                this.listenTo(filter, "update", this._onFilterUpdated);
-                this.listenTo(filter, "disable", this._onFilterDisabled);
+                this.listenTo(filter, {
+                    'update': this._onFilterUpdated,
+                    'disable': this._onFilterDisabled
+                });
             }, this);
 
             if (options.addButtonHint) {
                 this.addButtonHint = options.addButtonHint;
             }
 
-            Backbone.View.prototype.initialize.apply(this, arguments);
-
-            // destroy events bindings
-            mediator.once('page:request', function () {
-                _.each(this.filters, function (filter) {
-                    this.stopListening(filter, "update", this._onFilterUpdated);
-                    this.stopListening(filter, "disable", this._onFilterDisabled);
-                }, this);
-            }, this);
+            FiltersManager.__super__.initialize.apply(this, arguments);
 
             if (tools.isMobile()) {
-                this.collection.on('beforeFetch', this.closeDropdown, this);
+                this.listenTo(this.collection, 'beforeFetch', this.closeDropdown);
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.filters, function (filter) {
+                filter.dispose();
+            });
+            delete this.filters;
+            if (this.selectWidget) {
+                this.selectWidget.dispose();
+                delete this.selectWidget;
+            }
+            FiltersManager.__super__.dispose.call(this);
         },
 
         /**
          * Triggers when filter is updated
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
         _onFilterUpdated: function (filter) {
@@ -124,7 +145,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Triggers when filter is disabled
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
         _onFilterDisabled: function (filter) {
@@ -170,17 +191,17 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
         /**
          * Enable filter
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
-        enableFilter: function(filter) {
+        enableFilter: function (filter) {
             return this.enableFilters([filter]);
         },
 
         /**
          * Disable filter
          *
-         * @param {orofilter.filter.AbstractFilter} filter
+         * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
         disableFilter: function (filter) {
@@ -228,7 +249,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
             }
             var optionsSelectors = [];
 
-            _.each(filters, function(filter) {
+            _.each(filters, function (filter) {
                 filter.disable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
@@ -289,7 +310,7 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
                     selectedList: 0,
                     selectedText: this.addButtonHint,
                     classes: 'filter-list select-filter-widget',
-                    open: $.proxy(function() {
+                    open: $.proxy(function () {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._updateDropdownPosition();
@@ -381,4 +402,6 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/tools
             this.$el.find('.dropdown').removeClass('oro-open');
         }
     });
+
+    return FiltersManager;
 });

@@ -1,16 +1,22 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', './select-filter'
-    ], function (_, __, SelectFilter) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    './select-filter'
+], function (_, __, SelectFilter) {
     'use strict';
+
+    var MultiSelectFilter;
 
     /**
      * Multiple select filter: filter values as multiple select options
      *
-     * @export  orofilter/js/filter/multiselect-filter
-     * @class   orofilter.filter.MultiSelectFilter
-     * @extends orofilter.filter.SelectFilter
+     * @export  oro/filter/multiselect-filter
+     * @class   oro.filter.MultiSelectFilter
+     * @extends oro.filter.SelectFilter
      */
-    return SelectFilter.extend({
+    MultiSelectFilter = SelectFilter.extend({
         /**
          * Filter selector template
          *
@@ -31,9 +37,11 @@ define(['underscore', 'orotranslation/js/translator', './select-filter'
         /**
          * @inheritDoc
          */
-        _onSelectChange: function() {
-            SelectFilter.prototype._onSelectChange.apply(this, arguments);
+        _onSelectChange: function () {
+            MultiSelectFilter.__super__._onSelectChange.apply(this, arguments);
             this._setDropdownWidth();
         }
     });
+
+    return MultiSelectFilter;
 });

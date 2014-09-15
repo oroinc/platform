@@ -13,10 +13,8 @@ class SearchResultProperty extends TwigTemplateProperty
     /** @var array */
     protected $entitiesConfig;
 
-    public function __construct(
-        \Twig_Environment $environment,
-        $config
-    ) {
+    public function __construct(\Twig_Environment $environment, $config)
+    {
         parent::__construct($environment);
 
         $this->entitiesConfig = $config;
@@ -38,8 +36,7 @@ class SearchResultProperty extends TwigTemplateProperty
             $searchTemplate = $this->entitiesConfig[$entityClass]['search_template'];
         }
 
-        $template = $this->params->offsetGetOr('template', false);
-        if (!$template) {
+        if (!$this->params->offsetGetOr('template', false)) {
             $this->params->offsetSet('template', $searchTemplate);
         }
 

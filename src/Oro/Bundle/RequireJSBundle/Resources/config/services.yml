@@ -10,11 +10,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_requirejs.cache:
-          parent: oro.cache.abstract
-          calls:
-              - [setNamespace, ['oro_requirejs.cache']]
-
     oro_requirejs_config_provider:
         class: %oro_requirejs.provider.config.class%
         arguments:
@@ -22,3 +17,8 @@ services:
             - @templating
             - OroRequireJSBundle::require_config.js.twig
         lazy: true
+
+    oro_requirejs.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_requirejs.cache" ] ]

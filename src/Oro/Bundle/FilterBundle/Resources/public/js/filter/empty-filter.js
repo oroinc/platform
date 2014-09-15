@@ -1,14 +1,21 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/tools',
+    './abstract-filter'
 ], function ($, _, tools, AbstractFilter) {
     'use strict';
 
+    var EmptyFilter;
+
     /**
-     * @export  orofilter/js/filter/empty-filter
-     * @class   orofilter.filter.EmptyFilter
-     * @extends orofilter.filter.AbstractFilter
+     * @export  oro/filter/empty-filter
+     * @class   oro.filter.EmptyFilter
+     * @extends oro.filter.AbstractFilter
      */
-    return AbstractFilter.extend({
+    EmptyFilter = AbstractFilter.extend({
 
         /**
          * Template selector for filter criteria
@@ -16,6 +23,13 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
          * @property
          */
         emptyOption: 'filter_empty_option',
+
+        /**
+         * Template selector for filter criteria
+         *
+         * @property
+         */
+        notEmptyOption: 'filter_not_empty_option',
 
         /**
          * Stores old value for empty filter
@@ -110,14 +124,14 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
             var type = container.find(this.criteriaValueSelectors.type).val();
             var button = container.find(this.updateSelector);
 
-            if (type == this.emptyOption) {
+            if (this.isEmptyType(type)) {
                 var query = item.val();
-                if (query != this.emptyOption) {
+                if (!this.isEmptyType(query)) {
                     this.query = query;
                     this.revertQuery = true;
                 }
 
-                item.hide().val(this.emptyOption);
+                item.hide().val(type);
                 button.addClass(this.updateSelectorEmptyClass);
 
                 return;
@@ -137,8 +151,8 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
         /**
          * @inheritDoc
          */
-        isEmptyValue: function() {
-            if (this.value.type === this.emptyOption) {
+        isEmptyValue: function () {
+            if (this.isEmptyType(this.value.type)) {
                 return false;
             }
 
@@ -146,6 +160,16 @@ define(['jquery', 'underscore', 'oroui/js/tools', './abstract-filter'
                 return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
             return true;
+        },
+
+        /**
+         * @param {String} type
+         * @returns {Boolean}
+         */
+        isEmptyType: function(type) {
+            return _.contains([this.emptyOption, this.notEmptyOption], type);
         }
     });
+
+    return EmptyFilter;
 });

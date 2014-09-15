@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
