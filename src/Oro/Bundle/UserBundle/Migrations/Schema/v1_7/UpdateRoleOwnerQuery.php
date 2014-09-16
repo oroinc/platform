@@ -36,7 +36,7 @@ class UpdateRoleOwnerQuery extends ParametrizedMigrationQuery
     {
         $className = 'Oro\Bundle\UserBundle\Entity\Role';
         $classConfig = $this->loadEntityConfigData($logger, $className);
-        $data = unserialize($classConfig['data']);
+        $data = $this->connection->convertToPHPValue($classConfig['data'], 'array');
 
         unset($data['ownership']);
 

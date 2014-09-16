@@ -56,7 +56,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
     {
         $classConfig = $this->loadEntityConfigData($logger, $this->className);
         if ($classConfig) {
-            $data = unserialize($classConfig['data']);
+            $data = $this->connection->convertToPHPValue($classConfig['data'], 'array');
 
             $data = $this->getNewData($data);
 
