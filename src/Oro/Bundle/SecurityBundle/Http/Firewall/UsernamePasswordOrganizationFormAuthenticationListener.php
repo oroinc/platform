@@ -36,6 +36,7 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         SecurityContextInterface $securityContext,

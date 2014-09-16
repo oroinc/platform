@@ -124,6 +124,9 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param FormBuilderInterface $builder
      * @param array                $options
      * @throws \LogicException when getOwner method isn't implemented for entity with ownership type
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

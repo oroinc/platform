@@ -23,6 +23,8 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 /**
  * Class ACLHelper
  * This class analyse input query for acl and mark it with ORO_ACL_WALKER if it need to be ACL protected.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclHelper
 {

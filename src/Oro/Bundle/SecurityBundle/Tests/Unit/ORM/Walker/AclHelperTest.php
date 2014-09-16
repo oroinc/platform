@@ -123,6 +123,11 @@ class AclHelperTest extends OrmTestCase
         $this->assertNotEmpty($query->getSQL());
     }
 
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function dataProvider()
     {
         return [
