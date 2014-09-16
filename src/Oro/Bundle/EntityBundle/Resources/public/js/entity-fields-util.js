@@ -1,6 +1,10 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['underscore'], function (_) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/mediator'
+], function (_, __, mediator) {
     'use strict';
 
     function Util(entity, data) {
@@ -39,11 +43,18 @@ define(['underscore'], function (_) {
         return fields;
     };
 
+    Util.errorHandler = (function () {
+        var message, handler;
+        message = __('oro.entity.not_exist');
+        handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
+        return _.throttle(handler, 100, {trailing: false});
+    }());
+
     Util.prototype = {
 
         init: function (entity, data) {
             this.entity = entity;
-            this.data = data;
+            this.data = data || {};
         },
 
         /**
@@ -88,39 +99,44 @@ define(['underscore'], function (_) {
                 return this.entity ? chain : [];
             }
 
-            _.each(path.split('+'), function (item, i) {
-                var fieldName, entityName, pos;
+            try {
+                _.each(path.split('+'), function (item, i) {
+                    var fieldName, entityName, pos;
 
-                if (i === 0) {
-                    // first item is always just a field name
-                    fieldName = item;
-                } else {
-                    pos = item.indexOf('::');
-                    if (pos !== -1) {
-                        entityName = item.slice(0, pos);
-                        fieldName = item.slice(pos + 2);
+                    if (i === 0) {
+                        // first item is always just a field name
+                        fieldName = item;
                     } else {
-                        entityName = item;
+                        pos = item.indexOf('::');
+                        if (pos !== -1) {
+                            entityName = item.slice(0, pos);
+                            fieldName = item.slice(pos + 2);
+                        } else {
+                            entityName = item;
+                        }
                     }
-                }
 
-                if (entityName) {
-                    // set entity for previous chain part
-                    chain[i].entity = data[entityName];
-                }
-
-                if (fieldName) {
-                    item = {
-                        // take field from entity of previous chain part
-                        field: chain[i].entity.fieldsIndex[fieldName]
-                    };
-                    chain.push(item);
-                    item.path = self.entityChainToPath(chain);
-                    if (item.field.related_entity) {
-                        item.basePath = item.path + '+' + item.field.related_entity.name;
+                    if (entityName) {
+                        // set entity for previous chain part
+                        chain[i].entity = data[entityName];
                     }
-                }
-            });
+
+                    if (fieldName) {
+                        item = {
+                            // take field from entity of previous chain part
+                            field: chain[i].entity.fieldsIndex[fieldName]
+                        };
+                        chain.push(item);
+                        item.path = self.entityChainToPath(chain);
+                        if (item.field.related_entity) {
+                            item.basePath = item.path + '+' + item.field.related_entity.name;
+                        }
+                    }
+                });
+            } catch (e) {
+                Util.errorHandler();
+                chain = [];
+            }
 
             // if last item in the chain is a field -- cut it off
             if (trim && chain[chain.length - 1].entity === undefined) {
@@ -164,13 +180,18 @@ define(['underscore'], function (_) {
             var path;
             end = end || chain.length;
 
-            chain = _.map(chain.slice(1, end), function (item) {
-                var result = item.field.name;
-                if (item.entity) {
-                    result += '+' + item.entity.name;
-                }
-                return result;
-            });
+            try {
+                chain = _.map(chain.slice(1, end), function (item) {
+                    var result = item.field.name;
+                    if (item.entity) {
+                        result += '+' + item.entity.name;
+                    }
+                    return result;
+                });
+            } catch (e) {
+                Util.errorHandler();
+                chain = [];
+            }
 
             path = chain.join('::');
 
@@ -185,21 +206,27 @@ define(['underscore'], function (_) {
          * @returns {Object}
          */
         getApplicableConditions: function (fieldId) {
-            var chain, result;
+            var chain, result, entity;
+            result = {};
+
             if (!fieldId) {
-                return {};
+                return result;
             }
 
             chain = this.pathToEntityChain(fieldId);
-            result = {
-                parent_entity: null,
-                entity: chain[chain.length - 1].field.entity.name,
-                field:  chain[chain.length - 1].field.name
-            };
-            if (chain.length > 2) {
-                result.parent_entity = chain[chain.length - 2].field.entity.name;
+            entity = chain[chain.length - 1];
+
+            if (entity) {
+                result = {
+                    parent_entity: null,
+                    entity: entity.field.entity.name,
+                    field:  entity.field.name
+                };
+                if (chain.length > 2) {
+                    result.parent_entity = chain[chain.length - 2].field.entity.name;
+                }
+                _.extend(result, _.pick(entity.field, ['type', 'identifier']));
             }
-            _.extend(result, _.pick(chain[chain.length - 1].field, ['type', 'identifier']));
 
             return result;
         },
@@ -254,31 +281,36 @@ define(['underscore'], function (_) {
             }
 
             entityData = this.data[this.entity];
-            fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
-                var fieldPartId, fieldsData;
-                fieldPartId = fieldName;
-                fieldsData = null;
-                if (entityData.hasOwnProperty('fieldsIndex')) {
-                    fieldsData = entityData.fieldsIndex;
-                } else if (
-                    entityData.hasOwnProperty('related_entity') &&
-                        entityData.related_entity.hasOwnProperty('fieldsIndex')
-                ) {
-                    fieldsData = entityData.related_entity.fieldsIndex;
-                }
-
-                if (fieldsData && fieldsData.hasOwnProperty(fieldName)) {
-                    entityData = fieldsData[fieldName];
-
-                    if (entityData.hasOwnProperty('related_entity')) {
-                        fieldPartId += '+' + entityData.related_entity.name;
+            try {
+                fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
+                    var fieldPartId, fieldsData;
+                    fieldPartId = fieldName;
+                    fieldsData = null;
+                    if (entityData.hasOwnProperty('fieldsIndex')) {
+                        fieldsData = entityData.fieldsIndex;
+                    } else if (
+                        entityData.hasOwnProperty('related_entity') &&
+                            entityData.related_entity.hasOwnProperty('fieldsIndex')
+                    ) {
+                        fieldsData = entityData.related_entity.fieldsIndex;
                     }
-                }
 
-                return fieldPartId;
-            });
+                    if (fieldsData && fieldsData.hasOwnProperty(fieldName)) {
+                        entityData = fieldsData[fieldName];
 
-            fieldIdParts.push(pathData[pathData.length - 1]);
+                        if (entityData.hasOwnProperty('related_entity')) {
+                            fieldPartId += '+' + entityData.related_entity.name;
+                        }
+                    }
+
+                    return fieldPartId;
+                });
+
+                fieldIdParts.push(pathData[pathData.length - 1]);
+            } catch (e) {
+                Util.errorHandler();
+                fieldIdParts = [];
+            }
             return fieldIdParts.join('::');
         }
     };
