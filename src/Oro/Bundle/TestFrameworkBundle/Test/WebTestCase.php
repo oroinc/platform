@@ -540,6 +540,7 @@ abstract class WebTestCase extends BaseWebTestCase
                 $created
             )
         );
+
         return $wsseHeader;
     }
 

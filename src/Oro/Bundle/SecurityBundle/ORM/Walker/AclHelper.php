@@ -322,11 +322,12 @@ class AclHelper
 
         $resultData = null;
         $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_USER_CLASS]);
-        if (!$isUserTable || ($isSubRequest === false && $rangeVariableDeclaration->isRoot)) {
+        $resultData = false;
+        if (!$isUserTable || $rangeVariableDeclaration->isRoot) {
             $resultData = $this->builder->getAclConditionData($entityName, $permission);
         }
 
-        if ($resultData === null || !empty($resultData)) {
+        if ($resultData !== false && ($resultData === null || !empty($resultData))) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
                 list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)

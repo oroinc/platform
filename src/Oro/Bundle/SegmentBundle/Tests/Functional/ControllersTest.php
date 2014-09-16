@@ -246,7 +246,6 @@ class ControllersTest extends WebTestCase
         return $form;
     }
 
-
     /**
      * @param $expected
      * @param $actual

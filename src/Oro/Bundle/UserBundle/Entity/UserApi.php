@@ -21,7 +21,7 @@ class UserApi
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="api", fetch="LAZY")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="apiKeys", fetch="LAZY")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE", nullable=false)
      */
     protected $user;

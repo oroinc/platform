@@ -110,8 +110,8 @@ If user **Robert** will login into the **Second organization**, he should see th
 | Access level       | Data                                                  |
 |:------------------ | :---------------------------------------------------- |
 | **User**           | Account D                                             |
-| **Business Unit**  | Account D, Account F                                  |
-| **Division**       | Account D, Account F, Account C                       |
+| **Business Unit**  | Account D, Account F, Account E                       |
+| **Division**       | Account D, Account F, Account C, Account E            |
 | **Organization**   | Account D, Account F, Account C, Account E, Account J |
 
 ###Mark

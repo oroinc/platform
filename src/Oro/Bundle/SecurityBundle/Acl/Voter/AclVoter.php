@@ -202,20 +202,22 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && !($object instanceof ObjectIdentity)
         ) {
             $className = ClassUtils::getClass($object);
-            $config = $this->configProvider->getConfig($className);
-            $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
-            if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
-                || ($accessLevel === AccessLevel::SYSTEM_LEVEL
-                    && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT']))
-            ) {
-                if ($config && $config->has('organization_field_name')) {
-                    $accessor = PropertyAccess::createPropertyAccessor();
-                    /** @var Organization $objectOrganization */
-                    $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
-                    if ($objectOrganization
-                        && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
-                    ) {
-                        $result = self::ACCESS_DENIED;
+            if ($this->configProvider->hasConfig($className)) {
+                $config = $this->configProvider->getConfig($className);
+                $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
+                if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
+                    || ($accessLevel === AccessLevel::SYSTEM_LEVEL
+                        && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT']))
+                ) {
+                    if ($config->has('organization_field_name')) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        /** @var Organization $objectOrganization */
+                        $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
+                        if ($objectOrganization
+                            && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
+                        ) {
+                            $result = self::ACCESS_DENIED;
+                        }
                     }
                 }
             }

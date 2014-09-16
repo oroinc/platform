@@ -3,13 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class OroSecurityOrganizationExtension extends \Twig_Extension
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     protected $securityContext;
 
     /**

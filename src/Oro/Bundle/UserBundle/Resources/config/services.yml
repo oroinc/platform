@@ -157,6 +157,8 @@ services:
     oro_user.handler.delete:
         class: %oro_user.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
+        calls:
+            - [ setSecurityFacade, [@oro_security.security_facade] ]
 
     oro_user.role.handler.delete:
         class: %oro_user.role.handler.delete.class%
