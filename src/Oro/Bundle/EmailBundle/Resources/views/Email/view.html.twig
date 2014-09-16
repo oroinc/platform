@@ -27,7 +27,7 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
-    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}
