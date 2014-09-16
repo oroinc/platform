@@ -10,16 +10,30 @@ use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ReleaseDataFixtureMigration;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * TODO: This listener is a temporary solution for migration of data fixtures.
  * TODO: It should be removed in scope of https://magecore.atlassian.net/browse/BAP-3605
  */
-class ReleaseDataFixtureListener
+class ReleaseDataFixtureListener implements ContainerAwareInterface
 {
     /**
      * @var Migration
      */
     protected $dataMigration;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @param PreMigrationEvent $event
@@ -52,6 +66,9 @@ class ReleaseDataFixtureListener
      */
     protected function getMappingData()
     {
-        return Yaml::parse(realpath(__DIR__ . '/data/1.0.0/platform.yml'));
+        $filePath = $this->container
+            ->get('kernel')
+            ->locateResource('@OroMigrationBundle/EventListener/data/1.0.0/platform.yml');
+        return Yaml::parse(realpath($filePath));
     }
 }

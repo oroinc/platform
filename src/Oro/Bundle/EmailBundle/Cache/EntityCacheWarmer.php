@@ -4,9 +4,12 @@ namespace Oro\Bundle\EmailBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
-class EntityCacheWarmer extends CacheWarmer
+class EntityCacheWarmer extends CacheWarmer implements ContainerAwareInterface
 {
     /**
      * @var EmailOwnerProviderStorage
@@ -28,6 +31,9 @@ class EntityCacheWarmer extends CacheWarmer
      */
     private $entityProxyNameTemplate;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /**
      * Constructor.
      *
@@ -46,6 +52,14 @@ class EntityCacheWarmer extends CacheWarmer
         $this->entityCacheDir            = $entityCacheDir;
         $this->entityCacheNamespace      = $entityCacheNamespace;
         $this->entityProxyNameTemplate   = $entityProxyNameTemplate;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -84,7 +98,9 @@ class EntityCacheWarmer extends CacheWarmer
      */
     protected function createTwigEnvironment()
     {
-        $entityTemplateDir = __DIR__ . '/../Resources/cache/Entity';
+        $entityTemplateDir = $this->container
+            ->get('kernel')
+            ->locateResource('@OroEmailBundle/Resources/cache/Entity');
 
         return new \Twig_Environment(new \Twig_Loader_Filesystem($entityTemplateDir));
     }
