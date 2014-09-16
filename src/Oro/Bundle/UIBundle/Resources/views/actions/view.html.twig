@@ -46,8 +46,8 @@
                             <div class="clearfix">
                                 <ul class="inline">
                                     {% block stats %}
-                                        <li>{{ 'Created At'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                        <li>{{ 'Updated At'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
                                     {% endblock stats %}
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
