@@ -27,12 +27,14 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
         $userManager = $this->container->get('oro_user.manager');
 
         $admin = $manager->getRepository('OroUserBundle:User')->findOneBy(array('username' => 'admin'));
+        $group = $manager->getRepository('OroUserBundle:Group')->findOneBy(array('name' => 'Administrators'));
         if (!$admin) {
             $role  = $manager->getRepository('OroUserBundle:Role')->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
             $admin = $userManager->createUser();
             $admin
                 ->setUsername('admin')
-                ->addRole($role);
+                ->addRole($role)
+                ->addGroup($group);
         }
 
         $admin
@@ -50,6 +52,10 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
                 ->setOrganization($organization);
 
             $admin->addApiKey($api);
+        }
+
+        if (!$admin->hasGroup($group)) {
+            $admin->addGroup($group);
         }
 
         $this->addReference('default_user', $admin);
