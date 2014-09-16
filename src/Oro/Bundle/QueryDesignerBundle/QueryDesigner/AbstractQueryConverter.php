@@ -389,9 +389,9 @@ abstract class AbstractQueryConverter
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
                 } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
-                    // such as
+                    // such as "Entity:Name|left|WITH|t2.field = t1"
 
-                    $entityClassName = $this->getFieldName($joinId);
+                    $entityClassName = $this->joinIdHelper->getUnidirectionalJoinEntityName($joinId);
                     $this->addJoinStatement(
                         $this->getJoinType($joinId),
                         $entityClassName,
@@ -749,7 +749,7 @@ abstract class AbstractQueryConverter
         }
         $parentJoinId = $mainEntityJoinId;
 
-        // TODO should be fixed in scope of BAP-
+        // TODO should be fixed in scope of BAP-5293
         /*
         $delimiterPos = strpos($item['join'], '.');
         if (false !== $delimiterPos) {
