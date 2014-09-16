@@ -54,7 +54,7 @@ oro:
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
-        api.label:                   API key
+        api_keys.label:              API keys
         birthday.label:              Birthday
         business_units.label:        Business Units
         organizations.label:         Organizations

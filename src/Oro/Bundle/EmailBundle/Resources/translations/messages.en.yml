@@ -31,6 +31,7 @@ oro:
             entity_name.label:   Entity name
             type.label:          Type
             translations.label:  Translations
+            organization.label:  Organization
 
             # sections for email template variables
             variables:
