@@ -11,7 +11,7 @@
             {
                 "name": "createdAt",
                 "type": "datetime",
-                "label": "Created"
+                "label": "Created At"
             }
         ]
     }
