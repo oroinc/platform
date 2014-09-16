@@ -385,7 +385,7 @@ abstract class AbstractQueryConverter
                         $this->getJoinType($joinId),
                         $entityClassName,
                         $joinAlias,
-                        $this->getUnidirectionalJoinConditionType($joinId, $entityClassName, $joinFieldName),
+                        $this->getUnidirectionalJoinConditionType($joinId),
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
                 } else {
@@ -942,20 +942,23 @@ abstract class AbstractQueryConverter
         $pos = strpos($condition, $alias);
         if (false !== $pos) {
             if (0 === $pos) {
+                // handle case "ALIAS.", "ALIAS.field"
                 $nextChar = substr($condition, $pos + strlen($alias), 1);
                 if (in_array($nextChar, ['.', ' ', '='])) {
                     return $pos;
                 }
             } elseif (strlen($condition) === $pos + strlen($alias) + 1) {
+                // handle case "ALIAS "
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '='])) {
                     return $pos;
                 }
             } else {
+                // handle case "t2.someField = entity.id" and "t2.someField = entity"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '=', '('])) {
                     $nextChar = substr($condition, $pos + strlen($alias), 1);
-                    if (in_array($nextChar, ['.', ' ', '=', ')'])) {
+                    if (in_array($nextChar, ['.', ' ', '=', ')']) || (false === $nextChar)) {
                         return $pos;
                     }
                 }
