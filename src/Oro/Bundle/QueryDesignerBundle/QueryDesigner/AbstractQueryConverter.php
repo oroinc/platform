@@ -388,7 +388,19 @@ abstract class AbstractQueryConverter
                         $this->getUnidirectionalJoinConditionType($joinId),
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
+                } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
+                    // such as
+
+                    $entityClassName = $this->getFieldName($joinId);
+                    $this->addJoinStatement(
+                        $this->getJoinType($joinId),
+                        $entityClassName,
+                        $joinAlias,
+                        $this->getJoinConditionType($joinId),
+                        $this->getJoinCondition($joinId)
+                    );
                 } else {
+                    // bidirectional
                     $join = null === $this->getEntityClassName($joinId)
                         ? $this->getJoin($joinId)
                         : sprintf('%s.%s', $joinTableAlias, $this->getFieldName($joinId));
@@ -735,10 +747,12 @@ abstract class AbstractQueryConverter
         if (isset($item['registered'])) {
             return;
         }
+        $parentJoinId = $mainEntityJoinId;
 
+        // TODO should be fixed in scope of BAP-
+        /*
         $delimiterPos = strpos($item['join'], '.');
         if (false !== $delimiterPos) {
-            $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
             $parentItem      = null;
@@ -752,7 +766,7 @@ abstract class AbstractQueryConverter
                 $this->registerVirtualColumnTableAlias($joins, $parentItem, $mainEntityJoinId);
             }
             $parentJoinId = $this->joins[$parentJoinAlias];
-        }
+        }*/
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
@@ -947,18 +961,18 @@ abstract class AbstractQueryConverter
                 if (in_array($nextChar, ['.', ' ', '='])) {
                     return $pos;
                 }
-            } elseif (strlen($condition) === $pos + strlen($alias) + 1) {
-                // handle case "ALIAS "
+            } elseif (strlen($condition) === $pos + strlen($alias)) {
+                // handle case "t2.someField = ALIAS"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '='])) {
                     return $pos;
                 }
             } else {
-                // handle case "t2.someField = entity.id" and "t2.someField = entity"
+                // handle case "t2.someField = ALIAS.id"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '=', '('])) {
                     $nextChar = substr($condition, $pos + strlen($alias), 1);
-                    if (in_array($nextChar, ['.', ' ', '=', ')']) || (false === $nextChar)) {
+                    if (in_array($nextChar, ['.', ' ', '=', ')'])) {
                         return $pos;
                     }
                 }

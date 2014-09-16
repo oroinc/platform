@@ -250,6 +250,22 @@ class JoinIdentifierHelper
     }
 
     /**
+     * Checks if given join identifier represents unidirectional join with already prepared conditions
+     * Possible use cases in virtual fields join with unidirectional join
+     *
+     * @param string $joinId
+     *
+     * @return bool
+     */
+    public function isUnidirectionalJoinWithCondition($joinId)
+    {
+        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
+        $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
+
+        return false === $startDelimiter;
+    }
+
+    /**
      * Extracts the join part from the given join identifier
      *
      * @param $joinId
