@@ -15,9 +15,11 @@ class OroTrackerBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $schema
-            ->getTable('oro_tracking_event')
-            ->getColumn('title')
+        $table = $schema->getTable('oro_tracking_event');
+        $table->getColumn('url')
+            ->setType(Type::getType(Type::TEXT))
+            ->setLength(null);
+        $table->getColumn('title')
             ->setType(Type::getType(Type::TEXT))
             ->setLength(null);
     }

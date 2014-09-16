@@ -67,7 +67,7 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);
-        $table->addColumn('url', 'string', ['length' => 255]);
+        $table->addColumn('url', 'text', []);
         $table->addColumn('title', 'text', ['notnull' => false]);
         $table->addColumn('code', 'string', ['notnull' => false, 'length' => 255]);
         $table->addIndex(['logged_at'], 'event_loggedat_idx', []);
