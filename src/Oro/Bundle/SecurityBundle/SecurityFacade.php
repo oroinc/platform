@@ -241,12 +241,9 @@ class SecurityFacade
                 $controllerData[1]
             );
 
-            if ($acl) {
+            if ($convertClassName && $acl) {
                 $entityClass = $acl->getClass();
-                if (!empty($entityClass)
-                    && $convertClassName
-                    && $this->entityClassResolver->isEntity($entityClass)
-                ) {
+                if (!empty($entityClass) && $this->entityClassResolver->isEntity($entityClass)) {
                     $acl->setClass($this->entityClassResolver->getEntityClass($entityClass));
                 }
             }
