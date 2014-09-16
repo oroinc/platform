@@ -18,19 +18,17 @@ class RestApiTest extends WebTestCase
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
-            'organization' => '1',
+            'organization' => 1,
             'phone' => '123-123-123',
             'website' => 'http://localhost',
             'email' => 'email@email.localhost',
             'fax' => '321-321-321',
             'appendUsers' => array(1),
-            //'owner' => '1',
         )
     );
 
     protected function setUp()
     {
-        $this->markTestSkipped('OEE-26');
         $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
@@ -80,7 +78,7 @@ class RestApiTest extends WebTestCase
                 $this->assertEquals($this->fixtureData['business_unit']['website'], $row['website']);
                 $this->assertArrayHasKey('organization', $row);
                 $this->assertEquals(1, $row['organization']['id']);
-                $this->assertEquals('default', $row['organization']['name']);
+                $this->assertNotEmpty($row['organization']['name']);
             }
         }
 
@@ -112,7 +110,7 @@ class RestApiTest extends WebTestCase
         $this->assertEquals($this->fixtureData['business_unit']['website'], $responseData['website']);
         $this->assertArrayHasKey('organization', $responseData);
         $this->assertEquals(1, $responseData['organization']['id']);
-        $this->assertEquals('default', $responseData['organization']['name']);
+        $this->assertNotEmpty($responseData['organization']['name']);
     }
 
     /**
@@ -133,7 +131,7 @@ class RestApiTest extends WebTestCase
 
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
-        // open address by id
+        // open businessUnit by id
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_businessunit', array('id' => $id))
