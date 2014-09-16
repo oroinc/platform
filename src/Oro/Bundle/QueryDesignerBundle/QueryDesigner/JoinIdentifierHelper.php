@@ -262,7 +262,37 @@ class JoinIdentifierHelper
         $lastItemDelimiter = $this->getStartPosition($joinId, '+');
         $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
 
-        return false === $startDelimiter;
+        if (false === $startDelimiter) {
+            $firstJoinPart = $this->getUnidirectionalJoinEntityName($joinId);
+
+            return false === strpos($firstJoinPart, '.');
+        }
+
+        return false;
+    }
+
+    /**
+     * Fetches entity name from unidirectional join or join part form prepared conditioned join
+     *
+     * @param string $joinId
+     *
+     * @return string
+     */
+    public function getUnidirectionalJoinEntityName($joinId)
+    {
+        $startDelimiter = $this->getStartPosition($joinId, '+');
+        $endDelimiter   = strpos($joinId, '|', $startDelimiter);
+
+        $lastJoinPart  = false === $endDelimiter
+            ? substr($joinId, $startDelimiter)
+            : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
+
+        $lastDelimiter = $this->getStartPosition($lastJoinPart, '::');
+        if ($lastDelimiter > 0) {
+            return substr($lastJoinPart, $lastDelimiter);
+        }
+
+        return $lastJoinPart;
     }
 
     /**
