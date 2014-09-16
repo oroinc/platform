@@ -33,8 +33,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             $admin = $userManager->createUser();
             $admin
                 ->setUsername('admin')
-                ->addRole($role)
-                ->addGroup($group);
+                ->addRole($role);
         }
 
         $admin
