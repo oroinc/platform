@@ -10,8 +10,23 @@ use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 use Oro\Bundle\MigrationBundle\Migration\UpdateEntityConfigMigration;
 
-class PreUpMigrationListener
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class PreUpMigrationListener implements ContainerAwareInterface
 {
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     public function onPreUp(PreMigrationEvent $event)
     {
         if ($event->isTableExist(CreateMigrationTableMigration::MIGRATION_TABLE)) {
@@ -32,11 +47,19 @@ class PreUpMigrationListener
             // @todo: this transient solution can be removed in a future
             // when we ensure RC1 and RC2 are updated for all clients
             if ($event->isTableExist('oro_installer_bundle_version')) {
-                $bundleVersions = Yaml::parse(realpath(__DIR__ . '/MigrationTableData/Oro.yml'));
+                $oroTableDataConfig = $this->container
+                    ->get('kernel')
+                    ->locateResource('@OroMigrationBundle/EventListener/MigrationTableData/Oro.yml');
+                $bundleVersions = Yaml::parse(realpath($oroTableDataConfig));
+
+                $oroCrmTableDataConfig = $this->container
+                    ->get('kernel')
+                    ->locateResource('@OroMigrationBundle/EventListener/MigrationTableData/OroCRM.yml');
+
                 if ($event->isTableExist('orocrm_account')) {
                     $bundleVersions = array_merge(
                         $bundleVersions,
-                        Yaml::parse(realpath(__DIR__ . '/MigrationTableData/OroCRM.yml'))
+                        Yaml::parse(realpath($oroCrmTableDataConfig))
                     );
                 }
                 foreach ($bundleVersions as $bundleName => $version) {

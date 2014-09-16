@@ -6,8 +6,30 @@ use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandl
 use Symfony\Component\Filesystem\Filesystem;
 use Composer\Script\CommandEvent;
 
-class ScriptHandler extends SensioScriptHandler
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class ScriptHandler extends SensioScriptHandler implements ContainerAwareInterface
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     /**
      * Installs the assets for installer bundle
      *
@@ -18,7 +40,10 @@ class ScriptHandler extends SensioScriptHandler
         $options = self::getOptions($event);
         $webDir  = $options['symfony-web-dir'];
 
-        $sourceDir = __DIR__ . '/../Resources/public';
+        //$sourceDir = __DIR__ . '/../Resources/public';
+        $sourceDir = self::getContainer()
+            ->get('kernel')
+            ->locateResource('@OroInstallerBundle/Resources/public');
         $targetDir = $webDir . '/bundles/oroinstaller';
 
         $filesystem = new Filesystem();

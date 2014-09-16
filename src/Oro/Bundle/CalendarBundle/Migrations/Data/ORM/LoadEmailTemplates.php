@@ -4,8 +4,22 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Data\ORM;
 
 use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
 
-class LoadEmailTemplates extends AbstractEmailFixture
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class LoadEmailTemplates extends AbstractEmailFixture implements ContainerAwareInterface
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     /**
      * Return path to email templates
      *
@@ -13,6 +27,9 @@ class LoadEmailTemplates extends AbstractEmailFixture
      */
     public function getEmailsDir()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . 'data/emails';
+        $dir =  $this->container
+            ->get('kernel')
+            ->locateResource('@OroCalendarBundle/Migrations/Data/ORM'.DIRECTORY_SEPARATOR . 'data/emails');
+        return $dir;
     }
 }
