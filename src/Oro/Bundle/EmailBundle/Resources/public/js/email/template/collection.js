@@ -9,15 +9,23 @@ define(['backbone', 'routing', './model'
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
-        route: 'oro_api_get_emailtemplates',
+        route: null,
+        routeId: null,
         url: null,
         model: EmailTemplateModel,
 
         /**
          * Constructor
+         *
+         * @param route {String}
+         * @param routeId {String}
          */
-        initialize: function () {
-            this.url = routing.generate(this.route, {entityName: null});
+        initialize: function (route, routeId) {
+            this.route = route;
+            this.routeId = routeId;
+            var routeParams = {};
+            routeParams[routeId] = null;
+            this.url = routing.generate(this.route, routeParams);
         },
 
         /**
@@ -26,7 +34,9 @@ define(['backbone', 'routing', './model'
          * @param id {String}
          */
         setEntityId: function (id) {
-            this.url = routing.generate(this.route, {entityName: id});
+            var routeParams = {};
+            routeParams[this.routeId] = id;
+            this.url = routing.generate(this.route, routeParams);
         }
     });
 });
