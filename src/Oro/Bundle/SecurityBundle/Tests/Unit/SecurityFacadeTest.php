@@ -453,7 +453,7 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider IsRequestObjectIsGrantedProvider
+     * @dataProvider isRequestObjectIsGrantedProvider
      */
     public function testIsRequestObjectIsGranted($requestController, $isGrant, $result)
     {
@@ -482,7 +482,7 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, $this->facade->isRequestObjectIsGranted($request, $object));
     }
 
-    public function IsRequestObjectIsGrantedProvider()
+    public function isRequestObjectIsGrantedProvider()
     {
         return [
             ['testBundle::testAction', true, 1],
