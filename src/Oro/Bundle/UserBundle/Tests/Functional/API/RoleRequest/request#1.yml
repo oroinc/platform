@@ -1,6 +1,5 @@
 # common test case
 request:
     label: Role_1_%str%
-    owner: 1
 response:
     return: true

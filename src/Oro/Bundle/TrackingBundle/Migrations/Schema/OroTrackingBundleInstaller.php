@@ -3,8 +3,11 @@
 namespace Oro\Bundle\TrackingBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+use Oro\Bundle\TrackingBundle\Migrations\Schema\v1_4\OroTrackerBundle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -17,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -34,6 +37,8 @@ class OroTrackingBundleInstaller implements Installation
         $this->addOroTrackingDataForeignKeys($schema);
         $this->addOroTrackingEventForeignKeys($schema);
         $this->addOroTrackingWebsiteForeignKeys($schema);
+
+        OroTrackerBundle::addOrganization($schema);
     }
 
     /**

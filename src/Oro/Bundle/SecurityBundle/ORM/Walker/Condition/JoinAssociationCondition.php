@@ -19,24 +19,38 @@ class JoinAssociationCondition extends JoinAclCondition
 
     /**
      * @param string $entityAlias
-     * @param string $entityField
-     * @param mixed  $value
+     * @param string   $entityField
+     * @param mixed   $value
      * @param int    $pathExpressionType
-     * @param string $entityClass
-     * @param array  $joinConditions
+     * @param string   $organizationField
+     * @param int   $organizationValue
+     * @param bool   $ignoreOwner
+     * @param string   $entityClass
+     * @param array   $joinConditions
      */
     public function __construct(
         $entityAlias,
         $entityField = null,
         $value = null,
         $pathExpressionType = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+        $organizationField = null,
+        $organizationValue = null,
+        $ignoreOwner = false,
         $entityClass = null,
         $joinConditions = null
     ) {
-        $this->entityClass    = $entityClass;
+        $this->entityClass = $entityClass;
         $this->joinConditions = $joinConditions;
 
-        parent::__construct($entityAlias, $entityField, $value, $pathExpressionType);
+        parent::__construct(
+            $entityAlias,
+            $entityField,
+            $value,
+            $pathExpressionType,
+            $organizationField,
+            $organizationValue,
+            $ignoreOwner
+        );
     }
 
     /**

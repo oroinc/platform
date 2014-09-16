@@ -100,6 +100,6 @@ class BusinessUnitController extends SoapController
      */
     public function getFormHandler()
     {
-        return $this->container->get('oro_organization.form.handler.api');
+        return $this->container->get('oro_organization.form.handler.business_unit.api');
     }
 }

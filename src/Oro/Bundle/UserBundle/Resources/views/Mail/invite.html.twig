@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Hello, {{ user|oro_format_name }}!</h1>
-    <p>A new user has been created for you in the {{ oro_config_value('oro_ui.application_title') }} installation
+    <p>A new user has been created for you
         at <a href="{{ url('oro_default') }}">{{ url('oro_default') }}</a>
     </p>
     <p>Please use the following credentials to log in:</p>

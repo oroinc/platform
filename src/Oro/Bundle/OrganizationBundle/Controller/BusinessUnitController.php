@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -52,6 +53,31 @@ class BusinessUnitController extends Controller
             // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
+    }
+
+    /**
+     * @Route(
+     *      "/search/{organizationId}",
+     *      name="oro_business_unit_search",
+     *      requirements={"organizationId"="\d+"}
+     * )
+     * Acl(
+     *      id="oro_business_unit_view",
+     *      type="action",
+     *      class="OroOrganizationBundle:BusinessUnit",
+     *      permission="VIEW"
+     * )
+     */
+    public function searchAction($organizationId)
+    {
+        $businessUnits = [];
+        if ($organizationId) {
+            $businessUnits = $this->get('oro_organization.business_unit_manager')
+                ->getBusinessUnitRepo()
+                ->getOrganizationBusinessUnitsTree($organizationId);
+        }
+
+        return new Response(json_encode($businessUnits));
     }
 
     /**

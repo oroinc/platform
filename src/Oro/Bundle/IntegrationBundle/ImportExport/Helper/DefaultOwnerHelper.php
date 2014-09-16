@@ -48,6 +48,15 @@ class DefaultOwnerHelper
             $defaultUserOwner = $this->ensureNotDetached($defaultUserOwner);
             $doctrineMetadata->setFieldValue($entity, $ownershipMetadata->getOwnerFieldName(), $defaultUserOwner);
         }
+        $defaultOrganization = $integration->getOrganization();
+        if ($defaultOrganization && $ownershipMetadata->getOrganizationFieldName()) {
+            $defaultOrganization = $this->ensureNotDetached($defaultOrganization);
+            $doctrineMetadata->setFieldValue(
+                $entity,
+                $ownershipMetadata->getOrganizationFieldName(),
+                $defaultOrganization
+            );
+        }
     }
 
     /**

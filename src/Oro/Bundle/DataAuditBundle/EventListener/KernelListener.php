@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
 
 class KernelListener implements EventSubscriberInterface
@@ -43,6 +44,10 @@ class KernelListener implements EventSubscriberInterface
         $token = $this->securityContext->getToken();
         if (null !== $token && $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $this->loggableManager->setUsername($token);
+
+            if ($token instanceof OrganizationContextTokenInterface) {
+                $this->loggableManager->setOrganization($token->getOrganizationContext());
+            }
         }
     }
 
