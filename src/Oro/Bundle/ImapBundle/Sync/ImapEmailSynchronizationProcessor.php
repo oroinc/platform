@@ -447,7 +447,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             $existingImapEmail = $isMultiFolder
                 ? null
-                : $this->findExistingImapEmail($relatedExistingImapEmails);
+                : $this->findExistingImapEmail($relatedExistingImapEmails, $folder->getType());
             if ($existingImapEmail) {
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
@@ -485,33 +485,67 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Tries to find IMAP email in the given list of related IMAP emails
      * This method returns ImapEmail object only if exactly one email is found
+     * and this email is located in the comparable folder {@see isComparableFolders()}
      *
-     * @param array $imapEmails
+     * @param ImapEmail[] $imapEmails
+     * @param string      $folderType
      *
      * @return ImapEmail|null
      */
-    protected function findExistingImapEmail(array $imapEmails)
+    protected function findExistingImapEmail(array $imapEmails, $folderType)
     {
         if (empty($imapEmails)) {
             return null;
         }
         if (count($imapEmails) === 1) {
-            return reset($imapEmails);
+            /** @var ImapEmail $imapEmail */
+            $imapEmail = reset($imapEmails);
+            return $this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType())
+                ? $imapEmail
+                : null;
         }
 
         /** @var ImapEmail[] $outdatedImapEmails */
         $activeImapEmails = array_filter(
             $imapEmails,
-            function (ImapEmail $imapEmail) {
-                return !$imapEmail->getImapFolder()->getFolder()->isOutdated();
+            function (ImapEmail $imapEmail) use ($folderType) {
+                return
+                    !$imapEmail->getImapFolder()->getFolder()->isOutdated()
+                    && $this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType());
             }
         );
 
-        if (count($activeImapEmails) === 1) {
-            return reset($activeImapEmails);
+        return count($activeImapEmails) === 1
+            ? reset($activeImapEmails)
+            : null;
+    }
+
+    /**
+     * Checks if the given folders types are comparable.
+     * For example two "Sent" folders are comparable, "Inbox" and "Other" folders
+     * are comparable as well, but "Inbox" and "Sent" folders are not comparable
+     *
+     * @param string $folderType1
+     * @param string $folderType2
+     *
+     * @return bool
+     */
+    protected function isComparableFolders($folderType1, $folderType2)
+    {
+        if ($folderType1 === $folderType2) {
+            return true;
+        }
+        if ($folderType1 === EmailFolder::OTHER) {
+            $folderType1 = EmailFolder::INBOX;
+        }
+        if ($folderType2 === EmailFolder::OTHER) {
+            $folderType2 = EmailFolder::INBOX;
+        }
+        if ($folderType1 === $folderType2) {
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     /**
