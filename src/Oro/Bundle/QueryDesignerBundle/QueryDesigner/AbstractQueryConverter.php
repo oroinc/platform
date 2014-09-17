@@ -385,10 +385,22 @@ abstract class AbstractQueryConverter
                         $this->getJoinType($joinId),
                         $entityClassName,
                         $joinAlias,
-                        $this->getUnidirectionalJoinConditionType($joinId, $entityClassName, $joinFieldName),
+                        $this->getUnidirectionalJoinConditionType($joinId),
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
+                } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
+                    // such as "Entity:Name|left|WITH|t2.field = t1"
+
+                    $entityClassName = $this->joinIdHelper->getUnidirectionalJoinEntityName($joinId);
+                    $this->addJoinStatement(
+                        $this->getJoinType($joinId),
+                        $entityClassName,
+                        $joinAlias,
+                        $this->getJoinConditionType($joinId),
+                        $this->getJoinCondition($joinId)
+                    );
                 } else {
+                    // bidirectional
                     $join = null === $this->getEntityClassName($joinId)
                         ? $this->getJoin($joinId)
                         : sprintf('%s.%s', $joinTableAlias, $this->getFieldName($joinId));
@@ -735,10 +747,12 @@ abstract class AbstractQueryConverter
         if (isset($item['registered'])) {
             return;
         }
+        $parentJoinId = $mainEntityJoinId;
 
+        // TODO should be fixed in scope of BAP-5293
+        /*
         $delimiterPos = strpos($item['join'], '.');
         if (false !== $delimiterPos) {
-            $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
             $parentItem      = null;
@@ -752,7 +766,7 @@ abstract class AbstractQueryConverter
                 $this->registerVirtualColumnTableAlias($joins, $parentItem, $mainEntityJoinId);
             }
             $parentJoinId = $this->joins[$parentJoinAlias];
-        }
+        }*/
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
@@ -942,16 +956,19 @@ abstract class AbstractQueryConverter
         $pos = strpos($condition, $alias);
         if (false !== $pos) {
             if (0 === $pos) {
+                // handle case "ALIAS.", "ALIAS.field"
                 $nextChar = substr($condition, $pos + strlen($alias), 1);
                 if (in_array($nextChar, ['.', ' ', '='])) {
                     return $pos;
                 }
-            } elseif (strlen($condition) === $pos + strlen($alias) + 1) {
+            } elseif (strlen($condition) === $pos + strlen($alias)) {
+                // handle case "t2.someField = ALIAS"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '='])) {
                     return $pos;
                 }
             } else {
+                // handle case "t2.someField = ALIAS.id"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '=', '('])) {
                     $nextChar = substr($condition, $pos + strlen($alias), 1);

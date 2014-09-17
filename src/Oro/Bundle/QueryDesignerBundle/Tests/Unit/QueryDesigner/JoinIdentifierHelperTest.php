@@ -178,6 +178,28 @@ class JoinIdentifierHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider isUnidirectionalJoinWithConditionProvider
+     */
+    public function testIsUnidirectionalJoinWithCondition($joinId, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->isUnidirectionalJoin($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider getUnidirectionalJoinEntityNameProvider
+     */
+    public function testGetUnidirectionalJoinEntityName($joinId, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->getUnidirectionalJoinEntityName($joinId)
+        );
+    }
+
     public function buildJoinIdentifierProvider()
     {
         return [
@@ -367,6 +389,32 @@ class JoinIdentifierHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function getUnidirectionalJoinEntityNameProvider()
+    {
+        return [
+            // column names
+            ['column1', 'column1'],
+            ['column1+Acme\E2::column2', 'column2'],
+            ['column1+Acme\E2::column2+Acme\E3::column3', 'column3'],
+            ['column1+Acme\E2::column2+Acme\E3::Acme\E31::column3', 'column3'],
+            ['column1+Acme\E2::column2+Acme\E3::Acme\E31::column3|left|WITH|condition', 'column3'],
+            // join ids
+            ['', false],
+            ['Acme\E1::column1', 'column1'],
+            ['Acme\E1::column1+Acme\E2::column2', 'column2'],
+            ['Acme\E1::column1+Acme\E2::column2+Acme\E3::column3', 'column3'],
+            ['Acme\E1::column1+Acme\E2::column2+Acme\E3::Acme\E31::column3', 'column3'],
+            ['Acme\E1::column1+Acme\E2::column2+Acme\E3::Acme\E31::column3|left|WITH|condition', 'column3'],
+            // joins without entity class
+            ['alias.fld', 'alias.fld'],
+            ['alias.fld|', 'alias.fld'],
+            ['column1+alias.fld', 'alias.fld'],
+            ['column1+alias.fld|', 'alias.fld'],
+            ['Acme\E1::column1+alias.fld', 'alias.fld'],
+            ['Acme\E1::column1+alias.fld|', 'alias.fld'],
+        ];
+    }
+
     public function getFieldNameProvider()
     {
         return [
@@ -401,6 +449,26 @@ class JoinIdentifierHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['', false],
+            ['Acme\E1::column1', false],
+            ['Acme\E1::column1|left|WITH|condition', false],
+            ['Acme\E1::column1+Acme\E2::column2', false],
+            ['Acme\E1::column1+Acme\E2::column2|left|WITH|condition', false],
+            ['Acme\E1::Acme\E11::column1', true],
+            ['Acme\E1::Acme\E11::column1|left|WITH|condition', true],
+            ['Acme\E1::column1+Acme\E2::Acme\E21::column2', true],
+            ['Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition', true],
+            ['Acme\E1::Acme\E11::column1+Acme\E2::column2', false],
+            ['Acme\E1::Acme\E11::column1+Acme\E2::column2|left|WITH|condition', false],
+            ['Acme\E1::Acme\E11::column1+Acme\E2::Acme\E21::column2', true],
+            ['Acme\E1::Acme\E11::column1+Acme\E2::Acme\E21::column2|left|WITH|condition', true],
+        ];
+    }
+
+    public function isUnidirectionalJoinWithConditionProvider()
+    {
+        return [
+            ['', false],
+            ['t1.country|left', false],
             ['Acme\E1::column1', false],
             ['Acme\E1::column1|left|WITH|condition', false],
             ['Acme\E1::column1+Acme\E2::column2', false],
