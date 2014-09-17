@@ -230,6 +230,10 @@ abstract class AbstractEmailSynchronizer
                 $syncStartTime = $this->getCurrentUtcDateTime();
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
+
+                $origin->incrementSyncCount();
+                $this->getEntityManager()->persist($origin);
+                $this->getEntityManager()->flush($origin);
             } else {
                 $this->log->notice('Skip because it is already in process.');
             }

@@ -97,10 +97,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
-
-        $origin->incrementSyncCount();
-        $this->em->persist($origin);
-        $this->em->flush($origin);
     }
 
     /**
