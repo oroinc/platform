@@ -9,6 +9,7 @@ oro:
         id.label:             Id
         message.label:        Message
         owner.label:          Created By
+        organization.label:   Organization
         updated_by.label:     Updated By
 
         action:
