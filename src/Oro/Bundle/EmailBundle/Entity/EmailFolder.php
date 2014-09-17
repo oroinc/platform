@@ -76,7 +76,7 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emails;
@@ -125,7 +125,7 @@ class EmailFolder
      *
      * @param string $name
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function setName($name)
     {
@@ -149,7 +149,7 @@ class EmailFolder
      *
      * @param string $fullName
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function setFullName($fullName)
     {
@@ -173,7 +173,7 @@ class EmailFolder
      *
      * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function setType($type)
     {
@@ -197,7 +197,7 @@ class EmailFolder
      *
      * @param EmailOrigin $origin
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function setOrigin(EmailOrigin $origin)
     {
@@ -219,13 +219,29 @@ class EmailFolder
     /**
      * Add email
      *
-     * @param  Email $email
+     * @param Email $email
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function addEmail(Email $email)
     {
-        $this->emails[] = $email;
+        if (!$this->emails->contains($email)) {
+            $this->emails->add($email);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return EmailFolder
+     */
+    public function removeEmail(Email $email)
+    {
+        if ($this->emails->contains($email)) {
+            $this->emails->removeElement($email);
+        }
 
         return $this;
     }
@@ -257,7 +273,7 @@ class EmailFolder
     /**
      * @param \DateTime $outdatedAt
      *
-     * @return $this
+     * @return EmailFolder
      */
     public function setOutdatedAt($outdatedAt = null)
     {
@@ -279,7 +295,7 @@ class EmailFolder
      */
     public function isOutdated()
     {
-        return is_null($this->outdatedAt);
+        return $this->outdatedAt !== null;
     }
 
     /**

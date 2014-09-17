@@ -43,8 +43,16 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManager')
+            ->with(null)
+            ->will($this->returnValue($this->em));
+
         $this->sync = new TestEmailSynchronizer(
-            $this->em,
+            $doctrine,
             $this->emailEntityBuilder,
             $this->emailAddressManager,
             new EmailAddressHelper(),

@@ -58,4 +58,18 @@ class EmailFolderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $emails);
         $this->assertTrue($email === $emails[0]);
     }
+
+    public function testOutdatedAt()
+    {
+        $entity = new EmailFolder();
+        $this->assertFalse($entity->isOutdated());
+
+        $date = new \DateTime();
+        $entity->setOutdatedAt($date);
+        $this->assertEquals($date, $entity->getOutdatedAt());
+        $this->assertTrue($entity->isOutdated());
+
+        $entity->setOutdatedAt(null);
+        $this->assertFalse($entity->isOutdated());
+    }
 }

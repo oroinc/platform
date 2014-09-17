@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
@@ -25,9 +26,9 @@ abstract class AbstractEmailSynchronizer
     protected $log = null;
 
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    protected $em;
+    protected $doctrine;
 
     /**
      * @var EmailEntityBuilder
@@ -52,18 +53,18 @@ abstract class AbstractEmailSynchronizer
     /**
      * Constructor
      *
-     * @param EntityManager       $em
+     * @param ManagerRegistry     $doctrine
      * @param EmailEntityBuilder  $emailEntityBuilder
      * @param EmailAddressManager $emailAddressManager
      * @param EmailAddressHelper  $emailAddressHelper
      */
     protected function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EmailEntityBuilder $emailEntityBuilder,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper
     ) {
-        $this->em                  = $em;
+        $this->doctrine            = $doctrine;
         $this->emailEntityBuilder  = $emailEntityBuilder;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper  = $emailAddressHelper;
@@ -253,6 +254,23 @@ abstract class AbstractEmailSynchronizer
     }
 
     /**
+     * Returns default entity manager
+     *
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        /** @var EntityManager $em */
+        $em = $this->doctrine->getManager();
+        if (!$em->isOpen()) {
+            $this->doctrine->resetManager();
+            $em = $this->doctrine->getManager();
+        }
+
+        return $em;
+    }
+
+    /**
      * Makes sure $this->knownEmailAddressChecker initialized
      */
     protected function ensureKnownEmailAddressCheckerCreated()
@@ -260,7 +278,7 @@ abstract class AbstractEmailSynchronizer
         if (!$this->knownEmailAddressChecker) {
             $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
                 $this->log,
-                $this->em,
+                $this->getEntityManager(),
                 $this->emailAddressManager,
                 $this->emailAddressHelper
             );
@@ -292,8 +310,8 @@ abstract class AbstractEmailSynchronizer
      */
     protected function changeOriginSyncState(EmailOrigin $origin, $syncCode, $synchronizedAt = null)
     {
-        $queryBuilder = $this->em->getRepository($this->getEmailOriginClass())
-            ->createQueryBuilder('o')
+        $repo = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
+        $qb   = $repo->createQueryBuilder('o')
             ->update()
             ->set('o.syncCode', ':code')
             ->set('o.syncCodeUpdatedAt', ':updated')
@@ -302,14 +320,14 @@ abstract class AbstractEmailSynchronizer
             ->setParameter('updated', $this->getCurrentUtcDateTime())
             ->setParameter('id', $origin->getId());
         if ($synchronizedAt !== null) {
-            $queryBuilder
+            $qb
                 ->set('o.synchronizedAt', ':synchronized')
                 ->setParameter('synchronized', $synchronizedAt);
         }
         if ($syncCode === self::SYNC_CODE_IN_PROCESS) {
-            $queryBuilder->andWhere('(o.syncCode IS NULL OR o.syncCode <> :code)');
+            $qb->andWhere('(o.syncCode IS NULL OR o.syncCode <> :code)');
         }
-        $affectedRows = $queryBuilder->getQuery()->execute();
+        $affectedRows = $qb->getQuery()->execute();
 
         return $affectedRows > 0;
     }
@@ -334,7 +352,7 @@ abstract class AbstractEmailSynchronizer
         $min = clone $now;
         $min->sub(new \DateInterval('P1Y'));
 
-        $repo = $this->em->getRepository($this->getEmailOriginClass());
+        $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')
             ->select(
                 'o'
@@ -386,7 +404,7 @@ abstract class AbstractEmailSynchronizer
     {
         $this->log->notice(sprintf('Finding an email origin (id: %d) ...', $originId));
 
-        $repo = $this->em->getRepository($this->getEmailOriginClass());
+        $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
             ->setParameter('isActive', true)
@@ -418,7 +436,7 @@ abstract class AbstractEmailSynchronizer
         $border = clone $now;
         $border->sub(new \DateInterval('P1D'));
 
-        $repo = $this->em->getRepository($this->getEmailOriginClass());
+        $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')
             ->update()
             ->set('o.syncCode', ':failure')
