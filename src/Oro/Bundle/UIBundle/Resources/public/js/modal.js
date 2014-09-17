@@ -27,6 +27,19 @@ define([
          * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
          */
         open: function (cb) {
+
+            // fix bootstrap modal issue with multiple popups
+            // @todo remove after bootstrap update and test. See https://magecore.atlassian.net/browse/CRM-1048
+            function resetFocusEventOnDocument(e) {
+                if (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                $(document).off('focusin.modal');
+                $(document).on('focusin.modal', resetFocusEventOnDocument);
+            }
+            resetFocusEventOnDocument();
+
             if (!this.isRendered) this.render();
             this.delegateEvents();
 
