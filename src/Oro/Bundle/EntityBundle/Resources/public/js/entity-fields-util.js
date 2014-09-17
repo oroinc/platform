@@ -78,6 +78,11 @@ define(['underscore'], function (_) {
         pathToEntityChain: function (path, trim) {
             var chain, data, self = this;
             data = this.data;
+
+            if (!data[this.entity]) {
+                return [];
+            }
+
             chain = [{
                 entity: data[this.entity],
                 path: '',
