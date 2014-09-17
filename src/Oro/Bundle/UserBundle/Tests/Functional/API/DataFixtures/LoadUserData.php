@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -31,12 +33,19 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $userManager = $this->container->get('oro_user.manager');
         $role = $userManager->getStorageManager()
             ->getRepository('OroUserBundle:Role')
-            ->findBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
+            ->findOneBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
+
+        $group = $userManager->getStorageManager()
+            ->getRepository('OroUserBundle:Group')
+            ->findOneBy(array('name' => 'Administrators'));
 
         $user = $userManager->createUser();
-        $api = new UserApi();
 
+        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+
+        $api = new UserApi();
         $api->setApiKey('user_api_key')
+            ->setOrganization($organization)
             ->setUser($user);
 
         $user
@@ -44,9 +53,12 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setPlainPassword(self::USER_PASSWORD)
             ->setFirstName('Simple')
             ->setLastName('User')
-            ->addRole($role[0])
+            ->addRole($role)
+            ->addGroup($group)
             ->setEmail('simple@example.com')
-            ->setApi($api)
+            ->setOrganization($organization)
+            ->setOrganizations(new ArrayCollection([$organization]))
+            ->addApiKey($api)
             ->setSalt('');
 
         $userManager->updateUser($user);

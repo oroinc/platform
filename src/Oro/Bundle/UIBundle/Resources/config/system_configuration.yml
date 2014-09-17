@@ -6,30 +6,17 @@ oro_system_configuration:
             page_reload: true
 
         application_name_settings:
-            title: 'Name'
+            title: 'URL'
 
         navbar_settings:
             title: oro.ui.system_configuration.groups.navbar_settings.title
 
     fields:
-        oro_ui.application_name:
-            data_type: string
-            type: text
-            options:
-                label: 'Short Name'
-
         oro_ui.application_url:
             data_type: string
             type: text
             options:
                 label: 'Application URL'
-
-        oro_ui.application_title:
-            data_type: string
-            type: text
-            options:
-                label: 'Full Name'
-
         oro_ui.navbar_position:
             data_type: string
             type: choice
@@ -50,10 +37,7 @@ oro_system_configuration:
                                 children:
                                     application_name_settings:
                                         children:
-                                            - oro_ui.application_name
-                                            - oro_ui.application_title
                                             - oro_ui.application_url
-
                             look_and_feel:
                                 children:
                                     navbar_settings:
@@ -62,8 +46,6 @@ oro_system_configuration:
 
     api_tree:
         application:
-            oro_ui.application_name: ~
-            oro_ui.application_title: ~
             oro_ui.application_url: ~
         look-and-feel:
             oro_ui.navbar_position: ~

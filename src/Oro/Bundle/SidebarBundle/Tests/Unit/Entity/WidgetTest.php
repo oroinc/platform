@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WidgetTest extends \PHPUnit_Framework_TestCase
@@ -31,6 +33,7 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
             array('position', 1),
             array('state', 'WIDGET_MAXIMIZED_HOVER'),
             array('settings', array('a' => 'b')),
+            array('organization', new Organization())
         );
     }
 }

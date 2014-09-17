@@ -32,6 +32,7 @@ services:
 
     oro_report.report.manager.api:
         class: %oro_report.report.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_report.report.entity.class%
             - @doctrine.orm.entity_manager

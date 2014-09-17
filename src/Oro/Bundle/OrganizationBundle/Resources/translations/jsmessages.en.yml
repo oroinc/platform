@@ -1,0 +1,5 @@
+oro:
+    business_unit:
+        form:
+            choose_business_user: Choose a business unit...
+            none_business_user:   None

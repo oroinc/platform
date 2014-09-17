@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -22,10 +23,13 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 /**
  * Class ACLHelper
  * This class analyse input query for acl and mark it with ORO_ACL_WALKER if it need to be ACL protected.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclHelper
 {
     const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
+    const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
      * @var OwnershipConditionDataBuilder
@@ -45,6 +49,35 @@ class AclHelper
     public function __construct(OwnershipConditionDataBuilder $builder)
     {
         $this->builder = $builder;
+    }
+
+    /**
+     * Add ACL checks to Criteria
+     *
+     * @param string   $className
+     * @param Criteria $criteria
+     * @param string   $permission
+     * @return Criteria
+     */
+    public function applyAclToCriteria($className, Criteria $criteria, $permission)
+    {
+        $conditionData = $this->builder->getAclConditionData($className, $permission);
+        if (!empty($conditionData)) {
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
+            list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                = $conditionData;
+            if (!is_null($organizationField) && !is_null($organizationValue)) {
+                $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
+            }
+            if (!$ignoreOwner && !empty($value)) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+                $criteria->andWhere(Criteria::expr()->in($entityField, $value));
+            }
+        }
+
+        return $criteria;
     }
 
     /**
@@ -91,9 +124,9 @@ class AclHelper
     /**
      * Check subrequests for acl access level
      *
-     * @param SelectStatement $ast
+     * @param SelectStatement     $ast
      * @param AclConditionStorage $storage
-     * @param $permission
+     * @param                     $permission
      */
     protected function processSubselects(SelectStatement $ast, AclConditionStorage $storage, $permission)
     {
@@ -142,7 +175,7 @@ class AclHelper
      * Check Access levels for subrequest
      *
      * @param Subselect $subSelect
-     * @param $permission
+     * @param           $permission
      * @return SubRequestAclConditionStorage
      */
     protected function processSubselect(Subselect $subSelect, $permission)
@@ -156,7 +189,7 @@ class AclHelper
      * Check request
      *
      * @param Subselect|SelectStatement $select
-     * @param string $permission
+     * @param string                    $permission
      * @return array
      */
     protected function processSelect($select, $permission)
@@ -173,7 +206,9 @@ class AclHelper
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             $condition = $this->processRangeVariableDeclaration(
                 $identificationVariableDeclaration->rangeVariableDeclaration,
-                $permission
+                $permission,
+                false,
+                $isSubRequest
             );
             if ($condition) {
                 $whereConditions[] = $condition;
@@ -188,7 +223,8 @@ class AclHelper
                         $condition = $this->processRangeVariableDeclaration(
                             $join->joinAssociationDeclaration,
                             $permission,
-                            true
+                            true,
+                            $isSubRequest
                         );
                     } else {
                         $condition = $this->processJoinAssociationPathExpression(
@@ -213,9 +249,9 @@ class AclHelper
      * Process Joins without "on" statement
      *
      * @param IdentificationVariableDeclaration $declaration
-     * @param $key
-     * @param $permission
-     * @return JoinAssociationCondition
+     * @param                                   $key
+     * @param                                   $permission
+     * @return JoinAssociationCondition|null
      */
     protected function processJoinAssociationPathExpression(
         IdentificationVariableDeclaration $declaration,
@@ -239,12 +275,16 @@ class AclHelper
             $this->entityAliases[$join->joinAssociationDeclaration->aliasIdentificationVariable] = $targetEntity;
         }
 
-        $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
+        $resultData = null;
+        if (!in_array($targetEntity, [self::ORO_USER_CLASS])) {
+            $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
+        }
 
         if ($resultData && is_array($resultData)) {
-            $entityField = $value = $pathExpressionType = null;
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                    = $resultData;
             }
 
             return new JoinAssociationCondition(
@@ -252,46 +292,78 @@ class AclHelper
                 $entityField,
                 $value,
                 $pathExpressionType,
+                $organizationField,
+                $organizationValue,
+                $ignoreOwner,
                 $targetEntity,
                 $this->getJoinConditions($associationMapping)
             );
         }
+
+        return null;
     }
 
     /**
      * Process where statement
      *
      * @param RangeVariableDeclaration $rangeVariableDeclaration
-     * @param $permission
-     * @param bool $isJoin
+     * @param string                   $permission
+     * @param bool                     $isJoin
+     * @param bool                     $isSubRequest
      * @return null|AclCondition|JoinAclCondition
      */
     protected function processRangeVariableDeclaration(
         RangeVariableDeclaration $rangeVariableDeclaration,
         $permission,
-        $isJoin = false
+        $isJoin = false,
+        $isSubRequest = false
     ) {
         $this->addEntityAlias($rangeVariableDeclaration);
         $entityName = $rangeVariableDeclaration->abstractSchemaName;
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 
-        $resultData = $this->builder->getAclConditionData($entityName, $permission);
+        $resultData = null;
+        $isUserTable = in_array($rangeVariableDeclaration->abstractSchemaName, [self::ORO_USER_CLASS]);
+        $resultData = false;
+        if (!$isUserTable || $rangeVariableDeclaration->isRoot) {
+            $resultData = $this->builder->getAclConditionData($entityName, $permission);
+        }
 
-        if ($resultData === null || !empty($resultData)) {
-            $entityField = $value = $pathExpressionType = null;
+        if ($resultData !== false && ($resultData === null || !empty($resultData))) {
+            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType) = $resultData;
+                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
+                    = $resultData;
             }
             if ($isJoin) {
-                return new JoinAclCondition($entityAlias, $entityField, $value, $pathExpressionType);
+                return new JoinAclCondition(
+                    $entityAlias,
+                    $entityField,
+                    $value,
+                    $pathExpressionType,
+                    $organizationField,
+                    $organizationValue,
+                    $ignoreOwner
+                );
             } else {
-                return new AclCondition($entityAlias, $entityField, $value, $pathExpressionType);
+                return new AclCondition(
+                    $entityAlias,
+                    $entityField,
+                    $value,
+                    $pathExpressionType,
+                    $organizationField,
+                    $organizationValue,
+                    $ignoreOwner
+                );
             }
         }
 
         return null;
     }
 
+    /**
+     * @param RangeVariableDeclaration $rangeDeclaration
+     */
     protected function addEntityAlias(RangeVariableDeclaration $rangeDeclaration)
     {
         $alias = $rangeDeclaration->aliasIdentificationVariable;
@@ -307,11 +379,11 @@ class AclHelper
      */
     protected function getJoinConditions(array $associationMapping)
     {
-        $targetEntity          = $associationMapping['targetEntity'];
-        $type                  = $associationMapping['type'];
-        $targetEntityMetadata  = $this->em->getClassMetadata($targetEntity);
+        $targetEntity = $associationMapping['targetEntity'];
+        $type = $associationMapping['type'];
+        $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
         $joinConditionsColumns = [];
-        $joinConditions        = [];
+        $joinConditions = [];
 
         switch ($type) {
             case ClassMetadataInfo::ONE_TO_ONE:
@@ -332,7 +404,7 @@ class AclHelper
                 $joinConditions[] = $joinConditionsColumn;
             } else {
                 $joinConditions[] = $targetEntityMetadata
-                        ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
+                    ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
             }
         }
 

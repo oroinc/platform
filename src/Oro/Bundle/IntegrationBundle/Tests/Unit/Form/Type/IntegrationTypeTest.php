@@ -43,9 +43,6 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->at(1))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
-        $this->builder->expects($this->at(2))
-            ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber'));
 
         $this->type->buildForm($this->builder, []);
     }

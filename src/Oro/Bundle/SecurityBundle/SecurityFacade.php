@@ -3,32 +3,32 @@
 namespace Oro\Bundle\SecurityBundle;
 
 use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class SecurityFacade
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     private $securityContext;
 
-    /**
-     * @var AclAnnotationProvider
-     */
+    /** @var AclAnnotationProvider */
     protected $annotationProvider;
 
-    /**
-     * @var ObjectIdentityFactory
-     */
+    /** @var ObjectIdentityFactory */
     protected $objectIdentityFactory;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var LoggerInterface */
     private $logger;
 
     /**
@@ -37,17 +37,20 @@ class SecurityFacade
      * @param SecurityContextInterface $securityContext
      * @param AclAnnotationProvider    $annotationProvider
      * @param ObjectIdentityFactory    $objectIdentityFactory
+     * @param EntityClassResolver      $classResolver
      * @param LoggerInterface          $logger
      */
     public function __construct(
         SecurityContextInterface $securityContext,
         AclAnnotationProvider $annotationProvider,
         ObjectIdentityFactory $objectIdentityFactory,
+        EntityClassResolver $classResolver,
         LoggerInterface $logger
     ) {
         $this->securityContext       = $securityContext;
         $this->annotationProvider    = $annotationProvider;
         $this->objectIdentityFactory = $objectIdentityFactory;
+        $this->entityClassResolver   = $classResolver;
         $this->logger                = $logger;
     }
 
@@ -144,7 +147,7 @@ class SecurityFacade
             if (is_string($attributes) && $object == null) {
                 $delimiter = strpos($attributes, ';');
                 if ($delimiter) {
-                    $object = substr($attributes, $delimiter + 1);
+                    $object     = substr($attributes, $delimiter + 1);
                     $attributes = substr($attributes, 0, $delimiter);
                 }
             }
@@ -192,5 +195,86 @@ class SecurityFacade
     public function hasLoggedUser()
     {
         return ($this->getLoggedUser() !== null);
+    }
+
+    /**
+     * Get current organization object from the security token
+     *
+     * @return bool|Organization
+     */
+    public function getOrganization()
+    {
+        $token = $this->securityContext->getToken();
+        if ($token instanceof OrganizationContextTokenInterface) {
+            return $token->getOrganizationContext();
+        }
+
+        return false;
+    }
+
+    /**
+     * Get current organization id from the security token
+     *
+     * @return int|null
+     */
+    public function getOrganizationId()
+    {
+        /** @var Organization $organization */
+        $organization = $this->getOrganization();
+        return $organization ? $organization->getId() : null;
+    }
+
+    /**
+     * Get ACL annotation object for current controller action which was taken from request object
+     *
+     * @param Request $request
+     * @param bool    $convertClassName
+     * @return null|Acl
+     */
+    public function getRequestAcl(Request $request, $convertClassName = false)
+    {
+        $controller = $request->attributes->get('_controller');
+        if (strpos($controller, '::') !== false) {
+            $controllerData = explode('::', $controller);
+            $acl = $this->getClassMethodAnnotation(
+                $controllerData[0],
+                $controllerData[1]
+            );
+
+            if ($convertClassName && $acl) {
+                $entityClass = $acl->getClass();
+                if (!empty($entityClass) && $this->entityClassResolver->isEntity($entityClass)) {
+                    $acl->setClass($this->entityClassResolver->getEntityClass($entityClass));
+                }
+            }
+
+            return $acl;
+        }
+
+        return null;
+    }
+
+    /**
+     * Check access for object for current controller action which was taken from request object
+     *
+     * @param Request $request
+     * @param         $object
+     * @return int -1 if no access, 0 if can't decide, 1 if access is granted
+     */
+    public function isRequestObjectIsGranted(Request $request, $object)
+    {
+        $aclAnnotation = $this->getRequestAcl($request, true);
+        if ($aclAnnotation) {
+            $class      = $aclAnnotation->getClass();
+            $permission = $aclAnnotation->getPermission();
+            if ($permission
+                && $class
+                && is_a($object, $class)
+            ) {
+                return $this->isGranted($permission, $object) ? 1 : -1;
+            }
+        }
+
+        return 0;
     }
 }

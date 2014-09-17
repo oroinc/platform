@@ -7,6 +7,11 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Oro\Bundle\SoapBundle\Event\FindAfter;
+use Oro\Bundle\SoapBundle\Event\GetListBefore;
+
 class ApiEntityManager
 {
     /**
@@ -25,16 +30,31 @@ class ApiEntityManager
     protected $metadata;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * Constructor
      *
-     * @param string        $class Entity name
-     * @param ObjectManager $om    Object manager
+     * @param string          $class Entity name
+     * @param ObjectManager   $om Object manager
      */
     public function __construct($class, ObjectManager $om)
     {
         $this->om       = $om;
         $this->metadata = $this->om->getClassMetadata($class);
         $this->class    = $this->metadata->getName();
+    }
+
+    /**
+     * Sets a event dispatcher
+     *
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -65,7 +85,13 @@ class ApiEntityManager
      */
     public function find($id)
     {
-        return $this->getRepository()->find($id);
+        $object = $this->getRepository()->find($id);
+
+        // dispatch oro_api.request.find.after event
+        $event = new FindAfter($object);
+        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+
+        return $object;
     }
 
     /**
@@ -124,23 +150,28 @@ class ApiEntityManager
         $page = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
-        if ($criteria instanceof Criteria) {
-            $criteria
-                ->setMaxResults($limit)
-                ->orderBy($this->getOrderBy($orderBy))
-                ->setFirstResult($this->getOffset($page, $limit));
+        if (is_array($criteria)) {
+            $newCriteria = new Criteria();
+            foreach ($criteria as $fieldName => $value) {
+                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+            }
 
-            return $this->getRepository()
-                ->matching($criteria)
-                ->toArray();
-        } else {
-            return $this->getRepository()->findBy(
-                $criteria,
-                $this->getOrderBy($orderBy),
-                $limit,
-                $this->getOffset($page, $limit)
-            );
+            $criteria = $newCriteria;
         }
+
+        // dispatch oro_api.request.get_list.before event
+        $event = new GetListBefore($criteria, $this->class);
+        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $criteria = $event->getCriteria();
+
+        $criteria
+            ->setMaxResults($limit)
+            ->orderBy($this->getOrderBy($orderBy))
+            ->setFirstResult($this->getOffset($page, $limit));
+
+        return $this->getRepository()
+            ->matching($criteria)
+            ->toArray();
     }
 
     /**

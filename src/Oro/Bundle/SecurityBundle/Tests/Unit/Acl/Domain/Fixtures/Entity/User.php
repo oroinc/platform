@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
-class User
+use Oro\Bundle\UserBundle\Entity\User as ParentUser;
+
+class User extends ParentUser
 {
-    private $id;
+    protected $owner;
 
-    private $owner;
-
-    public function __construct($id = 0, $owner = null)
+    public function __construct($id = 0, $owner = null, $organization = null)
     {
         $this->id = $id;
         $this->owner = $owner;
+        $this->setOrganization($organization);
     }
 
     public function getId()

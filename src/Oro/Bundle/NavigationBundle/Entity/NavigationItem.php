@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * Navigation Entity
  *
@@ -72,6 +74,14 @@ class NavigationItem implements NavigationItemInterface
      * @ORM\Column(name="updated_at", type="datetime")
      */
     protected $updatedAt;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Constructor
@@ -273,6 +283,9 @@ class NavigationItem implements NavigationItemInterface
         if (isset($values['user'])) {
             $this->setUser($values['user']);
         }
+        if (isset($values['organization'])) {
+            $this->setOrganization($values['organization']);
+        }
     }
 
     /**
@@ -294,5 +307,29 @@ class NavigationItem implements NavigationItemInterface
     public function doPreUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return NavigationItem
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

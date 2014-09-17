@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tools;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -68,28 +70,52 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
                 continue;
             }
 
-            $this->relationBuilder->addManyToOneRelation(
+            $this->createOwnerRelation(
                 $entityConfig,
-                $this->getOwnerTargetEntity($ownerType),
-                $ownershipConfig->get('owner_field_name'),
-                'id',
-                [
-                    'entity'    => [
-                        'label'       => 'oro.custom_entity.owner.label',
-                        'description' => 'oro.custom_entity.owner.description',
-                    ],
-                    'view'      => [
-                        'is_displayable' => false
-                    ],
-                    'form'      => [
-                        'is_enabled' => false
-                    ],
-                    'dataaudit' => [
-                        'auditable' => true
-                    ]
-                ]
+                $this->getOwnerTargetEntityClassName($ownerType),
+                $ownershipConfig->get('owner_field_name')
             );
+
+            if (in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])
+                && $ownershipConfig->has('organization_field_name')
+            ) {
+                $this->createOwnerRelation(
+                    $entityConfig,
+                    $this->getOwnerTargetEntityClassName($ownerType),
+                    $ownershipConfig->get('organization_field_name')
+                );
+            }
         }
+    }
+
+    /**
+     * @param ConfigInterface $entityConfig
+     * @param string          $targetEntityClassName
+     * @param string          $relationName
+     */
+    protected function createOwnerRelation(ConfigInterface $entityConfig, $targetEntityClassName, $relationName)
+    {
+        $this->relationBuilder->addManyToOneRelation(
+            $entityConfig,
+            $targetEntityClassName,
+            $relationName,
+            'id',
+            [
+                'entity'    => [
+                    'label'       => 'oro.custom_entity.' . $relationName . '.label',
+                    'description' => 'oro.custom_entity.' . $relationName . '.description',
+                ],
+                'view'      => [
+                    'is_displayable' => false
+                ],
+                'form'      => [
+                    'is_enabled' => false
+                ],
+                'dataaudit' => [
+                    'auditable' => true
+                ]
+            ]
+        );
     }
 
     /**
@@ -97,14 +123,14 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
      * @return string
      * @throws \InvalidArgumentException
      */
-    protected function getOwnerTargetEntity($ownerType)
+    protected function getOwnerTargetEntityClassName($ownerType)
     {
         switch ($ownerType) {
-            case 'USER':
+            case OwnershipType::OWNER_TYPE_USER:
                 return $this->ownershipMetadataProvider->getUserClass();
-            case 'BUSINESS_UNIT':
+            case OwnershipType::OWNER_TYPE_BUSINESS_UNIT:
                 return $this->ownershipMetadataProvider->getBusinessUnitClass();
-            case 'ORGANIZATION':
+            case OwnershipType::OWNER_TYPE_ORGANIZATION:
                 return $this->ownershipMetadataProvider->getOrganizationClass();
         }
 

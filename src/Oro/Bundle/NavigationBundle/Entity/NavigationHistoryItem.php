@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * Navigation History Entity
  *
@@ -67,6 +69,14 @@ class NavigationHistoryItem implements NavigationItemInterface
      * @ORM\Column(name="visit_count", type="integer")
      */
     protected $visitCount = 0;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * @var string $url
@@ -305,6 +315,9 @@ class NavigationHistoryItem implements NavigationItemInterface
         if (isset($values['user'])) {
             $this->setUser($values['user']);
         }
+        if (isset($values['organization'])) {
+            $this->setOrganization($values['organization']);
+        }
         if (isset($values['route'])) {
             $this->setRoute($values['route']);
         }
@@ -333,5 +346,29 @@ class NavigationHistoryItem implements NavigationItemInterface
     {
         $this->visitedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->visitCount++;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     *
+     * @return NavigationHistoryItem
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

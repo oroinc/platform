@@ -16,8 +16,8 @@ class SetupStep extends AbstractStep
 
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_config.global');
-        $form->get('company_name')->setData($configManager->get('oro_ui.application_name'));
-        $form->get('company_title')->setData($configManager->get('oro_ui.application_title'));
+
+        $form->get('organization_name')->setData($configManager->get('oro_ui.organization_name'));
         $form->get('application_url')->setData($configManager->get('oro_ui.application_url'));
 
         return $this->render(
@@ -53,21 +53,20 @@ class SetupStep extends AbstractStep
 
             $this->get('oro_user.manager')->updateUser($adminUser);
 
-            // update company name and title if specified
             /** @var ConfigManager $configManager */
-            $configManager       = $this->get('oro_config.global');
-            $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-            $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+            $configManager           = $this->get('oro_config.global');
+            $defaultOrganizationName = $configManager->get('oro_ui.organization_name');
+            $organizationName        = $form->get('organization_name')->getData();
+            if (!empty($organizationName) && $organizationName !== $defaultOrganizationName) {
+                $organizationManager = $this->get('oro_organization.organization_manager');
+                $organization        = $organizationManager->getOrganizationByName('default');
+                $organization->setName($organizationName);
+
+                $organizationManager->updateOrganization($organization);
+            }
+
             $defaultAppURL       = $configManager->get('oro_ui.application_url');
-            $companyName         = $form->get('company_name')->getData();
-            $companyTitle        = $form->get('company_title')->getData();
             $applicationURL      = $form->get('application_url')->getData();
-            if (!empty($companyName) && $companyName !== $defaultCompanyName) {
-                $configManager->set('oro_ui.application_name', $companyName);
-            }
-            if (!empty($companyTitle) && $companyTitle !== $defaultCompanyTitle) {
-                $configManager->set('oro_ui.application_title', $companyTitle);
-            }
             if (!empty($applicationURL) && $applicationURL !== $defaultAppURL) {
                 $configManager->set('oro_ui.application_url', $applicationURL);
             }

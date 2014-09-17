@@ -5,54 +5,34 @@ namespace Oro\Bundle\OrganizationBundle\Event;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class RecordOwnerDataListener
 {
-    /**
-     * TODO: Refactor direct field name usage after extended entities will be implemented
-     */
-    const OWNER_FIELD_NAME = 'owner';
+    /** @var ServiceLink */
+    protected $securityContextLink;
 
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * @param ContainerInterface $container
+     * @param ServiceLink    $securityContextLink
      * @param ConfigProvider $configProvider
      */
-    public function __construct(ContainerInterface $container, ConfigProvider $configProvider)
+    public function __construct(ServiceLink $securityContextLink, ConfigProvider $configProvider)
     {
-        $this->container      = $container;
-        $this->configProvider = $configProvider;
-    }
-
-    /**
-     * @return SecurityContextInterface
-     */
-    protected function getSecurityContext()
-    {
-        if (!$this->securityContext) {
-            $this->securityContext = $this->container->get('security.context');
-        }
-
-        return $this->securityContext;
+        $this->securityContextLink = $securityContextLink;
+        $this->configProvider  = $configProvider;
     }
 
     /**
@@ -74,24 +54,59 @@ class RecordOwnerDataListener
         $entity    = $args->getEntity();
         $className = ClassUtils::getClass($entity);
         if ($this->configProvider->hasConfig($className)) {
+            $accessor = PropertyAccess::createPropertyAccessor();
             $config = $this->configProvider->getConfig($className);
             $ownerType = $config->get('owner_type');
-            if ($ownerType && $ownerType !== OwnershipType::OWNER_TYPE_NONE) {
-                if (!method_exists($entity, 'getOwner')) {
-                    throw new \LogicException(
-                        sprintf('Method getOwner must be implemented for %s entity', $className)
-                    );
+            $ownerFieldName = $config->get('owner_field_name');
+            // set default owner for organization and user owning entities
+            if ($ownerType
+                && in_array($ownerType, [OwnershipType::OWNER_TYPE_ORGANIZATION, OwnershipType::OWNER_TYPE_USER])
+                && !$accessor->getValue($entity, $ownerFieldName)
+            ) {
+                $owner = null;
+                if (OwnershipType::OWNER_TYPE_USER == $ownerType) {
+                    $owner = $user;
+                } elseif (OwnershipType::OWNER_TYPE_ORGANIZATION == $ownerType
+                    && $token instanceof OrganizationContextTokenInterface
+                ) {
+                    $owner = $token->getOrganizationContext();
                 }
-                if (!$entity->getOwner()) {
-                    /**
-                     * Automatically set current user as record owner
-                     */
-                    if (OwnershipType::OWNER_TYPE_USER == $ownerType
-                        && method_exists($entity, 'setOwner')) {
-                            $entity->setOwner($user);
-                    }
-                }
+                $accessor->setValue(
+                    $entity,
+                    $ownerFieldName,
+                    $owner
+                );
+            }
+            //set organization
+            $this->setDefaultOrganization($token, $config, $entity);
+        }
+    }
+
+    /**
+     * @param TokenInterface  $token
+     * @param ConfigInterface $config
+     * @param object          $entity
+     */
+    protected function setDefaultOrganization(TokenInterface $token, ConfigInterface $config, $entity)
+    {
+        if ($token instanceof OrganizationContextTokenInterface && $config->has('organization_field_name')) {
+            $accessor = PropertyAccess::createPropertyAccessor();
+            $fieldName = $config->get('organization_field_name');
+            if (!$accessor->getValue($entity, $fieldName)) {
+                $accessor->setValue(
+                    $entity,
+                    $fieldName,
+                    $token->getOrganizationContext()
+                );
             }
         }
+    }
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurityContext()
+    {
+        return $this->securityContextLink->getService();
     }
 }
