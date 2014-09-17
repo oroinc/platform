@@ -274,6 +274,15 @@ class User extends AbstractPageEntity
         return $this;
     }
 
+    public function setOrganization($organization)
+    {
+        $this->test->byXPath(
+            "//div[@id='oro_user_user_form_organizations']//label[contains(., '{$organization}')]"
+        )->click();
+
+        return $this;
+    }
+
     public function edit()
     {
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit User']")->click();

@@ -19,7 +19,7 @@ class Role extends AbstractPageEntity
     {
         parent::__construct($testCase, $redirect);
         $this->label = $this->test->byId('oro_user_role_form_label');
-        $this->owner = $this->test->select($this->test->byId('oro_user_role_form_owner'));
+//        $this->owner = $this->test->select($this->test->byId('oro_user_role_form_owner'));
     }
 
     public function setLabel($label)
