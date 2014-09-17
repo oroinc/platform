@@ -11,8 +11,7 @@ class OroAdministration extends AbstractPage
     {
         parent::__construct($testCase, $redirect);
 
-        $this->companyShort = $this->test->byId("oro_installer_setup_company_name");
-        $this->company = $this->test->byId("oro_installer_setup_company_title");
+        $this->organization = $this->test->byId("oro_installer_setup_organization_name");
         $this->username = $this->test->byId("oro_installer_setup_username");
         $this->passwordFirst = $this->test->byId("oro_installer_setup_plainPassword_first");
         $this->passwordSecond = $this->test->byId("oro_installer_setup_plainPassword_second");
