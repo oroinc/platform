@@ -367,7 +367,7 @@ class User extends ExtendUser implements
     protected $owner;
 
     /**
-     * @var Role[]
+     * @var Role[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_role",
@@ -387,7 +387,7 @@ class User extends ExtendUser implements
     protected $roles;
 
     /**
-     * @var Group[]
+     * @var Group[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Group")
      * @ORM\JoinTable(name="oro_user_access_group",
@@ -423,7 +423,7 @@ class User extends ExtendUser implements
     protected $api;
 
     /**
-     * @var Status[]
+     * @var Status[]|ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Status", mappedBy="user")
      * @ORM\OrderBy({"createdAt" = "DESC"})
@@ -439,7 +439,7 @@ class User extends ExtendUser implements
     protected $currentStatus;
 
     /**
-     * @var Email[]
+     * @var Email[]|ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
      */
@@ -452,7 +452,7 @@ class User extends ExtendUser implements
     protected $tags;
 
     /**
-     * @var BusinessUnit[]
+     * @var BusinessUnit[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_business_unit",
@@ -471,7 +471,7 @@ class User extends ExtendUser implements
     protected $businessUnits;
 
     /**
-     * @var EmailOrigin[]
+     * @var EmailOrigin[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
      * @ORM\JoinTable(name="oro_user_email_origin",

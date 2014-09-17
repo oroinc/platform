@@ -7,6 +7,34 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
 
 class OroAdministration extends AbstractPage
 {
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $companyShort;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $company;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $username;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $passwordFirst;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $passwordSecond;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $email;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $firstName;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $lastName;
+
+    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $loadFixtures;
+
+
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
