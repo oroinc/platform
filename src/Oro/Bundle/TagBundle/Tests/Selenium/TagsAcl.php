@@ -17,11 +17,10 @@ class TagsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
-            ->setOwner('Main')
-            ->setEntity('Tag', array('Create', 'Edit', 'Delete', 'View'), 'System')
-            ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
-            ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
-            ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
+            ->setEntity('Tag', array('Create', 'Edit', 'Delete', 'View'), 'Organization')
+            ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
+            ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
+            ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setCapability(
                 array(
                     'Tag assign/unassign',
@@ -59,6 +58,8 @@ class TagsAcl extends Selenium2TestCase
             ->setLastName('Last_'.$userName)
             ->setEmail($userName.'@mail.com')
             ->setRoles(array('Label_' . $role))
+            ->setOrganization('OroCRM')
+            ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
