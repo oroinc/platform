@@ -4,10 +4,11 @@
         function($, View, Collection) {
             $(function () {
                 'use strict';
+                var $templateSelectorEl = $('#{{ id }}');
                 new View({
-                    el: $('#{{ form.parent.children[depends_on_parent_field].vars.id }}'),
-                    target: $('#{{ id }}'),
-                    collection: new Collection()
+                    el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
+                    target: $templateSelectorEl,
+                    collection: new Collection('{{ data_route }}', {{ data_route_parameter|json_encode|raw }})
                 });
             });
         })

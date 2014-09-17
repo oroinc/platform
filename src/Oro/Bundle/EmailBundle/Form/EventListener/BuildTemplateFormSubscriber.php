@@ -5,10 +5,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 /**
  * BuildTemplateFormSubscriber used for populating templates choices
@@ -17,6 +19,19 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
  */
 class BuildTemplateFormSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var SecurityContextInterface
+     */
+    protected $securityContext;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     */
+    public function __construct(SecurityContextInterface $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -69,14 +84,22 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
      */
     protected function initChoicesByEntityName($entityName, $fieldName, FormInterface $form)
     {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token        = $this->securityContext->getToken();
+        $organization = $token->getOrganizationContext();
+
         FormUtils::replaceField(
             $form,
             $fieldName,
             [
                 'selectedEntity' => $entityName,
-                'query_builder'  => function (EmailTemplateRepository $templateRepository) use ($entityName) {
-                    return $templateRepository->getEntityTemplatesQueryBuilder($entityName);
-                },
+                'query_builder'  =>
+                    function (EmailTemplateRepository $templateRepository) use (
+                        $entityName,
+                        $organization
+                    ) {
+                        return $templateRepository->getEntityTemplatesQueryBuilder($entityName, $organization);
+                    },
             ],
             ['choice_list', 'choices']
         );

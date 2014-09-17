@@ -10,9 +10,7 @@ use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 
 class BusinessUnitTreeType extends AbstractType
 {
-    /**
-     * @var BusinessUnitManager
-     */
+    /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
     public function __construct(BusinessUnitManager $businessUnitManager)

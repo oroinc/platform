@@ -94,11 +94,6 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $this->batch->getOrigin(1)->getId());
         $this->assertNull($this->batch->getOrigin(123));
-
-        $this->setExpectedException('LogicException');
-        $origin1 = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')->getMock();
-        $origin1->expects($this->any())->method('getId')->will($this->returnValue(1));
-        $this->batch->addOrigin($origin1);
     }
 
     /**

@@ -37,6 +37,7 @@ oro:
         events.label:        Event
         connections.label:   Connection
         owner.label:         Owner
+        organization.label:  Organization
 
         my_calendar:         My Calendar
 

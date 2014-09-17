@@ -14,6 +14,7 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
 {
     const USER_OWNER_FIELD_NAME  = 'owner';
     const USER_OWNER_COLUMN_NAME = 'owner';
+    const ORGANIZATION_FIELD_NAME = 'organization';
 
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -59,11 +60,18 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
      * @param string      $ownerType
      * @param bool        $expectedReload
      * @param bool        $expectedSet
+     * @param bool        $expectedSetOrganization
      */
-    public function testPopulateChannelOwner(Integration $integration, $ownerType, $expectedReload, $expectedSet)
-    {
+    public function testPopulateChannelOwner(
+        Integration $integration,
+        $ownerType,
+        $expectedReload,
+        $expectedSet,
+        $expectedSetOrganization = false
+    ) {
         $entity = new \stdClass();
         $owner  = $integration->getDefaultUserOwner();
+        $organization = $integration->getOrganization();
 
         $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()->getMock();
@@ -78,7 +86,12 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($owner));
         }
 
-        $ownerMetadata = new OwnershipMetadata($ownerType, self::USER_OWNER_FIELD_NAME, self::USER_OWNER_COLUMN_NAME);
+        $ownerMetadata = new OwnershipMetadata(
+            $ownerType,
+            self::USER_OWNER_FIELD_NAME,
+            self::USER_OWNER_COLUMN_NAME,
+            self::ORGANIZATION_FIELD_NAME
+        );
         $this->metadataProvider->expects($this->any())->method('getMetadata')
             ->with(get_class($entity))
             ->will($this->returnValue($ownerMetadata));
@@ -86,6 +99,13 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         if ($expectedSet) {
             $doctrineMetadata->expects($this->once())->method('setFieldValue')
                 ->with($this->identicalTo($entity), self::USER_OWNER_FIELD_NAME, $this->identicalTo($owner));
+        } elseif ($expectedSetOrganization) {
+            $doctrineMetadata->expects($this->once())->method('setFieldValue')
+                ->with(
+                    $this->identicalTo($entity),
+                    self::ORGANIZATION_FIELD_NAME,
+                    $this->identicalTo($organization)
+                );
         } else {
             $doctrineMetadata->expects($this->never())->method('setFieldValue');
         }
@@ -101,8 +121,12 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         $integrationEmptyOwner = new Integration();
 
         $user                 = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization        = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $integrationWithOwner = new Integration();
         $integrationWithOwner->setDefaultUserOwner($user);
+
+        $integrationWithOrganization = new Integration();
+        $integrationWithOrganization->setOrganization($organization);
 
         return [
             'should set, user given and user owned entity'             => [$integrationWithOwner, 'USER', false, true],
@@ -118,6 +142,13 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
                 'BUSINESS_UNIT',
                 false,
                 false
+            ],
+            'set organization'                                         => [
+                $integrationWithOrganization,
+                'BUSINESS_UNIT',
+                false,
+                false,
+                true
             ]
         ];
     }

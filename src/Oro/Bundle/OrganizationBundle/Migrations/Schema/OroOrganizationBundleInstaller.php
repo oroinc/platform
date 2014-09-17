@@ -3,11 +3,13 @@
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_0\OroOrganizationBundle;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class OroOrganizationBundleInstaller implements Installation
 {
     /**
@@ -15,7 +17,7 @@ class OroOrganizationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -23,9 +25,82 @@ class OroOrganizationBundleInstaller implements Installation
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        OroOrganizationBundle::oroOrganizationTable($schema);
-        OroOrganizationBundle::oroBusinessUnitTable($schema);
+        /** Tables generation **/
+        $this->createOroOrganizationTable($schema);
+        $this->createOroBusinessUnitTable($schema);
 
-        OroOrganizationBundle::oroBusinessUnitForeignKeys($schema);
+        /** Foreign keys generation **/
+        $this->addOroBusinessUnitForeignKeys($schema);
+    }
+
+    /**
+     * Create oro_organization table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroOrganizationTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_organization');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('description', 'text', ['notnull' => false]);
+        $table->addColumn(
+            'created_at',
+            'datetime',
+            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
+        );
+        $table->addColumn(
+            'updated_at',
+            'datetime',
+            ['default' => null, 'notnull' => false, 'comment' => '(DC2Type:datetime)']
+        );
+        $table->addColumn('enabled', 'boolean', ['default' => '1']);
+        $table->addUniqueIndex(['name'], 'uniq_bb42b65d5e237e06');
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create oro_business_unit table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroBusinessUnitTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_business_unit');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', []);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('phone', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('website', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('fax', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addIndex(['organization_id'], 'idx_c033b2d532c8a3de', []);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['business_unit_owner_id'], 'idx_c033b2d559294170', []);
+    }
+
+    /**
+     * Add oro_business_unit foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroBusinessUnitForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_business_unit');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_business_unit'),
+            ['business_unit_owner_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
     }
 }

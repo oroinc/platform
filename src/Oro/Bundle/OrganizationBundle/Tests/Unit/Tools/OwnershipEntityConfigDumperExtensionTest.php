@@ -25,10 +25,10 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
 
     public function setUp()
     {
-        $this->configManager             = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->relationBuilder           = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
+        $this->relationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider =
@@ -61,7 +61,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
      * @dataProvider preUpdateProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdate($ownerType, $getOwnerClassMethodName)
+    public function testPreUpdate($ownerType, $getOwnerClassMethodName, $getOwnerClassMethodNameCalls)
     {
         $extendConfig1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig1->set('owner', ExtendScope::OWNER_CUSTOM);
@@ -85,6 +85,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
         $ownershipConfig1 = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $ownershipConfig1->set('owner_type', $ownerType);
         $ownershipConfig1->set('owner_field_name', 'owner_field');
+        $ownershipConfig1->set('organization_field_name', 'organization_field');
         $ownershipConfig2 = new Config(new EntityConfigId('ownership', 'Test\Entity2'));
 
         $extendConfigs    = [$extendConfig1, $extendConfig3, $extendConfig3, $extendConfig4, $extendConfig5];
@@ -142,33 +143,89 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                 )
             );
 
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects($this->exactly($getOwnerClassMethodNameCalls))
             ->method($getOwnerClassMethodName)
             ->will($this->returnValue('Test\Owner'));
 
-        $this->relationBuilder->expects($this->once())
-            ->method('addManyToOneRelation')
-            ->with(
-                $this->identicalTo($extendConfig1),
-                'Test\Owner',
-                'owner_field',
-                'id',
-                [
-                    'entity'    => [
-                        'label'       => 'oro.custom_entity.owner.label',
-                        'description' => 'oro.custom_entity.owner.description',
-                    ],
-                    'view'      => [
-                        'is_displayable' => false
-                    ],
-                    'form'      => [
-                        'is_enabled' => false
-                    ],
-                    'dataaudit' => [
-                        'auditable' => true
-                    ]
-                ]
-            );
+        $this->relationBuilder->expects($this->exactly($getOwnerClassMethodNameCalls))
+            ->method('addManyToOneRelation');
+
+
+        switch ($getOwnerClassMethodNameCalls) {
+            case 1:
+                $this->relationBuilder->expects($this->once())
+                    ->method('addManyToOneRelation')
+                    ->with(
+                        $this->identicalTo($extendConfig1),
+                        'Test\Owner',
+                        'owner_field',
+                        'id',
+                        [
+                            'entity'    => [
+                                'label'       => 'oro.custom_entity.owner_field.label',
+                                'description' => 'oro.custom_entity.owner_field.description',
+                            ],
+                            'view'      => [
+                                'is_displayable' => false
+                            ],
+                            'form'      => [
+                                'is_enabled' => false
+                            ],
+                            'dataaudit' => [
+                                'auditable' => true
+                            ]
+                        ]
+                    );
+                break;
+            case 2:
+                $this->relationBuilder->expects($this->at(0))
+                    ->method('addManyToOneRelation')
+                    ->with(
+                        $this->identicalTo($extendConfig1),
+                        'Test\Owner',
+                        'owner_field',
+                        'id',
+                        [
+                            'entity'    => [
+                                'label'       => 'oro.custom_entity.owner_field.label',
+                                'description' => 'oro.custom_entity.owner_field.description',
+                            ],
+                            'view'      => [
+                                'is_displayable' => false
+                            ],
+                            'form'      => [
+                                'is_enabled' => false
+                            ],
+                            'dataaudit' => [
+                                'auditable' => true
+                            ]
+                        ]
+                    );
+                $this->relationBuilder->expects($this->at(1))
+                    ->method('addManyToOneRelation')
+                    ->with(
+                        $this->identicalTo($extendConfig1),
+                        'Test\Owner',
+                        'organization_field',
+                        'id',
+                        [
+                            'entity'    => [
+                                'label'       => 'oro.custom_entity.organization_field.label',
+                                'description' => 'oro.custom_entity.organization_field.description',
+                            ],
+                            'view'      => [
+                                'is_displayable' => false
+                            ],
+                            'form'      => [
+                                'is_enabled' => false
+                            ],
+                            'dataaudit' => [
+                                'auditable' => true
+                            ]
+                        ]
+                    );
+                break;
+        }
 
         $this->extension->preUpdate();
     }
@@ -176,9 +233,9 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
     public function preUpdateProvider()
     {
         return [
-            ['USER', 'getUserClass'],
-            ['BUSINESS_UNIT', 'getBusinessUnitClass'],
-            ['ORGANIZATION', 'getOrganizationClass'],
+            ['USER', 'getUserClass', 2],
+            ['BUSINESS_UNIT', 'getBusinessUnitClass', 2],
+            ['ORGANIZATION', 'getOrganizationClass', 1],
         ];
     }
 }

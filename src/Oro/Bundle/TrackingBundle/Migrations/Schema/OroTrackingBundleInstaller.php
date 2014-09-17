@@ -3,8 +3,11 @@
 namespace Oro\Bundle\TrackingBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+use Oro\Bundle\TrackingBundle\Migrations\Schema\v1_4\OroTrackerBundle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -17,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_4';
     }
 
     /**
@@ -34,6 +37,8 @@ class OroTrackingBundleInstaller implements Installation
         $this->addOroTrackingDataForeignKeys($schema);
         $this->addOroTrackingEventForeignKeys($schema);
         $this->addOroTrackingWebsiteForeignKeys($schema);
+
+        OroTrackerBundle::addOrganization($schema);
     }
 
     /**
@@ -67,8 +72,8 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('user_identifier', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('logged_at', 'datetime', []);
-        $table->addColumn('url', 'string', ['length' => 255]);
-        $table->addColumn('title', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('url', 'text', []);
+        $table->addColumn('title', 'text', ['notnull' => false]);
         $table->addColumn('code', 'string', ['notnull' => false, 'length' => 255]);
         $table->addIndex(['logged_at'], 'event_loggedat_idx', []);
         $table->addIndex(['code'], 'code_idx', []);

@@ -24,7 +24,6 @@ class RestRolesTest extends WebTestCase
         $request  = array(
             "role" => array(
                 "label" => $roleName,
-                "owner" => "1"
             )
         );
         $this->client->request('POST', $this->getUrl('oro_api_post_role'), $request);

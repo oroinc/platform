@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +27,9 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $logger;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $classResolver;
+
     protected function setUp()
     {
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
@@ -37,10 +43,16 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
+        $this->classResolver =
+            $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+                ->disableOriginalConstructor()
+                ->getMock();
+
         $this->facade = new SecurityFacade(
             $this->securityContext,
             $this->annotationProvider,
             $this->objectIdentityFactory,
+            $this->classResolver,
             $this->logger
         );
     }
@@ -401,5 +413,81 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->facade->isGranted('PERMISSION', $obj);
         $this->assertTrue($result);
+    }
+
+    public function testGetRequestAcl()
+    {
+        $request = new Request();
+        $request->attributes->add(['_controller' => 'OroTestBundle::testAction']);
+        $acl = new Acl(['id' => 1, 'class' => 'OroTestBundle:Test', 'type' => 'entity']);
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotation')
+            ->with('OroTestBundle', 'testAction')
+            ->will($this->returnValue($acl));
+        $this->classResolver->expects($this->once())
+            ->method('isEntity')
+            ->with('OroTestBundle:Test')
+            ->will($this->returnValue(true));
+        $this->classResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with('OroTestBundle:Test')
+            ->will($this->returnValue('Oro\Bundle\TestBundle\Entity\Test'));
+
+        $returnAcl = $this->facade->getRequestAcl($request, true);
+        $this->assertNotNull($returnAcl);
+        $this->assertEquals('Oro\Bundle\TestBundle\Entity\Test', $acl->getClass());
+    }
+
+    public function testGeWrongRequestAcl()
+    {
+        $request = new Request();
+        $request->attributes->add(['_controller' => 'wrong controller']);
+        $this->annotationProvider->expects($this->never())
+            ->method('findAnnotation');
+        $this->classResolver->expects($this->never())
+            ->method('isEntity');
+        $this->classResolver->expects($this->never())
+            ->method('getEntityClass');
+
+        $this->assertNull($this->facade->getRequestAcl($request, true));
+    }
+
+    /**
+     * @dataProvider isRequestObjectIsGrantedProvider
+     */
+    public function testIsRequestObjectIsGranted($requestController, $isGrant, $result)
+    {
+        $object = new \stdClass();
+        $request = new Request();
+        $request->attributes->add(['_controller' => $requestController]);
+        $acl = new Acl(
+            ['id' => 1, 'class' => 'OroTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERMISSION']
+        );
+        $this->annotationProvider->expects($this->any())
+            ->method('findAnnotation')
+            ->will($this->returnValue($acl));
+        $this->classResolver->expects($this->any())
+            ->method('isEntity')
+            ->with('OroTestBundle:Test')
+            ->will($this->returnValue(true));
+        $this->classResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->with('OroTestBundle:Test')
+            ->will($this->returnValue('\stdClass'));
+        $this->securityContext->expects($this->any())
+            ->method('isGranted')
+            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($object))
+            ->will($this->returnValue($isGrant));
+
+        $this->assertEquals($result, $this->facade->isRequestObjectIsGranted($request, $object));
+    }
+
+    public function isRequestObjectIsGrantedProvider()
+    {
+        return [
+            ['testBundle::testAction', true, 1],
+            ['testBundle::testAction', false, -1],
+            ['wrong_action', true, 0]
+        ];
     }
 }

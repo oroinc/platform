@@ -22,6 +22,7 @@ oro:
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
+        organization.label:  Organization
 
         action:
             assign_unassign: "Tag assign/unassign"

@@ -4,7 +4,6 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -15,24 +14,9 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 class DeleteHandler
 {
     /**
-     * @var SecurityFacade
-     */
-    protected $securityFacade;
-
-    /**
      * @var OwnerDeletionManager
      */
     protected $ownerDeletionManager;
-
-    /**
-     * Sets a security facade
-     *
-     * @param SecurityFacade $securityFacade
-     */
-    public function setSecurityFacade(SecurityFacade $securityFacade)
-    {
-        $this->securityFacade = $securityFacade;
-    }
 
     /**
      * Sets an owner deletion manager
@@ -74,9 +58,6 @@ class DeleteHandler
      */
     protected function checkPermissions($entity, ObjectManager $em)
     {
-        if (!$this->securityFacade->isGranted('DELETE', $entity)) {
-            throw new ForbiddenException('acl');
-        }
         if ($this->ownerDeletionManager->isOwner($entity) && $this->ownerDeletionManager->hasAssignments($entity)) {
             throw new ForbiddenException('has assignments');
         };
