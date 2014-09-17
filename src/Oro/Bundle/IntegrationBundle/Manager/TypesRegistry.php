@@ -83,7 +83,7 @@ class TypesRegistry
      *
      * @return array
      */
-    public function getAvailableIntegrationTypesDetailedChoiceList()
+    public function getAvailableIntegrationTypesDetailedData()
     {
         /** @var ArrayCollection $types */
         $types  = $this->getAvailableIntegrationTypes();
@@ -94,7 +94,7 @@ class TypesRegistry
                 if ($type instanceof IconAwareIntegrationInterface) {
                     $result['icon'] = $type->getIcon();
                 }
-                return json_encode($result);
+                return $result;
             }
         )->toArray();
 

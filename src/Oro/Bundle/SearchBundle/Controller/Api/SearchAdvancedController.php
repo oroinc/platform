@@ -9,6 +9,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -88,12 +89,17 @@ class SearchAdvancedController extends FOSRestController
     {
         $view = new View();
 
+        $result = $this->get('oro_search.index')->advancedSearch(
+            $this->getRequest()->get('query')
+        );
+
+        $dispatcher = $this->container->get('event_dispatcher');
+        foreach ($result->getElements() as $item) {
+            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+        }
+
         return $this->get('fos_rest.view_handler')->handle(
-            $view->setData(
-                $this->get('oro_search.index')->advancedSearch(
-                    $this->getRequest()->get('query')
-                )->toSearchResultData()
-            )
+            $view->setData($result->toSearchResultData())
         );
     }
 }

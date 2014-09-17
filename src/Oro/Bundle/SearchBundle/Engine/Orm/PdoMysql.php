@@ -59,7 +59,7 @@ class PdoMysql extends BaseDriver
      */
     protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $words = $this->getWords($searchCondition['fieldValue']);
+        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldValue']));
 
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {

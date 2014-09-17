@@ -49,6 +49,8 @@ class CustomEntityType extends AbstractType
         'oneToMany'  => 'oro_multiple_entity',
         'manyToMany' => 'oro_multiple_entity',
         'optionSet'  => 'oro_option_select',
+        'enum'       => 'oro_enum_select',
+        'multiEnum'  => 'oro_enum_choice',
     ];
 
     /**
@@ -117,6 +119,17 @@ class CustomEntityType extends AbstractType
                     case 'optionSet':
                         $options['entityClassName'] = $className;
                         $options['entityFieldName'] = $fieldConfigId->getFieldName();
+                        break;
+                    case 'enum':
+                        $options['enum_code'] = $this->configManager->getProvider('enum')
+                            ->getConfig($className, $fieldConfigId->getFieldName())
+                            ->get('enum_code');
+                        break;
+                    case 'multiEnum':
+                        $options['expanded'] = true;
+                        $options['enum_code'] = $this->configManager->getProvider('enum')
+                            ->getConfig($className, $fieldConfigId->getFieldName())
+                            ->get('enum_code');
                         break;
                     case 'manyToOne':
                         $options['entity_class'] = $extendConfig->get('target_entity');

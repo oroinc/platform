@@ -10,7 +10,6 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -21,11 +20,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "ownership"={
- *              "owner_type"="BUSINESS_UNIT",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
- *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
@@ -75,13 +69,6 @@ class Role extends BaseRole
      * @JMS\Expose
      */
     protected $label;
-
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
 
     /**
      * Populate the role field
@@ -164,25 +151,6 @@ class Role extends BaseRole
     public function __toString()
     {
         return (string) $this->label;
-    }
-
-    /**
-     * @return BusinessUnit
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * @param BusinessUnit $owningBusinessUnit
-     * @return Role
-     */
-    public function setOwner($owningBusinessUnit)
-    {
-        $this->owner = $owningBusinessUnit;
-
-        return $this;
     }
 
     /**

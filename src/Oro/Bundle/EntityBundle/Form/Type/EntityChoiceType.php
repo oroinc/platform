@@ -69,6 +69,7 @@ class EntityChoiceType extends AbstractType
      * Returns a list of choices
      *
      * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
+     *
      * @return array of entities
      *               key = full class name, value = ChoiceListItem
      */

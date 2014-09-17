@@ -193,7 +193,7 @@ class SegmentFilterTest extends OrmTestCase
                         [
                             $deletedClassName,
                             null,
-                            $this->createExtendConfig($deletedClassName, ExtendScope::STATE_DELETED)
+                            $this->createExtendConfig($deletedClassName, ExtendScope::STATE_DELETE)
                         ],
                     ]
                 )

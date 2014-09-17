@@ -8,6 +8,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class GroupTest extends \PHPUnit_Framework_TestCase
 {
@@ -142,5 +143,15 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         $entity->setOwner($businessUnit);
 
         $this->assertEquals($businessUnit, $entity->getOwner());
+    }
+
+    public function testOrganization()
+    {
+        $entity         = new Group();
+        $organization   = new Organization();
+
+        $this->assertNull($entity->getOrganization());
+        $entity->setOrganization($organization);
+        $this->assertSame($organization, $entity->getOrganization());
     }
 }

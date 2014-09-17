@@ -6,6 +6,8 @@ parameters:
     oro_datagrid.datagrid.builder.class:                    Oro\Bundle\DataGridBundle\Datagrid\Builder
     oro_datagrid.datagrid.parameters.class:                 Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
     oro_datagrid.datagrid.request_parameters_factory.class: Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory
+    oro_datagrid.datagrid.guesser.class:                    Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser
+    oro_datagrid.datagrid.column_options_guesser.class:     Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser
 
     oro_datagrid.provider.resolver.class:                   Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
 
@@ -47,6 +49,17 @@ services:
             - %oro_datagrid.datagrid.parameters.class%
         calls:
             - [setRequest, [@?request=]]
+
+    oro_datagrid.datagrid.guesser:
+        class: %oro_datagrid.datagrid.guesser.class%
+        arguments:
+            - @service_container
+            - [] # a list of service ids of column options guessers
+
+    oro_datagrid.datagrid.column_options_guesser:
+        class: %oro_datagrid.datagrid.column_options_guesser.class%
+        tags:
+            - { name: oro_datagrid.column_options_guesser }
 
     oro_datagrid.provider.resolver:
         class: %oro_datagrid.provider.resolver.class%

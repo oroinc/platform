@@ -112,7 +112,7 @@ abstract class AbstractViewsList
     {
         foreach ($list as $view) {
             if (!$view instanceof View) {
-                throw new \InvalidArgumentException('List should contains only instances of View class');
+                throw new \InvalidArgumentException('List should contain only instances of View class');
             }
         }
     }

@@ -37,12 +37,6 @@ class AssociationBuilder
     public function createManyToManyAssociation($sourceEntityClass, $targetEntityClass, $associationKind)
     {
         $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
-        $relationKey  = ExtendHelper::buildRelationKey(
-            $sourceEntityClass,
-            $relationName,
-            'manyToMany',
-            $targetEntityClass
-        );
 
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
@@ -56,22 +50,17 @@ class AssociationBuilder
 
         $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
 
-        // create field
-        $this->relationBuilder->addFieldConfig(
-            $sourceEntityClass,
+        // add relation to owning entity
+        $this->relationBuilder->addManyToManyRelation(
+            $this->configManager->getProvider('extend')->getConfig($sourceEntityClass),
+            $targetEntityClass,
             $relationName,
-            'manyToMany',
+            $targetEntityPrimaryKeyColumns,
+            $targetEntityPrimaryKeyColumns,
+            $targetEntityPrimaryKeyColumns,
             [
                 'extend' => [
-                    'owner'           => ExtendScope::OWNER_SYSTEM,
-                    'state'           => ExtendScope::STATE_NEW,
-                    'extend'          => true,
                     'without_default' => true,
-                    'relation_key'    => $relationKey,
-                    'target_entity'   => $targetEntityClass,
-                    'target_grid'     => $targetEntityPrimaryKeyColumns,
-                    'target_title'    => $targetEntityPrimaryKeyColumns,
-                    'target_detailed' => $targetEntityPrimaryKeyColumns,
                 ],
                 'entity' => [
                     'label'       => $label,
@@ -85,14 +74,6 @@ class AssociationBuilder
                 ]
             ]
         );
-
-        // add relation to owning entity
-        $this->relationBuilder->addManyToManyRelation(
-            $targetEntityClass,
-            $sourceEntityClass,
-            $relationName,
-            $relationKey
-        );
     }
 
     /**
@@ -103,12 +84,6 @@ class AssociationBuilder
     public function createManyToOneAssociation($sourceEntityClass, $targetEntityClass, $associationKind)
     {
         $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
-        $relationKey  = ExtendHelper::buildRelationKey(
-            $sourceEntityClass,
-            $relationName,
-            'manyToOne',
-            $targetEntityClass
-        );
 
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
@@ -123,20 +98,13 @@ class AssociationBuilder
         $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
         $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
 
-        // create field
-        $this->relationBuilder->addFieldConfig(
-            $sourceEntityClass,
+        // add relation to owning entity
+        $this->relationBuilder->addManyToOneRelation(
+            $this->configManager->getProvider('extend')->getConfig($sourceEntityClass),
+            $targetEntityClass,
             $relationName,
-            'manyToOne',
+            $targetFieldName,
             [
-                'extend' => [
-                    'owner'         => ExtendScope::OWNER_SYSTEM,
-                    'state'         => ExtendScope::STATE_NEW,
-                    'extend'        => true,
-                    'target_entity' => $targetEntityClass,
-                    'target_field'  => $targetFieldName,
-                    'relation_key'  => $relationKey,
-                ],
                 'entity' => [
                     'label'       => $label,
                     'description' => $description,
@@ -148,14 +116,6 @@ class AssociationBuilder
                     'is_enabled' => false
                 ]
             ]
-        );
-
-        // add relation to owning entity
-        $this->relationBuilder->addManyToOneRelation(
-            $targetEntityClass,
-            $sourceEntityClass,
-            $relationName,
-            $relationKey
         );
     }
 
@@ -175,9 +135,9 @@ class AssociationBuilder
             // ignore entity not found exception
             return ['id'];
         }
-        // ignore any doctrine mapping exceptions
-        // it may happens if the entity has relation to deleted custom entity
-        // or during update schema for newly created custom entity with relation
+            // ignore any doctrine mapping exceptions
+            // it may happens if the entity has relation to deleted custom entity
+            // or during update schema for newly created custom entity with relation
         catch (ORMMappingException $e) {
             return ['id'];
         } catch (PersistenceMappingException $e) {

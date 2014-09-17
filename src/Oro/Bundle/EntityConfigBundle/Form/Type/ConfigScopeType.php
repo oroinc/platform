@@ -71,7 +71,8 @@ class ConfigScopeType extends AbstractType
             if (isset($config['form']['type'])) {
                 $options = isset($config['form']['options']) ? $config['form']['options'] : array();
 
-                $options['config_id'] = $this->config->getId();
+                $options['config_id']     = $this->config->getId();
+                $options['config_is_new'] = $this->configModel->getId() == false;
 
                 /**
                  * Disable field on editAction
@@ -103,7 +104,12 @@ class ConfigScopeType extends AbstractType
                             : $this->config->getId()->getScope();
 
                         if ($fieldName) {
-                            $configId = new FieldConfigId($scope, $className, $fieldName);
+                            $configId = new FieldConfigId(
+                                $scope,
+                                $className,
+                                $fieldName,
+                                $this->config->getId()->getFieldType()
+                            );
                         } else {
                             $configId = new EntityConfigId($scope, $className);
                         }

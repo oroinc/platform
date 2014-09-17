@@ -102,8 +102,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
             ->method('createManyToOneAssociation')
             ->with('Test\SourceEntity', 'Test\Entity1', 'test');
 
-        $extendConfigs = [];
-        $extension->preUpdate($extendConfigs);
+        $extension->preUpdate();
     }
 
     public function testPreUpdateForManyToMany()
@@ -135,8 +134,7 @@ class AssociationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_Test
             ->method('createManyToManyAssociation')
             ->with('Test\SourceEntity', 'Test\Entity1', 'test');
 
-        $extendConfigs = [];
-        $extension->preUpdate($extendConfigs);
+        $extension->preUpdate();
     }
 
     /**

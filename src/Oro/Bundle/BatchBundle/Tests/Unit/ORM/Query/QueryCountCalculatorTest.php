@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
-
 use Doctrine\ORM\UnitOfWork;
+
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 
 class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase

@@ -36,7 +36,7 @@ class OptionSetEntityTest extends Selenium2TestCase
             ->assertMessage('Field saved')
             ->createField()
             ->setFieldName($entityData['optionSetField'])
-            ->setType('Option set')
+            ->setType('Option Set (deprecated)')
             ->proceed()
             ->addOptions($options)
             ->save()

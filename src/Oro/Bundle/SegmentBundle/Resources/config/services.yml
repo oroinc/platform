@@ -28,6 +28,7 @@ services:
 
     oro_segment.segment_manager.api:
         class: %oro_segment.segment_manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_segment.segment.entity.class%
             - @doctrine.orm.entity_manager

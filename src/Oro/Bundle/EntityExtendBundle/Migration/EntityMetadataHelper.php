@@ -82,6 +82,22 @@ class EntityMetadataHelper
     }
 
     /**
+     * Adds a mapping between a table name and entity class name.
+     * This method can be used for new entities without doctrine mapping created during
+     * loading migrations, for instance for custom entities.
+     *
+     * @param string $tableName
+     * @param string $className
+     */
+    public function registerEntityClass($tableName, $className)
+    {
+        $this->ensureNameMapsLoaded();
+
+        $this->tableToClassMap[$tableName] = $className;
+        $this->classToTableMap[$className] = $tableName;
+    }
+
+    /**
      * Makes sure that table name <-> entity class name maps loaded
      */
     protected function ensureNameMapsLoaded()
@@ -96,8 +112,8 @@ class EntityMetadataHelper
      */
     protected function loadNameMaps()
     {
-        $this->tableToClassMap = [];
-        $this->classToTableMap = [];
+        $this->tableToClassMap  = [];
+        $this->classToTableMap  = [];
         $names = array_keys($this->doctrine->getManagers());
         foreach ($names as $name) {
             $manager = $this->doctrine->getManager($name);

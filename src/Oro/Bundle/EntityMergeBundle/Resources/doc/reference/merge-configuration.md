@@ -33,9 +33,7 @@ oro_entity_config:
                 # Twig template to render object as string
                 template: ~
                 # Enable merge for this entity
-                enable:
-                    options:
-                        is_bool: true
+                enable: ~
                 # Max entities to merge
                 max_entities_count: 5
 ```
@@ -65,23 +63,15 @@ oro_entity_config:
                 # Label of field that should be displayed for this field in merge UI, value will be translated
                 label: ~
                 # Display merge form for this field
-                display:
-                    options:
-                        is_bool: true
+                display: ~
                 # Make field read-only in merge
-                readonly:
-                    options:
-                        is_bool: true
+                readonly: ~
                 # Mode of merge supports next values, value can be an array or single mode:
                 #   replace - replace value with selected one
                 #   unite   - merge all values into one (applicable for collections and lists)
-                merge_modes:
-                    options:
-                        serializable: true
+                merge_modes: ~
                 # Flag for collection fields. This fields will support unite mode by default
-                is_collection:
-                    options:
-                        is_bool: true
+                is_collection: ~
                 # Options for rendering field value in the UI
                 #
                 # Method will be used to cast value to string (applicable only for values that are objects)
@@ -96,9 +86,7 @@ oro_entity_config:
                 # For example there is a Call entity with field referenced to Account using ManyToOne unidirectional relation.
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
-                inverse_display:
-                    options:
-                        is_bool: true
+                inverse_display: ~
                 # Same as merge_mode but used for relation entity
                 inverse_modes: ~
                 # Same as label but used for relation entity

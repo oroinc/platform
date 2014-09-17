@@ -187,7 +187,7 @@ class EntityFieldSelectType extends AbstractType
                 }
             }
 
-            if (!isset($field['related_entity_name'])) {
+            if (!isset($field['relation_type'])) {
                 $fieldData['id'] = $fieldId;
                 $result[]        = $fieldData;
             } else {

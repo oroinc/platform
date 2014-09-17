@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\Yaml\Yaml;
-
 class ExtendClassLoadingUtils
 {
     /**
@@ -47,10 +44,13 @@ class ExtendClassLoadingUtils
      */
     public static function registerClassLoader($cacheDir)
     {
-        $loader = new UniversalClassLoader();
-        $loader->registerNamespaces(
-            array('Extend\\' => $cacheDir . '/oro_entities')
-        );
+        // we have to use a loader that extends Doctrine's ClassLoader here rather than
+        // Symfony's UniversalClassLoader because in other case Doctrine cannot find our proxies
+        // if a class name does not conform Doctrine's conventions for entity class names,
+        // for example if a class name contains underscore characters
+        // the problem is in Doctrine\Common\ClassLoader::classExists; this method known nothing
+        // about Symfony's UniversalClassLoader
+        $loader = new ExtendClassLoader('Extend\Entity', $cacheDir . '/oro_entities');
         $loader->register();
     }
 

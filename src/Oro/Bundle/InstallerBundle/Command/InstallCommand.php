@@ -29,8 +29,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
             ->addOption('application-url', null, InputOption::VALUE_OPTIONAL, 'Application URL')
-            ->addOption('company-short-name', null, InputOption::VALUE_OPTIONAL, 'Company short name')
-            ->addOption('company-name', null, InputOption::VALUE_OPTIONAL, 'Company name')
+            ->addOption('organization-name', null, InputOption::VALUE_OPTIONAL, 'Organization name')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
             ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
@@ -228,7 +227,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $emailValidator = function ($value) {
+        $emailValidator     = function ($value) {
             if (strlen(trim($value)) === 0) {
                 throw new \Exception('The email must be specified');
             }
@@ -242,14 +241,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
             return $value;
         };
-        $lastNameValidator = function ($value) {
+        $lastNameValidator  = function ($value) {
             if (strlen(trim($value)) === 0) {
                 throw new \Exception('The last name must be specified');
             }
 
             return $value;
         };
-        $passwordValidator = function ($value) {
+        $passwordValidator  = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
@@ -314,45 +313,72 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     }
 
     /**
+     * Update the organization
+     *
+     * @param CommandExecutor $commandExecutor
+     */
+    protected function updateOrganization(CommandExecutor $commandExecutor)
+    {
+        /** @var ConfigManager $configManager */
+        $configManager             = $this->getContainer()->get('oro_config.global');
+        $defaultOrganizationName   = $configManager->get('oro_ui.organization_name');
+        $organizationNameValidator = function ($value) use (&$defaultOrganizationName) {
+            $len = strlen(trim($value));
+            if ($len === 0 && empty($defaultOrganizationName)) {
+                throw new \Exception('The organization name must not be empty');
+            }
+            if ($len > 15) {
+                throw new \Exception('The organization name must be not more than 15 characters long');
+            }
+            return $value;
+        };
+
+        $options = [
+            'organization-name' => [
+                'label'                  => 'Organization name',
+                'askMethod'              => 'askAndValidate',
+                'additionalAskArguments' => [$organizationNameValidator],
+                'defaultValue'           => $defaultOrganizationName,
+            ]
+        ];
+
+        $commandParameters = [];
+        foreach ($options as $optionName => $optionData) {
+            $commandParameters['--' . $optionName] = $this->inputOptionProvider->get(
+                $optionName,
+                $optionData['label'],
+                $optionData['defaultValue'],
+                $optionData['askMethod'],
+                $optionData['additionalAskArguments']
+            );
+        }
+
+        $commandExecutor->runCommand(
+            'oro:organization:update',
+            array_merge(
+                [
+                    'organization-name' => 'default',
+                    '--process-isolation' => true,
+                ],
+                $commandParameters
+            )
+        );
+    }
+
+    /**
      * Update system settings such as app url, company name and short name
      */
     protected function updateSystemSettings()
     {
         /** @var ConfigManager $configManager */
         $configManager = $this->getContainer()->get('oro_config.global');
-
-        $defaultCompanyName        = $configManager->get('oro_ui.application_name');
-        $companyShortNameValidator = function ($value) use (&$defaultCompanyName) {
-            $len = strlen(trim($value));
-            if ($len === 0 && empty($defaultCompanyName)) {
-                throw new \Exception('The company short name must not be empty');
-            }
-            if ($len > 15) {
-                throw new \Exception('The company short name must be not more than 15 characters long');
-            }
-
-            return $value;
-        };
-
-        $options = [
-            'application-url'    => [
+        $options       = [
+            'application-url' => [
                 'label'                  => 'Application URL',
                 'config_key'             => 'oro_ui.application_url',
                 'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
-            ],
-            'company-name'       => [
-                'label'                  => 'Company name',
-                'config_key'             => 'oro_ui.application_title',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
-            ],
-            'company-short-name' => [
-                'label'                  => 'Company short name',
-                'config_key'             => 'oro_ui.application_name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$companyShortNameValidator],
-            ],
+            ]
         ];
 
         foreach ($options as $optionName => $optionData) {
@@ -386,13 +412,14 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     {
         $output->writeln('<info>Setting up database.</info>');
 
-        $commandExecutor->runCommand(
-            'oro:migration:load',
-            [
-                '--force'             => true,
-                '--process-isolation' => true,
-            ]
-        )
+        $commandExecutor
+            ->runCommand(
+                'oro:migration:load',
+                [
+                    '--force'             => true,
+                    '--process-isolation' => true,
+                ]
+            )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 [
@@ -417,6 +444,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $output->writeln('<info>Administration setup.</info>');
 
         $this->updateSystemSettings();
+        $this->updateOrganization($commandExecutor);
         $this->updateUser($commandExecutor);
 
         $isDemo = $this->inputOptionProvider->get(

@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\Console\Application;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -31,6 +32,13 @@ class CommandsTest extends WebTestCase
         $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
         $application->setAutoExit(false);
 
+        /** @var Organization $organization */
+        $organization = $this->client
+            ->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->getFirst();
+
         $command = new GenerateWSSEHeaderCommand();
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -38,7 +46,8 @@ class CommandsTest extends WebTestCase
             array(
                 'command' => $command->getName(),
                 '--env' => $kernel->getEnvironment(),
-                'username' => 'admin'
+                'username' => 'admin',
+                'organization' => $organization->getName()
             )
         );
 

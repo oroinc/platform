@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
 class OrmSorterExtension extends AbstractExtension
 {
@@ -150,8 +151,13 @@ class OrmSorterExtension extends AbstractExtension
         $sorters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
         foreach ($sorters as $name => $definition) {
-            $definition     = is_array($definition) ? $definition : [];
-            $sorters[$name] = $definition;
+            if (isset($definition[PropertyInterface::DISABLED_KEY]) && $definition[PropertyInterface::DISABLED_KEY]) {
+                // remove disabled sorter
+                unset($sorters[$name]);
+            } else {
+                $definition     = is_array($definition) ? $definition : [];
+                $sorters[$name] = $definition;
+            }
         }
 
         return $sorters;

@@ -7,8 +7,6 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
@@ -22,8 +20,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock;
  */
 class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ENTITY = 'Test\Entity\TestEntity';
-    const TEST_FIELD  = 'testField';
+    const TEST_ENTITY  = 'Test\Entity\TestEntity';
+    const TEST_ENTITY2 = 'Test\Entity\TestEntity2';
+    const TEST_FIELD   = 'testField';
+    const TEST_FIELD2  = 'testField2';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -508,27 +508,61 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityModels()
     {
-        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $this->createRepositoryMock([$entityModel]);
+        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
+        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
+        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $this->createRepositoryMock([$entityModel1, $entityModel2]);
 
         $this->assertEquals(
-            [$entityModel],
+            [$entityModel1],
             $this->configModelManager->getModels()
+        );
+    }
+
+    public function testGetEntityModelsWithHidden()
+    {
+        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
+        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
+        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $this->createRepositoryMock([$entityModel1, $entityModel2]);
+
+        $this->assertEquals(
+            [$entityModel1, $entityModel2],
+            $this->configModelManager->getModels(null, true)
         );
     }
 
     public function testGetFieldModels()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
+        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
         $this->createRepositoryMock(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
         );
 
         $this->assertEquals(
-            [$fieldModel],
+            [$fieldModel1],
             $this->configModelManager->getModels(self::TEST_ENTITY)
+        );
+    }
+
+    public function testGetFieldModelsWithHidden()
+    {
+        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
+        $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
+        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $this->createRepositoryMock(
+            [$entityModel],
+            [UnitOfWork::STATE_MANAGED]
+        );
+
+        $this->assertEquals(
+            [$fieldModel1, $fieldModel2],
+            $this->configModelManager->getModels(self::TEST_ENTITY, true)
         );
     }
 

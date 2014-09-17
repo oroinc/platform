@@ -7,8 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -21,9 +21,6 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
 
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
-
-    /** @var ConfigInterface[] */
-    private $targetEntityConfigs;
 
     /**
      * @param ConfigManager             $configManager
@@ -45,119 +42,68 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
      */
     public function supports($actionType)
     {
-        if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
-            $targetEntityConfigs = $this->getTargetEntityConfigs();
-
-            return !empty($targetEntityConfigs);
-        }
-
-        return false;
+        return $actionType === ExtendConfigDumper::ACTION_PRE_UPDATE;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function preUpdate(array &$extendConfigs)
+    public function preUpdate()
     {
-        $targetEntityConfigs = $this->getTargetEntityConfigs();
-        foreach ($targetEntityConfigs as $targetEntityConfig) {
+        $ownershipConfigProvider = $this->configManager->getProvider('ownership');
+        $extendConfigProvider    = $this->configManager->getProvider('extend');
+        $entityConfigs           = $extendConfigProvider->getConfigs();
+        foreach ($entityConfigs as $entityConfig) {
+            if (!$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                continue;
+            }
+            if (!$entityConfig->is('state', ExtendScope::STATE_NEW)) {
+                continue;
+            }
+            if (!$ownershipConfigProvider->hasConfig($entityConfig->getId()->getClassName())) {
+                continue;
+            }
+
+            $ownershipConfig = $ownershipConfigProvider->getConfig($entityConfig->getId()->getClassName());
+            $ownerType       = $ownershipConfig->get('owner_type');
+            if (empty($ownerType)) {
+                continue;
+            }
+
             $this->createOwnerRelation(
-                $this->getOwnerTargetEntity($targetEntityConfig->get('owner_type')),
-                $targetEntityConfig->getId()->getClassName(),
-                $targetEntityConfig->get('owner_field_name')
+                $entityConfig,
+                $this->getOwnerTargetEntityClassName($ownerType),
+                $ownershipConfig->get('owner_field_name')
             );
-        }
-    }
 
-    /**
-     * Gets the list of configs for entities which can be the target of the association
-     *
-     * @return ConfigInterface[]
-     */
-    protected function getTargetEntityConfigs()
-    {
-        if (null === $this->targetEntityConfigs) {
-            $this->targetEntityConfigs = [];
-
-            $ownershipConfigs     = $this->configManager->getProvider('ownership')->getConfigs();
-            foreach ($ownershipConfigs as $ownershipConfig) {
-                $ownerType = $ownershipConfig->get('owner_type');
-                if (!empty($ownerType) && $this->isCustomEntity($ownershipConfig->getId()->getClassName())) {
-                    $this->targetEntityConfigs[] = $ownershipConfig;
-                }
+            if (in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])
+                && $ownershipConfig->has('organization_field_name')
+            ) {
+                $this->createOwnerRelation(
+                    $entityConfig,
+                    $this->getOwnerTargetEntityClassName($ownerType),
+                    $ownershipConfig->get('organization_field_name')
+                );
             }
         }
-
-        return $this->targetEntityConfigs;
     }
 
     /**
-     * @param string $className
-     * @return bool
+     * @param ConfigInterface $entityConfig
+     * @param string          $targetEntityClassName
+     * @param string          $relationName
      */
-    protected function isCustomEntity($className)
+    protected function createOwnerRelation(ConfigInterface $entityConfig, $targetEntityClassName, $relationName)
     {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        if ($extendConfigProvider->hasConfig($className)) {
-            $extendConfig = $extendConfigProvider->getConfig($className);
-            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $ownerType
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    protected function getOwnerTargetEntity($ownerType)
-    {
-        switch ($ownerType) {
-            case 'USER':
-                return $this->ownershipMetadataProvider->getUserClass();
-            case 'BUSINESS_UNIT':
-                return $this->ownershipMetadataProvider->getBusinessUnitClass();
-            case 'ORGANIZATION':
-                return $this->ownershipMetadataProvider->getOrganizationClass();
-        }
-
-        throw new \InvalidArgumentException(sprintf('Unexpected owner type: %s.', $ownerType));
-    }
-
-    /**
-     * @param string $targetEntityClass
-     * @param string $sourceEntityClass
-     * @param string $relationName
-     */
-    protected function createOwnerRelation($targetEntityClass, $sourceEntityClass, $relationName)
-    {
-        $relationKey = ExtendHelper::buildRelationKey(
-            $sourceEntityClass,
+        $this->relationBuilder->addManyToOneRelation(
+            $entityConfig,
+            $targetEntityClassName,
             $relationName,
-            'manyToOne',
-            $targetEntityClass
-        );
-
-        // create field
-        $this->relationBuilder->addFieldConfig(
-            $sourceEntityClass,
-            $relationName,
-            'manyToOne',
+            'id',
             [
-                'extend'    => [
-                    'owner'         => ExtendScope::OWNER_SYSTEM,
-                    'state'         => ExtendScope::STATE_NEW,
-                    'extend'        => true,
-                    'target_entity' => $targetEntityClass,
-                    'target_field'  => 'id',
-                    'relation_key'  => $relationKey,
-                ],
                 'entity'    => [
-                    'label'       => 'oro.custom_entity.owner.label',
-                    'description' => 'oro.custom_entity.owner.description',
+                    'label'       => 'oro.custom_entity.' . $relationName . '.label',
+                    'description' => 'oro.custom_entity.' . $relationName . '.description',
                 ],
                 'view'      => [
                     'is_displayable' => false
@@ -170,13 +116,24 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
                 ]
             ]
         );
+    }
 
-        // add relation to owning entity
-        $this->relationBuilder->addManyToOneRelation(
-            $targetEntityClass,
-            $sourceEntityClass,
-            $relationName,
-            $relationKey
-        );
+    /**
+     * @param string $ownerType
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    protected function getOwnerTargetEntityClassName($ownerType)
+    {
+        switch ($ownerType) {
+            case OwnershipType::OWNER_TYPE_USER:
+                return $this->ownershipMetadataProvider->getUserClass();
+            case OwnershipType::OWNER_TYPE_BUSINESS_UNIT:
+                return $this->ownershipMetadataProvider->getBusinessUnitClass();
+            case OwnershipType::OWNER_TYPE_ORGANIZATION:
+                return $this->ownershipMetadataProvider->getOrganizationClass();
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unexpected owner type: %s.', $ownerType));
     }
 }

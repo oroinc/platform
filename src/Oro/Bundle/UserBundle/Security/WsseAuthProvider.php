@@ -2,9 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+
+use Doctrine\Common\Cache\Cache;
+use Doctrine\ORM\PersistentCollection;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**
  * Class WsseAuthProvider
@@ -22,7 +32,7 @@ class WsseAuthProvider extends Provider
     protected function getSecret(UserInterface $user)
     {
         if ($user instanceof AdvancedApiUserInterface) {
-            return $user->getApiKey();
+            return $user->getApiKeys();
         }
 
         return parent::getSecret($user);
@@ -38,5 +48,41 @@ class WsseAuthProvider extends Provider
         }
 
         return parent::getSalt($user);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function authenticate(TokenInterface $token)
+    {
+        /** @var User $user */
+        $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
+        if ($user) {
+            $secret = $this->getSecret($user);
+            if ($secret instanceof PersistentCollection) {
+                /** @var $secret UserApi[] */
+                foreach ($secret as $userApi) {
+                    $isSecretValid = $this->validateDigest(
+                        $token->getAttribute('digest'),
+                        $token->getAttribute('nonce'),
+                        $token->getAttribute('created'),
+                        $userApi->getApiKey(),
+                        $this->getSalt($user)
+                    );
+                    if ($isSecretValid) {
+                        $authenticatedToken = new WsseToken($user->getRoles());
+                        $authenticatedToken->setUser($user);
+                        $authenticatedToken->setOrganizationContext($userApi->getOrganization());
+                        $authenticatedToken->setAuthenticated(true);
+
+                        return $authenticatedToken;
+                    }
+                }
+            } else {
+                return parent::authenticate($token);
+            }
+        }
+
+        throw new AuthenticationException('WSSE authentication failed.');
     }
 }

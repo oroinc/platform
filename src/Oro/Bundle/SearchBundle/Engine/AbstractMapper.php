@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Oro\Bundle\SearchBundle\Query\Query;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\SearchBundle\Query\Query;
 
 abstract class AbstractMapper
 {
@@ -116,7 +117,7 @@ abstract class AbstractMapper
                 ? $fieldConfig['target_fields']
                 : [$fieldConfig['name']];
 
-            if ($fieldConfig['target_type'] != 'text') {
+            if ($fieldConfig['target_type'] != Query::TYPE_TEXT) {
                 foreach ($targetFields as $targetField) {
                     $objectData[$fieldConfig['target_type']][$targetField] = $value;
                 }
