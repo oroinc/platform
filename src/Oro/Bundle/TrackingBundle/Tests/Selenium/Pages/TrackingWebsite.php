@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TrackingBundle\Tests\Selenium\Pages;
 
+use PHPUnit_Framework_Assert;
+
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 
 /**
@@ -82,5 +84,31 @@ class TrackingWebsite extends AbstractPageEntity
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new TrackingWebsites($this->test, false);
+    }
+
+
+    /**
+     * @param string $required
+     * @param string $optional
+     * @param string $message
+     * @return $this
+     */
+    public function assertTitles($required, $optional, $message = '')
+    {
+        try {
+            PHPUnit_Framework_Assert::assertEquals(
+                $optional,
+                $this->test->title(),
+                $message
+            );
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            PHPUnit_Framework_Assert::assertEquals(
+                $required,
+                $this->test->title(),
+                $message
+            );
+        }
+
+        return $this;
     }
 }

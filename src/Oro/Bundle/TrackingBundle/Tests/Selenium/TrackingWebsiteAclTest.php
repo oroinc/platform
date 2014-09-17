@@ -11,7 +11,7 @@ use Oro\Bundle\TrackingBundle\Tests\Selenium\Pages\TrackingWebsites;
  * @package Oro\Bundle\TrackingBundle\Tests\Selenium
  * {@inheritdoc}
  */
-class TrackingWebsiteAcl extends Selenium2TestCase
+class TrackingWebsiteAclTest extends Selenium2TestCase
 {
     public function testCreateRole()
     {
@@ -73,15 +73,15 @@ class TrackingWebsiteAcl extends Selenium2TestCase
         $login = $this->login();
         /** @var TrackingWebsites $login */
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
-            ->assertTitle('Tracking Websites - Marketing')
+            ->assertTitles('Tracking Websites', 'Tracking Websites - Marketing')
             ->add()
-            ->assertTitle('Create Tracking Website - Tracking Websites - Marketing')
+            ->assertTitles('Create Tracking Website', 'Create Tracking Website - Tracking Websites - Marketing')
             ->setName($identifier)
             ->setIdentifier($identifier)
             ->setUrl("http://{$identifier}.com")
             ->save()
             ->assertMessage('Tracking Website saved')
-            ->assertTitle("{$identifier} - Tracking Websites - Marketing");
+            ->assertTitles("{$identifier}", "{$identifier} - Tracking Websites - Marketing");
 
         return $identifier;
     }
