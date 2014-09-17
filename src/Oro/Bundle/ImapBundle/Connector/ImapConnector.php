@@ -190,7 +190,7 @@ class ImapConnector
      * Gets sub folders.
      *
      * @param Folder $parentFolder The parent folder.
-     * @param bool   $recursive    Determines whether
+     * @param bool   $recursive    Determines whether child folders should be returned as well
      *
      * @return Folder[]
      */
