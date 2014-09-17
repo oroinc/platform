@@ -123,12 +123,12 @@ class Imap extends \Zend\Mail\Storage\Imap
         foreach ($folders as $globalName => $data) {
             do {
                 if (!$parent || strpos($globalName, $parent) === 0) {
-                    $pos = strrpos($globalName, $data['delim']);
-                    if ($pos === false) {
-                        $localName = $globalName;
-                    } else {
-                        $localName = substr($globalName, $pos + 1);
-                    }
+                    // build local name based on global name
+                    $lastDelimPosition = strrpos($globalName, $data['delim']);
+                    $localName = $lastDelimPosition === false ?
+                        $globalName :
+                        substr($globalName, $lastDelimPosition + 1);
+
                     $selectable = !$data['flags'] || !in_array('\\Noselect', $data['flags']);
 
                     array_push($stack, $parent);

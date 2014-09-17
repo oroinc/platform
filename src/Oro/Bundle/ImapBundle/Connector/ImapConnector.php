@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Connector;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
@@ -196,10 +197,27 @@ class ImapConnector
      */
     protected function getSubFolders(Folder $parentFolder, $recursive = false)
     {
-        $result = array();
+        $result     = [];
+
+        switch (true) {
+            case $parentFolder->hasFlag(Folder::FLAG_SENT):
+                $parentFolder->type = EmailFolder::SENT;
+                break;
+            case $parentFolder->hasFlag(Folder::FLAG_INBOX):
+                $parentFolder->type = EmailFolder::INBOX;
+                break;
+            default:
+                $parentFolder->type = EmailFolder::OTHER;
+                break;
+        }
+
+        /** @var Folder $folder */
         foreach ($parentFolder as $folder) {
             $result[] = $folder;
+
             if ($recursive) {
+                $folder->type = $parentFolder->type;
+
                 $result = array_merge($result, $this->getSubFolders($folder, $recursive));
             }
         }

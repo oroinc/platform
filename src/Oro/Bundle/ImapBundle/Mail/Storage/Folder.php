@@ -16,6 +16,9 @@ class Folder extends BaseFolder
     /** @var string[] */
     public $flags = null;
 
+    /** @var string folder type (sent, inbox, etc) */
+    public $type = null;
+
     /**
      * Determines whether this folder is marked by the given flag
      *
