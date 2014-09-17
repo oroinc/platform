@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
@@ -10,33 +11,34 @@ class ImapEmailFolderRepository extends EntityRepository
 {
     /**
      * @param EmailOrigin $origin
-     * @param string      $alias
+     * @param bool        $withOutdated
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
-    public function getFoldersByOriginQueryBuilder(EmailOrigin $origin, $alias = 'ifo')
+    public function getFoldersByOriginQueryBuilder(EmailOrigin $origin, $withOutdated = false)
     {
-        return $this->createQueryBuilder($alias)
-            ->leftJoin($alias . '.folder', 'f')
-            ->where('f.origin = ?0')
-            ->orderBy('f.name')
-            ->setParameter(0, $origin);
+        $qb = $this->createQueryBuilder('imap_folder')
+            ->innerJoin('imap_folder.folder', 'folder')
+            ->where('folder.origin = :origin')
+            ->setParameter('origin', $origin);
+        if (!$withOutdated) {
+            $qb->andWhere('folder.outdatedAt IS NULL');
+        }
+
+        return $qb;
     }
 
     /**
      * @param EmailOrigin $origin
-     * @param bool        $filterOutdated
+     * @param bool        $withOutdated
      *
      * @return array
      */
-    public function getFoldersByOrigin(EmailOrigin $origin, $filterOutdated = true)
+    public function getFoldersByOrigin(EmailOrigin $origin, $withOutdated = false)
     {
-        $queryBuilder = $this->getFoldersByOriginQueryBuilder($origin, 'ifo');
-        if ($filterOutdated) {
-            $queryBuilder->andWhere('f.outdatedAt IS NULL');
-        }
-
-        return $queryBuilder->getQuery()->getResult();
+        return $this->getFoldersByOriginQueryBuilder($origin, $withOutdated)
+            ->select('imap_folder, folder')
+            ->getQuery()
+            ->getResult();
     }
 }
-

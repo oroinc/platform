@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmail;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
@@ -15,176 +15,148 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $loggerMock;
+    protected $logger;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $emMock;
+    protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityBuilderMock;
+    protected $entityBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $addrManagerMock;
+    protected $addrManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $addrCheckerMock;
+    protected $addrChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $imapManagerMock;
+    protected $imapManager;
 
     protected function setUp()
     {
-        $this->loggerMock        = $this->getMock('Psr\Log\LoggerInterface');
-        $this->emMock            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->logger        = $this->getMock('Psr\Log\LoggerInterface');
+        $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityBuilderMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
+        $this->entityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->addrManagerMock   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
+        $this->addrManager   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->addrCheckerMock   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker')
+        $this->addrChecker   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->imapManagerMock   = $this->getMockBuilder('Oro\Bundle\ImapBundle\Manager\ImapEmailManager')
+        $this->imapManager   = $this->getMockBuilder('Oro\Bundle\ImapBundle\Manager\ImapEmailManager')
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     public function testSyncFolders()
     {
-        $origin     = new ImapEmailOrigin();
-        $existingImapFolders = $this->getExistingImapFolders();
+        $origin              = new ImapEmailOrigin();
+        /** @var ImapEmailFolder[] $existingImapFolders */
+        $existingImapFolders = [
+            // existing with UIDVALIDITY equal
+            $this->createImapFolder('existing', 'existing', 4),
+            // existing with new UIDVALIDITY
+            $this->createImapFolder('Test', 'Test', 15, 1),
+        ];
+        /** @var Folder[] $remoteFolders */
+        $remoteFolders       = [
+            // UIDVALIDITY => Folder
+            1 => $this->createRemoteFolder('Inbox', '[Gmail]\Inbox', ['\Inbox']),
+            3 => $this->createRemoteFolder('Sent', '[Gmail]\Sent', ['\Sent']),
+            4 => $this->createRemoteFolder('existing', 'existing'),
+        ];
 
-        $this->loggerMock->expects($this->any())
+        $this->logger->expects($this->any())
             ->method('notice');
 
         // load existing imap folders
-        $repoMock = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository')
+        $repo = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $repoMock->expects($this->once())
+        $repo->expects($this->once())
             ->method('getFoldersByOrigin')
             ->with($origin)
             ->will($this->returnValue($existingImapFolders));
 
-        $this->emMock->expects($this->once())
+        $this->em->expects($this->once())
             ->method('getRepository')
             ->with('OroImapBundle:ImapEmailFolder')
-            ->will($this->returnValue($repoMock));
+            ->will($this->returnValue($repo));
 
-        $this->emMock->expects($this->any())
+        $this->em->expects($this->any())
             ->method('persist');
-        $this->emMock->expects($this->once())
+        $this->em->expects($this->once())
             ->method('flush');
 
+        $processor = $this->getProcessorMock(['getFolders']);
 
-        $processor   = $this->getProcessorMock(['loadSourceFolders']);
-
-        // load remote folders
-        $srcFolders = $this->getRemoteFolders();
         $processor->expects($this->once())
-            ->method('loadSourceFolders')
-            ->will($this->returnValue($srcFolders));
+            ->method('getFolders')
+            ->will($this->returnValue($remoteFolders));
 
-        $imapFolders = $this->callProtectedMethod($processor, 'syncFolders', [$origin]);
+        // get UIDVALIDITY expectations
+        $imapManagerCallIndex = 0;
+        foreach ($remoteFolders as $uidValidity => $folder) {
+            $this->imapManager->expects($this->at($imapManagerCallIndex++))
+                ->method('selectFolder')
+                ->with($folder->getGlobalName());
+            $this->imapManager->expects($this->at($imapManagerCallIndex++))
+                ->method('getUidValidity')
+                ->will($this->returnValue($uidValidity));
+        }
 
-        $this->assertCount(4, $imapFolders);
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailFolder', $imapFolders[0]);
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailFolder', $imapFolders[1]);
+        $imapFolders = ReflectionUtil::callProtectedMethod($processor, 'syncFolders', [$origin]);
+
+        $expectedImapFolder1 = $this->createImapFolder('Inbox', '[Gmail]\Inbox', 1);
+        $expectedImapFolder1->getFolder()->setType(EmailFolder::INBOX)->setOrigin($origin);
+        $expectedImapFolder2 = $this->createImapFolder('Sent', '[Gmail]\Sent', 3);
+        $expectedImapFolder2->getFolder()->setType(EmailFolder::SENT)->setOrigin($origin);
+        $expectedImapFolder3 = $this->createImapFolder('existing', 'existing', 4);
+        $this->assertEquals(
+            [$expectedImapFolder1, $expectedImapFolder2, $expectedImapFolder3],
+            $imapFolders
+        );
     }
 
-    public function testLoadSourceFolders()
+    public function testGetFolders()
     {
-        $this->loggerMock->expects($this->any())
+        $this->logger->expects($this->any())
             ->method('notice');
 
-        $folder1 = new Folder('Inbox', '[Gmail]\Inbox');
-        $folder1->setFlags(['\Inbox']);
+        $inboxFolder         = $this->createRemoteFolder('Inbox', '[Gmail]\Inbox', ['\Inbox']);
+        $subFolder           = $this->createRemoteFolder('Inbox', '[Gmail]\Test');
+        $sentFolder          = $this->createRemoteFolder('Sent', '[Gmail]\Sent', ['\Sent']);
+        $spamFolder          = $this->createRemoteFolder('Spam', '[Gmail]\Spam', ['\Spam']);
+        $trashFolder         = $this->createRemoteFolder('Spam', '[Gmail]\Trash', ['\Trash']);
+        $nonSelectableFolder = $this->createRemoteFolder('All', 'All', [], false);
 
-        $folder2 = new Folder('Sent', '[Gmail]\Sent');
-        $folder2->setFlags(['\Sent']);
-
-        $folder3 = new Folder('Spam', '[Gmail]\Spam');
-        $folder3->setFlags(['\Spam']);
-
-        $folder4 = new Folder('All', 'All', false);
-
-        $srcFolders  = [$folder1, $folder2, $folder3, $folder4];
-
-        $this->imapManagerMock->expects($this->once())
+        $this->imapManager->expects($this->once())
             ->method('getFolders')
             ->with(null, true)
-            ->will($this->returnValue($srcFolders));
-
-        $this->imapManagerMock->expects($this->exactly(2))
-            ->method('selectFolder')
-            ->will($this->returnValue($srcFolders));
-
-        $uidValidity = 0;
-        $this->imapManagerMock->expects($this->at(2))
-            ->method('getUidValidity')
-            ->will($this->returnValue($uidValidity++));
-
-        $this->imapManagerMock->expects($this->at(4))
-            ->method('getUidValidity')
-            ->will($this->returnValue($uidValidity++));
+            ->will(
+                $this->returnValue(
+                    [
+                        $inboxFolder,
+                        $subFolder,
+                        $sentFolder,
+                        $spamFolder,
+                        $trashFolder,
+                        $nonSelectableFolder
+                    ]
+                )
+            );
 
         $processor = $this->getProcessorMock();
 
-        $srcFolders = $this->callProtectedMethod($processor, 'loadSourceFolders');
-        $this->assertCount(2, $srcFolders);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getExistingImapFolders()
-    {
-        $folder1     = new EmailFolder();
-        $folder1->setFullName('existing');
-
-        // existing with uidvalidity equal
-        $imapFolder1 = new ImapEmailFolder();
-        $imapFolder1
-            ->setFolder($folder1)
-            ->setUidValidity(4); // corresponding to $folder3 in getRemoteFolders
-
-        $folder2     = new EmailFolder();
-        $folder2->setFullName('Test');
-
-        // existing with new uid validity
-        $imapFolder2 = new ImapEmailFolder();
-        $imapFolder2->setFolder($folder2)
-            ->setUidValidity(15);
-        $this->setProtectedProperty($imapFolder2, 'id', 1);
-
-        return [
-            $imapFolder1,
-            $imapFolder2,
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getRemoteFolders()
-    {
-        $folder1 = new Folder('Inbox', '[Gmail]\Inbox');
-        $folder1->setFlags(['\Inbox']);
-
-        $folder2 = new Folder('Sent', '[Gmail]\Sent');
-        $folder2->setFlags(['\Sent']);
-
-        $folder3 = new Folder('existing', 'existing');
-
-        return [
-            // uid validity => Folder
-            1  => $folder1,
-            3  => $folder2,
-            4  => $folder3,
-        ];
+        $srcFolders = ReflectionUtil::callProtectedMethod($processor, 'getFolders', []);
+        $this->assertEquals(
+            [$inboxFolder, $subFolder, $sentFolder],
+            $srcFolders
+        );
     }
 
     /**
@@ -198,43 +170,55 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor',
             $methods,
             [
-                $this->loggerMock,
-                $this->emMock,
-                $this->entityBuilderMock,
-                $this->addrManagerMock,
-                $this->addrCheckerMock,
-                $this->imapManagerMock
+                $this->logger,
+                $this->em,
+                $this->entityBuilder,
+                $this->addrManager,
+                $this->addrChecker,
+                $this->imapManager
             ]
         );
     }
 
     /**
-     * @param object $obj
-     * @param string $methodName
-     * @param array  $args
+     * @param string $localName
+     * @param string $globalName
+     * @param array  $flags
+     * @param bool   $selectable
      *
-     * @return mixed
+     * @return Folder
      */
-    protected function callProtectedMethod($obj, $methodName, $args = [])
+    protected function createRemoteFolder($localName, $globalName, array $flags = [], $selectable = true)
     {
-        $class = new \ReflectionClass($obj);
-        $method = $class->getMethod($methodName);
-        $method->setAccessible(true);
+        $folder = new Folder($localName, $globalName, $selectable);
+        $folder->setFlags($flags);
 
-        return $method->invokeArgs($obj, $args);
+        return $folder;
     }
 
     /**
-     * @param object $obj
-     * @param string $property
-     * @param mixed  $value
+     * @param string   $folderName
+     * @param string   $folderFullName
+     * @param int      $uidValidity
+     * @param int|null $id
+     *
+     * @return ImapEmailFolder
      */
-    protected function setProtectedProperty($obj, $property, $value)
+    protected function createImapFolder($folderName, $folderFullName, $uidValidity, $id = null)
     {
-        $class = new \ReflectionClass($obj);
-        $property = $class->getProperty($property);
-        $property->setAccessible(true);
+        $folder = new EmailFolder();
+        $folder
+            ->setName($folderName)
+            ->setFullName($folderFullName);
 
-        $property->setValue($obj, $value);
+        $imapFolder = new ImapEmailFolder();
+        $imapFolder
+            ->setFolder($folder)
+            ->setUidValidity($uidValidity);
+        if ($id !== null) {
+            ReflectionUtil::setId($imapFolder, $id);
+        }
+
+        return $imapFolder;
     }
 }

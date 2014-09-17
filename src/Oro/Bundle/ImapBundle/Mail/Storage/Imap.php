@@ -10,6 +10,11 @@ class Imap extends \Zend\Mail\Storage\Imap
     const INTERNALDATE = 'INTERNALDATE';
 
     /**
+     * Indicates whether IMAP server can store the same message in different folders
+     */
+    const CAPABILITY_MSG_MULTI_FOLDERS = 'X_MSG_MULTI_FOLDERS';
+
+    /**
      * UIDVALIDITY of currently selected folder
      *
      * @var int
@@ -18,8 +23,17 @@ class Imap extends \Zend\Mail\Storage\Imap
 
     /**
      * Items to be returned by getMessage
+     *
+     * @var array
      */
     protected $getMessageItems;
+
+    /**
+     * A local cache of IMAP server capabilities
+     *
+     * @var array
+     */
+    private $capability;
 
     /**
      * This flag is used to prevent closing the default storage socket
@@ -59,7 +73,11 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function capability()
     {
-        return $this->protocol->capability();
+        if ($this->capability === null) {
+            $this->capability = $this->getCapability();
+        }
+
+        return $this->capability;
     }
 
     /**
@@ -213,7 +231,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         $this->currentFolder = $globalName;
-        $selectResponse = $this->protocol->examine(
+        $selectResponse = $this->protocol->select(
             mb_convert_encoding((string)$this->currentFolder, 'UTF7-IMAP', 'UTF-8')
         );
         if (!$selectResponse) {
@@ -234,6 +252,16 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         parent::close();
+    }
+
+    /**
+     * Get capabilities from IMAP server
+     *
+     * @return string[] list of capabilities
+     */
+    protected function getCapability()
+    {
+        return $this->protocol->capability();
     }
 
     /**
