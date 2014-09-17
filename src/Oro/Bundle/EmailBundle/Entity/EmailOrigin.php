@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -64,11 +65,16 @@ abstract class EmailOrigin
     protected $syncCode;
 
     /**
-     * Constructor
+     * @var int
+     *
+     * @ORM\Column(name="sync_count", type="integer", nullable=true)
      */
+    protected $syncCount;
+
     public function __construct()
     {
-        $this->folders = new ArrayCollection();
+        $this->folders   = new ArrayCollection();
+        $this->syncCount = 0;
     }
 
     /**
@@ -85,6 +91,7 @@ abstract class EmailOrigin
      * Get an email folder
      *
      * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     *
      * @return EmailFolder|null
      */
     public function getFolder($type)
@@ -111,6 +118,7 @@ abstract class EmailOrigin
      * Add folder
      *
      * @param  EmailFolder $folder
+     *
      * @return EmailOrigin
      */
     public function addFolder(EmailFolder $folder)
@@ -127,7 +135,7 @@ abstract class EmailOrigin
      *
      * @return boolean
      */
-    public function getIsActive()
+    public function isActive()
     {
         return $this->isActive;
     }
@@ -136,6 +144,7 @@ abstract class EmailOrigin
      * Set this email origin in active/inactive state
      *
      * @param boolean $isActive
+     *
      * @return EmailOrigin
      */
     public function setIsActive($isActive)
@@ -169,6 +178,7 @@ abstract class EmailOrigin
      * Set date/time when emails from this origin were synchronized
      *
      * @param \DateTime $synchronizedAt
+     *
      * @return EmailOrigin
      */
     public function setSynchronizedAt($synchronizedAt)
@@ -192,6 +202,7 @@ abstract class EmailOrigin
      * Set the last synchronization result code
      *
      * @param int $syncCode
+     *
      * @return EmailOrigin
      */
     public function setSyncCode($syncCode)
@@ -199,6 +210,30 @@ abstract class EmailOrigin
         $this->syncCode = $syncCode;
 
         return $this;
+    }
+
+    /**
+     * Increase sync count by 1
+     *
+     * @return EmailOrigin
+     */
+    public function incrementSyncCount()
+    {
+        if ($this->syncCount === PHP_INT_MAX) {
+            $this->syncCount = 0;
+        }
+
+        $this->syncCount++;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSyncCount()
+    {
+        return $this->syncCount;
     }
 
     /**

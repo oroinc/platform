@@ -17,5 +17,8 @@ class OroEmailBundle implements Migration
         $table = $schema->getTable('oro_email_folder');
         $table->addColumn('outdated_at', 'datetime', ['notnull' => false]);
         $table->addIndex(['outdated_at'], 'email_folder_outdated_at_idx');
+
+        $table = $schema->getTable('oro_email_origin');
+        $table->addColumn('sync_count', 'integer', ['notnull' => false]);
     }
 }

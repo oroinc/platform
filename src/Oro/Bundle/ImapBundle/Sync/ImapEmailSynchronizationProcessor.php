@@ -26,6 +26,7 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     const EMAIL_ADDRESS_BATCH_SIZE = 100;
+    const CLEANUP_EVERY_N_RUN      = 100;
 
     /**
      * @var ImapEmailManager
@@ -86,6 +87,49 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items'])
                 );
             }
+        }
+
+        if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
+            $this->cleanupOutdatedData($origin);
+        }
+
+        $origin->incrementSyncCount();
+        $this->em->persist($origin);
+        $this->em->flush($origin);
+    }
+
+    /**
+     * Delete outdated folders and do other cleanup actions if needed
+     *
+     * @param EmailOrigin $origin
+     */
+    protected function cleanupOutdatedData(EmailOrigin $origin)
+    {
+        $imapFolders = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
+            ->createQueryBuilder('if')
+            ->innerJoin('if.folder', 'folder')
+            ->leftJoin('folder.emails', 'emails')
+            ->where('folder.outdatedAt IS NULL AND emails.id IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($imapFolders as $imapFolder) {
+            $this->em->remove($imapFolder);
+        }
+
+        $folders = $this->em->getRepository('OroEmailBundle:EmailFolder')
+            ->createQueryBuilder('f')
+            ->leftJoin('f.emails', 'e')
+            ->where('f.outdatedAt IS NULL AND e.id IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($folders as $folder) {
+            $this->em->remove($folder);
+        }
+
+        if (count($imapFolders) + count($folders) > 0) {
+            $this->em->flush();
         }
     }
 
