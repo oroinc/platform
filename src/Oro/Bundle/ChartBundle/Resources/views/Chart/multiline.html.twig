@@ -81,7 +81,9 @@
                                 if (label === null) {
                                     var number = parseInt(data);
                                     if (rawData.length > number) {
-                                        label = rawData[number]['label'] === null ? '{{ 'N/A'|trans }}'  : rawData[number]['label'];
+                                        label = rawData[number]['label'] === null
+                                            ? '{{ 'N/A'|trans }}'
+                                            : rawData[number]['label'];
                                     } else {
                                         label = '';
                                     }
@@ -93,7 +95,9 @@
                                 if (label === null) {
                                     var number = parseInt(data);
                                     if (rawData.length > number) {
-                                        label = rawData[data]['value'] === null ? '{{ 'N/A'|trans }}' : rawData[data]['value'];
+                                        label = rawData[data]['value'] === null
+                                            ? '{{ 'N/A'|trans }}'
+                                            : rawData[data]['value'];
                                     } else {
                                         label = '';
                                     }
@@ -148,7 +152,9 @@
                                         track : true,
                                         relative : true,
                                         trackFormatter: function (pointData) {
-                                            return   getXLabel(pointData.x) + ': ' + getYLabel(pointData.y);
+                                            return pointData.series.label
+                                                + ', ' + getXLabel(pointData.x)
+                                                + ': ' + getYLabel(pointData.y);
                                         }
                                     },
                                     yaxis: {
@@ -162,7 +168,6 @@
                                     xaxis: {
                                         autoscale: true,
                                         autoscaleMargin: 0,
-                                        labelsAngle: 45,
                                         tickFormatter: function (x) {
                                             return getXLabel(x);
                                         },
