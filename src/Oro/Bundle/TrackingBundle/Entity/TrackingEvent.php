@@ -66,14 +66,14 @@ class TrackingEvent
     /**
      * @var string
      *
-     * @ORM\Column(name="url", type="string", length=255)
+     * @ORM\Column(name="url", type="text")
      */
     protected $url;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", length=255, nullable=true)
+     * @ORM\Column(name="title", type="text", nullable=true)
      */
     protected $title;
 

@@ -8,10 +8,13 @@ class TestEntity
 
     private $owner;
 
-    public function __construct($id = 0, $owner = null)
+    private $organization;
+
+    public function __construct($id = 0, $owner = null, $organization = null)
     {
         $this->id = $id;
         $this->owner = $owner;
+        $this->organization = $organization;
     }
 
     public function getId()
@@ -27,5 +30,10 @@ class TestEntity
     public function setOwner($owner)
     {
         $this->owner = $owner;
+    }
+
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

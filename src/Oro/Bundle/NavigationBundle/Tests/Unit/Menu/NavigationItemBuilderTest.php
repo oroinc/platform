@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,6 +44,8 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->will($this->returnValue('anon.'));
 
+        $token->expects($this->never())->method('getOrganizationContext');
+
         $this->securityContext->expects($this->atLeastOnce())
             ->method('getToken')
             ->will($this->returnValue($token));
@@ -60,8 +63,9 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuild()
     {
-        $type = 'favorite';
-        $userId = 1;
+        $organization   = new Organization();
+        $type           = 'favorite';
+        $userId         = 1;
         $user = $this->getMockBuilder('stdClass')
             ->setMethods(array('getId'))
             ->getMock();
@@ -69,10 +73,18 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(1));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
         $token->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
 
         $this->securityContext->expects($this->atLeastOnce())
             ->method('getToken')
@@ -93,7 +105,7 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
         );
         $repository->expects($this->once())
             ->method('getNavigationItems')
-            ->with($userId, $type)
+            ->with($userId, $organization, $type)
             ->will($this->returnValue($items));
 
         $this->em->expects($this->once())

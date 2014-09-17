@@ -2,8 +2,15 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
 class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -74,80 +81,179 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testCanUserBeSetAsOwner($accessLevel, $expected, $parameterts = [])
+    public function testCanUserBeSetAsOwner($currentUser, $newUser, $accessLevel, $organizationContext, $isCanBeSet)
     {
+        $tree = new OwnerTree();
+        $this->addUserInfoToTree($tree, $currentUser);
+        $this->addUserInfoToTree($tree, $newUser);
+
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $tree = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTree')
-            ->disableOriginalConstructor()
-            ->getMock();
-        if (isset($parameterts['userBU'])) {
-            $tree->expects($this->any())
-                ->method('getUserBusinessUnitIds')
-                ->will($this->returnValue($parameterts['userBU']));
-        }
-        if (isset($parameterts['userSubBU'])) {
-            $tree->expects($this->any())
-                ->method('getUserSubordinateBusinessUnitIds')
-                ->will($this->returnValue($parameterts['userSubBU']));
-        }
-        if (isset($parameterts['orgBU'])) {
-            $tree->expects($this->any())
-                ->method('getOrganizationBusinessUnitIds')
-                ->will($this->returnValue($parameterts['orgBU']));
-        }
-        if (isset($parameterts['userOrg'])) {
-            $tree->expects($this->any())
-                ->method('getBusinessUnitsIdByUserOrganizations')
-                ->will($this->returnValue($parameterts['userOrg']));
-        }
+
         $treeProvider->expects($this->any())
             ->method('getTree')
             ->will($this->returnValue($tree));
 
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $owner = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->userRepo->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue($user));
-
-        $user->expects($this->any())
-            ->method('getOwner')
-            ->will($this->returnValue($owner));
-
-        if (isset($parameterts['ownerId'])) {
-            $owner->expects($this->any())
-                ->method('getId')
-                ->will($this->returnValue($parameterts['ownerId']));
-        }
-
-        $user->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(isset($parameterts['id'])? $parameterts['id'] : 1));
-
-        $result = $this->businessUnitManager->canUserBeSetAsOwner($user, 1, $accessLevel, $treeProvider);
-        $this->assertEquals($expected, $result);
+        $result = $this->businessUnitManager->canUserBeSetAsOwner(
+            $currentUser,
+            $newUser,
+            $accessLevel,
+            $treeProvider,
+            $organizationContext
+        );
+        $this->assertEquals($isCanBeSet, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function dataProvider()
     {
+        $organization1 = new Organization();
+        $organization1->setId(1);
+
+        $organization2 = new Organization();
+        $organization2->setId(2);
+
+        $bu11 = new BusinessUnit();
+        $bu11->setId(1);
+        $bu11->setOrganization($organization1);
+
+        $bu22 = new BusinessUnit();
+        $bu22->setId(2);
+        $bu22->setOrganization($organization2);
+
+        $newUser = new User();
+        $newUser->setId(2);
+        $newUser->setOrganizations(new ArrayCollection([$organization1]));
+        $newUser->setBusinessUnits(new ArrayCollection([$bu11]));
+
         return [
-            [AccessLevel::BASIC_LEVEL, true],
-            [AccessLevel::BASIC_LEVEL, false, ['id' => 2]],
-            [AccessLevel::SYSTEM_LEVEL, true],
-            [AccessLevel::LOCAL_LEVEL, true, ['userBU' => [1, 2, 3], 'ownerId' => 1]],
-            [AccessLevel::LOCAL_LEVEL, false, ['userBU' => [2, 3], 'ownerId' => 1]],
-            [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [1, 2], 'ownerId' => 2]],
-            [AccessLevel::DEEP_LEVEL, false, ['userBU' => [1], 'userSubBU' => [2], 'ownerId' => 3]],
-            [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 1]],
-            [AccessLevel::GLOBAL_LEVEL, false, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 4]],
+            'BASIC_LEVEL access level, current user' => [
+                $this->getCurrentUser(2, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::BASIC_LEVEL,
+                $organization1,
+                true
+            ],
+            'BASIC_LEVEL access level, another user' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::BASIC_LEVEL,
+                $organization1,
+                false
+            ],
+            'SYSTEM_LEVEL access level, current user' => [
+                $this->getCurrentUser(2, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::SYSTEM_LEVEL,
+                $organization1,
+                true
+            ],
+            'SYSTEM_LEVEL access level, another user' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::SYSTEM_LEVEL,
+                $organization1,
+                true
+            ],
+            'GLOBAL_LEVEL access level, current user' => [
+                $this->getCurrentUser(2, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::GLOBAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'GLOBAL_LEVEL access level, another user, same org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::GLOBAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'GLOBAL_LEVEL access level, another user, different org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::GLOBAL_LEVEL,
+                $organization2,
+                false
+            ],
+            'LOCAL_LEVEL access level, current user' => [
+                $this->getCurrentUser(2, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::LOCAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'LOCAL_LEVEL access level, another user, same org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::LOCAL_LEVEL,
+                $organization1,
+                true
+            ],
+            'LOCAL_LEVEL access level, another user, different org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::LOCAL_LEVEL,
+                $organization2,
+                false
+            ],
+            'DEEP_LEVEL access level, current user' => [
+                $this->getCurrentUser(2, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::DEEP_LEVEL,
+                $organization1,
+                true
+            ],
+            'DEEP_LEVEL access level, another user, same org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::DEEP_LEVEL,
+                $organization1,
+                true
+            ],
+            'DEEP_LEVEL access level, another user, different org' => [
+                $this->getCurrentUser(1, [$organization1], [$bu11]),
+                $newUser,
+                AccessLevel::DEEP_LEVEL,
+                $organization2,
+                false
+            ],
         ];
+    }
+
+    /**
+     * @param int   $id
+     * @param array $organizations
+     * @param array $bUnits
+     * @return User
+     */
+    protected function getCurrentUser($id, array $organizations, array $bUnits)
+    {
+        $user = new User();
+        $user->setId($id);
+        $user->setBusinessUnits(new ArrayCollection($bUnits));
+        $user->setOrganizations(new ArrayCollection($organizations));
+
+        return $user;
+    }
+
+    protected function addUserInfoToTree(OwnerTree $tree, User $user)
+    {
+        $owner = $user->getOwner();
+        $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
+        foreach ($user->getOrganizations() as $organization) {
+            $tree->addUserOrganization($user->getId(), $organization->getId());
+            foreach ($user->getBusinessUnits() as $businessUnit) {
+                $organizationId   = $organization->getId();
+                $buOrganizationId = $businessUnit->getOrganization()->getId();
+                if ($organizationId == $buOrganizationId) {
+                    $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());
+                }
+            }
+        }
     }
 }

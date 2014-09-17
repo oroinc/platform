@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailTemplateRepository extends EntityRepository
 {
@@ -23,23 +25,26 @@ class EmailTemplateRepository extends EntityRepository
     /**
      * Load templates by entity name
      *
-     * @param $entityName
+     * @param              $entityName
+     * @param Organization $organization
+     *
      * @return EmailTemplate[]
      */
-    public function getTemplateByEntityName($entityName)
+    public function getTemplateByEntityName($entityName, Organization $organization)
     {
-        return $this->findBy(array('entityName' => $entityName));
+        return $this->findBy(array('entityName' => $entityName, 'organization' => $organization));
     }
 
     /**
      * Return templates query builder filtered by entity name
      *
-     * @param string $entityName    entity class
-     * @param bool   $includeSystem if true - system templates will be included in result set
+     * @param string       $entityName    entity class
+     * @param Organization $organization
+     * @param bool         $includeSystem if true - system templates will be included in result set
      *
      * @return QueryBuilder
      */
-    public function getEntityTemplatesQueryBuilder($entityName, $includeSystem = false)
+    public function getEntityTemplatesQueryBuilder($entityName, Organization $organization, $includeSystem = false)
     {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
@@ -49,6 +54,9 @@ class EmailTemplateRepository extends EntityRepository
         if ($includeSystem) {
             $qb->orWhere('e.entityName IS NULL');
         }
+
+        $qb->andWhere("e.organization = :organization")
+            ->setParameter('organization', $organization);
 
         return $qb;
     }

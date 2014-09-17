@@ -12,6 +12,8 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 class UserManager implements UserProviderInterface
 {
     /**
@@ -298,5 +300,18 @@ class UserManager implements UserProviderInterface
     public function getStorageManager()
     {
         return $this->om;
+    }
+
+    /**
+     * Return related repository
+     *
+     * @param User         $user
+     * @param Organization $organization
+     *
+     * @return UserApi
+     */
+    public function getApi(User $user, Organization $organization)
+    {
+        return $this->getStorageManager()->getRepository('OroUserBundle:UserApi')->getApi($user, $organization);
     }
 }

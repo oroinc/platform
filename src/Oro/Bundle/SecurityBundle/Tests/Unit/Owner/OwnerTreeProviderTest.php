@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -143,20 +144,24 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $this->setId($user1, 1);
         $user1->setOwner($mainBu);
         $user1->addBusinessUnit($mainBu);
+        $user1->setOrganizations(new ArrayCollection([$organization]));
 
         $user2 = new User();
         $this->setId($user2, 2);
         $user2->setOwner($bu2);
         $user2->addBusinessUnit($bu2);
+        $user2->setOrganizations(new ArrayCollection([$organization]));
 
         $user3 = new User();
         $this->setId($user3, 3);
         $user3->setOwner($childBu);
         $user3->addBusinessUnit($childBu);
+        $user3->setOrganizations(new ArrayCollection([$organization]));
 
         $user3 = new User();
         $this->setId($user3, 4);
         $user3->addBusinessUnit($childBu);
+        $user3->setOrganizations(new ArrayCollection([$organization]));
 
         return [
             [$user1, $user2, $user3],

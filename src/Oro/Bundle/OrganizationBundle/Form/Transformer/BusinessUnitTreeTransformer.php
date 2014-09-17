@@ -9,14 +9,10 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class BusinessUnitTreeTransformer implements DataTransformerInterface
 {
-    /**
-     * @var BusinessUnitManager
-     */
+    /** @var BusinessUnitManager */
     protected $manager;
 
-    /**
-     * @var BusinessUnit
-     */
+    /** @var BusinessUnit */
     protected $entity;
 
     public function __construct($manager)

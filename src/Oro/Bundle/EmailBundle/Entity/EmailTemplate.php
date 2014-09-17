@@ -12,6 +12,7 @@ use Gedmo\Translatable\Translatable;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -31,7 +32,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id"
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -163,6 +166,14 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @Assert\Valid(deep = true)
      */
     protected $translations;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * @param $name
@@ -502,5 +513,28 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return EmailTemplate
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

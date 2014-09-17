@@ -115,8 +115,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
                     $value = array(
                         'id' => $value->getId(),
                         'name' => $value->getName(),
-                        'currency' => $value->getCurrency(),
-                        'precision' => $value->getPrecision(),
                     );
                 }
                 break;
@@ -188,6 +186,6 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      */
     public function getFormHandler()
     {
-        return $this->get('oro_organization.form.handler.api');
+        return $this->get('oro_organization.form.handler.business_unit.api');
     }
 }

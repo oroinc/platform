@@ -1,71 +1,131 @@
 Examples
 ========
 
- - **John** and **Mary** was created in  **Main business unit**. 
- - **Mike** was created in child **Child business unit**. 
- - **Robert** was created in **Second business unit**.
+We have:
 
+ - 2 organizations: **Main Organization** and the **Second Organization**;
+ - Main Organization contains one **BU A**;
+ - Senond Organization contains one **BU B**;
+ - BU B contains one subordinate **BU C**;
+ - user **John** was created in the Main Organization and BU A;
+ - user **Mary** was created in the Main Organization and BU A;
+ - user **Mike** was created in the Second Organization and BU C;
+ - user **Robert** was created in the Second Organization and BU B;
+ - user **Mark** was created in the Second Organization and BU B;
+ 
 Users was assigned:
 
- - **John** was assigned to **Main business unit** and **Second business unit**
- - **Mary** was assigned to **Main business unit**
- - **Mike** was assigned to **Main business unit** and **Child business unit**
- - **Robert** was assigned to **Main business unit** and **Second business unit**
+| User      | Main Organization     | Second Organization    |
+| --------- |:---------------------:| :---------------------:|
+| **John**  | BU A                  | BU C                   |
+| **Mary**  | BU A                  | BU B                   |
+| **Mike**  |    **No access**      | BU C                   |
+| **Robert**| BU A                  | BU B                   |
+| **Mark**  |    **No access**      |   **No business units**|
+
  
 User ownersip type
 ---------
+Ownreship type for accounts is **User**.
 
- Ownreship type for accounts is **User**.
- 
- John was create **Account A**,  Mary was create **Account B**, Mike was create **Account C**, Robert was create **Account D**.
+Each of users was created two Account records in different organizations:
+
+| User      | Main Organization  | Second Organization  |
+| --------- |:------------------:| :--------------------|
+| **John**  | Account A          | Account E            |
+| **Mary**  | Account B          | Account F            |
+| **Mike**  | Account G          | Account C            |
+| **Robert**| Account H          | Account D            |
+| **Mark**  | Account I          | Account J            |
+
+![User-ownership][1]
 
 ###John 
 
-![John-User][1]
+If user **John** will login into the **Main organization**, he should see the next data:
 
-John has access:
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account A                                             |
+| **Business Unit**  | Account A, Account B, Account H                       |
+| **Division**       | Account A, Account B, Account H                       |
+| **Organization**   | Account A, Account B, Account H, Account G, Account I |
 
- - on **User access level**: only to Account A.
- - on **Business Unit access level**: Account A and Account B (creators of record are in Main BU). Account D (John was assigned to Second BU).
- - on **Division access level**: Account A and Account B (creators of record are in Main BU). Account D (John was assigned to Second BU). Account C ("Child BU" is the child of "Second business unit" which was assigned to John).
- - on **Organization access level**: Account A and Account B (creators of record are in Main Organizations) and Account D and Account C (creators of record are in Second Organizations).
- - on **System access level**: All accounts (creators are in same system).
+If user **John** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account E                                             |
+| **Business Unit**  | Account E, Account C                                  |
+| **Division**       | Account E, Account C                                  |
+| **Organization**   | Account E, Account C, Account D, Account F, Account J |
+
 
 ###Mary
 
-![Mary-User][2]
+If user **Mary** will login into the **Main organization**, she should see the next data:
 
-Mary has access:
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account B                                             |
+| **Business Unit**  | Account B, Account A, Account H                       |
+| **Division**       | Account B, Account A, Account H                       |
+| **Organization**   | Account B, Account A, Account H, Account G, Account I |
 
- - on **User access level**: only to Account B.
- - on **Business Unit access level**: Account A and Account B (creators of record are in Main BU).
- - on **Division access level**: Account A and Account B (creators of record are in Main BU).
- - on **Organization access level**: Account A and Account B (creators of record are in Main Organizations).
- - on **System access level**: All accounts (creators are in same system).
+If user **Mary** will login into the **Second organization**, she should see the next data:
+
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account F                                             |
+| **Business Unit**  | Account F, Account D                                  |
+| **Division**       | Account F, Account D, Account C, Account E            |
+| **Organization**   | Account F, Account D, Account C, Account E, Account J |
 
 ###Mike
 
-![Mike-User][3]
+User **Mike** can not login into the **Main organization**.
 
-Mike has access:
+If user **Mike** will login into the **Second organization**, he should see the next data:
 
- - on **User access level**: only to Account C.
- - on **Business Unit access level**: Account C (as creator). Account A and Account B (via Main BU).
- - on **Division access level**: Account C (as creator). Account A and Account B (via Main BU).
- - on **Organization access level**: Account A and Account B (creators of record are in Main Organizations) and Account D and Account C (creators of record are in Second Organizations).
- - on **System access level**: All accounts (creators are in same system).
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account C                                             |
+| **Business Unit**  | Account C, Account E                                  |
+| **Division**       | Account C, Account E                                  |
+| **Organization**   | Account C, Account E, Account D, Account F, Account J |
 
 ###Robert
 
-![Robert-User][4]
+If user **Robert** will login into the **Main organization**, he should see the next data:
 
-Robert has access:
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account H                                             |
+| **Business Unit**  | Account H, Account A, Account B                       |
+| **Division**       | Account H, Account A, Account B                       |
+| **Organization**   | Account H, Account A, Account B, Account G, Account I |
 
- - on **User access level**: only to Account D.
- - on **Business Unit access level**: Account D (as creator). Account A and Account B (via Main BU).
- - on **Division access level**: Account D (as creator). Account A and Account B (via Main BU). Account C ("Child BU" is the child of "Second business unit" which was assigned to Robert).
- - on **Organization access level**: Account A and Account B (creators of record are in Main Organizations) and Account D and Account C (creators of record are in Second Organizations).
- - on **System access level**: All accounts (creators are in same system).
+If user **Robert** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account D                                             |
+| **Business Unit**  | Account D, Account F, Account E                       |
+| **Division**       | Account D, Account F, Account C, Account E            |
+| **Organization**   | Account D, Account F, Account C, Account E, Account J |
+
+###Mark
+
+User **Mark** can not login into the **Main organization**.
+
+If user **Mark** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                                                  |
+|:------------------ | :---------------------------------------------------- |
+| **User**           | Account J                                             |
+| **Business Unit**  | Account J                                             |
+| **Division**       | Account J                                             |
+| **Organization**   | Account J, Account F, Account E, Account C, Account D |
    
 Business Unit ownersip type
 ---------
@@ -74,51 +134,94 @@ Ownreship type for accounts is **Business Unit**.
 
 We cannot set User access level. Minimal access level is Business unit.
  
- John was create **Account A** and make Main BU as owner,  Mary was create **Account B** and make Main BU as owner, Mike was create **Account C** and make Second BU as owner, Robert was create **Account D** and make Child BU as owner.
+We have the next data:
+
+- Account A was created in the Main Organization and BU A;
+- Account B was created in the Main Organization and BU A;
+- Account C was created in the Second organization and BU C;
+- Account D was created in the Second organization and BU B;
+- Account E was created in the Second organization and BU B;
+
+![Business-unit-ownership][2]
 
 ###John 
 
-![John-BU][5]
+If user **John** will login into the **Main organization**, he should see the next data:
 
-John has access:
+| Access level       | Data                 |
+|:------------------ | :------------------- |
+| **Business Unit**  | Account A, Account B |
+| **Division**       | Account A, Account B |
+| **Organization**   | Account A, Account B |
 
- - on **Business Unit access level**: Account A and Account B (record are in Main BU). Account D (John was assigned to Second BU).
- - on **Division access level**: Account A and Account B (record are in Main BU). Account D (John was assigned to Second BU). Account C ("Child BU" is the child of "Second business unit" which was assigned to John).
- - on **Organization access level**: all records.
- - on **System access level**: all records.
+If user **John** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | Account C                       |
+| **Division**       | Account C                       |
+| **Organization**   | Account C, Account D, Account E |
 
 ###Mary 
 
-![Mary-BU][6]
+If user **Mary** will login into the **Main organization**, she should see the next data:
 
-Mary has access:
+| Access level       | Data                 |
+|:------------------ | :------------------- |
+| **Business Unit**  | Account A, Account B |
+| **Division**       | Account A, Account B |
+| **Organization**   | Account A, Account B |
 
- - on **Business Unit access level**: Account A and Account B (record are in Main BU). 
- - on **Division access level**: Account A and Account B (record are in Main BU). 
- - on **Organization access level**: Account A and Account B (record are in Main BU). 
- - on **System access level**: all records.
+If user **John** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | Account D, Account E            |
+| **Division**       | Account D, Account E, Account C |
+| **Organization**   | Account D, Account E, Account C |
 
 ###Mike 
 
-![Mike-BU][7]
+User **Mike** can not login into the **Main organization**.
 
-Mike has access:
+If user **Mike** will login into the **Second organization**, he should see the next data:
 
- - on **Business Unit access level**: Account C (record are in Child BU).  Account A, Account B (records are in Main BU). 
- - on **Division access level**: Account C (record are in Child BU).  Account A, Account B (records are in Main BU).
- - on **Organization access level**: all records.
- - on **System access level**: all records.
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | Account C                       |
+| **Division**       | Account C                       |
+| **Organization**   | Account C, Account D, Account E |
 
 ###Robert 
 
-![Robert-BU][8]
+If user **Robert** will login into the **Main organization**, he should see the next data:
 
-Robert has access:
+| Access level       | Data                 |
+|:------------------ | :------------------- |
+| **Business Unit**  | Account A, Account B |
+| **Division**       | Account A, Account B |
+| **Organization**   | Account A, Account B |
 
- - on **Business Unit access level**: Account D (record are in Second BU).  Account A, Account B (records are in Main BU). 
- - on **Division access level**: all records.
- - on **Organization access level**: all records.
- - on **System access level**: all records.
+If user **Robert** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | Account C                       |
+| **Division**       | Account C                       |
+| **Organization**   | Account C, Account D, Account E |
+   
+###Mark
+
+User **Mark** can not login into the **Main organization**.
+
+If user **Mark** will login into the **Second organization**, he should see the next data:
+
+| Access level       | Data                            |
+|:------------------ | :------------------------------ |
+| **Business Unit**  | -                               |
+| **Division**       | -                               |
+| **Organization**   | Account C, Account D, Account E |
+      
    
 Organization ownersip type
 ---------
@@ -127,34 +230,37 @@ Ownreship type for accounts is **Organization**.
 
 We cannot set User, Business unit and Division access level. Minimal access level is Organization.
  
- John was create **Account A** and make Main organization as owner,  Mary was create **Account B** and make Main organization as owner, Mike was create **Account C** and make Second organization as owner, Robert was create **Account D** and make Second organization as owner.
+We have the next data:
 
-###John, Mike, Robert
+- Account A was created in the Main Organization;
+- Account B was created in the Main Organization;
+- Account C was created in the Second organization;
+- Account D was created in the Second organization;
+- Account E was created in the Second organization;
 
-![John-Mike-Robert-Organization][9]
+![Organization-ownership][3]
 
-John,  Mike and Robert has access:
+###John, Mary, Robert
 
- - on **Organization access level**: all records.
- - on **System access level**: all records.
+If this users will login into the **Main organization**, they should see next data:
 
-###Mary
+- in Organization access level: Account A, Account B
 
-![Mary-Organization][10]
 
-Mary has access:
+If this users will login into the **Second organization**, they should see next data:
 
- - on **Organization access level**: Account A and Account B (record are in Main Organization).
- - on **System access level**: all records.
+- in Organization access level: Account C, Account D, Account E
+
+
+###Mike, Mark
+
+This users does can not login into the First Organization.
+
+If this users will login into the **Second organization**, they should see next data:
+
+- in Organization access level: Account C, Account D, Account E
  
 
-  [1]: img/John-User.png
-  [2]: img/Mary-User.png
-  [3]: img/Mike-User.png
-  [4]: img/Robert-User.png
-  [5]: img/John-BU.png
-  [6]: img/Mary-BU.png
-  [7]: img/Mike-BU.jpg
-  [8]: img/Robert-BU.png
-  [9]: img/John-Mike-Robert-Organization.png
-  [10]: img/Mary-Organization.png
+  [1]: img/User-ownership.png
+  [2]: img/BusinessUnit-ownership.png
+  [3]: img/Organization-ownership.png

@@ -29,16 +29,7 @@ class LoadSegmentData extends AbstractFixture
             $manager->persist($dynamicType);
         }
 
-        $organisation = $manager->getRepository('OroOrganizationBundle:Organization')
-            ->findOneBy(array('name' => 'Test Org'));
-
-        if (!$organisation) {
-            $organisation = new Organization();
-            $organisation->setName('Test Org');
-            $organisation->setCurrency('USD');
-            $organisation->setPrecision('0.00');
-            $manager->persist($organisation);
-        }
+        $organisation = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         $owner = $manager->getRepository('OroOrganizationBundle:BusinessUnit')->findOneBy(array('name' => 'Test'));
         if (!$owner) {
@@ -69,6 +60,7 @@ class LoadSegmentData extends AbstractFixture
             $entity->setOwner($owner);
             $entity->setType((rand(0, 100) % 2) ? $staticType : $dynamicType);
             $entity->setUpdatedAt(new \DateTime('now'));
+            $entity->setOrganization($organisation);
             $manager->persist($entity);
         }
 

@@ -12,10 +12,12 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class CalendarController extends Controller
 {
@@ -30,10 +32,14 @@ class CalendarController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
+        /** @var Organization $organization */
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
+
         $em = $this->getDoctrine()->getManager();
         /** @var CalendarRepository $repo */
         $repo     = $em->getRepository('OroCalendarBundle:Calendar');
-        $calendar = $repo->findByUser($user->getId());
+
+        $calendar = $repo->findByUserAndOrganization($user->getId(), $organization->getId());
 
         return $this->forward(
             'OroCalendarBundle:Calendar:view',

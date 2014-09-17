@@ -1,0 +1,15 @@
+placeholders:
+    organization_selector:
+        items:
+            selector:
+                order: 200
+    organization_name:
+        items:
+            org_name:
+                order: 200
+
+items:
+    selector:
+        template: OroSecurityBundle:Organization:selector.html.twig
+    org_name:
+        action: OroSecurityBundle:AclPermission:currentOrganizationName

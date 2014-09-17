@@ -3,15 +3,26 @@
 define(['../side-menu', '../mediator'], function ($, mediator) {
     'use strict';
 
+    var STATE_STORAGE_KEY = 'main-menu-state',
+        MAXIMIZED_STATE = 'maximized',
+        MINIMIZED_STATE = 'minimized';
+
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         /**
          * Do initial changes
-         *
-         * @private
          */
         _init: function () {
-            var minimized = this.element.hasClass('minimized');
-            if (minimized) {
+            this._update();
+        },
+
+        /**
+         * Updates menu's minimized/maximized view
+         */
+        _update: function () {
+            var isMinimized = localStorage[STATE_STORAGE_KEY] !== MAXIMIZED_STATE;
+            this.element.toggleClass('minimized', isMinimized);
+            $('#main').toggleClass('main-menu-maximized', isMinimized);
+            if (isMinimized) {
                 this._convertToDropdown();
             } else {
                 this._convertToAccordion();
@@ -22,9 +33,8 @@ define(['../side-menu', '../mediator'], function ($, mediator) {
          * Handles menu toggle state action
          */
         _toggle: function () {
-            this.element.toggleClass('minimized');
-            $('#main').toggleClass('main-menu-maximized');
-            this._init();
+            localStorage[STATE_STORAGE_KEY] = this.element.hasClass('minimized') ? MAXIMIZED_STATE : MINIMIZED_STATE;
+            this._update();
             mediator.trigger('layout:adjustHeight');
         }
     });

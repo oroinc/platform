@@ -117,7 +117,7 @@ class ControllersTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($result, 200, false);
 
         //verify result
-        $this->assertEquals($user->getApi()->getApiKey(), trim($result->getContent(), '"'));
+        $this->assertEquals($user->getApiKeys()[0]->getApiKey(), trim($result->getContent(), '"'));
     }
 
     public function testViewProfile()

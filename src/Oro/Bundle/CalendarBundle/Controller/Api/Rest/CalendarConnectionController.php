@@ -15,6 +15,7 @@ use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarConnectionRepository;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -116,9 +117,12 @@ class CalendarConnectionController extends FOSRestController implements
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
 
+        /** @var Organization $organization */
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
+
         $connectedCalendar = !empty($calendarId)
             ? $calendarRepo->find($id)
-            : $calendarRepo->findByUser($ownerId);
+            : $calendarRepo->findByUserAndOrganization($ownerId, $organization->getId());
         if (!$connectedCalendar) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
