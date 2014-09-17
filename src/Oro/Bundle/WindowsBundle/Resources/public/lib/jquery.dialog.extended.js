@@ -320,6 +320,7 @@ $.widget( "ui.dialog", $.ui.dialog, {
             widgetHeight = this.element.innerHeight(),
             maxHeight = viewportHeight + widgetHeight - dialogHeight;
         this.element.css('max-height', maxHeight);
+        this._position();
     },
 
     _getTitleBarHeight: function() {
