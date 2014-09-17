@@ -90,6 +90,9 @@ class Country implements Translatable
      *
      * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
      * @ORM\JoinColumn(name="continent_code", referencedColumnName="code")
+     * @JMS\Type("Oro\Bundle\AddressBundle\Entity\Continent")
+     * @JMS\SerializedName("continent")
+     * @JMS\Expose
      */
     protected $continent;
 
