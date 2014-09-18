@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\TrackingBundle\OroTrackingBundle, priority: 35 }
+    - { name: Oro\Bundle\TrackingBundle\OroTrackingBundle, priority: 25 }
