@@ -65,7 +65,6 @@ class ControllersTest extends WebTestCase
         $form['oro_business_unit_form[email]'] = 'test@test.com';
         $form['oro_business_unit_form[phone]'] = '123-123-123';
         $form['oro_business_unit_form[fax]'] = '321-321-321';
-        $form['oro_business_unit_form[owner]'] = 1;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -98,7 +97,6 @@ class ControllersTest extends WebTestCase
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_business_unit_form[name]'] = 'testBU_Updated';
-        $form['oro_business_unit_form[owner]'] = 1;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

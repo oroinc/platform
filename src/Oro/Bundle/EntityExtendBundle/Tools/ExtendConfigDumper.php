@@ -4,12 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Symfony\Component\Filesystem\Filesystem;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
@@ -33,6 +32,9 @@ class ExtendConfigDumper
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
     /** @var EntityGenerator */
     protected $entityGenerator;
 
@@ -45,17 +47,20 @@ class ExtendConfigDumper
     /**
      * @param OroEntityManager                $em
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param FieldTypeHelper                 $fieldTypeHelper
      * @param string                          $cacheDir
      * @param EntityGenerator                 $entityGenerator
      */
     public function __construct(
         OroEntityManager $em,
         ExtendDbIdentifierNameGenerator $nameGenerator,
+        FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
-        $this->nameGenerator   = $nameGenerator;
         $this->em              = $em;
+        $this->nameGenerator   = $nameGenerator;
+        $this->fieldTypeHelper = $fieldTypeHelper;
         $this->entityGenerator = $entityGenerator;
         $this->cacheDir        = $cacheDir;
     }
@@ -73,45 +78,45 @@ class ExtendConfigDumper
         $this->extensions[$priority][] = $extension;
     }
 
-    /**
-     * @param null $className
-     */
-    public function updateConfig($className = null)
+    public function updateConfig()
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
 
-        $extendProvider = $this->em->getExtendConfigProvider();
+        $extensions = $this->getExtensions();
 
-        $extendConfigs = $className
-            ? [$extendProvider->getConfig($className)]
-            : $extendProvider->getConfigs();
-
-        foreach ($this->getExtensions() as $extension) {
+        foreach ($extensions as $extension) {
             if ($extension->supports(self::ACTION_PRE_UPDATE)) {
-                $extension->preUpdate($extendConfigs);
+                $extension->preUpdate();
             }
         }
 
+        $extendProvider = $this->em->getExtendConfigProvider();
+        $extendConfigs  = $extendProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
                     $this->checkSchema($extendConfig, $aliases);
                 }
+
                 // some bundles can change configs in pre persist events,
                 // and other bundles can produce more changes depending on already made, it's a bit hacky,
                 // but it's a service operation so called inevitable evil
                 $extendProvider->flush();
-                $this->checkState($extendConfig);
-                $extendProvider->flush();
+
+                if ($this->checkState($extendConfig)) {
+                    $extendProvider->flush();
+                }
             }
         }
 
-        foreach ($this->getExtensions() as $extension) {
+        foreach ($extensions as $extension) {
             if ($extension->supports(self::ACTION_POST_UPDATE)) {
-                $extension->postUpdate($extendConfigs);
+                $extension->postUpdate();
             }
         }
+        // do one more flush to make sure changes made by post update extensions are saved
+        $extendProvider->flush();
 
         $this->clear();
     }
@@ -120,7 +125,7 @@ class ExtendConfigDumper
     {
         $schemas        = [];
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs();
+        $extendConfigs  = $extendProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
@@ -168,7 +173,7 @@ class ExtendConfigDumper
      */
     protected function getExtensions()
     {
-        if (empty($this->sortedExtensions)) {
+        if (null === $this->sortedExtensions) {
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
@@ -194,43 +199,39 @@ class ExtendConfigDumper
         array &$properties,
         array &$doctrine
     ) {
-        if ($fieldConfig->is('extend')) {
-            $fieldName = $fieldConfig->getId()->getFieldName();
+        if ($fieldConfig->is('is_extend')) {
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $fieldConfig->getId();
+            $fieldName     = $fieldConfigId->getFieldName();
+            $fieldType     = $fieldConfigId->getFieldType();
 
-            // TODO: getting a field type from a model here is a temporary solution.
-            // We need to use $fieldType = $fieldConfig->getId()->getFieldType();
-            $fieldType = $this->em->getExtendConfigProvider()
-                ->getConfigManager()
-                ->getConfigFieldModel(
-                    $fieldConfig->getId()->getClassName(),
-                    $fieldConfig->getId()->getFieldName()
-                )
-                ->getType();
-
-            if (in_array($fieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
-                $relationProperties[$fieldName] = $fieldConfig->getId()->getFieldName();
-                if ($fieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
-                    $defaultName = self::DEFAULT_PREFIX . $fieldConfig->getId()->getFieldName();
+            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
+            if (in_array($underlyingFieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
+                $relationProperties[$fieldName] = $fieldName;
+                if ($underlyingFieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
+                    $defaultName = self::DEFAULT_PREFIX . $fieldName;
 
                     $defaultProperties[$defaultName] = $defaultName;
                 }
             } else {
-                $properties[$fieldName] = $fieldConfig->getId()->getFieldName();
+                $properties[$fieldName] = $fieldName;
 
-                $doctrine[$entityName]['fields'][$fieldName]['code']      = $fieldName;
-                $doctrine[$entityName]['fields'][$fieldName]['type']      = $fieldType;
-                $doctrine[$entityName]['fields'][$fieldName]['nullable']  = true;
-                $doctrine[$entityName]['fields'][$fieldName]['length']    = $fieldConfig->get('length');
-                $doctrine[$entityName]['fields'][$fieldName]['precision'] = $fieldConfig->get('precision');
-                $doctrine[$entityName]['fields'][$fieldName]['scale']     = $fieldConfig->get('scale');
+                $doctrine[$entityName]['fields'][$fieldName] = [
+                    'column'    => $fieldName,
+                    'type'      => $fieldType,
+                    'nullable'  => true,
+                    'length'    => $fieldConfig->get('length'),
+                    'precision' => $fieldConfig->get('precision'),
+                    'scale'     => $fieldConfig->get('scale'),
+                ];
             }
         }
 
-        if (!$fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if (!$fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
 
-        if ($fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
             $fieldConfig->set('is_deleted', true);
         }
     }
@@ -240,6 +241,7 @@ class ExtendConfigDumper
      * @param array|null      $aliases
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function checkSchema(ConfigInterface $extendConfig, $aliases)
     {
@@ -255,12 +257,15 @@ class ExtendConfigDumper
                 $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
             }
             $doctrine[$entityName] = [
-                'type'   => 'entity',
-                'table'  => $tableName,
-                'fields' => [
-                    'id' => ['type' => 'integer', 'id' => true, 'generator' => ['strategy' => 'AUTO']]
-                ],
+                'type'  => 'entity',
+                'table' => $tableName
             ];
+            // add 'id' field only for Custom entity without inheritance
+            if (!$extendConfig->has('inherit')) {
+                $doctrine[$entityName]['fields'] = [
+                    'id' => ['type' => 'integer', 'id' => true, 'generator' => ['strategy' => 'AUTO']]
+                ];
+            }
         } else {
             $type                  = 'Extend';
             $entityName            = $extendConfig->get('extend_class');
@@ -305,7 +310,7 @@ class ExtendConfigDumper
                     $addRemoveMethods[$fieldName]['target']              =
                         $relation['target_field_id']->getFieldName();
                     $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() == 'manyToMany';
+                        $relation['field_id']->getFieldType() === 'manyToMany';
                 }
             }
 
@@ -331,6 +336,8 @@ class ExtendConfigDumper
             }
             $schema['parent']  = $parentClassName;
             $schema['inherit'] = get_parent_class($parentClassName);
+        } elseif ($extendConfig->has('inherit')) {
+            $schema['inherit'] = $extendConfig->get('inherit');
         }
 
         $extendConfig->set('schema', $schema);
@@ -340,30 +347,38 @@ class ExtendConfigDumper
 
     /**
      * @param ConfigInterface $extendConfig
+     *
+     * @return bool
      */
     protected function checkState(ConfigInterface $extendConfig)
     {
+        $hasChanges = false;
         $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $extendConfig->getId()->getClassName();
-        if ($extendConfig->is('state', ExtendScope::STATE_DELETED)) {
+        if ($extendConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
-            $extendConfig->set('is_deleted', true);
-            $extendProvider->persist($extendConfig);
+            if (!$extendConfig->is('is_deleted')) {
+                $extendConfig->set('is_deleted', true);
+                $extendProvider->persist($extendConfig);
+                $hasChanges = true;
+            }
 
             // mark all fields as deleted
-            $extendProvider->map(
-                function (Config $config) use ($extendProvider) {
-                    if (!$config->is('is_deleted')) {
-                        $config->set('is_deleted', true);
-                        $extendProvider->persist($config);
-                    }
-                },
-                $className
-            );
-        } else {
+            $fieldConfigs = $extendProvider->getConfigs($className, true);
+            foreach ($fieldConfigs as $fieldConfig) {
+                if (!$fieldConfig->is('is_deleted')) {
+                    $fieldConfig->set('is_deleted', true);
+                    $extendProvider->persist($fieldConfig);
+                    $hasChanges = true;
+                }
+            }
+        } elseif (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
             $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
             $extendProvider->persist($extendConfig);
+            $hasChanges = true;
         }
+
+        return $hasChanges;
     }
 
     /**
@@ -397,22 +412,5 @@ class ExtendConfigDumper
         $targetConfig->set('schema', $schema);
 
         $extendProvider->persist($targetConfig);
-    }
-
-    /**
-     * Get entity identifier name by class name
-     *
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getEntityIdentifier($className)
-    {
-        // Extend entity always have "id" identifier
-        if (ExtendHelper::isCustomEntity($className)) {
-            return 'id';
-        }
-
-        return $this->em->getClassMetadata($className)->getSingleIdentifierColumnName();
     }
 }

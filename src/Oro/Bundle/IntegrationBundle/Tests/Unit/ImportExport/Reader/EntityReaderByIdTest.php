@@ -43,12 +43,21 @@ class EntityReaderByIdTest extends OrmTestCase
             'Oro\Bundle\IntegrationBundle\Entity'
         );
 
+        $ownershipMetadataProvider =
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+                ->disableOriginalConstructor()
+                ->getMock();
+
         $this->em = $this->getTestEntityManager();
         $config   = $this->em->getConfiguration();
         $config->setMetadataDriverImpl($metadataDriver);
         $config->setEntityNamespaces(['OroIntegrationBundle' => 'Oro\Bundle\IntegrationBundle\Entity']);
 
-        $this->reader = new EntityReaderById($this->contextRegistry, $this->managerRegistry);
+        $this->reader = new EntityReaderById(
+            $this->contextRegistry,
+            $this->managerRegistry,
+            $ownershipMetadataProvider
+        );
     }
 
     protected function tearDown()

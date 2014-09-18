@@ -42,6 +42,10 @@ class IndexCommand extends ContainerAwareCommand
         $class       = $input->getArgument('class');
         $identifiers = $input->getArgument('identifiers');
 
+        // convert from short format to FQСN
+        $class = $this->getContainer()->get('doctrine')
+            ->getManagerForClass($class)->getClassMetadata($class)->getName();
+
         list($savedEntities, $deletedEntities) = $this->getSavedAndDeletedEntities($class, $identifiers);
 
         if ($savedEntities) {

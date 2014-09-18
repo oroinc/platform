@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ActionConfiguration
 {
@@ -12,9 +13,16 @@ class ActionConfiguration
     public static function getIsSyncAvailableCondition()
     {
         return function (ResultRecordInterface $record) {
+            $result = [];
             if ($record->getValue('enabled') === 'disabled') {
-                return ['schedule' => false];
+                $result['schedule'] = false;
             }
+
+            if ($record->getValue('editMode') == Channel::EDIT_MODE_DISALLOW) {
+                $result['delete'] = false;
+            }
+
+            return $result;
         };
     }
 }

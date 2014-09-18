@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
-class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
+abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
     {
@@ -63,6 +64,19 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         return $provider;
     }
 
+    /**
+     * @param array $config            Example:
+     *                                 'Test\Entity1' => array
+     *                                 .    'column1'   => 'string',
+     *                                 .    'relation1' => ['nullable' => true],
+     *                                 'Test\Entity2' => array
+     *                                 .    'column1' => 'integer',
+     * @param array $identifiersConfig Example:
+     *                                 'Test\Entity1' => ['id'],
+     *                                 'Test\Entity2' => ['id'],
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getDoctrine(array $config = [], array $identifiersConfig = [])
     {
         $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
@@ -123,19 +137,24 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
      * @param \PHPUnit_Framework_MockObject_MockObject|null $doctrine
      * @param \PHPUnit_Framework_MockObject_MockObject|null $functionProvider
      * @param \PHPUnit_Framework_MockObject_MockObject|null $virtualFieldProvider
+     * @param array                                         $guessers
      *
      * @return DatagridConfigurationBuilder
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function createDatagridConfigurationBuilder(
         QueryDesignerModel $model,
         $doctrine = null,
         $functionProvider = null,
-        $virtualFieldProvider = null
+        $virtualFieldProvider = null,
+        array $guessers = []
     ) {
         $builder = new DatagridConfigurationBuilder(
             $functionProvider ? : $this->getFunctionProvider(),
             $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
-            $doctrine ? : $this->getDoctrine()
+            $doctrine ? : $this->getDoctrine(),
+            new DatagridGuesserMock($guessers)
         );
 
         $builder->setGridName('test_grid');

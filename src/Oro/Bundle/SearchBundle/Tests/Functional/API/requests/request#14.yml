@@ -1,5 +1,6 @@
 # offset test case
 request:
+    supported_engines: [orm]
     search: \"item1@mail.com\"
     offset: 0
     max_results: 1
@@ -11,8 +12,10 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 record_string: item1@mail.com
+                record_url: http://localhost/search/
     soap:
         item:
             -
                 entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 recordTitle: item1@mail.com
+                recordUrl: http://localhost/search/

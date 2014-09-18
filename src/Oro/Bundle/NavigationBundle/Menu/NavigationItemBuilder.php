@@ -54,12 +54,13 @@ class NavigationItemBuilder implements BuilderInterface
         $user = $this->securityContext->getToken() ? $this->securityContext->getToken()->getUser() : null;
         $menu->setExtra('type', $alias);
         if (is_object($user)) {
+            $currentOrganization = $this->securityContext->getToken()->getOrganizationContext();
             /** @var $entity NavigationItemInterface */
             $entity = $this->factory->createItem($alias, array());
 
             /** @var $repo NavigationRepositoryInterface */
             $repo = $this->em->getRepository(ClassUtils::getClass($entity));
-            $items = $repo->getNavigationItems($user->getId(), $alias, $options);
+            $items = $repo->getNavigationItems($user->getId(), $currentOrganization, $alias, $options);
             foreach ($items as $item) {
                 $menu->addChild(
                     $alias . '_item_' . $item['id'],

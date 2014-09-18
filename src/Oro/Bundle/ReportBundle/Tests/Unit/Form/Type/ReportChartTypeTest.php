@@ -10,6 +10,7 @@ use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartType;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 class ReportChartTypeTest extends FormIntegrationTestCase
 {
@@ -52,16 +53,11 @@ class ReportChartTypeTest extends FormIntegrationTestCase
             ->method('getChartConfigs')
             ->will($this->returnValue([]));
 
-        $eventListener = $this
+        $mock = $this
             ->getMockBuilder('Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener')
-            ->setMethods(['getSubscribedEvents'])
             ->getMock();
 
-        $class = get_class($eventListener);
-
-        $class::staticExpects($this->any())
-            ->method('getSubscribedEvents')
-            ->will($this->returnValue([]));
+        $eventListener = new MutableFormEventSubscriber($mock);
 
         $childType = new ChartType($configProvider);
         $childType->setEventListener($eventListener);

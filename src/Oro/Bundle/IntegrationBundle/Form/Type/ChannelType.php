@@ -7,7 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber as IntegrationFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
@@ -17,34 +16,22 @@ class ChannelType extends AbstractType
     const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
-    /** @var TypesRegistry */
-    protected $registry;
-
     /** @var DefaultUserOwnerSubscriber */
     protected $defaultUserOwnerSubscriber;
 
     /** @var IntegrationFormSubscriber */
     protected $integrationFormSubscriber;
 
-    /** @var IntegrationFormSubscriber */
-    protected $organizationSubscriber;
-
     /**
-     * @param TypesRegistry              $registry
      * @param DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber
      * @param IntegrationFormSubscriber  $integrationFormSubscriber
-     * @param OrganizationSubscriber     $organizationSubscriber
      */
     public function __construct(
-        TypesRegistry $registry,
         DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber,
-        IntegrationFormSubscriber $integrationFormSubscriber,
-        OrganizationSubscriber $organizationSubscriber
+        IntegrationFormSubscriber $integrationFormSubscriber
     ) {
-        $this->registry                   = $registry;
         $this->defaultUserOwnerSubscriber = $defaultUserOwnerSubscriber;
         $this->integrationFormSubscriber  = $integrationFormSubscriber;
-        $this->organizationSubscriber     = $organizationSubscriber;
     }
 
     /**
@@ -54,14 +41,12 @@ class ChannelType extends AbstractType
     {
         $builder->addEventSubscriber($this->integrationFormSubscriber);
         $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
-        $builder->addEventSubscriber($this->organizationSubscriber);
 
         $builder->add(
             self::TYPE_FIELD_NAME,
             'oro_integration_type_select',
             [
                 'required' => true,
-                'choices'  => $this->registry->getAvailableIntegrationTypesDetailedChoiceList(),
                 'label'    => 'oro.integration.integration.type.label'
             ]
         );

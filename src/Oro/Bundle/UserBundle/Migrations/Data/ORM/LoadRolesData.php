@@ -43,17 +43,6 @@ class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
         $roleManager = new Role(self::ROLE_MANAGER);
         $roleManager->setLabel('Manager');
 
-        $defaultBusinessUnit = $manager
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
-
-        if ($defaultBusinessUnit) {
-            $roleAnonymous->setOwner($defaultBusinessUnit);
-            $roleUser->setOwner($defaultBusinessUnit);
-            $roleSAdmin->setOwner($defaultBusinessUnit);
-            $roleManager->setOwner($defaultBusinessUnit);
-        }
-
         $manager->persist($roleAnonymous);
         $manager->persist($roleUser);
         $manager->persist($roleSAdmin);

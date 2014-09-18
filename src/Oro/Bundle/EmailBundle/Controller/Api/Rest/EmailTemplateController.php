@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
@@ -98,11 +99,17 @@ class EmailTemplateController extends RestController
                 $this->view(null, Codes::HTTP_NOT_FOUND)
             );
         }
+
+        $securityContext = $this->get('security.context');
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token        = $securityContext->getToken();
+        $organization = $token->getOrganizationContext();
+
         $entityName = str_replace('_', '\\', $entityName);
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
-        $templates               = $emailTemplateRepository->getTemplateByEntityName($entityName);
+        $templates               = $emailTemplateRepository->getTemplateByEntityName($entityName, $organization);
 
         return $this->handleView(
             $this->view($templates, Codes::HTTP_OK)

@@ -22,6 +22,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      routeName="oro_integration_index",
  *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
@@ -41,6 +46,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Channel
 {
+    const EDIT_MODE_ALLOW = 3;
+    const EDIT_MODE_RESTRICTED = 2;
+    const EDIT_MODE_DISALLOW = 1;
+
     /**
      * @var integer
      *
@@ -131,12 +140,25 @@ class Channel
      */
     protected $statuses;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(
+     *     name="edit_mode",
+     *     type="integer",
+     *     nullable=false,
+     *     options={"default"=\Oro\Bundle\IntegrationBundle\Entity\Channel::EDIT_MODE_ALLOW})
+     * )
+     */
+    protected $editMode;
+
     public function __construct()
     {
         $this->statuses                = new ArrayCollection();
         $this->synchronizationSettings = ConfigObject::create([]);
         $this->mappingSettings         = ConfigObject::create([]);
         $this->enabled                 = true;
+        $this->editMode                = self::EDIT_MODE_ALLOW;
     }
 
     /**
@@ -380,5 +402,21 @@ class Channel
     public function getEnabled()
     {
         return $this->enabled;
+    }
+
+    /**
+     * @param int $editMode
+     */
+    public function setEditMode($editMode)
+    {
+        $this->editMode = $editMode;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEditMode()
+    {
+        return $this->editMode;
     }
 }

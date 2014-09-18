@@ -29,6 +29,7 @@ class UsersTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Manager', 'Marketing Manager'), true)
+            ->setOrganization('OroCRM')
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')

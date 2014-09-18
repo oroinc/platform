@@ -27,6 +27,14 @@ class RestSearchApiTest extends WebTestCase
      */
     public function testSearch(array $request, array $response)
     {
+        if (array_key_exists('supported_engines', $request)) {
+            $engine = $this->getContainer()->getParameter('oro_search.engine');
+            if (!in_array($engine, $request['supported_engines'])) {
+                $this->markTestIncomplete('Test should not be executed on this engine');
+            }
+            unset($request['supported_engines']);
+        }
+
         foreach ($request as $key => $value) {
             if (is_null($value)) {
                 unset($request[$key]);
@@ -46,13 +54,21 @@ class RestSearchApiTest extends WebTestCase
 
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
-        if (isset($response['rest']['data']) && is_array($response['rest']['data'])) {
-            foreach ($response['rest']['data'] as $key => $object) {
-                foreach ($object as $property => $value) {
-                    $this->assertEquals($value, $result['data'][$key][$property]);
-                }
+
+        if (empty($result['data'])) {
+            $result['data'] = [];
+        }
+
+        // remove ID references
+        $recordsRequired = !empty($response['rest']['data'][0]['record_string']);
+        foreach (array_keys($result['data']) as $key) {
+            unset($result['data'][$key]['record_id']);
+            if (!$recordsRequired) {
+                unset($result['data'][$key]['record_string']);
             }
         }
+
+        $this->assertResultHasItems($response['rest']['data'], $result['data']);
     }
 
     /**
@@ -61,5 +77,16 @@ class RestSearchApiTest extends WebTestCase
     public function searchDataProvider()
     {
         return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+    }
+
+    /**
+     * @param array $items
+     * @param array $result
+     */
+    protected function assertResultHasItems(array $items, array $result)
+    {
+        foreach ($items as $item) {
+            $this->assertContains($item, $result);
+        }
     }
 }

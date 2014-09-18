@@ -2,28 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
-class AssociationChoiceType extends AbstractAssociationChoiceType
+class AssociationChoiceType extends AbstractAssociationType
 {
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
-
-    /**
-     * @param ConfigManager       $configManager
-     * @param EntityClassResolver $entityClassResolver
-     */
-    public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
-    {
-        parent::__construct($configManager);
-        $this->entityClassResolver = $entityClassResolver;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -33,45 +15,10 @@ class AssociationChoiceType extends AbstractAssociationChoiceType
 
         $resolver->setDefaults(
             [
-                'empty_value'       => false,
-                'choices'           => ['No', 'Yes'],
-                'association_class' => null // can be full class name or entity name
+                'empty_value' => false,
+                'choices'     => ['No', 'Yes']
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isSchemaUpdateRequired($newVal, $oldVal)
-    {
-        return true == $newVal && false == $oldVal;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isReadOnly($options)
-    {
-        /** @var EntityConfigId $configId */
-        $configId  = $options['config_id'];
-        $className = $configId->getClassName();
-
-        // disable for owning side entity
-        if ($className === $this->entityClassResolver->getEntityClass($options['association_class'])) {
-            return true;
-        }
-
-        return parent::isReadOnly($options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function disableView(FormView $view)
-    {
-        parent::disableView($view);
-        $this->appendClassAttr($view->vars, 'disabled-choice');
     }
 
     /**
@@ -88,5 +35,13 @@ class AssociationChoiceType extends AbstractAssociationChoiceType
     public function getParent()
     {
         return 'choice';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isSchemaUpdateRequired($newVal, $oldVal)
+    {
+        return true == $newVal && false == $oldVal;
     }
 }

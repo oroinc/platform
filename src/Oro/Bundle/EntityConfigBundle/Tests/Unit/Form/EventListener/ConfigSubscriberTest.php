@@ -65,7 +65,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                FormEvents::POST_SUBMIT  => 'postSubmit',
+                FormEvents::POST_SUBMIT  => ['postSubmit', -10],
                 FormEvents::PRE_SET_DATA => 'preSetData'
             ],
             ConfigSubscriber::getSubscribedEvents()

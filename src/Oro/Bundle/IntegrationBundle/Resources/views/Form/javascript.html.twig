@@ -1,0 +1,41 @@
+{#
+    Renders javascript for integration form
+    params:
+        form - Symfony\Component\Form\FormView object
+        formSelector - jQuery selector of main form needed in order to replace form during ajax reload
+        csrfTokenSelector - Field full name of CSRF token needed to send if form is secured
+#}
+{% macro renderIntegrationFormJS(form, formSelector, csrfTokenFieldFillName) %}
+    {% set fieldsToSendOnTypeChange = [
+        form.type.vars.full_name,
+        form.name.vars.full_name,
+        form.defaultUserOwner.vars.full_name
+    ] %}
+    {% if csrfTokenFieldFillName is defined %}
+        {% set fieldsToSendOnTypeChange = fieldsToSendOnTypeChange|merge([csrfTokenFieldFillName]) %}
+    {% elseif form._token is defined %}
+        {% set fieldsToSendOnTypeChange = fieldsToSendOnTypeChange|merge([form._token.vars.full_name]) %}
+    {% endif %}
+
+    {% set fieldsToSendOnTransportTypeChange = fieldsToSendOnTypeChange|merge([form.transportType.vars.full_name]) %}
+
+    <script type="text/javascript">
+        require(['orointegration/js/channel-view'], function (ChannelView) {
+            "use strict";
+
+            $(function () {
+                var options = {
+                    formSelector:          '#{{ formSelector|default(form.vars.id) }}',
+                    typeSelector:          '#{{ form.type.vars.id }}',
+                    transportTypeSelector: '#{{ form.transportType.vars.id }}',
+                    fieldsSets:            {
+                        type:          {{ fieldsToSendOnTypeChange|json_encode|raw }},
+                        transportType: {{ fieldsToSendOnTransportTypeChange|json_encode|raw }}
+                    }
+                };
+
+                new ChannelView(options);
+            });
+        });
+    </script>
+{% endmacro %}

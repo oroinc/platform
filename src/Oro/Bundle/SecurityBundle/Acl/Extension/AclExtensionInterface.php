@@ -146,9 +146,10 @@ interface AclExtensionInterface
      *
      * @param int $mask
      * @param string $permission
+     * @param mixed $object An object to test
      * @return int Can be one of AccessLevel::*_LEVEL constants
      */
-    public function getAccessLevel($mask, $permission = null);
+    public function getAccessLevel($mask, $permission = null, $object = null);
 
     /**
      * Gets all permissions supported by this ACL extension

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -38,26 +39,29 @@ class FieldTypeTest extends TypeTestCase
 
     protected $defaultFieldTypeChoices = [
         self::FIELDS_GROUP    => [
-            'bigint'   => 'oro.entity_extend.form.data_type.bigint',
-            'boolean'  => 'oro.entity_extend.form.data_type.boolean',
-            'date'     => 'oro.entity_extend.form.data_type.date',
-            'decimal'  => 'oro.entity_extend.form.data_type.decimal',
-            'file'     => 'oro.entity_extend.form.data_type.file',
-            'float'    => 'oro.entity_extend.form.data_type.float',
-            'image'    => 'oro.entity_extend.form.data_type.image',
-            'integer'  => 'oro.entity_extend.form.data_type.integer',
-            'money'    => 'oro.entity_extend.form.data_type.money',
-            'percent'  => 'oro.entity_extend.form.data_type.percent',
-            'smallint' => 'oro.entity_extend.form.data_type.smallint',
-            'string'   => 'oro.entity_extend.form.data_type.string',
-            'text'     => 'oro.entity_extend.form.data_type.text',
+            'bigint'    => 'oro.entity_extend.form.data_type.bigint',
+            'boolean'   => 'oro.entity_extend.form.data_type.boolean',
+            'date'      => 'oro.entity_extend.form.data_type.date',
+            'datetime'  => 'oro.entity_extend.form.data_type.datetime',
+            'decimal'   => 'oro.entity_extend.form.data_type.decimal',
+            'enum'      => 'oro.entity_extend.form.data_type.enum',
+            'file'      => 'oro.entity_extend.form.data_type.file',
+            'float'     => 'oro.entity_extend.form.data_type.float',
+            'image'     => 'oro.entity_extend.form.data_type.image',
+            'integer'   => 'oro.entity_extend.form.data_type.integer',
+            'money'     => 'oro.entity_extend.form.data_type.money',
+            'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
+            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
+            'percent'   => 'oro.entity_extend.form.data_type.percent',
+            'smallint'  => 'oro.entity_extend.form.data_type.smallint',
+            'string'    => 'oro.entity_extend.form.data_type.string',
+            'text'      => 'oro.entity_extend.form.data_type.text',
         ],
         self::RELATIONS_GROUP => [
             'manyToMany' => 'oro.entity_extend.form.data_type.manyToMany',
             'manyToOne'  => 'oro.entity_extend.form.data_type.manyToOne',
             'oneToMany'  => 'oro.entity_extend.form.data_type.oneToMany',
-            'optionSet'  => 'oro.entity_extend.form.data_type.optionSet'
-        ]
+        ],
     ];
 
     protected $formOptions = array(
@@ -75,8 +79,7 @@ class FieldTypeTest extends TypeTestCase
         $this->translatorMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translatorMock
-            ->expects($this->any())
+        $this->translatorMock->expects($this->any())
             ->method('trans')
             ->will(
                 $this->returnCallback(
@@ -133,23 +136,19 @@ class FieldTypeTest extends TypeTestCase
         $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityConfigMock
-            ->expects($this->once())
+        $entityConfigMock->expects($this->once())
             ->method('is')
             ->with('relation')
             ->will($this->returnValue(false));
 
-        $entityConfigMock
-            ->expects($this->exactly(0))
+        $entityConfigMock->expects($this->never())
             ->method('get');
 
-        $this->configManagerMock
-            ->expects($this->exactly(2))
+        $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
 
-        $configProviderMock
-            ->expects($this->exactly(1))
+        $configProviderMock->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($entityConfigMock));
 
@@ -171,10 +170,12 @@ class FieldTypeTest extends TypeTestCase
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
-        $typeName = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1||testentity1_rel1';
+        $typeName        = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1'
+            . '||testentity1_rel1';
+
         $expectedChoices[self::RELATIONS_GROUP] = array_merge(
-            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation'],
-            $expectedChoices[self::RELATIONS_GROUP]
+            $expectedChoices[self::RELATIONS_GROUP],
+            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation']
         );
         $this->assertSame(
             $expectedChoices,
@@ -187,7 +188,7 @@ class FieldTypeTest extends TypeTestCase
 
     public function testTypeWithUnAssignedRelations()
     {
-        $config = $this->prepareRelationsConfig();
+        $config    = $this->prepareRelationsConfig();
         $configKey = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1';
 
         $config['relationConfig'][$configKey]['assign'] = false;
@@ -241,20 +242,17 @@ class FieldTypeTest extends TypeTestCase
         $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityConfigMock
-            ->expects($this->at(0))
+        $entityConfigMock->expects($this->at(0))
             ->method('is')
             ->with('relation')
             ->will($this->returnValue(true));
-        $entityConfigMock
-            ->expects($this->at(1))
+        $entityConfigMock->expects($this->at(1))
             ->method('get')
             ->with('relation')
             ->will($this->returnValue($config['relationConfig']));
 
         if ($withAssigned) {
-            $entityConfigMock
-                ->expects($this->at(2))
+            $entityConfigMock->expects($this->at(2))
                 ->method('get')
                 ->with('label')
                 ->will($this->returnValue('labelValue'));
@@ -264,18 +262,15 @@ class FieldTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($entityConfigMock));
-        $configProviderMock
-            ->expects($this->any())
+        $configProviderMock->expects($this->any())
             ->method('getConfigById')
             ->with($config['relationTargetConfigFieldId'])
             ->will($this->returnValue($entityConfigMock));
 
-        $this->configManagerMock
-            ->expects($this->exactly(2))
+        $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
     }

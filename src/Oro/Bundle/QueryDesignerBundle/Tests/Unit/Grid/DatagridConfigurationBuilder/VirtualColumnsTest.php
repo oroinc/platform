@@ -35,7 +35,7 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                             'value' => 'test'
                         ]
                     ]
-                ],
+                ]
             ]
         ];
         $doctrine              = $this->getDoctrine(
@@ -111,7 +111,7 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         );
 
@@ -122,8 +122,34 @@ class VirtualColumnsTest extends OrmQueryConverterTest
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
+            'name'    => 'test_grid',
+            'columns' => [
+                'c1' => ['frontend_type' => 'string', 'label' => 'lbl1', 'translatable' => false],
+                'c2' => ['frontend_type' => 'string', 'label' => 'lbl2', 'translatable' => false],
+                'c3' => ['frontend_type' => 'integer', 'label' => 'lbl3', 'translatable' => false],
+                'c4' => ['frontend_type' => 'string', 'label' => 'lbl4', 'translatable' => false],
+                'c5' => ['frontend_type' => 'string', 'label' => 'lbl5', 'translatable' => false],
+            ],
+            'sorters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                    'c3' => ['data_name' => 'c3'],
+                    'c4' => ['data_name' => 'c4'],
+                    'c5' => ['data_name' => 'c5'],
+                ],
+                'default' => ['c2' => 'DESC']
+            ],
+            'filters' => [
+                'columns' => [
+                    'c1' => ['type' => 'string', 'data_name' => 'c1', 'translatable' => false],
+                    'c2' => ['type' => 'string', 'data_name' => 'c2', 'translatable' => false],
+                    'c3' => ['type' => 'number', 'data_name' => 'c3', 'translatable' => false],
+                    'c4' => ['type' => 'string', 'data_name' => 'c4', 'translatable' => false],
+                    'c5' => ['type' => 'string', 'data_name' => 'c5', 'translatable' => false],
+                ]
+            ],
             'source'  => [
-                'type'         => 'orm',
                 'query'        => [
                     'select' => [
                         't1.column1 as c1',
@@ -161,6 +187,17 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                     ]
                 ],
                 'query_config' => [
+                    'filters'        => [
+                        [
+                            'column'      => 't3.phone',
+                            'filter'      => 'string',
+                            'filterData'  => [
+                                'type'  => '1',
+                                'value' => 'test'
+                            ],
+                            'columnAlias' => 'c4'
+                        ],
+                    ],
                     'table_aliases'  => [
                         ''                                                                  => 't1',
                         'Acme\Entity\TestEntity::rc1'                                       => 't2',
@@ -174,16 +211,126 @@ class VirtualColumnsTest extends OrmQueryConverterTest
                         'rc1+Acme\Entity\TestEntity1::column2' => 'c3',
                         'rc1+Acme\Entity\TestEntity1::vc2'     => 'c4',
                         'vc3'                                  => 'c5',
+                    ]
+                ],
+                'type'         => 'orm',
+                'hints'        => [
+                    [
+                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
+                        'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testVirtualColumnsForEnum()
+    {
+        $en                    = 'Acme\Entity\TestEntity';
+        $definition            = [
+            'columns' => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
+                ['name' => 'vc1', 'label' => 'lbl2', 'sorting' => 'DESC'],
+            ],
+            'filters' => [
+                [
+                    'columnName' => 'vc1',
+                    'criterion'  => [
+                        'filter' => 'enum',
+                        'data'   => [
+                            'params' => [
+                                'class'      => 'Test\EnumValue',
+                                'null_value' => ':empty:'
+                            ],
+                            'value'  => ['status1']
+                        ]
+                    ]
+                ],
+            ]
+        ];
+        $doctrine              = $this->getDoctrine(
+            [
+                $en => [
+                    'column1' => 'string',
+                ],
+            ]
+        );
+        $virtualColumnProvider = $this->getVirtualFieldProvider(
+            [
+                [
+                    $en,
+                    'vc1',
+                    [
+                        'select' => [
+                            'expr'         => 'status.name',
+                            'return_type'  => 'enum',
+                            'filter_by_id' => true
+                        ],
+                        'join'   => [
+                            'left' => [
+                                [
+                                    'join'  => 'entity.status',
+                                    'alias' => 'status'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $model = new QueryDesignerModel();
+        $model->setEntity($en);
+        $model->setDefinition(json_encode($definition));
+        $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
+        $result  = $builder->getConfiguration()->toArray();
+
+        $expected = [
+            'source'  => [
+                'type'         => 'orm',
+                'query'        => [
+                    'select' => [
+                        't1.column1 as c1',
+                        't2.name as c2',
+                    ],
+                    'from'   => [
+                        ['table' => $en, 'alias' => 't1']
+                    ],
+                    'join'   => [
+                        'left' => [
+                            [
+                                'join'  => 't1.status',
+                                'alias' => 't2'
+                            ],
+                        ]
+                    ]
+                ],
+                'query_config' => [
+                    'table_aliases'  => [
+                        ''               => 't1',
+                        't1.status|left' => 't2',
+                    ],
+                    'column_aliases' => [
+                        'column1' => 'c1',
+                        'vc1'     => 'c2',
                     ],
                     'filters'        => [
                         [
-                            'column'      => 't3.phone',
-                            'filter'      => 'string',
+                            'column'      => 't1.vc1',
+                            'filter'      => 'enum',
                             'filterData'  => [
-                                'type'  => '1',
-                                'value' => 'test'
+                                'params' => [
+                                    'class'      => 'Test\EnumValue',
+                                    'null_value' => ':empty:'
+                                ],
+                                'value' => ['status1']
                             ],
-                            'columnAlias' => 'c4'
+                            'columnAlias' => 'c2'
                         ],
                     ]
                 ],
@@ -196,29 +343,20 @@ class VirtualColumnsTest extends OrmQueryConverterTest
             ],
             'columns' => [
                 'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
-                'c2' => ['label' => 'lbl2', 'frontend_type' => 'string', 'translatable' => false],
-                'c3' => ['label' => 'lbl3', 'frontend_type' => 'integer', 'translatable' => false],
-                'c4' => ['label' => 'lbl4', 'frontend_type' => 'string', 'translatable' => false],
-                'c5' => ['label' => 'lbl5', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'enum', 'translatable' => false],
             ],
             'name'    => 'test_grid',
             'sorters' => [
                 'columns' => [
                     'c1' => ['data_name' => 'c1'],
                     'c2' => ['data_name' => 'c2'],
-                    'c3' => ['data_name' => 'c3'],
-                    'c4' => ['data_name' => 'c4'],
-                    'c5' => ['data_name' => 'c5'],
                 ],
                 'default' => ['c2' => 'DESC']
             ],
             'filters' => [
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
-                    'c2' => ['data_name' => 'c2', 'type' => 'string', 'translatable' => false],
-                    'c3' => ['data_name' => 'c3', 'type' => 'number', 'translatable' => false],
-                    'c4' => ['data_name' => 'c4', 'type' => 'string', 'translatable' => false],
-                    'c5' => ['data_name' => 'c5', 'type' => 'string', 'translatable' => false],
+                    'c2' => ['data_name' => 't1.vc1', 'type' => 'enum', 'translatable' => false],
                 ]
             ]
         ];

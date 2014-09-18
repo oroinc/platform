@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EmbeddedFormBundle\Migrations\Schema\v1_3\OroEmbeddedFormBundle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -18,7 +19,7 @@ class OroEmbeddedFormBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -28,6 +29,7 @@ class OroEmbeddedFormBundleInstaller implements Installation
     {
         /** Tables generation **/
         $this->createOroEmbeddedFormTable($schema);
+        OroEmbeddedFormBundle::addOwner($schema);
     }
 
     /**

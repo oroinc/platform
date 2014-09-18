@@ -2,6 +2,26 @@ table.grid thead th > a,
 table.grid thead th > span {
     text-transform: uppercase;
 }
+table.grid thead th span.caret {
+    display: none;
+    border: none;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+table.grid thead .btn-group .btn .caret {
+    margin-top:11px;
+}
+table.grid thead th.ascending span.caret {
+    margin-top:4px;
+    display: inline-block;
+    border-top:4px solid transparent;
+    border-bottom: 4px solid #000000;
+}
+table.grid thead th.descending span.caret {
+    display: inline-block;
+    border-bottom:4px solid transparent;
+    border-top: 4px solid #000000;
+}
 
 table.grid tfoot th {
     background-color: #f5f5f5;
@@ -11,34 +31,11 @@ table.grid tfoot th {
     background: linear-gradient(to bottom, #ffffff,#f5f5f5 );
     padding: 4px 10px;
 }
-
 table.grid tfoot th > a,
 table.grid tfoot th > span {
     text-transform: uppercase;
     color: #5e5e5e;
     font-size: 13px;
-}
-
-table.grid thead th span.caret {
-    display: none;
-    border: none;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
-}
-.grid thead .btn-group .btn .caret {
-    margin-top:11px;
-}
-table.grid thead tr th.ascending span.caret {
-    margin-top:4px;
-    display: inline-block;
-    border-top:4px solid transparent;
-    border-bottom: 4px solid #000000;
-}
-
-table.grid thead tr th.descending span.caret {
-    display: inline-block;
-    border-bottom:4px solid transparent;
-    border-top: 4px solid #000000;
 }
 
 table.grid tbody tr.row-click-action {
@@ -77,31 +74,31 @@ table.grid tbody tr.row-click-action {
     margin:10px 0;
 }
 
-table.grid tr .string-cell,
-table.grid tr .uri-cell,
-table.grid tr .email-cell,
-table.grid tr .select-cell,
-table.grid tr .date-cell,
-table.grid tr .time-cell,
-table.grid tr .datetime-cell,
-table.grid tr .boolean-cell {
+table.grid .string-cell,
+table.grid .uri-cell,
+table.grid .email-cell,
+table.grid .select-cell,
+table.grid .date-cell,
+table.grid .time-cell,
+table.grid .datetime-cell,
+table.grid .boolean-cell {
     text-align: left;
 }
-
-.datetime-cell {
-    white-space: nowrap;
-}
-
-table.grid tr .number-cell,
-table.grid tr .integer-cell {
+table.grid .number-cell,
+table.grid .integer-cell {
     text-align: right;
 }
-
-table.grid tr td:first-child,
-table.grid tr th:first-child {
+table.grid .datetime-cell {
+    white-space: nowrap;
+}
+table.grid .string-cell ul.unstyled {
+    margin-bottom: 0;
+}
+table.grid td:first-child,
+table.grid th:first-child {
     text-align: left !important;
 }
-table.grid tr td:first-child:before {
+table.grid td:first-child:before {
     content: '';
     min-height: 14px;
     display: inline-block;

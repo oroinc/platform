@@ -6,6 +6,8 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 class AttachmentTest extends EntityTestAbstract
 {
     protected function setUp()
@@ -22,13 +24,15 @@ class AttachmentTest extends EntityTestAbstract
         $file = new File();
         $date = new \DateTime('now');
         $owner = new TestUser();
+        $organization = new Organization();
 
         return [
             'comment' => ['comment', $comment, $comment],
             'file' => ['file', $file, $file],
             'createdAt' => ['createdAt', $date, $date],
             'updatedAt' => ['updatedAt', $date, $date],
-            'owner'    => ['owner', $owner, $owner]
+            'owner' => ['owner', $owner, $owner],
+            'organization' => ['organization', $organization, $organization]
         ];
     }
 

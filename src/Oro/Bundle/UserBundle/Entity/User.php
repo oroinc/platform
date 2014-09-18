@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -17,19 +15,22 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
+
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
+use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 
 /**
@@ -50,7 +51,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "dataaudit"={"auditable"=true},
  *          "security"={
@@ -406,7 +409,9 @@ class User extends ExtendUser implements
     protected $groups;
 
     /**
-     * @ORM\OneToOne(
+     * @var UserApi[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
      * )
      * @ConfigField(
@@ -420,7 +425,7 @@ class User extends ExtendUser implements
      *      }
      * )
      */
-    protected $api;
+    protected $apiKeys;
 
     /**
      * @var Status[]|ArrayCollection
@@ -471,6 +476,24 @@ class User extends ExtendUser implements
     protected $businessUnits;
 
     /**
+     * @var ArrayCollection Organization[]
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
+     * @ORM\JoinTable(name="oro_user_organization",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $organizations;
+
+    /**
      * @var EmailOrigin[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
@@ -509,6 +532,14 @@ class User extends ExtendUser implements
      */
     protected $updatedAt;
 
+    /**
+     * @var Organization|ArrayCollection
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
     public function __construct()
     {
         parent::__construct();
@@ -520,6 +551,8 @@ class User extends ExtendUser implements
         $this->emails        = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins  = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
+        $this->apiKeys       = new ArrayCollection();
     }
 
     /**
@@ -758,19 +791,41 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return UserApi
+     * @return UserApi[]
      */
-    public function getApi()
+    public function getApiKeys()
     {
-        return $this->api;
+        return $this->apiKeys->count() ? $this->apiKeys : uniqid('undefined');
     }
 
     /**
-     * {@inheritDoc}
+     * Add UserApi to User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
      */
-    public function getApiKey()
+    public function addApiKey(UserApi $api)
     {
-        return $this->api ? $this->getApi()->getApiKey() : uniqid('undefined');
+        $this->apiKeys[] = $api;
+
+        $api->setUser($this);
+
+        return $this;
+    }
+
+    /**
+     * Delete UserApi from User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
+     */
+    public function removeApiKey(UserApi $api)
+    {
+        $this->apiKeys->removeElement($api);
+
+        return $this;
     }
 
     /**
@@ -1006,18 +1061,6 @@ class User extends ExtendUser implements
     public function setLoginCount($count)
     {
         $this->loginCount = $count;
-
-        return $this;
-    }
-
-    /**
-     * @param  UserApi $api
-     *
-     * @return User
-     */
-    public function setApi(UserApi $api)
-    {
-        $this->api = $api;
 
         return $this;
     }
@@ -1479,6 +1522,75 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Get User Organizations
+     *
+     * @param  bool $onlyActive Returns enabled organizations only
+     * @return ArrayCollection Organization[]
+     */
+    public function getOrganizations($onlyActive = false)
+    {
+        if ($onlyActive) {
+            return $this->organizations->filter(
+                function (Organization $organization) {
+                    return $organization->isEnabled() === true;
+                }
+            );
+        }
+        return $this->organizations;
+    }
+
+    /**
+     * @param ArrayCollection $organizations
+     * @return User
+     */
+    public function setOrganizations($organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+
+    /**
+     * Add Organization to User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function addOrganization(Organization $organization)
+    {
+        $this->organizations[] = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Delete Organization from User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function removeOrganization(Organization $organization)
+    {
+        if ($this->hasOrganization($organization)) {
+            $this->getOrganizations()->removeElement($organization);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param Organization $organization
+     * @return bool
+     */
+    public function hasOrganization(Organization $organization)
+    {
+        return $this->getOrganizations()->contains($organization);
+    }
+
+    /**
      * @return BusinessUnit
      */
     public function getOwner()
@@ -1584,5 +1696,28 @@ class User extends ExtendUser implements
         $this->emailOrigins->removeElement($emailOrigin);
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return User
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

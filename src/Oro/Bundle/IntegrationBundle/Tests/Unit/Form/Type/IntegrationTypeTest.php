@@ -5,23 +5,17 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Form\FormBuilder;
 
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType as IntegrationType;
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var IntegrationType */
     protected $type;
 
-    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $registry;
-
     /** @var  FormBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $builder;
 
     public function setUp()
     {
-        $this->registry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-            ->disableOriginalConstructor()->getMock();
         $this->builder  = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()->getMock();
 
@@ -33,12 +27,12 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $organizationFS     = $this->getMockBuilder($subscribersNS . 'OrganizationSubscriber')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new IntegrationType($this->registry, $defaultUserOwnerFS, $integrationFS, $organizationFS);
+        $this->type = new IntegrationType($defaultUserOwnerFS, $integrationFS, $organizationFS);
     }
 
     public function tearDown()
     {
-        unset($this->type, $this->registry, $this->builder);
+        unset($this->type, $this->builder);
     }
 
     public function testBuildForm()
@@ -49,9 +43,6 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->at(1))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
-        $this->builder->expects($this->at(2))
-            ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber'));
 
         $this->type->buildForm($this->builder, []);
     }

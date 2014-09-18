@@ -35,7 +35,7 @@ class RelationCalculatorTest extends WebTestCase
                 $maxGroups = $groupsCount;
             }
             $rolesCount = count($user->getRoles());
-            if ($groupsCount > $maxRoles) {
+            if ($rolesCount > $maxRoles) {
                 $maxRoles = $rolesCount;
             }
             $businessUnitsCount = count($user->getBusinessUnits());

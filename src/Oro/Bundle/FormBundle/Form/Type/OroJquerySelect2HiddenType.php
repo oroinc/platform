@@ -74,6 +74,7 @@ class OroJquerySelect2HiddenType extends AbstractType
                     'autocomplete_alias' => null,
                     'excluded'           => null,
                     'random_id'          => true,
+                    'error_bubbling'     => false,
                 ]
             );
 

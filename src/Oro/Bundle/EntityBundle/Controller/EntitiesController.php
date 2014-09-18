@@ -31,15 +31,15 @@ class EntitiesController extends Controller
     /**
      * Grid of Custom/Extend entity.
      * @Route(
-     *      "/{id}",
+     *      "/{entityName}",
      *      name="oro_entity_index",
-     *      defaults={"id"=0}
+     *      defaults={"entityName"=0}
      * )
      * @Template()
      */
-    public function indexAction($id)
+    public function indexAction($entityName)
     {
-        $extendEntityName = str_replace('_', '\\', $id);
+        $extendEntityName = str_replace('_', '\\', $entityName);
         $this->checkAccess('VIEW', $extendEntityName);
 
         /** @var ConfigProvider $entityConfigProvider */
@@ -52,7 +52,7 @@ class EntitiesController extends Controller
         $entityConfig = $entityConfigProvider->getConfig($extendEntityName);
 
         return [
-            'entity_id'    => $id,
+            'entity_id'    => $entityName,
             'entity_class' => $extendEntityName,
             'label'        => $entityConfig->get('label'),
             'plural_label' => $entityConfig->get('plural_label')

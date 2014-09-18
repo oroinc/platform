@@ -58,7 +58,7 @@
                                 }
                                 var url = routing.generate(
                                     'oro_api_get_emailtemplate_compiled',
-                                    {'id': $(this).val(), 'entityId': {{ entity.entityId }}}
+                                    {'id': $(this).val(), 'entityId': Number('{{ entity.entityId }}')}
                                 );
 
                                 mediator.execute('showLoading');

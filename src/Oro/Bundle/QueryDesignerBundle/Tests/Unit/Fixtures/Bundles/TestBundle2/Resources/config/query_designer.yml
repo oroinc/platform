@@ -6,6 +6,9 @@ query_designer:
             type:       number
         filter4:
             query_type: [type2]
+        filter5:
+            options:
+                option2: val2
 
     grouping:
         exclude: [{type: array}]

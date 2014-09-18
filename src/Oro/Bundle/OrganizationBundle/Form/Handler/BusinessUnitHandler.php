@@ -12,19 +12,13 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class BusinessUnitHandler
 {
-    /**
-     * @var FormInterface
-     */
+    /** @var FormInterface */
     protected $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $manager;
 
     /**

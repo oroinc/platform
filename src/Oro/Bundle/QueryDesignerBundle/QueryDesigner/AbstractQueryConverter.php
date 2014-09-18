@@ -76,7 +76,7 @@ abstract class AbstractQueryConverter
      *      key   = {declared entity class name}::{declared field name}
      *      value = data type
      */
-    protected $virtualColumnTypes;
+    protected $virtualColumnOptions;
 
     /**
      * Constructor
@@ -221,9 +221,9 @@ abstract class AbstractQueryConverter
         $this->tableAliases             = [];
         $this->columnAliases            = [];
         $this->virtualColumnExpressions = [];
-        $this->virtualColumnTypes       = [];
+        $this->virtualColumnOptions     = [];
         $this->buildQuery();
-        $this->virtualColumnTypes       = null;
+        $this->virtualColumnOptions     = null;
         $this->virtualColumnExpressions = null;
         $this->columnAliases            = null;
         $this->tableAliases             = null;
@@ -385,10 +385,22 @@ abstract class AbstractQueryConverter
                         $this->getJoinType($joinId),
                         $entityClassName,
                         $joinAlias,
-                        $this->getUnidirectionalJoinConditionType($joinId, $entityClassName, $joinFieldName),
+                        $this->getUnidirectionalJoinConditionType($joinId),
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
+                } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
+                    // such as "Entity:Name|left|WITH|t2.field = t1"
+
+                    $entityClassName = $this->joinIdHelper->getUnidirectionalJoinEntityName($joinId);
+                    $this->addJoinStatement(
+                        $this->getJoinType($joinId),
+                        $entityClassName,
+                        $joinAlias,
+                        $this->getJoinConditionType($joinId),
+                        $this->getJoinCondition($joinId)
+                    );
                 } else {
+                    // bidirectional
                     $join = null === $this->getEntityClassName($joinId)
                         ? $this->getJoin($joinId)
                         : sprintf('%s.%s', $joinTableAlias, $this->getFieldName($joinId));
@@ -698,8 +710,10 @@ abstract class AbstractQueryConverter
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
 
         $key = sprintf('%s::%s', $className, $fieldName);
-        if (!isset($this->virtualColumnTypes[$key])) {
-            $this->virtualColumnTypes[$key] = $query['select']['return_type'];
+        if (!isset($this->virtualColumnOptions[$key])) {
+            $options = $query['select'];
+            unset($options['expr']);
+            $this->virtualColumnOptions[$key] = $options;
         }
     }
 
@@ -733,10 +747,12 @@ abstract class AbstractQueryConverter
         if (isset($item['registered'])) {
             return;
         }
+        $parentJoinId = $mainEntityJoinId;
 
+        // TODO should be fixed in scope of BAP-5293
+        /*
         $delimiterPos = strpos($item['join'], '.');
         if (false !== $delimiterPos) {
-            $parentJoinId = $mainEntityJoinId;
         } else {
             $parentJoinAlias = substr($item['join'], 0, $delimiterPos);
             $parentItem      = null;
@@ -750,7 +766,7 @@ abstract class AbstractQueryConverter
                 $this->registerVirtualColumnTableAlias($joins, $parentItem, $mainEntityJoinId);
             }
             $parentJoinId = $this->joins[$parentJoinAlias];
-        }
+        }*/
         if (!isset($item['registered'])) {
             $tableAlias                  = $item['alias'];
             $joinId                      = $this->joinIdHelper->buildJoinIdentifier(
@@ -940,16 +956,19 @@ abstract class AbstractQueryConverter
         $pos = strpos($condition, $alias);
         if (false !== $pos) {
             if (0 === $pos) {
+                // handle case "ALIAS.", "ALIAS.field"
                 $nextChar = substr($condition, $pos + strlen($alias), 1);
                 if (in_array($nextChar, ['.', ' ', '='])) {
                     return $pos;
                 }
-            } elseif (strlen($condition) === $pos + strlen($alias) + 1) {
+            } elseif (strlen($condition) === $pos + strlen($alias)) {
+                // handle case "t2.someField = ALIAS"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '='])) {
                     return $pos;
                 }
             } else {
+                // handle case "t2.someField = ALIAS.id"
                 $prevChar = substr($condition, $pos - 1, 1);
                 if (in_array($prevChar, [' ', '=', '('])) {
                     $nextChar = substr($condition, $pos + strlen($alias), 1);
@@ -1011,8 +1030,8 @@ abstract class AbstractQueryConverter
         if ($this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
             // try to guess virtual column type
             $key = sprintf('%s::%s', $className, $fieldName);
-            if (isset($this->virtualColumnTypes[$key])) {
-                $result = $this->virtualColumnTypes[$key];
+            if (isset($this->virtualColumnOptions[$key]['return_type'])) {
+                $result = $this->virtualColumnOptions[$key]['return_type'];
             }
         }
 

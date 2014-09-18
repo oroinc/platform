@@ -15,9 +15,13 @@ services:
     oro_soap.handler.delete.abstract:
         abstract: true
         calls:
-            - [setSecurityFacade, [@oro_security.security_facade]]
             - [setOwnerDeletionManager, [@oro_organization.owner_deletion_manager]]
 
     oro_soap.handler.delete:
         class: %oro_soap.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
+
+    oro_soap.manager.entity_manager.abstract:
+        abstract: true
+        calls:
+            - [setEventDispatcher, [@event_dispatcher]]
