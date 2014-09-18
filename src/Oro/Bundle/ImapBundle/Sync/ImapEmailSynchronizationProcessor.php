@@ -419,9 +419,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 }
             );
 
-            $existingImapEmail = $isMultiFolder
-                ? null
-                : $this->findExistingImapEmail($relatedExistingImapEmails, $folder->getType());
+            $existingImapEmail = $this->findExistingImapEmail(
+                $relatedExistingImapEmails,
+                $folder->getType(),
+                $isMultiFolder
+            );
             if ($existingImapEmail) {
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
@@ -463,10 +465,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param ImapEmail[] $imapEmails
      * @param string      $folderType
+     * @param bool        $outdatedOnly
      *
      * @return ImapEmail|null
      */
-    protected function findExistingImapEmail(array $imapEmails, $folderType)
+    protected function findExistingImapEmail(array $imapEmails, $folderType, $outdatedOnly)
     {
         if (empty($imapEmails)) {
             return null;
@@ -474,17 +477,22 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if (count($imapEmails) === 1) {
             /** @var ImapEmail $imapEmail */
             $imapEmail = reset($imapEmails);
-            return $this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType())
-                ? $imapEmail
-                : null;
+            if ($outdatedOnly && !$imapEmail->getImapFolder()->getFolder()->isOutdated()) {
+                return null;
+            }
+            if (!$this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType())) {
+                return null;
+            }
+
+            return $imapEmail;
         }
 
         /** @var ImapEmail[] $outdatedImapEmails */
         $activeImapEmails = array_filter(
             $imapEmails,
-            function (ImapEmail $imapEmail) use ($folderType) {
+            function (ImapEmail $imapEmail) use ($folderType, $outdatedOnly) {
                 return
-                    !$imapEmail->getImapFolder()->getFolder()->isOutdated()
+                    !($outdatedOnly xor $imapEmail->getImapFolder()->getFolder()->isOutdated())
                     && $this->isComparableFolders($folderType, $imapEmail->getImapFolder()->getFolder()->getType());
             }
         );
