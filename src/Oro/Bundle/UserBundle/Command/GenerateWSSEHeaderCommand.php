@@ -9,6 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
+use Oro\Bundle\UserBundle\Entity\UserApi;
+
 class GenerateWSSEHeaderCommand extends ContainerAwareCommand
 {
     /**
@@ -17,11 +19,10 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName('oro:wsse:generate-header');
-        $this->setDescription('Generate X-WSSE HTTP header for a given user');
+        $this->setDescription('Generate X-WSSE HTTP header for a given API key');
         $this->setDefinition(
             array(
-                new InputArgument('username', InputArgument::REQUIRED, 'The username'),
-                new InputArgument('organization', InputArgument::REQUIRED, 'The Organization'),
+                new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
             )
         );
     }
@@ -36,32 +37,27 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var ContainerInterface $container */
-        $container        = $this->getContainer();
-        $username         = $input->getArgument('username');
-        $organizationName = $input->getArgument('organization');
-        $userManager      = $container->get('oro_user.manager');
-        $user             = $userManager->findUserByUsername($username);
-
-        if (!$user) {
-            throw new \InvalidArgumentException(sprintf('User "%s" does not exist', $username));
-        }
-
-        $organization = $container->get('oro_organization.organization_manager')->getEnabledUserOrganizationByName(
-            $user,
-            $organizationName,
-            false
+        $container = $this->getContainer();
+        $apiKey = $input->getArgument('apiKey');
+        /** @var UserApi $userApi */
+        $userApi = $container->get('doctrine')->getRepository('OroUserBundle:UserApi')->findOneBy(
+            ['apiKey' => $apiKey]
         );
-        if (!$organization) {
-            throw new \InvalidArgumentException(sprintf('Organization "%s" not found', $organizationName));
-        }
-
-        $userApi  = $userManager->getApi($user, $organization);
         if (!$userApi) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'User "%s" does not yet have an API key generated for organization "%s"',
-                    $username,
-                    $organizationName
+                    'API key "%s" does not exists',
+                    $apiKey
+                )
+            );
+        }
+        $user = $userApi->getUser();
+        $organization = $userApi->getOrganization();
+        if (!$organization->isEnabled()) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Organization for API key "%s" is not active',
+                    $apiKey
                 )
             );
         }
@@ -90,7 +86,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $output->writeln(
             sprintf(
                 'X-WSSE: UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
-                $username,
+                $user->getUsername(),
                 $passwordDigest,
                 $nonce,
                 $created
