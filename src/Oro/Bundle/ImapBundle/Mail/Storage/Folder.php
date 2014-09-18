@@ -124,9 +124,9 @@ class Folder extends BaseFolder
     {
         $this->type = 'other';
 
-        foreach ($this->flagTypeMap as $flag) {
+        foreach ($this->flagTypeMap as $flag => $type) {
             if ($this->hasFlag($flag)) {
-                $this->type = $this->flagTypeMap[$flag];
+                $this->type = $type;
                 break;
             }
         }
