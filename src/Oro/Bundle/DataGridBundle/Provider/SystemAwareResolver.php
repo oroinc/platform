@@ -92,6 +92,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
+        $match = [];
         switch (true) {
             case preg_match('#^%([\w\._]+)%$#', $val, $match):
                 $val = $this->container->getParameter($match[1]);
