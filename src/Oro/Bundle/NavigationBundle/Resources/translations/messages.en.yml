@@ -9,3 +9,5 @@ oro:
             history.label: History
             favorite.label: Favorites
             mostviewed.label: Most Viewed
+        messages:
+            no_items: No items

@@ -41,7 +41,7 @@
 
     <a href="{{ transitionData['transition-url'] }}"
         {% for key, value in transitionData %}
-            data-{{ key }}="{{ value }}"
+            data-{{ key }}="{{ value|e('html_attr')|raw }}"
         {% endfor %}
         {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
             data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
