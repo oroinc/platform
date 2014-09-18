@@ -54,15 +54,6 @@
 {% endmacro %}
 
 {#
-    Render flexible attribute row
-    Parameters:
-        value - flexible attribute
-#}
-{% macro flexibleAttributeRow(value) %}
-    {{ _self.attibuteRow(value.attribute.label, value.__toString|default('N/A')) }}
-{% endmacro %}
-
-{#
     Render attribute row
     Parameters:
         title - attribute title
@@ -70,7 +61,7 @@
         additionalData - array with additional data
 #}
 {% macro attibuteRow(title, value, additionalData) %}
-    {% macro attribute_data(value, additionalData) %}
+    {% set attributeValue %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
                 <div class="control-label">{{ value }}</div>
@@ -85,8 +76,8 @@
                 </div>
             {% endfor %}
         {% endif %}
-    {% endmacro %}
-    {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
+    {% endset %}
+    {{ _self.renderAttribute(title, attributeValue) }}
 {% endmacro %}
 
 {#
@@ -152,11 +143,11 @@
         {% endif %}
         {% if parameters.data is defined %}
             {% for dataItemName,dataItemValue in parameters.data %}
-                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+                data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+       {% if parameters.title is defined %}title="{{ parameters.title|trans }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -783,7 +774,7 @@
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|raw }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title|escape }}</a>
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -793,7 +784,7 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title|escape }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
 
