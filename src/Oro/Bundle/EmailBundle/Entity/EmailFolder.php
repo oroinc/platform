@@ -21,12 +21,6 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
-    const INBOX  = 'inbox';
-    const SENT   = 'sent';
-    const TRASH  = 'trash';
-    const DRAFTS = 'drafts';
-    const OTHER  = 'other';
-
     /**
      * @var integer
      *
@@ -171,7 +165,7 @@ class EmailFolder
     /**
      * Set folder type
      *
-     * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
+     * @param string $type One of FolderType constants
      *
      * @return EmailFolder
      */

@@ -7,6 +7,7 @@ use Doctrine\ORM\Query;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
@@ -142,7 +143,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $sqb->sent($folder->getSynchronizedAt());
         }
 
-        if ($folder->getType() === EmailFolder::SENT) {
+        if ($folder->getType() === FolderType::SENT) {
             $sqb->openParenthesis();
             $this->addEmailAddressesToSearchQueryBuilder($sqb, 'to', $emailAddresses);
             $sqb->orOperator();
@@ -248,7 +249,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $folder
                     ->setFullName($folderFullName)
                     ->setName($srcFolder->getLocalName())
-                    ->setType($this->getFolderType($srcFolder));
+                    ->setType($srcFolder->guessFolderType());
                 $origin->addFolder($folder);
                 $this->em->persist($folder);
 
@@ -340,25 +341,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->manager->selectFolder($folder->getGlobalName());
 
         return $this->manager->getUidValidity();
-    }
-
-    /**
-     * Gets the type of the given folder
-     *
-     * @param Folder $folder
-     *
-     * @return string
-     */
-    protected function getFolderType(Folder $folder)
-    {
-        switch (true) {
-            case $folder->hasFlag(Folder::FLAG_INBOX):
-                return EmailFolder::INBOX;
-            case $folder->hasFlag(Folder::FLAG_SENT):
-                return EmailFolder::SENT;
-            default:
-                return EmailFolder::OTHER;
-        }
     }
 
     /**
@@ -531,11 +513,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($folderType1 === $folderType2) {
             return true;
         }
-        if ($folderType1 === EmailFolder::OTHER) {
-            $folderType1 = EmailFolder::INBOX;
+        if ($folderType1 === FolderType::OTHER) {
+            $folderType1 = FolderType::INBOX;
         }
-        if ($folderType2 === EmailFolder::OTHER) {
-            $folderType2 = EmailFolder::INBOX;
+        if ($folderType2 === FolderType::OTHER) {
+            $folderType2 = FolderType::INBOX;
         }
         if ($folderType1 === $folderType2) {
             return true;

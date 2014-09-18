@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
@@ -112,9 +113,9 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
         $imapFolders = ReflectionUtil::callProtectedMethod($processor, 'syncFolders', [$origin]);
 
         $expectedImapFolder1 = $this->createImapFolder('Inbox', '[Gmail]\Inbox', 1);
-        $expectedImapFolder1->getFolder()->setType(EmailFolder::INBOX)->setOrigin($origin);
+        $expectedImapFolder1->getFolder()->setType(FolderType::INBOX)->setOrigin($origin);
         $expectedImapFolder2 = $this->createImapFolder('Sent', '[Gmail]\Sent', 3);
-        $expectedImapFolder2->getFolder()->setType(EmailFolder::SENT)->setOrigin($origin);
+        $expectedImapFolder2->getFolder()->setType(FolderType::SENT)->setOrigin($origin);
         $expectedImapFolder3 = $this->createImapFolder('existing', 'existing', 4);
         $this->assertEquals(
             [$expectedImapFolder1, $expectedImapFolder2, $expectedImapFolder3],

@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Zend\Mail\Storage\Folder as BaseFolder;
 
+use Oro\Bundle\EmailBundle\Model\FolderType;
+
 class Folder extends BaseFolder
 {
     const FLAG_SENT   = 'Sent';
@@ -12,6 +14,15 @@ class Folder extends BaseFolder
     const FLAG_DRAFTS = 'Drafts';
     const FLAG_INBOX  = 'Inbox';
     const FLAG_ALL    = 'All';
+
+    /** @var array */
+    protected $flagTypeMap = [
+        self::FLAG_INBOX  => FolderType::INBOX,
+        self::FLAG_SENT   => FolderType::SENT,
+        self::FLAG_DRAFTS => FolderType::DRAFTS,
+        self::FLAG_TRASH  => FolderType::TRASH,
+        self::FLAG_SPAM   => FolderType::SPAM,
+    ];
 
     /** @var string[] */
     public $flags = null;
@@ -102,5 +113,24 @@ class Folder extends BaseFolder
             }
             unset($this->flags[$flag]);
         }
+    }
+
+    /**
+     * Guess folder type based on it's flags
+     *
+     * @return string
+     */
+    public function guessFolderType()
+    {
+        $this->type = 'other';
+
+        foreach ($this->flagTypeMap as $flag) {
+            if ($this->hasFlag($flag)) {
+                $this->type = $this->flagTypeMap[$flag];
+                break;
+            }
+        }
+
+        return $this->type;
     }
 }
