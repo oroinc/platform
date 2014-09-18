@@ -74,7 +74,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         // iterate through all folders and do a synchronization of emails for each one
         $imapFolders = $this->syncFolders($origin);
         foreach ($imapFolders as $imapFolder) {
-            $folder = $imapFolder->getFolder();
+            $synchronizedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+            $folder         = $imapFolder->getFolder();
 
             // register the current folder in the entity builder
             $this->emailEntityBuilder->setFolder($folder);
@@ -93,6 +94,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                     $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items'])
                 );
             }
+
+            // update folder sync time
+            $folder->setSynchronizedAt($synchronizedAt);
+            $this->em->flush();
         }
 
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
@@ -353,30 +358,21 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     {
         $this->log->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
 
-        $folder = $imapFolder->getFolder();
-        $folder->setSynchronizedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $emails = $this->manager->getEmails($searchQuery);
 
-        $needFolderFlush = true;
-        $count           = 0;
-        $batch           = array();
+        $count = 0;
+        $batch = array();
         foreach ($emails as $email) {
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
                 $this->saveEmails($batch, $imapFolder);
-                $needFolderFlush = false;
-                $count           = 0;
-                $batch           = array();
+                $count = 0;
+                $batch = array();
             }
         }
         if ($count > 0) {
             $this->saveEmails($batch, $imapFolder);
-            $needFolderFlush = false;
-        }
-
-        if ($needFolderFlush) {
-            $this->em->flush();
         }
     }
 
