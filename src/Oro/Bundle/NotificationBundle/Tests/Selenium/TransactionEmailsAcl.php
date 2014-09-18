@@ -13,8 +13,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
-            ->setOwner('Main')
-            ->setEntity('Email Notification', array('Create', 'Edit', 'Delete', 'View'), 'System')
+            ->setEntity('Email Notification', array('Create', 'Edit', 'Delete', 'View'), 'Organization')
             ->save()
             ->assertMessage('Role saved')
             ->close();
@@ -44,6 +43,8 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Label_' . $role))
+            ->setOrganization('OroCRM')
+            ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()

@@ -92,7 +92,6 @@ class RolesTest extends Selenium2TestCase
             ->add()
             ->assertTitle('Create Role - Roles - User Management - System')
             ->setLabel($this->newRole['LABEL'] . $randomPrefix)
-            ->setOwner('Main')
             ->save()
             ->assertMessage('Role saved')
             ->close();
