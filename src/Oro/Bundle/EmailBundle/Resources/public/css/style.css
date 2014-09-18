@@ -43,12 +43,6 @@
 .ui-dialog .email-form .uneditable-input {
     width: 97%;
 }
-.ui-dialog .email-form .form-horizontal .control-group {
-    padding-left: 110px;
-}
-.ui-dialog .email-form .form-horizontal .control-group .control-label {
-    margin-left: -120px;
-}
 .ui-dialog .email-form .form-horizontal .control-group .controls .validation-failed {
     margin-left: 14px;
 }

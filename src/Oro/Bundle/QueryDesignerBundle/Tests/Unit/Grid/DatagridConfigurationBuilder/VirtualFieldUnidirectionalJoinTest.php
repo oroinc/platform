@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
-
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
-class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
+use Doctrine\ORM\Query;
+
+class VirtualFieldUnidirectionalJoinTest extends OrmQueryConverterTest
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -37,14 +37,14 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
                     'vc1',
                     [
                         'select' => [
-                            'expr'        => 'country.name',
-                            'return_type' => 'string'
+                            'expr'        => 'h.amount',
+                            'return_type' => 'money'
                         ],
                         'join'   => [
                             'left' => [
                                 [
-                                    'join'  => 'entity.country',
-                                    'alias' => 'country'
+                                    'join'  => 'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
+                                    'alias' => 'h'
                                 ]
                             ]
                         ]
@@ -80,7 +80,7 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
         $expected = [
             'name'    => 'test_grid',
             'columns' => [
-                'c1' => ['frontend_type' => 'string', 'label' => 'lbl1', 'translatable' => false],
+                'c1' => ['frontend_type' => 'currency', 'label' => 'lbl1', 'translatable' => false],
                 'c2' => ['frontend_type' => 'string', 'label' => 'lbl2', 'translatable' => false],
             ],
             'sorters' => [
@@ -91,15 +91,15 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['type' => 'string', 'data_name' => 'c1', 'translatable' => false],
+                    'c1' => ['type' => 'number', 'data_name' => 'c1', 'translatable' => false],
                     'c2' => ['type' => 'string', 'data_name' => 'c2', 'translatable' => false],
                 ]
             ],
             'source'  => [
                 'query'        => [
                     'select' => [
-                        't2.name as c1',
-                        't2.iso2Code as c2',
+                        't2.amount as c1',
+                        't3.iso2Code as c2',
                     ],
                     'from'   => [
                         ['table' => $en, 'alias' => 't1']
@@ -107,16 +107,21 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
                     'join'   => [
                         'left' => [
                             [
-                                'join'  => 't1.country',
+                                'join'  => 'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory',
                                 'alias' => 't2'
+                            ],
+                            [
+                                'join'  => 't1.country',
+                                'alias' => 't3'
                             ]
                         ]
                     ]
                 ],
                 'query_config' => [
                     'table_aliases'  => [
-                        ''                => 't1',
-                        't1.country|left' => 't2',
+                        '' => 't1',
+                        'OroCRM\Bundle\ChannelBundle\Entity\LifetimeValueHistory|left' => 't2',
+                        't1.country|left' => 't3'
                     ],
                     'column_aliases' => [
                         'vc1' => 'c1',
@@ -136,4 +141,5 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
 
         $this->assertEquals($expected, $result);
     }
+
 }
