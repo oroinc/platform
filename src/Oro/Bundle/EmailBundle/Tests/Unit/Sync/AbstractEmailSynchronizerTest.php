@@ -16,6 +16,9 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
     private $log;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -43,16 +46,16 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->with(null)
             ->will($this->returnValue($this->em));
 
         $this->sync = new TestEmailSynchronizer(
-            $doctrine,
+            $this->doctrine,
             $this->emailEntityBuilder,
             $this->emailAddressManager,
             new EmailAddressHelper(),
@@ -108,7 +111,15 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
 
         $sync = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(
+                [
+                    $this->doctrine,
+                    $this->emailEntityBuilder,
+                    $this->emailAddressManager,
+                    new EmailAddressHelper(),
+                    $this->knownEmailAddressChecker
+                ]
+            )
             ->setMethods(
                 array(
                     'findOriginToSync',
@@ -415,8 +426,8 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'o'
                 . ', CASE WHEN o.syncCode = :inProcess THEN 0 ELSE 1 END AS HIDDEN p1'
-                . ', (COALESCE(o.syncCode, 1000) * 100'
-                . ' + (:now - COALESCE(o.syncCodeUpdatedAt, :min))'
+                . ', (COALESCE(o.syncCode, 1000) * 30'
+                . ' + TIMESTAMPDIFF(MINUTE, COALESCE(o.syncCodeUpdatedAt, :min), :now)'
                 . ' / (CASE o.syncCode WHEN :success THEN 100 ELSE 1 END)) AS HIDDEN p2'
             )
             ->will($this->returnValue($qb));
