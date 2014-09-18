@@ -124,7 +124,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($statement));
 
         $driver = $this->getMockBuilder('Doctrine\DBAL\Driver')
-            ->setMethods('connect', 'getDatabasePlatform')
+            ->setMethods(array('connect', 'getDatabasePlatform'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $driver->expects($this->any())

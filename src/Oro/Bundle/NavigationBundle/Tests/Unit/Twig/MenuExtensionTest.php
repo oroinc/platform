@@ -489,7 +489,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     protected function assertGetMenuString($menu, $path, $options)
     {
         $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
-            ->setMethods('getChild', 'getExtra')
+            ->setMethods(array('getChild', 'getExtra'))
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getChild')
