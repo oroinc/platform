@@ -51,6 +51,7 @@ class EmailType extends AbstractType
                 'oro_email_template_list',
                 [
                     'required' => false,
+                    'depends_on_parent_field' => 'entityClass',
                     'configs' => [
                         'allowClear' => true
                     ]
