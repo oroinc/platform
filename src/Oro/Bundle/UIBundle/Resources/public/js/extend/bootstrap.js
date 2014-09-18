@@ -2,7 +2,7 @@
 define([
     'jquery',
     'bootstrap'
-], function ($, Bootstrap) {
+], function ($) {
     'use strict';
 
     /**
