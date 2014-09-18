@@ -6,6 +6,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
@@ -170,15 +171,11 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     {
         $mock = $this->getMockBuilder($class)
             ->disableOriginalConstructor()
-            ->setMethods(['getSubscribedEvents'])
             ->getMock();
-        $class = get_class($mock);
 
-        // Static stub method
-        $class::staticExpects($this->any())
-            ->method('getSubscribedEvents')
-            ->will($this->returnValue($events));
+        $eventListener = new MutableFormEventSubscriber($mock);
+        $eventListener->setSubscribedEvents($events);
 
-        return $mock;
+        return $eventListener;
     }
 }

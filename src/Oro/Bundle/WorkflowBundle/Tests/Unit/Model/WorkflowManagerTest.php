@@ -50,7 +50,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
-            ->setMethods('getManager')
+            ->setMethods(array('getManager'))
             ->getMockForAbstractClass();
 
         $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
