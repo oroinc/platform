@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -230,10 +231,6 @@ abstract class AbstractEmailSynchronizer
                 $syncStartTime = $this->getCurrentUtcDateTime();
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
-
-                $origin->incrementSyncCount();
-                $this->getEntityManager()->persist($origin);
-                $this->getEntityManager()->flush($origin);
             } else {
                 $this->log->notice('Skip because it is already in process.');
             }
@@ -323,14 +320,21 @@ abstract class AbstractEmailSynchronizer
             ->setParameter('code', $syncCode)
             ->setParameter('updated', $this->getCurrentUtcDateTime())
             ->setParameter('id', $origin->getId());
+
         if ($synchronizedAt !== null) {
             $qb
                 ->set('o.synchronizedAt', ':synchronized')
                 ->setParameter('synchronized', $synchronizedAt);
         }
+
         if ($syncCode === self::SYNC_CODE_IN_PROCESS) {
             $qb->andWhere('(o.syncCode IS NULL OR o.syncCode <> :code)');
         }
+
+        if ($syncCode === self::SYNC_CODE_SUCCESS) {
+            $qb->set('o.syncCount', 'o.syncCount + 1');
+        }
+
         $affectedRows = $qb->getQuery()->execute();
 
         return $affectedRows > 0;

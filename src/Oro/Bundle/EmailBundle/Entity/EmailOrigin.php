@@ -213,22 +213,6 @@ abstract class EmailOrigin
     }
 
     /**
-     * Increase sync count by 1
-     *
-     * @return EmailOrigin
-     */
-    public function incrementSyncCount()
-    {
-        if ($this->syncCount === PHP_INT_MAX) {
-            $this->syncCount = 0;
-        }
-
-        $this->syncCount++;
-
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getSyncCount()
