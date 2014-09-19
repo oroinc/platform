@@ -125,9 +125,11 @@ class Imap extends \Zend\Mail\Storage\Imap
                 if (!$parent || strpos($globalName, $parent) === 0) {
                     // build local name based on global name
                     $lastDelimPosition = strrpos($globalName, $data['delim']);
-                    $localName = $lastDelimPosition === false ?
-                        $globalName :
-                        substr($globalName, $lastDelimPosition + 1);
+                    if ($lastDelimPosition === false) {
+                        $localName = $globalName;
+                    } else {
+                        $localName = substr($globalName, $lastDelimPosition + 1);
+                    }
 
                     $selectable = !$data['flags'] || !in_array('\\Noselect', $data['flags']);
 

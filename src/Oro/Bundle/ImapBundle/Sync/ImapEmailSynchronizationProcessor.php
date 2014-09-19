@@ -113,17 +113,21 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             ->innerJoin('if.folder', 'folder')
             ->leftJoin('folder.emails', 'emails')
             ->where('folder.outdatedAt IS NULL AND emails.id IS NULL')
+            ->andWhere('folder.origin = :origin')
+            ->setParameter('origin', $origin)
             ->getQuery()
             ->getResult();
 
         /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {
+            $this->log->notice(sprintf('CLEANUP: Removing "%s" folder...', $imapFolder->getFolder()->getFullName()));
             $this->em->remove($imapFolder);
             $this->em->remove($imapFolder->getFolder());
         }
 
         if (count($imapFolders) > 0) {
             $this->em->flush();
+            $this->log->notice(sprintf('CLEANUP: Removed %d folders'));
         }
     }
 
