@@ -130,11 +130,6 @@ class EntityProvider
         foreach ($entityConfigs as $entityConfig) {
             $entityConfigId = $entityConfig->getId();
 
-            $className = $entityConfigId->getClassName();
-            if ($applyExclusions && $this->isIgnoredEntity($className)) {
-                continue;
-            }
-
             $isStateCorrect = $this->extendConfigProvider
                 ->getConfigById($entityConfigId)
                 ->in(
@@ -142,6 +137,11 @@ class EntityProvider
                     [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                 );
             if (false == $isStateCorrect) {
+                continue;
+            }
+
+            $className = $entityConfigId->getClassName();
+            if ($applyExclusions && $this->isIgnoredEntity($className)) {
                 continue;
             }
 
@@ -165,10 +165,6 @@ class EntityProvider
      */
     protected function isIgnoredEntity($className)
     {
-        if (false == class_exists($className)) {
-            return true;
-        }
-
         return $this->exclusionProvider->isIgnoredEntity($className);
     }
 

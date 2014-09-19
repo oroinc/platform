@@ -733,6 +733,21 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigById')
+            ->will(
+                $this->returnCallback(
+                    function (EntityConfigId $configId) use (&$config) {
+                        $className = $configId->getClassname();
+
+                        if (isset($config[$className])) {
+                            return $this->getExtendEntityConfig($className, $config[$className]['config']);
+                        }
+                    }
+                )
+            );
+
         $this->extendConfigProvider->expects($this->any())
             ->method('getId')
             ->will(
