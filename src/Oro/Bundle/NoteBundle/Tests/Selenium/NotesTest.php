@@ -47,7 +47,7 @@ class NotesTest extends Selenium2TestCase
             ->updateSchema()
             ->assertMessage('Schema updated');
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
         /** @var Notes $login */
@@ -73,7 +73,7 @@ class NotesTest extends Selenium2TestCase
 
         $login = $this->login();
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
         /** @var Notes $login */
@@ -96,7 +96,7 @@ class NotesTest extends Selenium2TestCase
     {
         $login = $this->login();
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
         /** @var Notes $login */
@@ -123,7 +123,7 @@ class NotesTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Entity saved');
         /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
+        $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
         /** @var Notes $login */
