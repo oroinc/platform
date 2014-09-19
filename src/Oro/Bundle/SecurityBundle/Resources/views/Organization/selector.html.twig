@@ -1,5 +1,5 @@
-{% set curr_organization   = app.security.getToken().getOrganizationContext() %}
-{% set organizations       = get_enabled_organizations() %}
+{% set curr_organization = get_current_organization() %}
+{% set organizations = get_enabled_organizations() %}
 
 {% set organization_name %}
     {% placeholder organization_name %}
@@ -12,7 +12,7 @@
             <ul class="dropdown-menu dropdown-organization-switcher">
                 {% for organization in organizations %}
                     <li>
-                        {% if curr_organization.getId() == organization.id %}
+                        {% if curr_organization and curr_organization.getId() == organization.id %}
                         <span class="selected"><b>{{ organization.name }}</b></span>
                         {% else %}
                         <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
