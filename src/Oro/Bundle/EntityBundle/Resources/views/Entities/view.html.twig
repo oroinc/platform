@@ -9,7 +9,7 @@
 {% block navButtons %}
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
         {{ UI.editButton({
-            'path': path('oro_entity_update', { 'entity_id': parent, id: entity.id }),
+            'path': path('oro_entity_update', {entityName: entity_name, id: entity.id}),
             'entity_label': entity_config.get('label')|default('N/A')|trans
         }) }}
     {% endif %}
@@ -22,7 +22,7 @@
         'indexLabel': 'Entities',
         'entityTitle': 'Item #'~entity.id|default('N/A'),
         'additional': [{
-            'indexPath'  : path('oro_entity_index', {id: parent}),
+            'indexPath'  : path('oro_entity_index', {entityName: entity_name}),
             'indexLabel' : entity_config.get('label')|default('N/A')
         }]
     }%}

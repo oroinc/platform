@@ -267,7 +267,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $route       = $this->entityViewRoute;
                 $routeParams = [
-                    'entity_id' => str_replace('\\', '_', $entityClassName),
+                    'entityName' => str_replace('\\', '_', $entityClassName),
                     'id'        => null
                 ];
             }
