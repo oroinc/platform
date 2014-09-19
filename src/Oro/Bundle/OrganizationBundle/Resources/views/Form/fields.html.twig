@@ -104,6 +104,8 @@
         {% set entityId = form.parent.vars.value.id %}
     {% endif %}
     {% if expanded %}
+        {# prevent escaping label because it's done in form type "oro_business_unit_tree" #}
+        {% set raw_label = true %}
         {{ block('choice_widget_expanded') }}
     {% else %}
         {{ block('choice_bu_widget_collapsed') }}
@@ -144,6 +146,7 @@
                 {% endif %}
                 <option {{ disable }} value="{{ choice.value }}"
                 {% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
+                    {# output is not escaped because it's done form in type "oro_business_unit_tree" #}
                     {{- choice.label|trans({}, translation_domain)|raw -}}
                 </option>
             {% endif %}

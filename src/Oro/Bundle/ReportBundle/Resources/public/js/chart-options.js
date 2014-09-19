@@ -13,7 +13,7 @@ define(function (require) {
 
 
     /**
-     * @export ororeport/js/chart_options
+     * @export ororeport/js/chart-options
      * @class  ororeport.ChartOptions
      */
     return {
@@ -139,11 +139,12 @@ define(function (require) {
             optionsTemplate = _.template(this.options.optionsTemplate);
 
             $.each(this.items, function () {
-                var options = this.func;
-                var chain = util.pathToEntityChain(this.name).slice(1);
-                var field = chain[chain.length - 1].field;
-                var items = data.results;
-                if (!Util.filterFields([field], exclude).length) {
+                var options, chain, entity, items;
+                options = this.func;
+                chain = util.pathToEntityChain(this.name).slice(1);
+                entity = chain[chain.length - 1];
+                items = data.results;
+                if (!entity || !Util.filterFields([entity.field], exclude).length) {
                     return;
                 }
                 $.each(chain, function () {
