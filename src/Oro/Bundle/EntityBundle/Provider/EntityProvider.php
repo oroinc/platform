@@ -165,6 +165,10 @@ class EntityProvider
      */
     protected function isIgnoredEntity($className)
     {
+        if (false == class_exists($className)) {
+            return true;
+        }
+
         return $this->exclusionProvider->isIgnoredEntity($className);
     }
 
