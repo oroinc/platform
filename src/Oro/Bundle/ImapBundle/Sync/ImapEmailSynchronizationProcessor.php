@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
@@ -25,11 +26,18 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     /** Determines how many emails can be loaded from IMAP server at once */
     const READ_BATCH_SIZE = 100;
 
+    /** Determines how often "Processed X of N emails" hint should be added to a log */
+    const READ_HINT_COUNT = 500;
+
+    /** Determines how often the clearing of outdated folders routine should be executed */
     const CLEANUP_EVERY_N_RUN = 100;
 
     /** @var ImapEmailManager */
@@ -95,39 +103,43 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->em->flush($folder);
         }
 
+        // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
     }
 
     /**
-     * Delete outdated folders
+     * Deletes all empty outdated folders
      *
      * @param EmailOrigin $origin
      */
     protected function cleanupOutdatedFolders(EmailOrigin $origin)
     {
-        $imapFolders = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
-            ->createQueryBuilder('if')
-            ->select('if, folder')
-            ->innerJoin('if.folder', 'folder')
-            ->leftJoin('folder.emails', 'emails')
-            ->where('folder.outdatedAt IS NULL AND emails.id IS NULL')
-            ->andWhere('folder.origin = :origin')
-            ->setParameter('origin', $origin)
-            ->getQuery()
-            ->getResult();
+        $this->log->notice('Removing empty outdated folders ...');
 
-        /** @var ImapEmailFolder $imapFolder */
+        /** @var ImapEmailFolderRepository $repo */
+        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
+        $folders     = new ArrayCollection();
+
         foreach ($imapFolders as $imapFolder) {
-            $this->log->notice(sprintf('CLEANUP: Removing "%s" folder...', $imapFolder->getFolder()->getFullName()));
+            $this->log->notice(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+
+            if (!$folders->contains($imapFolder->getFolder())) {
+                $folders->add($imapFolder->getFolder());
+            }
+
             $this->em->remove($imapFolder);
-            $this->em->remove($imapFolder->getFolder());
+        }
+
+        foreach ($folders as $folder) {
+            $this->em->remove($folder);
         }
 
         if (count($imapFolders) > 0) {
             $this->em->flush();
-            $this->log->notice(sprintf('CLEANUP: Removed %d folders'));
+            $this->log->notice(sprintf('Removed %d folder(s).', count($imapFolders)));
         }
     }
 
@@ -295,7 +307,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         /** @var Email $email */
         foreach ($emails as $email) {
             $processed++;
-            if ($processed % (self::READ_BATCH_SIZE * 5) === 0) {
+            if ($processed % self::READ_HINT_COUNT === 0) {
                 $this->log->notice(sprintf('Processed %d of %d emails ...', $processed, $emails->count()));
             }
 
