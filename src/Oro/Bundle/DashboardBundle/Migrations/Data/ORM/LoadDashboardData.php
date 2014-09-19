@@ -12,7 +12,10 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData'];
+        return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization'
+        ];
     }
 
     /**

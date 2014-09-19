@@ -11,6 +11,13 @@ oro:
               value: Value (Y axis)
           settings:
               connect_dots_with_line: Connect dots with line
+      multiline_chart:
+          label: Line Chart
+          params:
+              label: Category (X axis)
+              value: Value (Y axis)
+          settings:
+              connect_dots_with_line: Connect dots with line
       bar_chart:
           label: Bar Chart
           params:
