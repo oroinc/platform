@@ -296,7 +296,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setBatchCallback(
             function ($batch) use ($folderType) {
-                $this->registerInIsApplicableEmailChecker($batch, $folderType);
+                $this->registerEmailsInKnownEmailAddressChecker($batch, $folderType);
             }
         );
         $this->log->notice(sprintf('Found %d email(s).', $emails->count()));
@@ -361,7 +361,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @return bool
      */
-    protected function registerInIsApplicableEmailChecker(array $emails, $folderType)
+    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
     {
         $addresses = [];
         foreach ($emails as $email) {
