@@ -35,7 +35,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPrePersist(LifecycleEventArgs $args, $expectsMethod)
     {
         $entity = $args->getEntity();
-        $this->setExpects($entity, 'preUpload', $expectsMethod);
+        $this->setExpects($entity, ['preUpload'], $expectsMethod);
         $this->listener->prePersist($args);
     }
 
@@ -45,7 +45,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPreUpdate(LifecycleEventArgs $args, $expectsMethod)
     {
         $entity = $args->getEntity();
-        $this->setExpects($entity, 'preUpload', $expectsMethod);
+        $this->setExpects($entity, ['preUpload'], $expectsMethod);
         $this->listener->preUpdate($args);
     }
 
@@ -55,7 +55,7 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPostPersist(LifecycleEventArgs $args, $expectsMethod)
     {
         $entity = $args->getEntity();
-        $this->setExpects($entity, 'upload', $expectsMethod);
+        $this->setExpects($entity, ['upload', 'checkOnDelete'], $expectsMethod);
         $this->listener->postPersist($args);
     }
 
@@ -65,19 +65,24 @@ class FileListenerTest extends \PHPUnit_Framework_TestCase
     public function testPostUpdate(LifecycleEventArgs $args, $expectsMethod)
     {
         $entity = $args->getEntity();
-        $this->setExpects($entity, 'upload', $expectsMethod);
+        $this->setExpects($entity, ['upload', 'checkOnDelete'], $expectsMethod);
         $this->listener->postUpdate($args);
     }
 
-    protected function setExpects($entity, $methodName, $expectsMethod)
+    protected function setExpects($entity, $methodNames, $expectsMethod)
     {
         if ($expectsMethod) {
-            $this->manager->expects($this->once())
-                ->method($methodName)
-                ->with($entity);
+            foreach ($methodNames as $methodName) {
+                $this->manager->expects($this->once())
+                    ->method($methodName)
+                    ->with($entity);
+            }
+
         } else {
-            $this->manager->expects($this->never())
-                ->method($methodName);
+            foreach ($methodNames as $methodName) {
+                $this->manager->expects($this->never())
+                    ->method($methodName);
+            }
         }
     }
 
