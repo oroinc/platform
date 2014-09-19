@@ -20,24 +20,20 @@
     {% if importAllowed %}
         <div class="btn-group">
             {% set buttonsHtml %}
-            <a type="button"
-               class="btn import-btn icons-holder-text no-hash"
-               href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
-                <i class="icon-upload-alt  hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
-            </a>
+                <a type="button"
+                   class="btn import-btn icons-holder-text no-hash"
+                   href="{{ path('oro_importexport_import_form', {'entity': entity_class}) }}">
+                    <i class="icon-upload-alt  hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+                </a>
+                {% if hasExportTemplateProcessor %}
+                    <a type="button"
+                       class="btn icons-holder-text no-hash"
+                       target="_blank"
+                       href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
+                        <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+                    </a>
+                {% endif %}
             {% endset %}
-
-        {% if hasExportTemplateProcessor %}
-            {% set buttonsHtml %}
-            {{ buttonsHtml|raw }}
-            <a type="button"
-               class="btn icons-holder-text no-hash"
-               target="_blank"
-               href="{{ path('oro_importexport_export_template', {'processorAlias': exportTemplateProcessor}) }}">
-                <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
-            </a>
-            {% endset %}
-        {% endif %}
 
             {% set parameters = {
                 'html': buttonsHtml

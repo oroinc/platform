@@ -64,7 +64,7 @@ class BusinessUnitTreeType extends AbstractType
         $choices = array();
         $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
         foreach ($options as $option) {
-            $choices += array($option['id'] => $blanks . $option['name']);
+            $choices += array($option['id'] => $blanks . htmlspecialchars($option['name']));
             if (isset($option['children'])) {
                 $choices += $this->getTreeOptions($option['children'], $level + 1);
             }
