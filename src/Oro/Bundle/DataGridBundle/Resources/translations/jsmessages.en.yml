@@ -41,3 +41,6 @@
 "oro.datagrid.pagination.totalRecords": "Total of {{ totalRecords }} records"
 oro.datagrid.extension.export.label: "Export Grid"
 oro.datagrid.extension.export.tooltip: "With this button you will export the content of the grid as it appears to you, with filters and sorting applied. All pages will be exported."
+oro_datagrid.label_add_filter: "Manage filters"
+oro_datagrid.action.reset: "Reset"
+oro_datagrid.action.refresh: "Refresh"

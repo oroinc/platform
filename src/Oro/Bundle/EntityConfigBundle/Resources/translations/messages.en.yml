@@ -46,7 +46,11 @@ oro:
         field_config:
             field_name.label: Name
             type.label:       Data Type
+            records_count.label: Number of records
 
+        datagrid:
+            view:         View
+            update:       Update
         info:
             new_field.label:     New Field
             records_count.label: Number of records: %count%

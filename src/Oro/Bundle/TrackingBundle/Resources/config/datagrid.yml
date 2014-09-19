@@ -93,20 +93,20 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_tracking_website_view
-                label:         View
+                label:         oro.tracking.datagrid.view
                 icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_tracking_website_update
-                label:         Update
+                label:         oro.tracking.datagrid.update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
                 acl_resource:  oro_tracking_website_delete
-                label:         Delete
+                label:         oro.tracking.datagrid.delete
                 icon:          trash
                 link:          delete_link
 

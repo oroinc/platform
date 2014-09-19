@@ -52,3 +52,8 @@ oro:
                 The script will log an event with the [name] name and optional [value].
 
         website_configuration: Tracking websites
+
+        datagrid:
+            delete:       Delete
+            view:         View
+            update:       Update

@@ -12,3 +12,8 @@ oro:
         caption:
             oro: Oro Packages
             thirdParty: 3rd Party Packages
+
+oro:
+    distribution:
+        package_manager:
+            label: Package Manager

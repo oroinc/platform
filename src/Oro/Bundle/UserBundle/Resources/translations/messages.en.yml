@@ -18,6 +18,7 @@ Login page: Login page
 "Generate key was successful. New key:": "Generate key was successful. New key&#58;"
 "Generate key": "Generate key"
 "Access Settings": "Access Settings"
+"Organization": "Organization"
 
 change_password:
     flash:
@@ -27,6 +28,10 @@ resetting:
         success: The password has been successfully reset
 
 
+        datagrid:
+            delete:       Delete
+            view:         View
+            update:       Update
 oro:
     user:
         menu:

@@ -14,4 +14,8 @@ oro:
             config.saved.message: "Configuration saved"
             page.reload.message:  "Please wait until page will be reloaded..."
 
+    dashboard:
+        widgets:
+            quick_launchpad.title: "Settings"
+
 "Settings": "Settings"

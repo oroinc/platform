@@ -68,6 +68,11 @@ oro:
                 label:   Report design
                 tooltip: Add chart to the report
 
+        datagrid:
+            delete:       Delete
+            view:         View
+            update:       Update
+
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

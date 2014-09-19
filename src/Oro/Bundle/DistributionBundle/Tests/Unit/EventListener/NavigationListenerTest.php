@@ -141,7 +141,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'package_manager',
                 [
-                    'label'          => 'Package Manager',
+                    'label'          => 'oro.distribution.package_manager.label',
                     'uri'            => '/' . self::ENTRY_POINT,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110']
@@ -199,7 +199,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'package_manager',
                 [
-                    'label'          => 'Package Manager',
+                    'label'          => 'oro.distribution.package_manager.label',
                     'uri'            => '/subdir/' . self::ENTRY_POINT,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110']

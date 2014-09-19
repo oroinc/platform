@@ -71,7 +71,7 @@ class Translator extends BaseTranslator
      * @param string $domain The domain for the message
      * @param string $locale The locale
      *
-     * @return string The translated string
+     * @return bool Whether string have translation
      */
     public function hasTrans($id, $domain = null, $locale = null)
     {

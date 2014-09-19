@@ -12,3 +12,8 @@ oro:
 
         validation:
             unique_field: Value for field "%field%" must be unique|Combination of values for "%field%" fields must be unique
+
+        datagrid:
+            delete:       Delete
+            view:         View
+            update:       Update

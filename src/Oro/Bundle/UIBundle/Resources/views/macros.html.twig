@@ -66,7 +66,7 @@
             {% if value.value is not defined  %}
                 <div class="control-label">{{ value }}</div>
             {% else %}
-                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
@@ -132,7 +132,7 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
         {% endset %}
     {% else %}
     {% endif %}
@@ -147,7 +147,7 @@
             {% endfor %}
         {% endif %}
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       {% if parameters.title is defined %}title="{{ parameters.title|trans }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+       {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trim }}</a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -184,7 +184,7 @@
             {% if parameters.iCss is defined %}
                 <i class="{{ parameters.iCss }}"></i>
             {% endif %}
-            {{ parameters.label|trans }}
+            {{ parameters.label }}
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
@@ -385,8 +385,8 @@
         %}
     {% endif %}
 
-    {% set message = parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
-    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set message = parameters.dataMessage is defined ? parameters.dataMessage : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
     {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
     {% set linkParams = {
         'data': {
@@ -448,7 +448,7 @@
         data-url="{{ parameters.dataUrl }}"
         {% endif %}
         {% if (parameters.successMessage is defined) %}
-        data-success-message="{{ parameters.successMessage|trans }}"
+        data-success-message="{{ parameters.successMessage }}"
         {% endif %}
         {% if parameters.dataRedirect is defined %}
         data-redirect="{{ parameters.dataRedirect  }}"
@@ -539,7 +539,7 @@
     <div class="btn-group">
         <button type="{{ parameters.type }}" class="btn {% if (parameters.class is defined) %}{{ parameters.class }}{% endif %}{% if (parameters.action is defined) %} action-button{% endif %}"
                 {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}>
-            {{ parameters.label|trans }}
+            {{ parameters.label }}
         </button>
     </div>
 {% endmacro %}
@@ -581,7 +581,7 @@
         <div class="{{ span }}">
     {% endif %#}
     <div class="{{ spanClass }}">
-    {% if title|length %}<h5 class="user-fieldset"><span>{{ title|trans }}</span></h5>{% endif %}
+    {% if title|length %}<h5 class="user-fieldset"><span>{{ title }}</span></h5>{% endif %}
     {% for dataBlock in data %}
         {{ dataBlock|raw }}
     {% endfor %}
@@ -708,7 +708,7 @@
 #}
 {% macro collectionField(field, label, buttonCaption) %}
     <div class="control-group">
-        <label class="control-label">{{ label|trans }}</label>
+        <label class="control-label">{{ label }}</label>
         <div class="controls">
             <div class="row-oro">
                 <div class="collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
@@ -716,7 +716,7 @@
                         {{ _self.collection_prototype(emailField) }}
                     {% endfor %}
                 </div>
-                <a class="btn add-list-item" href="javascript: void(0);">{{ buttonCaption|trans }}</a>
+                <a class="btn add-list-item" href="javascript: void(0);">{{ buttonCaption }}</a>
             </div>
         </div>
     </div>

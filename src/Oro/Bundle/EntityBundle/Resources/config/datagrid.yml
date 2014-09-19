@@ -37,18 +37,18 @@ datagrid:
             # TODO: add dynamic acl_resources
             view:
                 type: navigate
-                label: View
+                label: oro.entity.datagrid.view
                 icon: eye-open
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
-                label: Update
+                label: oro.entity.datagrid.update
                 icon: edit
                 link: update_link
             delete:
                 type: delete
-                label: Delete
+                label: oro.entity.datagrid.delete
                 icon: trash
                 link: delete_link
         sorters:
