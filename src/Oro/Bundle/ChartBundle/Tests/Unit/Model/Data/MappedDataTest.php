@@ -47,6 +47,28 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $mappedData->toArray());
     }
 
+    public function testToArrayIfSourceIsNestedArray()
+    {
+        $mapping = array('label' => 'firstName', 'value' => 'totalAmount');
+        $source = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $name = 'John';
+        $amount = 10;
+        $secondName = 'Alex';
+        $secondAmount = 42;
+        $sourceData = array(
+            'first'  => array(array('firstName' => $name, 'totalAmount' => $amount)),
+            'second' => array(array('firstName' => $secondName, 'totalAmount' => $secondAmount))
+        );
+        $expected = array(
+            'first'  => array(array('label' => $name, 'value' => $amount)),
+            'second' => array(array('label' => $secondName, 'value' => $secondAmount))
+        );
+        $source->expects($this->once())->method('toArray')->will($this->returnValue($sourceData));
+        $mappedData = new MappedData($mapping, $source);
+
+        $this->assertEquals($expected, $mappedData->toArray());
+    }
+
     public function testToArrayIfSourceIsObject()
     {
         $mapping = array('label' => 'firstName', 'value' => 'totalAmount');

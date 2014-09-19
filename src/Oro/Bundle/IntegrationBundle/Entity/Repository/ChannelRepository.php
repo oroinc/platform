@@ -48,12 +48,16 @@ class ChannelRepository extends EntityRepository
      *
      * @param int $id
      *
-     * @return Integration
+     * @return Integration|bool
      */
     public function getOrLoadById($id)
     {
         $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
         $integration = $this->getEntityManager()->find('OroIntegrationBundle:Channel', $id);
+        if ($integration === null) {
+            return false;
+        }
+
         $unitOfWork->markReadOnly($integration);
 
         return $integration;

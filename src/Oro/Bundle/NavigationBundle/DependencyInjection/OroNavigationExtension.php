@@ -39,10 +39,8 @@ class OroNavigationExtension extends Extension
                 $this->mergeMenuConfig($entitiesConfig, $resource->data[self::MENU_CONFIG_KEY]);
             }
             // Merge titles from bundle configuration
-            if (isset($resource->data[self::TITLES_KEY])) {
-                $titlesConfig += is_array($resource->data[self::TITLES_KEY])
-                    ? $resource->data[self::TITLES_KEY]
-                    : array();
+            if (!empty($resource->data[self::TITLES_KEY])) {
+                $titlesConfig = array_merge($titlesConfig, (array)$resource->data[self::TITLES_KEY]);
             }
         }
 

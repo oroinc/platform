@@ -27,6 +27,7 @@ use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -44,16 +45,11 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
-        $subscriber = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
+        $mock = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
             ->disableOriginalConstructor()
-            ->setMethods(['getSubscribedEvents'])
             ->getMock();
-        $subscriberСlass = get_class($subscriber);
 
-        // Static stub method
-        $subscriberСlass::staticExpects($this->any())
-            ->method('getSubscribedEvents')
-            ->will($this->returnValue([]));
+        $subscriber = new MutableFormEventSubscriber($mock);
 
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(

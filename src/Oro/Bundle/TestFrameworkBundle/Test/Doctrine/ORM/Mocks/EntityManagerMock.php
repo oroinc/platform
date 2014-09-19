@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks;
 
 use Doctrine\Common\EventManager;
 
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\ORM\Configuration;
 
@@ -77,5 +78,25 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
         }
 
         return new EntityManagerMock($conn, $config, $eventManager);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flush($entity = null)
+    {
+        $this->getUnitOfWork()->commit($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function persist($entity)
+    {
+        if (!is_object($entity)) {
+            throw ORMInvalidArgumentException::invalidObject('EntityManager#persist()', $entity);
+        }
+
+        $this->getUnitOfWork()->persist($entity);
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class NoteTest extends \PHPUnit_Framework_TestCase
@@ -28,5 +29,10 @@ class NoteTest extends \PHPUnit_Framework_TestCase
              ->setOwner($user);
         $this->assertSame($user, $note->getUpdatedBy());
         $this->assertEquals($user, $note->getOwner());
+
+        $organization = new Organization();
+        $this->assertNull($note->getOrganization());
+        $note->setOrganization($organization);
+        $this->assertSame($organization, $note->getOrganization());
     }
 }
