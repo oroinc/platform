@@ -3,8 +3,8 @@ Cumulative Resources
 
 This resource type provides a way to load configuration from any bundle without an additional registration of configuration files in each bundle.
 
-Introdution
------------
+Introduction
+------------
 Please imagine your bundle need to load configuration from `Resources\config\acme.yml` file located in any other bundle. In other words you need to allow other bundles to provide additional configuration to your bundle. In this case a bundle which need this configuration can use [CumulativeConfigLoader](../../Loader/CumulativeConfigLoader.php). The following example demonstrates this:
 
 ``` php
