@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Symfony\Component\HttpFoundation\File\File;
+
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
 
@@ -20,9 +22,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var TestAttachment
-     */
+    /** @var TestAttachment */
     protected $attachment;
 
     public function setUp()
@@ -169,7 +169,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->attachment->setEmptyFile(false);
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([__DIR__.'/../Fixtures/testFile/test.txt'])
             ->getMock();
         $this->attachment->setFile($file);
         $path = __DIR__ . '/../Fixtures/testFile/test.txt';
@@ -208,7 +208,9 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->expects($this->once())
             ->method('delete')
             ->with($this->attachment->getFilename());
+
         $this->attachmentManager->preUpload($this->attachment);
+
         $this->assertNull($this->attachment->getFilename());
         $this->assertNull($this->attachment->getExtension());
         $this->assertNull($this->attachment->getOriginalFilename());
@@ -216,35 +218,13 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreUpload()
     {
-        $this->attachment->setEmptyFile(false)
-            ->setFilename('test.doc');
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attachment->setFile($file);
-        $file->expects($this->once())
-            ->method('isFile')
-            ->will($this->returnValue(true));
-        $this->filesystem->expects($this->once())
-            ->method('delete')
-            ->with($this->attachment->getFilename());
-        $this->filesystem->expects($this->once())
-            ->method('has')
-            ->with($this->attachment->getFilename())
-            ->will($this->returnValue(true));
-        $file->expects($this->once())
-            ->method('guessExtension')
-            ->will($this->returnValue('xls'));
-        $file->expects($this->once())
-            ->method('getFileName')
-            ->will($this->returnValue('newFile.xls'));
-        $file->expects($this->once())
-            ->method('getMimeType')
-            ->will($this->returnValue('text/css'));
-        $file->expects($this->once())
-            ->method('getSize')
-            ->will($this->returnValue(1024));
-        $adapter = $file = $this->getMockBuilder('Gaufrette\Adapter\Cache')
+        $file = new File(__DIR__.'/../Fixtures/testFile/test.txt');
+
+        $this->attachment
+            ->setEmptyFile(false)
+            ->setFile($file);
+
+        $adapter = $this->getMockBuilder('Gaufrette\Adapter\Cache')
             ->disableOriginalConstructor()
             ->getMock();
         $this->filesystem->expects($this->any())
@@ -255,10 +235,10 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->attachmentManager->preUpload($this->attachment);
 
-        $this->assertEquals('newFile.xls', $this->attachment->getOriginalFilename());
-        $this->assertEquals('xls', $this->attachment->getExtension());
-        $this->assertEquals('text/css', $this->attachment->getMimeType());
-        $this->assertEquals(1024, $this->attachment->getFileSize());
+        $this->assertEquals('test.txt', $this->attachment->getOriginalFilename());
+        $this->assertEquals('txt', $this->attachment->getExtension());
+        $this->assertEquals('text/plain', $this->attachment->getMimeType());
+        $this->assertEquals(9, $this->attachment->getFileSize());
     }
 
     public function testGetFilteredImageUrl()

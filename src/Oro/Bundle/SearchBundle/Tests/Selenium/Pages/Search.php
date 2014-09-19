@@ -101,6 +101,7 @@ class Search extends AbstractPage
     public function submit()
     {
         $this->searchButton->click();
+        sleep(1);
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;

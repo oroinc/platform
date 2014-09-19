@@ -8,6 +8,7 @@ oro:
         comment.label:       Comment
         file.label:          File
         owner.label:         Owner
+        organization.label:  Organization
 
         block_titles:
             attachments.label:  Attachments

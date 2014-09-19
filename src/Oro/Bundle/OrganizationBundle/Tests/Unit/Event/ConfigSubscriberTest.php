@@ -100,8 +100,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity1')
             ->will($this->returnValue($extendConfig));
 
-        $configManager->expects($this->never())
-            ->method('persist');
+        $configManager->expects($this->never())->method('persist');
+        $configManager->expects($this->never())->method('calculateConfigChangeSet');
 
         $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
     }
@@ -112,17 +112,29 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $config->set('owner_type', 'USER');
         $config->set('owner_field_name', 'owner');
         $config->set('owner_column_name', 'owner_id');
+        $config->set('organization_field_name', 'organization');
+        $config->set('organization_column_name', 'organization_id');
 
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
         $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager->expects($this->once())
+        $extendConfigProvider    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->with('ownership')
-            ->will($this->returnValue($ownershipConfigProvider));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['ownership', $ownershipConfigProvider],
+                        ['extend', $extendConfigProvider],
+                    ]
+                )
+            );
 
         $ownershipConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -133,8 +145,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity1')
             ->will($this->returnValue($config));
 
-        $configManager->expects($this->never())
-            ->method('persist');
+        $configManager->expects($this->never())->method('persist');
+        $configManager->expects($this->never())->method('calculateConfigChangeSet');
 
         $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
     }
@@ -185,10 +197,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity1')
             ->will($this->returnValue($extendConfig));
 
-        $expectedConfig = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
-        $expectedConfig->set('owner_type', 'USER');
+        $expectedConfig = clone $config;
         $expectedConfig->set('owner_field_name', 'owner');
         $expectedConfig->set('owner_column_name', 'owner_id');
+        $expectedConfig->set('organization_field_name', 'organization');
+        $expectedConfig->set('organization_column_name', 'organization_id');
 
         $configManager->expects($this->once())
             ->method('persist')

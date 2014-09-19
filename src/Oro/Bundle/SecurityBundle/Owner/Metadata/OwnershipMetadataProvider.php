@@ -186,7 +186,9 @@ class OwnershipMetadataProvider
                         $data = new OwnershipMetadata(
                             $config->get('owner_type'),
                             $config->get('owner_field_name'),
-                            $config->get('owner_column_name')
+                            $config->get('owner_column_name'),
+                            $config->get('organization_field_name'),
+                            $config->get('organization_column_name')
                         );
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
 
-class Organization
+use Oro\Bundle\OrganizationBundle\Entity\Organization as ParentOrganization;
+
+class Organization extends ParentOrganization
 {
-    private $id;
+    protected $id;
 
     public function __construct($id = 0)
     {

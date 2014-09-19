@@ -78,8 +78,24 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
+            'name'    => 'test_grid',
+            'columns' => [
+                'c1' => ['frontend_type' => 'string', 'label' => 'lbl1', 'translatable' => false],
+                'c2' => ['frontend_type' => 'string', 'label' => 'lbl2', 'translatable' => false],
+            ],
+            'sorters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                ],
+            ],
+            'filters' => [
+                'columns' => [
+                    'c1' => ['type' => 'string', 'data_name' => 'c1', 'translatable' => false],
+                    'c2' => ['type' => 'string', 'data_name' => 'c2', 'translatable' => false],
+                ]
+            ],
             'source'  => [
-                'type'         => 'orm',
                 'query'        => [
                     'select' => [
                         't2.name as c1',
@@ -99,38 +115,23 @@ class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
                 ],
                 'query_config' => [
                     'table_aliases'  => [
-                        ''                  => 't1',
-                        't1.country|left'   => 't2',
+                        ''                => 't1',
+                        't1.country|left' => 't2',
                     ],
                     'column_aliases' => [
                         'vc1' => 'c1',
                         'vc2' => 'c2',
                     ],
                 ],
-                'hints' => [
+                'type'         => 'orm',
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
                     ]
                 ]
-            ],
-            'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
-                'c2' => ['label' => 'lbl2', 'frontend_type' => 'string', 'translatable' => false],
-            ],
-            'name'    => 'test_grid',
-            'sorters' => [
-                'columns' => [
-                    'c1' => ['data_name' => 'c1'],
-                    'c2' => ['data_name' => 'c2'],
-                ],
-            ],
-            'filters' => [
-                'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
-                    'c2' => ['data_name' => 'c2', 'type' => 'string', 'translatable' => false],
-                ]
             ]
+
         ];
 
         $this->assertEquals($expected, $result);

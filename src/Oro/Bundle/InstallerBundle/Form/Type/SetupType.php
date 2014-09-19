@@ -29,22 +29,10 @@ class SetupType extends AbstractType
                 )
             )
             ->add(
-                'company_name',
+                'organization_name',
                 'text',
                 array(
-                    'label'    => 'form.setup.company_name',
-                    'mapped'   => false,
-                    'constraints'   => array(
-                        new Assert\NotBlank(),
-                        new Assert\Length(array('max' => 15))
-                    ),
-                )
-            )
-            ->add(
-                'company_title',
-                'text',
-                array(
-                    'label'    => 'form.setup.company_title',
+                    'label'    => 'form.setup.organization_name',
                     'mapped'   => false,
                     'required' => false,
                 )

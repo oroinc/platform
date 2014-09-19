@@ -18,12 +18,14 @@ services:
 
     oro_calendar.calendar_connection.manager.api:
         class: %oro_calendar.calendar_connection.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_calendar.calendar_connection.entity.class%
             - @doctrine.orm.entity_manager
 
     oro_calendar.calendar_event.manager.api:
         class: %oro_calendar.calendar_event.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_calendar.calendar_event.entity.class%
             - @doctrine.orm.entity_manager

@@ -56,4 +56,24 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
 
         $accessor->getOwner($obj);
     }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     */
+    public function testGetOrganizationWrongObject()
+    {
+        $metadataProvider = new OwnershipMetadataProviderStub($this);
+        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $accessor->getOrganization('not_an_object');
+    }
+
+    public function testGetOrganization()
+    {
+        $metadataProvider = new OwnershipMetadataProviderStub($this);
+        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $org = new \stdClass();
+        $obj = new TestEntity(1, null, $org);
+        $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata(null, null, null, 'organization'));
+        $this->assertSame($org, $accessor->getOrganization($obj));
+    }
 }

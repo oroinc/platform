@@ -76,6 +76,7 @@ services:
     # Tag API
     oro_tag.tag.manager.api:
         class: %oro_tag.tag.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_tag.tag.entity.class%
             - @doctrine.orm.entity_manager

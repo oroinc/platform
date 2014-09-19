@@ -16,9 +16,20 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 
 class EmailTypeTest extends TypeTestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+    }
+
     protected function getExtensions()
     {
-        $emailAddressType  = new EmailAddressType();
+        $emailAddressType  = new EmailAddressType($this->securityContext);
         $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
             ->disableOriginalConstructor()
             ->getMock();
@@ -54,7 +65,7 @@ class EmailTypeTest extends TypeTestCase
             'template' => new EmailTemplate(),
         ];
 
-        $type = new EmailType();
+        $type = new EmailType($this->securityContext);
         $form = $this->factory->create($type);
 
         $form->submit($formData);
@@ -87,13 +98,13 @@ class EmailTypeTest extends TypeTestCase
                 ]
             );
 
-        $type = new EmailType([]);
+        $type = new EmailType($this->securityContext);
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $type = new EmailType([]);
+        $type = new EmailType($this->securityContext);
         $this->assertEquals('oro_email_email', $type->getName());
     }
 }

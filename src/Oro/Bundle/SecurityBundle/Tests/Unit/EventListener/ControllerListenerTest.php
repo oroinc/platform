@@ -52,6 +52,9 @@ class ControllerListenerTest extends \PHPUnit_Framework_TestCase
                 $this->securityContext,
                 $this->annotationProvider,
                 $this->objectIdentityFactory,
+                $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+                    ->disableOriginalConstructor()
+                    ->getMock(),
                 $logger
             ),
             $logger

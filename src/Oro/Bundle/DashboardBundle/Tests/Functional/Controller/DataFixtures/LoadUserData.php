@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+
+use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
@@ -33,9 +37,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
      */
     public function load(ObjectManager $manager)
     {
-        /**
-         * @var \Oro\Bundle\UserBundle\Entity\UserManager $userManager
-         */
+        /** @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
 
         $role = $userManager
@@ -44,11 +46,16 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->findBy(array('role' => 'IS_AUTHENTICATED_ANONYMOUSLY'));
 
         $user = $userManager->createUser();
-        $api  = new UserApi();
 
-        $api
+        /** @var OrganizationManager $organizationManager */
+        $organizationManager = $this->container->get('oro_organization.organization_manager');
+        $org = $organizationManager->getOrganizationRepo()->getFirst();
+
+        $apiKey = new UserApi();
+        $apiKey
             ->setApiKey(self::USER_PASSWORD)
-            ->setUser($user);
+            ->setUser($user)
+            ->setOrganization($org);
 
         $user
             ->setUsername(self::USER_NAME)
@@ -57,7 +64,9 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setLastName('User')
             ->addRole($role[0])
             ->setEmail('simple@example.com')
-            ->setApi($api)
+            ->addApiKey($apiKey)
+            ->setOrganization($org)
+            ->addOrganization($org)
             ->setSalt('');
 
         $userManager->updateUser($user);

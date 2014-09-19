@@ -17,6 +17,7 @@ Login page: Login page
 "Reset password": "Reset password"
 "Generate key was successful. New key:": "Generate key was successful. New key&#58;"
 "Generate key": "Generate key"
+"Access Settings": "Access Settings"
 
 change_password:
     flash:
@@ -53,9 +54,11 @@ oro:
         #
         # Oro/Bundle/UserBundle/Entity/User
         #
+        api_keys.label:              API keys
         api.label:                   API key
         birthday.label:              Birthday
         business_units.label:        Business Units
+        organizations.label:         Organizations
         confirmation_token.label:    Confirmation token
         current_status.label:        Current status
         groups.label:                Groups
@@ -83,6 +86,7 @@ oro:
         salt.label:                  Salt
         statuses.label:              Statuses
         username.label:              Username
+        organization.label:          Organization
         #
         # Oro/Bundle/UserBundle/Entity/Group
         #
@@ -94,6 +98,7 @@ oro:
             name.label:  Name
             roles.label: Roles
             owner.label: Owner
+            organization.label: Organization
         #
         # Oro/Bundle/UserBundle/Entity/Role
         #
