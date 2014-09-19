@@ -8,13 +8,12 @@ use Doctrine\ORM\Query;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 
 abstract class AbstractEmailSynchronizationProcessor
 {
+    /** Determines how many emails can be stored in a database at once */
     const DB_BATCH_SIZE = 30;
 
     /**
@@ -67,45 +66,4 @@ abstract class AbstractEmailSynchronizationProcessor
      * @param \DateTime   $syncStartTime
      */
     abstract public function process(EmailOrigin $origin, $syncStartTime);
-
-    /**
-     * Gets a list of email addresses which have an owner
-     * Email addresses are sorted by modification date; newest at the top
-     *
-     * @return EmailAddress[]
-     */
-    protected function getKnownEmailAddresses()
-    {
-        $this->log->notice('Loading known email addresses ...');
-
-        $repo           = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $query          = $repo->createQueryBuilder('a')
-            ->select('partial a.{id, email, updated}')
-            ->where('a.hasOwner = ?1')
-            ->orderBy('a.updated', 'DESC')
-            ->setParameter(1, true)
-            ->getQuery();
-        $emailAddresses = $query->getResult();
-
-        $this->log->notice(sprintf('Loaded %d email address(es).', count($emailAddresses)));
-
-        return $emailAddresses;
-    }
-
-    /**
-     * @param EmailEntity[]|array $emails
-     *
-     * @return array
-     */
-    protected function getEmailsByMessageId(array $emails)
-    {
-        $result = [];
-
-        /** @var EmailEntity $email */
-        foreach ($emails as $email) {
-            $result[$email->getMessageId()] = $email;
-        }
-
-        return $result;
-    }
 }

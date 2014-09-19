@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
@@ -10,14 +11,12 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
@@ -32,8 +31,14 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
  */
 class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
-    const EMAIL_ADDRESS_BATCH_SIZE = 100;
-    const CLEANUP_EVERY_N_RUN      = 100;
+    /** Determines how many emails can be loaded from IMAP server at once */
+    const READ_BATCH_SIZE = 100;
+
+    /** Determines how often "Processed X of N emails" hint should be added to a log */
+    const READ_HINT_COUNT = 500;
+
+    /** Determines how often the clearing of outdated folders routine should be executed */
+    const CLEANUP_EVERY_N_RUN = 100;
 
     /** @var ImapEmailManager */
     protected $manager;
@@ -68,156 +73,74 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         // make sure that the entity builder is empty
         $this->emailEntityBuilder->clear();
 
-        // get a list of emails belong to any object, for example an user or a contacts
-        $emailAddressBatches = $this->getKnownEmailAddressBatches($origin->getSynchronizedAt());
-
         // iterate through all folders and do a synchronization of emails for each one
         $imapFolders = $this->syncFolders($origin);
         foreach ($imapFolders as $imapFolder) {
-            $synchronizedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-            $folder         = $imapFolder->getFolder();
-
-            // register the current folder in the entity builder
-            $this->emailEntityBuilder->setFolder($folder);
+            $folder = $imapFolder->getFolder();
 
             // ask an email server to select the current folder
             $folderName = $folder->getFullName();
             $this->manager->selectFolder($folderName);
 
-            // sync emails in the current folder
-            $this->log->notice(sprintf('Loading emails from "%s" folder ...', $folderName));
-            foreach ($emailAddressBatches as $emailAddressBatch) {
-                $needFullSync = $emailAddressBatch['needFullSync'] && !$folder->getSynchronizedAt();
+            // register the current folder in the entity builder
+            $this->emailEntityBuilder->setFolder($folder);
 
-                $this->syncEmails(
-                    $imapFolder,
-                    $this->getSearchQuery($folder, $needFullSync, $emailAddressBatch['items'])
-                );
+            // build a search query
+            $sqb = $this->manager->getSearchQueryBuilder();
+            if ($origin->getSynchronizedAt() && $folder->getSynchronizedAt()) {
+                if ($folder->getType() === FolderType::SENT) {
+                    $sqb->sent($folder->getSynchronizedAt());
+                } else {
+                    $sqb->received($folder->getSynchronizedAt());
+                }
             }
 
-            // update folder sync time
-            $folder->setSynchronizedAt($synchronizedAt);
-            $this->em->flush();
+            // sync emails using this search query
+            $lastSynchronizedAt = $this->syncEmails($imapFolder, $sqb->get());
+
+            // update synchronization date for the current folder
+            $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
+            $this->em->flush($folder);
         }
 
+        // run removing of empty outdated folders every N synchronizations
         if ($origin->getSyncCount() > 0 && $origin->getSyncCount() % self::CLEANUP_EVERY_N_RUN == 0) {
             $this->cleanupOutdatedFolders($origin);
         }
     }
 
     /**
-     * Delete outdated folders
+     * Deletes all empty outdated folders
      *
      * @param EmailOrigin $origin
      */
     protected function cleanupOutdatedFolders(EmailOrigin $origin)
     {
-        $imapFolders = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
-            ->createQueryBuilder('if')
-            ->select('if, folder')
-            ->innerJoin('if.folder', 'folder')
-            ->leftJoin('folder.emails', 'emails')
-            ->where('folder.outdatedAt IS NULL AND emails.id IS NULL')
-            ->andWhere('folder.origin = :origin')
-            ->setParameter('origin', $origin)
-            ->getQuery()
-            ->getResult();
+        $this->log->notice('Removing empty outdated folders ...');
 
-        /** @var ImapEmailFolder $imapFolder */
+        /** @var ImapEmailFolderRepository $repo */
+        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
+        $folders     = new ArrayCollection();
+
         foreach ($imapFolders as $imapFolder) {
-            $this->log->notice(sprintf('CLEANUP: Removing "%s" folder...', $imapFolder->getFolder()->getFullName()));
+            $this->log->notice(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+
+            if (!$folders->contains($imapFolder->getFolder())) {
+                $folders->add($imapFolder->getFolder());
+            }
+
             $this->em->remove($imapFolder);
-            $this->em->remove($imapFolder->getFolder());
+        }
+
+        foreach ($folders as $folder) {
+            $this->em->remove($folder);
         }
 
         if (count($imapFolders) > 0) {
             $this->em->flush();
-            $this->log->notice(sprintf('CLEANUP: Removed %d folders'));
+            $this->log->notice(sprintf('Removed %d folder(s).', count($imapFolders)));
         }
-    }
-
-    /**
-     * Builds IMAP search query is used to find emails to be synchronized
-     *
-     * @param EmailFolder    $folder
-     * @param bool           $needFullSync
-     * @param EmailAddress[] $emailAddresses
-     *
-     * @return SearchQuery
-     */
-    protected function getSearchQuery(EmailFolder $folder, $needFullSync, array $emailAddresses)
-    {
-        $sqb = $this->manager->getSearchQueryBuilder();
-        if (false == $needFullSync) {
-            $sqb->sent($folder->getSynchronizedAt());
-        }
-
-        if ($folder->getType() === FolderType::SENT) {
-            $sqb->openParenthesis();
-            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'to', $emailAddresses);
-            $sqb->orOperator();
-            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'cc', $emailAddresses);
-
-            // not all IMAP servers support search by BCC, for example imap-mail.outlook.com does not
-            //$sqb->orOperator();
-            //$this->addEmailAddressesToSearchQueryBuilder($sqb, 'bcc', $emailAddresses);
-
-            $sqb->closeParenthesis();
-        } else {
-            $sqb->openParenthesis();
-            $this->addEmailAddressesToSearchQueryBuilder($sqb, 'from', $emailAddresses);
-            $sqb->closeParenthesis();
-        }
-
-        return $sqb->get();
-    }
-
-    /**
-     * Adds the given email addresses to the search query.
-     * Addresses are delimited by OR operator.
-     *
-     * @param SearchQueryBuilder $sqb
-     * @param string             $addressType
-     * @param EmailAddress[]     $addresses
-     */
-    protected function addEmailAddressesToSearchQueryBuilder(SearchQueryBuilder $sqb, $addressType, array $addresses)
-    {
-        for ($i = 0; $i < count($addresses); $i++) {
-            if ($i > 0) {
-                $sqb->orOperator();
-            }
-            $sqb->{$addressType}($addresses[$i]->getEmail());
-        }
-    }
-
-    /**
-     * Gets a list of email addresses which have an owner and splits them into batches
-     *
-     * @param \DateTime|null $lastSyncTime
-     *
-     * @return array of ['needFullSync' => true/false, 'items' => EmailAddress[]]
-     */
-    protected function getKnownEmailAddressBatches($lastSyncTime)
-    {
-        $batches    = array();
-        $batchIndex = 0;
-        $count      = 0;
-        foreach ($this->getKnownEmailAddresses() as $emailAddress) {
-            $needFullSync = !$lastSyncTime || $emailAddress->getUpdated() > $lastSyncTime;
-            if ($count >= self::EMAIL_ADDRESS_BATCH_SIZE
-                || (isset($batches[$batchIndex]) && $needFullSync !== $batches[$batchIndex]['needFullSync'])
-            ) {
-                $batchIndex++;
-                $count = 0;
-            }
-            if ($count === 0) {
-                $batches[$batchIndex] = array('needFullSync' => $needFullSync, 'items' => array());
-            }
-            $batches[$batchIndex]['items'][$count] = $emailAddress;
-            $count++;
-        }
-
-        return $batches;
     }
 
     /**
@@ -225,11 +148,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param EmailOrigin $origin
      *
-     * @return ImapEmailFolder[] The list folders excluding outdated ones
+     * @return ImapEmailFolder[] The list of folders for which emails need to be synchronized
      */
     protected function syncFolders(EmailOrigin $origin)
     {
-        $imapFoldersToSync = [];
+        $folders = [];
 
         $existingImapFolders = $this->getExistingImapFolders($origin);
         $srcFolders          = $this->getFolders();
@@ -271,7 +194,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             }
 
             // save folder to the list of folders to be synchronized
-            $imapFoldersToSync[] = $imapFolder;
+            $folders[] = $imapFolder;
         }
 
         // mark the rest of existing folders as outdated
@@ -286,7 +209,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->em->persist($origin);
         $this->em->flush();
 
-        return $imapFoldersToSync;
+        return $folders;
     }
 
     /**
@@ -357,16 +280,45 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      *
      * @param ImapEmailFolder $imapFolder
      * @param SearchQuery     $searchQuery
+     *
+     * @return \DateTime The max sent date
      */
     protected function syncEmails(ImapEmailFolder $imapFolder, SearchQuery $searchQuery)
     {
+        $folder             = $imapFolder->getFolder();
+        $folderType         = $folder->getType();
+        $lastSynchronizedAt = $folder->getSynchronizedAt();
+
+        $this->log->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
         $this->log->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
 
         $emails = $this->manager->getEmails($searchQuery);
+        $emails->setBatchSize(self::READ_BATCH_SIZE);
+        $emails->setBatchCallback(
+            function ($batch) use ($folderType) {
+                $this->registerEmailsInKnownEmailAddressChecker($batch, $folderType);
+            }
+        );
+        $this->log->notice(sprintf('Found %d email(s).', $emails->count()));
 
-        $count = 0;
-        $batch = array();
+        $count     = 0;
+        $processed = 0;
+        $batch     = [];
+        /** @var Email $email */
         foreach ($emails as $email) {
+            $processed++;
+            if ($processed % self::READ_HINT_COUNT === 0) {
+                $this->log->notice(sprintf('Processed %d of %d emails ...', $processed, $emails->count()));
+            }
+
+            if (!$this->isApplicableEmail($email, $folderType)) {
+                continue;
+            }
+
+            if ($email->getSentAt() > $lastSynchronizedAt) {
+                $lastSynchronizedAt = $email->getSentAt();
+            }
+
             $count++;
             $batch[] = $email;
             if ($count === self::DB_BATCH_SIZE) {
@@ -378,6 +330,50 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($count > 0) {
             $this->saveEmails($batch, $imapFolder);
         }
+
+        return $lastSynchronizedAt;
+    }
+
+    /**
+     * @param Email  $email
+     * @param string $folderType
+     *
+     * @return bool
+     */
+    protected function isApplicableEmail(Email $email, $folderType)
+    {
+        if ($folderType === FolderType::SENT) {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getToRecipients(),
+                $email->getCcRecipients(),
+                $email->getBccRecipients()
+            );
+        } else {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getFrom()
+            );
+        }
+    }
+
+    /**
+     * @param Email[] $emails
+     * @param string  $folderType
+     *
+     * @return bool
+     */
+    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
+    {
+        $addresses = [];
+        foreach ($emails as $email) {
+            if ($folderType === FolderType::SENT) {
+                $addresses[] = $email->getToRecipients();
+                $addresses[] = $email->getCcRecipients();
+                $addresses[] = $email->getBccRecipients();
+            } else {
+                $addresses[] = $email->getFrom();
+            }
+        }
+        $this->knownEmailAddressChecker->preLoadEmailAddresses($addresses);
     }
 
     /**
