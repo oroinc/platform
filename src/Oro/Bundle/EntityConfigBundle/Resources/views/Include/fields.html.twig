@@ -1,5 +1,5 @@
 {% block oro_entity_option_set_widget %}
-    <div class="email-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
+    <div class="float-holder{% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.label) }}
             <label class="add-on" title="{{ 'Default'|trans }}">
