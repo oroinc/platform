@@ -21,7 +21,7 @@ define([
         breadcrumbsTemplate: _.template('<ul class="breadcrumb">' +
             '<% for (var i =0; i < breadcrumbs.length; i++) { %>' +
                 '<li>' +
-                    '<%= breadcrumbs[i] %>' +
+                    '<%- breadcrumbs[i] %>' +
                     '<%if (i+1 != breadcrumbs.length) { %><span class="divider">/&nbsp;</span><% } %>' +
                 '</li>' +
             '<% } %>' +

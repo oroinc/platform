@@ -15,7 +15,7 @@
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
         {% for pinbarItem in item.children %}
             {% if pinbarItem.extras.isAllowed %}
-                {% set pinbarItems = pinbarItems|merge([{'id': pinbarItem.extras.id, 'title': pinbarItem.label|raw, 'title_rendered': oro_title_render(pinbarItem.label|raw), 'title_rendered_short': oro_title_render_short(pinbarItem.label|raw), 'url': pinbarItem.uri, 'type': pinbarItem.extras.type}]) %}
+                {% set pinbarItems = pinbarItems|merge([{'id': pinbarItem.extras.id, 'title': pinbarItem.label, 'title_rendered': oro_title_render(pinbarItem.label), 'title_rendered_short': oro_title_render_short(pinbarItem.label), 'url': pinbarItem.uri, 'type': pinbarItem.extras.type}]) %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -23,5 +23,5 @@
     {% set frontendOptions = ['maxPinbarItems', 'el', 'listBar', 'tabTitle', 'tabIcon', 'minimizeButton', 'closeButton', 'defaultUrl'] %}
     <div data-data="{{ pinbarItems|json_encode }}" data-options="{{- pinbar.get_options(frontendOptions, options) -}}"></div>
     <ul class="extra-list"></ul>
-    <div class="dot-menu-empty-message">{{ 'No items'|trans|raw }}</div>
+    <div class="dot-menu-empty-message">{{ 'oro.navigation.messages.no_items'|trans }}</div>
 {% endblock %}

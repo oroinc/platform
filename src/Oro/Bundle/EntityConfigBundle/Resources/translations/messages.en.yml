@@ -49,4 +49,4 @@ oro:
 
         info:
             new_field.label:     New Field
-            records_count.label: Number of records
+            records_count.label: Number of records: %count%

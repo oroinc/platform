@@ -19,7 +19,7 @@
                     {% for item in items %}
                         {% if resource_granted(item.acl) %}
                             <li class="{{ loop.last ? 'last' : '' }}">
-                                <a href="{{ path(item.route, item.route_parameters|default({}))|raw }}">{{ item.label|trans }}</a>
+                                <a href="{{ path(item.route, item.route_parameters|default({})) }}">{{ item.label|trans }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
