@@ -2,7 +2,9 @@
 {% set organizations = get_enabled_organizations() %}
 
 {% set organization_name %}
+{% spaceless %}
     {% placeholder organization_name %}
+{% endspaceless %}
 {% endset %}
 
 {% if organizations|length > 1 %}
@@ -27,27 +29,26 @@
                 {% endfor %}
             </ul>
         </div>
-        <h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-                {% if oro_theme_logo() %}
-                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                {% else %}
-                    {{ organization_name }}
-                {% endif %}
-            </a>
-        </h1>
+        {{ _self.organization_name_and_logo(organization_name) }}
     </div>
     <script type="text/javascript">
         require(['orosecurity/js/init-organization-selector'])
     </script>
 {% else %}
-    <h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-        <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-            {% if oro_theme_logo() %}
-                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-            {% else %}
-                {{ organization_name }}
-            {% endif %}
-        </a>
-    </h1>
+    {{ _self.organization_name_and_logo(organization_name) }}
 {% endif %}
+
+{% macro organization_name_and_logo(organization_name) %}
+    {% set logo = oro_theme_logo() %}
+    {% if organization_name|length or logo %}
+        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+            <a href="{{ path('oro_default') }}" {% if organization_name|length %}title="{{ organization_name }}"{% endif %}>
+                {% if logo %}
+                    <img src="{{ asset(logo) }}" {% if organization_name %}alt="{{ organization_name }}"{% endif %}>
+                {% else %}
+                    {{ organization_name }}
+                {% endif %}
+            </a>
+        </h1>
+    {% endif %}
+{% endmacro %}
