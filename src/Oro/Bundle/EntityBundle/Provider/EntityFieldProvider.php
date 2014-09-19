@@ -463,7 +463,7 @@ class EntityFieldProvider
         /** @var EntityConfigId[] $entityConfigIds */
         $entityConfigIds = $this->entityConfigProvider->getIds();
         foreach ($entityConfigIds as $entityConfigId) {
-            if ($this->isIgnoredConfig($entityConfigId)) {
+            if ($this->isIgnoredEntity($entityConfigId)) {
                 continue;
             }
 
@@ -493,7 +493,7 @@ class EntityFieldProvider
      *
      * @return bool
      */
-    protected function isIgnoredConfig(EntityConfigId $entityConfigId)
+    protected function isIgnoredEntity(EntityConfigId $entityConfigId)
     {
         $entityConfig = $this->extendConfigProvider->getConfigById($entityConfigId);
 
