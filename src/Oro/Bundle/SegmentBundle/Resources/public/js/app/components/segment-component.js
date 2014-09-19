@@ -12,7 +12,9 @@ define(function (require) {
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+        Modal = require('oroui/js/modal'),
+        EntityFieldsUtil = require('oroentity/js/entity-fields-util'),
+        mediator = require('oroui/js/mediator');
     require('oroentity/js/field-choice');
     require('oroentity/js/fields-loader');
     require('orosegment/js/segment-choice');
@@ -69,6 +71,46 @@ define(function (require) {
             }
 
             SegmentComponent.__super__.initialize.call(this, options);
+
+            this.form = this.$storage.parents('form');
+            this.form.submit(_.bind(this.onBeforeSubmit, this));
+        },
+
+        onBeforeSubmit: function (e) {
+            var messages = [], modal, message, componentNames = [], thisCopy = this;
+            this.trigger('check-state', messages);
+            if (!messages.length) {
+                // Normal exit, form submitted
+                return;
+            }
+            e.preventDefault();
+
+            for (var i = 0; i < messages.length; i++) {
+                message = messages[i];
+                switch (message.type) {
+                    case "UNSAVED_CHANGES":
+                        componentNames.push(message.componentName);
+                        break;
+                    default:
+                        throw "Unrecognized message type";
+                }
+            }
+
+            modal = new Modal({
+                title: __('oro.segment.unsaved_changes'),
+                content: __('oro.segment.unsaved_changes_ask_with_names', {components: componentNames.join(', ')}),
+                okCloses: true
+            });
+
+            modal.open(function () {
+                thisCopy.trigger('clean-before-submit');
+                thisCopy.form[0].submit();
+                // show loading mask
+                // @todo don't call it manually here
+                mediator.trigger('page:beforeChange');
+            });
+
+            return;
         },
 
         /**
@@ -380,6 +422,17 @@ define(function (require) {
             sortingLabels = {};
             $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
                 sortingLabels[this.value] = $(this).text();
+            });
+
+            this.on('check-state', function (messages) {
+                var message = $editor.itemsManagerEditor('checkState');
+                if (message) {
+                    messages.push(message);
+                }
+            });
+
+            this.on('clean-before-submit', function () {
+                $editor.itemsManagerEditor('reset');
             });
 
             template = _.template(this.options.columnFieldChoiceOptions.select2.formatSelectionTemplate);

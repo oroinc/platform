@@ -2,8 +2,9 @@
 /*jslint nomen: true*/
 define([
     'jquery',
+    'orotranslation/js/translator',
     'jquery-ui'
-], function ($) {
+], function ($, __) {
     'use strict';
 
     function setValue($elem, value) {
@@ -30,7 +31,17 @@ define([
             },
             getter: function ($el, name, value) {
                 return value;
-            }
+            },
+            touched: false
+        },
+
+        /**
+         * Should return error message if required
+         *
+         * @returns {object} message description
+         */
+        checkState: function () {
+            return !this.touched ? null : { componentName: __('oro.ui.report_column_editor'), type: "UNSAVED_CHANGES"};
         },
 
         _create: function () {
@@ -77,6 +88,7 @@ define([
                 });
             }
             this._updateActions();
+            this.touched = false;
         },
 
         _onSaveItem: function (e) {
@@ -155,6 +167,7 @@ define([
         },
 
         _onElementChange: function (e) {
+            this.touched = true;
             if (this.validated) {
                 this._validate(e.target);
             }
