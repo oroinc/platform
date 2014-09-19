@@ -244,18 +244,18 @@ class User extends AbstractPageEntity
                 }
                 $condition .= "normalize-space(text()) = '{$role}'";
             }
-            $xpath = $this->roles->element(
+            $element = $this->roles->element(
                 $this->test->using('xpath')->value("div[label[{$condition}]]/input")
             );
-            $this->test->moveto($xpath);
-            $xpath->click();
+            $this->test->moveto($element);
+            $element->click();
         } else {
             foreach ($roles as $role) {
-                $xpath = $this->roles->element(
+                $element = $this->roles->element(
                     $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
                 );
-                $this->test->moveto($xpath);
-                $xpath->click();
+                $this->test->moveto($element);
+                $element->click();
             }
         }
 
@@ -276,10 +276,11 @@ class User extends AbstractPageEntity
 
     public function setOrganization($organization)
     {
-        $this->test->byXPath(
+        $element = $this->test->byXPath(
             "//div[@id='oro_user_user_form_organizations']//label[contains(., '{$organization}')]"
-        )->click();
-
+        );
+        $this->test->moveto($element);
+        $element->click();
         return $this;
     }
 

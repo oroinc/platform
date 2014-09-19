@@ -38,12 +38,22 @@ class MappedData implements DataInterface
     public function toArray()
     {
         $result = array();
-        foreach ($this->sourceData->toArray() as $sourceItem) {
-            $record = array();
-            foreach ($this->mapping as $name => $fieldName) {
-                $record[$name] = $this->getValue($sourceItem, $fieldName);
+        foreach ($this->sourceData->toArray() as $sourceKey => $sourceItem) {
+            if ($this->hasNestedRecords($sourceItem)) {
+                foreach ($sourceItem as $nestedItem) {
+                    $record = array();
+                    foreach ($this->mapping as $name => $fieldName) {
+                        $record[$name] = $this->getValue($nestedItem, $fieldName);
+                    }
+                    $result[$sourceKey][] = $record;
+                }
+            } else {
+                $record = array();
+                foreach ($this->mapping as $name => $fieldName) {
+                    $record[$name] = $this->getValue($sourceItem, $fieldName);
+                }
+                $result[] = $record;
             }
-            $result[] = $record;
         }
 
         return $result;
@@ -81,5 +91,25 @@ class MappedData implements DataInterface
         }
 
         return $this->accessor;
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function hasNestedRecords($item)
+    {
+        if (!is_array($item)) {
+            return false;
+        }
+
+        $keys = array_keys($item);
+        foreach ($keys as $key) {
+            if (!is_int($key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

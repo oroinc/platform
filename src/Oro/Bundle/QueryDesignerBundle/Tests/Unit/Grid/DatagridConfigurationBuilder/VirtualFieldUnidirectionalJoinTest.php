@@ -141,5 +141,4 @@ class VirtualFieldUnidirectionalJoinTest extends OrmQueryConverterTest
 
         $this->assertEquals($expected, $result);
     }
-
 }

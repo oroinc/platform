@@ -342,6 +342,26 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOwner($owner));
     }
 
+    public function testGetOrganization()
+    {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->dashboardEntity->expects($this->once())
+            ->method('getOrganization')
+            ->will($this->returnValue($organization));
+
+        $this->assertEquals($organization, $this->dashboardModel->getOrganization());
+    }
+
+    public function testSetOrganization()
+    {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->dashboardEntity->expects($this->once())
+            ->method('setOrganization')
+            ->with($organization);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOrganization($organization));
+    }
+
     public function testGetLabelFromEntity()
     {
         $label = 'Label';
