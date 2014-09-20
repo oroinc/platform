@@ -50,6 +50,13 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'A list of bundle names which migrations should be skipped.'
+            )
+            ->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Timeout for child command execution',
+                300
             );
     }
 
@@ -60,6 +67,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     {
         $force = $input->getOption('force');
         $dryRun = $input->getOption('dry-run');
+        $this->initCommandExecutor($input);
 
         if ($force || $dryRun) {
             $output->writeln($dryRun ? 'List of migrations:' : 'Process migrations...');
@@ -121,5 +129,14 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     protected function getMigrationExecutor(InputInterface $input)
     {
         return $this->getContainer()->get('oro_migration.migrations.executor');
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    protected function initCommandExecutor(InputInterface $input)
+    {
+        $commandExecutor = $this->getContainer()->get('oro_entity_config.tools.command_executor');
+        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
     }
 }

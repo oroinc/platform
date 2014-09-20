@@ -418,6 +418,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
+                    '--timeout'           => $commandExecutor->getDefaultTimeout()
                 ]
             )
             ->runCommand(
