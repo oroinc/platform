@@ -401,7 +401,7 @@ abstract class AbstractEmailSynchronizer
             }
             $this->log->notice('An email origin was not found.');
         } else {
-            $this->log->notice(sprintf('Found email origin id: %d.', $result->getId()));
+            $this->log->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;
@@ -432,7 +432,7 @@ abstract class AbstractEmailSynchronizer
         if ($result === null) {
             $this->log->notice('An email origin was not found.');
         } else {
-            $this->log->notice(sprintf('Found email origin id: %d.', $result->getId()));
+            $this->log->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;

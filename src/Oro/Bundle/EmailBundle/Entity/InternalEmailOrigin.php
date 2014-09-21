@@ -54,6 +54,6 @@ class InternalEmailOrigin extends EmailOrigin
      */
     public function __toString()
     {
-        return sprintf('InternalEmailOrigin(%s)', $this->internalName);
+        return sprintf('Internal - %s', $this->internalName);
     }
 }

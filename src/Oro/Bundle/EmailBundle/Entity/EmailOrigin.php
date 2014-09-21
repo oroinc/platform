@@ -227,6 +227,6 @@ abstract class EmailOrigin
      */
     public function __toString()
     {
-        return sprintf('EmailOrigin(%d)', $this->id);
+        return (string)$this->id;
     }
 }

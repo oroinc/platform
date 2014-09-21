@@ -51,7 +51,6 @@ class ImapEmailFolderRepository extends EntityRepository
     public function getEmptyOutdatedFoldersByOriginQueryBuilder(EmailOrigin $origin)
     {
         return $this->createQueryBuilder('imap_folder')
-            ->select('imap_folder, folder')
             ->innerJoin('imap_folder.folder', 'folder')
             ->leftJoin('folder.emails', 'emails')
             ->where('folder.outdatedAt IS NOT NULL AND emails.id IS NULL')

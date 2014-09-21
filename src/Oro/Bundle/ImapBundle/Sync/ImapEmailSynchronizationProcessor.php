@@ -14,8 +14,9 @@ use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
+
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
@@ -228,7 +229,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
         $imapFolders = $repo->getFoldersByOrigin($origin);
 
-        $this->log->notice(sprintf('Loaded %d existing folder(s).', count($imapFolders)));
+        $this->log->notice(sprintf('Loaded %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
     }
@@ -332,48 +333,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         return $lastSynchronizedAt;
-    }
-
-    /**
-     * @param Email  $email
-     * @param string $folderType
-     *
-     * @return bool
-     */
-    protected function isApplicableEmail(Email $email, $folderType)
-    {
-        if ($folderType === FolderType::SENT) {
-            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
-                $email->getToRecipients(),
-                $email->getCcRecipients(),
-                $email->getBccRecipients()
-            );
-        } else {
-            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
-                $email->getFrom()
-            );
-        }
-    }
-
-    /**
-     * @param Email[] $emails
-     * @param string  $folderType
-     *
-     * @return bool
-     */
-    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
-    {
-        $addresses = [];
-        foreach ($emails as $email) {
-            if ($folderType === FolderType::SENT) {
-                $addresses[] = $email->getToRecipients();
-                $addresses[] = $email->getCcRecipients();
-                $addresses[] = $email->getBccRecipients();
-            } else {
-                $addresses[] = $email->getFrom();
-            }
-        }
-        $this->knownEmailAddressChecker->preLoadEmailAddresses($addresses);
     }
 
     /**
@@ -487,8 +446,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             return $imapEmail;
         }
 
-        /** @var ImapEmail[] $outdatedImapEmails */
-        $activeImapEmails = array_filter(
+        /** @var ImapEmail[] $filteredImapEmails */
+        $filteredImapEmails = array_filter(
             $imapEmails,
             function (ImapEmail $imapEmail) use ($folderType, $outdatedOnly) {
                 return
@@ -497,37 +456,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             }
         );
 
-        return count($activeImapEmails) === 1
-            ? reset($activeImapEmails)
+        return count($filteredImapEmails) === 1
+            ? reset($filteredImapEmails)
             : null;
-    }
-
-    /**
-     * Checks if the given folders types are comparable.
-     * For example two "Sent" folders are comparable, "Inbox" and "Other" folders
-     * are comparable as well, but "Inbox" and "Sent" folders are not comparable
-     *
-     * @param string $folderType1
-     * @param string $folderType2
-     *
-     * @return bool
-     */
-    protected function isComparableFolders($folderType1, $folderType2)
-    {
-        if ($folderType1 === $folderType2) {
-            return true;
-        }
-        if ($folderType1 === FolderType::OTHER) {
-            $folderType1 = FolderType::INBOX;
-        }
-        if ($folderType2 === FolderType::OTHER) {
-            $folderType2 = FolderType::INBOX;
-        }
-        if ($folderType1 === $folderType2) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -595,36 +526,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
-     * Creates email entity and register it in the email entity batch processor
-     *
-     * @param Email       $email
-     * @param EmailFolder $folder
-     *
-     * @return EmailEntity
-     */
-    protected function addEmail(Email $email, EmailFolder $folder)
-    {
-        $emailEntity = $this->emailEntityBuilder->email(
-            $email->getSubject(),
-            $email->getFrom(),
-            $email->getToRecipients(),
-            $email->getSentAt(),
-            $email->getReceivedAt(),
-            $email->getInternalDate(),
-            $email->getImportance(),
-            $email->getCcRecipients(),
-            $email->getBccRecipients()
-        );
-        $emailEntity
-            ->addFolder($folder)
-            ->setMessageId($email->getMessageId())
-            ->setXMessageId($email->getXMessageId())
-            ->setXThreadId($email->getXThreadId());
-
-        return $emailEntity;
-    }
-
-    /**
      * Gets the list of UIDs of emails already exist in a database
      *
      * @param EmailFolder $folder
@@ -653,6 +554,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * Gets the list of IMAP emails by Message-ID
+     *
      * @param EmailOrigin $origin
      * @param string[]    $messageIds
      * @param bool        $outdatedOnly
