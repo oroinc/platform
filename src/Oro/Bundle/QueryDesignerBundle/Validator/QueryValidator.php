@@ -3,8 +3,8 @@
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Doctrine\DBAL\DBALException;
-
 use Doctrine\ORM\ORMException;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
