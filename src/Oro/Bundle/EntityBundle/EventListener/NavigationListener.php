@@ -76,7 +76,7 @@ class NavigationListener
                         'options' => array(
                             'route'           => 'oro_entity_index',
                             'routeParameters' => array(
-                                'id' => str_replace('\\', '_', $config->getId()->getClassName())
+                                'entityName' => str_replace('\\', '_', $config->getId()->getClassName())
                             ),
                             'extras'          => array(
                                 'safe_label' => true,

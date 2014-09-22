@@ -51,6 +51,7 @@ class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
     public function validateDataProvider()
     {
         return [
+            'empty'           => [[], false],
             'name_not_unique' => [
                 [
                     [

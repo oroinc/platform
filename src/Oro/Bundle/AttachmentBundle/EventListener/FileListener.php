@@ -51,6 +51,7 @@ class FileListener
         $entity = $args->getEntity();
         if ($entity instanceof File) {
             $this->manager->upload($entity);
+            $this->manager->checkOnDelete($entity, $args->getEntityManager());
         }
     }
 

@@ -12,7 +12,7 @@
 {% block navButtons %}
     {% if resource_granted('CREATE', 'entity:' ~ entity_class) %}
         {{ UI.addButton({
-            'path': path('oro_entity_update', {'entity_id': entity_id}),
+            'path': path('oro_entity_update', {'entityName': entity_name}),
             'entity_label': label|trans,
         }) }}
     {% endif %}

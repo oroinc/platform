@@ -236,7 +236,8 @@ class Email extends ExtendEmail
      * Set email subject
      *
      * @param string $subject
-     * @return $this
+     *
+     * @return Email
      */
     public function setSubject($subject)
     {
@@ -259,7 +260,8 @@ class Email extends ExtendEmail
      * Set FROM email name
      *
      * @param string $fromName
-     * @return $this
+     *
+     * @return Email
      */
     public function setFromName($fromName)
     {
@@ -282,7 +284,8 @@ class Email extends ExtendEmail
      * Set FROM email address
      *
      * @param EmailAddress $fromEmailAddress
-     * @return $this
+     *
+     * @return Email
      */
     public function setFromEmailAddress(EmailAddress $fromEmailAddress)
     {
@@ -315,8 +318,9 @@ class Email extends ExtendEmail
     /**
      * Add recipient
      *
-     * @param  EmailRecipient $recipient
-     * @return $this
+     * @param EmailRecipient $recipient
+     *
+     * @return Email
      */
     public function addRecipient(EmailRecipient $recipient)
     {
@@ -341,7 +345,8 @@ class Email extends ExtendEmail
      * Set date/time when email received
      *
      * @param \DateTime $receivedAt
-     * @return $this
+     *
+     * @return Email
      */
     public function setReceivedAt($receivedAt)
     {
@@ -364,7 +369,8 @@ class Email extends ExtendEmail
      * Set date/time when email sent
      *
      * @param \DateTime $sentAt
-     * @return $this
+     *
+     * @return Email
      */
     public function setSentAt($sentAt)
     {
@@ -387,7 +393,8 @@ class Email extends ExtendEmail
      * Set email importance
      *
      * @param integer $importance Can be one of *_IMPORTANCE constants
-     * @return $this
+     *
+     * @return Email
      */
     public function setImportance($importance)
     {
@@ -410,7 +417,8 @@ class Email extends ExtendEmail
      * Set email internal date receives from an email server
      *
      * @param \DateTime $internalDate
-     * @return $this
+     *
+     * @return Email
      */
     public function setInternalDate($internalDate)
     {
@@ -433,7 +441,8 @@ class Email extends ExtendEmail
      * Set value of email Message-ID header
      *
      * @param string $messageId
-     * @return $this
+     *
+     * @return Email
      */
     public function setMessageId($messageId)
     {
@@ -456,7 +465,8 @@ class Email extends ExtendEmail
      * Set email message id uses for group related messages
      *
      * @param string $xMessageId
-     * @return $this
+     *
+     * @return Email
      */
     public function setXMessageId($xMessageId)
     {
@@ -479,7 +489,8 @@ class Email extends ExtendEmail
      * Set email thread id uses for group related messages
      *
      * @param string $xThreadId
-     * @return $this
+     *
+     * @return Email
      */
     public function setXThreadId($xThreadId)
     {
@@ -501,7 +512,17 @@ class Email extends ExtendEmail
     /**
      * @param EmailFolder $folder
      *
-     * @return $this
+     * @return bool
+     */
+    public function hasFolder(EmailFolder $folder)
+    {
+        return $this->folders->contains($folder);
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return Email
      */
     public function addFolder(EmailFolder $folder)
     {
@@ -515,15 +536,15 @@ class Email extends ExtendEmail
     /**
      * @param EmailFolder $folder
      *
-     * @return boolean
+     * @return Email
      */
     public function removeFolder(EmailFolder $folder)
     {
         if ($this->folders->contains($folder)) {
-            return $this->folders->removeElement($folder);
+            $this->folders->removeElement($folder);
         }
 
-        return false;
+        return $this;
     }
 
     /**
@@ -543,8 +564,9 @@ class Email extends ExtendEmail
     /**
      * Set email body
      *
-     * @param  EmailBody $emailBody
-     * @return $this
+     * @param EmailBody $emailBody
+     *
+     * @return Email
      */
     public function setEmailBody(EmailBody $emailBody)
     {
