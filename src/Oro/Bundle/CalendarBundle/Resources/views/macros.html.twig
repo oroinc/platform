@@ -59,7 +59,7 @@
 
         var options = {
             el: {{ containerSelector|json_encode|raw }},
-            calendar: {{ entity.id }},
+            calendar: {{ entity.id|json_encode|raw }},
             collection: events,
             eventsOptions: {
                 subordinate: true,
