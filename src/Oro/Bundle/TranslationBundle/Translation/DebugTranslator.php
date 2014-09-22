@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Translation;
-
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+namespace Oro\Bundle\TranslationBundle\Translation;
 
 class DebugTranslator extends Translator
 {
