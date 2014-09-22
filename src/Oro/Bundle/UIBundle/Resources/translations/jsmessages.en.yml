@@ -35,9 +35,9 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
+Ok: Ok
 
 oro:
     ui:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
-        report_column_editor: the Report Column Editor

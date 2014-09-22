@@ -12,7 +12,6 @@ define(function (require) {
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        Modal = require('oroui/js/modal'),
         EntityFieldsUtil = require('oroentity/js/entity-fields-util'),
         mediator = require('oroui/js/mediator');
     require('oroentity/js/field-choice');
@@ -77,40 +76,35 @@ define(function (require) {
         },
 
         onBeforeSubmit: function (e) {
-            var messages = [], modal, message, componentNames = [], thisCopy = this;
-            this.trigger('check-state', messages);
-            if (!messages.length) {
+            var allErrors = [], modal, errors, unsavedComponents = [];
+            this.trigger('check-state', allErrors);
+            if (!allErrors.length) {
                 // Normal exit, form submitted
+                this.trigger('before-submit');
                 return;
             }
-            e.preventDefault();
 
-            for (var i = 0; i < messages.length; i++) {
-                message = messages[i];
-                switch (message.type) {
-                    case "UNSAVED_CHANGES":
-                        componentNames.push(message.componentName);
-                        break;
-                    default:
-                        throw "Unrecognized message type";
+            for (var i = 0; i < allErrors.length; i++) {
+                errors = allErrors[i];
+                if (errors.indexOf("UNSAVED_CHANGES") !== -1) {
+                    unsavedComponents.push(errors.componentName);
                 }
             }
 
-            modal = new Modal({
-                title: __('oro.segment.unsaved_changes'),
-                content: __('oro.segment.unsaved_changes_ask_with_names', {components: componentNames.join(', ')}),
-                okCloses: true
+            modal = new DeleteConfirmation({
+                title: __('oro.segment.confirm.unsaved_changes.title'),
+                content: __('oro.segment.confirm.unsaved_changes.message', {components: unsavedComponents.join(', ')}),
+                okCloses: true,
+                okText: __('Ok')
             });
 
-            modal.open(function () {
-                thisCopy.trigger('clean-before-submit');
-                thisCopy.form[0].submit();
-                // show loading mask
-                // @todo don't call it manually here
-                mediator.trigger('page:beforeChange');
-            });
+            modal.open(_.bind(function () {
+                this.trigger('before-submit');
+                this.form.trigger('submit');
+            }, this));
 
-            return;
+            // prevent form submitting
+            e.preventDefault();
         },
 
         /**
@@ -322,6 +316,18 @@ define(function (require) {
                 collection: collection
             }));
 
+            this.on('check-state', function (messages) {
+                var message = $editor.itemsManagerEditor('checkState');
+                if (message) {
+                    message.componentName = __('oro.segment.grouping_editor');
+                    messages.push(message);
+                }
+            });
+
+            this.on('before-submit', function () {
+                $editor.itemsManagerEditor('reset');
+            });
+
             // setup Items Manager's table
             template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
             $table.itemsManagerTable({
@@ -427,11 +433,12 @@ define(function (require) {
             this.on('check-state', function (messages) {
                 var message = $editor.itemsManagerEditor('checkState');
                 if (message) {
+                    message.componentName = __('oro.segment.report_column_editor');
                     messages.push(message);
                 }
             });
 
-            this.on('clean-before-submit', function () {
+            this.on('before-submit', function () {
                 $editor.itemsManagerEditor('reset');
             });
 

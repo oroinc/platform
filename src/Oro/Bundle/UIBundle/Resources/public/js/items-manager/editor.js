@@ -36,12 +36,12 @@ define([
         },
 
         /**
-         * Should return error message if required
+         * Should return array with validation errors keys
          *
-         * @returns {object} message description
+         * @returns {array}
          */
         checkState: function () {
-            return !this.touched ? null : { componentName: __('oro.ui.report_column_editor'), type: "UNSAVED_CHANGES"};
+            return !this.touched ? null : ["UNSAVED_CHANGES"];
         },
 
         _create: function () {
