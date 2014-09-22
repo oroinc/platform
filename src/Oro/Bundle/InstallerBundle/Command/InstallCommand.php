@@ -491,7 +491,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $assetsOptions = array(
             '--exclude' => array('OroInstallerBundle')
         );
-        if ($input->getOption('symlink')) {
+        if ($input->hasOption('symlink')) {
             $assetsOptions['--symlink'] = true;
         }
 

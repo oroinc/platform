@@ -24,7 +24,13 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Forces operation to be executed.'
             )
-            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Timeout for child command execution', 300)
+            ->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Timeout for child command execution',
+                CommandExecutor::DEFAULT_TIMEOUT
+            )
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it') ;
     }
 
@@ -39,7 +45,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $assetsOptions = array(
                 '--exclude' => array('OroInstallerBundle')
             );
-            if ($input->getOption('symlink')) {
+            if ($input->hasOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
 
