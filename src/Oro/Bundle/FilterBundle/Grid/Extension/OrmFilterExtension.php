@@ -30,6 +30,9 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /**
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -74,6 +77,7 @@ class OrmFilterExtension extends AbstractExtension
     {
         $filters = $this->getFiltersToApply($config);
         $values  = $this->getValuesToApply($config);
+        /** @var OrmDatasource $datasource */
         $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
@@ -216,29 +220,23 @@ class OrmFilterExtension extends AbstractExtension
      * Takes param from request and merge with default filters
      *
      * @param DatagridConfiguration $config
-     * @param bool $readParameters
+     * @param bool                  $readParameters
      *
      * @return array
      */
     protected function getValuesToApply(DatagridConfiguration $config, $readParameters = true)
     {
-        $result         = array();
-        $filters        = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
 
-        if ($readParameters) {
-            $filterBy = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
-        } else {
-            $filterBy = $defaultFilters;
+        if (!$readParameters) {
+            return $defaultFilters;
         }
 
-        foreach ($filterBy as $column => $value) {
-            if (isset($filters[$column])) {
-                $result[$column] = $value;
-            }
+        if (!$this->getParameters()->all()) {
+            return $defaultFilters;
         }
 
-        return $result;
+        return $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
     }
 
     /**
