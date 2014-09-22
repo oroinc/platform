@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -18,13 +18,13 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
     private $now;
 
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EmailEntityBuilder $emailEntityBuilder,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
         KnownEmailAddressChecker $knownEmailAddressChecker
     ) {
-        parent::__construct($em, $emailEntityBuilder, $emailAddressManager, $emailAddressHelper);
+        parent::__construct($doctrine, $emailEntityBuilder, $emailAddressManager, $emailAddressHelper);
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
     }
 
@@ -42,7 +42,7 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
     {
         return new TestEmailSynchronizationProcessor(
             $this->log,
-            $this->em,
+            $this->getEntityManager(),
             $this->emailEntityBuilder,
             $this->emailAddressManager,
             $this->knownEmailAddressChecker

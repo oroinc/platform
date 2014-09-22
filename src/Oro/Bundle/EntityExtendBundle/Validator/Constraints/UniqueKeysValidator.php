@@ -14,6 +14,10 @@ class UniqueKeysValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (empty($value)) {
+            return;
+        }
+
         /** @var UniqueKeys $constraint */
         $names = ArrayUtils::arrayColumn($value, 'name');
         if ($names != array_unique($names)) {

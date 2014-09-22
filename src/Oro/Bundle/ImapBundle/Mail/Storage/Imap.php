@@ -5,9 +5,14 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 class Imap extends \Zend\Mail\Storage\Imap
 {
     const RFC822_HEADER = 'RFC822.HEADER';
-    const FLAGS = 'FLAGS';
-    const UID = 'UID';
-    const INTERNALDATE = 'INTERNALDATE';
+    const FLAGS         = 'FLAGS';
+    const UID           = 'UID';
+    const INTERNALDATE  = 'INTERNALDATE';
+
+    /**
+     * Indicates whether IMAP server can store the same message in different folders
+     */
+    const CAPABILITY_MSG_MULTI_FOLDERS = 'X_MSG_MULTI_FOLDERS';
 
     /**
      * UIDVALIDITY of currently selected folder
@@ -18,8 +23,17 @@ class Imap extends \Zend\Mail\Storage\Imap
 
     /**
      * Items to be returned by getMessage
+     *
+     * @var array
      */
     protected $getMessageItems;
+
+    /**
+     * A local cache of IMAP server capabilities
+     *
+     * @var array
+     */
+    private $capability;
 
     /**
      * This flag is used to prevent closing the default storage socket
@@ -59,7 +73,11 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function capability()
     {
-        return $this->protocol->capability();
+        if ($this->capability === null) {
+            $this->capability = $this->getCapability();
+        }
+
+        return $this->capability;
     }
 
     /**
@@ -105,12 +123,14 @@ class Imap extends \Zend\Mail\Storage\Imap
         foreach ($folders as $globalName => $data) {
             do {
                 if (!$parent || strpos($globalName, $parent) === 0) {
-                    $pos = strrpos($globalName, $data['delim']);
-                    if ($pos === false) {
+                    // build local name based on global name
+                    $lastDelimPosition = strrpos($globalName, $data['delim']);
+                    if ($lastDelimPosition === false) {
                         $localName = $globalName;
                     } else {
-                        $localName = substr($globalName, $pos + 1);
+                        $localName = substr($globalName, $lastDelimPosition + 1);
                     }
+
                     $selectable = !$data['flags'] || !in_array('\\Noselect', $data['flags']);
 
                     array_push($stack, $parent);
@@ -157,28 +177,29 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function getMessage($id)
     {
-        $data = $this->protocol->fetch($this->getMessageItems, $id);
-        $header = $data[self::RFC822_HEADER];
+        return $this->createMessageObject(
+            $id,
+            $this->protocol->fetch($this->getMessageItems, $id)
+        );
+    }
 
-        $flags = array();
-        foreach ($data[self::FLAGS] as $flag) {
-            $flags[] = isset(static::$knownFlags[$flag]) ? static::$knownFlags[$flag] : $flag;
+    /**
+     * Get a messages with headers and body
+     *
+     * @param int[] $ids int numbers of messages
+     *
+     * @return Message[] key = message id
+     */
+    public function getMessages($ids)
+    {
+        $messages = [];
+
+        $items = $this->protocol->fetch($this->getMessageItems, $ids);
+        foreach ($items as $id => $data) {
+            $messages[$id] = $this->createMessageObject($id, $data);
         }
 
-        /** @var \Zend\Mail\Storage\Message $message */
-        $message = new $this->messageClass(
-            array(
-                'handler' => $this,
-                'id' => $id,
-                'headers' => $header,
-                'flags' => $flags
-            )
-        );
-
-        $headers = $message->getHeaders();
-        $this->setExtHeaders($headers, $data);
-
-        return $message;
+        return $messages;
     }
 
     /**
@@ -234,6 +255,49 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         parent::close();
+    }
+
+    /**
+     * Creates Message object based on the given data
+     *
+     * @param int   $id
+     * @param array $data
+     *
+     * @return Message
+     */
+    protected function createMessageObject($id, array $data)
+    {
+        $header = $data[self::RFC822_HEADER];
+
+        $flags = [];
+        foreach ($data[self::FLAGS] as $flag) {
+            $flags[] = isset(static::$knownFlags[$flag]) ? static::$knownFlags[$flag] : $flag;
+        }
+
+        /** @var \Zend\Mail\Storage\Message $message */
+        $message = new $this->messageClass(
+            [
+                'handler' => $this,
+                'id'      => $id,
+                'headers' => $header,
+                'flags'   => $flags
+            ]
+        );
+
+        $headers = $message->getHeaders();
+        $this->setExtHeaders($headers, $data);
+
+        return $message;
+    }
+
+    /**
+     * Get capabilities from IMAP server
+     *
+     * @return string[] list of capabilities
+     */
+    protected function getCapability()
+    {
+        return $this->protocol->capability();
     }
 
     /**

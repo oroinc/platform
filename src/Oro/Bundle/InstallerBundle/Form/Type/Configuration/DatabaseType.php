@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 
 class DatabaseType extends AbstractType
 {
@@ -24,6 +25,7 @@ class DatabaseType extends AbstractType
                     ),
                     'constraints' => array(
                         new Assert\NotBlank(),
+                        new ExtensionLoaded(),
                     ),
                 )
             )
