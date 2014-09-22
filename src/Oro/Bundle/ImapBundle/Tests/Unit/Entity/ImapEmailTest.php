@@ -2,49 +2,45 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_STRING    = 'testString';
-    const TEST_ID        = 123;
-    const TEST_FLOAT     = 123.123;
-
-    /** @var ImapEmail */
-    protected $entity;
-
-    protected function setUp()
+    public function testGetId()
     {
-        $this->entity = new ImapEmail();
+        $imapEmail = new ImapEmail();
+        ReflectionUtil::setId($imapEmail, 123);
+        $this->assertEquals(123, $imapEmail->getId());
     }
 
-    /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
-     */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testUidGetterAndSetter()
     {
-        if (method_exists($this->entity, 'set' . ucfirst($property))) {
-            if ($value !== null) {
-                call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
-            }
-        }
-
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $imapEmail = new ImapEmail();
+        $this->assertNull($imapEmail->getUid());
+        $imapEmail->setUid(123);
+        $this->assertEquals(123, $imapEmail->getUid());
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function testEmailGetterAndSetter()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email', array(), array(), '', false);
-        return [
-            'uid'        => ['uid', self::TEST_ID, self::TEST_ID],
-            'email'        => ['email', $email, $email],
-        ];
+        $email = new Email();
+
+        $imapEmail = new ImapEmail();
+        $this->assertNull($imapEmail->getEmail());
+        $imapEmail->setEmail($email);
+        $this->assertSame($email, $imapEmail->getEmail());
+    }
+
+    public function testImapFolderGetterAndSetter()
+    {
+        $folder = new ImapEmailFolder();
+
+        $imapEmail = new ImapEmail();
+        $this->assertNull($imapEmail->getImapFolder());
+        $imapEmail->setImapFolder($folder);
+        $this->assertSame($folder, $imapEmail->getImapFolder());
     }
 }
