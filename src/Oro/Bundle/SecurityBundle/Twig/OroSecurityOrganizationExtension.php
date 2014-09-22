@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Twig;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Security\Core\SecurityContextInterface;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class OroSecurityOrganizationExtension extends \Twig_Extension
 {
@@ -28,9 +30,13 @@ class OroSecurityOrganizationExtension extends \Twig_Extension
     {
         return [
             'get_enabled_organizations' => new \Twig_SimpleFunction('get_enabled_organizations', [
-                    $this,
-                    'getOrganizations'
-                ]),
+                $this,
+                'getOrganizations'
+            ]),
+            'get_current_organization' => new \Twig_SimpleFunction('get_current_organization', [
+                $this,
+                'getCurrentOrganization'
+            ]),
         ];
     }
 
@@ -43,10 +49,21 @@ class OroSecurityOrganizationExtension extends \Twig_Extension
     }
 
     /**
-     * @return ArrayCollection
+     * @return Organization[]
      */
     public function getOrganizations()
     {
-        return $this->securityContext->getToken()->getUser()->getOrganizations(true);
+        $token = $this->securityContext->getToken();
+        $user = $token ? $token->getUser() : null;
+        return $user instanceof User ? $user->getOrganizations(true)->toArray() : [];
+    }
+
+    /**
+     * @return Organization|null
+     */
+    public function getCurrentOrganization()
+    {
+        $token = $this->securityContext->getToken();
+        return $token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null;
     }
 }
