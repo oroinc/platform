@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
 use Doctrine\DBAL\DBALException;
 
+use Doctrine\ORM\ORMException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -83,6 +84,8 @@ class QueryValidator extends ConstraintValidator
         try {
             $dataSource->getResults();
         } catch (DBALException $e) {
+            $this->context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
+        } catch (ORMException $e) {
             $this->context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
         } catch (InvalidConfigurationException $e) {
             $this->context->addViolation($constraint->message);
