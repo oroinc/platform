@@ -39,7 +39,7 @@ services:
         scope: prototype
         class: %oro_imap.email_synchronizer.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @oro_email.email.entity.builder
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper

@@ -19,7 +19,6 @@ class GmailImap extends Imap
     {
         parent::__construct($params);
         array_push($this->getMessageItems, self::X_GM_MSGID, self::X_GM_THRID, self::X_GM_LABELS);
-
     }
 
     /**
@@ -35,6 +34,17 @@ class GmailImap extends Imap
         }
 
         return parent::search($criteria);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCapability()
+    {
+        $capability   = parent::getCapability();
+        $capability[] = self::CAPABILITY_MSG_MULTI_FOLDERS;
+
+        return $capability;
     }
 
     /**

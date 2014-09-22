@@ -26,7 +26,7 @@
                     if (!view.isEmpty()) {
                         var confirm = new DeleteConfirmation({
                             title: __('Change Entity Confirmation'),
-                            okText: __('Yes, I Agree'),
+                            okText: __('Yes'),
                             content: __('oro.email.emailtemplate.change_entity_confirmation')
                         });
                         confirm.on('ok', function () {
@@ -278,7 +278,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}">{{ title }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
@@ -315,14 +315,11 @@
         attachments - an array of Oro\Bundle\EmailBundle\Entity\EmailAttachment
 #}
 {% macro attachments(attachments) -%}
-    {% macro attachment_row_data(values) -%}
-        {%- for val in values -%}
-        <a class="no-hash" href="{{ path('oro_email_attachment', {id:val.id}) }}">
-            <span class="label label-info">{{ val.fileName }}</span>
-        </a>
-        {%- endfor -%}
-    {%- endmacro -%}
-    {{ _self.attachment_row_data(attachments)|raw }}
+    {%- for attachment in attachments -%}
+    <a class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+        <span class="label label-info">{{ attachment.fileName }}</span>
+    </a>
+    {%- endfor -%}
 {%- endmacro %}
 
 {#
@@ -335,7 +332,7 @@
     {% if emailBody.bodyIsText -%}
         <pre class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}">{{ emailBody.bodyContent }}</pre>
     {%- else -%}
-        <iframe class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}" src="{{ path('oro_email_body', {id:emailBody.id}) }}"></iframe>
+        <iframe sandbox="" class="email-body{% if cssClass is defined %} {{ cssClass }}{% endif %}" src="{{ path('oro_email_body', {id:emailBody.id}) }}"></iframe>
     {%- endif %}
 {%- endmacro %}
 

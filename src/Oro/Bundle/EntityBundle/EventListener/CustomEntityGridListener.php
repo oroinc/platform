@@ -61,8 +61,8 @@ class CustomEntityGridListener
             return $router->generate(
                 $route,
                 [
-                    'entity_id' => str_replace('\\', '_', $className),
-                    'id'        => $record->getValue('id')
+                    'entityName' => str_replace('\\', '_', $className),
+                    'id' => $record->getValue('id')
                 ]
             );
         };
