@@ -7,12 +7,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Parser;
-
-use Oro\Component\Log\OutputLogger;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
+use Oro\Component\Log\OutputLogger;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;

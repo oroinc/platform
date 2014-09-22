@@ -3,24 +3,24 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use JMS\Serializer\Annotation as JMS;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
  * Email Folder
  *
- * @ORM\Table(name="oro_email_folder")
+ * @ORM\Table(
+ *      name="oro_email_folder",
+ *      indexes={@Index(name="email_folder_outdated_at_idx", columns={"outdated_at"})}
+ * )
  * @ORM\Entity
  */
 class EmailFolder
 {
-    const INBOX  = 'inbox';
-    const SENT   = 'sent';
-    const TRASH  = 'trash';
-    const DRAFTS = 'drafts';
-    const OTHER  = 'other';
-
     /**
      * @var integer
      *
@@ -70,7 +70,7 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="Email", mappedBy="folders", cascade={"persist"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emails;
@@ -81,6 +81,13 @@ class EmailFolder
      * @ORM\Column(name="synchronized", type="datetime", nullable=true)
      */
     protected $synchronizedAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
+     */
+    protected $outdatedAt;
 
     public function __construct()
     {
@@ -111,7 +118,8 @@ class EmailFolder
      * Set folder name
      *
      * @param string $name
-     * @return $this
+     *
+     * @return EmailFolder
      */
     public function setName($name)
     {
@@ -134,7 +142,8 @@ class EmailFolder
      * Set full name of this folder
      *
      * @param string $fullName
-     * @return $this
+     *
+     * @return EmailFolder
      */
     public function setFullName($fullName)
     {
@@ -156,8 +165,9 @@ class EmailFolder
     /**
      * Set folder type
      *
-     * @param string $type Can be 'inbox', 'sent', 'trash', 'drafts' or 'other'
-     * @return $this
+     * @param string $type One of FolderType constants
+     *
+     * @return EmailFolder
      */
     public function setType($type)
     {
@@ -180,7 +190,8 @@ class EmailFolder
      * Set email folder origin
      *
      * @param EmailOrigin $origin
-     * @return $this
+     *
+     * @return EmailFolder
      */
     public function setOrigin(EmailOrigin $origin)
     {
@@ -202,12 +213,29 @@ class EmailFolder
     /**
      * Add email
      *
-     * @param  Email $email
-     * @return $this
+     * @param Email $email
+     *
+     * @return EmailFolder
      */
     public function addEmail(Email $email)
     {
-        $this->emails[] = $email;
+        if (!$this->emails->contains($email)) {
+            $this->emails->add($email);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return EmailFolder
+     */
+    public function removeEmail(Email $email)
+    {
+        if ($this->emails->contains($email)) {
+            $this->emails->removeElement($email);
+        }
 
         return $this;
     }
@@ -226,6 +254,7 @@ class EmailFolder
      * Set date/time when emails in this folder were synchronized
      *
      * @param \DateTime $synchronizedAt
+     *
      * @return EmailOrigin
      */
     public function setSynchronizedAt($synchronizedAt)
@@ -233,6 +262,34 @@ class EmailFolder
         $this->synchronizedAt = $synchronizedAt;
 
         return $this;
+    }
+
+    /**
+     * @param \DateTime $outdatedAt
+     *
+     * @return EmailFolder
+     */
+    public function setOutdatedAt($outdatedAt = null)
+    {
+        $this->outdatedAt = $outdatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getOutdatedAt()
+    {
+        return $this->outdatedAt;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutdated()
+    {
+        return $this->outdatedAt !== null;
     }
 
     /**

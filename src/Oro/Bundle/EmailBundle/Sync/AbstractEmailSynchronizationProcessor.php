@@ -9,12 +9,15 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Model\EmailHeader;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 abstract class AbstractEmailSynchronizationProcessor
 {
+    /** Determines how many emails can be stored in a database at once */
     const DB_BATCH_SIZE = 30;
 
     /**
@@ -69,43 +72,100 @@ abstract class AbstractEmailSynchronizationProcessor
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * Gets a list of email addresses which have an owner
-     * Email addresses are sorted by modification date; newest at the top
+     * @param EmailHeader $email
+     * @param string      $folderType
      *
-     * @return EmailAddress[]
+     * @return bool
      */
-    protected function getKnownEmailAddresses()
+    protected function isApplicableEmail(EmailHeader $email, $folderType)
     {
-        $this->log->notice('Loading known email addresses ...');
-
-        $repo           = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $query          = $repo->createQueryBuilder('a')
-            ->select('partial a.{id, email, updated}')
-            ->where('a.hasOwner = ?1')
-            ->orderBy('a.updated', 'DESC')
-            ->setParameter(1, true)
-            ->getQuery();
-        $emailAddresses = $query->getResult();
-
-        $this->log->notice(sprintf('Loaded %d email address(es).', count($emailAddresses)));
-
-        return $emailAddresses;
+        if ($folderType === FolderType::SENT) {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getToRecipients(),
+                $email->getCcRecipients(),
+                $email->getBccRecipients()
+            );
+        } else {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getFrom()
+            );
+        }
     }
 
     /**
-     * @param EmailEntity[]|array $emails
-     *
-     * @return array
+     * @param EmailHeader[] $emails
+     * @param string        $folderType
      */
-    protected function getEmailsByMessageId(array $emails)
+    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
     {
-        $result = [];
-
-        /** @var EmailEntity $email */
+        $addresses = [];
         foreach ($emails as $email) {
-            $result[$email->getMessageId()] = $email;
+            if ($folderType === FolderType::SENT) {
+                $addresses[] = $email->getToRecipients();
+                $addresses[] = $email->getCcRecipients();
+                $addresses[] = $email->getBccRecipients();
+            } else {
+                $addresses[] = $email->getFrom();
+            }
+        }
+        $this->knownEmailAddressChecker->preLoadEmailAddresses($addresses);
+    }
+
+    /**
+     * Creates email entity and register it in the email entity batch processor
+     *
+     * @param EmailHeader       $email
+     * @param EmailFolder $folder
+     *
+     * @return EmailEntity
+     */
+    protected function addEmail(EmailHeader $email, EmailFolder $folder)
+    {
+        $emailEntity = $this->emailEntityBuilder->email(
+            $email->getSubject(),
+            $email->getFrom(),
+            $email->getToRecipients(),
+            $email->getSentAt(),
+            $email->getReceivedAt(),
+            $email->getInternalDate(),
+            $email->getImportance(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+        $emailEntity
+            ->addFolder($folder)
+            ->setMessageId($email->getMessageId())
+            ->setXMessageId($email->getXMessageId())
+            ->setXThreadId($email->getXThreadId());
+
+        return $emailEntity;
+    }
+
+    /**
+     * Checks if the given folders types are comparable.
+     * For example two "Sent" folders are comparable, "Inbox" and "Other" folders
+     * are comparable as well, but "Inbox" and "Sent" folders are not comparable
+     *
+     * @param string $folderType1
+     * @param string $folderType2
+     *
+     * @return bool
+     */
+    protected function isComparableFolders($folderType1, $folderType2)
+    {
+        if ($folderType1 === $folderType2) {
+            return true;
+        }
+        if ($folderType1 === FolderType::OTHER) {
+            $folderType1 = FolderType::INBOX;
+        }
+        if ($folderType2 === FolderType::OTHER) {
+            $folderType2 = FolderType::INBOX;
+        }
+        if ($folderType1 === $folderType2) {
+            return true;
         }
 
-        return $result;
+        return false;
     }
 }
