@@ -1,19 +1,19 @@
 oro_system_configuration:
     groups:
         look_and_feel:
-            title:       'Display settings'
+            title:       oro.datagrid.system_configuration.groups.look_and_feel.title
             icon:        'icon-eye-open'
             page_reload: true
 
         grid_settings:
-            title: 'Data Grid settings'
+            title:       oro.datagrid.system_configuration.groups.grid_settings.title
 
     fields:
         oro_data_grid.default_per_page:
             data_type: integer
             type: choice
             options:
-                label:    'Items per Page by Default'
+                label: oro.datagrid.system_configuration.fields.default_per_page.label
                 choices:
                     10:     10
                     25:     25

@@ -57,3 +57,21 @@ oro:
             delete:       Delete
             view:         View
             update:       Update
+
+        system_configuration:
+            groups:
+                tracking.title: 'Tracking'
+                tracking_settings.title: 'Tracking settings'
+            fields:
+                dynamic_tracking_enabled.label: 'Enable dynamic tracking'
+                log_rotate_interval:
+                    label: 'Log Rotation Interval'
+                    choices:
+                        60: '1 hour'
+                        30: '30 minutes'
+                        20: '20 minutes'
+                        15: '15 minutes'
+                        10: '10 minutes'
+                        5:  '5 minutes'
+                piwik_host.label: 'Piwik Host'
+                piwik_token_auth.label: 'Piwik Token Auth'

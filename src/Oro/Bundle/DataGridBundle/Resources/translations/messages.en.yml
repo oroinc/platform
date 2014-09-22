@@ -15,3 +15,11 @@
 "oro.grid.datagrid.page_size.all": "All"
 "oro.grid.mass_action.delete.success_message": "{0} No entities were removed|{1} One entity was removed|]1,Inf[ %count% entities were removed"
 "oro.grid.export.csv": "CSV"
+
+oro.datagrid:
+    system_configuration:
+        groups:
+            look_and_feel.title: 'Display settings'
+            grid_settings.title: 'Data Grid settings'
+        fields:
+            default_per_page.label: 'Items per Page by Default'
