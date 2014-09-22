@@ -39,14 +39,18 @@
 {% endif %}
 
 {% macro organization_name_and_logo(organization_name) %}
-    {% set logo = oro_theme_logo() %}
-    <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
-        <a href="{{ path('oro_default') }}" {% if organization_name|length %}title="{{ organization_name }}"{% endif %}>
-            {% if logo %}
-                <img src="{{ asset(logo) }}" {% if organization_name %}alt="{{ organization_name }}"{% endif %}>
-            {% else %}
-                {{ organization_name }}
-            {% endif %}
-        </a>
-    </h1>
+    {% if organization_name|length %}
+        {% set logo = oro_theme_logo() %}
+        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
+                {% if logo %}
+                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
+                {% else %}
+                    {{- organization_name -}}
+                {% endif %}
+            </a>
+        </h1>
+    {% else %}
+        <span class="logo-placeholder"></span>
+    {% endif %}
 {% endmacro %}
