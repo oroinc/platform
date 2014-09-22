@@ -96,7 +96,9 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
      */
     protected function getNewData($data)
     {
-        $data['ownership'] = array_merge($data['ownership'], $this->ownershipData);
+        $data['ownership'] = (isset($data['ownership'])) ?
+            $data['ownership'] = array_merge($data['ownership'], $this->ownershipData) :
+            $data['ownership'] = $this->ownershipData;
 
         return $data;
     }
