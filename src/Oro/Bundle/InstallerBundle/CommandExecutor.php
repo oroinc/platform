@@ -13,6 +13,8 @@ use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class CommandExecutor
 {
+    const DEFAULT_TIMEOUT = 300;
+
     /**
      * @var string|null
      */
@@ -41,7 +43,7 @@ class CommandExecutor
     /**
      * @var int
      */
-    protected $defaultTimeout = 300;
+    protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
     /**
      * Constructor

@@ -36,7 +36,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
-            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Timeout for child command execution', 300)
+            ->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Timeout for child command execution',
+                CommandExecutor::DEFAULT_TIMEOUT
+            )
             ->addOption(
                 'sample-data',
                 null,
@@ -418,6 +424,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
+                    '--timeout'           => $commandExecutor->getDefaultTimeout()
                 ]
             )
             ->runCommand(
