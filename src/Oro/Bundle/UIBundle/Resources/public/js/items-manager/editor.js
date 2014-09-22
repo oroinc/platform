@@ -2,9 +2,8 @@
 /*jslint nomen: true*/
 define([
     'jquery',
-    'orotranslation/js/translator',
     'jquery-ui'
-], function ($, __) {
+], function ($) {
     'use strict';
 
     function setValue($elem, value) {
