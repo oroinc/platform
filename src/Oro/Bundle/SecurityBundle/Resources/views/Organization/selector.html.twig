@@ -40,15 +40,13 @@
 
 {% macro organization_name_and_logo(organization_name) %}
     {% set logo = oro_theme_logo() %}
-    {% if organization_name|length or logo %}
-        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
-            <a href="{{ path('oro_default') }}" {% if organization_name|length %}title="{{ organization_name }}"{% endif %}>
-                {% if logo %}
-                    <img src="{{ asset(logo) }}" {% if organization_name %}alt="{{ organization_name }}"{% endif %}>
-                {% else %}
-                    {{ organization_name }}
-                {% endif %}
-            </a>
-        </h1>
-    {% endif %}
+    <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+        <a href="{{ path('oro_default') }}" {% if organization_name|length %}title="{{ organization_name }}"{% endif %}>
+            {% if logo %}
+                <img src="{{ asset(logo) }}" {% if organization_name %}alt="{{ organization_name }}"{% endif %}>
+            {% else %}
+                {{ organization_name }}
+            {% endif %}
+        </a>
+    </h1>
 {% endmacro %}
