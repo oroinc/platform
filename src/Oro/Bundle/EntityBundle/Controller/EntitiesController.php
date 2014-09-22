@@ -13,13 +13,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -31,6 +29,10 @@ class EntitiesController extends Controller
 {
     /**
      * Grid of Custom/Extend entity.
+     *
+     * @param string $entityName
+     *
+     * @return array
      *
      * @Route(
      *      "/{entityName}",
@@ -66,6 +68,12 @@ class EntitiesController extends Controller
     }
 
     /**
+     * @param string $id
+     * @param string $entityName
+     * @param string $fieldName
+     *
+     * @return array
+     *
      * @Route(
      *      "/detailed/{id}/{entityName}/{fieldName}",
      *      name="oro_entity_detailed",
@@ -92,36 +100,51 @@ class EntitiesController extends Controller
             throw $this->createNotFoundException();
         }
 
+        /** @var ConfigInterface[] $fields */
         $fields = $extendProvider->filter(
             function (ConfigInterface $config) use ($relationConfig) {
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $config->getId();
+
                 return
                     !$config->is('state', ExtendScope::STATE_NEW)
                     && !$config->is('is_deleted')
-                    && $config->getId() instanceof FieldConfigId
-                    && in_array($config->getId()->getFieldName(), (array)$relationConfig->get('target_detailed'));
+                    && $fieldConfigId instanceof FieldConfigId
+                    && in_array($fieldConfigId->getFieldName(), (array)$relationConfig->get('target_detailed'));
             },
             $relationConfig->get('target_entity')
         );
 
         $entity = $this->getDoctrine()->getRepository($relationTargetEntity)->find($id);
 
-        if ($entity->getId()) {
-            $dynamicRow = array();
-            foreach ($fields as $field) {
-                $fieldName          = $field->getId()->getFieldName();
-                $label              = $entityProvider->getConfigById($field->getId())->get('label') ? : $fieldName;
-                $dynamicRow[$label] = FieldAccessor::getValue($entity, $fieldName);
-            }
-
-            return array(
-                'dynamic' => $dynamicRow,
-                'entity'  => $entity
-            );
+        if (!$entity) {
+            return $this->createNotFoundException();
         }
+
+        $dynamicRow = array();
+        foreach ($fields as $field) {
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId      = $field->getId();
+            $fieldName          = $fieldConfigId->getFieldName();
+            $label              = $entityProvider->getConfigById($fieldConfigId)->get('label') ?: $fieldName;
+            $dynamicRow[$label] = FieldAccessor::getValue($entity, $fieldName);
+        }
+
+        return array(
+            'dynamic' => $dynamicRow,
+            'entity'  => $entity
+        );
     }
 
     /**
      * Grid of Custom/Extend entity.
+     *
+     * @param string $id
+     * @param string $entityName
+     * @param string $fieldName
+     *
+     * @return array
+     *
      * @Route(
      *      "/relation/{id}/{entityName}/{fieldName}",
      *      name="oro_entity_relation",
@@ -165,6 +188,12 @@ class EntitiesController extends Controller
 
     /**
      * View custom entity instance.
+     *
+     * @param string $entityName
+     * @param string $id
+     *
+     * @return array
+     *
      * @Route(
      *      "/view/{entityName}/item/{id}",
      *      name="oro_entity_view"
@@ -201,6 +230,13 @@ class EntitiesController extends Controller
 
     /**
      * Update custom entity instance.
+     *
+     * @param Request $request
+     * @param string $entityName
+     * @param string $id
+     *
+     * @return array
+     *
      * @Route(
      *      "/update/{entityName}/item/{id}",
      *      name="oro_entity_update",
@@ -275,6 +311,12 @@ class EntitiesController extends Controller
 
     /**
      * Delete custom entity instance.
+     *
+     * @param string $entityName
+     * @param string $id
+     *
+     * @return array
+     *
      * @Route(
      *      "/delete/{entityName}/item/{id}",
      *      name="oro_entity_delete"
