@@ -37,6 +37,16 @@
     float: left;
     margin: 3px 0 0 10px;
 }
+.popover {
+    max-width: 315px; /* little increase to fit usual content */
+}
+.oro-popover-content {
+    overflow-y: auto;
+    max-height: 60px;
+}
+.popover-content {
+    padding: 6px 8px;
+}
 .ui-dialog{
     position: absolute;
 }
