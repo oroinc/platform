@@ -158,9 +158,9 @@ class CustomEntityType extends AbstractType
                             'grid_url'              => $this->router->generate(
                                 'oro_entity_relation',
                                 [
-                                    'id'        => (($data && $data->getId()) ? $data->getId() : 0),
-                                    'className' => str_replace('\\', '_', $className),
-                                    'fieldName' => $fieldConfigId->getFieldName()
+                                    'id'         => (($data && $data->getId()) ? $data->getId() : 0),
+                                    'entityName' => str_replace('\\', '_', $className),
+                                    'fieldName'  => $fieldConfigId->getFieldName()
                                 ]
                             ),
                             'selector_window_title' => $selectorWindowTitle,
@@ -250,9 +250,9 @@ class CustomEntityType extends AbstractType
                         $this->router->generate(
                             'oro_entity_relation',
                             [
-                                'id'        => $dataId,
-                                'className' => str_replace('\\', '_', $className),
-                                'fieldName' => $fieldName
+                                'id'         => $dataId,
+                                'entityName' => str_replace('\\', '_', $className),
+                                'fieldName'  => $fieldName
                             ]
                         );
 
@@ -307,9 +307,9 @@ class CustomEntityType extends AbstractType
                 'link'      => $this->router->generate(
                     'oro_entity_detailed',
                     [
-                        'id'        => $entity->getId(),
-                        'className' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
-                        'fieldName' => $extendConfig->getId()->getFieldName()
+                        'id'         => $entity->getId(),
+                        'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
+                        'fieldName'  => $extendConfig->getId()->getFieldName()
                     ]
                 ),
                 'extraData' => $extraData,

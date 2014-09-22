@@ -30,6 +30,18 @@ class ImapEmailManager
     }
 
     /**
+     * Checks if IMAP server supports the given capability
+     *
+     * @param string $capability
+     *
+     * @return bool
+     */
+    public function hasCapability($capability)
+    {
+        return in_array($capability, $this->connector->getCapability());
+    }
+
+    /**
      * Get selected folder
      *
      * @return string
