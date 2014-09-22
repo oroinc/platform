@@ -43,6 +43,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'Timeout for child command execution',
                 CommandExecutor::DEFAULT_TIMEOUT
             )
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption(
                 'sample-data',
                 null,
@@ -119,7 +120,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->checkStep($output)
             ->prepareStep($commandExecutor, $input->getOption('drop-database'))
             ->loadDataStep($commandExecutor, $output)
-            ->finalStep($commandExecutor, $output);
+            ->finalStep($commandExecutor, $output, $input);
 
         $output->writeln('');
         $output->writeln(
@@ -480,12 +481,19 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
     /**
      * @param CommandExecutor $commandExecutor
      * @param OutputInterface $output
-     *
+     * @param InputInterface $input
      * @return InstallCommand
      */
-    protected function finalStep(CommandExecutor $commandExecutor, OutputInterface $output)
+    protected function finalStep(CommandExecutor $commandExecutor, OutputInterface $output, InputInterface $input)
     {
         $output->writeln('<info>Preparing application.</info>');
+
+        $assetsOptions = array(
+            '--exclude' => array('OroInstallerBundle')
+        );
+        if ($input->hasOption('symlink')) {
+            $assetsOptions['--symlink'] = true;
+        }
 
         $commandExecutor
             ->runCommand(
@@ -504,9 +512,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->runCommand('oro:localization:dump')
             ->runCommand(
                 'oro:assets:install',
-                array(
-                    '--exclude' => array('OroInstallerBundle')
-                )
+                $assetsOptions
             )
             ->runCommand(
                 'assetic:dump',
