@@ -38,10 +38,13 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
      */
     protected function createAdminDashboardModel(ObjectManager $manager, $dashboardName)
     {
+        $adminUser = $this->getAdminUser($manager);
+
         $dashboard = $this->getDashboardManager()
             ->createDashboardModel()
             ->setName($dashboardName)
-            ->setOwner($this->getAdminUser($manager));
+            ->setOwner($adminUser)
+            ->setOrganization($adminUser->getOrganization());
 
         $this->getDashboardManager()->save($dashboard);
 

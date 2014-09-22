@@ -33,10 +33,10 @@ class EmailOriginTest extends \PHPUnit_Framework_TestCase
         $entity = new TestEmailOrigin();
 
         // check  that true by default
-        $this->assertTrue($entity->getIsActive());
+        $this->assertTrue($entity->isActive());
 
         // check setter
         $entity->setIsActive(false);
-        $this->assertFalse($entity->getIsActive());
+        $this->assertFalse($entity->isActive());
     }
 }

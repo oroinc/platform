@@ -134,7 +134,7 @@ function(_, Backbone, routing, messenger, __,
         initEntityFieldsLoader: function() {
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
-                okText: __('Yes, I Agree'),
+                okText: __('Yes'),
                 content: __('oro.workflow.change_entity_confirmation')
             });
             confirm.on('ok', _.bind(function() {

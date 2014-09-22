@@ -45,9 +45,9 @@ class DashboardsManagementTest extends Selenium2TestCase
             ->assertTitle("{$dashboardName} - Manage dashboards - Dashboards");
 
         $this->assertTrue($login->isEmpty());
-        $login = $login->addWidget('Recent Emails');
-        $this->assertTrue($login->widgetExists(array('Recent Emails')));
-        $login = $login->removeWidget('Recent Emails');
-        $this->assertFalse($login->widgetExists(array('Recent Emails')));
+        $login = $login->addWidget('Quick Launchpad');
+        $this->assertTrue($login->widgetExists(array('Quick Launchpad')));
+        $login = $login->removeWidget('Quick Launchpad');
+        $this->assertFalse($login->widgetExists(array('Quick Launchpad')));
     }
 }

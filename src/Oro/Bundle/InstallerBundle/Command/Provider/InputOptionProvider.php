@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
-use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,10 +14,15 @@ class InputOptionProvider
     /** @var InputInterface */
     protected $input;
 
-    /** @var DialogHelper */
+    /** @var HelperInterface */
     protected $dialog;
 
-    public function __construct(OutputInterface $output, InputInterface $input, DialogHelper $dialog)
+    /**
+     * @param OutputInterface $output
+     * @param InputInterface  $input
+     * @param HelperInterface $dialog
+     */
+    public function __construct(OutputInterface $output, InputInterface $input, HelperInterface $dialog)
     {
         $this->output = $output;
         $this->input  = $input;

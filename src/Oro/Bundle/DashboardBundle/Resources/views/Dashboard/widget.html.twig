@@ -26,7 +26,7 @@
                         href="{{ action.url|default('javascript:void(0);') }}"
                         {% if action.data is defined %}
                             {% for dataItemName,dataItemValue in action.data %}
-                            data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+                            data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
                             {% endfor %}
                         {% endif %}
                     >{% if action.icon is defined %}<i class="icon-{{ action.icon }}"></i> {% endif %}{{ action.label }}</a>

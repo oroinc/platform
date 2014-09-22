@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
@@ -253,6 +254,26 @@ class DashboardModel implements EntityModelInterface
     public function setOwner(User $owner)
     {
         $this->getEntity()->setOwner($owner);
+        return $this;
+    }
+
+    /**
+     * Get dashboard organization
+     *
+     * @return User
+     */
+    public function getOrganization()
+    {
+        return $this->entity->getOrganization();
+    }
+
+    /**
+     * @param Organization $organization
+     * @return DashboardModel
+     */
+    public function setOrganization(Organization $organization)
+    {
+        $this->getEntity()->setOrganization($organization);
         return $this;
     }
 

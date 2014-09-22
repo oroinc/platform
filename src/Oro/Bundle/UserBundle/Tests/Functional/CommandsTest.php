@@ -32,12 +32,19 @@ class CommandsTest extends WebTestCase
         $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
         $application->setAutoExit(false);
 
-        /** @var Organization $organization */
-        $organization = $this->client
+        $doctrine =$this->client
             ->getContainer()
-            ->get('doctrine')
-            ->getRepository('OroOrganizationBundle:Organization')
+            ->get('doctrine');
+        /** @var Organization $organization */
+        $organization = $doctrine->getRepository('OroOrganizationBundle:Organization')
             ->getFirst();
+        $user = $this->client
+            ->getContainer()
+            ->get('oro_user.manager')
+            ->findUserByUsername('admin');
+        $apiKey = $doctrine->getRepository('OroUserBundle:UserApi')->findOneBy(
+            ['user' => $user, 'organization' => $organization]
+        );
 
         $command = new GenerateWSSEHeaderCommand();
         $command->setApplication($application);
@@ -46,8 +53,7 @@ class CommandsTest extends WebTestCase
             array(
                 'command' => $command->getName(),
                 '--env' => $kernel->getEnvironment(),
-                'username' => 'admin',
-                'organization' => $organization->getName()
+                'apiKey' => $apiKey->getApiKey(),
             )
         );
 

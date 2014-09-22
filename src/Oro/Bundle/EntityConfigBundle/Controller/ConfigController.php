@@ -260,7 +260,7 @@ class ConfigController extends Controller
                     ->findBy(
                         [
                             'entity' => $entity->getId(),
-                            'type'   => 'string'
+                            'type'   => array('integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money')
                         ]
                     );
 
@@ -400,7 +400,7 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['id' => str_replace('\\', '_', $entity->getClassName())]
+                    ['entityName' => str_replace('\\', '_', $entity->getClassName())]
                 );
             }
         }
