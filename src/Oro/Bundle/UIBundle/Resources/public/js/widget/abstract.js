@@ -221,7 +221,7 @@ define([
                                 width: '1px',
                                 height: '1px'
                             });
-                            form.append(submitReplacement);
+                            form.prepend(submitReplacement);
                             actionId = 'form_submit';
                             break;
                         case 'reset':

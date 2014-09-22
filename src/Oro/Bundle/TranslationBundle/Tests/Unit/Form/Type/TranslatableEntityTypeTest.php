@@ -91,7 +91,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
-            ->setMethods('getManager', 'getRepository')
+            ->setMethods(array('getManager', 'getRepository'))
             ->getMockForAbstractClass();
         $this->registry->expects($this->any())
             ->method('getManager')

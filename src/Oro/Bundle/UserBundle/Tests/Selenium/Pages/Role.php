@@ -12,14 +12,11 @@ class Role extends AbstractPageEntity
     protected $label;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $accessLevel;
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
-    protected $owner;
 
     public function __construct($testCase, $redirect = true)
     {
         parent::__construct($testCase, $redirect);
         $this->label = $this->test->byId('oro_user_role_form_label');
-        $this->owner = $this->test->select($this->test->byId('oro_user_role_form_owner'));
     }
 
     public function setLabel($label)
@@ -31,18 +28,6 @@ class Role extends AbstractPageEntity
     public function getLabel()
     {
         return $this->label->value();
-    }
-
-    public function setOwner($owner)
-    {
-        $this->owner->selectOptionByLabel($owner);
-
-        return $this;
-    }
-
-    public function getOwner()
-    {
-        return trim($this->owner->selectedLabel());
     }
 
     /**

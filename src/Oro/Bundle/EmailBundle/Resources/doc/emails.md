@@ -23,12 +23,15 @@ namespace Oro\Bundle\UserBundle\Entity;
 ...
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
-class User extends AbstractEntityFlexible implements
+class User extends ExtendUser implements
     AdvancedUserInterface,
     \Serializable,
-    EntityUploadedImageInterface,
     Taggable,
-    EmailOwnerInterface
+    EmailOwnerInterface,
+    EmailHolderInterface,
+    FullNameInterface,
+    NotificationEmailInterface,
+    AdvancedApiUserInterface
 {
     ...
 }

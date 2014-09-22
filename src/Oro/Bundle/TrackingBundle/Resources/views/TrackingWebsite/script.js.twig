@@ -10,7 +10,7 @@
     // Uncomment following line to track custom events
     // _paq.push(['trackEvent', 'OroCRM', 'Tracking', [name], [value] ]);
     (function() {
-        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ host|raw }}/";
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ host }}/";
         _paq.push(['setTrackerUrl', u+'tracking.php']);
         _paq.push(['setSiteId', '{{ entity.identifier }}']);
         var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';

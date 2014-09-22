@@ -189,7 +189,7 @@
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
-                    dashboardId: {{ dashboard.id }},
+                    dashboardId: {{ dashboard.id|json_encode|raw }},
                     columnsSelector: '.dashboard-column',
                     allowEdit: {{ allowEdit ? 'true' : 'false' }}
                 });

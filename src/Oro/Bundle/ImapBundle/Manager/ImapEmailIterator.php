@@ -3,30 +3,38 @@
 namespace Oro\Bundle\ImapBundle\Manager;
 
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
+use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 
 class ImapEmailIterator implements \Iterator, \Countable
 {
-    /**
-     * @var ImapMessageIterator
-     */
+    /** @var ImapMessageIterator */
     private $iterator;
 
-    /**
-     * @var ImapEmailManager
-     */
+    /** @var ImapEmailManager */
     private $manager;
+
+    /** @var Email[]|null an array is indexed by underlying iterator keys */
+    private $batch;
+
+    /** @var \Closure */
+    private $onBatchLoaded;
 
     /**
      * Constructor
      *
      * @param ImapMessageIterator $iterator
-     * @param ImapEmailManager $manager
+     * @param ImapEmailManager    $manager
      */
     public function __construct(ImapMessageIterator $iterator, ImapEmailManager $manager)
     {
         $this->iterator = $iterator;
-        $this->manager = $manager;
+        $this->manager  = $manager;
+
+        $this->onBatchLoaded = function ($batch) {
+            $this->handleBatchLoaded($batch);
+        };
+        $this->iterator->setBatchCallback($this->onBatchLoaded);
     }
 
     /**
@@ -39,6 +47,36 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function setIterationOrder($reverse)
     {
         $this->iterator->setIterationOrder($reverse);
+    }
+
+    /**
+     * Sets batch size
+     *
+     * @param int $batchSize Determines how many messages can be loaded at once
+     */
+    public function setBatchSize($batchSize)
+    {
+        $this->iterator->setBatchSize($batchSize);
+    }
+
+    /**
+     * Sets a callback function is called when a batch is loaded
+     *
+     * @param \Closure|null $callback The callback function is called when a batch is loaded
+     *                                function (Email[] $batch)
+     */
+    public function setBatchCallback(\Closure $callback = null)
+    {
+        if ($callback === null) {
+            // restore default callback
+            $this->iterator->setBatchCallback($this->onBatchLoaded);
+        } else {
+            $iteratorCallback = function ($batch) use ($callback) {
+                call_user_func($this->onBatchLoaded, $batch);
+                call_user_func($callback, $this->batch);
+            };
+            $this->iterator->setBatchCallback($iteratorCallback);
+        }
     }
 
     /**
@@ -58,7 +96,11 @@ class ImapEmailIterator implements \Iterator, \Countable
      */
     public function current()
     {
-        return $this->manager->convertToEmail($this->iterator->current());
+        // call the underlying iterator to make sure a batch is loaded
+        // actually $this->batch is initialized at this moment
+        $this->iterator->current();
+
+        return $this->batch[$this->iterator->key()];
     }
 
     /**
@@ -95,5 +137,16 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function rewind()
     {
         $this->iterator->rewind();
+    }
+
+    /**
+     * @param Message[] $batch
+     */
+    protected function handleBatchLoaded($batch)
+    {
+        $this->batch = [];
+        foreach ($batch as $key => $val) {
+            $this->batch[$key] = $this->manager->convertToEmail($val);
+        }
     }
 }

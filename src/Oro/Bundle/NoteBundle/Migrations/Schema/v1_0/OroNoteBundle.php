@@ -14,6 +14,14 @@ class OroNoteBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::addNoteTable($schema);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function addNoteTable(Schema $schema)
+    {
         $table = $schema->createTable('oro_note');
 
         $table->addColumn('id', 'integer', ['autoincrement' => true]);

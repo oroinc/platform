@@ -234,7 +234,7 @@ define(function (require) {
 
             confirm = new DeleteConfirmation({
                 title: __('Change Entity Confirmation'),
-                okText: __('Yes, I Agree'),
+                okText: __('Yes'),
                 content: __(options.confirmMessage)
             });
 

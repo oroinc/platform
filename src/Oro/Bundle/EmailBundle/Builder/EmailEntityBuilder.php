@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailEntityBuilder
@@ -50,18 +51,21 @@ class EmailEntityBuilder
     /**
      * Create Email entity object
      *
-     * @param string $subject The email subject
-     * @param string $from The FROM email address, for example: john@example.com or "John Smith" <john@example.c4m>
-     * @param string|string[]|null $to The TO email address(es).
-     *                                 Example of email address see in description of $from parameter
-     * @param \DateTime $sentAt The date/time when email sent
-     * @param \DateTime $receivedAt The date/time when email received
-     * @param \DateTime $internalDate The date/time an email server returned in INTERNALDATE field
-     * @param integer $importance The email importance flag. Can be one of *_IMPORTANCE constants of Email class
-     * @param string|string[]|null $cc The CC email address(es).
-     *                                 Example of email address see in description of $from parameter
-     * @param string|string[]|null $bcc The BCC email address(es).
-     *                                  Example of email address see in description of $from parameter
+     * @param string               $subject      The email subject
+     * @param string $from                       The FROM email address,
+     *                                           for example: john@example.com or "John Smith" <john@example.c4m>
+     * @param string|string[]|null $to           The TO email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param \DateTime            $sentAt       The date/time when email sent
+     * @param \DateTime            $receivedAt   The date/time when email received
+     * @param \DateTime            $internalDate The date/time an email server returned in INTERNALDATE field
+     * @param integer $importance                The email importance flag.
+     *                                           Can be one of *_IMPORTANCE constants of Email class
+     * @param string|string[]|null $cc           The CC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     * @param string|string[]|null $bcc          The BCC email address(es).
+     *                                           Example of email address see in description of $from parameter
+     *
      * @return Email
      */
     public function email(
@@ -97,8 +101,8 @@ class EmailEntityBuilder
     /**
      * Add recipients to the specified Email object
      *
-     * @param Email $obj The Email object recipients is added to
-     * @param string $type The recipient type. Can be to, cc or bcc
+     * @param Email  $obj   The Email object recipients is added to
+     * @param string $type  The recipient type. Can be to, cc or bcc
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
      */
     protected function addRecipients(Email $obj, $type, $email)
@@ -118,12 +122,13 @@ class EmailEntityBuilder
      * Create EmailAddress entity object
      *
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
+     *
      * @return EmailAddress
      */
     public function address($email)
     {
         $pureEmail = $this->emailAddressHelper->extractPureEmailAddress($email);
-        $result = $this->batch->getAddress($pureEmail);
+        $result    = $this->batch->getAddress($pureEmail);
         if ($result === null) {
             $result = $this->emailAddressManager->newEmailAddress()
                 ->setEmail($pureEmail);
@@ -136,8 +141,9 @@ class EmailEntityBuilder
     /**
      * Create EmailAttachment entity object
      *
-     * @param string $fileName The attachment file name
+     * @param string $fileName    The attachment file name
      * @param string $contentType The attachment content type. It may be any MIME type
+     *
      * @return EmailAttachment
      */
     public function attachment($fileName, $contentType)
@@ -153,8 +159,10 @@ class EmailEntityBuilder
     /**
      * Create EmailAttachmentContent entity object
      *
-     * @param string $content The attachment content encoded as it is specified in $contentTransferEncoding parameter
+     * @param string $content The attachment content encoded
+     *                        as it is specified in $contentTransferEncoding parameter
      * @param string $contentTransferEncoding The attachment content encoding type
+     *
      * @return EmailAttachmentContent
      */
     public function attachmentContent($content, $contentTransferEncoding)
@@ -170,10 +178,11 @@ class EmailEntityBuilder
     /**
      * Create EmailBody entity object
      *
-     * @param string $content The body content
-     * @param bool $isHtml Indicate whether the body content is HTML or TEXT
-     * @param bool $persistent Indicate whether this email body can be removed by the email cache manager or not
-     *                         Set false for external email, and true for system email, for example sent by BAP
+     * @param string $content    The body content
+     * @param bool   $isHtml     Indicate whether the body content is HTML or TEXT
+     * @param bool   $persistent Indicate whether this email body can be removed by the email cache manager or not
+     *                           Set false for external email, and true for system email, for example sent by BAP
+     *
      * @return EmailBody
      */
     public function body($content, $isHtml, $persistent = false)
@@ -191,13 +200,14 @@ class EmailEntityBuilder
      * Create EmailFolder entity object for INBOX folder
      *
      * @param string $fullName The full name of INBOX folder if known
-     * @param string $name The name of INBOX folder if known
+     * @param string $name     The name of INBOX folder if known
+     *
      * @return EmailFolder
      */
     public function folderInbox($fullName = null, $name = null)
     {
         return $this->folder(
-            EmailFolder::INBOX,
+            FolderType::INBOX,
             $fullName !== null ? $fullName : 'Inbox',
             $name !== null ? $name : 'Inbox'
         );
@@ -207,13 +217,14 @@ class EmailEntityBuilder
      * Create EmailFolder entity object for SENT folder
      *
      * @param string $fullName The full name of SENT folder if known
-     * @param string $name The name of SENT folder if known
+     * @param string $name     The name of SENT folder if known
+     *
      * @return EmailFolder
      */
     public function folderSent($fullName = null, $name = null)
     {
         return $this->folder(
-            EmailFolder::SENT,
+            FolderType::SENT,
             $fullName !== null ? $fullName : 'Sent',
             $name !== null ? $name : 'Sent'
         );
@@ -223,13 +234,14 @@ class EmailEntityBuilder
      * Create EmailFolder entity object for TRASH folder
      *
      * @param string $fullName The full name of TRASH folder if known
-     * @param string $name The name of TRASH folder if known
+     * @param string $name     The name of TRASH folder if known
+     *
      * @return EmailFolder
      */
     public function folderTrash($fullName = null, $name = null)
     {
         return $this->folder(
-            EmailFolder::TRASH,
+            FolderType::TRASH,
             $fullName !== null ? $fullName : 'Trash',
             $name !== null ? $name : 'Trash'
         );
@@ -239,13 +251,14 @@ class EmailEntityBuilder
      * Create EmailFolder entity object for DRAFTS folder
      *
      * @param string $fullName The full name of DRAFTS folder if known
-     * @param string $name The name of DRAFTS folder if known
+     * @param string $name     The name of DRAFTS folder if known
+     *
      * @return EmailFolder
      */
     public function folderDrafts($fullName = null, $name = null)
     {
         return $this->folder(
-            EmailFolder::DRAFTS,
+            FolderType::DRAFTS,
             $fullName !== null ? $fullName : 'Drafts',
             $name !== null ? $name : 'Drafts'
         );
@@ -255,20 +268,22 @@ class EmailEntityBuilder
      * Create EmailFolder entity object for custom folder
      *
      * @param string $fullName The full name of the folder
-     * @param string $name The name of the folder
+     * @param string $name     The name of the folder
+     *
      * @return EmailFolder
      */
     public function folderOther($fullName, $name)
     {
-        return $this->folder(EmailFolder::OTHER, $fullName, $name);
+        return $this->folder(FolderType::OTHER, $fullName, $name);
     }
 
     /**
      * Create EmailFolder entity object
      *
-     * @param string $type The folder type. Can be inbox, sent, trash, drafts or other
+     * @param string $type     The folder type. Can be inbox, sent, trash, drafts or other
      * @param string $fullName The full name of a folder
-     * @param string $name The folder name
+     * @param string $name     The folder name
+     *
      * @return EmailFolder
      */
     protected function folder($type, $fullName, $name)
@@ -290,6 +305,7 @@ class EmailEntityBuilder
      * Register EmailOrigin entity object
      *
      * @param EmailFolder $folder The email folder
+     *
      * @return EmailFolder
      */
     public function setFolder(EmailFolder $folder)
@@ -303,6 +319,7 @@ class EmailEntityBuilder
      * Register EmailOrigin entity object
      *
      * @param EmailOrigin $origin The email origin
+     *
      * @return EmailOrigin
      */
     public function setOrigin(EmailOrigin $origin)
@@ -316,6 +333,7 @@ class EmailEntityBuilder
      * Create EmailRecipient entity object to store TO field
      *
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
+     *
      * @return EmailRecipient
      */
     public function recipientTo($email)
@@ -327,6 +345,7 @@ class EmailEntityBuilder
      * Create EmailRecipient entity object to store CC field
      *
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
+     *
      * @return EmailRecipient
      */
     public function recipientCc($email)
@@ -338,6 +357,7 @@ class EmailEntityBuilder
      * Create EmailRecipient entity object to store BCC field
      *
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
+     *
      * @return EmailRecipient
      */
     public function recipientBcc($email)
@@ -348,8 +368,9 @@ class EmailEntityBuilder
     /**
      * Create EmailRecipient entity object
      *
-     * @param string $type The recipient type. Can be to, cc or bcc
+     * @param string $type  The recipient type. Can be to, cc or bcc
      * @param string $email The email address, for example: john@example.com or "John Smith" <john@example.com>
+     *
      * @return EmailRecipient
      */
     protected function recipient($type, $email)

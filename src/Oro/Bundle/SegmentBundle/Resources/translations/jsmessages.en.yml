@@ -6,6 +6,6 @@ oro:
             content: Please confirm that you want to refresh this segment.
             success: Segment successfully processed.
             error: An unidentified error has occurred. Please contact your Administrator.
-            okText: Yes, I Agree
+            okText: Yes
         unsaved_changes: Unsaved changes
         unsaved_changes_ask_with_names: You have unsaved changes in {{ components }} that will be lost. Proceed anyway?
