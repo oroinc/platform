@@ -86,6 +86,7 @@ oro:
         name_suffix.label:           Name suffix
         owner.label:                 Owner
         password.label:              Password
+        password_re.label:           Re-enter password
         password_requested_at.label: Password requested at
         roles.label:                 Roles
         salt.label:                  Salt

@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -53,9 +52,6 @@ class OwnerFormExtension extends AbstractTypeExtension
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /** @var string */
     protected $fieldName;
 
@@ -86,7 +82,6 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
      * @param BusinessUnitManager       $businessUnitManager
      * @param SecurityFacade            $securityFacade
-     * @param TranslatorInterface       $translator
      * @param AclVoter                  $aclVoter
      * @param OwnerTreeProvider         $treeProvider
      */
@@ -96,7 +91,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         OwnershipMetadataProvider $ownershipMetadataProvider,
         BusinessUnitManager $businessUnitManager,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator,
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
@@ -105,7 +99,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
         $this->businessUnitManager = $businessUnitManager;
         $this->securityFacade = $securityFacade;
-        $this->translator = $translator;
         $this->aclVoter = $aclVoter;
         $this->treeProvider = $treeProvider;
     }
@@ -397,7 +390,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     array(
-                        'empty_value'       => $this->translator->trans($emptyValueLabel),
+                        'empty_value'       => $emptyValueLabel,
                         'mapped'            => true,
                         'label'             => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),

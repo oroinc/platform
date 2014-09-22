@@ -259,7 +259,10 @@
         'path' - button url
         'label' - button label | 'Cancel' by default
 #}
-{% macro cancelButton(path, label = 'Cancel') %}
+{% macro cancelButton(path, label) %}
+    {% if label is empty %}
+        {% set label = 'Cancel'|trans %}
+    {% endif %}
     {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
 {% endmacro %}
 
@@ -544,11 +547,17 @@
     </div>
 {% endmacro %}
 
-{% macro saveAndCloseButton(label = 'Save and Close') %}
+{% macro saveAndCloseButton(label) %}
+    {% if label is empty %}
+        {% set label = 'Save and Close'|trans %}
+    {% endif %}
     {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(label = 'Save') %}
+{% macro saveAndStayButton(label) %}
+    {% if label is empty %}
+        {% set label = 'Save'|trans %}
+    {% endif %}
     {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
 {% endmacro %}
 

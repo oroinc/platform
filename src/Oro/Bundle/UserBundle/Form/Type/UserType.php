@@ -120,21 +120,21 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options'  => array('label' => 'Password'),
-                    'second_options' => array('label' => 'Re-enter password'),
+                    'first_options'  => array('label' => 'oro.user.password.label'),
+                    'second_options' => array('label' => 'oro.user.password_re.label'),
                 )
             )
             ->add(
                 'emails',
                 'collection',
                 array(
+                    'label'          => 'oro.user.emails.label',
                     'type'           => 'oro_user_email',
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'by_reference'   => false,
                     'prototype'      => true,
-                    'prototype_name' => 'tag__name__',
-                    'label'          => ' '
+                    'prototype_name' => 'tag__name__'
                 )
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
