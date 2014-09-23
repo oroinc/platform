@@ -56,7 +56,7 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
         $organization->setEnabled(true);
 
         $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMock('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface');
 
         $this->securityContext->expects($this->once())
             ->method('getToken')
@@ -68,8 +68,42 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->twigExtension->getOrganizations();
 
-        $this->assertTrue($result->count() == 1);
-        $this->assertTrue($result instanceof ArrayCollection);
-        $this->assertSame($result->first(), $organization);
+        $this->assertInternalType('array', $result);
+        $this->assertCount(1, $result);
+        $this->assertSame($organization, $result[0]);
+    }
+
+    public function testGetCurrentOrganizationWorks()
+    {
+        $organization = $this->getMock('Oro\\Bundle\\OrganizationBundle\\Entity\\Organization');
+
+        $token = $this->getMock(
+            'Oro\\Bundle\\SecurityBundle\\Authentication\\Token\\OrganizationContextTokenInterface'
+        );
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
+        $this->assertSame($organization, $this->twigExtension->getCurrentOrganization());
+    }
+
+    public function testGetCurrentOrganizationWorksWithNotOrganizationContextToken()
+    {
+        $token = $this->getMock(
+            'Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface'
+        );
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->never())->method($this->anything());
+
+        $this->assertNull($this->twigExtension->getCurrentOrganization());
     }
 }

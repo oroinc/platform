@@ -129,6 +129,7 @@ oro:
             name.label:                   Code
             label.label:                  Name
             related_entity.label:         Related entity
+            datagrid.view:                View
 
         processtrigger:
             entity_label:         Process Trigger

@@ -1,0 +1,4 @@
+{% set current_organization = get_current_organization() %}
+{% if current_organization %}
+    {{ current_organization.name }}
+{% endif %}

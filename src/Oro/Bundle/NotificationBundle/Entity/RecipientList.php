@@ -28,7 +28,7 @@ class RecipientList
     protected $id;
 
     /**
-     * @var User[]
+     * @var User[]|ArrayCollection
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinTable(name="oro_notification_recip_user",
      *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -38,7 +38,7 @@ class RecipientList
     protected $users;
 
     /**
-     * @var Group[]
+     * @var Group[]|ArrayCollection
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Group")
      * @ORM\JoinTable(name="oro_notification_recip_group",
      *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},

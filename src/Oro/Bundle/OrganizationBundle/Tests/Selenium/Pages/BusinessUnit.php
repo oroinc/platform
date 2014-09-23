@@ -13,13 +13,12 @@ class BusinessUnit extends AbstractPageEntity
 {
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $businessUnitName;
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element_Select */
-    protected $organization;
+    /** @var  string */
+    protected $organization = "//select[@id = 'oro_business_unit_form_organization']";
 
     public function init()
     {
         $this->businessUnitName = $this->test->byId('oro_business_unit_form_name');
-        $this->organization = $this->test->select($this->test->byId('oro_business_unit_form_organization'));
 
         return $this;
     }
@@ -41,18 +40,6 @@ class BusinessUnit extends AbstractPageEntity
     public function getBusinessUnitName()
     {
         return $this->businessUnitName->value();
-    }
-
-    public function setOrganization($organization)
-    {
-        $this->organization->selectOptionByLabel($organization);
-
-        return $this;
-    }
-
-    public function getOrganization()
-    {
-        return trim($this->organization->selectedLabel());
     }
 
     public function edit()

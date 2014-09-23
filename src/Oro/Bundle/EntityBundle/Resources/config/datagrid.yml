@@ -3,6 +3,7 @@ datagrid:
         options:
             base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
             entityHint: entity
+            export: true
         source:
             acl_resource: ~
             type: orm

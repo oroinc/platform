@@ -12,6 +12,10 @@ abstract class AbstractPageEntity extends AbstractPage
 {
     /** @var string */
     protected $owner;
+
+    /** @var string */
+    protected $organization;
+
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
 
@@ -165,5 +169,26 @@ abstract class AbstractPageEntity extends AbstractPage
             $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
         }
         return $this;
+    }
+
+    /**
+     * @param $organization
+     *
+     * @return $this
+     */
+    public function setOrganization($organization)
+    {
+        if (isset($this->organization)) {
+            $element = $this->test->select($this->test->byXPath($this->organization));
+            $this->test->moveto($element);
+            $element->selectOptionByLabel($organization);
+        }
+        return $this;
+    }
+
+    public function getOrganization()
+    {
+        $element = $this->test->select($this->test->byXPath($this->organization));
+        return trim($element->selectedLabel());
     }
 }

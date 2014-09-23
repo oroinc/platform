@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -114,7 +113,7 @@ class EntityProcessor
                 if (!$entityConfig->is('is_extend')) {
                     continue;
                 }
-                if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
+                if ($entityConfig->in('state', [ExtendScope::STATE_NEW])) {
                     continue;
                 }
 

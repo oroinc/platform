@@ -18,42 +18,28 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     const TEST_MESSAGE_LIMIT = 10;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityPool;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailRenderer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $twig;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $cm;
 
-    /**
-     * @var EmailNotificationProcessor
-     */
+    /** @var EmailNotificationProcessor */
     protected $processor;
 
     protected function setUp()

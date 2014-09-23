@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
+use Doctrine\ORM\EntityManager;
+
 use JMS\JobQueueBundle\Entity\Job;
 
 use Psr\Log\LoggerInterface;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
@@ -34,12 +36,12 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     /**
      * Constructor
      *
-     * @param LoggerInterface $logger
-     * @param EntityManager   $em
-     * @param EntityPool      $entityPool
-     * @param EmailRenderer   $emailRenderer
-     * @param \Swift_Mailer   $mailer
-     * @param ConfigManager   $cm
+     * @param LoggerInterface   $logger
+     * @param EntityManager     $em
+     * @param EntityPool        $entityPool
+     * @param EmailRenderer     $emailRenderer
+     * @param \Swift_Mailer     $mailer
+     * @param ConfigManager     $cm
      */
     public function __construct(
         LoggerInterface $logger,
@@ -50,9 +52,9 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         ConfigManager $cm
     ) {
         parent::__construct($logger, $em, $entityPool);
-        $this->renderer = $emailRenderer;
-        $this->mailer   = $mailer;
-        $this->cm       = $cm;
+        $this->renderer          = $emailRenderer;
+        $this->mailer            = $mailer;
+        $this->cm                = $cm;
     }
 
     /**
@@ -91,6 +93,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
+            /** @var EmailTemplate $emailTemplate */
             $emailTemplate = $notification->getTemplate();
 
             try {
