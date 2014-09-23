@@ -5,10 +5,11 @@
     <div class="btn-group">
         {% for data in transitionsData %}
             {# Show button for start or transit workflow #}
+            {# Transaltions temporary disabled due to BAP-5355 #}
             {% set transitionData = {
                 'enabled': data.isAllowed,
-                'transition-label': data.transition.label|trans,
-                'message': data.transition.message|trans|nl2br,
+                'transition-label': data.transition.label,
+                'message': data.transition.message|nl2br,
                 'transition-condition-messages': data.errors
             } %}
 
@@ -74,7 +75,7 @@
         <div class="btn-group">
             {% set data = {
                 'url':              path('oro_workflow_api_rest_workflow_delete', {workflowItemId: workflowItem.id}),
-                'title':            'Reset workflow data',
+                'title':            'Reset workflow data'|trans,
                 'workflow_item_id': workflowItem.id,
             } %}
 
