@@ -34,18 +34,28 @@ class PackageController extends Controller
         $this->setUpEnvironment();
         $manager = $this->getPackageManager();
         $items = [];
+        $errors = [];
 
         foreach ($manager->getInstalled() as $package) {
             $items[] = [
                 'package' => $package,
-                'update' => $manager->getPackageUpdate($package),
-                'canBeDeleted' => $manager->canBeDeleted($package->getPrettyName())
+                'update' => null,
+                'canBeDeleted' => false
             ];
+            try {
+                $items['update'] = $manager->getPackageUpdate($package);
+                $items['canBeDeleted'] = $manager->canBeDeleted($package->getPrettyName());
+            } catch (\Exception $e) {
+                if (!in_array($e->getMessage(), $errors)) {
+                    $errors[] = $e->getMessage();
+                }
+            }
         }
 
         return [
             'items' => $items,
-            'notWritableSystemPaths' => $this->getNotWritablePaths()
+            'notWritableSystemPaths' => $this->getNotWritablePaths(),
+            'errors' => $errors
         ];
     }
 
