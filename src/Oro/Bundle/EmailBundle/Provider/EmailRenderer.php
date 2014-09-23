@@ -11,6 +11,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailRenderer extends \Twig_Environment
 {
@@ -150,7 +151,8 @@ class EmailRenderer extends \Twig_Environment
      *   -- datetime variables with formatting will be skipped, e.g. {{ entity.createdAt|date('F j, Y, g:i A') }}
      *   -- processes ONLY variables that passed without formatting, e.g. {{ entity.createdAt }}
      *
-     * Rendering \DateTime objects in twig causes Calling "__tostring" method on a "DateTime" object is not allowed
+     * Note: Rendering \DateTime objects (without formatting) in twig
+     *       causes Calling "__tostring" method on a "DateTime" object is not allowed
      *
      * @param EmailTemplateInterface $emailTemplate
      * @param                        $entity
@@ -162,34 +164,29 @@ class EmailRenderer extends \Twig_Environment
         $entityManager  = $this->doctrine->getManager();
         $entityMetadata = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
         if ($entityMetadata) {
+            $accessor = PropertyAccess::createPropertyAccessor();
+
             $emailTemplateContent = $emailTemplate->getContent();
             $emailTemplateSubject = $emailTemplate->getSubject();
 
             $entityFieldMappings = $entityMetadata->fieldMappings;
             array_walk(
                 $entityFieldMappings,
-                function ($field) use ($entity, &$emailTemplateContent, &$emailTemplateSubject, &$haveReplacements) {
-                    $value = $entity->{Inflector::camelize('get_' . $field['fieldName'])}();
-                    if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])
-                        && !empty($value)
-                    ) {
+                function ($field) use ($entity, $accessor, &$emailTemplateContent, &$emailTemplateSubject) {
+                    if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])) {
+                        $value   = $accessor->getValue($entity, $field['fieldName']);
                         $pattern = '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/';
 
-                        if (preg_match($pattern, $emailTemplateContent)) {
-                            $emailTemplateContent = preg_replace(
-                                $pattern,
-                                $this->dateTimeFormatter->format($value),
-                                $emailTemplateContent
-                            );
-                        }
-
-                        if (preg_match($pattern, $emailTemplateSubject)) {
-                            $emailTemplateSubject = preg_replace(
-                                $pattern,
-                                $this->dateTimeFormatter->format($value),
-                                $emailTemplateSubject
-                            );
-                        }
+                        $emailTemplateContent = preg_replace(
+                            $pattern,
+                            $this->dateTimeFormatter->format($value),
+                            $emailTemplateContent
+                        );
+                        $emailTemplateSubject = preg_replace(
+                            $pattern,
+                            $this->dateTimeFormatter->format($value),
+                            $emailTemplateSubject
+                        );
                     }
                 }
             );
