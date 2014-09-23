@@ -533,7 +533,7 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
-     * @var Organization|ArrayCollection
+     * @var Organization
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
