@@ -1,6 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% if resource_granted('oro_note_create') %}
+{% if resource_granted('oro_note_create') and resource_granted('oro_note_view') %}
     {{ UI.clientButton({
         'id': 'add-entity-note-button',
         'aCss': 'no-hash',
