@@ -146,7 +146,10 @@ class EmailRenderer extends \Twig_Environment
 
     /**
      * Process entity variables of dateTime type
-     * Because of rendering such fields causes Calling "__tostring" method on a "DateTime" object is not allowed
+     *   -- datetime variables with formatting will be skipped, e.g. {{ entity.createdAt|date('F j, Y, g:i A') }}
+     *   -- processes ONLY variables that passed without formatting, e.g. {{ entity.createdAt }}
+     *
+     * Rendering \DateTime objects in twig causes Calling "__tostring" method on a "DateTime" object is not allowed
      *
      * @param EmailTemplateInterface $emailTemplate
      * @param                        $entity
