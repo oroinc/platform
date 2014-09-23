@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
@@ -10,7 +12,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmailRenderer extends \Twig_Environment
 {
@@ -125,7 +126,9 @@ class EmailRenderer extends \Twig_Environment
     {
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
-        $template = $this->processDateTimeVariables($template, $templateParams['entity']);
+        if (isset($templateParams['entity'])) {
+            $template = $this->processDateTimeVariables($template, $templateParams['entity']);
+        }
 
         $templateRendered = $this->render($template->getContent(), $templateParams);
         $subjectRendered  = $this->render($template->getSubject(), $templateParams);
