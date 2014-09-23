@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -125,7 +124,7 @@ class EmailRenderer extends \Twig_Environment
     {
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
-        $template = $this->processDateTimeFields($template, $templateParams['entity']);
+        $template = $this->processDateTimeVariables($template, $templateParams['entity']);
 
         $templateRendered = $this->render($template->getContent(), $templateParams);
         $subjectRendered  = $this->render($template->getSubject(), $templateParams);
@@ -146,16 +145,18 @@ class EmailRenderer extends \Twig_Environment
     }
 
     /**
+     * Process entity variables of dateTime type
+     * Because of rendering such fields causes Calling "__tostring" method on a "DateTime" object is not allowed
+     *
      * @param EmailTemplateInterface $emailTemplate
-     * @param                        $object
+     * @param                        $entity
      *
      * @return EmailTemplate
      */
-    protected function processDateTimeFields(EmailTemplateInterface $emailTemplate, $object)
+    protected function processDateTimeVariables(EmailTemplateInterface $emailTemplate, $entity)
     {
-        $haveReplacements     = false;
-        $entityManager        = $this->doctrine->getManager();
-        $entityMetadata       = $entityManager->getClassMetadata(get_class($object));
+        $entityManager  = $this->doctrine->getManager();
+        $entityMetadata = $entityManager->getClassMetadata(get_class($entity));
         if ($entityMetadata) {
             $emailTemplateContent = $emailTemplate->getContent();
             $emailTemplateSubject = $emailTemplate->getSubject();
@@ -163,39 +164,34 @@ class EmailRenderer extends \Twig_Environment
             $entityFieldMappings = $entityMetadata->fieldMappings;
             array_walk(
                 $entityFieldMappings,
-                function ($field) use ($object, &$emailTemplateContent, &$emailTemplateSubject, &$haveReplacements) {
+                function ($field) use ($entity, &$emailTemplateContent, &$emailTemplateSubject, &$haveReplacements) {
+                    $value = $entity->{Inflector::camelize('get_' . $field['fieldName'])}();
                     if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])
-                        && !empty($object->{Inflector::camelize('get_' . $field['fieldName'])}())
+                        && !empty($value)
                     ) {
-                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateContent)) {
+                        $pattern = '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/';
+
+                        if (preg_match($pattern, $emailTemplateContent)) {
                             $emailTemplateContent = preg_replace(
-                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
-                                $this->dateTimeFormatter->format(
-                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
-                                ),
+                                $pattern,
+                                $this->dateTimeFormatter->format($value),
                                 $emailTemplateContent
                             );
-                            $haveReplacements     = true;
                         }
 
-                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateSubject)) {
+                        if (preg_match($pattern, $emailTemplateSubject)) {
                             $emailTemplateSubject = preg_replace(
-                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
-                                $this->dateTimeFormatter->format(
-                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
-                                ),
+                                $pattern,
+                                $this->dateTimeFormatter->format($value),
                                 $emailTemplateSubject
                             );
-                            $haveReplacements     = true;
                         }
                     }
                 }
             );
 
-            if ($haveReplacements) {
-                $emailTemplate->setContent($emailTemplateContent);
-                $emailTemplate->setSubject($emailTemplateSubject);
-            }
+            $emailTemplate->setContent($emailTemplateContent);
+            $emailTemplate->setSubject($emailTemplateSubject);
         }
 
         return $emailTemplate;
