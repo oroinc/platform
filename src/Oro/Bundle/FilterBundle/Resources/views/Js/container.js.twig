@@ -3,11 +3,11 @@
         {% if isMobileVersion() %}
             <div class="filter-box oro-clearfix-width">
                 <div class="dropdown">
-                    <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">Filter Results</a>
+                    <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">{{ 'Filter Results'|trans|e('html')|raw }}</a>
                     <ul class="dropdown-menu">
                         <li>
                             <div class="filter-container">
-                                <a id="reset-filter-button" href="javascript:void(0);">Reset</a>
+                                <a id="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
                                 <select id="add-filter-select" multiple>
                                     <% _.each(filters, function (filter, name) { %>
                                     <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
