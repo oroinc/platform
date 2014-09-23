@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class CacheClearCommand extends ContainerAwareCommand
