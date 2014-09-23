@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
-use Doctrine\Common\Util\Inflector;
 use Doctrine\ORM\EntityManager;
-use Doctrine\DBAL\Types\Type;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -15,7 +13,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -36,9 +33,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     /** @var string */
     protected $env = 'prod';
 
-    /** @var  DateTimeFormatter */
-    protected $dateTimeFormatter;
-
     /**
      * Constructor
      *
@@ -48,7 +42,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param EmailRenderer     $emailRenderer
      * @param \Swift_Mailer     $mailer
      * @param ConfigManager     $cm
-     * @param DateTimeFormatter $dateTimeFormatter
      */
     public function __construct(
         LoggerInterface $logger,
@@ -56,14 +49,12 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        ConfigManager $cm,
-        DateTimeFormatter $dateTimeFormatter
+        ConfigManager $cm
     ) {
         parent::__construct($logger, $em, $entityPool);
         $this->renderer          = $emailRenderer;
         $this->mailer            = $mailer;
         $this->cm                = $cm;
-        $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
@@ -104,7 +95,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         foreach ($notifications as $notification) {
             /** @var EmailTemplate $emailTemplate */
             $emailTemplate = $notification->getTemplate();
-            $emailTemplate = $this->processDateTimeFields($emailTemplate, $object);
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
@@ -140,60 +130,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
 
             $this->addJob(self::SEND_COMMAND);
         }
-    }
-
-    /**
-     * @param EmailTemplate $emailTemplate
-     * @param               $object
-     *
-     * @return EmailTemplate
-     */
-    protected function processDateTimeFields(EmailTemplate $emailTemplate, $object)
-    {
-        $haveReplacements     = false;
-        $emailTemplateContent = $emailTemplate->getContent();
-        $emailTemplateSubject = $emailTemplate->getSubject();
-        $entityMetadata       = $this->em->getClassMetadata(get_class($object));
-        if ($entityMetadata) {
-            $entityFieldMappings = $entityMetadata->fieldMappings;
-            array_walk(
-                $entityFieldMappings,
-                function ($field) use ($object, &$emailTemplateContent, &$emailTemplateSubject, &$haveReplacements) {
-                    if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])
-                        && !empty($object->{Inflector::camelize('get_' . $field['fieldName'])}())
-                    ) {
-                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateContent)) {
-                            $emailTemplateContent = preg_replace(
-                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
-                                $this->dateTimeFormatter->format(
-                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
-                                ),
-                                $emailTemplateContent
-                            );
-                            $haveReplacements     = true;
-                        }
-
-                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateSubject)) {
-                            $emailTemplateSubject = preg_replace(
-                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
-                                $this->dateTimeFormatter->format(
-                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
-                                ),
-                                $emailTemplateSubject
-                            );
-                            $haveReplacements     = true;
-                        }
-                    }
-                }
-            );
-
-            if ($haveReplacements) {
-                $emailTemplate->setContent($emailTemplateContent);
-                $emailTemplate->setSubject($emailTemplateSubject);
-            }
-        }
-
-        return $emailTemplate;
     }
 
     /**

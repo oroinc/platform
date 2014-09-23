@@ -3,9 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Util\Inflector;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class EmailRenderer extends \Twig_Environment
 {
@@ -18,13 +23,31 @@ class EmailRenderer extends \Twig_Environment
     /** @var  string */
     protected $cacheKey;
 
+    /** @var  DateTimeFormatter */
+    protected $dateTimeFormatter;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /**
+     * @param \Twig_LoaderInterface   $loader
+     * @param array                   $options
+     * @param VariablesProvider       $variablesProvider
+     * @param Cache                   $cache
+     * @param                         $cacheKey
+     * @param \Twig_Extension_Sandbox $sandbox
+     * @param DateTimeFormatter       $dateTimeFormatter
+     * @param ManagerRegistry         $doctrine
+     */
     public function __construct(
         \Twig_LoaderInterface $loader,
         $options,
         VariablesProvider $variablesProvider,
         Cache $cache,
         $cacheKey,
-        \Twig_Extension_Sandbox $sandbox
+        \Twig_Extension_Sandbox $sandbox,
+        DateTimeFormatter $dateTimeFormatter,
+        ManagerRegistry $doctrine
     ) {
         parent::__construct($loader, $options);
 
@@ -34,6 +57,9 @@ class EmailRenderer extends \Twig_Environment
 
         $this->addExtension($sandbox);
         $this->configureSandbox();
+
+        $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->doctrine          = $doctrine;
     }
 
     /**
@@ -99,6 +125,8 @@ class EmailRenderer extends \Twig_Environment
     {
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
+        $template = $this->processDateTimeFields($template, $templateParams['entity']);
+
         $templateRendered = $this->render($template->getContent(), $templateParams);
         $subjectRendered  = $this->render($template->getSubject(), $templateParams);
 
@@ -115,5 +143,60 @@ class EmailRenderer extends \Twig_Environment
     public function compilePreview(EmailTemplate $entity)
     {
         return $this->render('{% verbatim %}' . $entity->getContent() . '{% endverbatim %}', []);
+    }
+
+    /**
+     * @param EmailTemplateInterface $emailTemplate
+     * @param                        $object
+     *
+     * @return EmailTemplate
+     */
+    protected function processDateTimeFields(EmailTemplateInterface $emailTemplate, $object)
+    {
+        $haveReplacements     = false;
+        $emailTemplateContent = $emailTemplate->getContent();
+        $emailTemplateSubject = $emailTemplate->getSubject();
+        $entityManager        = $this->doctrine->getManager();
+        $entityMetadata       = $entityManager->getClassMetadata(get_class($object));
+        if ($entityMetadata) {
+            $entityFieldMappings = $entityMetadata->fieldMappings;
+            array_walk(
+                $entityFieldMappings,
+                function ($field) use ($object, &$emailTemplateContent, &$emailTemplateSubject, &$haveReplacements) {
+                    if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])
+                        && !empty($object->{Inflector::camelize('get_' . $field['fieldName'])}())
+                    ) {
+                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateContent)) {
+                            $emailTemplateContent = preg_replace(
+                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
+                                $this->dateTimeFormatter->format(
+                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
+                                ),
+                                $emailTemplateContent
+                            );
+                            $haveReplacements     = true;
+                        }
+
+                        if (preg_match('/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/', $emailTemplateSubject)) {
+                            $emailTemplateSubject = preg_replace(
+                                '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/',
+                                $this->dateTimeFormatter->format(
+                                    $object->{Inflector::camelize('get_' . $field['fieldName'])}()
+                                ),
+                                $emailTemplateSubject
+                            );
+                            $haveReplacements     = true;
+                        }
+                    }
+                }
+            );
+
+            if ($haveReplacements) {
+                $emailTemplate->setContent($emailTemplateContent);
+                $emailTemplate->setSubject($emailTemplateSubject);
+            }
+        }
+
+        return $emailTemplate;
     }
 }

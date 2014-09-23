@@ -187,6 +187,8 @@ services:
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
             - @oro_email.twig.email_sandbox
+            - @oro_locale.formatter.date_time
+            - @doctrine
         lazy: true
 
     oro_email.twig.email_security_policy:

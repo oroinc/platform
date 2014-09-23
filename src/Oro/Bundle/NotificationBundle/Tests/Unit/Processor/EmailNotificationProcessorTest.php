@@ -41,9 +41,6 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $cm;
 
-    /** @var  DateTimeFormatter */
-    protected $dateTimeFormatter;
-
     /** @var EmailNotificationProcessor */
     protected $processor;
 
@@ -85,8 +82,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             $this->entityPool,
             $this->emailRenderer,
             $this->mailer,
-            $this->cm,
-            $this->dateTimeFormatter
+            $this->cm
         );
 
         $this->processor->setEnv(self::TEST_ENV);

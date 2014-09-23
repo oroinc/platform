@@ -138,7 +138,6 @@ services:
             - @oro_email.email_renderer
             - @swiftmailer.mailer.db_spool_mailer
             - @oro_config.global
-            - @oro_locale.formatter.date_time
         calls:
             - [ setEnv, ['prod'] ]
             - [ setMessageLimit, [100] ]
