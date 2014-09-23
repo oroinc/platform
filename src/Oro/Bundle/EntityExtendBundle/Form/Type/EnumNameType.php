@@ -71,7 +71,7 @@ class EnumNameType extends AbstractType
                         }
                     }
                 };
-                $constraints[] = new Assert\Callback($callback);
+                $constraints[] = new Assert\Callback([$callback]);
                 $constraints[] = new UniqueEnumName(
                     [
                         'entityClassName' => $fieldConfigId->getClassName(),
