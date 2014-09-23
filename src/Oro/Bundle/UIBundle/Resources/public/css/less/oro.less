@@ -3209,8 +3209,13 @@ span.validation-failed {
 }
 
 .popover {
+  max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding-right: 25px;
+    padding: 6px 25px 6px 8px;
+  }
+  .oro-popover-content {
+    overflow-y: auto;
+    max-height: 60px;
   }
   .popover-close {
     position: absolute;
