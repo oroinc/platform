@@ -63,11 +63,9 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
-        $columns    = $gridConfig->offsetGet('columns');
-
-        $result = array();
+        $gridConfig = $this->context->getConfiguration();
+        $columns    = $gridConfig['columns'];
+        $result     = array();
         foreach ($columns as $columnName => $column) {
             $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
