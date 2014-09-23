@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
