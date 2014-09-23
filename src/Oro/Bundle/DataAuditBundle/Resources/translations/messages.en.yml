@@ -19,5 +19,13 @@ oro:
             data: Data
             organization: Organization
 
+        entity_config:
+            entity:
+                items:
+                    auditable: Auditable
+            field:
+                items:
+                    auditable: Auditable
+
 
 

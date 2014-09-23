@@ -154,7 +154,7 @@ oro:
             entity_attribute_name.label:  Entity attribute name
             name.label:                   Code # this translation has been chosen because it doesn't confuse users
             related_entity.label:         Related entity
-            start_step.label:             Start step
+            start_step.label:             Default step
             steps.label:                  Steps
             steps_display_ordered.label:  Display steps ordered
             active.label:                 Active
@@ -198,3 +198,20 @@ oro:
             related_entity.label:       Workflow Step
             related_entity.description: Related field for Workflow Step
             grid.label:                 Step
+
+        form:
+            name.label: Name
+            from_step.label: From step
+            to_step.label: To step
+            view_form.label: View form
+            warning_message.label: Warning message
+            button_icon.label: Button icon
+            button_style.label: Button style
+            button_preview.label: Button preview
+            entity_field.label: Entity field
+            label.label: Label
+            required.label: Required
+            name.label: Name
+            position.label: Position
+            final.label: Final
+

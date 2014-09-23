@@ -11,7 +11,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 
@@ -51,8 +50,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $user;
-
-    private $tranlsator;
 
     private $organizations;
 
@@ -122,9 +119,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->any())->method('getFormConfig')->will($this->returnValue($config));
         $this->builder->expects($this->any())->method('getOption')->with('required')->will($this->returnValue(true));
         $this->fieldName = 'owner';
-        $this->tranlsator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
@@ -140,7 +134,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,
-            $this->tranlsator,
             $aclVoter,
             $treeProvider
         );
@@ -228,7 +221,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->fieldName,
             'oro_business_unit_tree_select',
             array(
-                'empty_value' => null,
+                'empty_value' => 'oro.business_unit.form.choose_business_user',
                 'mapped' => true,
                 'label' => 'Owner',
                 'business_unit_ids' => array(),
@@ -370,7 +363,6 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,
-            $this->tranlsator,
             $aclVoter,
             $treeProvider
         );

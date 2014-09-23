@@ -142,7 +142,7 @@ datagrid:
                       END) as hasCurrentBusinessUnit
         columns:
             hasCurrentBusinessUnit:
-                label: Has business unit
+                label: oro.business_unit.datagrid.has_business_unit
                 editable: true
                 frontend_type: boolean
             firstName:

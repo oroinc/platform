@@ -17,3 +17,29 @@ oro:
             delete:       Delete
             view:         View
             update:       Update
+
+        entity_config:
+            entity:
+                entity:
+                    items:
+                        icon: Icon
+                        label: Label
+                        plural_label: Plural label
+                        description: Description
+                field:
+                    items:
+                        label: Label
+                        description: Description
+            datagrid:
+                field:
+                    items:
+                        is_visible: Show on grid
+                        show_filter: Show grid filter
+            form:
+                field:
+                    items:
+                        is_enabled: Show on form
+            view:
+                field:
+                    items:
+                        is_displayable: Show on view

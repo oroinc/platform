@@ -295,7 +295,7 @@ datagrid:
                       END) as has_role
         columns:
             has_role:
-                label: Has role
+                label: oro.user.role.has_role.label
                 editable: true
                 frontend_type: boolean
             firstName:
@@ -359,7 +359,7 @@ datagrid:
                       END) as has_group
         columns:
             has_group:
-                label: Has group
+                label: oro.user.group.has_group.label
                 editable: true
                 frontend_type: boolean
             firstName:

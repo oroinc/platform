@@ -38,6 +38,10 @@ oro:
                 system: 'System variables'
                 entity: 'Entity variables'
 
+            action:
+                preview: Preview
+                clone: Clone
+
             # email template system variables
             user_name:           Username of logged in user
             user_first_name:     First name of logged in user
@@ -101,6 +105,12 @@ oro:
 
         empty_body:               Empty body
 
+        entity_config:
+            email:
+                field:
+                    items:
+                        available_in_template: Available in email templates
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"
@@ -112,3 +122,4 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
+"Content": "Content"

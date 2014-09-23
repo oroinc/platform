@@ -24,7 +24,7 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'Entities'|trans,
         'entityTitle': entity_config.get('label')|default('N/A')|trans,
     } %}
 

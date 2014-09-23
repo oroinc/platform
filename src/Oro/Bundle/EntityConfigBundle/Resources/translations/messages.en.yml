@@ -25,7 +25,6 @@ oro:
             entity_management.label:       Entity Management
             entity_management.description: List of entities
 
-
         controller:
             config_entity:
                 message:
@@ -54,3 +53,7 @@ oro:
         info:
             new_field.label:     New Field
             records_count.label: Number of records: %count%
+
+        form:
+            name.label: Name
+            type.label: Type

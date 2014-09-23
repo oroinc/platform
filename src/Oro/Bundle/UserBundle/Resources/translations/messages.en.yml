@@ -19,6 +19,9 @@ Login page: Login page
 "Generate key": "Generate key"
 "Access Settings": "Access Settings"
 "Organization": "Organization"
+"Business Unit": "Business Unit"
+"User": "User"
+"None": "None"
 
 change_password:
     flash:
@@ -105,6 +108,7 @@ oro:
             roles.label: Roles
             owner.label: Owner
             organization.label: Organization
+            has_group.label: Has group
         #
         # Oro/Bundle/UserBundle/Entity/Role
         #
@@ -116,5 +120,6 @@ oro:
             role.label:   Role
             label.label:  Label
             owner.label:  Owner
+            has_role.label: Has role
         invite:
             label: Send an Email Invitation

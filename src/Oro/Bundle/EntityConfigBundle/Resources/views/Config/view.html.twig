@@ -14,8 +14,8 @@
     {% if resource_granted('oro_entityconfig_manage') %}
         {{ UI.editButton({
             'path': path('oro_entityconfig_update', { id: entity.id }),
-            'title': 'Edit entity',
-            'label': 'Edit'
+            'title': 'Edit entity'|trans,
+            'label': 'Edit'|trans
         }) }}
         {% for button in button_config %}
             {{ UI.button({
@@ -25,8 +25,8 @@
                 },
                 'iCss'   : button.iCss|default(''),
                 'aCss'   : button.aCss|default(''),
-                'title'  : button.title|default(button.name),
-                'label'  : button.name
+                'title'  : button.title|default(button.name)|trans,
+                'label'  : button.name|trans
             }) }}
         {% endfor %}
     {% endif %}
@@ -36,7 +36,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'Entities'|trans,
         'entityTitle': entity_config.get('label')|default(entity_name)|trans,
     }%}
 

@@ -114,7 +114,7 @@
                         <div class="form-container">
                             <form action="#" class="form-horizontal">
                                 <div class="control-group">
-                                    {{ _self.render_label("Name", true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.transition.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                     </div>
@@ -124,7 +124,7 @@
                                 var stepFromName = stepFrom ? stepFrom.get('name') : '';
                                 %>
                                 <div class="control-group">
-                                    {{ _self.render_label("From step", true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.from_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_from.tooltip") }}
                                     <div class="controls">
                                         <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
                                         <% if (name && !_is_clone) { %>disabled="disabled"<% } %>
@@ -144,7 +144,7 @@
                                 <% } %>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("To step", true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.to_step.label"|trans, true, "oro.workflow.workflowdefinition.transition.step_to.tooltip") }}
                                     <div class="controls">
                                         <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
                                             <option value=""></option>
@@ -161,7 +161,7 @@
                                 </div>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("View form", true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.view_form.label"|trans, true, "oro.workflow.workflowdefinition.transition.display_type.tooltip") }}
                                     <div class="controls">
                                         <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
                                             <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
@@ -171,7 +171,7 @@
                                 </div>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("Warning message", false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.warning_message.label"|trans, false, "oro.workflow.workflowdefinition.transition.message.tooltip") }}
                                     <div class="controls">
                                         <textarea name="message"><%= message %></textarea>
                                     </div>
@@ -186,7 +186,7 @@
                                 <% print('</sc' + 'ript>'); %>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("Button style", false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.button_style.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_color.tooltip") }}
                                     <div class="controls">
                                         <select name="button_color">
                                             <% _.each(allowedButtonStyles, function (style) { %>
@@ -199,7 +199,7 @@
                                 </div>
 
                                 <div class="control-group transition-example-container">
-                                    {{ _self.render_label("Button preview", false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.button_preview.label"|trans, false, "oro.workflow.workflowdefinition.transition.button_preview.tooltip") }}
                                     <div class="controls">
                                         <div class="transition-btn-example"></div>
                                     </div>
@@ -248,21 +248,21 @@
                         <div class="tab-data">
                             <form action="#" class="form-horizontal">
                                 <div class="control-group">
-                                    {{ _self.render_label("Name", true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
                                     </div>
                                 </div>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("Position", false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
                                     <div class="controls">
                                         <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
                                     </div>
                                 </div>
 
                                 <div class="control-group">
-                                    {{ _self.render_label("Final", false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
+                                    {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
                                     <div class="controls">
                                         <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
                                     </div>
@@ -337,21 +337,21 @@
         <form action="#">
             <div class="form-horizontal" style="width: 436px;">
                 <div class="control-group">
-                    {{ _self.render_label("Entity field", true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
+                    {{ _self.render_label("oro.workflow.form.entity_field.label"|trans, true, "oro.workflow.workflowdefinition.attribute.property_path.tooltip") }}
                     <div class="controls">
                         <input type="hidden" name="property_path" data-validation="{{ requiredConstraint|json_encode }}"/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    {{ _self.render_label("Label", false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
+                    {{ _self.render_label("oro.workflow.form.label.label"|trans, false, "oro.workflow.workflowdefinition.attribute.label.tooltip") }}
                     <div class="controls">
                         <input type="text" name="label" value="<%= label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    {{ _self.render_label("Required", false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
+                    {{ _self.render_label("oro.workflow.form.required.label"|trans, false, "oro.workflow.workflowdefinition.attribute.required.tooltip") }}
                     <div class="controls">
                         <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>
                     </div>
@@ -445,7 +445,7 @@
     {% set startStepSelector %}
         {% set startStep = entity.startStep ? entity.startStep.name : '' %}
         <div class="control-group">
-            {{ _self.render_label("Default step", false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
+            {{ _self.render_label("oro.workflow.workflowdefinition.start_step.label"|trans, false, "oro.workflow.workflowdefinition.start_step.tooltip") }}
             <div class="controls">
                 <input type="hidden" name="start_step" value="{{ startStep }}"/>
             </div>
