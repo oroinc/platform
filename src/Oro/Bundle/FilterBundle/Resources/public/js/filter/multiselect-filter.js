@@ -39,19 +39,31 @@ define([
         },
 
         /**
+         * Minimal width of dropdown
+         *
+         * @private
+         */
+        minimumDropdownWidth: 120,
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function (options) {
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {
+                    value: [FILTER_EMPTY_VALUE]
+                };
+            }
+            MultiSelectFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
          * @inheritDoc
          */
         _onSelectChange: function () {
             MultiSelectFilter.__super__._onSelectChange.apply(this, arguments);
             this._setDropdownWidth();
         },
-
-        /**
-         * Minimal width of dropdown
-         *
-         * @private
-         */
-        minimumDropdownWidth: 120,
 
         /**
          * Set design for select dropdown
@@ -79,60 +91,44 @@ define([
          * @return {*}
          */
         setValue: function (value) {
-            var oldValue = this.value;
-
-            this.value = this._checkValue(tools.deepClone(value), oldValue);
-
-            // update checkboxes state always
-            this._onValueUpdated(this.value, oldValue);
-            this._updateDOMValue();
-
-            return this;
+            var normValue;
+            normValue = this._normalizeValue(tools.deepClone(value));
+            // prevent uncheck 'Any' value
+            if (value.value == null && tools.isEqualsLoosely(this.value, normValue)) {
+                this._updateDOMValue();
+                this._onValueUpdated(normValue, this.value);
+            }
+            MultiSelectFilter.__super__.setValue.call(this, normValue);
         },
 
         /**
          * Updates checkboxes when user clicks on element corresponding empty value
          */
-        _checkValue: function (newValue, oldValue) {
-            // means that  all checkboxes are unchecked
-            if (newValue.value == null) {
-                newValue.value = [FILTER_EMPTY_VALUE];
-                return newValue;
+        _normalizeValue: function (value) {
+            // means that all checkboxes are unchecked
+            if (value.value == null) {
+                value.value = [FILTER_EMPTY_VALUE];
+                return value;
             }
             // if we have old value
             // need to check if it has selected "EMPTY" option
-            if (
-                    oldValue.value == FILTER_EMPTY_VALUE
-                    || (oldValue.value.indexOf && oldValue.value.indexOf(FILTER_EMPTY_VALUE) != -1)
-            ) {
+            if (this.isEmpty()) {
                 // need to uncheck it in new value
-                if (newValue.value.length > 1) {
-                    var indexOfEmptyOption = newValue.value.indexOf(FILTER_EMPTY_VALUE);
+                if (value.value.length > 1) {
+                    var indexOfEmptyOption = value.value.indexOf(FILTER_EMPTY_VALUE);
                     if (indexOfEmptyOption != -1) {
-                        newValue.value.splice(indexOfEmptyOption, 1);
+                        value.value.splice(indexOfEmptyOption, 1);
                     }
                 }
             } else {
                 // if we just selected "EMPTY" option
-                if (!newValue.value || newValue.value.indexOf(FILTER_EMPTY_VALUE) != -1) {
+                if (!value.value || value.value.indexOf(FILTER_EMPTY_VALUE) != -1) {
                     // clear other choices
-                    newValue.value = [FILTER_EMPTY_VALUE];
+                    value.value = [FILTER_EMPTY_VALUE];
                 }
             }
-            return newValue;
-        },
-
-        isEmpty: function () {
-            var value = this.getValue().value;
-            if (!value || value.length == 0) {
-                return true;
-            }
-            if (value.length == 1 && value[0] == FILTER_EMPTY_VALUE) {
-                return true;
-            }
-            return false;
+            return value;
         }
-
     });
 
     return MultiSelectFilter;

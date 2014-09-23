@@ -27,9 +27,4 @@ class TestEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     public function process(EmailOrigin $origin, $syncStartTime)
     {
     }
-
-    public function callGetKnownEmailAddresses()
-    {
-        return $this->getKnownEmailAddresses();
-    }
 }

@@ -39,7 +39,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
      */
     public function getDefaultDefinition()
     {
-        return '*/30 * * * *';
+        return '*/1 * * * *';
     }
 
     /**

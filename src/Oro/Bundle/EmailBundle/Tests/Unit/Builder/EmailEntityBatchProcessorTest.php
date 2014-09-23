@@ -130,6 +130,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $dbAddr = $this->addrManager->newEmailAddress()->setEmail('DbExist');
 
         $email1 = new Email();
+        $email1->setXMessageId('email1');
         $email1->setMessageId('email1');
         $email1->addFolder($folder);
         $email1->setFromEmailAddress($addr);
@@ -138,6 +139,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->batch->addEmail($email1);
 
         $email2 = new Email();
+        $email2->setXMessageId('email2');
         $email2->setMessageId('email2');
         $email2->addFolder($newFolder);
         $email2->setFromEmailAddress($newAddr);
@@ -146,6 +148,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->batch->addEmail($email2);
 
         $email3 = new Email();
+        $email3->setXMessageId('email3');
         $email3->setMessageId('some_email');
         $email3->addFolder($folder);
         $email3->setFromEmailAddress($newAddr);
@@ -154,6 +157,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->batch->addEmail($email3);
 
         $email4 = new Email();
+        $email4->setXMessageId('email4');
         $email4->setMessageId('some_email');
         $email4->addFolder($folder);
         $email4->setFromEmailAddress($newAddr);
@@ -162,6 +166,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->batch->addEmail($email4);
 
         $existingEmail = new Email();
+        $existingEmail->setXMessageId('existing_email');
         $existingEmail->setMessageId('some_email');
         $existingEmail->addFolder($dbFolder);
         $existingEmail->setFromEmailAddress($newAddr);
@@ -256,6 +261,14 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($newAddr === $email2Recipients[1]->getEmailAddress());
         $this->assertTrue($owner === $email2Recipients[1]->getEmailAddress()->getOwner());
 
+        $changes = $this->batch->getChanges();
+        $this->assertCount(3, $changes);
+        $this->assertSame($folder, $changes[0]['old']);
+        $this->assertSame($dbFolder, $changes[0]['new']);
+        $this->assertSame($email3, $changes[1]['old']);
+        $this->assertSame($existingEmail, $changes[1]['new']);
+        $this->assertSame($email4, $changes[2]['old']);
+        $this->assertSame($existingEmail, $changes[2]['new']);
     }
 
     /**

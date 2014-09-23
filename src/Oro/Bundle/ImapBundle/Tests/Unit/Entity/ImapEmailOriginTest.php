@@ -2,49 +2,55 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
 class ImapEmailOriginTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_STRING    = 'testString';
-    const TEST_ID        = 123;
-    const TEST_FLOAT     = 123.123;
-
-    /** @var ImapEmailOrigin */
-    protected $entity;
-
-    protected function setUp()
+    public function testGetId()
     {
-        $this->entity = new ImapEmailOrigin();
+        $origin = new ImapEmailOrigin();
+        ReflectionUtil::setId($origin, 123);
+        $this->assertEquals(123, $origin->getId());
     }
 
-    /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
-     */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testHostGetterAndSetter()
     {
-        if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
-        }
-
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $origin = new ImapEmailOrigin();
+        $this->assertNull($origin->getHost());
+        $origin->setHost('test');
+        $this->assertEquals('test', $origin->getHost());
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function testPortGetterAndSetter()
     {
-        return [
-            'host'        => ['host', self::TEST_STRING, self::TEST_STRING],
-            'port'        => ['port', self::TEST_ID, self::TEST_ID],
-            'ssl'         => ['ssl', self::TEST_STRING, self::TEST_STRING],
-            'user'        => ['user', self::TEST_STRING, self::TEST_STRING],
-            'password'    => ['password', self::TEST_STRING, self::TEST_STRING],
-        ];
+        $origin = new ImapEmailOrigin();
+        $this->assertEquals(0, $origin->getPort());
+        $origin->setPort(123);
+        $this->assertEquals(123, $origin->getPort());
+    }
+
+    public function testSslGetterAndSetter()
+    {
+        $origin = new ImapEmailOrigin();
+        $this->assertNull($origin->getSsl());
+        $origin->setSsl('test');
+        $this->assertEquals('test', $origin->getSsl());
+    }
+
+    public function testUserGetterAndSetter()
+    {
+        $origin = new ImapEmailOrigin();
+        $this->assertNull($origin->getUser());
+        $origin->setUser('test');
+        $this->assertEquals('test', $origin->getUser());
+    }
+
+    public function testPasswordGetterAndSetter()
+    {
+        $origin = new ImapEmailOrigin();
+        $this->assertNull($origin->getPassword());
+        $origin->setPassword('test');
+        $this->assertEquals('test', $origin->getPassword());
     }
 }
