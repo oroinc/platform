@@ -154,11 +154,12 @@ class EmailRenderer extends \Twig_Environment
     protected function processDateTimeFields(EmailTemplateInterface $emailTemplate, $object)
     {
         $haveReplacements     = false;
-        $emailTemplateContent = $emailTemplate->getContent();
-        $emailTemplateSubject = $emailTemplate->getSubject();
         $entityManager        = $this->doctrine->getManager();
         $entityMetadata       = $entityManager->getClassMetadata(get_class($object));
         if ($entityMetadata) {
+            $emailTemplateContent = $emailTemplate->getContent();
+            $emailTemplateSubject = $emailTemplate->getSubject();
+
             $entityFieldMappings = $entityMetadata->fieldMappings;
             array_walk(
                 $entityFieldMappings,

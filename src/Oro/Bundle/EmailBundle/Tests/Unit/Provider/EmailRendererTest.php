@@ -157,10 +157,10 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $subject = 'subject';
 
         $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $emailTemplate->expects($this->exactly(2))
+        $emailTemplate->expects($this->once())
             ->method('getContent')
             ->will($this->returnValue($content));
-        $emailTemplate->expects($this->exactly(2))
+        $emailTemplate->expects($this->once())
             ->method('getSubject')
             ->will($this->returnValue($subject));
 
@@ -236,13 +236,17 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function getRendererInstance()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject */
         $dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject */
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject */
         $em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
             ->disableOriginalConstructor()
             ->getMock();

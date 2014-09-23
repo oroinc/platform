@@ -73,9 +73,6 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()->getMock();
-
         $this->processor = new EmailNotificationProcessor(
             $this->logger,
             $this->entityManager,
