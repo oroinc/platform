@@ -63,18 +63,15 @@ class EnumNameType extends AbstractType
                         'message' => self::INVALID_NAME_MESSAGE
                     ]
                 );
-                $constraints[] = new Assert\Callback(
-                    [
-                        function ($value, ExecutionContext $context) {
-                            if (!empty($value)) {
-                                $code = ExtendHelper::buildEnumCode($value, false);
-                                if (empty($code)) {
-                                    $context->addViolation(self::INVALID_NAME_MESSAGE, ['{{ value }}' => $value]);
-                                }
-                            }
+                $callback = function ($value, ExecutionContext $context) {
+                    if (!empty($value)) {
+                        $code = ExtendHelper::buildEnumCode($value, false);
+                        if (empty($code)) {
+                            $context->addViolation(self::INVALID_NAME_MESSAGE, ['{{ value }}' => $value]);
                         }
-                    ]
-                );
+                    }
+                };
+                $constraints[] = new Assert\Callback($callback);
                 $constraints[] = new UniqueEnumName(
                     [
                         'entityClassName' => $fieldConfigId->getClassName(),
