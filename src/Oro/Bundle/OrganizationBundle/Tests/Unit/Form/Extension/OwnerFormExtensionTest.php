@@ -223,7 +223,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             array(
                 'empty_value' => 'oro.business_unit.form.choose_business_user',
                 'mapped' => true,
-                'label' => 'Owner',
+                'label' => 'oro.form.owner.label',
                 'business_unit_ids' => array(),
                 'configs'     => array(
                     'is_translated_option' => true,
@@ -252,7 +252,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
-                'label' => 'Owner'
+                'label' => 'oro.form.owner.label'
             )
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
