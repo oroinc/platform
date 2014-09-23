@@ -76,9 +76,11 @@ define(function (require) {
 
         onBeforeSubmit: function (e) {
             var unsavedComponents = [], modal;
+
             // please note that event name, looks like method call
             // 'cause listeners will populate unsavedComponents array
             this.trigger('find-unsaved-components', unsavedComponents);
+
             if (!unsavedComponents.length) {
                 // Normal exit, form submitted
                 this.trigger('before-submit');
@@ -93,6 +95,7 @@ define(function (require) {
             });
 
             modal.open(_.bind(function () {
+                // let sub-components do cleanup before submit
                 this.trigger('before-submit');
                 this.form.trigger('submit');
             }, this));
