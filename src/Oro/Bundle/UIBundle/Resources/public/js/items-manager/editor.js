@@ -31,13 +31,13 @@ define([
             getter: function ($el, name, value) {
                 return value;
             },
-            chenged: false
+            changed: false
         },
 
         /**
-         * Should return array with validation errors keys
+         * Is this component changed by user
          *
-         * @returns {array}
+         * @returns {boolean}
          */
         hasChanges: function () {
             return this.changed;
