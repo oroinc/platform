@@ -54,7 +54,7 @@ class EnumValueType extends AbstractType
                 }
             };
 
-            $constraints[] = new Assert\Callback($callback);
+            $constraints[] = new Assert\Callback([$callback]);
         }
 
         $form->add(
