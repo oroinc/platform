@@ -37,19 +37,20 @@ class PackageController extends Controller
         $errors = [];
 
         foreach ($manager->getInstalled() as $package) {
-            $items[] = [
+            $item = [
                 'package' => $package,
                 'update' => null,
                 'canBeDeleted' => false
             ];
             try {
-                $items['update'] = $manager->getPackageUpdate($package);
-                $items['canBeDeleted'] = $manager->canBeDeleted($package->getPrettyName());
+                $item['update'] = $manager->getPackageUpdate($package);
+                $item['canBeDeleted'] = $manager->canBeDeleted($package->getPrettyName());
             } catch (\Exception $e) {
                 if (!in_array($e->getMessage(), $errors)) {
                     $errors[] = $e->getMessage();
                 }
             }
+            $items[] = $item;
         }
 
         return [
