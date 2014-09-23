@@ -29,6 +29,8 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  *      order.products|left|WITH|products.orderId = order AND products.active = true
  *          - represents "order -> products" join with custom condition and forces to use LEFT JOIN
  * The join identifier for the root table is empty string.
+ * @todo: need to think how to reduce the complexity of this class
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JoinIdentifierHelper
 {
@@ -262,13 +264,7 @@ class JoinIdentifierHelper
         $lastItemDelimiter = $this->getStartPosition($joinId, '+');
         $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
 
-        if (false === $startDelimiter) {
-            $firstJoinPart = $this->getUnidirectionalJoinEntityName($joinId);
-
-            return false === strpos($firstJoinPart, '.');
-        }
-
-        return false;
+        return (false === $startDelimiter) && (false === strpos($this->getUnidirectionalJoinEntityName($joinId), '.'));
     }
 
     /**
@@ -288,11 +284,8 @@ class JoinIdentifierHelper
             : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
 
         $lastDelimiter = $this->getStartPosition($lastJoinPart, '::');
-        if ($lastDelimiter > 0) {
-            return substr($lastJoinPart, $lastDelimiter);
-        }
 
-        return $lastJoinPart;
+        return $lastDelimiter > 0 ? substr($lastJoinPart, $lastDelimiter) : $lastJoinPart;
     }
 
     /**
