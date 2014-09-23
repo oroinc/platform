@@ -5,7 +5,9 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,42 +20,31 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     const TEST_MESSAGE_LIMIT = 10;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityPool;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailRenderer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $twig;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $cm;
 
-    /**
-     * @var EmailNotificationProcessor
-     */
+    /** @var  DateTimeFormatter */
+    protected $dateTimeFormatter;
+
+    /** @var EmailNotificationProcessor */
     protected $processor;
 
     protected function setUp()
@@ -85,13 +76,17 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+            ->disableOriginalConstructor()->getMock();
+
         $this->processor = new EmailNotificationProcessor(
             $this->logger,
             $this->entityManager,
             $this->entityPool,
             $this->emailRenderer,
             $this->mailer,
-            $this->cm
+            $this->cm,
+            $this->dateTimeFormatter
         );
 
         $this->processor->setEnv(self::TEST_ENV);
@@ -118,7 +113,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $object       = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $object       = new User();
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
