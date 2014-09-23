@@ -35,7 +35,6 @@ class CacheClearCommand extends ContainerAwareCommand
         if (!$input->getOption('no-warmup')) {
             $dumper->dump();
             $processor->generateProxies();
-
         }
     }
 }
