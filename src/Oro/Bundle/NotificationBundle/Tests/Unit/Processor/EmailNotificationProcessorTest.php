@@ -5,9 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
