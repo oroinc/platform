@@ -15,6 +15,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 
 class OrmFilterExtension extends AbstractExtension
 {
@@ -232,7 +234,21 @@ class OrmFilterExtension extends AbstractExtension
             return $defaultFilters;
         }
 
-        if (!$this->getParameters()->all()) {
+        $intersectKeys = array_intersect(
+            $this->getParameters()->keys(),
+            [
+                OrmSorterExtension::SORTERS_ROOT_PARAM,
+                PagerInterface::PAGER_ROOT_PARAM,
+                ParameterBag::ADDITIONAL_PARAMETERS,
+                ParameterBag::MINIFIED_PARAMETERS,
+                self::FILTER_ROOT_PARAM,
+                self::MINIFIED_FILTER_PARAM
+            ]
+        );
+
+        $gridHasInitialState = empty($intersectKeys);
+
+        if ($gridHasInitialState) {
             return $defaultFilters;
         }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
 class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
@@ -83,11 +84,11 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $gridConfig
      * @param array $parameters
-     * @param array $expected
+     * @param mixed $expected
      *
      * @dataProvider valuesDataProvider
      */
-    public function testGetValuesToApply(array $gridConfig, array $parameters, array $expected)
+    public function testGetValuesToApply(array $gridConfig, array $parameters, $expected)
     {
         $gridConfig = DatagridConfiguration::create($gridConfig);
 
@@ -113,7 +114,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $form
-            ->expects($this->once())
+            ->expects(is_array($expected) ? $this->once() : $this->never())
             ->method('submit')
             ->with($this->equalTo($expected));
 
@@ -143,7 +144,29 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     public function valuesDataProvider()
     {
         return [
-            'default_filter_without_parametrized'         => [
+            'default_filter_no_parameters_modified_grid'  => [
+                [
+                    'filters' => [
+                        'columns' => [
+                            'filter' => [
+                                'type' => 'string'
+                            ],
+                        ],
+                        'default' => [
+                            'filter' => [
+                                'value' => 'filter-value'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    PagerInterface::PAGER_ROOT_PARAM => [
+                        PagerInterface::DISABLED_PARAM => true
+                    ]
+                ],
+                false
+            ],
+            'default_filter_no_parameters_new_grid'       => [
                 [
                     'filters' => [
                         'columns' => [
