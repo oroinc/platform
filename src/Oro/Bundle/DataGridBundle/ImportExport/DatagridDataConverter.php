@@ -64,8 +64,8 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        if ($this->context->hasOption('columns')) {
-            $columns = $this->context->getOption('columns');
+        if ($this->context->getValue('columns')) {
+            $columns = $this->context->getValue('columns');
         } elseif ($this->context->hasOption('gridName')) {
             $gridName   = $this->context->getOption('gridName');
             $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
@@ -84,7 +84,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         }
 
         return $result;
-
     }
 
     /**
