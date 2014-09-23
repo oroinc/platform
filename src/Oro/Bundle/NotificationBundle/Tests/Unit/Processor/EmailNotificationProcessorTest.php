@@ -113,7 +113,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $object       = new User();
+        $object       = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
