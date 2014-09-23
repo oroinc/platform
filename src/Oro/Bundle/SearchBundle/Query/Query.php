@@ -394,7 +394,13 @@ class Query
      */
     public static function clearString($inputString)
     {
-        return trim(preg_replace('/ +/', self::DELIMITER, mb_ereg_replace('[^\w:*]', self::DELIMITER, $inputString)));
+        return trim(
+            preg_replace(
+                '/ +/',
+                self::DELIMITER,
+                preg_replace('/[^\w:*]/u', self::DELIMITER, $inputString)
+            )
+        );
     }
 
     /**
