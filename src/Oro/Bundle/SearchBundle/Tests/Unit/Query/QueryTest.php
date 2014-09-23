@@ -111,4 +111,24 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($query->getEntityByAlias('bad alias'));
     }
+
+    public function testStringCleanup()
+    {
+        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again';
+
+        $clearedValue     = Query::clearString($testString);
+        $textAllDataField = sprintf('%s %s', $testString, $clearedValue);
+
+        $result = implode(
+            Query::DELIMITER,
+            array_unique(
+                explode(
+                    Query::DELIMITER,
+                    $textAllDataField
+                )
+            )
+        );
+
+        $this->assertEquals($testString, $result);
+    }
 }

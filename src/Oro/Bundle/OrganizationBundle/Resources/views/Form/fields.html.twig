@@ -146,8 +146,10 @@
                 {% endif %}
                 <option {{ disable }} value="{{ choice.value }}"
                 {% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
-                    {# output is not escaped because it's done form in type "oro_business_unit_tree" #}
-                    {{- choice.label|trans({}, translation_domain)|raw -}}
+                    {%- spaceless -%}
+                        {# output is not escaped because it's done form in type "oro_business_unit_tree" #}
+                        {{ choice.label|trans({}, translation_domain)|raw }}
+                    {%- endspaceless -%}
                 </option>
             {% endif %}
         {% endfor %}

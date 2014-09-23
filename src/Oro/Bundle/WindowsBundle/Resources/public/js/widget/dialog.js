@@ -120,17 +120,18 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
          * @private
          */
         _onContentLoadFail: function(jqxhr) {
-            if (jqxhr.status != 403) {
-                AbstractWidget.prototype._onContentLoadFail.apply(this, arguments);
-            }
+            this.options.stateEnabled = false;
+            if (jqxhr.status == 403) {
+                messenger.notificationFlashMessage('error', __('oro.ui.forbidden_error'));
 
-            messenger.notificationFlashMessage('error', __('oro.ui.forbidden_error'));
-
-            if (this.widget) {
-                this.widget.dialog("close");
+                if (this.widget) {
+                    this.widget.dialog("close");
+                } else {
+                    // for case if error triggered before widget rendering
+                    this.closeHandler();
+                }
             } else {
-                //for case if error triggered before widget rendering
-                this.closeHandler();
+                AbstractWidget.prototype._onContentLoadFail.apply(this, arguments);
             }
         },
 

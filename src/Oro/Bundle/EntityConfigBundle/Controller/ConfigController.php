@@ -137,7 +137,7 @@ class ConfigController extends Controller
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
-        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
+        list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
         list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
 
         return [
@@ -400,7 +400,7 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['id' => str_replace('\\', '_', $entity->getClassName())]
+                    ['entityName' => str_replace('\\', '_', $entity->getClassName())]
                 );
             }
         }

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Component\Log\OutputLogger;
-
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 
@@ -50,6 +50,13 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'A list of bundle names which migrations should be skipped.'
+            )
+            ->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Timeout for child command execution',
+                CommandExecutor::DEFAULT_TIMEOUT
             );
     }
 
@@ -60,6 +67,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     {
         $force = $input->getOption('force');
         $dryRun = $input->getOption('dry-run');
+        $this->initCommandExecutor($input);
 
         if ($force || $dryRun) {
             $output->writeln($dryRun ? 'List of migrations:' : 'Process migrations...');
@@ -121,5 +129,14 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     protected function getMigrationExecutor(InputInterface $input)
     {
         return $this->getContainer()->get('oro_migration.migrations.executor');
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    protected function initCommandExecutor(InputInterface $input)
+    {
+        $commandExecutor = $this->getContainer()->get('oro_entity_config.tools.command_executor');
+        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
     }
 }
