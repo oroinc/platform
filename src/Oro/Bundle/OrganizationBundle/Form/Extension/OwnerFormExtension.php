@@ -56,7 +56,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $fieldName;
 
     /** @var string */
-    protected $fieldLabel = 'Owner';
+    protected $fieldLabel = 'oro.form.owner.label';
 
     /** @var bool */
     protected $isAssignGranted;
@@ -315,6 +315,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             $isRequired = $formBuilder->getOption('required');
 
             $options = array(
+                'label'              => $this->fieldLabel,
                 'required'           => true,
                 'constraints'        => $isRequired ? array(new NotBlank()) : array(),
                 'autocomplete_alias' => 'acl_users',

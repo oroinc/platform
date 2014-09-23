@@ -71,6 +71,7 @@ define([
             confirm_title: 'Execution Confirmation',
             confirm_content: 'Are you sure you want to do this?',
             confirm_ok: 'Yes, do it',
+            confirm_cancel: 'Cancel',
             success: 'Action performed.',
             error: 'Action is not performed.',
             empty_selection: 'Please, select item to perform action.'
@@ -282,7 +283,8 @@ define([
                 this.confirmModal = (new this.confirmModalConstructor({
                     title: __(this.messages.confirm_title),
                     content: __(this.messages.confirm_content),
-                    okText: __(this.messages.confirm_ok)
+                    okText: __(this.messages.confirm_ok),
+                    cancelText: __(this.messages.confirm_cancel)
                 }));
                 this.listenTo(this.confirmModal, 'ok', callback);
 

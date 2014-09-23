@@ -75,7 +75,7 @@ datagrid:
         columns:
             assigned:
                 frontend_type: boolean
-                label: Assigned
+                label: oro.entity.datagrid.assigned
                 editable: true
         properties:
             id: ~

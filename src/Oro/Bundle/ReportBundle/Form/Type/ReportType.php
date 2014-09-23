@@ -18,7 +18,11 @@ class ReportType extends AbstractQueryDesignerType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', array('required' => true))
+            ->add(
+                'name',
+                'text',
+                array('label' => '', 'required' => true)
+            )
             ->add('entity', 'oro_report_entity_choice', array('required' => true))
             ->add(
                 'type',

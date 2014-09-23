@@ -17,6 +17,7 @@ oro:
             delete:       Delete
             view:         View
             update:       Update
+            assigned:     Assigned
 
         entity_config:
             entity:
