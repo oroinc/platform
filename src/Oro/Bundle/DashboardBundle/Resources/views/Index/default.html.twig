@@ -19,7 +19,7 @@
                 <div class="pull-left pull-left-extra">
                     <div class="pull-left">
                         <h1 class="oro-subtitle">
-                            {{ dashboard.getLabel() }}
+                            {{ dashboard.getLabel()|trans }}
                         </h1>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                                 <select id="dashboard_selector">
                                     {% for dashboardModel in dashboards %}
                                         <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                            {{ dashboardModel.getLabel()|truncate(50) }}
+                                            {{ dashboardModel.getLabel()|trans|truncate(50) }}
                                         </option>
                                     {% endfor %}
                                 </select>
