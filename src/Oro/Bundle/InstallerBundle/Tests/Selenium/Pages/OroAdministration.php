@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Tests\Selenium\Pages;
 
-
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
 
 class OroAdministration extends AbstractPage
@@ -33,7 +32,6 @@ class OroAdministration extends AbstractPage
 
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $loadFixtures;
-
 
     public function __construct($testCase, $redirect = true)
     {
@@ -68,9 +66,8 @@ class OroAdministration extends AbstractPage
         $this->test->byXpath("//a[@class = 'button next primary']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Finish - Oro Application installation');
+        
         return new OroFinish($this->test);
-
-
     }
 
     public function setPasswordFirst($value)
