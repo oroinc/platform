@@ -31,7 +31,7 @@ define([
             getter: function ($el, name, value) {
                 return value;
             },
-            touched: false
+            chenged: false
         },
 
         /**
@@ -39,8 +39,8 @@ define([
          *
          * @returns {array}
          */
-        checkState: function () {
-            return !this.touched ? null : ["UNSAVED_CHANGES"];
+        hasChanges: function () {
+            return this.changed;
         },
 
         _create: function () {
@@ -87,7 +87,7 @@ define([
                 });
             }
             this._updateActions();
-            this.touched = false;
+            this.changed = false;
         },
 
         _onSaveItem: function (e) {
@@ -166,7 +166,7 @@ define([
         },
 
         _onElementChange: function (e) {
-            this.touched = true;
+            this.changed = true;
             if (this.validated) {
                 this._validate(e.target);
             }

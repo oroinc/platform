@@ -12,8 +12,7 @@ define(function (require) {
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        EntityFieldsUtil = require('oroentity/js/entity-fields-util'),
-        mediator = require('oroui/js/mediator');
+        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
     require('oroentity/js/field-choice');
     require('oroentity/js/fields-loader');
     require('orosegment/js/segment-choice');
@@ -76,19 +75,14 @@ define(function (require) {
         },
 
         onBeforeSubmit: function (e) {
-            var allErrors = [], modal, errors, unsavedComponents = [];
-            this.trigger('check-state', allErrors);
-            if (!allErrors.length) {
+            var unsavedComponents = [], modal;
+            // please note that event name, looks like method call
+            // 'cause listeners will populate unsavedComponents array
+            this.trigger('find-unsaved-components', unsavedComponents);
+            if (!unsavedComponents.length) {
                 // Normal exit, form submitted
                 this.trigger('before-submit');
                 return;
-            }
-
-            for (var i = 0; i < allErrors.length; i++) {
-                errors = allErrors[i];
-                if (errors.indexOf("UNSAVED_CHANGES") !== -1) {
-                    unsavedComponents.push(errors.componentName);
-                }
             }
 
             modal = new DeleteConfirmation({
@@ -316,11 +310,9 @@ define(function (require) {
                 collection: collection
             }));
 
-            this.on('check-state', function (messages) {
-                var message = $editor.itemsManagerEditor('checkState');
-                if (message) {
-                    message.componentName = __('oro.segment.grouping_editor');
-                    messages.push(message);
+            this.on('find-unsaved-components', function (unsavedComponents) {
+                if ($editor.itemsManagerEditor('hasChanges')) {
+                    unsavedComponents.push(__('oro.segment.grouping_editor'));
                 }
             });
 
@@ -430,11 +422,9 @@ define(function (require) {
                 sortingLabels[this.value] = $(this).text();
             });
 
-            this.on('check-state', function (messages) {
-                var message = $editor.itemsManagerEditor('checkState');
-                if (message) {
-                    message.componentName = __('oro.segment.report_column_editor');
-                    messages.push(message);
+            this.on('find-unsaved-components', function (unsavedComponents) {
+                if ($editor.itemsManagerEditor('hasChanges')) {
+                    unsavedComponents.push(__('oro.segment.report_column_editor'));
                 }
             });
 
