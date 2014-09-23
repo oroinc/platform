@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
@@ -63,9 +64,19 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        $gridConfig = $this->context->getConfiguration();
-        $columns    = $gridConfig['columns'];
-        $result     = array();
+        if ($this->context->hasOption('columns')) {
+            $columns = $this->context->getOption('columns');
+        } elseif ($this->context->hasOption('gridName')) {
+            $gridName   = $this->context->getOption('gridName');
+            $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
+            $columns    = $gridConfig->offsetGet('columns');
+        } else {
+            throw new InvalidConfigurationException(
+                'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
+            );
+        }
+
+        $result = array();
         foreach ($columns as $columnName => $column) {
             $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
@@ -73,6 +84,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         }
 
         return $result;
+
     }
 
     /**
