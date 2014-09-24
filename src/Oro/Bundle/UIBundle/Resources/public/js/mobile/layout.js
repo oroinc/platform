@@ -26,16 +26,18 @@ define(function (require) {
      * @see http://stackoverflow.com/questions/14492613/ios-ipad-fixed-position-breaks-when-keyboard-is-opened
      */
     function fixFixedHeader() {
-        var $body = $('body');
+        var $body, scroll;
+        $body = $('body');
+        scroll = _.debounce(function () {
+            $(document).scrollTop($(document).scrollTop());
+        }, 1);
         $(document)
             .on('focus', ':input', function () {
                 $body.addClass('fixfixed');
             })
             .on('blur', ':input', function () {
                 $body.removeClass('fixfixed');
-                _.debounce(function () {
-                    $(document).scrollTop($(document).scrollTop());
-                }, 1);
+                scroll();
             });
     }
 
