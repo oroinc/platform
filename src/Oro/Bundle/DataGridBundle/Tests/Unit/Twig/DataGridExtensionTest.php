@@ -187,7 +187,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
         $metadata->expects($this->once())
             ->method('offsetAddToArray')
-            ->with('options', ['url' => $url]);
+            ->with('options', ['url' => $url, 'urlParams' => $params]);
 
         $metadataArray = ['metadata-array'];
         $metadata->expects($this->once())

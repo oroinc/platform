@@ -90,7 +90,13 @@ class DataGridExtension extends \Twig_Extension
     public function getGridMetadata(DatagridInterface $grid, array $params = [])
     {
         $metaData = $grid->getMetadata();
-        $metaData->offsetAddToArray('options', ['url' => $this->generateUrl($grid, $params)]);
+        $metaData->offsetAddToArray(
+            'options',
+            [
+                'url' => $this->generateUrl($grid, $params),
+                'urlParams' => $params,
+            ]
+        );
 
         return $metaData->toArray();
     }
