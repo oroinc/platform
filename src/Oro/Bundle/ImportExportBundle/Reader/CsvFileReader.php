@@ -59,8 +59,8 @@ class CsvFileReader extends AbstractReader
         if (false !== $data) {
             $context = $this->getContext();
             $context->incrementReadOffset();
-            if (null === $data || array(null) === $data) {
-                return $this->getFile()->eof() ? null : array();
+            if (null === $data || [null] === $data) {
+                return $this->getFile()->eof() ? null : [];
             }
             $context->incrementReadCount();
 
@@ -158,10 +158,9 @@ class CsvFileReader extends AbstractReader
         } elseif (!$this->fileInfo->isReadable()) {
             throw new InvalidArgumentException(sprintf('File "%s" is not readable.', $this->fileInfo->getRealPath()));
         }
-    }
 
-    public function resetFile()
-    {
-        $this->getFile()->rewind();
+        if ($file = $this->getFile()) {
+            $file->rewind();
+        }
     }
 }

@@ -1,35 +1,43 @@
 parameters:
+    oro_importexport.handler.abstract.class:           Oro\Bundle\ImportExportBundle\Handler\AbstractHandler
+    oro_importexport.handler.import.abstract.class:    Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler
     oro_importexport.handler.import.http.class:        Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler
     oro_importexport.handler.import.cli.class:         Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
     oro_importexport.handler.export.class:             Oro\Bundle\ImportExportBundle\Handler\ExportHandler
 
 services:
-    oro_importexport.handler.import.http:
-        class: %oro_importexport.handler.import.http.class%
+    oro_importexport.handler.abstract:
+        class: %oro_importexport.handler.abstract.class%
+        absract: true
         arguments:
             - @oro_importexport.job_executor
             - @oro_importexport.processor.registry
             - @oro_importexport.file.file_system_operator
-            - @translator
-            - @session
-            - @router
+
+    oro_importexport.handler.import.abstract:
+        class: %oro_importexport.handler.import.abstract.class%
+        absract: true
+        parent: oro_importexport.handler.abstract
+        calls:
+            - [setTranslator, [@translator]]
+
+    oro_importexport.handler.import.http:
+        class: %oro_importexport.handler.import.http.class%
+        parent: oro_importexport.handler.import.abstract
+        calls:
+            - [setSession, [@session]]
+            - [setRouter, [@router]]
         lazy: true
 
     oro_importexport.handler.export:
         class: %oro_importexport.handler.export.class%
-        arguments:
-            - @oro_importexport.job_executor
-            - @oro_importexport.processor.registry
-            - @oro_importexport.file.file_system_operator
-            - @oro_importexport.file.mime_type_guesser
-            - @router
+        parent: oro_importexport.handler.abstract
+        calls:
+            - [setMimeTypeGuesser, [@oro_importexport.file.mime_type_guesser]]
+            - [setRouter, [@router]]
         lazy: true
 
     oro_importexport.handler.import.cli:
         class: %oro_importexport.handler.import.cli.class%
-        arguments:
-            - @oro_importexport.job_executor
-            - @oro_importexport.processor.registry
-            - @oro_importexport.file.file_system_operator
-            - @translator
+        parent: oro_importexport.handler.import.abstract
         lazy: true

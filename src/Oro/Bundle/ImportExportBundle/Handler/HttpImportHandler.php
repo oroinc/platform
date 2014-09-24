@@ -2,63 +2,43 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class HttpImportHandler extends AbstractImportHandler
 {
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
-
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
     /**
-     * Constructor
-     *
-     * @param JobExecutor        $jobExecutor
-     * @param ProcessorRegistry  $processorRegistry
-     * @param FileSystemOperator $fileSystemOperator
-     * @param Session            $session
-     * @param Router             $router
-     * @param Translator         $translator
+     * @param SessionInterface $session
      */
-    public function __construct(
-        JobExecutor $jobExecutor,
-        ProcessorRegistry $processorRegistry,
-        FileSystemOperator $fileSystemOperator,
-        Translator $translator,
-        Session $session,
-        Router $router
-    ) {
-        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $translator);
-        $this->session    = $session;
-        $this->translator = $translator;
-        $this->router     = $router;
+    public function setSession(SessionInterface $session)
+    {
+        $this->session = $session;
     }
 
     /**
-     * Handles import validation action
-     *
-     * @param string $jobName
-     * @param string $processorAlias
-     * @param string $inputFormat
-     * @param string $inputFilePrefix
-     * @param array  $options
-     * @return array response parameters
+     * @param RouterInterface $router
+     */
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function handleImportValidation(
         $jobName,
@@ -87,11 +67,11 @@ class HttpImportHandler extends AbstractImportHandler
         $counts = $this->getValidationCounts($jobResult);
 
         $errorsUrl           = null;
-        $errorsAndExceptions = array();
+        $errorsAndExceptions = [];
         if (!empty($counts['errors'])) {
             $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
-                array('jobCode' => $jobResult->getJobCode())
+                ['jobCode' => $jobResult->getJobCode()]
             );
             $context = $jobResult->getContext();
             $errorsAndExceptions = array_slice(
@@ -101,25 +81,18 @@ class HttpImportHandler extends AbstractImportHandler
             );
         }
 
-        return array(
+        return [
             'isSuccessful'   => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
             'errorsUrl'      => $errorsUrl,
             'errors'         => $errorsAndExceptions,
             'entityName'     => $entityName,
-        );
+        ];
     }
 
     /**
-     * Handles import action
-     *
-     * @param string $jobName
-     * @param string $processorAlias
-     * @param string $inputFormat
-     * @param string $inputFilePrefix
-     * @param array  $options
-     * @return Response
+     * {@inheritdoc}
      */
     public function handleImport(
         $jobName,
@@ -145,15 +118,15 @@ class HttpImportHandler extends AbstractImportHandler
         if ($jobResult->getFailureExceptions()) {
             $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
-                array('jobCode' => $jobResult->getJobCode())
+                ['jobCode' => $jobResult->getJobCode()]
             );
         }
 
-        return array(
+        return [
             'success'   => $jobResult->isSuccessful(),
             'message'   => $message,
             'errorsUrl' => $errorsUrl,
-        );
+        ];
     }
 
     /**
@@ -176,10 +149,7 @@ class HttpImportHandler extends AbstractImportHandler
     }
 
     /**
-     * @param string $inputFilePrefix
-     * @param string $inputFormat
-     * @return string
-     * @throws BadRequestHttpException
+     * {@inheritdoc}
      */
     protected function getImportingFileName($inputFormat, $inputFilePrefix = null)
     {
@@ -195,8 +165,8 @@ class HttpImportHandler extends AbstractImportHandler
     /**
      * Removes session variable for the given import file
      *
-     * @param $inputFilePrefix
-     * @param $inputFormat
+     * @param string $inputFilePrefix
+     * @param string $inputFormat
      */
     protected function removeImportingFile($inputFilePrefix, $inputFormat)
     {

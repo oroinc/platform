@@ -4,10 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 class ImportCommand extends ContainerAwareCommand
@@ -18,11 +18,12 @@ class ImportCommand extends ContainerAwareCommand
     const SRC_ARGUMENT_NAME = 'file';
 
     /**
-     * Set up the current command.
+     * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setName(static::COMMAND_NAME)
+        $this
+            ->setName(static::COMMAND_NAME)
             ->addArgument(
                 static::PROCESSOR_ALIAS_ARGUMENT_NAME,
                 InputArgument::REQUIRED,
@@ -37,9 +38,7 @@ class ImportCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int|null
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -58,7 +57,6 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         if ($validationInfo['isSuccessful']) {
-
             if (!$input->getOption('no-interaction') && !$this->getHelper('dialog')->askConfirmation(
                 $output,
                 '<question>Do you want to proceed [yes]?</question>',
@@ -67,14 +65,6 @@ class ImportCommand extends ContainerAwareCommand
                 return 0;
             }
 
-            /**
-             * Because of the fact that the reader is a shared service
-             * and it doesn't reset the read pointer after validation,
-             * we have to do this workaround to do it manually
-             */
-            $this->getContainer()->get('oro_importexport.reader.csv')->resetFile();
-
-            /** @var \Symfony\Component\HttpFoundation\JsonResponse $importInfo */
             $importInfo = $this->getImportHandler()->handleImport(
                 JobExecutor::JOB_IMPORT_FROM_CSV,
                 $processorAlias
@@ -91,7 +81,7 @@ class ImportCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return \Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
+     * @return CliImportHandler
      */
     protected function getImportHandler()
     {

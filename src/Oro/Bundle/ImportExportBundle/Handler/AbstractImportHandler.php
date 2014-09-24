@@ -2,31 +2,23 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 
 abstract class AbstractImportHandler extends AbstractHandler
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
-    public function __construct(
-        JobExecutor $jobExecutor,
-        ProcessorRegistry $processorRegistry,
-        FileSystemOperator $fileSystemOperator,
-        Translator $translator
-    ) {
-        parent::__construct(
-            $jobExecutor,
-            $processorRegistry,
-            $fileSystemOperator
-        );
-
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
         $this->translator = $translator;
     }
 
@@ -38,6 +30,7 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param string $inputFormat
      * @param string $inputFilePrefix
      * @param array  $options
+     *
      * @return array response parameters
      */
     abstract public function handleImportValidation(
@@ -56,6 +49,7 @@ abstract class AbstractImportHandler extends AbstractHandler
      * @param string $inputFormat
      * @param string $inputFilePrefix
      * @param array  $options
+     *
      * @return array
      */
     abstract public function handleImport(
@@ -74,12 +68,13 @@ abstract class AbstractImportHandler extends AbstractHandler
     abstract protected function getImportingFileName($inputFormat, $inputFilePrefix = null);
 
     /**
-     * @param $jobName
-     * @param $processorAlias
-     * @param $inputFormat
-     * @param $inputFilePrefix
+     * @param string $jobName
+     * @param string $processorAlias
+     * @param string $inputFormat
+     * @param string $inputFilePrefix
      * @param array $options
-     * @return \Oro\Bundle\ImportExportBundle\Job\JobResult
+     *
+     * @return JobResult
      */
     protected function executeJob($jobName, $processorAlias, $inputFormat, array $options, $inputFilePrefix = null)
     {
@@ -89,17 +84,17 @@ abstract class AbstractImportHandler extends AbstractHandler
             $processorAlias
         );
 
-        $configuration = array(
+        $configuration = [
             'import' =>
                 array_merge(
-                    array(
+                    [
                         'processorAlias' => $processorAlias,
                         'entityName' => $entityName,
                         'filePath' => $fileName
-                    ),
+                    ],
                     $options
                 )
-        );
+        ];
 
         $jobResult = $this->jobExecutor->executeJob(
             ProcessorRegistry::TYPE_IMPORT,
@@ -118,7 +113,7 @@ abstract class AbstractImportHandler extends AbstractHandler
     {
         $context = $jobResult->getContext();
 
-        $counts = array();
+        $counts = [];
         $counts['errors'] = count($jobResult->getFailureExceptions());
         if ($context) {
             $counts['process'] = 0;
@@ -154,17 +149,17 @@ abstract class AbstractImportHandler extends AbstractHandler
         $entityName
     ) {
         $fileName = $this->getImportingFileName($inputFormat, $inputFilePrefix);
-        $configuration = array(
+        $configuration = [
             'import_validation' =>
                 array_merge(
-                    array(
+                    [
                         'processorAlias' => $processorAlias,
                         'entityName' => $entityName,
                         'filePath' => $fileName
-                    ),
+                    ],
                     $options
                 )
-        );
+        ];
 
         $jobResult = $this->jobExecutor->executeJob(
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
