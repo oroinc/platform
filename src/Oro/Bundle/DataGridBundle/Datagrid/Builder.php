@@ -14,11 +14,12 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class Builder
 {
-    const DATASOURCE_PATH          = '[source]';
-    const DATASOURCE_TYPE_PATH     = '[source][type]';
-    const DATASOURCE_ACL_PATH      = '[source][acl_resource]';
-    const BASE_DATAGRID_CLASS_PATH = '[options][base_datagrid_class]';
-    const DATASOURCE_SKIP_ACL_WALKER_PATH = '[options][skip_acl_walker_check]';
+    const DATASOURCE_PATH           = '[source]';
+    const DATASOURCE_TYPE_PATH      = '[source][type]';
+    const DATASOURCE_ACL_PATH       = '[source][acl_resource]';
+    const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
+    const DATASOURCE_SKIP_ACL_CHECK = '[options][skip_acl_check]';
+
     // Use this option as workaround for http://www.doctrine-project.org/jira/browse/DDC-2794
     const DATASOURCE_SKIP_COUNT_WALKER_PATH = '[options][skip_count_walker]';
 
@@ -53,7 +54,7 @@ class Builder
      * Create, configure and build datagrid
      *
      * @param DatagridConfiguration $config
-     * @param ParameterBag $parameters
+     * @param ParameterBag          $parameters
      *
      * @return DatagridInterface
      */

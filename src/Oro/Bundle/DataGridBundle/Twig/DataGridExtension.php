@@ -7,6 +7,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtension extends \Twig_Extension
@@ -114,8 +115,9 @@ class DataGridExtension extends \Twig_Extension
         $gridConfig = $this->manager->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
-            $acl = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
-            if ($acl && !$this->securityFacade->isGranted($acl)) {
+            $acl     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+            $aclSKip = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
+            if (!$aclSKip && $acl && !$this->securityFacade->isGranted($acl)) {
                 return false;
             } else {
                 return true;
