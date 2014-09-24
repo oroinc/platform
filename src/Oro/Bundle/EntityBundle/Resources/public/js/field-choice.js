@@ -45,6 +45,7 @@ define(function (require) {
             select2Options = $.extend({
                 initSelection: function (element, callback) {
                     var id, chain, opts, match;
+                    instance = element.data('select2');
                     opts = instance.opts;
                     id = element.val();
                     match = null;

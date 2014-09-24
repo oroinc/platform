@@ -69,6 +69,39 @@ define(function (require) {
             }
 
             SegmentComponent.__super__.initialize.call(this, options);
+
+            this.form = this.$storage.parents('form');
+            this.form.submit(_.bind(this.onBeforeSubmit, this));
+        },
+
+        onBeforeSubmit: function (e) {
+            var unsavedComponents = [], modal;
+
+            // please note that event name, looks like method call
+            // 'cause listeners will populate unsavedComponents array
+            this.trigger('find-unsaved-components', unsavedComponents);
+
+            if (!unsavedComponents.length) {
+                // Normal exit, form submitted
+                this.trigger('before-submit');
+                return;
+            }
+
+            modal = new DeleteConfirmation({
+                title: __('oro.segment.confirm.unsaved_changes.title'),
+                content: __('oro.segment.confirm.unsaved_changes.message', {components: unsavedComponents.join(', ')}),
+                okCloses: true,
+                okText: __('Ok')
+            });
+
+            modal.open(_.bind(function () {
+                // let sub-components do cleanup before submit
+                this.trigger('before-submit');
+                this.form.trigger('submit');
+            }, this));
+
+            // prevent form submitting
+            e.preventDefault();
         },
 
         /**
@@ -280,6 +313,16 @@ define(function (require) {
                 collection: collection
             }));
 
+            this.on('find-unsaved-components', function (unsavedComponents) {
+                if ($editor.itemsManagerEditor('hasChanges')) {
+                    unsavedComponents.push(__('oro.segment.grouping_editor'));
+                }
+            });
+
+            this.on('before-submit', function () {
+                $editor.itemsManagerEditor('reset');
+            });
+
             // setup Items Manager's table
             template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
             $table.itemsManagerTable({
@@ -380,6 +423,16 @@ define(function (require) {
             sortingLabels = {};
             $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
                 sortingLabels[this.value] = $(this).text();
+            });
+
+            this.on('find-unsaved-components', function (unsavedComponents) {
+                if ($editor.itemsManagerEditor('hasChanges')) {
+                    unsavedComponents.push(__('oro.segment.report_column_editor'));
+                }
+            });
+
+            this.on('before-submit', function () {
+                $editor.itemsManagerEditor('reset');
             });
 
             template = _.template(this.options.columnFieldChoiceOptions.select2.formatSelectionTemplate);

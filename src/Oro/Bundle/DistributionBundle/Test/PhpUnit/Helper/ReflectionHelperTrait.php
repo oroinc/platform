@@ -36,5 +36,4 @@ trait ReflectionHelperTrait
         $rp->setValue($classOrObject, $attributeValue);
         $rp->setAccessible(false);
     }
-
 }

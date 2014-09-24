@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use NumberFormatter as IntlNumberFormatter;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -318,16 +319,6 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                 'symbols' => array(),
                 'locale' => 'en_US'
             ),
-            'with_words' => array(
-                'expected' => '1 hour, 1 minute, 1 second',
-                'value' => 3661,
-                'attributes' => array(),
-                'textAttributes' => array(
-                    \NumberFormatter::DEFAULT_RULESET => "%with-words"
-                ),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
             'fix_for_localization_problems' => array(
                 'expected' => '01:01:01',
                 'value' => 3661,
@@ -365,12 +356,15 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function getAttributeDataProvider()
     {
+        $intlFormatter = new IntlNumberFormatter('en_US', \NumberFormatter::DECIMAL);
+        $maxIntegerDigits = $intlFormatter->getAttribute(\NumberFormatter::MAX_INTEGER_DIGITS);
+
         return array(
             array('parse_int_only', 'DECIMAL', 'en_US', 0),
             array('parse_int_only', null, 'en_US', 0),
             array('GROUPING_USED', 'decimal', 'en_US', 1),
             array(\NumberFormatter::DECIMAL_ALWAYS_SHOWN, \NumberFormatter::DECIMAL, 'en_US', 0),
-            array(\NumberFormatter::MAX_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 309),
+            array(\NumberFormatter::MAX_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', $maxIntegerDigits),
             array(\NumberFormatter::MIN_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1),
             array(\NumberFormatter::INTEGER_DIGITS,\NumberFormatter::DECIMAL, 'en_US', 1),
             array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 3),

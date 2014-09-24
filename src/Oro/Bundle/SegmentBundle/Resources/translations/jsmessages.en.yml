@@ -7,3 +7,10 @@ oro:
             success: Segment successfully processed.
             error: An unidentified error has occurred. Please contact your Administrator.
             okText: Yes
+        confirm:
+            unsaved_changes:
+                title: Unsaved changes
+                message: You have unsaved changes in {{ components }} that will be lost. Proceed anyway?
+        report_column_editor: the Report Column Editor
+        grouping_editor: the Grouping Editor
+

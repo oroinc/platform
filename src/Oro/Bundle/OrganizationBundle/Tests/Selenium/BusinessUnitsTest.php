@@ -28,7 +28,7 @@ class BusinessUnitsTest extends Selenium2TestCase
             ->assertTitle('Create Business Unit - Business Units - User Management - System');
         /* @var BusinessUnit $login */
         $login->setBusinessUnitName($unitName)
-            ->setOwner('Main')
+            ->setOrganization('OroCRM')
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
