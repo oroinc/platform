@@ -29,7 +29,7 @@ class GridController extends Controller
      * @Route(
      *      "/widget/{gridName}",
      *      name="oro_datagrid_widget",
-     *      requirements={"gridName"="\w\:-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      * @Template
      *
@@ -92,7 +92,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/export/",
      *      name="oro_datagrid_export_action",
-     *      requirements={"gridName"="\w\:-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
      * @param string $gridName
@@ -154,7 +154,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/massAction/{actionName}",
      *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="\w\:-]+", "actionName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
      *
      * @param string $gridName
