@@ -82,7 +82,7 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         return [
-            'isSuccessful'   => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
+            'success'        => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
             'processorAlias' => $processorAlias,
             'counts'         => $counts,
             'errorsUrl'      => $errorsUrl,
