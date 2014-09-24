@@ -113,10 +113,16 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isSubmitted')
             ->will($this->returnValue(false));
 
-        $form
-            ->expects(is_array($expected) ? $this->once() : $this->never())
-            ->method('submit')
-            ->with($this->equalTo($expected));
+        if (is_array($expected)) {
+            $form
+                ->expects($this->once())
+                ->method('submit')
+                ->with($this->equalTo($expected));
+        } else {
+            $form
+                ->expects($this->never())
+                ->method('submit');
+        }
 
         $filter
             ->expects($this->any())
