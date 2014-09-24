@@ -159,4 +159,9 @@ class CsvFileReader extends AbstractReader
             throw new InvalidArgumentException(sprintf('File "%s" is not readable.', $this->fileInfo->getRealPath()));
         }
     }
+
+    public function resetFile()
+    {
+        $this->getFile()->rewind();
+    }
 }

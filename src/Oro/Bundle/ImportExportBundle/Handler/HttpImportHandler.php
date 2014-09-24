@@ -13,17 +13,18 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
-class ImportHandler extends AbstractHandler
+class HttpImportHandler extends AbstractImportHandler
 {
     /**
      * @var Session
      */
     protected $session;
 
+
     /**
-     * @var Translator
+     * @var Router
      */
-    protected $translator;
+    protected $router;
 
     /**
      * Constructor
@@ -39,13 +40,14 @@ class ImportHandler extends AbstractHandler
         JobExecutor $jobExecutor,
         ProcessorRegistry $processorRegistry,
         FileSystemOperator $fileSystemOperator,
+        Translator $translator,
         Session $session,
-        Router $router,
-        Translator $translator
+        Router $router
     ) {
-        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $router);
+        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $translator);
         $this->session    = $session;
         $this->translator = $translator;
+        $this->router     = $router;
     }
 
     /**
@@ -68,52 +70,30 @@ class ImportHandler extends AbstractHandler
         if ($inputFilePrefix === null) {
             $inputFilePrefix = $processorAlias;
         }
-        $fileName   = $this->getImportingFileName($inputFilePrefix, $inputFormat);
         $entityName = $this->processorRegistry->getProcessorEntityName(
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             $processorAlias
         );
 
-        $configuration = array(
-            'import_validation' =>
-                array_merge(
-                    array(
-                        'processorAlias' => $processorAlias,
-                        'entityName'     => $entityName,
-                        'filePath'       => $fileName
-                    ),
-                    $options
-                )
-        );
-
-        $jobResult = $this->jobExecutor->executeJob(
-            ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+        $jobResult = $this->executeValidation(
             $jobName,
-            $configuration
+            $processorAlias,
+            $inputFormat,
+            $inputFilePrefix,
+            $options,
+            $entityName
         );
 
-        $context = $jobResult->getContext();
-
-        $counts           = array();
-        $counts['errors'] = count($jobResult->getFailureExceptions());
-        if ($context) {
-            $counts['process'] = 0;
-            $counts['read']    = $context->getReadCount();
-            $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['replace'] = $context->getReplaceCount();
-            $counts['process'] += $counts['update'] = $context->getUpdateCount();
-            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
-            $counts['error_entries'] = $context->getErrorEntriesCount();
-            $counts['errors'] += count($context->getErrors());
-        }
+        $counts = $this->getValidationCounts($jobResult);
 
         $errorsUrl           = null;
         $errorsAndExceptions = array();
         if (!empty($counts['errors'])) {
-            $errorsUrl           = $this->router->generate(
+            $errorsUrl = $this->router->generate(
                 'oro_importexport_error_log',
                 array('jobCode' => $jobResult->getJobCode())
             );
+            $context = $jobResult->getContext();
             $errorsAndExceptions = array_slice(
                 array_merge($jobResult->getFailureExceptions(), $context->getErrors()),
                 0,
@@ -151,32 +131,11 @@ class ImportHandler extends AbstractHandler
         if ($inputFilePrefix === null) {
             $inputFilePrefix = $processorAlias;
         }
-        $fileName   = $this->getImportingFileName($inputFilePrefix, $inputFormat);
-        $entityName = $this->processorRegistry->getProcessorEntityName(
-            ProcessorRegistry::TYPE_IMPORT,
-            $processorAlias
-        );
 
-        $configuration = array(
-            'import' =>
-                array_merge(
-                    array(
-                        'processorAlias' => $processorAlias,
-                        'entityName'     => $entityName,
-                        'filePath'       => $fileName
-                    ),
-                    $options
-                )
-        );
-
-        $jobResult = $this->jobExecutor->executeJob(
-            ProcessorRegistry::TYPE_IMPORT,
-            $jobName,
-            $configuration
-        );
+        $jobResult = $this->executeJob($jobName, $processorAlias, $inputFormat, $options, $inputFilePrefix);
 
         if ($jobResult->isSuccessful()) {
-            $this->removeImportingFile($inputFilePrefix, $inputFormat);
+            $this->removeImportingFile($inputFormat, $inputFilePrefix);
             $message = $this->translator->trans('oro.importexport.import.success');
         } else {
             $message = $this->translator->trans('oro.importexport.import.error');
@@ -190,12 +149,10 @@ class ImportHandler extends AbstractHandler
             );
         }
 
-        return new JsonResponse(
-            array(
-                'success'   => $jobResult->isSuccessful(),
-                'message'   => $message,
-                'errorsUrl' => $errorsUrl,
-            )
+        return array(
+            'success'   => $jobResult->isSuccessful(),
+            'message'   => $message,
+            'errorsUrl' => $errorsUrl,
         );
     }
 
@@ -224,7 +181,7 @@ class ImportHandler extends AbstractHandler
      * @return string
      * @throws BadRequestHttpException
      */
-    protected function getImportingFileName($inputFilePrefix, $inputFormat)
+    protected function getImportingFileName($inputFormat, $inputFilePrefix = null)
     {
         $fileName = $this->session
             ->get($this->getImportFileSessionKey($inputFilePrefix, $inputFormat));
