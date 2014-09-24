@@ -75,7 +75,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      */
     protected function checkUserOrganization(User $user, Organization $organization)
     {
-        if (!$user->getOrganizations()->contains($organization)) {
+        if (!$user->getOrganizations()->contains($organization) || !$organization->isEnabled()) {
             throw new BadCredentialsException(
                 sprintf("You don't have access to organization '%s'", $organization->getName())
             );

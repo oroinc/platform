@@ -6,6 +6,8 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             - NotBlank:     ~
             - Length:
                 max:        255
+        organization:
+            - NotBlank:     ~
         phone:
             - Length:
                 max:        100
