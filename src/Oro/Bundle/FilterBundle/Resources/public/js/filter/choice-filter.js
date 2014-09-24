@@ -140,6 +140,11 @@ define([
          */
         _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+
+            if (!value.type) {
+                throw new Error('Missing "type" option');
+            }
+
             var option = this._getChoiceOption(value.type);
 
             if (this.isEmptyType(value.type)) {
