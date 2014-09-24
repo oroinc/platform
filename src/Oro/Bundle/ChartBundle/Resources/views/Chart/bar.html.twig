@@ -109,7 +109,7 @@
                                         },
                                         xaxis: {
                                             {% if options.settings.xNoTicks is defined %}
-                                            noTicks: {{ options.settings.xNoTicks }},
+                                            noTicks: {{ options.settings.xNoTicks|json_encode|raw }},
                                             {% endif %}
                                             tickFormatter: function (x) {
                                                 return xLabels[parseInt(x)];

@@ -200,15 +200,17 @@
     </body>
     </html>
 {% else %}
-{# Template for hash tag navigation#}
-{% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-{% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
-    with {
-        'data': {
-            'scripts': block('head_script'),
-            'content': block('page_container'),
-            'breadcrumb': block('breadcrumb')|trim
+    {# Title should be generated as least once in order to pass data to title service #}
+    {% set title = oro_title_render() %}
+    {# Template for hash tag navigation#}
+    {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
+    {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
+        with {
+            'data': {
+                'scripts': block('head_script'),
+                'content': block('page_container'),
+                'breadcrumb': block('breadcrumb')|trim
+            }
         }
-    }
-%}
+    %}
 {% endif %}

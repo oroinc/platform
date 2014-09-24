@@ -69,7 +69,7 @@
             {% for child in form %}
                 <div class="oro-clearfix">
                     {{ form_widget(child) }}
-                    {{ form_label(child) }}
+                    {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false}) }}
                 </div>
             {% endfor %}
         </div>
@@ -99,16 +99,6 @@
     {% endif %}
 {% endspaceless %}
 {% endblock choice_widget_option_attributes %}
-
-{% block oro_flexibleentity_email_collection_widget %}
-    {% set subform = form.collection %}
-    {{ block('collection_render') }}
-{%  endblock oro_flexibleentity_email_collection_widget %}
-
-{% block oro_flexibleentity_phone_collection_widget %}
-    {% set subform = form.collection %}
-    {{ block('collection_render') }}
-{%  endblock oro_flexibleentity_phone_collection_widget %}
 
 {% block collection_render %}
     {% spaceless %}

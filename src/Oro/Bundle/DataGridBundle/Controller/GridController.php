@@ -110,11 +110,10 @@ class GridController extends Controller
 
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters = $parametersFactory->createParameters($gridName);
-
         $context = new ExportContext(
             array(
                 'gridName' => $gridName,
-                'gridParameters' => $parameters
+                'gridParameters' => $parameters,
             )
         );
 

@@ -245,7 +245,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
      * @param Email       $email
      * @param object|null $owner
      */
-    protected function addEmailSender(Email $email, $owner)
+    protected function addEmailSender(Email $email, $owner = null)
     {
         $emailAddr = new EmailAddress();
         $emailAddr->setOwner($owner);
@@ -257,7 +257,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
      * @param Email       $email
      * @param object|null $owner
      */
-    protected function addEmailRecipient(Email $email, $owner)
+    protected function addEmailRecipient(Email $email, $owner = null)
     {
         $emailAddr = new EmailAddress();
         $emailAddr->setOwner($owner);

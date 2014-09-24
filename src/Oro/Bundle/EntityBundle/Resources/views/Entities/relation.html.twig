@@ -8,9 +8,8 @@
             'data_not_in': app.request.get('removed')|split(','),
         },
         'class_name': entity_class,
-        'entity_id': entity_id,
-        'field_name': app.request.get('fieldName'),
-        'id': app.request.get('id')
+        'field_name': field_name,
+        'id': id
     } %}
 
     <style type="text/css">
@@ -78,7 +77,7 @@
                                         'oro_entity_detailed',
                                         {
                                             id: model.get('id'),
-                                            className: '{{ relation.get('target_entity')|replace('\\', '_') }}',
+                                            entityName: '{{ relation.get('target_entity')|replace('\\', '_') }}',
                                             fieldName: '{{ relation.getId().getFieldName() }}'
                                         }
                                 ),

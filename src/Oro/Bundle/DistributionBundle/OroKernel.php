@@ -25,7 +25,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles = array();
+        $bundles = [];
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -42,7 +42,7 @@ abstract class OroKernel extends Kernel
         // clear state of CumulativeResourceManager
         CumulativeResourceManager::getInstance()->clear();
 
-        $bundles = array();
+        $bundles = [];
 
         if (!$this->getCacheDir()) {
             foreach ($this->collectBundles() as $class => $params) {
@@ -71,11 +71,12 @@ abstract class OroKernel extends Kernel
      * Finds all .../Resource/config/oro/bundles.yml in given root folders
      *
      * @param array $roots
+     *
      * @return array
      */
-    protected function findBundles($roots = array())
+    protected function findBundles($roots = [])
     {
-        $paths = array();
+        $paths = [];
         foreach ($roots as $root) {
             if (!is_dir($root)) {
                 continue;
@@ -100,6 +101,7 @@ abstract class OroKernel extends Kernel
                         if (is_file($file)) {
                             $paths[] = $file;
                         }
+
                         return false;
                     }
                 }
@@ -112,44 +114,71 @@ abstract class OroKernel extends Kernel
         return $paths;
     }
 
+    /**
+     * @return array
+     */
     protected function collectBundles()
     {
         $files = $this->findBundles(
-            array(
+            [
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
-            )
+            ]
         );
+
+        $bundles    = [];
+        $exclusions = [];
         foreach ($files as $file) {
-            $import = Yaml::parse($file);
-
-            foreach ($import['bundles'] as $bundle) {
-                $kernel   = false;
-                $priority = 0;
-
-                if (is_array($bundle)) {
-                    $class    = $bundle['name'];
-                    $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
-                    $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
-                } else {
-                    $class = $bundle;
-                }
-
-                if (!isset($bundles[$class])) {
-                    $bundles[$class] = array(
-                        'name'     => $class,
-                        'kernel'   => $kernel,
-                        'priority' => $priority,
-                    );
-                }
+            $import  = Yaml::parse($file);
+            $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+            if (!empty($import['exclusions'])) {
+                $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
             }
         }
 
-        uasort($bundles, array($this, 'compareBundles'));
+        $bundles = array_diff_key($bundles, $exclusions);
+
+        uasort($bundles, [$this, 'compareBundles']);
 
         return $bundles;
     }
 
+    /**
+     * @param $bundles
+     *
+     * @return array
+     */
+    protected function getBundlesMapping(array $bundles)
+    {
+        $result = [];
+        foreach ($bundles as $bundle) {
+            $kernel   = false;
+            $priority = 0;
+
+            if (is_array($bundle)) {
+                $class    = $bundle['name'];
+                $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
+                $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
+            } else {
+                $class = $bundle;
+            }
+
+            $result[$class] = [
+                'name'     => $class,
+                'kernel'   => $kernel,
+                'priority' => $priority,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $a
+     * @param array $b
+     *
+     * @return int
+     */
     public function compareBundles($a, $b)
     {
         // @todo: this is preliminary algorithm. we need to implement more sophisticated one,
@@ -216,7 +245,7 @@ abstract class OroKernel extends Kernel
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
+        $content = $dumper->dump(['class' => $class, 'base_class' => $baseClass]);
         $cache->write($content, $container->getResources());
 
         if (!$this->debug) {

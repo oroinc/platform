@@ -1,7 +1,7 @@
-<script type="text/html" id="{{ id|raw }}">
+<script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="items list-box"></div>
     <div class="no-data">
-        <span>{{ "oro.note.no_notes_exist"|trans|raw }}</span>
+        <span>{{ "oro.note.no_notes_exist"|trans|e('html')|raw }}</span>
     </div>
     <div class="loading-mask"></div>
 </script>

@@ -1,8 +1,10 @@
-{% set curr_organization   = app.security.getToken().getOrganizationContext() %}
-{% set organizations       = get_enabled_organizations() %}
+{% set curr_organization = get_current_organization() %}
+{% set organizations = get_enabled_organizations() %}
 
 {% set organization_name %}
+{% spaceless %}
     {% placeholder organization_name %}
+{% endspaceless %}
 {% endset %}
 
 {% if organizations|length > 1 %}
@@ -12,7 +14,7 @@
             <ul class="dropdown-menu dropdown-organization-switcher">
                 {% for organization in organizations %}
                     <li>
-                        {% if curr_organization.getId() == organization.id %}
+                        {% if curr_organization and curr_organization.getId() == organization.id %}
                         <span class="selected"><b>{{ organization.name }}</b></span>
                         {% else %}
                         <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
@@ -27,27 +29,28 @@
                 {% endfor %}
             </ul>
         </div>
-        <h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-                {% if oro_theme_logo() %}
-                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                {% else %}
-                    {{ organization_name }}
-                {% endif %}
-            </a>
-        </h1>
+        {{ _self.organization_name_and_logo(organization_name) }}
     </div>
     <script type="text/javascript">
         require(['orosecurity/js/init-organization-selector'])
     </script>
 {% else %}
-    <h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-        <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-            {% if oro_theme_logo() %}
-                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-            {% else %}
-                {{ organization_name }}
-            {% endif %}
-        </a>
-    </h1>
+    {{ _self.organization_name_and_logo(organization_name) }}
 {% endif %}
+
+{% macro organization_name_and_logo(organization_name) %}
+    {% if organization_name|length %}
+        {% set logo = oro_theme_logo() %}
+        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
+                {% if logo %}
+                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
+                {% else %}
+                    {{- organization_name -}}
+                {% endif %}
+            </a>
+        </h1>
+    {% else %}
+        <span class="logo-placeholder"></span>
+    {% endif %}
+{% endmacro %}

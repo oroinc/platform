@@ -75,7 +75,7 @@ define([
                 if (!this.isEmpty()) {
                     var confirm = new DeleteConfirmation({
                         title:   __('oro.integration.change_type'),
-                        okText:  __('Yes, I Agree'),
+                        okText:  __('Yes'),
                         content: __('oro.integration.submit')
                     });
                     confirm.on('ok', _.bind(function () {

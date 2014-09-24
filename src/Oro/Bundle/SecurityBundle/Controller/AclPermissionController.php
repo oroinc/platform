@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class AclPermissionController extends Controller
 {
@@ -46,10 +48,13 @@ class AclPermissionController extends Controller
      */
     public function switchOrganizationAction(Organization $organization)
     {
-        $token         = $this->container->get('security.context')->getToken();
-        $organizations = $token->getUser()->getOrganizations();
+        $token = $this->container->get('security.context')->getToken();
 
-        if (!$organization->isEnabled() || !$organizations->contains($organization)) {
+        if (!$token instanceof OrganizationContextTokenInterface ||
+            !$token->getUser() instanceof User ||
+            !$organization->isEnabled() ||
+            !$token->getUser()->getOrganizations()->contains($organization)
+        ) {
             throw new AccessDeniedException(
                 $this->get('translator')->trans(
                     'oro.security.organization.access_denied',
@@ -60,19 +65,5 @@ class AclPermissionController extends Controller
 
         $token->setOrganizationContext($organization);
         return $this->redirect($this->generateUrl('oro_default'));
-    }
-
-    /**
-     * @Route(
-     *      "/organization",
-     *      name="oro_security_current_organization"
-     * )
-     * @Template("OroSecurityBundle:Organization:name.html.twig")
-     */
-    public function currentOrganizationNameAction()
-    {
-        return [
-            'name' => $this->container->get('security.context')->getToken()->getOrganizationContext()->getName()
-        ];
     }
 }

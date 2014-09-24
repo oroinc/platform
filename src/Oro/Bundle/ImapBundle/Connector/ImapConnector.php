@@ -35,14 +35,26 @@ class ImapConnector
     protected $searchStringManager;
 
     /**
-     * @param ImapConfig $config
+     * @param ImapConfig          $config
      * @param ImapServicesFactory $factory
      */
     public function __construct(ImapConfig $config, ImapServicesFactory $factory)
     {
-        $this->config = $config;
+        $this->config  = $config;
         $this->factory = $factory;
-        $this->imap = null;
+        $this->imap    = null;
+    }
+
+    /**
+     * Gets capabilities of IMAP server
+     *
+     * @return string[] list of capabilities
+     */
+    public function getCapability()
+    {
+        $this->ensureConnected();
+
+        return $this->imap->capability();
     }
 
     /**
@@ -60,7 +72,6 @@ class ImapConnector
     /**
      * Get selected folder
      *
-     * @throws \RuntimeException
      * @return string
      */
     public function getSelectedFolder()
@@ -84,6 +95,7 @@ class ImapConnector
 
     /**
      * @param SearchQuery|null $query
+     *
      * @return ImapMessageIterator
      */
     public function findItems($query = null)
@@ -98,7 +110,7 @@ class ImapConnector
         if (empty($searchString)) {
             $result = new ImapMessageIterator($this->imap);
         } else {
-            $ids = $this->imap->search(array($searchString));
+            $ids    = $this->imap->search(array($searchString));
             $result = new ImapMessageIterator($this->imap, $ids);
         }
 
@@ -109,7 +121,8 @@ class ImapConnector
      * Finds folders.
      *
      * @param string|null $parentFolder The global name of a parent folder.
-     * @param bool $recursive True to get all subordinate folders
+     * @param bool        $recursive    True to get all subordinate folders
+     *
      * @return Folder[]
      */
     public function findFolders($parentFolder = null, $recursive = false)
@@ -123,6 +136,7 @@ class ImapConnector
      * Finds a folder by its name.
      *
      * @param string $name The global name of the folder.
+     *
      * @return Folder
      */
     public function findFolder($name)
@@ -136,6 +150,7 @@ class ImapConnector
      * Retrieves item detail by its id.
      *
      * @param int $uid The UID of a message
+     *
      * @return Message
      */
     public function getItem($uid)
@@ -151,7 +166,6 @@ class ImapConnector
      * Gets UIDVALIDITY of currently selected folder
      *
      * @return int
-     * @throws \LogicException
      */
     public function getUidValidity()
     {
@@ -166,8 +180,8 @@ class ImapConnector
     protected function ensureConnected()
     {
         if ($this->imap === null) {
-            $imapServices = $this->factory->createImapServices($this->config);
-            $this->imap = $imapServices->getStorage();
+            $imapServices              = $this->factory->createImapServices($this->config);
+            $this->imap                = $imapServices->getStorage();
             $this->searchStringManager = $imapServices->getSearchStringManager();
         }
     }
@@ -176,15 +190,23 @@ class ImapConnector
      * Gets sub folders.
      *
      * @param Folder $parentFolder The parent folder.
-     * @param bool $recursive Determines whether
+     * @param bool   $recursive    Determines whether child folders should be returned as well
+     *
      * @return Folder[]
      */
     protected function getSubFolders(Folder $parentFolder, $recursive = false)
     {
-        $result = array();
+        $result = [];
+
+        $parentFolder->guessFolderType();
+
+        /** @var Folder $folder */
         foreach ($parentFolder as $folder) {
             $result[] = $folder;
+
             if ($recursive) {
+                $folder->type = $parentFolder->type;
+
                 $result = array_merge($result, $this->getSubFolders($folder, $recursive));
             }
         }

@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
@@ -104,7 +105,7 @@ class Processor
             $messageDate
         );
 
-        $email->addFolder($origin->getFolder(EmailFolder::SENT));
+        $email->addFolder($origin->getFolder(FolderType::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
 
@@ -173,9 +174,9 @@ class Processor
 
         $outboxFolder = new EmailFolder();
         $outboxFolder
-            ->setType(EmailFolder::SENT)
-            ->setName(EmailFolder::SENT)
-            ->setFullName(EmailFolder::SENT);
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
 
         $origin = new InternalEmailOrigin();
         $origin

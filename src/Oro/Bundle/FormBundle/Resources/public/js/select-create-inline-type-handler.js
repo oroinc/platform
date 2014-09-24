@@ -38,9 +38,10 @@ function (routing, DialogWidget, widgetManager, __) {
                         entitySelectDialog._wid,
                         function(widget) {
                             widget.remove();
+                            selectorEl.select2('focus');
                         }
                     );
-                })
+                });
             };
 
             entitySelectDialog.on('grid-row-select', _.bind(processSelectedEntities, this));
@@ -66,6 +67,7 @@ function (routing, DialogWidget, widgetManager, __) {
             var processSelectedEntities = function (id) {
                 selectorEl.select2('val', id, true);
                 entityCreateDialog.remove();
+                selectorEl.select2('focus');
             };
 
             entityCreateDialog.on('formSave', _.bind(processSelectedEntities, this));
@@ -77,7 +79,7 @@ function (routing, DialogWidget, widgetManager, __) {
             container.find('.entity-create-btn').on('click', handleCreate);
         }
 
-        var configurator = {
+        return {
             getUrlParts: function () {
                 return urlParts;
             },
@@ -91,7 +93,5 @@ function (routing, DialogWidget, widgetManager, __) {
                 return selectorEl.select2('val');
             }
         };
-
-        return configurator;
     };
 });

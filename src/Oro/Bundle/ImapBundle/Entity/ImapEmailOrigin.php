@@ -166,4 +166,14 @@ class ImapEmailOrigin extends EmailOrigin
 
         return $this;
     }
+
+    /**
+     * Get a human-readable representation of this object.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s (%s)', $this->user, $this->host);
+    }
 }

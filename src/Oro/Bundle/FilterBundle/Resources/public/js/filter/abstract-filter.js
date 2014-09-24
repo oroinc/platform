@@ -125,7 +125,7 @@ define([
                 this.emptyValue = {};
             }
             // init raw value of filter
-            this.value = _.clone(this.emptyValue);
+            this.value = tools.deepClone(this.emptyValue);
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
         },

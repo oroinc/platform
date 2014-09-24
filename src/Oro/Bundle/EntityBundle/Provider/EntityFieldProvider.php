@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
@@ -17,6 +16,9 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -451,6 +453,7 @@ class EntityFieldProvider
      *
      * @param EntityManager $em
      * @param string        $className
+     *
      * @return array
      */
     protected function getUnidirectionalRelations(EntityManager $em, $className)
@@ -460,6 +463,10 @@ class EntityFieldProvider
         /** @var EntityConfigId[] $entityConfigIds */
         $entityConfigIds = $this->entityConfigProvider->getIds();
         foreach ($entityConfigIds as $entityConfigId) {
+            if ($this->isIgnoredEntity($entityConfigId)) {
+                continue;
+            }
+
             $metadata       = $em->getClassMetadata($entityConfigId->getClassName());
             $targetMappings = $metadata->getAssociationMappings();
             if (empty($targetMappings)) {
@@ -477,6 +484,26 @@ class EntityFieldProvider
         }
 
         return $relations;
+    }
+
+    /**
+     * Check if entity config is new (entity not generated yet) or was deleted
+     *
+     * @param EntityConfigId $entityConfigId
+     *
+     * @return bool
+     */
+    protected function isIgnoredEntity(EntityConfigId $entityConfigId)
+    {
+        $entityConfig = $this->extendConfigProvider->getConfigById($entityConfigId);
+
+        if ($entityConfig->is('is_deleted') ||
+            $entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -562,6 +589,7 @@ class EntityFieldProvider
      * Gets doctrine entity manager for the given class
      *
      * @param string $className
+     *
      * @return EntityManager
      * @throws InvalidEntityException
      */
@@ -585,6 +613,7 @@ class EntityFieldProvider
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return string
      */
     protected function getFieldLabel($className, $fieldName)
@@ -603,6 +632,7 @@ class EntityFieldProvider
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return string
      */
     protected function getRelationFieldType($className, $fieldName)
@@ -617,6 +647,7 @@ class EntityFieldProvider
      * Gets a relation type
      *
      * @param string $relationFieldType
+     *
      * @return string
      */
     protected function getRelationType($relationFieldType)

@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -202,7 +203,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $origin->expects($this->once())
             ->method('getFolder')
-            ->with(EmailFolder::SENT)
+            ->with(FolderType::SENT)
             ->will($this->returnValue($folder));
 
         $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -451,9 +452,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $outboxFolder = new EmailFolder();
         $outboxFolder
-            ->setType(EmailFolder::SENT)
-            ->setName(EmailFolder::SENT)
-            ->setFullName(EmailFolder::SENT);
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
 
         $origin = new InternalEmailOrigin();
         $origin

@@ -45,18 +45,16 @@ class EnumValueType extends AbstractType
             new Assert\Length(['max' => 255])
         ];
         if (empty($data['id'])) {
-            $constraints[] = new Assert\Callback(
-                [
-                    function ($value, ExecutionContext $context) {
-                        if (!empty($value)) {
-                            $id = ExtendHelper::buildEnumValueId($value, false);
-                            if (empty($id)) {
-                                $context->addViolation(self::INVALID_NAME_MESSAGE, ['{{ value }}' => $value]);
-                            }
-                        }
+            $callback = function ($value, ExecutionContext $context) {
+                if (!empty($value)) {
+                    $id = ExtendHelper::buildEnumValueId($value, false);
+                    if (empty($id)) {
+                        $context->addViolation(self::INVALID_NAME_MESSAGE, ['{{ value }}' => $value]);
                     }
-                ]
-            );
+                }
+            };
+
+            $constraints[] = new Assert\Callback([$callback]);
         }
 
         $form->add(
