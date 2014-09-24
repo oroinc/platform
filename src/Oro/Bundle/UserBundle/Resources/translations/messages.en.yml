@@ -30,11 +30,6 @@ resetting:
     flash:
         success: The password has been successfully reset
 
-
-        datagrid:
-            delete:       Delete
-            view:         View
-            update:       Update
 oro:
     user:
         menu:
@@ -123,3 +118,8 @@ oro:
             has_role.label: Has role
         invite:
             label: Send an Email Invitation
+
+        datagrid:
+            delete:       Delete
+            view:         View
+            update:       Update
