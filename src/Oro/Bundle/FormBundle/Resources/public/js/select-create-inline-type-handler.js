@@ -79,7 +79,7 @@ function (routing, DialogWidget, widgetManager, __) {
             container.find('.entity-create-btn').on('click', handleCreate);
         }
 
-        var configurator = {
+        return {
             getUrlParts: function () {
                 return urlParts;
             },
@@ -93,7 +93,5 @@ function (routing, DialogWidget, widgetManager, __) {
                 return selectorEl.select2('val');
             }
         };
-
-        return configurator;
     };
 });

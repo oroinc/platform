@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -55,7 +53,10 @@ class TargetFieldType extends AbstractType
         $fields = $this->configProvider->filter(
             function (Config $config) {
                 return
-                    in_array($config->getId()->getFieldType(), array('integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money'))
+                    in_array(
+                        $config->getId()->getFieldType(),
+                        ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
+                    )
                     && $config->is('is_deleted', false);
             },
             $this->entityClass

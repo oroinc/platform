@@ -18,42 +18,28 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     const TEST_MESSAGE_LIMIT = 10;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityPool;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailRenderer;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $twig;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
     protected $cm;
 
-    /**
-     * @var EmailNotificationProcessor
-     */
+    /** @var EmailNotificationProcessor */
     protected $processor;
 
     protected function setUp()
@@ -228,12 +214,17 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->at(2))
             ->method('where')
-            ->with('job.command = :command AND job.state <> :state')
+            ->with('job.command = :command AND job.state IN ( :state )')
             ->will($this->returnSelf());
 
         $queryBuilder->expects($this->at(3))
             ->method('setParameters')
-            ->with(array('command' => EmailNotificationProcessor::SEND_COMMAND, 'state' => Job::STATE_FINISHED))
+            ->with(
+                [
+                    'command' => EmailNotificationProcessor::SEND_COMMAND,
+                    'state'   => [Job::STATE_RUNNING, Job::STATE_PENDING]
+                ]
+            )
             ->will($this->returnSelf());
 
         $queryBuilder->expects($this->at(4))

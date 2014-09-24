@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 
 use Oro\Bundle\DistributionBundle\OroKernel;
+use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
 
 class OroKernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,12 +14,7 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->kernel = $this->getMockForAbstractClass(
-            'Oro\Bundle\DistributionBundle\OroKernel',
-            [],
-            '',
-            false
-        );
+        $this->kernel = new OroKernelStub('env', false);
     }
 
     /**
@@ -26,7 +22,7 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompareBundles($bundles, $expects)
     {
-        uasort($bundles, array($this->kernel, 'compareBundles'));
+        uasort($bundles, [$this->kernel, 'compareBundles']);
         $id = 0;
         foreach ($bundles as $bundleData) {
             $this->assertEquals($expects[$id], $bundleData['name']);
@@ -43,7 +39,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroCRMTestBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCRMCallBundle', 'OroCRMTestBundle'
+                    'OroCRMCallBundle',
+                    'OroCRMTestBundle'
                 ]
             ],
             [
@@ -52,7 +49,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroCRMCallBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCRMCallBundle', 'OroCRMTestBundle'
+                    'OroCRMCallBundle',
+                    'OroCRMTestBundle'
                 ]
             ],
             [
@@ -61,7 +59,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroCRMTestBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCallBundle', 'OroCRMTestBundle'
+                    'OroCallBundle',
+                    'OroCRMTestBundle'
                 ]
             ],
             [
@@ -70,7 +69,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroCallBundle', 'priority' => 30],
                 ],
                 [
-                    'OroCallBundle', 'OroCRMTestBundle'
+                    'OroCallBundle',
+                    'OroCRMTestBundle'
                 ]
             ],
             [
@@ -79,7 +79,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroTestBundle', 'priority' => 30],
                 ],
                 [
-                    'OroTestBundle', 'OroCRMCallBundle'
+                    'OroTestBundle',
+                    'OroCRMCallBundle'
                 ]
             ],
             [
@@ -88,7 +89,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'OroCRMCallBundle', 'priority' => 30],
                 ],
                 [
-                    'OroTestBundle', 'OroCRMCallBundle'
+                    'OroTestBundle',
+                    'OroCRMCallBundle'
                 ]
             ],
             [
@@ -98,7 +100,8 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
 
                 ],
                 [
-                    'OroFirstBundle', 'OroSecondBundle'
+                    'OroFirstBundle',
+                    'OroSecondBundle'
                 ]
             ],
             [
@@ -110,8 +113,68 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ['name' => 'AcmeDemoBundle', 'priority' => 100],
                 ],
                 [
-                    'AcmeTestBundle', 'OroSomeBundle', 'OroCRMAnotherBundle', 'AcmeDemoBundle', 'AcmeLastBundle',
+                    'AcmeTestBundle',
+                    'OroSomeBundle',
+                    'OroCRMAnotherBundle',
+                    'AcmeDemoBundle',
+                    'AcmeLastBundle',
                 ]
+            ]
+        ];
+    }
+
+    /**
+     * @param array $bundles
+     *
+     * @dataProvider bundlesDataProvider
+     */
+    public function testCollectBundles(array $bundles)
+    {
+        $this->assertEquals(
+            $bundles,
+            $this->kernel->registerBundles()
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function bundlesDataProvider()
+    {
+        return [
+            [
+                [
+                    'Acme\Bundle\TestBundle\AcmeSimplifiedBundle'       => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeSimplifiedBundle',
+                        'kernel'   => null,
+                        'priority' => 0
+                    ],
+                    'Acme\Bundle\TestBundle\AcmeDuplicateBundle'        => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeDuplicateBundle',
+                        'kernel'   => null,
+                        'priority' => 50
+                    ],
+                    'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'  => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle',
+                        'kernel'   => null,
+                        'priority' => 50
+                    ],
+                    'Acme\Bundle\TestBundle\AcmeRegisteredBundle'       => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeRegisteredBundle',
+                        'kernel'   => null,
+                        'priority' => 50
+                    ],
+                    'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle' => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle',
+                        'kernel'   => null,
+                        'priority' => 50
+                    ],
+                    'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle'  => [
+                        'name'     => 'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle',
+                        'kernel'   => null,
+                        'priority' => 50
+                    ]
+                ],
             ]
         ];
     }

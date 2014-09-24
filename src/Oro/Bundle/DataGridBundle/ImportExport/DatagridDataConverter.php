@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
@@ -64,12 +65,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
-        $columns    = $gridConfig->offsetGet('columns');
+        if ($this->context->getValue('columns')) {
+            $columns = $this->context->getValue('columns');
+        } elseif ($this->context->hasOption('gridName')) {
+            $gridName   = $this->context->getOption('gridName');
+            $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
+            $columns    = $gridConfig->offsetGet('columns');
+        } else {
+            throw new InvalidConfigurationException(
+                'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
+            );
+        }
 
         $result = array();
         foreach ($columns as $columnName => $column) {
+            if (isset($column['renderable']) && false === $column['renderable']) {
+                continue;
+            }
+
             $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
             $result[$this->translator->trans($column['label'])] = $val;
