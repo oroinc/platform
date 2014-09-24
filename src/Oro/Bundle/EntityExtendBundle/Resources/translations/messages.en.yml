@@ -107,6 +107,3 @@ oro:
             priority.description:   A number is used to sort options
             default.label:          Is Default
             default.description:    Determines if this option is selected by default for new records
-
-
-
