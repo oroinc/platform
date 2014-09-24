@@ -21,10 +21,44 @@ For example:
                     - { table: OroCRMContactBundle:Group, alias: g }
 
         filters:
-            SOME_FITLER_NAME: # uses for query param, and for setting default filters
-                type: string  # Filter type, list of available types described below
-                data_name: g.id
+            columns:
+                SOME_FITLER_NAME: # uses for query param, and for setting default filters
+                    type: string  # Filter type, list of available types described below
+                    data_name: g.id
 
+```
+
+## Default values
+
+### String filter
+
+```
+        filters:
+            columns:
+                fieldName:
+                    type:      string
+                    data_name: priorityLabel
+            default:
+                fieldName: { value: 'someText', type: %oro_filter.form.type.filter.text.class%::TYPE_CONTAINS }
+```
+
+### Choice filter
+
+```
+        filters:
+            columns:
+                period:
+                    type: orocrm_period_filter
+                    data_name: period
+                    options:
+                        populate_default: false
+                        field_options:
+                            choices:
+                                monthPeriod:    Monthly
+                                quarterPeriod:  Quarterly
+                                yearPeriod:     Yearly
+            default:
+                period: { value: monthPeriod }
 ```
 
 ## Additional params

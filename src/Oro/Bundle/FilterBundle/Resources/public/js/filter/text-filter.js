@@ -297,11 +297,6 @@ define([
          */
         _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var option = this._getChoiceOption(value.type);
-
-            if (this.isEmptyType(value.type)) {
-                return option ? option.label : this.placeholder;
-            }
 
             if (!value.value) {
                 return this.placeholder;
