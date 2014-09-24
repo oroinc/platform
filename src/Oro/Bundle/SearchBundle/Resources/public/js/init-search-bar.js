@@ -12,6 +12,7 @@ function($, _, routing, mediator) {
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
+
           mediator.bind('page:beforeChange', function () {
               searchBarContainer.removeClass('header-search-focused');
           });
@@ -29,9 +30,16 @@ function($, _, routing, mediator) {
               if ($searchString.length === 0) {
                   return false;
               }
-              // clear value after search
-              //$(this).find('.search').val('').blur();
               searchByTagClose();
+          });
+
+          mediator.on('page:update', function (page) {
+              if (page.currentRoute == 'oro_search_results') {
+                  // clear value when navigate out of search results
+                  mediator.once('beforeControllerDispose', function (){
+                      $('.search-form .search').val('');
+                  });
+              }
           });
 
           searchBarDropdown.find('li a').click(function(e) {
