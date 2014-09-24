@@ -24,8 +24,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                 var url, delimiter, modal, progress;
 
                 url = $(el).data('url');
-                delimiter = url.indexOf('?') > -1 ? '&' : '?';
-                url = url + delimiter + '_enableContentProviders=mainMenu';
 
                 progress = $('#progressbar').clone();
                 progress.removeAttr('id').find('h3').remove();
@@ -46,7 +44,9 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal
                     mediator.once('page:afterChange', function () {
                         mediator.execute('showFlashMessage', 'success', __('oro.entity_extend.schema_updated'));
                     });
-                    mediator.execute('redirectTo', {url: routing.generate('oro_entityconfig_index')});
+                    mediator.execute('redirectTo', {
+                        url: routing.generate('oro_entityconfig_index', {'_enableContentProviders': 'mainMenu'})
+                    });
                 }).fail(function () {
                     modal.close();
                     mediator.execute('showFlashMessage', 'error', __('oro.entity_extend.schema_update_failed'));

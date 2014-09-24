@@ -46,6 +46,11 @@
         {% endif %}
         {# End help link logic #}
 
+        {% set tooltip = '<div class="oro-popover-content">'
+            ~ tooltip
+            ~ '</div>'
+        %}
+
         <i class="icon-info-sign tooltip-icon"
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"

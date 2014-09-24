@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class CacheClearCommand extends ContainerAwareCommand
@@ -28,8 +29,12 @@ class CacheClearCommand extends ContainerAwareCommand
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
         $dumper->clear();
 
+        /** @var EntityProcessor $processor */
+        $processor = $this->getContainer()->get('oro_entity_extend.extend.entity_processor');
+
         if (!$input->getOption('no-warmup')) {
             $dumper->dump();
+            $processor->generateProxies();
         }
     }
 }
