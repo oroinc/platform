@@ -1,0 +1,10 @@
+bundles:
+    - { name: Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle, priority: 50 }
+    - { name: Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle, priority: 50 }
+    - { name: Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle, priority: 50 }
+    - { name: Acme\Bundle\TestBundle\AcmeDuplicateBundle, priority: 60 }
+    - 'Acme\Bundle\TestBundle\AcmeSimplifiedBundle'
+
+exclusions:
+    - { name: Acme\Bundle\TestBundle\AcmeFirstExcludedBundle }
+    - { name: Acme\Bundle\TestBundle\AcmeThirdExcludedBundle }

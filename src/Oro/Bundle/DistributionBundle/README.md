@@ -15,6 +15,16 @@ bundles:
 
 That's it! Your bundle (and "VendorAnyBundle") will be automatically registered in AppKernel.php.
 
+## Exclusions ##
+
+```
+bundles:
+    ...
+
+exclusions:
+    - { name: VendorName\Bundle\VendorBundle\VendorAnyBundle }
+```
+
 ## Routing autoload ##
 Add Resources/config/oro/routing.yml file to every bundle for which you want to autoload its routes.
 
