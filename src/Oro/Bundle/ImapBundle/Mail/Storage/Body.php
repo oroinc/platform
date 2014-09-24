@@ -55,9 +55,9 @@ class Body
     public function getContent($format = Body::FORMAT_TEXT)
     {
         if (!$this->part->isMultipart()) {
-            if ($format === Body::FORMAT_TEXT) {
+            //if ($format === Body::FORMAT_TEXT) {
                 return $this->extractContent($this->part);
-            }
+           // }
         } else {
             foreach ($this->part as $part) {
                 $contentTypeHeader = $this->getPartContentType($part);

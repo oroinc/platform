@@ -28,13 +28,24 @@ class Message extends \Zend\Mail\Storage\Message
             return new Body($this);
         }
 
+        $contentType = $this->getPartContentType($this->getPart(1));
+        if ($contentType !== null) {
+            if ($contentType->getParameter('name') === null) {
+                $body = new Body($this->getPart(1));
+            }
+        }
+
         foreach ($this as $part) {
             $contentType = $this->getPartContentType($part);
-            if ($contentType !== null) {
+            if ($contentType !== null && $contentType->getType() === 'text/html') {
                 if ($contentType->getParameter('name') === null) {
-                    return new Body($part);
+                    $body = new Body($part);
                 }
             }
+        }
+
+        if (isset($body)) {
+            return $body;
         }
 
         throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot find a message body.');
