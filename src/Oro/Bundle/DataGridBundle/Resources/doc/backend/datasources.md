@@ -1,8 +1,8 @@
 Datasources
-============
+===========
 
 Overview
--------------
+--------
 
 Datagrid can retrieve data from different datasource types (e.g orm, dql, array, etc...)
 Here's list of currently implemented datasource adapters:

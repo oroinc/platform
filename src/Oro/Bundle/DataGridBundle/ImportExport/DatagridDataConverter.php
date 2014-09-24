@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
@@ -82,7 +83,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        throw new \RuntimeException('The convertToImportFormat method is not implemented.');
+        throw new RuntimeException('The convertToImportFormat method is not implemented.');
     }
 
     /**
