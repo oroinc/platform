@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class OrganizationRememberMeToken extends RememberMeToken implements OrganizationContextTokenInterface
 {

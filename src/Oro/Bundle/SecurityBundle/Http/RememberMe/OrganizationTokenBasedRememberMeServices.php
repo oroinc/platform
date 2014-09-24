@@ -109,7 +109,8 @@ class OrganizationTokenBasedRememberMeServices implements RememberMeServicesInte
      */
     public function autoLogin(Request $request)
     {
-        if (null === $cookie = $request->cookies->get($this->options['name'])) {
+        $cookie = $request->cookies->get($this->options['name']);
+        if (null === $cookie) {
             return;
         }
 
@@ -305,12 +306,11 @@ class OrganizationTokenBasedRememberMeServices implements RememberMeServicesInte
             );
         }
 
-        if (true !==
-            $this->compareHashes(
-                $hash,
-                $this->generateCookieHash($class, $username, $expires, $user->getPassword())
-            )
-        ) {
+        $isHashesIdentical = $this->compareHashes(
+            $hash,
+            $this->generateCookieHash($class, $username, $expires, $user->getPassword())
+        );
+        if (true !== $isHashesIdentical) {
             throw new AuthenticationException('The cookie\'s hash is invalid.');
         }
 

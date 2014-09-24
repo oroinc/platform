@@ -16,7 +16,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationRememberMeAuthenticationProvider extends RememberMeAuthenticationProvider
 {
-
     /**
      * @var string
      */
