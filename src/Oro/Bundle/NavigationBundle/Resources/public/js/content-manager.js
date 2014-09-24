@@ -380,14 +380,11 @@ define([
          * @returns {boolean}
          */
         compareUrl: function (url, refPath) {
-            var comparePath;
             if (refPath == null) {
                 refPath = current.path;
-            } else {
-                refPath = fetchPath(refPath);
             }
-            comparePath = fetchPath(url);
-            return refPath === comparePath;
+
+            return fetchPath(refPath) === fetchPath(url);
         },
 
         /**
