@@ -82,7 +82,7 @@ class DataGridExtension extends \Twig_Extension
         $metaData->offsetAddToArray(
             'options',
             [
-                'url'        => $this->generateUrl($grid->getName(), $params),
+                'url'       => $this->generateUrl($grid->getName(), $params),
                 'urlParams' => $params,
             ]
         );
