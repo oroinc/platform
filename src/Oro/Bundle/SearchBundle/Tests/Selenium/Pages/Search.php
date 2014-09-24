@@ -108,14 +108,14 @@ class Search extends AbstractPage
     }
 
     /**
-     * @param string $entitytype
-     * @param string $entitycount
+     * @param string $entityType
+     * @param string $entityCount
      * @return $this
      */
-    public function assertEntity($entitytype, $entitycount)
+    public function assertEntity($entityType, $entityCount)
     {
         $this->assertElementPresent(
-            "//td[@class='search-entity-types-column']//a[contains(., '{$entitytype} ({$entitycount})')]"
+            "//td[@class='search-entity-types-column']//a[contains(., '{$entityType} ({$entityCount})')]"
         );
 
         return $this;

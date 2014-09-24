@@ -38,8 +38,7 @@ class NoteApiHandler
      * @param ObjectManager $manager
      * @param ConfigManager $configManager
      */
-    public function __construct
-    (
+    public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager,
