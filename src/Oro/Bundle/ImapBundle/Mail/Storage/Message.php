@@ -38,10 +38,10 @@ class Message extends \Zend\Mail\Storage\Message
             }
         }
 
-        if (count($parts) > 0) {
-            $part = reset($parts);
+        if (!empty($parts)) {
+            $part     = reset($parts);
             $htmlType = 'text/html';
-            if (array_key_exists ($htmlType, $parts)) {
+            if (array_key_exists($htmlType, $parts)) {
                 $part = $parts[$htmlType];
             }
             return new Body($part);
@@ -90,6 +90,7 @@ class Message extends \Zend\Mail\Storage\Message
      * Gets the Content-Type for the given part
      *
      * @param Part $part The message part
+     *
      * @return \Zend\Mail\Header\ContentType|null
      */
     protected function getPartContentType($part)
@@ -102,8 +103,9 @@ class Message extends \Zend\Mail\Storage\Message
     /**
      * Gets the Content-Disposition for the given part
      *
-     * @param Part $part The message part
+     * @param Part $part   The message part
      * @param bool $format Can be FORMAT_RAW or FORMAT_ENCODED, see HeaderInterface::FORMAT_* constants
+     *
      * @return string|null
      */
     protected function getPartContentDisposition($part, $format = HeaderInterface::FORMAT_RAW)
