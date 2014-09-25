@@ -15,10 +15,7 @@ function($, _, routing, mediator) {
 
           mediator.bind('page:beforeChange', function () {
               searchBarContainer.removeClass('header-search-focused');
-          });
-
-          mediator.bind('page:update', function () {
-              $('.search-form .search').val('');
+              $('#oroplatform-header .search-form .search').val('');
           });
 
           mediator.bind('page:afterChange', searchByTagClose);
