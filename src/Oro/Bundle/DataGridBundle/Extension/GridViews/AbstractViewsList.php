@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
+
 abstract class AbstractViewsList
 {
     /** @var TranslatorInterface */
@@ -106,13 +108,13 @@ abstract class AbstractViewsList
      *
      * @param array $list
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function validate(array $list)
     {
         foreach ($list as $view) {
             if (!$view instanceof View) {
-                throw new \InvalidArgumentException('List should contain only instances of View class');
+                throw new InvalidArgumentException('List should contain only instances of View class');
             }
         }
     }

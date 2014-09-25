@@ -1,6 +1,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 <div class="widget-content grid-widget-content">
-    {% set gridName = 'entity-relation-grid' %}
+    {% set gridName = oro_datagrid_build_fullname('entity-relation-grid', entity_name ~ '-' ~  field_name) %}
 
     {% set gridParams = {
         '_parameters' : {

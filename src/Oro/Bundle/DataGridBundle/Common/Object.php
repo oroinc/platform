@@ -7,6 +7,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
+
 class Object implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
@@ -56,12 +58,12 @@ class Object implements \ArrayAccess, \IteratorAggregate
      * throws exception if current object is unnamed
      *
      * @return string
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function getName()
     {
         if (!isset($this[self::NAME_KEY])) {
-            throw new \LogicException("Trying to get name of unnamed object");
+            throw new LogicException("Trying to get name of unnamed object");
         }
 
         return $this[self::NAME_KEY];

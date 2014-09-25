@@ -16,6 +16,9 @@ class Datagrid implements DatagridInterface
     /** @var string */
     protected $name;
 
+    /** @var string */
+    protected $scope;
+
     /** @var DatagridConfiguration */
     protected $config;
 
@@ -54,6 +57,24 @@ class Datagrid implements DatagridInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getScope()
+    {
+        return $this->scope;
     }
 
     /**
