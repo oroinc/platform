@@ -116,3 +116,45 @@ datagrid:
         options:
             routerEnabled: false
 ```
+
+#### Problem:
+*I'm developing grid that should not be under ACL control*
+#### Solution:
+- set option 'skip_acl_check' to TRUE
+
+Example:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        options:
+            skip_acl_check: true
+```
+
+#### Problem:
+*I want to implement some custom security verification/logic without any default acl, even if some "acl_resource" have been defined *
+*e.g. i'm extending some existing grid but with custom acl logic*
+#### Solution:
+- set option 'skip_acl_check' to TRUE
+
+Example:
+- configure grid
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        options:
+            skip_acl_check: true
+```
+- declare own grid listener
+```
+my_bundle.event_listener.my_grid_listener:
+        class: %my_grid_listener.class%
+        arguments: ~
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.my-grid-name, method: onBuildBefore }
+```
+- last step is implementing grid listener
+- as an example see:
+    - Oro/Bundle/UserBundle/Resources/config/datagrid.yml ( owner-users-select-grid )
+    - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php ( service name: "oro_user.event_listener.owner_user_grid_listener" )
