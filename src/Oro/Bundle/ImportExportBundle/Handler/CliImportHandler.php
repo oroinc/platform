@@ -43,8 +43,12 @@ class CliImportHandler extends AbstractImportHandler
         $errorsAndExceptions = [];
         if (!empty($counts['errors'])) {
             $context = $jobResult->getContext();
+            $contextErrors = [];
+            if ($context) {
+                $contextErrors = $context->getErrors();
+            }
             $errorsAndExceptions = array_slice(
-                array_merge($jobResult->getFailureExceptions(), $context->getErrors()),
+                array_merge($jobResult->getFailureExceptions(), $contextErrors),
                 0,
                 100
             );

@@ -74,8 +74,12 @@ class HttpImportHandler extends AbstractImportHandler
                 ['jobCode' => $jobResult->getJobCode()]
             );
             $context = $jobResult->getContext();
+            $contextErrors = [];
+            if ($context) {
+                $contextErrors = $context->getErrors();
+            }
             $errorsAndExceptions = array_slice(
-                array_merge($jobResult->getFailureExceptions(), $context->getErrors()),
+                array_merge($jobResult->getFailureExceptions(), $contextErrors),
                 0,
                 100
             );
