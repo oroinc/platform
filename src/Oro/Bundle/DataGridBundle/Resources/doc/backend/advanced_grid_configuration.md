@@ -135,10 +135,7 @@ datagrid:
 *I want to implement some custom security verification/logic without any default acl, even if some "acl_resource" have been defined *
 *e.g. i'm extending some existing grid but with custom acl logic*
 #### Solution:
-- set option 'skip_acl_check' to TRUE
-
-Example:
-- configure grid
+- configure grid (set option 'skip_acl_check' to TRUE)
 ``` yml
 datagrid:
     acme-demo-grid:
@@ -156,5 +153,5 @@ my_bundle.event_listener.my_grid_listener:
 ```
 - last step is implementing grid listener
 - as an example see:
-    - Oro/Bundle/UserBundle/Resources/config/datagrid.yml ( owner-users-select-grid )
-    - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php ( service name: "oro_user.event_listener.owner_user_grid_listener" )
+    - Oro/Bundle/UserBundle/Resources/config/datagrid.yml (owner-users-select-grid)
+    - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
