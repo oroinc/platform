@@ -3,14 +3,13 @@
 define([
     'jquery',
     'underscore',
-    'url',
     'routing',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, Url, routing, __, mediator, Modal, BaseView) {
+], function ($, _, routing, __, mediator, Modal, BaseView) {
     'use strict';
 
     var PageStateView;
@@ -30,7 +29,7 @@ define([
             var confirmModal;
 
             this._initialData = null;
-            this._restore = false;
+            this._resetChanges = false;
 
             confirmModal = new Modal({
                 title: __('Refresh Confirmation'),
@@ -41,10 +40,6 @@ define([
                 cancelText: __('Cancel')
             });
             this.subview('confirmModal', confirmModal);
-
-            if (this._hasForm()) {
-                this._loadState();
-            }
         },
 
         /**
@@ -66,7 +61,7 @@ define([
                     self.stopListening(confirmModal);
                 });
                 this.listenTo(confirmModal, 'ok', function () {
-                    deferred.resolve({restore: true});
+                    deferred.resolve({resetChanges: true});
                 });
                 this.listenTo(confirmModal, 'cancel', function () {
                     deferred.reject();
@@ -78,35 +73,11 @@ define([
         },
 
         /**
-         * Initializes form changes trace
-         *  - if attributes is not in a cache, loads data from server
-         * @private
-         */
-        _loadState: function () {
-            var url, self;
-            self = this;
-
-            url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
-            $.get(url).done(function (data) {
-                var attributes;
-                attributes = {
-                    pageId: data.pagestate.pageId || self._combinePageId(),
-                    data: self._restore ? '' : data.pagestate.data
-                };
-                if (data.id) {
-                    attributes.id = data.id;
-                }
-                self._initFormTracer(attributes);
-                self._updateCache();
-            });
-        },
-
-        /**
          * Clear page state timer and model on page request is started
          */
         onPageRequest: function () {
             this._initialData = null;
-            this._restore = false;
+            this._resetChanges = false;
             this.$el.off('change.page-state');
             this.model.clear({silent: true});
         },
@@ -117,7 +88,7 @@ define([
         onPageUpdate: function (attributes, args) {
             var options;
             options = (args || {}).options;
-            this._restore = Boolean(options && options.restore);
+            this._resetChanges = Boolean(options && options.resetChanges);
         },
 
         /**
@@ -125,11 +96,11 @@ define([
          */
         afterPageChange: function () {
             var attributes;
-            if (!this._hasForm()) {
+            if (!this._hasForm() || !this._isRestoreRequired()) {
                 return;
             }
 
-            if (this._restore) {
+            if (this._resetChanges) {
                 // delete cache if changes are discarded
                 mediator.execute('pageCache:state:save', 'form', null);
             }
@@ -143,23 +114,42 @@ define([
         },
 
         /**
+         * Initializes form changes trace
+         *  - if attributes is not in a cache, loads data from server
+         * @protected
+         */
+        _loadState: function () {
+            var url, self;
+            self = this;
+
+            url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
+            $.get(url).done(function (data) {
+                var attributes;
+                attributes = {
+                    pageId: data.pagestate.pageId || self._combinePageId(),
+                    data: self._resetChanges ? '' : data.pagestate.data,
+                    pagestate: data.pagestate
+                };
+                if (data.id) {
+                    attributes.id = data.id;
+                }
+                self._initFormTracer(attributes);
+            });
+        },
+
+        /**
          * Rests page state model, restores page forms and start tracing changes
          * @param attributes
-         * @private
+         * @protected
          */
         _initFormTracer: function (attributes) {
-            var options;
             this._initialData = this._collectFormsData();
-            if (attributes.data) {
-                options = {silent: true};
-            } else {
+            if (!attributes.data) {
                 attributes.data = this._initialData;
             }
-
-            this.model.set(attributes, options);
-            if (this.model.get('restore')) {
+            this.model.set(attributes);
+            if (this._isRestoreRequired()) {
                 this._restoreState();
-                this.model.set('restore', false);
             } else {
                 this.model.set('data', this._initialData, {silent: true});
             }
@@ -168,7 +158,7 @@ define([
 
         /**
          * Updates state in cache on model sync
-         * @private
+         * @protected
          */
         _updateCache: function () {
             var attributes;
@@ -180,7 +170,7 @@ define([
         /**
          * Defines if page has forms and state tracing is required
          * @returns {boolean}
-         * @private
+         * @protected
          */
         _hasForm: function () {
             return Boolean($('form[data-collect=true]').length);
@@ -188,10 +178,11 @@ define([
 
         /**
          * Handles model save
-         * @private
+         * @protected
          */
         _saveModel: function () {
-            if (!this.model.get('pageId')) {
+            // page state is the same -- nothing to save
+            if (this.model.get('pagestate').data === this.model.get('data')) {
                 return;
             }
             // @TODO why data duplication is required?
@@ -207,7 +198,7 @@ define([
          * Collects data of page forms and update model if state is changed
          *  - collects data
          *  - updates model
-         * @private
+         * @protected
          */
         _collectState: function () {
             var pageId, data;
@@ -232,7 +223,7 @@ define([
         /**
          * Goes through the form and collects data
          * @returns {string}
-         * @private
+         * @protected
          */
         _collectFormsData: function () {
             var data;
@@ -270,7 +261,7 @@ define([
 
         /**
          * Reads data from model and restores page forms
-         * @private
+         * @protected
          */
         _restoreState: function () {
             var data;
@@ -285,14 +276,13 @@ define([
         /**
          * Updates form from data
          * @param {string} data JSON
-         * @private
+         * @protected
          */
         _restoreForms: function (data) {
             data = JSON.parse(data);
 
             $.each(data, function (index, el) {
                 var form = $('form[data-collect=true]').eq(index);
-                form.find('option').prop('selected', false);
 
                 $.each(el, function (i, input) {
                     var element = form.find('[name="' + input.name + '"]');
@@ -301,13 +291,17 @@ define([
                         element.filter('[value="' +  input.value + '"]').prop('checked', true);
                         break;
                     case 'select-multiple':
-                        element.find('option[value="' + input.value + '"]').prop('selected', true);
+                        element
+                            .find('option').prop('selected', false).end()
+                            .find('option[value="' + input.value + '"]').prop('selected', true);
                         break;
                     default:
                         if (input.selectedData) {
                             element.data('selected-data', input.selectedData);
                         }
-                        element.val(input.value);
+                        if (input.value !== element.val()) {
+                            element.val(input.value).trigger('change');
+                        }
                     }
                 });
             });
@@ -316,32 +310,41 @@ define([
         /**
          * Combines pageId
          * @returns {string}
-         * @private
+         * @protected
          */
         _combinePageId: function () {
-            var model, url, params, _ref;
-            model = this.model;
-            url = mediator.execute('currentUrl');
+            var url;
+            url = this._parseCurrentURL();
+            return base64_encode(url.pathname);
+        },
 
+        /**
+         * Parses URL for current page
+         * @returns {Object}
+         * @protected
+         */
+        _parseCurrentURL: function () {
+            var url, _ref;
+            url = mediator.execute('currentUrl');
             _ref = url.split('?');
             url = {
                 pathname: _ref[0],
                 search: _ref[1] || ''
             };
+            return url;
+        },
 
-            params = url.search.split('&');
-
-            params = _.filter(params, function (part) {
-                var toRestore;
-                toRestore = part.indexOf('restore') !== -1;
-                if (toRestore) {
-                    model.set('restore', true);
-                }
-                return !toRestore && part.length;
+        /**
+         * Reads URL params and defines if data restore required
+         * @protected
+         */
+        _isRestoreRequired: function () {
+            var url, restore;
+            url = this._parseCurrentURL();
+            restore = _.some(url.search.split('&'), function (param) {
+                return param === 'restore=1';
             });
-
-            url = url.pathname + (params.length ? '?' + params.join('&') : '');
-            return base64_encode(url);
+            return restore;
         }
     });
 
