@@ -16,8 +16,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $clone = clone $config;
 
-        $this->assertTrue($config == $clone);
-        $this->assertFalse($config === $clone);
+        $this->assertEquals($config, $clone);
+        $this->assertNotSame($config, $clone);
 
     }
 
@@ -29,7 +29,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             'firstKey' => 'firstValue',
             'secondKey' => 'secondValue',
             'thirdKey' => 3,
-            'fourthKey' => new \stdClass()
+            'fourthKey' => new \stdClass(),
+            'falseKey' => false,
+            'nullKey' => null,
         );
         $config->setValues($values);
 
@@ -46,18 +48,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('firstValue', $config->get('firstKey'));
         $this->assertEquals('secondValue', $config->get('secondKey'));
 
-        $this->assertEquals(true, $config->is('secondKey'));
+        $this->assertTrue($config->is('secondKey'));
 
-        $this->assertEquals(true, $config->in('thirdKey', ['3']));
-        $this->assertEquals(false, $config->in('thirdKey', ['3'], true));
-        $this->assertEquals(true, $config->in('thirdKey', [3]));
-        $this->assertEquals(true, $config->in('thirdKey', [3], true));
-        $this->assertEquals(false, $config->in('thirdKey', [100]));
+        $this->assertTrue($config->in('thirdKey', ['3']));
+        $this->assertFalse($config->in('thirdKey', ['3'], true));
+        $this->assertTrue($config->in('thirdKey', [3]));
+        $this->assertTrue($config->in('thirdKey', [3], true));
+        $this->assertFalse($config->in('thirdKey', [100]));
 
-        $this->assertEquals(true, $config->has('secondKey'));
-        $this->assertEquals(false, $config->has('nonExistKey'));
+        $this->assertTrue($config->has('secondKey'));
+        $this->assertFalse($config->has('nonExistKey'));
+        $this->assertTrue($config->has('falseKey'));
+        $this->assertTrue($config->has('nullKey'));
 
-        $this->assertEquals(null, $config->get('nonExistKey'));
+        $this->assertNull($config->get('nonExistKey'));
+        $this->assertFalse($config->get('falseKey'));
+        $this->assertNull($config->get('nullKey'));
 
         $this->assertEquals($config, unserialize(serialize($config)));
 
