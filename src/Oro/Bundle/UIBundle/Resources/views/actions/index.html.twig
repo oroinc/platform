@@ -24,6 +24,9 @@
     </div>
     {% block content_datagrid %}
         {% if gridName is defined %}
+            {% if gridScope is defined %}
+                {% set gridName = oro_datagrid_build_fullname(gridName, gridScope) %}
+            {% endif %}
             {% if params is defined %}
                 {{ dataGrid.renderGrid(gridName, params) }}
             {% else %}

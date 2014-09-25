@@ -77,7 +77,7 @@ define(function (require) {
          */
         processOptions: function (options) {
             options.$el = $(document.createDocumentFragment());
-            options.gridName = options.metadata.options.gridName;
+            options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
             options.gridPromise = this.built.promise();
@@ -136,7 +136,7 @@ define(function (require) {
         build: function () {
             var options, collectionOptions, collection, collectionName, grid;
 
-            collectionName = this.metadata.options.gridName;
+            collectionName = this.gridName;
             collection = gridContentManager.get(collectionName);
             if (!collection) {
                 // otherwise, create collection from metadata
@@ -167,7 +167,7 @@ define(function (require) {
          */
         combineCollectionOptions: function () {
             return _.extend({
-                inputName: this.metadata.options.gridName,
+                inputName: this.gridName,
                 parse: true,
                 url: '\/user\/json',
                 state: _.extend({
@@ -217,7 +217,7 @@ define(function (require) {
             });
 
             return {
-                name: metadata.options.gridName,
+                name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
                 massActions: massActions,
