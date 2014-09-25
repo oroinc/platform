@@ -101,10 +101,13 @@ class StringFilter extends AbstractFilter
                     $eq = $ds->expr()->eq($fieldName, $emptyString);
                 }
 
-                return $ds->expr()->orX($ds->expr()->isNull($fieldName), $eq);
+                return $ds->expr()->andX(
+                    $ds->expr()->orX($ds->expr()->isNull($fieldName), $eq),
+                    $ds->expr()->eq(true, true)
+                );
             case FilterUtility::TYPE_NOT_EMPTY:
                 $emptyString = $ds->expr()->literal('');
-                $neq         = $ds->expr()->eq($fieldName, $emptyString);
+                $neq         = $ds->expr()->neq($fieldName, $emptyString);
 
                 if ($this->isCompositeField($ds, $fieldName)) {
                     $fieldName = $ds->expr()->trim($fieldName);
