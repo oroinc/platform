@@ -14,7 +14,7 @@ define(function (require) {
             title: 'oro.segment.refresh_dialog.title',
             okText: 'oro.segment.refresh_dialog.okText',
             content: 'oro.segment.refresh_dialog.content',
-            reloadRequired: true
+            reloadRequired: false
         };
 
     function run(url, reloadRequired) {

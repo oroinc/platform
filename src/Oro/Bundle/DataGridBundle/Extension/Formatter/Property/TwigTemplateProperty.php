@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 
 class TwigTemplateProperty extends AbstractProperty
 {
@@ -34,7 +35,7 @@ class TwigTemplateProperty extends AbstractProperty
     {
         $checkInvalidArgument = array_intersect(array_keys($this->getOr(self::CONTEXT_KEY, [])), $this->reservedKeys);
         if (count($checkInvalidArgument)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Context of template "%s" includes reserved key(s) - (%s)',
                     $this->get(self::TEMPLATE_KEY),

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action\Actions;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 
 abstract class AbstractAction implements ActionInterface
@@ -72,12 +73,12 @@ abstract class AbstractAction implements ActionInterface
      *
      * @param string $optionName
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function assertHasRequiredOption($optionName)
     {
         if (!isset($this->options[$optionName])) {
-            throw new \LogicException(
+            throw new LogicException(
                 'There is no option "' . $optionName . '" for action "' . $this->getName() . '".'
             );
         }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Exception;
 
-interface UserInputErrorExceptionInterface
+interface UserInputErrorExceptionInterface extends DatagridException
 {
     const TYPE = 'user_input_error';
 

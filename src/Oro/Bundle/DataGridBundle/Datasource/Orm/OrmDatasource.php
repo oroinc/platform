@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
+use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
 class OrmDatasource implements DatasourceInterface
 {
@@ -66,7 +67,7 @@ class OrmDatasource implements DatasourceInterface
                 if ($qb instanceof QueryBuilder) {
                     $this->qb = $qb;
                 } else {
-                    throw new \Exception(
+                    throw new DatasourceException(
                         sprintf(
                             '%s::%s() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                             get_class($repository),
@@ -76,11 +77,11 @@ class OrmDatasource implements DatasourceInterface
                     );
                 }
             } else {
-                throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
+                throw new DatasourceException(sprintf('%s has no method %s', get_class($repository), $method));
             }
 
         } else {
-            throw new \Exception(get_class($this).' expects to be configured with query or repository method');
+            throw new DatasourceException(get_class($this).' expects to be configured with query or repository method');
         }
 
         if (isset($config['hints'])) {
