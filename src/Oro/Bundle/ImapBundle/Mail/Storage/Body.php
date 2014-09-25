@@ -3,7 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Zend\Mail\Headers;
-use \Zend\Mail\Storage\Part;
+use Zend\Mail\Storage\Part;
+
+use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\InvalidBodyFormatException;
 
 class Body
 {
@@ -50,73 +53,30 @@ class Body
      *
      * @param bool $format The required format of the body. Can be FORMAT_TEXT or FORMAT_HTML
      * @return Content
-     * @throws Exception\InvalidBodyFormatException
+     * @throws InvalidBodyFormatException
      */
     public function getContent($format = Body::FORMAT_TEXT)
     {
-        if (!$this->part->isMultipart()) {
-            if ($format === Body::FORMAT_TEXT) {
-                return $this->extractContent($this->part);
-            }
-        } else {
-            foreach ($this->part as $part) {
-                $contentTypeHeader = $this->getPartContentType($part);
-                if ($contentTypeHeader !== null) {
-                    if ($format === Body::FORMAT_TEXT && $contentTypeHeader->getType() === 'text/plain') {
-                        return $this->extractContent($part);
-                    } elseif ($format === Body::FORMAT_HTML && $contentTypeHeader->getType() === 'text/html') {
-                        return $this->extractContent($part);
-                    }
-                }
-            }
+        $contentProcessor = new ContentProcessor();
+        $content = null;
+        switch ($format) {
+            case Body::FORMAT_HTML:
+                $content = $contentProcessor->processHtml($this->part);
+                break;
+            case Body::FORMAT_TEXT:
+                $content = $contentProcessor->processText($this->part);
+                break;
         }
 
-        throw new Exception\InvalidBodyFormatException(
+        if ($content) {
+            return $content;
+        }
+
+        throw new InvalidBodyFormatException(
             sprintf(
                 'A messages does not have %s content.',
                 $format === Body::FORMAT_TEXT ? 'TEXT' : 'HTML'
             )
         );
-    }
-
-    /**
-     * Extracts body content from the given part
-     *
-     * @param Part $part The message part where the content is stored
-     * @return Content
-     */
-    protected function extractContent($part)
-    {
-        /** @var \Zend\Mail\Header\ContentType $contentTypeHeader */
-        $contentTypeHeader = $this->getPartContentType($part);
-        if ($contentTypeHeader !== null) {
-            $contentType = $contentTypeHeader->getType();
-            $charset = $contentTypeHeader->getParameter('charset');
-            $encoding = $charset !== null ? $charset : 'ASCII';
-        } else {
-            $contentType = 'text/plain';
-            $encoding = 'ASCII';
-        }
-
-        if ($part->getHeaders()->has('Content-Transfer-Encoding')) {
-            $contentTransferEncoding = $part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        } else {
-            $contentTransferEncoding = 'BINARY';
-        }
-
-        return new Content($part->getContent(), $contentType, $contentTransferEncoding, $encoding);
-    }
-
-    /**
-     * Gets the Content-Type for the given part
-     *
-     * @param Part $part The message part
-     * @return \Zend\Mail\Header\ContentType|null
-     */
-    protected function getPartContentType($part)
-    {
-        return $part->getHeaders()->has('Content-Type')
-            ? $part->getHeader('Content-Type')
-            : null;
     }
 }
