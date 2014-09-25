@@ -85,11 +85,12 @@ class WsseAuthProvider extends Provider
      */
     protected function getValidUserApi(TokenInterface $token, PersistentCollection $secrets, User $user)
     {
-        $nonce = $token->getAttribute('nonce');
         $currentIteration = 0;
-        $secretsCount = $secrets->count();
+        $nonce            = $token->getAttribute('nonce');
+        $secretsCount     = $secrets->count();
+
         foreach ($secrets as $userApi) {
-            $currentIteration += 1;
+            $currentIteration++;
             $isSecretValid = $this->validateDigest(
                 $token->getAttribute('digest'),
                 $nonce,
@@ -97,10 +98,12 @@ class WsseAuthProvider extends Provider
                 $userApi->getApiKey(),
                 $this->getSalt($user)
             );
+
             // delete nonce from cache because user have another api keys
             if (!$isSecretValid && $secretsCount !== $currentIteration) {
                 $this->getNonceCache()->delete($nonce);
             }
+
             if ($isSecretValid) {
                 return $userApi;
             }
