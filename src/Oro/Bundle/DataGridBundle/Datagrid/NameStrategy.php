@@ -72,8 +72,7 @@ class NameStrategy implements NameStrategyInterface
             throw new InvalidArgumentException(
                 sprintf(
                     'Grid name "%s" is invalid, name must be not empty.',
-                    $name,
-                    self::DELIMITER
+                    $name
                 )
             );
         }

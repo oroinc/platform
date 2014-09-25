@@ -153,7 +153,7 @@ class DataGridExtension extends \Twig_Extension
     }
 
     /**
-     * @param $gridName
+     * @param string $gridName
      *
      * @return bool
      */
