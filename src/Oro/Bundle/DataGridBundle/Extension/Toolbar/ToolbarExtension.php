@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Toolbar;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -101,7 +102,7 @@ class ToolbarExtension extends AbstractExtension
         );
 
         if (empty($exist)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf('Default page size "%d" must present in size items array', $perPageDefault)
             );
         }

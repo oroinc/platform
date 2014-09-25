@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
 class EventDispatcher extends ImmutableEventDispatcher
@@ -15,6 +16,7 @@ class EventDispatcher extends ImmutableEventDispatcher
      * @param GridEventInterface|GridConfigurationEventInterface|Event $event
      *
      * @return Event
+     * @throws InvalidArgumentException
      */
     public function dispatch($eventName, Event $event = null)
     {
@@ -24,7 +26,7 @@ class EventDispatcher extends ImmutableEventDispatcher
         } elseif ($event instanceof GridConfigurationEventInterface) {
             $config = $event->getConfig();
         } else {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
             );
         }

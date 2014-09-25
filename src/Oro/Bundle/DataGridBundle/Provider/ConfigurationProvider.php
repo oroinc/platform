@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Provider;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
@@ -41,7 +42,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     public function getConfiguration($gridName)
     {
         if (!isset($this->rawConfiguration[$gridName])) {
-            throw new \RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
+            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
         }
 
         if (!isset($this->processedConfiguration[$gridName])) {

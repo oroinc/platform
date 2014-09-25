@@ -104,6 +104,7 @@ oro:
         x_thread_id.label:        xThread Id
 
         empty_body:               Empty body
+        unable_to_load_body:      Unfortunately we could not load the email body from the server. It is possible that it has been deleted.
 
         entity_config:
             email:

@@ -70,8 +70,8 @@ abstract class AbstractNotificationProcessor
             ->createQueryBuilder()
             ->select('COUNT(job)')
             ->from('JMSJobQueueBundle:Job', 'job')
-            ->where('job.command = :command AND job.state <> :state')
-            ->setParameters(array('command' => $command, 'state' => Job::STATE_FINISHED))
+            ->where('job.command = :command AND job.state IN ( :state )')
+            ->setParameters(['command' => $command, 'state' => [Job::STATE_RUNNING, Job::STATE_PENDING]])
             ->getQuery()
             ->getSingleScalarResult();
 
