@@ -26,6 +26,7 @@ services:
         class: %oro_datagrid.extension.formatter.property.link_property.class%
         arguments:
             - @router
+            - @twig
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: link }
 
