@@ -35,25 +35,17 @@ class ContentProcessor
         }
 
         $content = $this->getMultipartContentRecursively($part, 'text/html');
-        if (!$contents = $this->loadContents($part)) {
-            return $content;
-        }
 
-        $replacedContent = strtr($content->getContent(), $contents);
-
-        return new Content(
-            $replacedContent,
-            $content->getContentType(),
-            $content->getContentTransferEncoding(),
-            $content->getEncoding()
-        );
+        return $content ? $this->replaceEmbeddedContent($content, $part) : null;
     }
 
     /**
+     * Goes recursively through all parts of multi part and tries to retrieve content in required format
+     *
      * @param PartInterface $multipart
      * @param string        $format
      *
-     * @return Content
+     * @return Content|null  Returns null if given part is not multipart or when content of required format not found
      */
     protected function getMultipartContentRecursively(PartInterface $multipart, $format)
     {
@@ -110,6 +102,32 @@ class ContentProcessor
     protected function getPartContentType(PartInterface $part)
     {
         return $part->getHeaders()->has('Content-Type') ? $part->getHeader('Content-Type') : null;
+    }
+
+    /**
+     * Trying to find links on embedded content, extract it and replace respectively.
+     * Returns new instance of Content if there was any replacement or same instance otherwise
+     *
+     * @param Content       $content
+     * @param PartInterface $multipart
+     *
+     * @return Content
+     */
+    protected function replaceEmbeddedContent(Content $content, PartInterface $multipart)
+    {
+        $contentReplacements = $this->loadContents($multipart);
+        if ($contentReplacements) {
+            $replacedContent = strtr($content->getContent(), $contentReplacements);
+
+            return new Content(
+                $replacedContent,
+                $content->getContentType(),
+                $content->getContentTransferEncoding(),
+                $content->getEncoding()
+            );
+        }
+
+        return $content;
     }
 
     /**

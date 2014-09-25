@@ -24,30 +24,7 @@ class Message extends \Zend\Mail\Storage\Message
      */
     public function getBody()
     {
-        if (!$this->isMultipart()) {
-            return new Body($this);
-        }
-
-        $parts = array();
-        foreach ($this as $part) {
-            $contentType = $this->getPartContentType($part);
-            if ($contentType !== null) {
-                if ($contentType->getParameter('name') === null) {
-                    $parts[$contentType->getType()] = $part;
-                }
-            }
-        }
-
-        if (!empty($parts)) {
-            $part     = reset($parts);
-            $htmlType = 'text/html';
-            if (array_key_exists($htmlType, $parts)) {
-                $part = $parts[$htmlType];
-            }
-            return new Body($part);
-        }
-
-        throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot find a message body.');
+        return new Body($this);
     }
 
     /**
