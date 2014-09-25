@@ -212,6 +212,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                 this.trigger('expand', this.$el, this);
                 mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
                 this.widgetContentContainer.slideDown();
+
+                // every chart resizes at this event. I don't know how it works.
+                this.$el.find(".chart").trigger("resize");
             }
         },
 
