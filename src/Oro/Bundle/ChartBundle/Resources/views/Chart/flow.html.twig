@@ -13,7 +13,7 @@
                     containerId: '{{ containerId }}',
                     data: {{ data|json_encode|raw }},
                     label: '{{ 'from'|trans }} {{ options.settings.quarterDate|oro_format_date }}',
-                    colors: {{ config.default_settings.chartColors|json_encode|raw }},
+                    colors: {{ options.settings.chartColors|json_encode|raw }},
                     fontColors: {{ options.settings.chartFontColor|json_encode|raw }},
                     fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
                     {% if options.data_schema.value.formatter is defined %}
@@ -29,6 +29,7 @@
             require(['jquery', 'underscore', 'oroui/js/layout', 'flotr2',
                 'orolocale/js/formatter/number', 'orochart/js/flotr2/funnel'],
                     function($, _, layout, Flotr, numberFormatter){
+                        return;
                         var formatter = numberFormatter;
                         $(function () {
                             var $chart = $('#{{ containerId }}-chart');

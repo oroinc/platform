@@ -39,7 +39,6 @@
                 noTicks: {{ options.settings.xNoTicks|json_encode|raw }}
                 {% endif %}
             };
-//            chart(options);
             $.orochart.barChart(options, $('#{{ containerId }}-chart'));
         });
     </script>

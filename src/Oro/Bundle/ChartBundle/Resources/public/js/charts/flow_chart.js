@@ -20,10 +20,11 @@ define([
         _draw: function () {
             var $chart = this.element;
             var options = this.options;
+            var formatter = numberFormatter;
+
             if (!$chart.get(0).clientWidth) {
                 return;
             }
-            var formatter = numberFormatter;
             var data = options.data;
             var chartData = {};
             var nozzleSteps = [];
@@ -50,7 +51,7 @@ define([
                             },
                             nozzleFormatter: function (label, value) {
                                 return label
-                                        + ' ('+ options.label + '): '
+                                        + options.label
                                         + formatter.formatCurrency(value);
                             }
                         },
