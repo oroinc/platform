@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
+use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
@@ -74,12 +75,9 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             ->setParameter(2, $folder)
             ->getQuery();
 
-        /** @var ImapEmail $imapEmail */
-        $imapEmail = $query->getSingleResult();
-
-        $loadedEmail = $manager->findEmail($imapEmail['uid']);
-        if ($loadedEmail === null) {
-            throw new \RuntimeException(sprintf('Cannot find a body for "%s" email.', $email->getSubject()));
+        $loadedEmail = $manager->findEmail($query->getSingleScalarResult());
+        if (null === $loadedEmail) {
+            throw new EmailBodyNotFoundException($email);
         }
 
         $builder = new EmailBodyBuilder();

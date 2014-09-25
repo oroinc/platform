@@ -16,13 +16,18 @@
             {{ UI.attibuteRow('Cc'|trans, EA.recipient_email_addresses(entity.recipients('cc'), true)) }}
             {{ UI.attibuteRow('Bcc'|trans, EA.recipient_email_addresses(entity.recipients('bcc'), true)) }}
             {{ UI.attibuteRow('oro.email.subject.label'|trans, entity.subject) }}
-            {% if entity.emailBody.hasAttachments %}
-                {{ UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments)) }}
-            {% endif %}
-            {% if entity.emailBody.bodyContent is empty %}
-                {{ UI.attibuteRow('', 'oro.email.empty_body'|trans) }}
+            {% if noBodyFound %}
+                {% set notFoundMessage %}<strong>{{ 'oro.email.unable_to_load_body'|trans}}</strong>{% endset %}
+                {{ UI.attibuteRow('', notFoundMessage) }}
             {% else %}
-                {{ EA.body(entity.emailBody, 'scrollable-container') }}
+                {% if entity.emailBody.hasAttachments %}
+                    {{ UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments)) }}
+                {% endif %}
+                {% if entity.emailBody.bodyContent is empty %}
+                    {{ UI.attibuteRow('', 'oro.email.empty_body'|trans) }}
+                {% else %}
+                    {{ EA.body(entity.emailBody, 'scrollable-container') }}
+                {% endif %}
             {% endif %}
         </div>
     </div>
