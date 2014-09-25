@@ -147,7 +147,7 @@
                 });
                 widget.addAction('back', 'adopted', backAction);
 
-                {% if isSuccessful %}
+                {% if success %}
                     var importAction = $('<button type="button" class="btn btn-primary">{{ 'Import'|trans }}</button>');
                     importAction.on('click', function(e) {
                         Messenger.notificationFlashMessage(
