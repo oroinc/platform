@@ -57,11 +57,11 @@ class WsseAuthProvider extends Provider
         if ($user) {
             $secret = $this->getSecret($user);
             if ($secret instanceof PersistentCollection) {
-                $correctUserAPI = $this->getValidUserApi($token, $secret, $user);
-                if ($correctUserAPI) {
+                $validUserApi = $this->getValidUserApi($token, $secret, $user);
+                if ($validUserApi) {
                     $authenticatedToken = new WsseToken($user->getRoles());
                     $authenticatedToken->setUser($user);
-                    $authenticatedToken->setOrganizationContext($correctUserAPI->getOrganization());
+                    $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
                     $authenticatedToken->setAuthenticated(true);
 
                     return $authenticatedToken;
