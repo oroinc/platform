@@ -3,12 +3,9 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\PersistentCollection;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
@@ -60,23 +57,14 @@ class WsseAuthProvider extends Provider
         if ($user) {
             $secret = $this->getSecret($user);
             if ($secret instanceof PersistentCollection) {
-                /** @var $secret UserApi[] */
-                foreach ($secret as $userApi) {
-                    $isSecretValid = $this->validateDigest(
-                        $token->getAttribute('digest'),
-                        $token->getAttribute('nonce'),
-                        $token->getAttribute('created'),
-                        $userApi->getApiKey(),
-                        $this->getSalt($user)
-                    );
-                    if ($isSecretValid) {
-                        $authenticatedToken = new WsseToken($user->getRoles());
-                        $authenticatedToken->setUser($user);
-                        $authenticatedToken->setOrganizationContext($userApi->getOrganization());
-                        $authenticatedToken->setAuthenticated(true);
+                $validUserApi = $this->getValidUserApi($token, $secret, $user);
+                if ($validUserApi) {
+                    $authenticatedToken = new WsseToken($user->getRoles());
+                    $authenticatedToken->setUser($user);
+                    $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
+                    $authenticatedToken->setAuthenticated(true);
 
-                        return $authenticatedToken;
-                    }
+                    return $authenticatedToken;
                 }
             } else {
                 return parent::authenticate($token);
@@ -84,5 +72,43 @@ class WsseAuthProvider extends Provider
         }
 
         throw new AuthenticationException('WSSE authentication failed.');
+    }
+
+    /**
+     * Get valid UserApi for given token
+     *
+     * @param TokenInterface       $token
+     * @param PersistentCollection $secrets
+     * @param User                 $user
+     *
+     * @return bool|UserApi
+     */
+    protected function getValidUserApi(TokenInterface $token, PersistentCollection $secrets, User $user)
+    {
+        $currentIteration = 0;
+        $nonce            = $token->getAttribute('nonce');
+        $secretsCount     = $secrets->count();
+
+        foreach ($secrets as $userApi) {
+            $currentIteration++;
+            $isSecretValid = $this->validateDigest(
+                $token->getAttribute('digest'),
+                $nonce,
+                $token->getAttribute('created'),
+                $userApi->getApiKey(),
+                $this->getSalt($user)
+            );
+
+            // delete nonce from cache because user have another api keys
+            if (!$isSecretValid && $secretsCount !== $currentIteration) {
+                $this->getNonceCache()->delete($nonce);
+            }
+
+            if ($isSecretValid) {
+                return $userApi;
+            }
+        }
+
+        return false;
     }
 }
