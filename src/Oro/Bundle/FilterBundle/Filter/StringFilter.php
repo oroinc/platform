@@ -93,29 +93,29 @@ class StringFilter extends AbstractFilter
                 return $ds->expr()->notIn($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
                 $emptyString = $ds->expr()->literal('');
-                $eq          = $ds->expr()->eq($fieldName, $emptyString);
 
                 if ($this->isCompositeField($ds, $fieldName)) {
                     $fieldName = $ds->expr()->trim($fieldName);
-
-                    $eq = $ds->expr()->eq($fieldName, $emptyString);
                 }
 
                 return $ds->expr()->andX(
-                    $ds->expr()->orX($ds->expr()->isNull($fieldName), $eq),
+                    $ds->expr()->orX(
+                        $ds->expr()->isNull($fieldName),
+                        $ds->expr()->eq($fieldName, $emptyString)
+                    ),
                     $ds->expr()->eq(true, true)
                 );
             case FilterUtility::TYPE_NOT_EMPTY:
                 $emptyString = $ds->expr()->literal('');
-                $neq         = $ds->expr()->neq($fieldName, $emptyString);
 
                 if ($this->isCompositeField($ds, $fieldName)) {
                     $fieldName = $ds->expr()->trim($fieldName);
-
-                    $neq = $ds->expr()->neq($fieldName, $emptyString);
                 }
 
-                return $ds->expr()->andX($ds->expr()->isNotNull($fieldName), $neq);
+                return $ds->expr()->andX(
+                    $ds->expr()->isNotNull($fieldName),
+                    $ds->expr()->neq($fieldName, $emptyString)
+                );
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }
