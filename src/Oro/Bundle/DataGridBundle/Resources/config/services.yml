@@ -3,6 +3,7 @@ parameters:
     oro_datagrid.extension.acceptor.class:                  Oro\Bundle\DataGridBundle\Extension\Acceptor
 
     oro_datagrid.datagrid.manager.class:                    Oro\Bundle\DataGridBundle\Datagrid\Manager
+    oro_datagrid.datagrid.name_strategy.class:              Oro\Bundle\DataGridBundle\Datagrid\NameStrategy
     oro_datagrid.datagrid.builder.class:                    Oro\Bundle\DataGridBundle\Datagrid\Builder
     oro_datagrid.datagrid.parameters.class:                 Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
     oro_datagrid.datagrid.request_parameters_factory.class: Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory
@@ -15,9 +16,8 @@ parameters:
     oro_datagrid.event_listener.base_orm_relation.class:    Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
     oro_datagrid.configuration.provider.class:              Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
     oro_datagrid.configuration.provider.chain.class:        Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
-    oro_datagrid.event.dispatcher.class:             Oro\Bundle\DataGridBundle\Event\EventDispatcher
+    oro_datagrid.event.dispatcher.class:                    Oro\Bundle\DataGridBundle\Event\EventDispatcher
     oro_datagrid.event_listener.ormdatasource_acl.class:    Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
-    oro_datagrid.event_listener.hide_toolbar_by_records.class: Oro\Bundle\DataGridBundle\EventListener\DisableToolbarByRecordCountListener
 
 services:
     oro_datagrid.datagrid.manager:
@@ -26,6 +26,10 @@ services:
             - @oro_datagrid.configuration.provider.chain
             - @oro_datagrid.datagrid.builder
             - @oro_datagrid.datagrid.request_parameters_factory
+            - @oro_datagrid.datagrid.name_strategy
+
+    oro_datagrid.datagrid.name_strategy:
+        class: %oro_datagrid.datagrid.name_strategy.class%
 
     oro_datagrid.datagrid.manager.link:
         tags:
@@ -81,6 +85,7 @@ services:
         class: %oro_datagrid.twig.datagrid.class%
         arguments:
             - @oro_datagrid.datagrid.manager
+            - @oro_datagrid.datagrid.name_strategy
             - @router
             - @oro_security.security_facade
         tags:

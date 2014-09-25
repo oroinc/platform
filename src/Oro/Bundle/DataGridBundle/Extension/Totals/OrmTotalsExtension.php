@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
@@ -390,13 +391,13 @@ class OrmTotalsExtension extends AbstractExtension
      * @param array $rowConfig
      * @param string $gridName
      * @return array
-     * @throws \Exception
+     * @throws LogicException
      */
     protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridName)
     {
         if (isset($rowConfig[Configuration::TOTALS_EXTEND_KEY]) && $rowConfig[Configuration::TOTALS_EXTEND_KEY]) {
             if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]])) {
-                throw new \Exception(sprintf(
+                throw new LogicException(sprintf(
                     'Total row "%s" definition in "%s" datagrid config does not exist',
                     $rowConfig[Configuration::TOTALS_EXTEND_KEY],
                     $gridName

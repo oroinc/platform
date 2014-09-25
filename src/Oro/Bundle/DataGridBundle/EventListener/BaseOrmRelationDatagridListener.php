@@ -23,20 +23,20 @@ class BaseOrmRelationDatagridListener
     const GRID_PARAM_DATA_IN     = 'data_in';
     const GRID_PARAM_DATA_NOT_IN = 'data_not_in';
 
-    /** @var string */
-    protected $paramName;
+    /** @var array */
+    protected $parameterNames;
 
     /** @var boolean */
     protected $isEditMode;
 
     /**
-     * @param string $paramName  Parameter name that should be taken from request and binded to query
-     * @param bool   $isEditMode whether or not to add data_in, data_not_in params to query
+     * @param array|string $paramName  One or more parameter names that should be taken from request and binded to query
+     * @param bool         $isEditMode whether or not to add data_in, data_not_in params to query
      */
     public function __construct($paramName, $isEditMode = true)
     {
-        $this->paramName  = $paramName;
-        $this->isEditMode = $isEditMode;
+        $this->parameterNames = is_array($paramName) ? $paramName : [$paramName];
+        $this->isEditMode     = $isEditMode;
     }
 
     /**
@@ -82,10 +82,13 @@ class BaseOrmRelationDatagridListener
             }
 
             $queryParameters = [
-                $this->paramName => $parameters->get($this->paramName),
                 'data_in'        => $dataIn,
                 'data_not_in'    => $dataOut,
             ];
+
+            foreach ($this->parameterNames as $paramName) {
+                $queryParameters[$paramName] = $parameters->get($paramName);
+            }
 
             if (!$this->isEditMode) {
                 unset($queryParameters['data_in'], $queryParameters['data_not_in']);

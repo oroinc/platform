@@ -18,6 +18,22 @@ interface DatagridInterface
     public function getName();
 
     /**
+     * Returns datagrid scope
+     *
+     * @return string
+     */
+    public function getScope();
+
+    /**
+     * Set scope of datagrid
+     *
+     * @param string $scope
+     *
+     * @return $this
+     */
+    public function setScope($scope);
+
+    /**
      * Set grid datasource
      *
      * @param DatasourceInterface $source

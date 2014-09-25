@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Event\PreBuild;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class Builder
@@ -68,6 +69,7 @@ class Builder
 
         /** @var DatagridInterface $datagrid */
         $datagrid = new $class($name, $config, $parameters);
+        $datagrid->setScope($config->offsetGetOr('scope'));
 
         $event = new BuildBefore($datagrid, $config);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
@@ -149,17 +151,17 @@ class Builder
      * @param DatagridInterface     $grid
      * @param DatagridConfiguration $config
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function buildDataSource(DatagridInterface $grid, DatagridConfiguration $config)
     {
         $sourceType = $config->offsetGetByPath(self::DATASOURCE_TYPE_PATH, false);
         if (!$sourceType) {
-            throw new \RuntimeException('Datagrid source does not configured');
+            throw new RuntimeException('Datagrid source does not configured');
         }
 
         if (!isset($this->dataSources[$sourceType])) {
-            throw new \RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
+            throw new RuntimeException(sprintf('Datagrid source "%s" does not exist', $sourceType));
         }
 
         $this->dataSources[$sourceType]->process($grid, $config->offsetGetByPath(self::DATASOURCE_PATH, []));

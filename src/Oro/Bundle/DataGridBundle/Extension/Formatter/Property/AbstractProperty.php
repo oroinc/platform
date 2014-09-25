@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
 abstract class AbstractProperty implements PropertyInterface
 {
@@ -138,7 +139,7 @@ abstract class AbstractProperty implements PropertyInterface
      *
      * @param string $paramName
      *
-     * @throws \LogicException
+     * @throws LogicException
      * @return PropertyConfiguration|mixed
      */
     protected function get($paramName = null)
@@ -147,7 +148,7 @@ abstract class AbstractProperty implements PropertyInterface
 
         if ($paramName !== null) {
             if (!isset($this->params[$paramName])) {
-                throw new \LogicException(sprintf('Trying to access not existing parameter: "%s"', $paramName));
+                throw new LogicException(sprintf('Trying to access not existing parameter: "%s"', $paramName));
             }
 
             $value = $this->params[$paramName];
