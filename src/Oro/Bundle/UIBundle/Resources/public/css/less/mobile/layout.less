@@ -21,6 +21,13 @@
   height: @headerHeight;
   top: 0;
 }
+/**
+ * Fixes issue when header with position fixed loses its place after blur event on some input
+ * @see fixStickyHeader() in oroui/js/mobile/layout.js
+ */
+&.input-focused #oroplatform-header {
+  position: absolute;
+}
 #main {
   float: none;
   height: 100%;
