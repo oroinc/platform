@@ -25,19 +25,19 @@ define(function (require) {
      * @see http://dansajin.com/2012/12/07/fix-position-fixed/
      * @see http://stackoverflow.com/questions/14492613/ios-ipad-fixed-position-breaks-when-keyboard-is-opened
      */
-    function fixFixedHeader() {
-        var $body, scroll;
+    function fixStickyHeader() {
+        var $body, forceHeaderLayoutUpdate;
         $body = $('body');
-        scroll = _.debounce(function () {
+        forceHeaderLayoutUpdate = _.debounce(function () {
             $(document).scrollTop($(document).scrollTop());
         }, 1);
         $(document)
             .on('focus', ':input', function () {
-                $body.addClass('fixfixed');
+                $body.addClass('input-focused');
             })
             .on('blur', ':input', function () {
-                $body.removeClass('fixfixed');
-                scroll();
+                $body.removeClass('input-focused');
+                forceHeaderLayoutUpdate();
             });
     }
 
@@ -45,7 +45,7 @@ define(function (require) {
      * Initiate mobile layout
      */
     function initLayout() {
-        fixFixedHeader();
+        fixStickyHeader();
         initMainMenu();
         pageHeader.init();
     }
