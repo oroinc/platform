@@ -38,45 +38,7 @@ datagrid:
             bind_parameters:
                 - groupId
 ```
-
-In case if name of parameters in grid and query not match, you can pass associative array of parameters, where key will
-be name of parameter in query, and value - name of parameter if grid:
-
-``` yml
-datagrid:
-    acme-demo-grid:
-        source:
-            type: orm
-            query:
-                select:
-                    - u
-                from:
-                    { table: AcmeDemoBundle:User, alias:u }
-            where:
-                and:
-                    - u.group = :group_id
-            bind_parameters:
-                group_id: groupId
-```
-
-Full format of bind parameters:
-
-``` yml
-    bind_parameters:
-        data_in: # option string key will be interpreted as name of parameter in query
-            path: _parameters.groupId # it will reference to parameter groupId in key _parameters of parameter bag.
-            default: [0] # some default value, will be used if parameter is not passed
-            type: array # type applicable with Doctrine: Doctrine\DBAL\Types\Type::getType()
-```
-
-``` yml
-    bind_parameters:
-        -
-            name: # name of parameter in query
-            path: _parameters.groupId # it will reference to parameter groupId in key _parameters of parameter bag.
-            default: [0] # some default value, will be used if parameter is not passed
-            type: array # type applicable with Doctrine: Doctrine\DBAL\Types\Type::getType()
-```
+[More about parameters binding](./parameter_binding.md).
 
 #### Problem:
 Let's take previous problem, but in additional we need to fill some form field dependent on grid state.

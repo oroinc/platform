@@ -148,7 +148,7 @@ class ParameterBinder implements ParameterBinderInterface
      * @param array $source
      * @param array $config
      * @return mixed
-     * @throws NoSuchPropertyException
+     * @throws InvalidArgumentException
      */
     protected function getParameterValue($source, array $config)
     {
@@ -163,7 +163,15 @@ class ParameterBinder implements ParameterBinderInterface
             if (isset($config['default'])) {
                 $result = $config['default'];
             } else {
-                throw $exception;
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot bind datasource parameter "%s", there is no datagrid parameter with path "%s".',
+                        $config['name'],
+                        $config['path']
+                    ),
+                    0,
+                    $exception
+                );
             }
         }
         if (null === $result && isset($config['default'])) {
@@ -184,7 +192,7 @@ class ParameterBinder implements ParameterBinderInterface
 
         /** @var Parameter $parameter */
         foreach ($parameters->getValues() as $parameter) {
-            if ($parameter->getName() == $newParameter->getName()) {
+            if ($parameter->getName() === $newParameter->getName()) {
                 $removeParameters[] = $parameter;
             }
         }

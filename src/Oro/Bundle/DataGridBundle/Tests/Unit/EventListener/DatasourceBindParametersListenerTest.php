@@ -41,6 +41,8 @@ class DatasourceBindParametersListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider onBuildAfterDataProvider
+     * @param array $config
+     * @param array $expectedBindParameters
      */
     public function testOnBuildAfterWorks(array $config, array $expectedBindParameters = null)
     {
@@ -69,6 +71,9 @@ class DatasourceBindParametersListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onBuildAfter($this->event);
     }
 
+    /**
+     * @return array
+     */
     public function onBuildAfterDataProvider()
     {
         return [

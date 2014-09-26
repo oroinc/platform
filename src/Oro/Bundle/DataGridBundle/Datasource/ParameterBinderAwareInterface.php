@@ -17,7 +17,7 @@ interface ParameterBinderAwareInterface
     /**
      * Binds datagrid parameters to datasource query.
      *
-     * @see \Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface::bindParameters
+     * @see ParameterBinderInterface::bindParameters
      * @param array $datasourceToDatagridParameters
      * @param bool $append
      */

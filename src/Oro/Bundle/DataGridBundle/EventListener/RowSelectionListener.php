@@ -69,9 +69,9 @@ class RowSelectionListener
 
         $config = $datagrid->getConfig();
 
-        $rowSelectionConfig = $config->offsetGetByPath(self::ROW_SELECTION_OPTION_PATH);
+        $rowSelectionConfig = $config->offsetGetByPath(self::ROW_SELECTION_OPTION_PATH, []);
 
-        if (!$rowSelectionConfig || !is_array($rowSelectionConfig) || empty($rowSelectionConfig['columnName'])) {
+        if (!is_array($rowSelectionConfig) || empty($rowSelectionConfig['columnName'])) {
             return;
         }
 

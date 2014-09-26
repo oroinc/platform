@@ -49,6 +49,11 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider bindParametersDataProvider
+     * @param array $bindParameters
+     * @param array $datagridParameters
+     * @param array $oldQueryParameters
+     * @param array $expectedQueryParameters
+     * @param bool $append
      */
     public function testBindParametersWorks(
         array $bindParameters,
@@ -85,6 +90,7 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
      */
     public function bindParametersDataProvider()
     {
@@ -152,6 +158,21 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
                     $this->createQueryParameter('entity_name', 'test'),
                 ]
             ],
+            'default catch exception' => [
+                'bindParameters' => [
+                    'entity_name' => [
+                        'path' => 'foo.bar',
+                        'default' => 'test',
+                    ]
+                ],
+                'datagridParameters' => [
+                    'foo' => new \stdClass,
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    $this->createQueryParameter('entity_name', 'test'),
+                ]
+            ],
             'parameter path' => [
                 'bindParameters' => [
                     'entity_id' => '_parameters.entityId',
@@ -169,7 +190,7 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
                     $this->createQueryParameter('entity_name', 'test'),
                 ]
             ],
-            'addend' => [
+            'append' => [
                 'bindParameters' => ['entity_name'],
                 'datagridParameters' => ['entity_name' => 'test'],
                 'oldQueryParameters' => [$this->createQueryParameter('entity_id', 1)],
@@ -199,7 +220,7 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testBindParametersFailsWithInvalidDatasource()
+    public function testBindParametersFailsWithInvalidPath()
     {
         $datasource = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
@@ -214,6 +235,36 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->parameterBinder->bindParameters($this->datagrid, ['foo']);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cannot bind datasource parameter "bar", there is no datagrid parameter with path "foo.bar".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testBindParametersFailsWithInvalidDatasource()
+    {
+        $datagridParameters = ['foo' => new \stdClass];
+        $queryParameters = new ArrayCollection();
+
+        $this->datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->will($this->returnValue($this->datasource));
+
+        $this->datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($this->queryBuilder));
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue($queryParameters));
+
+        $this->datagrid->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue(new ParameterBag($datagridParameters)));
+
+        $this->parameterBinder->bindParameters($this->datagrid, ['bar' => 'foo.bar']);
     }
 
     public function testBindParametersWorksWithEmptyParameters()
