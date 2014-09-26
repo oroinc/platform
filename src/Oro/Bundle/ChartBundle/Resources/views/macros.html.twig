@@ -1,9 +1,11 @@
 {#
-    Renders datagrid widget
+    Renders chart
 
     parameters:
         name: chart name
-        params: params for chart
+        options: options for chart
+        config: config for chart
+        isMobileVersion: render for mobile
 #}
 {% macro renderChart(data, options, config, isMobileVersion) %}
     {% set name = options.name|replace({'_chart': ''}) %}
