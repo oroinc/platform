@@ -20,6 +20,7 @@
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
+        {% if form.vars.show_organizations_selector is defined %}
             {% for org in form.vars.organization_tree_ids %}
                 <div class="oro-clearfix">
                     <input type="checkbox"
@@ -34,7 +35,18 @@
                     {{ _self.renderOrganizationChildren(form, org.id, org.children, form.vars.selected_business_units) }}
                 {% endif %}
             {% endfor %}
+        {% else %}
+            <input type="hidden" name="{{ form.vars.full_name }}[organizations][]" value="{{ form.default_organization.vars.value }}" />
+            {{ _self.renderOrganizationChildren(
+                form,
+                form.vars.organization_tree_ids[0].organization,
+                form.vars.organization_tree_ids,
+                form.vars.selected_business_units,
+                0
+            ) }}
+        {% endif %}
         </div>
+        {% if form.vars.show_organizations_selector is defined %}
         <script type="text/javascript">
             require(['jquery'],
             function($) {
@@ -55,6 +67,7 @@
                 });
             });
         </script>
+        {% endif %}
     {% endspaceless %}
 {% endblock %}
 
@@ -62,9 +75,11 @@
     {% for child in children %}
         <div class="oro-clearfix">
             <span style="float:left;">
+            {% if level != 0 %}
                 {% for i in 1..level %}
                     {% for si in 0..5 %}{{ '&nbsp;' }}{% endfor %}
                 {% endfor %}
+            {% endif %}
             </span>
             <input type="checkbox"
                    id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
