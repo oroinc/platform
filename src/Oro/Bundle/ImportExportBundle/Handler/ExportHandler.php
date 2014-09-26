@@ -6,9 +6,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
@@ -20,23 +19,24 @@ class ExportHandler extends AbstractHandler
     protected $mimeTypeGuesser;
 
     /**
-     * Constructor
-     *
-     * @param JobExecutor        $jobExecutor
-     * @param ProcessorRegistry  $processorRegistry
-     * @param FileSystemOperator $fileSystemOperator
-     * @param MimeTypeGuesser    $mimeTypeGuesser
-     * @param Router             $router
+     * @var RouterInterface
      */
-    public function __construct(
-        JobExecutor $jobExecutor,
-        ProcessorRegistry $processorRegistry,
-        FileSystemOperator $fileSystemOperator,
-        MimeTypeGuesser $mimeTypeGuesser,
-        Router $router
-    ) {
-        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $router);
+    protected $router;
+
+    /**
+     * @param MimeTypeGuesser $mimeTypeGuesser
+     */
+    public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
+    {
         $this->mimeTypeGuesser = $mimeTypeGuesser;
+    }
+
+    /**
+     * @param RouterInterface $router
+     */
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
     }
 
     /**
@@ -67,17 +67,17 @@ class ExportHandler extends AbstractHandler
             $processorAlias
         );
 
-        $configuration = array(
+        $configuration = [
             $processorType =>
                 array_merge(
-                    array(
+                    [
                         'processorAlias' => $processorAlias,
                         'entityName'     => $entityName,
                         'filePath'       => $fileName
-                    ),
+                    ],
                     $options
                 )
-        );
+        ];
 
         $url         = null;
         $errorsCount = 0;
@@ -92,7 +92,7 @@ class ExportHandler extends AbstractHandler
         if ($jobResult->isSuccessful()) {
             $url     = $this->router->generate(
                 'oro_importexport_export_download',
-                array('fileName' => basename($fileName))
+                ['fileName' => basename($fileName)]
             );
             $context = $jobResult->getContext();
             if ($context) {
@@ -101,17 +101,17 @@ class ExportHandler extends AbstractHandler
         } else {
             $url         = $this->router->generate(
                 'oro_importexport_error_log',
-                array('jobCode' => $jobResult->getJobCode())
+                ['jobCode' => $jobResult->getJobCode()]
             );
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
-        return array(
+        return [
             'success'     => $jobResult->isSuccessful(),
             'url'         => $url,
             'readsCount'  => $readsCount,
             'errorsCount' => $errorsCount,
-        );
+        ];
     }
 
     /**
@@ -177,24 +177,9 @@ class ExportHandler extends AbstractHandler
      */
     protected function getFileContentType($fileName)
     {
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-        return $this->mimeTypeGuesser->guessByFileExtension($ext);
-    }
-
-    /**
-     * Get a mimetype value from a file extension
-     *
-     * @param string $extension File extension
-     *
-     * @return string|null
-     *
-     */
-    protected function guessMimetypeByFileExtension($extension)
-    {
-        $extension = strtolower($extension);
-
-        return isset($this->mimetypes[$extension]) ? $this->mimetypes[$extension] : null;
+        return $this->mimeTypeGuesser->guessByFileExtension($extension);
     }
 
     /**

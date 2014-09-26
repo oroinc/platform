@@ -6,12 +6,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -23,12 +24,14 @@ class ImportExportController extends Controller
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
      * @Template
+     *
+     * @return array
      */
     public function importFormAction()
     {
         $entityName = $this->getRequest()->get('entity');
 
-        $importForm = $this->createForm('oro_importexport_import', null, array('entityName' => $entityName));
+        $importForm = $this->createForm('oro_importexport_import', null, ['entityName' => $entityName]);
 
         if ($this->getRequest()->isMethod('POST')) {
             $importForm->submit($this->getRequest());
@@ -43,16 +46,16 @@ class ImportExportController extends Controller
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',
-                    array('processorAlias' => $processorAlias),
+                    ['processorAlias' => $processorAlias],
                     $this->getRequest()->query->all()
                 );
             }
         }
 
-        return array(
+        return [
             'entityName' => $entityName,
             'form'       => $importForm->createView()
-        );
+        ];
     }
 
     /**
@@ -61,6 +64,9 @@ class ImportExportController extends Controller
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
      * @Template
+     *
+     * @param string $processorAlias
+     * @return array
      */
     public function importValidateAction($processorAlias)
     {
@@ -75,14 +81,16 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
-     * @return Response
+     * @return JsonResponse
      */
     public function importProcessAction($processorAlias)
     {
-        return $this->getImportHandler()->handleImport(
+        $result = $this->getImportHandler()->handleImport(
             JobExecutor::JOB_IMPORT_FROM_CSV,
             $processorAlias
         );
+
+        return new JsonResponse($result);
     }
 
     /**
@@ -125,6 +133,9 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/download/{fileName}", name="oro_importexport_export_download")
      * @AclAncestor("oro_importexport_export")
+     *
+     * @param string $fileName
+     * @return Response
      */
     public function downloadExportResultAction($fileName)
     {
@@ -134,6 +145,9 @@ class ImportExportController extends Controller
     /**
      * @Route("/import_export/error/{jobCode}.log", name="oro_importexport_error_log")
      * @AclAncestor("oro_importexport")
+     *
+     * @param string $jobCode
+     * @return Response
      */
     public function errorLogAction($jobCode)
     {
@@ -144,15 +158,15 @@ class ImportExportController extends Controller
         );
         $content = implode("\r\n", $errors);
 
-        return new Response($content, 200, array('Content-Type' => 'text/x-log'));
+        return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }
 
     /**
-     * @return ImportHandler
+     * @return HttpImportHandler
      */
     protected function getImportHandler()
     {
-        return $this->get('oro_importexport.handler.import');
+        return $this->get('oro_importexport.handler.import.http');
     }
 
     /**

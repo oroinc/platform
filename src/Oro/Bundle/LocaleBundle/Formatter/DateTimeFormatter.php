@@ -38,9 +38,14 @@ class DateTimeFormatter
         if (!$timeZone) {
             $timeZone = $this->localeSettings->getTimeZone();
         }
-        $date = $this->getDateTime($date);
-        $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
-        return $formatter->format((int)$date->format('U'));
+        $dateTime = $this->getDateTime($date);
+
+        // use Formatter if we have DateTime object and return the incoming argument otherwise
+        if ($dateTime) {
+            $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
+            return $formatter->format((int)$dateTime->format('U'));
+        }
+        return $date;
     }
 
     /**
@@ -159,13 +164,18 @@ class DateTimeFormatter
     }
 
     /**
-     * Returns DateTime by $data and $timezone
+     * Returns DateTime by $data and $timezone and false otherwise
      *
      * @param \DateTime|string|int $date
-     * @return \DateTime
+     *
+     * @return \DateTime|false
      */
     protected function getDateTime($date)
     {
+        if (!$date) {
+            return false;
+        }
+
         if ($date instanceof \DateTime) {
             return $date;
         }

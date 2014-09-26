@@ -24,20 +24,7 @@ class Message extends \Zend\Mail\Storage\Message
      */
     public function getBody()
     {
-        if (!$this->isMultipart()) {
-            return new Body($this);
-        }
-
-        foreach ($this as $part) {
-            $contentType = $this->getPartContentType($part);
-            if ($contentType !== null) {
-                if ($contentType->getParameter('name') === null) {
-                    return new Body($part);
-                }
-            }
-        }
-
-        throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot find a message body.');
+        return new Body($this);
     }
 
     /**
@@ -80,6 +67,7 @@ class Message extends \Zend\Mail\Storage\Message
      * Gets the Content-Type for the given part
      *
      * @param Part $part The message part
+     *
      * @return \Zend\Mail\Header\ContentType|null
      */
     protected function getPartContentType($part)
@@ -92,8 +80,9 @@ class Message extends \Zend\Mail\Storage\Message
     /**
      * Gets the Content-Disposition for the given part
      *
-     * @param Part $part The message part
+     * @param Part $part   The message part
      * @param bool $format Can be FORMAT_RAW or FORMAT_ENCODED, see HeaderInterface::FORMAT_* constants
+     *
      * @return string|null
      */
     protected function getPartContentDisposition($part, $format = HeaderInterface::FORMAT_RAW)
