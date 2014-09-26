@@ -10,9 +10,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
 class OrganizationsSelectType extends AbstractType
@@ -23,17 +22,22 @@ class OrganizationsSelectType extends AbstractType
     /** @var BusinessUnitManager */
     protected $buManager;
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
+    /**
+     * @param EntityManager       $em
+     * @param BusinessUnitManager $buManager
+     * @param SecurityFacade      $securityFacade
+     */
     public function __construct(
         EntityManager $em,
         BusinessUnitManager $buManager,
-        SecurityContextInterface $securityContext
+        SecurityFacade $securityFacade
     ) {
         $this->em              = $em;
         $this->buManager       = $buManager;
-        $this->securityContext = $securityContext;
+        $this->securityFacade  = $securityFacade;
     }
 
     /**
@@ -69,16 +73,12 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->securityContext->getToken();
-        $organization = $token->getOrganizationContext();
-
         $builder->add(
             'default_organization',
             'hidden',
             [
                 'mapped' => false,
-                'data'   => $organization->getId(),
+                'data'   => $this->securityFacade->getOrganizationId(),
             ]
         );
         $builder->add(
@@ -108,11 +108,9 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->securityContext->getToken();
-        $organization = $token->getOrganizationContext();
-
-        $buTree = $this->buManager->getBusinessUnitRepo()->getOrganizationBusinessUnitsTree($organization->getId());
+        $buTree = $this->buManager->getBusinessUnitRepo()->getOrganizationBusinessUnitsTree(
+            $this->securityFacade->getOrganizationId()
+        );
 
         $view->vars['organization_tree_ids'] = $buTree;
 
@@ -126,7 +124,7 @@ class OrganizationsSelectType extends AbstractType
             )->getValues();
         }
 
-        $view->vars['selected_organizations']  = [$organization->getId()];
+        $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
     }
 
