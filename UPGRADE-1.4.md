@@ -7,6 +7,10 @@ UPGRADE FROM 1.3 to 1.4
 
 ####DataGridBundle:
 - `Extension\Pager\PagerInterface` no longer has `getLinks` method for implementation
+- `Orm/OrmDatasource\OrmDatasource`:
+    - now implement and `ParameterBinderAwareInterface`
+    - methods `getParameterBinder` and `bindParameters` have been added
+- `EventListener\BaseOrmRelationDatagridListener` has been deprecated
 
 ####EmailBundle:
 - `Builder\EmailEntityBatchInterface` currently has mandatory method `getChanges` for implementation
@@ -36,9 +40,6 @@ UPGRADE FROM 1.3 to 1.4
 - `oro:entity-config:debug` command has been changed to get a different kind of configuration data as well as add/remove/update configuration of entities.
 
 ####EntityExtendBundle:
-- Support of `enum` and `multi-enum` types have been added
-    - `enum` (named `Select` on UI) only one option may be selected
-    - `multiEnum` (named `Multi-Select` on UI) - several options may be selected
 - `EntityConfig\ExtendScope` constants `STATE_UPDATED` and `STATE_DELETED` have been deprecated
 
 ####FilterBundle:
@@ -97,5 +98,5 @@ UPGRADE FROM 1.3 to 1.4
 - `Security\AdvancedApiUserInterface` has been changed method name from `getApiKey` to `getApiKeys`
 - `Security\WsseAuthProvider` new method `authenticate` has been added
 
-#WorkflowBundle:
+####WorkflowBundle:
 - `Acl\Voter\WorkflowEntityVoter` now extends from `Acl\Voter\AbstractEntityVoter`
