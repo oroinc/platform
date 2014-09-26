@@ -56,7 +56,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $fieldName;
 
     /** @var string */
-    protected $fieldLabel = 'oro.form.owner.label';
+    protected $fieldLabel = 'oro.user.owner.label';
 
     /** @var bool */
     protected $isAssignGranted;

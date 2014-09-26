@@ -104,6 +104,12 @@ oro:
                         set_expanded: "Expanded"
                         set_options: "Options"
 
+        config_grid:
+            entities: Entities
+            new_entity: New entity
+            unique_keys: Unique keys
+            new_field: New field
+
     entityextend:
         enumvalue:
             id.label:               Id

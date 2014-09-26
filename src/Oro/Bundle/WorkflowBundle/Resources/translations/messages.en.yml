@@ -80,6 +80,7 @@ oro:
 
             workflow:
                 general: Workflow manipulations
+                reset_data: Reset workflow data
 
         block:
             title:

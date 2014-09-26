@@ -35,6 +35,7 @@ oro:
                     saved: Field saved
 
         entity:
+            plural_label:      Entities
             information.label: Entity Information
             unique.label:      Unique Keys
 

@@ -18,7 +18,7 @@ oro:
             statistics:   Statistics
             trace:        Stack trace
             view:         View
-            job:          Job "%name%"
+            job:          'Job "%name%"'
 
         menu:
             cron_job.description:          Cron job queue
