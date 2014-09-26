@@ -1,32 +1,42 @@
-define([
-    'jquery',
-    './abstract_chart',
-    'oroui/js/layout',
-    'flotr2',
-    'orolocale/js/formatter/number',
-    'jquery-ui'
-], function($, abstractChart, layout, Flotr, numberFormatter) {
-    $.widget('orochart.lineChart', $.orochart.abstractChart, {
-        options: {
-            containerId: null,
-            data: {},
-            colors: [],
-            fontColors: [],
-            fontSize: 10,
-            formatter: null,
-            noTicks: null
+define(function(require) {
+    var Flotr = require('flotr2');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var BarChartComponent;
+
+
+    /**
+     *
+     * @class orochart.app.components.BarCharComponent
+     * @extends orochart.app.components.BaseCharComponent
+     * @exports orochart/app/components/BarCharComponent
+     */
+    BarChartComponent = BaseChartComponent.extend({
+        /**
+         *
+         * @overrides
+         * @param {object} options
+         */
+        initialize: function(options) {
+            BaseChartComponent.prototype.initialize.call(this, options);
+
+            this.update();
         },
 
-        _draw: function () {
-            var $chart = this.element;
+        /**
+         * Draw chart
+         *
+         * @overrides
+         */
+        draw: function() {
+            var $chart = this.$chart;
             var options = this.options;
-            var xFormat = options.xFormat;
-            var yFormat = options.yFormat;
+            var xFormat = options.data_schema.label.type;
+            var yFormat = options.data_schema.value.type;
             if (!$chart.get(0).clientWidth) {
                 return;
             }
 
-            var rawData = options.rawData;
+            var rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
                 rawData.sort(function(first, second){
@@ -42,8 +52,8 @@ define([
                 });
             }
 
-            var connectDots = options.connectDots;
-            var colors = options.colors;
+            var connectDots = options.settings.connect_dots_with_line;
+            var colors = this.config.default_settings.chartColors;
             var chartData = [];
             var yMax = null;
             var yMin = null;
@@ -54,7 +64,7 @@ define([
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[number]['label'] === null ? options.label  : rawData[number]['label'];
+                        label = rawData[number]['label'] === null ? 'N/A' : rawData[number]['label'];
                     } else {
                         label = '';
                     }
@@ -66,7 +76,7 @@ define([
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[data]['value'] === null ? options.label : rawData[data]['value'];
+                        label = rawData[data]['value'] === null ? 'N/A' : rawData[data]['value'];
                     } else {
                         label = '';
                     }
@@ -119,9 +129,9 @@ define([
                     $chart.get(0),
                     [chart],
                     {
-                        colors: colors,
-                        fontColor: options.fontColor,
-                        fontSize: options.fontSize,
+                        colors: options.settings.chartColors,
+                        fontColor: options.settings.chartFontColor,
+                        fontSize: options.settings.chartFontSize,
                         lines : {
                             show : connectDots
                         },
@@ -138,7 +148,7 @@ define([
                             tickFormatter: function (y) {
                                 return getYLabel(y);
                             },
-                            title: options.title
+                            title: options.data_schema.value.label
                         },
                         xaxis: {
                             max: xMax,
@@ -146,7 +156,7 @@ define([
                             tickFormatter: function (x) {
                                 return getXLabel(x);
                             },
-                            title: options.title
+                            title: options.data_schema.label.label
                         },
                         HtmlText : false,
                         grid: {
@@ -156,4 +166,6 @@ define([
             );
         }
     });
+
+    return BarChartComponent;
 });

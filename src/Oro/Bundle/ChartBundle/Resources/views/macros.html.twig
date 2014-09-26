@@ -1,0 +1,20 @@
+{#
+    Renders datagrid widget
+
+    parameters:
+        name: chart name
+        params: params for chart
+#}
+{% macro renderChart(data, options, config, isMobileVersion) %}
+    {% set name = options.name|replace({'_chart': ''}) %}
+    {% set params = {
+        ratio: isMobileVersion ? '0.8' : '0.35',
+        data: data,
+        options: options,
+        config: config
+    } %}
+
+
+    <div data-page-component-module="orochart/js/app/components/{{ name }}-chart-component"
+         data-page-component-options="{{ params|json_encode }}"></div>
+{% endmacro %}

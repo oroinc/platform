@@ -18,36 +18,8 @@
 
 #}
 {% if data|length>0  %}
-{% set containerId = "chart-container-" ~ random() %}
-
-<div class="chart-container">
-    <div class="clearfix">
-        <div id="{{ containerId }}-chart" class="pie-chart chart pull-left"></div>
-        <div id="{{ containerId }}-legend" class="pie-chart-legend chart-legend pull-left"></div>
-    </div>
-</div>
-
-<script type="text/javascript">
-    require(['jquery', 'orochart/js/charts/pie_chart'], function($){
-        var options = {
-            containerId: '{{ containerId }}',
-            rawData: {{ data|json_encode|raw }},
-            colors: {{ config.default_settings.chartColors|json_encode|raw }},
-            fontColors: {{ options.settings.chartFontColor|json_encode|raw }},
-            lineColor: {{ options.settings.chartHighlightColor|json_encode|raw }},
-            chartFontColor: {{ options.settings.chartFontColor|json_encode|raw }},
-            fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-            ratio: {{  isMobileVersion() ? '0.8' : '0.35' }},
-            {% if options.data_schema.value.formatter is defined %}
-            formatter: '{{ options.data_schema.value.formatter }}',
-            {% endif %}
-            {% if options.settings.xNoTicks is defined %}
-            noTicks: {{ options.settings.xNoTicks|json_encode|raw }}
-            {% endif %}
-        };
-        $.orochart.pieChart(options, $('#{{ containerId }}-chart'));
-    });
-</script>
+    {% import 'OroChartBundle::macros.html.twig' as chart %}
+    {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
     <div class="container-fluid grid-container-parent">
         <div class="grid-container">
@@ -57,3 +29,4 @@
         </div>
     </div>
 {% endif %}
+

@@ -17,31 +17,10 @@
     ]
 
 #}
+
 {% if data|length>0  %}
-    {% set containerId = "chart-container-" ~ random() %}
-    <div class="chart-container">
-        <div class="clearfix">
-            <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
-        </div>
-    </div>
-    <script type="text/javascript">
-        require(['jquery', 'orochart/js/charts/bar_chart'], function($){
-            var options = {
-                containerId: '{{ containerId }}',
-                data: {{ data|json_encode|raw }},
-                colors: {{ config.default_settings.chartColors|json_encode|raw }},
-                fontColors: {{ options.settings.chartFontColor|json_encode|raw }},
-                fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                {% if options.data_schema.value.formatter is defined %}
-                formatter: '{{ options.data_schema.value.formatter }}',
-                {% endif %}
-                {% if options.settings.xNoTicks is defined %}
-                noTicks: {{ options.settings.xNoTicks|json_encode|raw }}
-                {% endif %}
-            };
-            $.orochart.barChart(options, $('#{{ containerId }}-chart'));
-        });
-    </script>
+    {% import 'OroChartBundle::macros.html.twig' as chart %}
+    {{ chart.renderChart(data, options, config) }}
 {% else %}
     <div class="container-fluid grid-container-parent">
         <div class="grid-container">
