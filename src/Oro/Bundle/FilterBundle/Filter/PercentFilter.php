@@ -14,7 +14,7 @@ class PercentFilter extends NumberFilter
         $params[FilterUtility::FRONTEND_TYPE_KEY]             = 'number';
         $params[FilterUtility::FORM_OPTIONS_KEY]              =
             isset($params[FilterUtility::FORM_OPTIONS_KEY]) ? $params[FilterUtility::FORM_OPTIONS_KEY] : [];
-        $params[FilterUtility::FORM_OPTIONS_KEY]['data_type'] = NumberFilterType::DATA_DECIMAL;
+        $params[FilterUtility::FORM_OPTIONS_KEY]['data_type'] = NumberFilterType::DATA_INTEGER;
         parent::init($name, $params);
     }
 

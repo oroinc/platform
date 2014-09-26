@@ -18,6 +18,11 @@ define([
      */
     NumberFilter = ChoiceFilter.extend({
         /**
+         * @property {boolean}
+         */
+        wrapHintValue: false,
+
+        /**
          * Initialize.
          *
          * @param {Object} options
@@ -60,6 +65,10 @@ define([
          * @inheritDoc
          */
         _formatDisplayValue: function (value) {
+            if (value.value && _.isString(value.value)) {
+                value.value = parseFloat(value.value);
+            }
+
             if (_.isNumber(value.value)) {
                 value.value = this.formatter.fromRaw(value.value);
             }
