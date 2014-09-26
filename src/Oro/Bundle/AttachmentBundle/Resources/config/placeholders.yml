@@ -13,7 +13,9 @@ items:
     oro_add_attachment_button:
         template: OroAttachmentBundle:Attachment:addButton.html.twig
         applicable: @oro_attachment.placeholder.filter->isAttachmentAssociationEnabled($entity$)
+        acl: oro_attachment_view
 
     oro_attachments:
         template: OroAttachmentBundle:Attachment:attachments.html.twig
         applicable: @oro_attachment.placeholder.filter->isAttachmentAssociationEnabled($entity$)
+        acl: oro_attachment_view
