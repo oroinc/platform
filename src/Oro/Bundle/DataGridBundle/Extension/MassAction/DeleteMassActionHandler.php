@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 
@@ -128,14 +129,14 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param MassActionHandlerArgs $args
      *
      * @return string
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function getEntityName(MassActionHandlerArgs $args)
     {
         $massAction = $args->getMassAction();
         $entityName = $massAction->getOptions()->offsetGet('entity_name');
         if (!$entityName) {
-            throw new \LogicException(sprintf('Mass action "%s" must define entity name', $massAction->getName()));
+            throw new LogicException(sprintf('Mass action "%s" must define entity name', $massAction->getName()));
         }
 
         return $entityName;
@@ -144,7 +145,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * @param MassActionHandlerArgs $args
      *
-     * @throws \LogicException
+     * @throws LogicException
      * @return string
      */
     protected function getEntityIdentifierField(MassActionHandlerArgs $args)
@@ -152,7 +153,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $massAction = $args->getMassAction();
         $identifier = $massAction->getOptions()->offsetGet('data_identifier');
         if (!$identifier) {
-            throw new \LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
+            throw new LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
         }
 
         // if we ask identifier that's means that we have plain data in array

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Exception;
 
-class UnexpectedTypeException extends \InvalidArgumentException
+class UnexpectedTypeException extends InvalidArgumentException
 {
     /**
      * @param mixed $value

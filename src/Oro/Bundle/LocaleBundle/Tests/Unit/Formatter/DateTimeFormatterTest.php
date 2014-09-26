@@ -24,6 +24,14 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $this->formatter = new DateTimeFormatter($this->localeSettings);
     }
 
+    public function testEmptyDate()
+    {
+        $this->assertEquals(null, $this->formatter->format(null));
+        $this->assertEquals(null, $this->formatter->formatTime(null));
+        $this->assertEquals(null, $this->formatter->formatDate(null));
+    }
+
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @dataProvider formatDataProvider
