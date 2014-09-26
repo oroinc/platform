@@ -22,6 +22,7 @@ class NumberFilterType extends AbstractType
 
     const DATA_INTEGER = 'data_integer';
     const DATA_DECIMAL = 'data_decimal';
+    const DATA_FLEX_DECIMAL = 'data_flex_decimal';
 
     /**
      * @var TranslatorInterface
@@ -93,14 +94,21 @@ class NumberFilterType extends AbstractType
         $formatterOptions = array();
 
         switch ($dataType) {
+            case self::DATA_FLEX_DECIMAL:
+                $formatterOptions['decimals'] = 2;
+                $formatterOptions['grouping'] = true;
+                $formatterOptions['flex_decimal'] = true;
+                break;
             case self::DATA_DECIMAL:
                 $formatterOptions['decimals'] = 2;
                 $formatterOptions['grouping'] = true;
+                $formatterOptions['flex_decimal'] = false;
                 break;
             case self::DATA_INTEGER:
             default:
                 $formatterOptions['decimals'] = 0;
                 $formatterOptions['grouping'] = false;
+                $formatterOptions['flex_decimal'] = false;
         }
 
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
