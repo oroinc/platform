@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -34,11 +35,14 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+        $templateVars = array('entity' => $entity, 'noBodyFound' => false);
+        try {
+            $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+        } catch (EmailBodyNotFoundException $e) {
+            $templateVars['noBodyFound'] = true;
+        }
 
-        return array(
-            'entity' => $entity
-        );
+        return $templateVars;
     }
 
     /**

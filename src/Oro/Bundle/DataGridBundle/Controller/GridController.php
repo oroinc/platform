@@ -29,7 +29,7 @@ class GridController extends Controller
      * @Route(
      *      "/widget/{gridName}",
      *      name="oro_datagrid_widget",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      * @Template
      *
@@ -51,7 +51,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}",
      *      name="oro_datagrid_index",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
      * @param string $gridName
@@ -63,8 +63,9 @@ class GridController extends Controller
         $gridManager = $this->get('oro_datagrid.datagrid.manager');
         $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
         $acl         = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+        $aclSkip     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
 
-        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+        if (!$aclSkip && $acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
             throw new AccessDeniedException('Access denied.');
         }
 
@@ -92,7 +93,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/export/",
      *      name="oro_datagrid_export_action",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
      * @param string $gridName
@@ -154,7 +155,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/massAction/{actionName}",
      *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
      *
      * @param string $gridName

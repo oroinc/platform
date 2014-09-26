@@ -8,6 +8,8 @@ use Symfony\Component\Config\Definition\Processor;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 class YamlConverter implements QueryConverterInterface
 {
     /**
@@ -24,7 +26,7 @@ class YamlConverter implements QueryConverterInterface
         $value = $processor->processConfiguration(new QueryConfiguration(), $value);
 
         if (!isset($value['from'])) {
-            throw new \RuntimeException('Missing mandatory "from" section');
+            throw new InvalidConfigurationException('Missing mandatory "from" section');
         }
 
         foreach ((array)$value['from'] as $from) {
