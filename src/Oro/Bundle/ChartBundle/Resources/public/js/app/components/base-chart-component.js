@@ -54,7 +54,6 @@ define(function(require) {
          * Update chart size and redraw
          */
         update: function() {
-            console.log('up');
             if(this.setChartSize()) {
                 this.draw();
                 this.fixSize();
