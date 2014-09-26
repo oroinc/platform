@@ -79,20 +79,20 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_segment_view
-                label:         oro.segment.datagrid.view
+                label:         oro.grid.action.view
                 icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_segment_update
-                label:         oro.segment.datagrid.update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
                 acl_resource:  oro_segment_delete
-                label:         oro.segment.datagrid.delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
         options:

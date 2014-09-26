@@ -53,11 +53,6 @@ oro:
 
         website_configuration: Tracking websites
 
-        datagrid:
-            delete:       Delete
-            view:         View
-            update:       Update
-
         system_configuration:
             groups:
                 tracking.title: 'Tracking'

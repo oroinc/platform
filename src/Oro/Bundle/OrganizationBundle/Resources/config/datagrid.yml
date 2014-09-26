@@ -63,20 +63,20 @@ datagrid:
         actions:
             view:
                 type:          navigate
-                label:         oro.business_unit.datagrid.action.view
+                label:         oro.grid.action.view
                 link:          view_link
                 icon:          eye-open
                 acl_resource:  oro_business_unit_view
                 rowAction:     true
             update:
                 type:          navigate
-                label:         oro.business_unit.datagrid.action.update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_business_unit_update
             delete:
                 type:          delete
-                label:         oro.business_unit.datagrid.action.delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_business_unit_delete

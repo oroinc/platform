@@ -120,8 +120,3 @@ oro:
             has_role.label: Has role
         invite:
             label: Send an Email Invitation
-
-        datagrid:
-            delete:       Delete
-            view:         View
-            update:       Update

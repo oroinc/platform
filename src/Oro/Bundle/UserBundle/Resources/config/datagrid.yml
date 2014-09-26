@@ -108,20 +108,20 @@ datagrid:
         actions:
             view:
                 type:          navigate
-                label:         oro.user.datagrid.view
+                label:         oro.grid.action.view
                 link:          view_link
                 icon:          eye-open
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
-                label:         oro.user.datagrid.update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_user_update
             delete:
                 type:          delete
-                label:         oro.user.datagrid.delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_user_delete
@@ -159,14 +159,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         oro.user.datagrid.update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         oro.user.datagrid.delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_group_delete
@@ -221,14 +221,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         oro.user.datagrid.update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_role_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         oro.user.datagrid.delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_role_delete

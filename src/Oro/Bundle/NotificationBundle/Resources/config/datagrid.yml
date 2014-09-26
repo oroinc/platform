@@ -77,14 +77,14 @@ datagrid:
         actions:
             update:
                 type: navigate
-                label: oro.notification.datagrid.action.update
+                label: oro.grid.action.update
                 acl_resource: oro_notification_emailnotification_update
                 icon: edit
                 link: update_link
                 rowAction: true
             delete:
                 type: delete
-                label: oro.notification.datagrid.action.delete
+                label: oro.grid.action.delete
                 acl_resource: oro_notification_emailnotification_delete
                 icon: trash
                 link: delete_link

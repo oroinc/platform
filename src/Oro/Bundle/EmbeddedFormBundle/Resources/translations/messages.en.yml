@@ -18,8 +18,3 @@ oro:
 
         controller:
             saved_message: Form has been saved successfully
-
-        datagrid:
-            delete:       Delete
-            view:         View
-            update:       Update

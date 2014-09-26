@@ -40,13 +40,13 @@ datagrid:
             # @TODO check why those actions dont have ACL
             view:
                 type: navigate
-                label: oro.entity_config.datagrid.view
+                label: oro.grid.action.view
                 icon: eye-open
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
-                label: oro.entity_config.datagrid.update
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
         sorters:
@@ -110,7 +110,7 @@ datagrid:
             # @TODO check why those actions dont have ACL
             update:
                 type: navigate
-                label: Edit
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
                 rowAction: true

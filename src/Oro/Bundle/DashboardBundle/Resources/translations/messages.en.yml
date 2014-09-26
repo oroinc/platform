@@ -57,8 +57,3 @@ oro:
         delete_dashboard_link:
             title: Remove current dashboard
             text:  Delete dashboard
-
-        datagrid:
-            delete:       Delete
-            view:         View
-            update:       Update

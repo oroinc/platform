@@ -25,5 +25,3 @@ oro:
     dashboard:
         widgets:
             quick_launchpad.title: "Settings"
-
-"Settings": "Settings"

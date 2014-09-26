@@ -27,3 +27,4 @@ oro:
             view: View
             update: Edit
             delete: Delete
+            clone: Clone

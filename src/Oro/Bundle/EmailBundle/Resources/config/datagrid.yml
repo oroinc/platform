@@ -221,20 +221,20 @@ datagrid:
         actions:
             update:
                 type:         navigate
-                label:        oro.email.datagrid.emailtemplate.action.update
+                label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit
                 acl_resource: oro_email_emailtemplate_update
                 rowAction:    true
             clone:
                 type:         navigate
-                label:        oro.email.datagrid.emailtemplate.action.clone
+                label:        oro.grid.action.clone
                 link:         clone_link
                 icon:         copy
                 acl_resource: oro_email_emailtemplate_create
             delete:
                 type:         delete
-                label:        oro.email.datagrid.emailtemplate.action.delete
+                label:        oro.grid.action.delete
                 acl_resource: oro_email_emailtemplate_delete
                 icon:         trash
                 link:         delete_link
