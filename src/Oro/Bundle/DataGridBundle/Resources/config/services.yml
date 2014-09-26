@@ -108,4 +108,4 @@ services:
     oro_datagrid.event_listener.row_selection:
         class: %oro_datagrid.event_listener.row_selection.class%
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }

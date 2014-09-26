@@ -399,7 +399,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_group
                 selectors:
