@@ -16,7 +16,19 @@
   .forScreen(@smallScreen, width, 100%);
   .forScreen(@smallScreen, float, none);
 }
-
+.ui-dialog{
+  max-width: 100%;
+  /**
+   * That's a temporary solution and needs to be updated
+   */
+  .responsive-cell {
+    width: auto;
+    float: left;
+  }
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+}
 .layout-content .responsive-section{
   padding: 0 0 35px;
 }
