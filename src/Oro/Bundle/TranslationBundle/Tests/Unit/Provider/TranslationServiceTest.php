@@ -112,7 +112,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $service->expects($this->once())
             ->method('cleanup');
 
-        $service->update($dir);
+        $service->update([$dir]);
     }
 
     public function testDownload()
@@ -178,9 +178,6 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $service->expects($this->once())
             ->method('unzip')
             ->will($this->throwException($ex));
-
-        $this->adapter->expects($this->once())
-            ->method('parseResponse');
 
         $service->download($path, ['Oro'], 'en');
         unlink($path . TranslationServiceProvider::FILE_NAME_SUFFIX);

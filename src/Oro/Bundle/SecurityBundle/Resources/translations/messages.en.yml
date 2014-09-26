@@ -11,7 +11,7 @@ oro:
             BASIC: User
             LOCAL: Business Unit
             DEEP: Division
-            GLOBAL: Organization
+            GLOBAL: System
             SYSTEM: System
             NONE: None
         organization:
