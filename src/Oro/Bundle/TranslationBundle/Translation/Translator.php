@@ -87,6 +87,8 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
+        $id = (string)$id;
+
         $catalogue = $this->catalogues[$locale];
         $result    = $catalogue->defines($id, $domain);
         while (!$result && $catalogue = $catalogue->getFallbackCatalogue()) {
