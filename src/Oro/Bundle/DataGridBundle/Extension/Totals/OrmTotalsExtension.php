@@ -43,9 +43,7 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $groupParts = [];
 
     public function __construct(
@@ -118,7 +116,7 @@ class OrmTotalsExtension extends AbstractExtension
                         $result,
                         $rowConfig['columns'],
                         $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
-                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
+                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
                     )
                 );
             }

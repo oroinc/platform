@@ -7,29 +7,19 @@ use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $nameStrategy;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    /**
-     * @var DataGridExtension
-     */
+    /** @var DataGridExtension */
     protected $twigExtension;
 
     protected function setUp()
@@ -89,9 +79,13 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configuration->expects($this->once())
+        $configuration->expects($this->at(0))
             ->method('offsetGetByPath')
             ->with(Builder::DATASOURCE_ACL_PATH)
+            ->will($this->returnValue(null));
+        $configuration->expects($this->at(1))
+            ->method('offsetGetByPath')
+            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
             ->will($this->returnValue(null));
 
         $this->manager->expects($this->once())
@@ -129,10 +123,14 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configuration->expects($this->once())
+        $configuration->expects($this->at(0))
             ->method('offsetGetByPath')
             ->with(Builder::DATASOURCE_ACL_PATH)
             ->will($this->returnValue($acl));
+        $configuration->expects($this->at(1))
+            ->method('offsetGetByPath')
+            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
+            ->will($this->returnValue(false));
 
         $this->manager->expects($this->once())
             ->method('getConfigurationForGrid')

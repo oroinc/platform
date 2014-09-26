@@ -61,8 +61,8 @@ class OrmPagerExtension extends AbstractExtension
 
         if ($datasource instanceof OrmDatasource) {
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
-            $this->pager->setSkipAclWalkerCheck(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_WALKER_PATH, false)
+            $this->pager->setSkipAclCheck(
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
             );
             $this->pager->setSkipCountWalker(
                 $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)

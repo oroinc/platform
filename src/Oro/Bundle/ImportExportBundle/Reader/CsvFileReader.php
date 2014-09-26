@@ -52,6 +52,8 @@ class CsvFileReader extends AbstractReader
     public function read()
     {
         if ($this->getFile()->eof()) {
+            $this->getFile()->rewind();
+
             return null;
         }
 
@@ -59,8 +61,14 @@ class CsvFileReader extends AbstractReader
         if (false !== $data) {
             $context = $this->getContext();
             $context->incrementReadOffset();
-            if (null === $data || array(null) === $data) {
-                return $this->getFile()->eof() ? null : array();
+            if (null === $data || [null] === $data) {
+                if ($this->getFile()->eof()) {
+                    $this->getFile()->rewind();
+
+                    return null;
+                }
+
+                return [];
             }
             $context->incrementReadCount();
 
