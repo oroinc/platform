@@ -205,7 +205,7 @@ define([
                     }
                 }, this));
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
-                    var model;
+                    var model, insertPosition;
                     this.itemEditDialog.remove();
                     delete this.itemEditDialog;
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
@@ -213,7 +213,8 @@ define([
                     if (model) {
                         model.set(response);
                     } else {
-                        this.collection.add(response, {at:0});
+                        insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
+                        this.collection.add(response, {at: insertPosition});
                     }
                 }, this));
             }
