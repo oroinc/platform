@@ -134,9 +134,10 @@ EOF
         $projectNamespace = $input->getArgument('project');
 
         $namespaces = [$projectNamespace];
-        if ('Pro' != substr($projectNamespace, -3)) {
-            $namespaces[] = $projectNamespace . 'Pro';
-        }
+        // TODO: incomment later
+//        if ('Pro' != substr($projectNamespace, -3)) {
+//            $namespaces[] = $projectNamespace . 'Pro';
+//        }
 
         if ($input->getOption('dump') === true) {
             foreach ($namespaces as $namespace) {
