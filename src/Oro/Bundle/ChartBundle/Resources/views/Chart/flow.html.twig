@@ -1,7 +1,8 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
 {% if data|length>0  %}
     {% if isDesktopVersion() %}
         {# for desktop version #}
-        {% import 'OroChartBundle::macros.html.twig' as chart %}
         {{ chart.renderChart(data, options, config, isMobileVersion()) }}
     {% else %}
         {# for mobile version #}

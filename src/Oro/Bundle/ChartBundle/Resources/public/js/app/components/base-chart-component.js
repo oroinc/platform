@@ -30,8 +30,8 @@ define(function(require) {
 
             this.renderBaseLayout();
 
-            this.$chart.bind('update', $.proxy(this.update, this));
-            $(window).bind('resize', $.proxy(this.update, this));
+            this.$chart.bind('update.' + this.cid, $.proxy(this.update, this));
+            $(window).bind('resize.' + this.cid, $.proxy(this.update, this));
         },
 
         /**
@@ -40,9 +40,9 @@ define(function(require) {
          * @overrides
          */
         dispose: function() {
+            this.$chart.unbind(this.cid);
             BaseComponent.prototype.dispose.call(this);
-            this.$chart.unbind('update', this.update);
-            $(window).bind('resize', this.update);
+            $(window).unbind(this.cid);
         },
 
         renderBaseLayout: function() {
@@ -54,6 +54,7 @@ define(function(require) {
          * Update chart size and redraw
          */
         update: function() {
+            console.log('up');
             if(this.setChartSize()) {
                 this.draw();
                 this.fixSize();

@@ -1,3 +1,5 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
 {# Chart variables format:
 
     "options":
@@ -19,7 +21,6 @@
 #}
 
 {% if data|length>0  %}
-    {% import 'OroChartBundle::macros.html.twig' as chart %}
     {{ chart.renderChart(data, options, config) }}
 {% else %}
     <div class="container-fluid grid-container-parent">
