@@ -145,19 +145,10 @@ class TranslationServiceProvider
         $this->cleanup($targetDir);
 
         $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
-        try {
-            $isExtracted = $this->unzip(
-                $pathToSave,
-                is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
-            );
-        } catch (\RuntimeException $e) {
-            // try to check possible error messages in file
-            if ($e->getCode() === \ZipArchive::ER_NOZIP) {
-                $this->adapter->parseResponse(file_get_contents($pathToSave));
-            }
-
-            throw $e;
-        }
+        $isExtracted  = $this->unzip(
+            $pathToSave,
+            is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
+        );
 
         if ($locale == 'en') {
             // check and fix exported file names, replace $locale_XX locale in file names to $locale

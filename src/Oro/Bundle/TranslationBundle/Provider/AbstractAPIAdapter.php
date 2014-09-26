@@ -98,22 +98,6 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     }
 
     /**
-     * @param $response
-     *
-     * @return \SimpleXMLElement
-     * @throws \RuntimeException
-     */
-    public function parseResponse($response)
-    {
-        $result = new \SimpleXMLElement($response);
-        if ($result->getName() == 'error') {
-            throw new \RuntimeException($result->message, (int)$result->code);
-        }
-
-        return $result;
-    }
-
-    /**
      * Extract list of folders recursively from file paths
      *
      * @param array $files

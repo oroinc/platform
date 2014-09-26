@@ -6,8 +6,8 @@ use FOS\Rest\Util\Codes;
 
 class OroTranslationAdapter extends AbstractAPIAdapter
 {
-    const URL_STATS    = '/stats';
-    const URL_DOWNLOAD = '/download';
+    const URL_STATS    = 'stats';
+    const URL_DOWNLOAD = 'download';
 
     /**
      * {@inheritdoc}
@@ -15,9 +15,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
     public function download($path, array $projects = [], $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
-
-        $fileHandler = fopen($path, 'wb');
-        $result      = (bool)$this->request(
+        $result  = $this->request(
             self::URL_DOWNLOAD,
             [
                 'packages' => implode(',', $projects),
@@ -25,13 +23,11 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             ],
             'GET',
             [
-                'file'           => $fileHandler,
+                'save_to'           => $path,
             ]
         );
 
-        fclose($fileHandler);
-
-        return $result;
+        return 200 == $result->getStatusCode();
     }
 
     /**
@@ -66,9 +62,8 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             ['packages' => implode(',', $packages)]
         );
 
-        $responseCode = $this->apiRequest->getResponseCode();
-        if ($responseCode === Codes::HTTP_OK) {
-            $result = json_decode($response, true);
+        if ($response->getStatusCode() === Codes::HTTP_OK) {
+            $result = $response->json();
             $result = is_array($result) ? $result : [];
 
             $filtered = array_filter(
@@ -88,22 +83,5 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             $this->logger->critical('Service unavailable. Status received: ' . $responseCode);
             throw new \RuntimeException('Service unavailable');
         }
-    }
-
-    /**
-     * @param $response
-     *
-     * @return \stdClass
-     * @throws \RuntimeException
-     */
-    public function parseResponse($response)
-    {
-        $result = json_decode($response);
-        if (isset($result->message)) {
-            $code = isset($result->code) ? (int)$result->code : 0;
-            throw new \RuntimeException($result->message, $code);
-        }
-
-        return $result;
     }
 }
