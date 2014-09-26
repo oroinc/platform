@@ -27,4 +27,18 @@ interface EmailTemplateInterface
      * @return string
      */
     public function getContent();
+
+    /**
+     * Sets email template content
+     *
+     * @return EmailTemplateInterface
+     */
+    public function setContent();
+
+    /**
+     * Sets email subject
+     *
+     * @return EmailTemplateInterface
+     */
+    public function setSubject();
 }
