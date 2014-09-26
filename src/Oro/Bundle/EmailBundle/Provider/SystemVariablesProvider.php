@@ -7,7 +7,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class SystemVariablesProvider implements SystemVariablesProviderInterface
 {
@@ -20,25 +19,19 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
 
-    /** @var SecurityContext */
-    protected $securityContext;
-
     /**
      * @param TranslatorInterface $translator
      * @param ConfigManager       $configManager
      * @param DateTimeFormatter   $dateTimeFormatter
-     * @param SecurityContext     $securityContext
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
-        DateTimeFormatter $dateTimeFormatter,
-        SecurityContext $securityContext
+        DateTimeFormatter $dateTimeFormatter
     ) {
         $this->translator        = $translator;
         $this->configManager     = $configManager;
         $this->dateTimeFormatter = $dateTimeFormatter;
-        $this->securityContext   = $securityContext;
     }
 
     /**
@@ -68,30 +61,10 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
 
         $this->addApplicationShortName($result, $addValue);
         $this->addApplicationFullName($result, $addValue);
-        $this->addOrganizationName($result, $addValue);
         $this->addApplicationUrl($result, $addValue);
         $this->addCurrentDateAndTime($result, $addValue);
 
         return $result;
-    }
-
-    /**
-     * @param array $result
-     * @param bool  $addValue
-     */
-    protected function addOrganizationName(array &$result, $addValue)
-    {
-        if ($addValue) {
-            /** @var UsernamePasswordOrganizationToken $token */
-            $token = $this->securityContext->getToken();
-            $val   = $token->getOrganizationContext()->getName();
-        } else {
-            $val = [
-                'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.app_organization_name')
-            ];
-        }
-        $result['appOrganizationName'] = $val;
     }
 
     /**
