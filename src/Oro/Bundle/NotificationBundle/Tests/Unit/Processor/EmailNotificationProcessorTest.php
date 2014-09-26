@@ -214,12 +214,17 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->at(2))
             ->method('where')
-            ->with('job.command = :command AND job.state <> :state')
+            ->with('job.command = :command AND job.state IN ( :state )')
             ->will($this->returnSelf());
 
         $queryBuilder->expects($this->at(3))
             ->method('setParameters')
-            ->with(array('command' => EmailNotificationProcessor::SEND_COMMAND, 'state' => Job::STATE_FINISHED))
+            ->with(
+                [
+                    'command' => EmailNotificationProcessor::SEND_COMMAND,
+                    'state'   => [Job::STATE_RUNNING, Job::STATE_PENDING]
+                ]
+            )
             ->will($this->returnSelf());
 
         $queryBuilder->expects($this->at(4))

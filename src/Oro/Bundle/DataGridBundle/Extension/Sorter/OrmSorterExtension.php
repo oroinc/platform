@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
@@ -90,7 +91,7 @@ class OrmSorterExtension extends AbstractExtension
 
         $extraSorters = array_diff(array_keys($sorters), $proceed);
         if (count($extraSorters)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf('Could not found column(s) "%s" for sorting', implode(', ', $extraSorters))
             );
         }

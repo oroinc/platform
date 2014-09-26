@@ -3,7 +3,7 @@
 
 {% oro_title_set({params : {
     "%entityName%": (entity_config.get('label')|trans)|default('N/A'),
-    "%fieldName%": (field_config.get('label')|trans)|default('N/A')|trans,
+    "%fieldName%": field.fieldName|default('N/A')|trans,
 }}) %}
 
 {% set audit_entity_class = field.entity.className|replace('\\', '_') %}
