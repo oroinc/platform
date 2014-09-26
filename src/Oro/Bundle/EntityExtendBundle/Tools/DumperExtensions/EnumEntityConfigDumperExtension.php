@@ -177,19 +177,21 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $extendClassName   = $entityConfig->get('extend_class');
+                    $mappingClassName   = $entityConfig->has('extend_class')
+                        ? $entityConfig->get('extend_class')
+                        : $entityConfig->getId()->getClassName();
                     $fieldName         = $fieldConfigId->getFieldName();
                     $snapshotFieldName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
 
                     $schema = $entityConfig->get('schema', false, []);
 
-                    if (!empty($schema['doctrine'][$extendClassName]['fields'][$snapshotFieldName])) {
+                    if (!empty($schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName])) {
                         continue;
                     }
 
                     $schema['property'][$snapshotFieldName] = $snapshotFieldName;
 
-                    $schema['doctrine'][$extendClassName]['fields'][$snapshotFieldName] = [
+                    $schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName] = [
                         'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
                         'type'     => 'string',
                         'nullable' => true,

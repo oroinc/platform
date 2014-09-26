@@ -51,156 +51,18 @@ class BodyTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($header === $result);
     }
 
-    public function testGetPartContentType()
-    {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $headers->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue(true));
-
-        $this->part->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
-
-        $header = new \stdClass();
-
-        $this->part
-            ->expects($this->once())
-            ->method('getHeader')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue($header));
-
-        $result = $this->callProtectedMethod($this->body, 'getPartContentType', array($this->part));
-
-        $this->assertTrue($header === $result);
-    }
-
-    public function testGetPartContentTypeWithNoContentTypeHeader()
-    {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $headers->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('Content-Type'))
-            ->will($this->returnValue(false));
-
-        $this->part->expects($this->once())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
-
-
-        $result = $this->callProtectedMethod($this->body, 'getPartContentType', array($this->part));
-
-        $this->assertNull($result);
-    }
-
-    /**
-     * @dataProvider extractContentProvider
-     */
-    public function testExtractContent(
-        $contentTransferEncoding,
-        $contentType,
-        $contentCharset,
-        $contentValue,
-        $expected,
-        $decodedValue
-    ) {
-        // Content-Type header
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
-            ->disableOriginalConstructor()
-            ->getMock();
-        if ($contentType !== null) {
-            $contentTypeHeader->expects($this->once())
-                ->method('getType')
-                ->will($this->returnValue($contentType));
-            $contentTypeHeader->expects($this->once())
-                ->method('getParameter')
-                ->with($this->equalTo('charset'))
-                ->will($this->returnValue($contentCharset));
-        }
-
-        // Content-Transfer-Encoding header
-        $contentTransferEncodingHeader = $this->getMockBuilder('Zend\Mail\Header\GenericHeader')
-            ->disableOriginalConstructor()
-            ->getMock();
-        if ($contentTransferEncoding !== null) {
-            $contentTransferEncodingHeader->expects($this->once())
-                ->method('getFieldValue')
-                ->will($this->returnValue($contentTransferEncoding));
-        }
-
-        // Headers object
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $headers->expects($this->any())
-            ->method('has')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('Content-Type', $contentType !== null),
-                        array('Content-Transfer-Encoding', $contentTransferEncoding !== null),
-                    )
-                )
-            );
-
-        // Part object
-        $this->part->expects($this->any())
-            ->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $this->part
-            ->expects($this->any())
-            ->method('getHeader')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('Content-Type', null, $contentTypeHeader),
-                        array('Content-Transfer-Encoding', null, $contentTransferEncodingHeader),
-                    )
-                )
-            );
-        $this->part->expects($this->once())
-            ->method('getContent')
-            ->will($this->returnValue($contentValue));
-
-        $result = $this->callProtectedMethod($this->body, 'extractContent', array($this->part));
-
-        $this->assertEquals($expected, $result);
-        $this->assertEquals($decodedValue, $result->getDecodedContent());
-    }
-
     public function testGetContentSinglePartText()
     {
-        $contentValue = 'testContent';
-        $contentType = 'testContentType';
+        $contentValue            = 'testContent';
+        $contentType             = 'type/testContentType';
         $contentTransferEncoding = 'testContentTransferEncoding';
-        $contentEncoding = 'testEncoding';
+        $contentEncoding         = 'testEncoding';
 
-        $bodyPartialMock = $this->getMock(
-            'Oro\Bundle\ImapBundle\Mail\Storage\Body',
-            array('extractContent'),
-            array($this->part)
-        );
-        $bodyPartialMock->expects($this->once())
-            ->method('extractContent')
-            ->will(
-                $this->returnValue(
-                    new Content($contentValue, $contentType, $contentTransferEncoding, $contentEncoding)
-                )
-            );
-
-        $this->part->expects($this->once())
-            ->method('isMultipart')
+        $this->part->expects($this->once())->method('isMultipart')
             ->will($this->returnValue(false));
 
-
-        $result = $bodyPartialMock->getContent(Body::FORMAT_TEXT);
-
+        $this->preparePartMock($this->part, $contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
+        $result   = $this->body->getContent(Body::FORMAT_TEXT);
         $expected = new Content($contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
 
         $this->assertEquals($expected, $result);
@@ -220,201 +82,96 @@ class BodyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContentMultipartText()
     {
-        $maxIterationCount = 3;
-        $iteratorPos = 0;
-
-        $contentTypeHeader = $this->getMockBuilder('Zend\Mail\Header\ContentType')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $contentTypeHeader->expects($this->any())
-            ->method('getType')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos) {
-                        switch ($iteratorPos) {
-                            case 1:
-                                return 'text/plain';
-                            case 2:
-                                return 'text/html';
-                        }
-                        return 'other';
-                    }
-                )
-            );
-
-        $bodyPartialMock = $this->getMock(
-            'Oro\Bundle\ImapBundle\Mail\Storage\Body',
-            array('extractContent', 'getPartContentType'),
-            array($this->part)
-        );
-        $bodyPartialMock->expects($this->any())
-            ->method('getPartContentType')
-            ->will($this->returnValue($contentTypeHeader));
-        $bodyPartialMock->expects($this->any())
-            ->method('extractContent')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos) {
-                        return new Content(
-                            (string)$iteratorPos,
-                            'SomeContentType',
-                            'SomeContentTransferEncoding',
-                            'SomeEncoding'
-                        );
-                    }
-                )
-            );
-
-        $this->part->expects($this->any())
-            ->method('isMultipart')
+        $this->part->expects($this->any())->method('isMultipart')
             ->will($this->returnValue(true));
 
-        $this->mockIterator($this->part, $iteratorPos, $maxIterationCount);
+        $part1 = $this->getMockBuilder('Zend\Mail\Storage\Part')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $part2 = $this->getMockBuilder('Zend\Mail\Storage\Part')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $part1->expects($this->any())->method('isMultipart')
+            ->will($this->returnValue(false));
+        $part2->expects($this->any())->method('isMultipart')
+            ->will($this->returnValue(false));
+
+        $this->mockIterator($this->part, $part1, $part2);
+        $this->preparePartMock($part1, 'part1Content', 'text/plain', '8Bit', 'ISO-8859-1');
+        $this->preparePartMock($part2, 'part2Content', 'text/html', 'Base64', 'ISO-8859-1');
 
         // Test to TEXT body
-        $result = $bodyPartialMock->getContent(Body::FORMAT_TEXT);
-        $this->assertEquals(1, $iteratorPos);
+        $result = $this->body->getContent(Body::FORMAT_TEXT);
         $this->assertEquals(
-            new Content('1', 'SomeContentType', 'SomeContentTransferEncoding', 'SomeEncoding'),
+            new Content('part1Content', 'text/plain', '8Bit', 'ISO-8859-1'),
             $result
         );
 
         // Test to HTML body
-        $result = $bodyPartialMock->getContent(Body::FORMAT_HTML);
-        $this->assertEquals(2, $iteratorPos);
+        $result = $this->body->getContent(Body::FORMAT_HTML);
         $this->assertEquals(
-            new Content('2', 'SomeContentType', 'SomeContentTransferEncoding', 'SomeEncoding'),
+            new Content('part2Content', 'text/html', 'Base64', 'ISO-8859-1'),
             $result
         );
     }
 
-    private function mockIterator(\PHPUnit_Framework_MockObject_MockObject $obj, &$iteratorPos, &$maxIterationCount)
+    private function mockIterator(\PHPUnit_Framework_MockObject_MockObject $obj, $iterationResult1, $iterationResult2)
     {
-        $obj->expects($this->any())
+        $obj->expects($this->exactly(3))
             ->method('current')
-            ->will($this->returnValue(null));
-        $obj->expects($this->any())
-            ->method('next')
             ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos) {
-                        $iteratorPos++;
-                    }
-                )
+                $this->onConsecutiveCalls($iterationResult1, $iterationResult1, $iterationResult2)
             );
-        $obj->expects($this->any())
-            ->method('rewind')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos) {
-                        $iteratorPos = 1;
-                    }
-                )
-            );
-        $obj->expects($this->any())
-            ->method('valid')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos, &$maxIterationCount) {
-                        return $iteratorPos < $maxIterationCount;
-                    }
-                )
-            );
-        $obj->expects($this->any())
-            ->method('key')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$iteratorPos) {
-                        return $iteratorPos;
-                    }
-                )
-            );
+        $obj->expects($this->any())->method('next');
+        $obj->expects($this->any())->method('rewind');
+        $obj->expects($this->exactly(4))->method('valid')
+            ->will($this->onConsecutiveCalls(true, true, true, false));
     }
 
-    private function callProtectedMethod($obj, $methodName, array $args)
-    {
-        $class = new \ReflectionClass($obj);
-        $method = $class->getMethod($methodName);
-        $method->setAccessible(true);
+    private function preparePartMock(
+        \PHPUnit_Framework_MockObject_MockObject $obj,
+        $contentValue,
+        $contentType,
+        $contentTransferEncoding,
+        $contentEncoding
+    ) {
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()->getMock();
 
-        return $method->invokeArgs($obj, $args);
-    }
+        $headers->expects($this->any())->method('has')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Content-Type', true],
+                        ['Content-Transfer-Encoding', true]
+                    ]
+                )
+            );
 
-    public static function extractContentProvider()
-    {
-        return array(
-            '7bit' => array(
-                '7Bit',
-                'SomeContentType',
-                'ISO-8859-1',
-                'A value',
-                new Content('A value', 'SomeContentType', '7Bit', 'ISO-8859-1'),
-                'A value'
-            ),
-            '8bit' => array(
-                '8Bit',
-                'SomeContentType',
-                'ISO-8859-1',
-                'A value',
-                new Content('A value', 'SomeContentType', '8Bit', 'ISO-8859-1'),
-                'A value'
-            ),
-            'binary' => array(
-                'Binary',
-                'SomeContentType',
-                'ISO-8859-1',
-                'A value',
-                new Content('A value', 'SomeContentType', 'Binary', 'ISO-8859-1'),
-                'A value'
-            ),
-            'base64' => array(
-                'Base64',
-                'SomeContentType',
-                'ISO-8859-1',
-                base64_encode('A value'),
-                new Content(base64_encode('A value'), 'SomeContentType', 'Base64', 'ISO-8859-1'),
-                'A value'
-            ),
-            'quoted-printable' => array(
-                'Quoted-Printable',
-                'SomeContentType',
-                'ISO-8859-1',
-                quoted_printable_encode('A value='), // = symbol is added to test the 'quoted printable' decoding
-                new Content(quoted_printable_encode('A value='), 'SomeContentType', 'Quoted-Printable', 'ISO-8859-1'),
-                'A value='
-            ),
-            'Unknown' => array(
-                'Unknown',
-                'SomeContentType',
-                'ISO-8859-1',
-                'A value',
-                new Content('A value', 'SomeContentType', 'Unknown', 'ISO-8859-1'),
-                'A value'
-            ),
-            'no charset' => array(
-                '8Bit',
-                'SomeContentType',
-                null,
-                'A value',
-                new Content('A value', 'SomeContentType', '8Bit', 'ASCII'),
-                'A value'
-            ),
-            'no Content-Type' => array(
-                '8Bit',
-                null,
-                null,
-                'A value',
-                new Content('A value', 'text/plain', '8Bit', 'ASCII'),
-                'A value'
-            ),
-            'no Content-Transfer-Encoding' => array(
-                null,
-                'SomeContentType',
-                'ISO-8859-1',
-                'A value',
-                new Content('A value', 'SomeContentType', 'BINARY', 'ISO-8859-1'),
-                'A value'
-            ),
-        );
+        $obj->expects($this->any())->method('getHeaders')
+            ->will($this->returnValue($headers));
+        $obj->expects($this->once())->method('getContent')
+            ->will($this->returnValue($contentValue));
+
+        $contentTypeHeader = $this->getMock('Zend\Mail\Header\ContentType');
+        $contentTypeHeader->expects($this->any())->method('getType')
+            ->will($this->returnValue($contentType));
+        $contentTypeHeader->expects($this->any())->method('getParameter')
+            ->will($this->returnValue($contentEncoding));
+
+        $contentEncodingHeader = $this->getMock('Zend\Mail\Header\HeaderInterface');
+        $contentEncodingHeader->expects($this->any())->method('getFieldValue')
+            ->will($this->returnValue($contentTransferEncoding));
+
+        $obj->expects($this->any())->method('getHeader')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['Content-Type', null, $contentTypeHeader],
+                        ['Content-Transfer-Encoding', null, $contentEncodingHeader]
+                    ]
+                )
+            );
     }
 }
