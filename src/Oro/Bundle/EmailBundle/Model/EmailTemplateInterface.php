@@ -32,6 +32,7 @@ interface EmailTemplateInterface
      * Sets email template content
      *
      * @param string $content
+     *
      * @return EmailTemplateInterface
      */
     public function setContent($content);
@@ -40,6 +41,7 @@ interface EmailTemplateInterface
      * Sets email subject
      *
      * @param string $subject
+     *
      * @return EmailTemplateInterface
      */
     public function setSubject($subject);
