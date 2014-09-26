@@ -22,7 +22,8 @@ define([
             'page:request mediator': 'onPageRequest',
             'page:update mediator': 'onPageUpdate',
             'page:afterChange mediator': 'afterPageChange',
-            'page:beforeRefresh mediator': 'beforePageRefresh'
+            'page:beforeRefresh mediator': 'beforePageRefresh',
+            'route:change mediator': 'toggleStateTrace'
         },
 
         initialize: function () {
@@ -78,12 +79,13 @@ define([
         onPageRequest: function () {
             this._initialData = null;
             this._resetChanges = false;
-            this.$el.off('change.page-state');
-            this.model.clear({silent: true});
+            this._switchOffTrace();
         },
 
         /**
          * Init page state on page updated
+         * @param {Object} attributes
+         * @param {Object} args
          */
         onPageUpdate: function (attributes, args) {
             var options;
@@ -95,7 +97,7 @@ define([
          * Fetches model's attributes from cache on page changes is done
          */
         afterPageChange: function () {
-            var attributes;
+            var options;
             if (!this._hasForm() || !this._isRestoreRequired()) {
                 return;
             }
@@ -103,22 +105,55 @@ define([
             if (this._resetChanges) {
                 // delete cache if changes are discarded
                 mediator.execute('pageCache:state:save', 'form', null);
+                options = {initial: true};
             }
 
+            this._switchOnTrace(options);
+        },
+
+        /**
+         * Switch on/off form state trace
+         */
+        toggleStateTrace: function () {
+            var switchOn = this._isRestoreRequired();
+            if (switchOn) {
+                this._switchOnTrace({initial: true});
+            } else {
+                this._switchOffTrace();
+            }
+        },
+
+        /**
+         * Switch on form state trace
+         * @param {Object=} options
+         * @protected
+         */
+        _switchOnTrace: function (options) {
+            var attributes;
             attributes = mediator.execute('pageCache:state:fetch', 'form');
             if (attributes && attributes.id) {
-                this._initFormTracer(attributes);
+                this._initStateTracer(attributes, options);
             } else {
-                this._loadState();
+                this._loadState(options);
             }
+        },
+
+        /**
+         * Switch off form state trace
+         * @protected
+         */
+        _switchOffTrace: function () {
+            this.$el.off('change.page-state');
+            this.model.clear({silent: true});
         },
 
         /**
          * Initializes form changes trace
          *  - if attributes is not in a cache, loads data from server
+         * @param {Object=} options
          * @protected
          */
-        _loadState: function () {
+        _loadState: function (options) {
             var url, self;
             self = this;
 
@@ -133,25 +168,25 @@ define([
                 if (data.id) {
                     attributes.id = data.id;
                 }
-                self._initFormTracer(attributes);
+                self._initStateTracer(attributes, options);
             });
         },
 
         /**
-         * Rests page state model, restores page forms and start tracing changes
-         * @param attributes
+         * Resets page state model, restores page forms and start tracing changes
+         * @param {Object} attributes
+         * @param {Object=} options
          * @protected
          */
-        _initFormTracer: function (attributes) {
+        _initStateTracer: function (attributes, options) {
+            options = options || {};
             this._initialData = this._collectFormsData();
-            if (!attributes.data) {
+            if (!attributes.data || options.initial) {
                 attributes.data = this._initialData;
             }
             this.model.set(attributes);
-            if (this._isRestoreRequired()) {
+            if (attributes.data !== this._initialData) {
                 this._restoreState();
-            } else {
-                this.model.set('data', this._initialData, {silent: true});
             }
             this.$el.on('change.page-state', _.bind(this._collectState, this));
         },
@@ -313,9 +348,9 @@ define([
          * @protected
          */
         _combinePageId: function () {
-            var url;
-            url = this._parseCurrentURL();
-            return base64_encode(url.pathname);
+            var route;
+            route = this._parseCurrentURL();
+            return base64_encode(route.path);
         },
 
         /**
@@ -324,14 +359,14 @@ define([
          * @protected
          */
         _parseCurrentURL: function () {
-            var url, _ref;
-            url = mediator.execute('currentUrl');
-            _ref = url.split('?');
-            url = {
-                pathname: _ref[0],
-                search: _ref[1] || ''
+            var route, _ref;
+            route = mediator.execute('currentUrl');
+            _ref = route.split('?');
+            route = {
+                path: _ref[0],
+                query: _ref[1] || ''
             };
-            return url;
+            return route;
         },
 
         /**
@@ -339,9 +374,9 @@ define([
          * @protected
          */
         _isRestoreRequired: function () {
-            var url, restore;
-            url = this._parseCurrentURL();
-            restore = _.some(url.search.split('&'), function (param) {
+            var route, restore;
+            route = this._parseCurrentURL();
+            restore = _.some(route.query.split('&'), function (param) {
                 return param === 'restore=1';
             });
             return restore;
