@@ -204,6 +204,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.state.expanded = true;
 
             var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            var $chart = this.$el.find(".chart");
             collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
 
             this.widget.removeClass('collapsed');
@@ -212,6 +213,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                 this.trigger('expand', this.$el, this);
                 mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
                 this.widgetContentContainer.slideDown();
+
+            }
+
+            if($chart.length > 0) {
+                $chart.trigger("update");
             }
         },
 

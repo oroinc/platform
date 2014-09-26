@@ -1,92 +1,9 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
 {% if data|length>0  %}
-    {% set containerId = "chart-container-" ~ random() %}
-    <div class="chart-container">
-        <div class="clearfix">
-            <div id="{{ containerId }}-chart" class="flow-chart chart pull-left"></div>
-        </div>
-    </div>
     {% if isDesktopVersion() %}
         {# for desktop version #}
-        <script type="text/javascript">
-            require(['jquery', 'underscore', 'oroui/js/layout', 'flotr2',
-                'orolocale/js/formatter/number', 'orochart/js/flotr2/funnel'],
-                    function($, _, layout, Flotr, numberFormatter){
-                        var formatter = numberFormatter;
-                        $(function () {
-                            var $chart = $('#{{ containerId }}-chart');
-                            var $widgetContent = $chart.parents('.chart-container').parent();
-                            var setChartSize = function () {
-                                var chartWidth = Math.round($widgetContent.width() * 0.9);
-                                if (chartWidth != $chart.width()) {
-                                    $chart.width(chartWidth);
-                                    $chart.height(Math.min(Math.round(chartWidth * 0.4), 350));
-                                    return true;
-                                }
-                                return false;
-                            };
-                            var setChartContainerSize = function () {
-                                $chart.closest('.clearfix').width($chart.width());
-                            };
-                            var drawChart = function () {
-                                if (!$chart.get(0).clientWidth) {
-                                    return;
-                                }
-                                var data = {{ data|json_encode|raw }};
-                                var chartData = {};
-                                var nozzleSteps = [];
-                                _.each(data, function(value, key) {
-                                    if (value.value <= 0) {
-                                        data[key].value = 0.0001;
-                                    }
-                                    chartData[value.label] = value.value;
-                                    if (value.isNozzle) {
-                                        nozzleSteps.push(value.label);
-                                    }
-                                });
-                                Flotr.draw(
-                                        $chart.get(0),
-                                        new Array(chartData),
-                                        {
-                                            funnel : {
-                                                show : true,
-                                                formatter: formatter.formatCurrency,
-                                                nozzleSteps: nozzleSteps,
-                                                colors: {{ options.settings.chartColors|json_encode|raw }},
-                                                tickFormatter: function (label, value) {
-                                                    return label + ': ' + formatter.formatCurrency(value);
-                                                },
-                                                nozzleFormatter: function (label, value) {
-                                                    return label
-                                                            + ' ({{ 'from'|trans }} {{ options.settings.quarterDate|oro_format_date }}): '
-                                                            + formatter.formatCurrency(value);
-                                                }
-                                            },
-                                            mouse: {
-                                                track: true,
-                                                relative: true
-                                            },
-                                            grid: {
-                                                outlineWidth: 0
-                                            }
-                                        }
-                                );
-                            };
-
-                            layout.onPageRendered(function () {
-                                setChartSize();
-                                drawChart();
-                                setChartContainerSize();
-                            });
-
-                            $(window).resize(function () {
-                                if (setChartSize()) {
-                                    drawChart();
-                                    setChartContainerSize();
-                                }
-                            });
-                        });
-                    });
-        </script>
+        {{ chart.renderChart(data, options, config, isMobileVersion()) }}
     {% else %}
         {# for mobile version #}
         <div class="funnel-data">
