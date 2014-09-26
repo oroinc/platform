@@ -75,9 +75,13 @@ define([
             model.set('position', 0);
         },
 
-        onAdd: function () {
+        onAdd: function (model) {
             mediator.execute({name: 'pageCache:add', silent: true});
             this.reorder();
+            if (model.get('url') !== mediator.execute('currentUrl')) {
+                // if URL was changed on server, applies this changes for current page
+                mediator.execute('changeUrl', model.get('url'), {replace: true});
+            }
         },
 
         onRemove: function (model) {
@@ -85,6 +89,10 @@ define([
             url = model.get('url');
             mediator.execute({name: 'pageCache:remove', silent: true}, url);
             this.reorder();
+            if (mediator.execute('compareUrl', model.get('url'))) {
+                // remove 'restore' param from URL, if pin was removed for current page
+                mediator.execute('changeUrlParam', 'restore', null);
+            }
         },
 
         /**

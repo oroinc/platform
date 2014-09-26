@@ -24,10 +24,11 @@ define([
 
             Application.__super__.initialize.apply(this, arguments);
 
-            mediator.setHandler('changeURL', function (route, options) {
+            mediator.setHandler('changeRoute', function (route, options) {
                 options = options || {};
                 options.changeURL = true;
                 this.router.changeURL(null, null, route, options);
+                mediator.trigger('route:change');
             }, this);
         },
 

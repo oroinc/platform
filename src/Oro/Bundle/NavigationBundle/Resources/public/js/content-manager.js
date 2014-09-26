@@ -315,7 +315,6 @@ define([
          * @param {string=} hash
          */
         saveState: function (key, value, hash) {
-            var route, query;
             if (value !== null) {
                 current.state[key] = value;
             } else {
@@ -327,26 +326,54 @@ define([
                 return;
             }
 
+            this.changeUrlParam(key, hash);
+            mediator.trigger('pagestate:change');
+        },
+
+        /**
+         * Changes url for current page
+         *
+         * @param {string} url
+         * @param {Object} options
+         */
+        changeUrl: function (url, options) {
+            var route, _ref;
+            options = options || {};
+            _ref = url.split('?');
+            current.path = _ref[0];
+            current.query = _ref[1] || '';
+            route = _.pick(current, ['path', 'query']);
+            mediator.execute('changeRoute', route, options);
+        },
+
+        /**
+         * Updates URL parameter for current page
+         *
+         * @param {string} param
+         * @param {string} value
+         */
+        changeUrlParam: function (param, value) {
+            var route, query;
+
             query = Chaplin.utils.queryParams.parse(current.query);
-            if (query[key] === hash || (query[key] == null && hash == null)) {
+            if (query[param] === value || (query[param] == null && value == null)) {
                 // there's nothing to change in query, skip query update and redirect
                 return;
             }
 
-            if (hash !== null) {
-                // if there's new hash, update query
-                query[key] = hash;
+            if (value !== null) {
+                // if there's new value, update query
+                query[param] = value;
             } else {
-                // if there's no new hash, delete query part
-                delete query[key];
+                // if there's no new value, delete query part
+                delete query[param];
             }
 
             query = Chaplin.utils.queryParams.stringify(query);
             current.query = query;
 
             route = _.pick(current, ['path', 'query']);
-            mediator.execute('changeURL', route, {replace: true});
-            mediator.trigger('pagestate:change');
+            mediator.execute('changeRoute', route, {replace: true});
         },
 
         /**

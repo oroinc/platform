@@ -355,6 +355,7 @@
                         form.validate()
                             .element(selector);
                     }
+                    selector.trigger('change');
                 }
             });
             selector.keyup(
@@ -405,7 +406,10 @@
                 changeMonth: true,
                 changeYear: true,
                 yearRange: '-80:+1',
-                showButtonPanel: true
+                showButtonPanel: true,
+                onSelect: function () {
+                    selector.trigger('change');
+                }
             });
             selector.keyup(
                 function () {
