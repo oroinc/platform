@@ -370,7 +370,7 @@ class User extends ExtendUser implements
     protected $owner;
 
     /**
-     * @var Role[]|ArrayCollection
+     * @var Role[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_role",

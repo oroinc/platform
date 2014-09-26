@@ -13,7 +13,9 @@ items:
     oro_add_note_button:
         template: OroNoteBundle:Note:addButton.html.twig
         applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)
+        acl: oro_note_view
 
     oro_notes:
         template: OroNoteBundle:Note:notes.html.twig
         applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)
+        acl: oro_note_view

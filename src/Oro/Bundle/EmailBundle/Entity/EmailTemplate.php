@@ -275,6 +275,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set parent
      *
      * @param integer $parent
+     *
      * @return EmailTemplate
      */
     public function setParent($parent)
@@ -295,10 +296,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set subject
-     *
-     * @param string $subject
-     * @return EmailTemplate
+     * {@inheritdoc}
      */
     public function setSubject($subject)
     {
@@ -308,9 +306,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Get subject
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSubject()
     {
@@ -318,10 +314,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set content
-     *
-     * @param string $content
-     * @return EmailTemplate
+     * {@inheritdoc}
      */
     public function setContent($content)
     {
@@ -331,9 +324,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Get content
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getContent()
     {

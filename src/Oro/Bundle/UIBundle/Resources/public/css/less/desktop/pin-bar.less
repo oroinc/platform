@@ -165,7 +165,7 @@
     position: relative;
     .pin-holder {
       position: relative;
-      padding: 1px 25px 1px 5px;
+      padding: 1px 25px 1px 18px;
       border-right: 1px solid @baseGradientColorBorder;
       .box-shadow(inset 0 -1px 2px rgba(0, 0, 0, .15));
       a {
@@ -185,8 +185,8 @@
         position:absolute;
         top: 5px;
         right: 5px;
-        width: 13px;
-        height: 13px;
+        width: 14px;
+        height: 14px;
         display: block;
         background-color: transparent;
         color: transparent;
@@ -198,20 +198,26 @@
           font-size:12px;
           color:@headerTextColor;
         }
+        &:hover:before {
+          color: lighten(@headerTextColor, 20%);
+        }
       }
       &:hover {
         a {
-          color: lighten(@headerTextColor, 10%);
+          color: lighten(@headerTextColor, 20%);
           &.icon-remove {
             color: transparent;
             &:before {
               color:@headerTextColor;
             }
             &:hover:before {
-              color: lighten(@headerTextColor, 10%);
+              color: lighten(@headerTextColor, 20%);
             }
           }
         }
+      }
+      a{
+        white-space: nowrap;
       }
     }
     &.active {
@@ -222,14 +228,15 @@
     }
   }
   .pin-status {
+    position: absolute;
     font-size: 6px;
-    vertical-align: middle;
-    line-height: 12px;
-    margin-right: 5px;
+    top: 9px;
+    left: 4px;
     &.outdated {
       color: #FECA67;
       font-size: 8px;
-      margin-top: -2px;
+      left: 3px;
+      top: 7px;
     }
   }
   .pin-bar-empty a{
