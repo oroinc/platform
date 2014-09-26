@@ -2,6 +2,7 @@ parameters:
     oro_datagrid.datagrid.base.class:                             Oro\Bundle\DataGridBundle\Datagrid\Datagrid
     oro_datagrid.extension.acceptor.class:                        Oro\Bundle\DataGridBundle\Extension\Acceptor
 
+    oro_datagrid.datagrid.name_strategy.class:                    Oro\Bundle\DataGridBundle\Datagrid\NameStrategy
     oro_datagrid.datagrid.manager.class:                          Oro\Bundle\DataGridBundle\Datagrid\Manager
     oro_datagrid.datagrid.builder.class:                          Oro\Bundle\DataGridBundle\Datagrid\Builder
     oro_datagrid.datagrid.parameters.class:                       Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
