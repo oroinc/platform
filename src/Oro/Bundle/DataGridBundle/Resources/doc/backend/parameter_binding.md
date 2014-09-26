@@ -4,8 +4,8 @@ Parameter binding
 ## Overview
 
 Parameter binding is used to fill datasource with parameters from datagrid. For example
-[ORM datasource](./datasources/orm.md) is working query on top of Doctrine ORM and QueryBuilder is used
-to build query to database. Using parameter binding option in orm datasource you can confiure mapping between
+[ORM datasource](./datasources/orm.md) is working on top of Doctrine ORM and using QueryBuilder to build query to
+database. Using parameter binding option in orm datasource you can configure mapping between
 parameters of datagrid and parameters of query.
 
 ## Configuration Syntax
@@ -24,7 +24,8 @@ datagrid:
                 and:
                     - u.group = :group_id
             bind_parameters:
-                # Get parameter "group_id" from datagrid and set it's value to "group_id" parameter in datasource query
+                # Get parameter "group_id" from datagrid
+                # and set it's value to "group_id" parameter in datasource query
                 - group_id
 ```
 
@@ -45,8 +46,10 @@ datagrid:
                 and:
                     - u.group = :group_id
             bind_parameters:
-                # Get parameter "groupId" from datagrid and set it's value to "group_id" parameter in datasource query
+                # Get parameter "groupId" from datagrid
+                # and set it's value to "group_id" parameter in datasource query
                 group_id: groupId
+```
 
 To pass parameter "groupId" to the grid use this format when rendering grid in template:
 
@@ -54,7 +57,7 @@ To pass parameter "groupId" to the grid use this format when rendering grid in t
 {{ dataGrid.renderGrid('acme-demo-datagrid', {'groupId': entityId}) }}
 ```
 
-Or pass them to [DatagridManager](./../../Datagrid/DatagridManager.php) directly:
+Or pass them to [DatagridManager](./../../../Datagrid/DatagridManager.php) directly:
 
 ``` php
 $datagridManager->getDatagrid('acme-demo-datagrid', ['groupId' => $entityId]);
@@ -81,12 +84,12 @@ There is also available full format for declaring parameters binding:
 
 ## Support of parameter binding by datasource
 
-Datasource must implement [ParameterBinderAwareInterface](./../../Datasource/ParameterBinderAwareInterface.php)
+Datasource must implement [ParameterBinderAwareInterface](./../../../Datasource/ParameterBinderAwareInterface.php)
 to support "bind_parameters" option.
 
 ## Parameter binder class
 
-Parameter binder class must implements [ParameterBinderInterface](./../../Datasource/ParameterBinderInterface.php) and
+Parameter binder class must implements [ParameterBinderInterface](./../../../Datasource/ParameterBinderInterface.php) and
 depends on datasources implementation.
 
 Example of usage:
@@ -105,9 +108,9 @@ $queryParameterBinder->bindParameters($datagrid, ['email'], false);
 
 ## Parameter binding listener
 
-[DatasourceBindParametersListener](./../../EventListener/DatasourceBindParametersListener.php) is responsible
+[DatasourceBindParametersListener](./../../../EventListener/DatasourceBindParametersListener.php) is responsible
 for run binding of datasource parameters. It checks whether datasource implements
-[ParameterBinderInterface](./../../Datasource/ParameterBinderInterface.php) and whether it has "bind_parameters" option.
+[ParameterBinderInterface](./../../../Datasource/ParameterBinderInterface.php) and whether it has "bind_parameters" option.
 
-If grid configuration is applicable, that parameters configuration specified in "bind_parameters" will be passed to
+If grid configuration is applicable, then parameters configuration specified in "bind_parameters" will be passed to
 datasource method _bindParameters_.
