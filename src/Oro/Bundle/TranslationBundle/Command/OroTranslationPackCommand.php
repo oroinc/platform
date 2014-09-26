@@ -129,12 +129,30 @@ EOF
         $this->path = $this->getContainer()->getParameter('kernel.root_dir')
             . str_replace('//', '/', $input->getOption('path') . '/');
 
+        $locale           = $input->getArgument('locale');
+        $outputFormat     = $input->getOption('output-format');
+        $projectNamespace = $input->getArgument('project');
+
+        $namespaces = [$projectNamespace];
+        if ('Pro' != substr($projectNamespace, -3)) {
+            $namespaces[] = $projectNamespace . 'Pro';
+        }
+
         if ($input->getOption('dump') === true) {
-            $this->dump($input, $output);
+            foreach ($namespaces as $namespace) {
+                $this->dump($namespace, $locale, $output, $outputFormat);
+            }
         }
 
         if ($input->getOption('upload') === true) {
-            $this->upload($input, $output);
+            $translationService = $this->getTranslationService($input, $output);
+
+            $langPackDirs = [];
+            foreach ($namespaces as $namespace) {
+                $langPackDirs[$namespace] = $this->getLangPackDir($namespace);
+            }
+
+            $this->upload($translationService, $input->getOption('upload-mode'), $langPackDirs);
         }
 
         if ($input->getOption('download') === true) {
@@ -145,19 +163,15 @@ EOF
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param TranslationServiceProvider $translationService
+     * @param string                     $mode
+     * @param array                      $languagePackPath one or few dirs
      *
-     * @return bool
+     * @return array
      */
-    protected function upload(InputInterface $input, OutputInterface $output)
+    protected function upload(TranslationServiceProvider $translationService, $mode, $languagePackPath)
     {
-        $projectName            = $input->getArgument('project');
-        $languagePackPath       = $this->getLangPackDir($projectName);
-        $translationService     = $this->getTranslationService($input, $output);
-        $mode                   = $input->getOption('upload-mode');
-
-        if ($mode == 'update') {
+        if ('update' == $mode) {
             $translationService->update($languagePackPath);
         } else {
             $translationService->upload($languagePackPath);
@@ -197,7 +211,8 @@ EOF
         $service->setLogger(new OutputLogger($output));
 
         // set non default adapter if comes from input
-        if ($adapter = $this->getAdapterFromInput($input)) {
+        $adapter = $this->getAdapterFromInput($input);
+        if ($adapter) {
             $service->setAdapter($adapter);
         }
 
@@ -239,15 +254,15 @@ EOF
     /**
      * Performs dump operation
      *
-     * @param InputInterface  $input
+     * @param string          $projectNamespace
+     * @param string          $locale
      * @param OutputInterface $output
+     * @param string          $outputFormat
      *
      * @return bool
      */
-    protected function dump(InputInterface $input, OutputInterface $output)
+    protected function dump($projectNamespace, $locale, OutputInterface $output, $outputFormat)
     {
-        $projectNamespace = $input->getArgument('project');
-
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
         $container = $this->getContainer();
@@ -264,8 +279,8 @@ EOF
         $dumper->dump(
             $languagePackPath,
             $projectNamespace,
-            $input->getOption('output-format'),
-            $input->getArgument('locale')
+            $outputFormat,
+            $locale
         );
 
         return true;

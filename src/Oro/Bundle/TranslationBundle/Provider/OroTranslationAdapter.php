@@ -4,32 +4,10 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use FOS\Rest\Util\Codes;
 
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
-
-class OroTranslationAdapter implements APIAdapterInterface
+class OroTranslationAdapter extends AbstractAPIAdapter
 {
-    use LoggerAwareTrait;
-
     const URL_STATS    = '/stats';
     const URL_DOWNLOAD = '/download';
-
-    /** @var string */
-    protected $apiKey;
-
-    /** @var string endpoint URL */
-    protected $endpoint;
-
-    /** @var ApiRequestInterface */
-    protected $apiRequest;
-
-    public function __construct(ApiRequestInterface $apiRequest, $endpoint, $apiKey = null)
-    {
-        $this->apiRequest = $apiRequest;
-        $this->setEndpoint($endpoint);
-        $this->setApiKey($apiKey);
-        $this->setLogger(new NullLogger());
-    }
 
     /**
      * {@inheritdoc}
@@ -47,15 +25,21 @@ class OroTranslationAdapter implements APIAdapterInterface
             ],
             'GET',
             [
-                CURLOPT_FILE           => $fileHandler,
-                CURLOPT_RETURNTRANSFER => false,
-                CURLOPT_HEADER         => false,
+                'file'           => $fileHandler,
             ]
         );
 
         fclose($fileHandler);
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function upload($files, $mode = 'add')
+    {
+        throw new \Exception('Adapter not support this method');
     }
 
     /**
@@ -104,41 +88,6 @@ class OroTranslationAdapter implements APIAdapterInterface
             $this->logger->critical('Service unavailable. Status received: ' . $responseCode);
             throw new \RuntimeException('Service unavailable');
         }
-    }
-
-    /**
-     * @param string $apiKey
-     */
-    public function setApiKey($apiKey)
-    {
-        $this->apiKey = $apiKey;
-    }
-
-    /**
-     * @param $endpoint
-     */
-    public function setEndpoint($endpoint)
-    {
-        $this->endpoint = $endpoint;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
-    {
-        $this->apiRequest->reset();
-
-        $data['key'] = $this->apiKey;
-        $data        = '?' . http_build_query($data, '', '&');
-
-        $requestParams = [
-                CURLOPT_URL            => $this->endpoint . $uri . $data,
-                CURLOPT_RETURNTRANSFER => true,
-            ] + $curlOptions;
-        $this->apiRequest->setOptions($requestParams);
-
-        return $this->apiRequest->execute();
     }
 
     /**
