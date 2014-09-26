@@ -23,3 +23,8 @@ oro.datagrid:
             grid_settings.title: 'Data Grid settings'
         fields:
             default_per_page.label: 'Items per Page by Default'
+
+    action:
+        view: View
+        update: Edit
+        delete: Delete
