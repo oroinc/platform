@@ -62,8 +62,8 @@ define(['underscore', './abstract-formatter'
 
             var parts = number.split('.');
             var integerPart = parts[0];
-            var isFlexDecimalTrim = parts[1] && parts[1] == this.EMPTY_DECIMAL && ~~this.flex_decimal;
-            var decimalPart = parts[1] && !isFlexDecimalTrim ? (this.decimalSeparator || '.') + parts[1] : '';
+            var isPercentValueTrim = parts[1] && parts[1] == this.EMPTY_DECIMAL && ~~this.percent;
+            var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
 
             return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
         },

@@ -104,7 +104,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                         'grouping'         => false,
                         'orderSeparator'   => '',
                         'decimalSeparator' => '.',
-                        'flex_decimal' => false,
                     )
                 ),
                 'customOptions' => array(
@@ -125,7 +124,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                         'grouping'         => true,
                         'orderSeparator'   => ' ',
                         'decimalSeparator' => '.',
-                        'flex_decimal' => false,
                     )
                 ),
                 'customOptions' => array(
