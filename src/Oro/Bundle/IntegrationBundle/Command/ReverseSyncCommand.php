@@ -28,7 +28,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
     const INTEGRATION_ARG_NAME = 'integration';
     const CONNECTOR_ARG_NAME   = 'connector';
     const PARAMETERS_ARG_NAME  = 'params';
-    const STATUS_SUSSES        = 0;
+    const STATUS_SUCCESS       = 0;
     const STATUS_FAILED        = 255;
 
     /**
@@ -54,7 +54,7 @@ class ReverseSyncCommand extends ContainerAwareCommand
         $convertedParams = unserialize(stripslashes($params));
         $logger          = new OutputLogger($output);
         $processor       = $this->getService(self::SYNC_PROCESSOR);
-        $exitCode        = self::STATUS_SUSSES;
+        $exitCode        = self::STATUS_SUCCESS;
         /** @var ChannelRepository $repository */
         $repository = $this->getService('doctrine.orm.entity_manager')
             ->getRepository('OroIntegrationBundle:Channel');

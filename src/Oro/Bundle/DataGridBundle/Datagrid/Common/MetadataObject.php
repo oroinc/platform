@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
 class MetadataObject extends Object
 {
@@ -40,7 +41,7 @@ class MetadataObject extends Object
     public function getName()
     {
         if (!isset($this[self::OPTIONS_KEY][self::GRID_NAME_KEY])) {
-            throw new \LogicException("Trying to get name of unnamed object");
+            throw new LogicException("Trying to get name of unnamed object");
         }
 
         return $this[self::OPTIONS_KEY][self::GRID_NAME_KEY];

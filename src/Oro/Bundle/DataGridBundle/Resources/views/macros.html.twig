@@ -16,9 +16,10 @@
             {% set metaData = metaData|merge({'options': metadataOptions}) %}
         {% endif %}
         {% set data     = oro_datagrid_data(datagrid) %}
-        {% set gridId   = 'grid-' ~ name ~ '-' ~ random() %}
+        {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set options  = {
             el: '#' ~ gridId,
+            gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
             builders: metaData.requireJSModules,
             metadata: metaData,
             data: data

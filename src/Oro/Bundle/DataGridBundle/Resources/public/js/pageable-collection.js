@@ -66,6 +66,11 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         multipleSorting: true,
 
         /**
+         * @property {Object}
+         */
+        urlParams: {},
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models
@@ -99,6 +104,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             if (options.url) {
                 this.url = options.url;
+                this.urlParams = options.urlParams;
             }
             if (options.model) {
                 this.model = options.model;

@@ -4,17 +4,22 @@ namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtension extends \Twig_Extension
 {
     const ROUTE = 'oro_datagrid_index';
 
-    /** @var Manager */
+    /** @var ManagerInterface */
     protected $manager;
+
+    /** @var NameStrategyInterface */
+    protected $nameStrategy;
 
     /** @var RouterInterface */
     protected $router;
@@ -23,13 +28,19 @@ class DataGridExtension extends \Twig_Extension
     protected $securityFacade;
 
     /**
-     * @param Manager         $manager
-     * @param RouterInterface $router
-     * @param SecurityFacade  $securityFacade
+     * @param ManagerInterface      $manager
+     * @param NameStrategyInterface $nameStrategy
+     * @param RouterInterface       $router
+     * @param SecurityFacade        $securityFacade
      */
-    public function __construct(Manager $manager, RouterInterface $router, $securityFacade)
-    {
+    public function __construct(
+        ManagerInterface $manager,
+        NameStrategyInterface $nameStrategy,
+        RouterInterface $router,
+        SecurityFacade $securityFacade
+    ) {
         $this->manager        = $manager;
+        $this->nameStrategy   = $nameStrategy;
         $this->router         = $router;
         $this->securityFacade = $securityFacade;
     }
@@ -51,6 +62,8 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_build', [$this, 'getGrid']),
             new \Twig_SimpleFunction('oro_datagrid_data', [$this, 'getGridData']),
             new \Twig_SimpleFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
+            new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
+            new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
         ];
     }
 
@@ -78,7 +91,13 @@ class DataGridExtension extends \Twig_Extension
     public function getGridMetadata(DatagridInterface $grid, array $params = [])
     {
         $metaData = $grid->getMetadata();
-        $metaData->offsetAddToArray('options', ['url' => $this->generateUrl($grid->getName(), $params)]);
+        $metaData->offsetAddToArray(
+            'options',
+            [
+                'url' => $this->generateUrl($grid, $params),
+                'urlParams' => $params,
+            ]
+        );
 
         return $metaData->toArray();
     }
@@ -95,17 +114,47 @@ class DataGridExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $name
-     * @param array  $params
-     * @return string
+     * Generate grid element id.
+     *
+     * @param DatagridInterface $grid
+     * @return array
      */
-    protected function generateUrl($name, $params)
+    public function generateGridElementId(DatagridInterface $grid)
     {
-        return $this->router->generate(self::ROUTE, ['gridName' => $name, $name => $params]);
+        $result = 'grid-' . $grid->getName() . '-';
+        if ($grid->getScope()) {
+            $result .= $grid->getScope() . '-';
+        }
+        $result .= mt_rand();
+
+        return $result;
     }
 
     /**
-     * @param $gridName
+     * Generate grid full name.
+     *
+     * @param string $name
+     * @param string $scope
+     * @return array
+     */
+    public function buildGridFullName($name, $scope)
+    {
+        return $this->nameStrategy->buildGridFullName($name, $scope);
+    }
+
+    /**
+     * @param DatagridInterface $grid
+     * @param array $params
+     * @return string
+     */
+    protected function generateUrl(DatagridInterface $grid, $params)
+    {
+        $gridFullName = $this->nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
+        return $this->router->generate(self::ROUTE, ['gridName' => $gridFullName, $gridFullName => $params]);
+    }
+
+    /**
+     * @param string $gridName
      *
      * @return bool
      */
@@ -114,8 +163,9 @@ class DataGridExtension extends \Twig_Extension
         $gridConfig = $this->manager->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
-            $acl = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
-            if ($acl && !$this->securityFacade->isGranted($acl)) {
+            $acl     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+            $aclSKip = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
+            if (!$aclSKip && $acl && !$this->securityFacade->isGranted($acl)) {
                 return false;
             } else {
                 return true;

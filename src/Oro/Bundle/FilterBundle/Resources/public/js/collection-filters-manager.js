@@ -84,8 +84,13 @@ define([
          * @protected
          */
         _onCollectionReset: function (collection) {
-            if (collection.state.totalRecords > 0 && this.$el.children().length > 0) {
+            var hasRecords, hasFiltersState;
+            hasRecords = collection.state.totalRecords > 0;
+            hasFiltersState = !_.isEmpty(collection.state.filters);
+            if (hasRecords || hasFiltersState) {
                 this.$el.show();
+            } else {
+                this.$el.hide();
             }
         },
 
