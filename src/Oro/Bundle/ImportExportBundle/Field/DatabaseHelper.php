@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 class DatabaseHelper
 {
     /**
@@ -14,16 +16,23 @@ class DatabaseHelper
     protected $registry;
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var array
      */
     protected $entities = [];
 
     /**
      * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -49,7 +58,7 @@ class DatabaseHelper
      */
     public function find($entityName, $identifier)
     {
-        return $this->registry->getRepository($entityName)->find($identifier);
+        return $this->doctrineHelper->getEntity($entityName, $identifier);
     }
 
     /**
@@ -58,11 +67,7 @@ class DatabaseHelper
      */
     public function getIdentifier($entity)
     {
-        $entityName = ClassUtils::getClass($entity);
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
-        $identifier = $entityManager->getClassMetadata($entityName)->getIdentifierValues($entity);
-        return current($identifier);
+        return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
     /**
@@ -71,9 +76,7 @@ class DatabaseHelper
      */
     public function getIdentifierFieldName($entityName)
     {
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
-        return $entityManager->getClassMetadata($entityName)->getSingleIdentifierFieldName();
+        return $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
     }
 
     /**

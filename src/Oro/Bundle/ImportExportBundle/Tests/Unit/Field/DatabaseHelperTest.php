@@ -24,6 +24,11 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
     protected $metadata;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var DatabaseHelper
      */
     protected $helper;
@@ -56,7 +61,11 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->repository));
 
-        $this->helper = new DatabaseHelper($registry);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper);
     }
 
     public function testFindOneBy()
@@ -84,9 +93,9 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $identifier = 1;
 
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with($identifier)
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntity')
+            ->with(self::TEST_CLASS, $identifier)
             ->will($this->returnValue($entity));
 
         $this->assertEquals($entity, $this->helper->find(self::TEST_CLASS, $identifier));
@@ -97,10 +106,10 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $identifier = 1;
 
-        $this->metadata->expects($this->once())
-            ->method('getIdentifierValues')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
             ->with($entity)
-            ->will($this->returnValue([$identifier]));
+            ->will($this->returnValue($identifier));
 
         $this->assertEquals($identifier, $this->helper->getIdentifier($entity));
     }
@@ -109,8 +118,9 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
     {
         $fieldName = 'id';
 
-        $this->metadata->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(self::TEST_CLASS)
             ->will($this->returnValue($fieldName));
 
         $this->assertEquals($fieldName, $this->helper->getIdentifierFieldName(self::TEST_CLASS));
@@ -159,9 +169,11 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $fieldName = 'id';
 
-        $this->metadata->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(self::TEST_CLASS)
             ->will($this->returnValue($fieldName));
+
         $this->metadata->expects($this->once())
             ->method('setIdentifierValues')
             ->with($entity, [$fieldName => null])

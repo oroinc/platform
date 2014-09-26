@@ -14,5 +14,6 @@ services:
         class: %oro_importexport.field.database_helper.class%
         arguments:
             - @doctrine
+            - @oro_entity.doctrine_helper
         tags:
             - { name: doctrine.event_listener, event: onClear }
