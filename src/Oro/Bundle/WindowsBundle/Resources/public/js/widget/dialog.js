@@ -212,9 +212,11 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             this._fixDialogMinHeight(true);
             this.widget.on("dialogmaximize dialogrestore", _.bind(function() {
                 this._fixDialogMinHeight(true);
+                this.widget.trigger('resize');
             }, this));
             this.widget.on("dialogminimize", _.bind(function() {
                 this._fixDialogMinHeight(false);
+                this.widget.trigger('resize');
             }, this));
 
             this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
@@ -247,6 +249,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
                 = parseInt(dialogWidget.css('border-top-width')) + parseInt(dialogWidget.css('border-bottom-width'));
             this.widget.width(this.widget.width() - widthShift);
             this.widget.height(this.widget.height() - heightShift);
+            this._fixScrollableHeight();
         },
 
         _fixScrollableHeight: function() {
