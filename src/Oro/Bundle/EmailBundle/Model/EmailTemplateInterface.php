@@ -31,14 +31,16 @@ interface EmailTemplateInterface
     /**
      * Sets email template content
      *
+     * @param string $content
      * @return EmailTemplateInterface
      */
-    public function setContent();
+    public function setContent($content);
 
     /**
      * Sets email subject
      *
+     * @param string $subject
      * @return EmailTemplateInterface
      */
-    public function setSubject();
+    public function setSubject($subject);
 }
