@@ -13,21 +13,37 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     protected $logger;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $client;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $request;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $response;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $query;
 
     protected function setUp()
     {
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
-        $this->request = $this->getMock('Oro\Bundle\TranslationBundle\Provider\ApiRequestInterface');
+        $this->client = $this->getMock('Guzzle\Http\Client');
+        $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->response = $this->getMockBuilder('Guzzle\Http\Message\Response')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->query = $this->getMock('Guzzle\Http\QueryString');
 
-        $this->adapter = new CrowdinAdapter('http://service-url.tld/api/', $this->request);
+        $this->adapter = new CrowdinAdapter($this->client);
         $this->adapter->setApiKey('some-api-key');
         $this->adapter->setLogger($this->logger);
     }
 
     protected function tearDown()
     {
-        unset($this->logger, $this->request, $this->adapter);
+        unset($this->logger, $this->client, $this->adapter);
     }
 
     /**
@@ -43,12 +59,15 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this->adapter->setProjectId(1);
 
+        $this->client->expects($this->exactly(4))
+            ->method('createRequest')
+            ->will($this->returnValue($this->request));
         $this->request->expects($this->exactly(4))
-            ->method('setOptions');
-
+            ->method('send')
+            ->will($this->returnValue($this->response));
         $this->request->expects($this->exactly(4))
-            ->method('execute')
-            ->will($this->returnValue('<?xml version="1.0" encoding="UTF-8"?><test>test</test>'));
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
 
         $this->adapter->upload($files, $mode);
     }
@@ -65,16 +84,15 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this->adapter->setProjectId(1);
 
+        $this->client->expects($this->once())
+            ->method('createRequest')
+            ->will($this->returnValue($this->request));
         $this->request->expects($this->once())
-            ->method('setOptions');
-
+            ->method('send')
+            ->will($this->throwException(new \Exception('test')));
         $this->request->expects($this->once())
-            ->method('execute')
-            ->will(
-                $this->returnValue(
-                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>0</code></error>'
-                )
-            );
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
 
         $this->adapter->upload($files, $mode);
     }
@@ -86,16 +104,21 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $dirs = ['some/path'];
 
+        $this->client->expects($this->once())
+            ->method('createRequest')
+            ->will($this->returnValue($this->request));
         $this->request->expects($this->once())
-            ->method('setOptions');
+            ->method('send')
+            ->will($this->returnValue($this->response));
+        $this->request->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
+        $this->response->expects($this->once())
+            ->method('json')
+            ->will($this->returnValue(['success' => true]));
 
-        $this->request->expects($this->once())
-            ->method('execute')
-            ->will(
-                $this->returnValue(
-                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>13</code></error>'
-                )
-            );
+        $this->logger->expects($this->once())
+            ->method('notice');
 
         $this->logger->expects($this->once())
             ->method('info');
@@ -112,13 +135,15 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             'some/path/to/file.yml' => 'api/path/test.yml',
         ];
 
+        $this->client->expects($this->once())
+            ->method('createRequest')
+            ->will($this->returnValue($this->request));
         $this->request->expects($this->once())
-            ->method('execute')
-            ->will(
-                $this->returnValue(
-                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>13</code></error>'
-                )
-            );
+            ->method('send')
+            ->will($this->throwException(new \Exception('test')));
+        $this->request->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
 
         $this->logger->expects($this->once())
             ->method('error');
@@ -126,29 +151,27 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
         $this->adapter->uploadFiles($files, 'add');
     }
 
-    /**
-     * Test upload method
-     */
     public function testDownload()
     {
         $locale = 'en';
-        $path =  sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' .
-            DIRECTORY_SEPARATOR . 'target.zip';
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
+        $path =  sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'target.zip';
 
+        $this->client->expects($this->once())
+            ->method('createRequest')
+            ->will($this->returnValue($this->request));
         $this->request->expects($this->once())
-            ->method('setOptions');
+            ->method('send')
+            ->will($this->returnValue($this->response));
+        $this->request->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
+        $this->response->expects($this->once())
+            ->method('getStatusCode')
+            ->will($this->returnValue(200));
 
-        $this->request->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue(true));
 
         $res = $this->adapter->download($path, [$locale]);
         $this->assertTrue($res);
-        unlink($path);
     }
 
     /**
