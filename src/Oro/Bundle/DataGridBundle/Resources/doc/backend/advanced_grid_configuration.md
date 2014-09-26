@@ -13,20 +13,71 @@ For example "_grid should show users for group that currently editing_"
 Macros that renders datagrid could retrieve parameters that will be used for generating URL for data retrieving.
 
 Example:
+
 ``` twig
 [dataGrid.renderGrid(gridName, {groupId: entityId})]
 ```
-This param will be passed to request and could be applied to datasource in build.after event listener. There is base implementation of listener in Datagrid bundle, so just need to configure it as service
+
+This param will be passed to datagrid parameter bag and will be bind to datasource query in listener
+of "oro_datagrid.datagrid.build.after" event automatically if you will specify "bind_parameters" option in datasource
+configuration:
 
 ``` yml
-    some.service.name:
-        class: %oro_datagrid.event_listener.base_orm_relation.class%
-        arguments:
-          - groupId # param name
-          - false   # edit mode disabled
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.GRID_NAME, method: onBuildAfter }
+datagrid:
+    acme-demo-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            where:
+                and:
+                    - u.group = :groupId
+            bind_parameters:
+                - groupId
 ```
+
+In case if name of parameters in grid and query not match, you can pass associative array of parameters, where key will
+be name of parameter in query, and value - name of parameter if grid:
+
+``` yml
+datagrid:
+    acme-demo-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            where:
+                and:
+                    - u.group = :group_id
+            bind_parameters:
+                group_id: groupId
+```
+
+Full format of bind parameters:
+
+``` yml
+    bind_parameters:
+        data_in: # option string key will be interpreted as name of parameter in query
+            path: _parameters.groupId # it will reference to parameter groupId in key _parameters of parameter bag.
+            default: [0] # some default value, will be used if parameter is not passed
+            type: array # type applicable with Doctrine: Doctrine\DBAL\Types\Type::getType()
+```
+
+``` yml
+    bind_parameters:
+        -
+            name: # name of parameter in query
+            path: _parameters.groupId # it will reference to parameter groupId in key _parameters of parameter bag.
+            default: [0] # some default value, will be used if parameter is not passed
+            type: array # type applicable with Doctrine: Doctrine\DBAL\Types\Type::getType()
+```
+
 #### Problem:
 Let's take previous problem, but in additional we need to fill some form field dependent on grid state.
 For example "_grid should show users for group that currently editing and user should be able to add/remove users from group_"
@@ -52,6 +103,8 @@ datagrid:
                          END) as isAssigned
                 from:
                     { table: AcmeDemoBundle:User, alias:u }
+            bind_parameters:
+                - groupId
         columns:
             isAssigned: # column has name correspond to data_name
                 label: Assigned
@@ -71,16 +124,15 @@ For example fields are:
 
 ```
 
-Last step: need to register column listener that will fill values of those fields:
+Last step: need to set "rowSelection" option, it will add behavior of selecting rows on frontend and handle binding
+of "data_in" and "data_not_in" parameters to datasource:
 ``` yml
 datagrid:
     acme-demo-grid:
         ... # previous configuration
         options:
             entityHint: account
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: isAssigned    # frontend column name
                 selectors:

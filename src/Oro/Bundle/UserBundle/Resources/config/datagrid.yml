@@ -293,6 +293,8 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_role
+            bind_parameters:
+                - role_id
         columns:
             has_role:
                 label: Has role
@@ -334,9 +336,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_role
                 selectors:
@@ -357,6 +357,8 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_group
+            bind_parameters:
+                - group_id
         columns:
             has_group:
                 label: Has group
@@ -397,8 +399,6 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
             columnListener:
                 dataField: id
                 columnName: has_group

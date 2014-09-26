@@ -1,23 +1,24 @@
 parameters:
-    oro_datagrid.datagrid.base.class:                       Oro\Bundle\DataGridBundle\Datagrid\Datagrid
-    oro_datagrid.extension.acceptor.class:                  Oro\Bundle\DataGridBundle\Extension\Acceptor
+    oro_datagrid.datagrid.base.class:                             Oro\Bundle\DataGridBundle\Datagrid\Datagrid
+    oro_datagrid.extension.acceptor.class:                        Oro\Bundle\DataGridBundle\Extension\Acceptor
 
-    oro_datagrid.datagrid.manager.class:                    Oro\Bundle\DataGridBundle\Datagrid\Manager
-    oro_datagrid.datagrid.name_strategy.class:              Oro\Bundle\DataGridBundle\Datagrid\NameStrategy
-    oro_datagrid.datagrid.builder.class:                    Oro\Bundle\DataGridBundle\Datagrid\Builder
-    oro_datagrid.datagrid.parameters.class:                 Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
-    oro_datagrid.datagrid.request_parameters_factory.class: Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory
-    oro_datagrid.datagrid.guesser.class:                    Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser
-    oro_datagrid.datagrid.column_options_guesser.class:     Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser
+    oro_datagrid.datagrid.manager.class:                          Oro\Bundle\DataGridBundle\Datagrid\Manager
+    oro_datagrid.datagrid.builder.class:                          Oro\Bundle\DataGridBundle\Datagrid\Builder
+    oro_datagrid.datagrid.parameters.class:                       Oro\Bundle\DataGridBundle\Datagrid\ParameterBag
+    oro_datagrid.datagrid.request_parameters_factory.class:       Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory
+    oro_datagrid.datagrid.guesser.class:                          Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser
+    oro_datagrid.datagrid.column_options_guesser.class:           Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser
 
-    oro_datagrid.provider.resolver.class:                   Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
+    oro_datagrid.provider.resolver.class:                         Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver
 
-    oro_datagrid.twig.datagrid.class:                       Oro\Bundle\DataGridBundle\Twig\DataGridExtension
-    oro_datagrid.event_listener.base_orm_relation.class:    Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
-    oro_datagrid.configuration.provider.class:              Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
-    oro_datagrid.configuration.provider.chain.class:        Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
-    oro_datagrid.event.dispatcher.class:                    Oro\Bundle\DataGridBundle\Event\EventDispatcher
-    oro_datagrid.event_listener.ormdatasource_acl.class:    Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
+    oro_datagrid.configuration.provider.class:                    Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider
+    oro_datagrid.configuration.provider.chain.class:              Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider
+    oro_datagrid.event.dispatcher.class:                          Oro\Bundle\DataGridBundle\Event\EventDispatcher
+    oro_datagrid.event_listener.base_orm_relation.class:          Oro\Bundle\DataGridBundle\EventListener\BaseOrmRelationDatagridListener
+    oro_datagrid.event_listener.datasource_bind_parameters.class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
+    oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
+    oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
+    oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
 
 services:
     oro_datagrid.datagrid.manager:
@@ -91,9 +92,19 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_datagrid.event_listener.datasource_bind_parameters:
+        class: %oro_datagrid.event_listener.datasource_bind_parameters.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
+
     oro_datagrid.event_listener.ormdatasource_acl:
         class: %oro_datagrid.event_listener.ormdatasource_acl.class%
         arguments:
             - @oro_security.acl_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
+
+    oro_datagrid.event_listener.row_selection:
+        class: %oro_datagrid.event_listener.row_selection.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
