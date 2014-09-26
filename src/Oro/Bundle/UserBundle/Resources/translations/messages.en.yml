@@ -86,6 +86,8 @@ oro:
         password.label:              Password
         password_re.label:           Re-enter password
         password_requested_at.label: Password requested at
+        new_password.label:          New password
+        new_password_re.label:       Repeat new password
         roles.label:                 Roles
         salt.label:                  Salt
         statuses.label:              Statuses

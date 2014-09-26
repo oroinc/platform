@@ -1,5 +1,12 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
+"System": "System"
+"Custom": "Custom"
+"New": "New"
+"Requires update": "Requires update"
+"Active": "Active"
+"Deleted": "Deleted"
+
 oro:
     entity_extend:
         datagrid:
