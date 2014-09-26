@@ -6,7 +6,7 @@ define([
 ], function ($, Chaplin) {
     'use strict';
 
-    var BaseController, reuses, promises;
+    var BaseController, reuses, promiseLoads;
 
     BaseController = Chaplin.Controller.extend({
         /**
@@ -17,32 +17,28 @@ define([
          * @override
          */
         beforeAction: function (params, route, options) {
-            var i, deferred, self;
-
-            if (!route.previous) {
-                // if it's first time route, initializes page cache
-                this.cache.init(
-                    route.path,
-                    route.query,
-                    Chaplin.mediator.execute('retrieveOption', 'userName') || false
-                );
-            }
+            var i, deferredInit, self;
 
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            deferred = $.Deferred();
+            deferredInit = $.Deferred();
             self = this;
 
-            $.when.apply($, promises).then(function () {
+            $.when.apply($, promiseLoads).then(function () {
+                // if it's first time route
+                if (!route.previous) {
+                    // initializes page cache
+                    self.cache.init(route);
+                }
                 // compose global instances
                 for (i = 0; i < reuses.length; i += 1) {
                     self.reuse.apply(self, reuses[i]);
                 }
                 // all compositions are ready, allows to execute action
-                deferred.resolve();
+                deferredInit.resolve();
             });
 
-            return deferred;
+            return deferredInit.promise();
         },
 
         /**
@@ -65,11 +61,13 @@ define([
             /**
              * Executes 'init' handler for pageCache manager
              *
-             * @param {string} path
-             * @param {string} query
-             * @param {string} userName
+             * @param {Object} route
              */
-            init: function (path, query, userName) {
+            init: function (route) {
+                var path, query, userName;
+                path = route.path;
+                query = route.query;
+                userName = Chaplin.mediator.execute('retrieveOption', 'userName') || false;
                 Chaplin.mediator.execute({
                     name: 'pageCache:init',
                     silent: true
@@ -92,7 +90,7 @@ define([
     });
 
     reuses = [];
-    promises = [];
+    promiseLoads = [];
 
     /**
      * Collects compositions to reuse before controller action
@@ -113,14 +111,14 @@ define([
      * @static
      */
     BaseController.loadBeforeAction = function (modules, initCallback) {
-        var deferred, callback;
-        deferred = $.Deferred();
-        promises.push(deferred);
+        var deferredLoad, callback;
+        deferredLoad = $.Deferred();
+        promiseLoads.push(deferredLoad.promise());
         callback = function () {
             var args;
             args = Array.prototype.slice.call(arguments, 0);
             initCallback.apply(null, args);
-            deferred.resolve();
+            deferredLoad.resolve();
         };
         require(modules, callback);
     };

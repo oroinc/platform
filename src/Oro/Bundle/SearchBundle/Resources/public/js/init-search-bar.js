@@ -12,8 +12,10 @@ function($, _, routing, mediator) {
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
+
           mediator.bind('page:beforeChange', function () {
               searchBarContainer.removeClass('header-search-focused');
+              $('#oroplatform-header .search-form .search').val('');
           });
 
           mediator.bind('page:afterChange', searchByTagClose);
@@ -23,14 +25,11 @@ function($, _, routing, mediator) {
               return false;
           });
 
-
           $('.search-form').submit(function(){
               var $searchString = $.trim($(this).find('.search').val());
               if ($searchString.length === 0) {
                   return false;
               }
-              // clear value after search
-              //$(this).find('.search').val('').blur();
               searchByTagClose();
           });
 

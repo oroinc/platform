@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
@@ -17,11 +17,14 @@ class UrlProperty extends AbstractProperty
     protected $excludeParams = [self::ROUTE_KEY, self::IS_ABSOLUTE_KEY, self::ANCHOR_KEY, self::PARAMS_KEY];
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
-    public function __construct(Router $router)
+    /**
+     * @param RouterInterface $router
+     */
+    public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }

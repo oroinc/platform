@@ -19,6 +19,9 @@ class TwigTemplateProperty extends AbstractProperty
     /**  @var array */
     protected $reservedKeys = ['record', 'value'];
 
+    /**
+     * @param \Twig_Environment $environment
+     */
     public function __construct(
         \Twig_Environment $environment
     ) {

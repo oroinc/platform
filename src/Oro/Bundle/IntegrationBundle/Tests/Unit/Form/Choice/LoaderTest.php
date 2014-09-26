@@ -40,7 +40,7 @@ class LoaderTest extends OrmTestCase
             ],
             'all types are denied'     => [
                 [],
-                'SELECT i FROM OroIntegrationBundle:Channel i WHERE 1 = 0 ORDER BY i.name ASC'
+                'SELECT i FROM OroIntegrationBundle:Channel i WHERE 1 <> 1 ORDER BY i.name ASC'
             ],
             'test type is allowed'     => [
                 ['test'],

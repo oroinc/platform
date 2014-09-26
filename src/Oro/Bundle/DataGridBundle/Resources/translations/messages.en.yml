@@ -1,30 +1,29 @@
-"oro_datagrid.no_data_hint %entityHint%": "No %entityHint% exists."
-"oro_datagrid.not_found_hint %entityHint%":  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
-"oro_datagrid.label_add_filter": "Manage filters"
-"oro_datagrid.label_loading_mask": "Loading . . ."
-"oro.grid.mass_action.label": "Mass Actions"
-"oro.grid.mass_action.selected_rows": "Selected Rows"
-"oro.grid.mass_action.confirm_title": "Mass Action Confirmation"
-"oro.grid.mass_action.confirm_content": "Are you sure you want to do this?"
-"oro.grid.mass_action.confirm_ok": "Yes, do it"
-"oro.grid.mass_action.error_title": "Mass Action Error"
-"oro.grid.mass_action.error_content": "Cannot perform mass action"
-"oro.grid.mass_action.delete.label": "Delete"
-"oro.grid.mass_action.delete.confirm_title": "Mass Delete Confirmation"
-"oro.grid.mass_action.delete.confirm_content": "Are you sure you want to do delete selected items?"
-"oro.grid.datagrid.page_size.all": "All"
-"oro.grid.mass_action.delete.success_message": "{0} No entities were removed|{1} One entity was removed|]1,Inf[ %count% entities were removed"
-"oro.grid.export.csv": "CSV"
+oro_datagrid:
+    no_data_hint %entityHint%: "No %entityHint% exists."
+    not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
+    label_add_filter: Manage filters
+    label_loading_mask: "Loading . . ."
 
-oro.datagrid:
-    system_configuration:
-        groups:
-            look_and_feel.title: 'Display settings'
-            grid_settings.title: 'Data Grid settings'
-        fields:
-            default_per_page.label: 'Items per Page by Default'
+oro:
+    grid:
+        mass_action:
+            label: Mass Actions
+            selected_rows: Selected Rows
+            confirm_title: Mass Action Confirmation
+            confirm_content: Are you sure you want to do this?
+            confirm_ok: Yes, do it
+            error_title: Mass Action Error
+            error_content: Cannot perform mass action
+            delete:
+                label: Delete
+                confirm_title: Mass Delete Confirmation
+                confirm_content: Are you sure you want to do delete selected items?
+                success_message: "{0} No entities were removed|{1} One entity was removed|]1,Inf[ %count% entities were removed"
+        datagrid.page_size.all: All
+        export.csv: CSV
+        open_link: Open
 
-    action:
-        view: View
-        update: Edit
-        delete: Delete
+        action:
+            view: View
+            update: Edit
+            delete: Delete
