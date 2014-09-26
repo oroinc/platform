@@ -13,7 +13,8 @@
         ratio: isMobileVersion ? '0.8' : '0.35',
         data: data,
         options: options,
-        config: config
+        config: config,
+        date: options.settings.quarterDate ? options.settings.quarterDate|oro_format_date : ''
     } %}
 
 

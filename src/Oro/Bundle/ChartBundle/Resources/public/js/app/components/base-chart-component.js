@@ -109,8 +109,6 @@ define(function(require) {
 
             $chart.height($chart.height() + (labelMaxHeight - labelMinHeight));
 
-//            console.log($chart.height());
-
             this.setChartContainerSize();
         },
 

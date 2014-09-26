@@ -21,6 +21,8 @@ define(function(require) {
         initialize: function(options) {
             BaseChartComponent.prototype.initialize.call(this, options);
 
+            this.date = options.date;
+
             this.update();
         },
 
@@ -30,6 +32,7 @@ define(function(require) {
          * @overrides
          */
         draw: function () {
+            var scope = this;
             var $chart = this.$chart;
             var options = this.options;
 
@@ -64,7 +67,7 @@ define(function(require) {
                         },
                         nozzleFormatter: function (label, value) {
                             return label
-                                    + ' (from' + options.settings.quarterDate + '): '
+                                    + ' (from ' + scope.date + '): '
                                     + numberFormatter.formatCurrency(value);
                         }
                     },
