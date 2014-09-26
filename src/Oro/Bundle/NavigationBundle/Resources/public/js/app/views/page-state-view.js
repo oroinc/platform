@@ -23,7 +23,9 @@ define([
             'page:update mediator': 'onPageUpdate',
             'page:afterChange mediator': 'afterPageChange',
             'page:beforeRefresh mediator': 'beforePageRefresh',
-            'route:change mediator': 'toggleStateTrace'
+
+            'add collection': 'toggleStateTrace',
+            'remove collection': 'toggleStateTrace'
         },
 
         initialize: function () {
@@ -98,7 +100,7 @@ define([
          */
         afterPageChange: function () {
             var options;
-            if (!this._hasForm() || !this._isRestoreRequired()) {
+            if (!this._hasForm() || !this._isStateTraceRequired()) {
                 return;
             }
 
@@ -115,7 +117,7 @@ define([
          * Switch on/off form state trace
          */
         toggleStateTrace: function () {
-            var switchOn = this._isRestoreRequired();
+            var switchOn = this._isStateTraceRequired();
             if (switchOn) {
                 this._switchOnTrace({initial: true});
             } else {
@@ -370,16 +372,11 @@ define([
         },
 
         /**
-         * Reads URL params and defines if data restore required
+         * Defines if page is in cache and state trace is required
          * @protected
          */
-        _isRestoreRequired: function () {
-            var route, restore;
-            route = this._parseCurrentURL();
-            restore = _.some(route.query.split('&'), function (param) {
-                return param === 'restore=1';
-            });
-            return restore;
+        _isStateTraceRequired: function () {
+            return Boolean(this.collection.getCurrentModel());
         }
     });
 
