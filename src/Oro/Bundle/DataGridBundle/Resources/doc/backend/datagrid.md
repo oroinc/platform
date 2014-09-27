@@ -36,7 +36,30 @@ datagrid:
             type: orm  # datasource type
             query:
                 ....   # some query configuration
-``` 
+```
+
+#####Parameters binding
+
+If datasource supports parameters binding, additional option "bind_parameters" can be specified. For example
+
+``` yaml
+datagrid:
+    acme-demo-datagrid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            where:
+                and:
+                    - u.group = :group_id
+            bind_parameters:
+                group_id: groupId
+```
+
+[More about parameters binding](./parameter_binding.md).
 
 ####Columns and properties
 Next step is columns definition. It's array as well as other parts of grid configuration.
@@ -136,7 +159,7 @@ Contains registered datasource type and extensions, also it performs check for d
 - Extension\ExtensionVisitorInterface - visitor interface
 - Extension\AbstractExtension - basic empty implementation
 - Datasource\DatasourceInterface - link object between data and grid. Should provide results as array of ResultRecordInterface compatible objects
-- Provider\SystemAwareResolver - resolve specific grid YAML syntax expressions. For details [see](./link.md).
+- Provider\SystemAwareResolver - resolve specific grid YAML syntax expressions. For details [see](./references_in_configuration.md).
 ##Extendability
 ####Behavior customization
 For customization of grid behavior(e.g. dynamic columns, actions etc) event listeners could be used.
