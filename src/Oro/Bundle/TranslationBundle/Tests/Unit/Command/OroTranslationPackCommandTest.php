@@ -90,7 +90,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             'dump action should perform'            => array(
                 array('--dump' => true, 'project' => 'SomeProject'),
                 array(
-                    'dump'   => 2,
+                    'dump'   => 1,
                     'upload' => 0
                 ),
             ),
@@ -100,13 +100,13 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
                     'dump'                  => 0,
                     'upload'                => 1,
                     'getTranslationService' => 1,
-                    'getLangPackDir'        => 2,
+                    'getLangPackDir'        => 1,
                 ),
             ),
             'dump and upload action should perform' => array(
                 array('--upload' => true, '--dump' => true, 'project' => 'SomeProject'),
                 array(
-                    'dump'   => 2,
+                    'dump'   => 1,
                     'upload' => 1,
                     'getTranslationService' => 1,
                 ),
