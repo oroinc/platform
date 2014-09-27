@@ -479,3 +479,4 @@ services:
               - @oro_security.security_facade
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent }
+              - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }
