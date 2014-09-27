@@ -96,7 +96,9 @@ class Indexer
             $query->from('*');
         }
 
-        $query->andWhere(self::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+        if ($searchString) {
+            $query->andWhere(self::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+        }
 
         if ($maxResults > 0) {
             $query->setMaxResults($maxResults);

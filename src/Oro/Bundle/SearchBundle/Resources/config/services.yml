@@ -9,13 +9,22 @@ parameters:
     oro_search.prepare_result_item.listener.class:        Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener
 
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
-    oro_search.extension.search_results.class:          Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
+    oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
     oro_search.event_listener.search_results_grid_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
-    oro_search.datasource.search.class:                 Oro\Bundle\SearchBundle\Extension\SearchDatasource
+    oro_search.datasource.search.class:                           Oro\Bundle\SearchBundle\Extension\SearchDatasource
 
-    oro_search.extension.orm_pager.class:               Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
-    oro_search.extension.pager.search.pager.class:      Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
+    oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
+    oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
+
+    # services used only for ORM search engine
+    oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
+    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
+    oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
+
+    oro_search.drivers:
+        pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
+        pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
 
 services:
     oro_search.index:
@@ -115,4 +124,24 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    # services used only for ORM search engine
+    oro_search.fulltext_index_manager:
+        class: %oro_search.fulltext_index_manager.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+            - %oro_search.drivers%
 
+    oro_search.event_listener.update_schema_listener:
+        class: %oro_search.event_listener.update_schema_listener.class%
+        arguments:
+            - @oro_search.fulltext_index_manager
+            - @service_container
+        tags:
+            - { name: kernel.event_listener, event: console.terminate }
+
+    oro_search.event_listener.orm.fulltext_index_listener:
+        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        arguments:
+            - %database_driver%
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }
