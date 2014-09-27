@@ -123,11 +123,9 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->setDescription('description')
             ->setCreateDate(new \DateTime());
 
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->mapper = new ObjectMapper($this->mappingConfig, $this->dispatcher);
+        $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
     }
 
     public function testMapObject()

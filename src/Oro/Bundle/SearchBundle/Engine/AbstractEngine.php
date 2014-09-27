@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -31,6 +31,11 @@ abstract class AbstractEngine implements EngineInterface
     protected $registry;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
@@ -46,26 +51,21 @@ abstract class AbstractEngine implements EngineInterface
     protected $logQueries = false;
 
     /**
-     * @var ContainerAwareEventDispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @param ManagerRegistry               $registry
-     * @param DoctrineHelper                $doctrineHelper
-     * @param ObjectMapper                  $mapper
-     * @param ContainerAwareEventDispatcher $eventDispatcher
+     * @param ManagerRegistry          $registry
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param ObjectMapper             $mapper
      */
     public function __construct(
         ManagerRegistry $registry,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper,
-        ContainerAwareEventDispatcher $eventDispatcher
+        ObjectMapper $mapper
     ) {
-        $this->registry       = $registry;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->mapper         = $mapper;
+        $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->mapper          = $mapper;
     }
 
     /**

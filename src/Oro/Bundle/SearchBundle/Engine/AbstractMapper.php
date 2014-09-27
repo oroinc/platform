@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -9,12 +10,14 @@ use Oro\Bundle\SearchBundle\Query\Query;
 abstract class AbstractMapper
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @var array
      */
     protected $mappingConfig;
-
-
-    protected $dispatcher;
 
     /**
      * Get object field value

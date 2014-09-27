@@ -61,7 +61,7 @@ services:
 
     oro_search.mapper:
         class:                        %oro_search.mapper.class%
-        arguments:                    [%oro_search.entities_config%, @event_dispatcher]
+        arguments:                    [@event_dispatcher, %oro_search.entities_config%]
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
