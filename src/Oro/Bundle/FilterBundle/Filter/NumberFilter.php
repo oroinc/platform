@@ -97,12 +97,31 @@ class NumberFilter extends AbstractFilter
             case NumberFilterType::TYPE_NOT_EQUAL:
                 return $ds->expr()->neq($fieldName, $parameterName, true);
             case FilterUtility::TYPE_EMPTY:
+                if ($this->isAggregateField($ds, $fieldName)) {
+                    $fieldName = $ds->expr()->coalesce([$fieldName]);
+                }
+
                 return $ds->expr()->isNull($fieldName);
             case FilterUtility::TYPE_NOT_EMPTY:
+                if ($this->isAggregateField($ds, $fieldName)) {
+                    $fieldName = $ds->expr()->coalesce([$fieldName]);
+                }
+
                 return $ds->expr()->isNotNull($fieldName);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string                           $fieldName
+     *
+     * @return bool
+     */
+    protected function isAggregateField(FilterDatasourceAdapterInterface $ds, $fieldName)
+    {
+        return (bool)preg_match('/(?<![\w:.])(\w+)\s*\(/im', $ds->getFieldByAlias($fieldName));
     }
 
     /**
