@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Engine;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -14,10 +13,8 @@ abstract class AbstractMapper
      */
     protected $mappingConfig;
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+
+    protected $dispatcher;
 
     /**
      * Get object field value
@@ -31,7 +28,11 @@ abstract class AbstractMapper
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        return $propertyAccessor->getValue($objectOrArray, $fieldName);
+        try {
+            return $propertyAccessor->getValue($objectOrArray, $fieldName);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

@@ -52,7 +52,7 @@ services:
 
     oro_search.mapper:
         class:                        %oro_search.mapper.class%
-        arguments:                    ["@service_container", %oro_search.entities_config%]
+        arguments:                    [%oro_search.entities_config%, @event_dispatcher]
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%

@@ -1,15 +1,16 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class ObjectMapper extends AbstractMapper
 {
-    public function __construct(ContainerInterface $container, $mappingConfig)
+    public function __construct($mappingConfig, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->mappingConfig = $mappingConfig;
-        $this->container     = $container;
+        $this->dispatcher    = $dispatcher;
     }
 
     /**
@@ -98,6 +99,10 @@ class ObjectMapper extends AbstractMapper
                         $objectData = $this->setDataValue($alias, $objectData, $field, $value);
                 }
             }
+
+            $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
+            $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
+            $objectData = $event->getData();
         }
 
         return $objectData;
