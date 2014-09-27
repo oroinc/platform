@@ -45,7 +45,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $assetsOptions = array(
                 '--exclude' => array('OroInstallerBundle')
             );
-            if ($input->hasOption('symlink')) {
+            if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
 

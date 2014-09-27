@@ -3,6 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
+
+use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Client;
+use Guzzle\Http\Message\Request;
 
 abstract class AbstractAPIAdapter implements APIAdapterInterface
 {
@@ -14,16 +19,13 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     /** @var string */
     protected $projectId;
 
-    /** @var string endpoint URL */
-    protected $endpoint;
+    /** @var Client */
+    protected $client;
 
-    /** @var ApiRequestInterface */
-    protected $apiRequest;
-
-    public function __construct($endpoint, ApiRequestInterface $apiRequest)
+    public function __construct(Client $client)
     {
-        $this->endpoint  = $endpoint;
-        $this->apiRequest = $apiRequest;
+        $this->client = $client;
+        $this->setLogger(new NullLogger());
     }
 
     /**
@@ -32,6 +34,14 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
     }
 
     /**
@@ -53,47 +63,64 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     abstract public function upload($files, $mode = 'add');
 
     /**
-     * Perform request
+     * Allow adapter to modify request before sending,
+     * adding API key by default
      *
-     * @param string $uri
-     * @param array  $data
-     * @param string $method
-     * @param array  $curlOptions
-     *
-     * @throws \RuntimeException
-     * @return mixed
+     * @param Request $request
      */
-    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
+    protected function preprocessRequest(Request $request)
     {
-        $requestParams = [
-                CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
-                CURLOPT_RETURNTRANSFER => true,
-            ] + $curlOptions;
-
-        if ($method == 'POST') {
-            $requestParams[CURLOPT_POST] = true;
-            $requestParams[CURLOPT_POSTFIELDS] = $data;
-        }
-
-        $this->apiRequest->reset();
-        $this->apiRequest->setOptions($requestParams);
-
-        return $this->apiRequest->execute();
+        $request->getQuery()->add('key', $this->getApiKey());
     }
 
     /**
-     * @param $response
-     *
-     * @return \SimpleXMLElement
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
-    public function parseResponse($response)
+    public function request($uri, $data = [], $method = 'GET', $options = [], $headers = [])
     {
-        $result = new \SimpleXMLElement($response);
-        if ($result->getName() == 'error') {
-            throw new \RuntimeException($result->message, (int)$result->code);
+        $request = $this->client->createRequest(
+            $method,
+            $uri,
+            $headers,
+            $data,
+            $options
+        );
+
+        $this->preprocessRequest($request);
+
+        try {
+            $response = $request->send();
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
         }
 
-        return $result;
+        return $response;
+    }
+
+    /**
+     * Extract list of folders recursively from file paths
+     *
+     * @param array $files
+     *
+     * @return array
+     */
+    protected function getFileFolders(array $files)
+    {
+        $dirs = [];
+
+        foreach ($files as $remotePath) {
+            $subFolders = explode(DIRECTORY_SEPARATOR, dirname($remotePath));
+
+            $currentDir = [];
+            foreach ($subFolders as $folderName) {
+                $currentDir[] = $folderName;
+
+                // crowdin understand only "/" as directory separator
+                $path         = implode('/', $currentDir);
+                $dirs[]  = $path;
+            }
+        }
+
+        return $dirs;
     }
 }

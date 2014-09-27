@@ -107,7 +107,6 @@ class UserType extends AbstractType
                 'oro_organizations_select',
                 array(
                     'required' => false,
-                    'label'    => 'oro.user.organizations.label'
                 )
             );
         }

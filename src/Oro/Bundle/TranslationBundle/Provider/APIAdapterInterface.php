@@ -4,6 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerAwareInterface;
 
+use Guzzle\Http\Message\Response;
+
 interface APIAdapterInterface extends LoggerAwareInterface
 {
     /**
@@ -24,17 +26,11 @@ interface APIAdapterInterface extends LoggerAwareInterface
      * @param array  $data
      * @param string $method
      * @param array  $options
+     * @param array  $headers
      *
      * @throws \RuntimeException
-     * @return mixed
-     */
-    public function request($uri, $data = array(), $method = 'GET', $options = []);
-
-    /**
-     * @param $response
      *
-     * @return \stdClass
-     * @throws \RuntimeException
+     * @return Response
      */
-    public function parseResponse($response);
+    public function request($uri, $data = array(), $method = 'GET', $options = [], $headers = []);
 }

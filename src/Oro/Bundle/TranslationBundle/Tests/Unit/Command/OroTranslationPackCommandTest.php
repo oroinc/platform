@@ -4,9 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Translation\Extractor\ChainExtractor;
-use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand;
@@ -48,7 +45,19 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         if ($exception) {
             $this->setExpectedException($exception);
         }
+
+        $transServiceMock = $this->getMockBuilder(
+            'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
         foreach ($expectedCalls as $method => $count) {
+            if ($method == 'getTranslationService') {
+                $commandMock->expects($this->exactly($count))
+                    ->method($method)
+                    ->will($this->returnValue($transServiceMock));
+            }
             $commandMock->expects($this->exactly($count))->method($method);
         }
 
@@ -81,22 +90,25 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             'dump action should perform'            => array(
                 array('--dump' => true, 'project' => 'SomeProject'),
                 array(
-                    'dump'   => 1,
+                    'dump'   => 2,
                     'upload' => 0
                 ),
             ),
             'upload action should perform'          => array(
                 array('--upload' => true, 'project' => 'SomeProject'),
                 array(
-                    'dump'   => 0,
-                    'upload' => 1
+                    'dump'                  => 0,
+                    'upload'                => 1,
+                    'getTranslationService' => 1,
+                    'getLangPackDir'        => 2,
                 ),
             ),
             'dump and upload action should perform' => array(
                 array('--upload' => true, '--dump' => true, 'project' => 'SomeProject'),
                 array(
-                    'dump'   => 1,
-                    'upload' => 1
+                    'dump'   => 2,
+                    'upload' => 1,
+                    'getTranslationService' => 1,
                 ),
             )
         );

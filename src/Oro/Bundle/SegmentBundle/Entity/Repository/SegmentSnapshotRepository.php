@@ -89,7 +89,7 @@ class SegmentSnapshotRepository extends EntityRepository
         $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
 
         foreach ($entities as $key => $entity) {
-            if (is_array($entity) && !empty($entity['id'])) {
+            if (is_array($entity) && array_key_exists('id', $entity)) {
                 $entityId = $entity['id'];
                 $className = ClassUtils::getClass($entity['entity']);
             } else {
@@ -98,6 +98,10 @@ class SegmentSnapshotRepository extends EntityRepository
                 $metadata  = $entityManager->getClassMetadata($className);
                 $entityIds = $metadata->getIdentifierValues($entity);
                 $entityId  = reset($entityIds);
+            }
+
+            if (!$entityId) {
+                continue;
             }
 
             if (!isset($deleteParams[$className])) {

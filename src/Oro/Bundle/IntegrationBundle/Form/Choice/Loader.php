@@ -26,7 +26,7 @@ class Loader extends ORMQueryBuilderLoader
             if (!empty($allowedTypes)) {
                 $qb->andWhere($qb->expr()->in('i.type', $allowedTypes));
             } else {
-                $qb->andWhere($qb->expr()->eq(true, false));
+                $qb->andWhere($qb->expr()->neq(true, true));
             }
         }
 
