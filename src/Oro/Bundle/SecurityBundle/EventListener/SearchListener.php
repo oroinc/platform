@@ -6,12 +6,14 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
-
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SearchListener
 {
+    const EMPTY_ORGANIZATION_ID = 0;
+
     /**
      * @var OwnershipMetadataProvider
      */
@@ -40,7 +42,7 @@ class SearchListener
         $data = $event->getData();
         $className = $event->getClassName();
         $entity = $event->getEntity();
-        $organizationId = -1;
+        $organizationId = self::EMPTY_ORGANIZATION_ID;
 
         $metadata = $this->metadataProvider->getMetadata($className);
         if ($metadata) {
@@ -55,9 +57,10 @@ class SearchListener
 
             if ($organizationField) {
                 $propertyAccessor = PropertyAccess::createPropertyAccessor();
+                /** @var Organization $organization */
                 $organization = $propertyAccessor->getValue($entity, $organizationField);
                 if ($organization) {
-                    $organizationId =  $organization->getId();
+                    $organizationId = $organization->getId();
                 }
             }
         }
@@ -75,7 +78,7 @@ class SearchListener
         $query = $event->getQuery();
         $organizationId = $this->securityFacade->getOrganizationId();
         if ($organizationId) {
-            $query->andWhere('organization', 'in', [-1, $organizationId], 'integer');
+            $query->andWhere('organization', 'in', [$organizationId, self::EMPTY_ORGANIZATION_ID], 'integer');
         }
         $event->setQuery($query);
     }
