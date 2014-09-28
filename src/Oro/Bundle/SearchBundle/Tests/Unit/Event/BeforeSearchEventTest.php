@@ -14,7 +14,7 @@ class BeforeSearchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($query, $event->getQuery());
         $anotherQuery = new Query();
         $anotherQuery->from('test');
-        $event->setQuery($query);
+        $event->setQuery($anotherQuery);
         $this->assertEquals($anotherQuery, $event->getQuery());
     }
 }
