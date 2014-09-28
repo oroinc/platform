@@ -140,6 +140,8 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as hasCurrentBusinessUnit
+            bind_parameters:
+                - business_unit_id
         columns:
             hasCurrentBusinessUnit:
                 label: Has business unit
@@ -180,9 +182,7 @@ datagrid:
 
         options:
             entityHint: user
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: hasCurrentBusinessUnit
                 selectors:
@@ -199,6 +199,8 @@ datagrid:
                 where:
                     and:
                         - :business_unit_id MEMBER OF u.businessUnits
+            bind_parameters:
+                - business_unit_id
         columns:
             firstName:
                 label: oro.user.first_name.label

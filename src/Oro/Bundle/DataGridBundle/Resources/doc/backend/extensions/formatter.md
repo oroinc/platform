@@ -63,7 +63,7 @@ column_name:
     type: callback
     callable: @link # required
 ```
-Used when field should be formatted using some callback, format [see](./../../link.md).
+Used when field should be formatted using some callback, format [see](./../../references_in_configuration.md).
 
 ### Localized Number
 ```
