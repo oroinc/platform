@@ -7,12 +7,12 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
 
-use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class AclProtectedQueryBuilderLoader extends ORMQueryBuilderLoader
+class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 {
     /** @var AclHelper */
     protected $aclHelper;
@@ -95,7 +95,7 @@ class AclProtectedQueryBuilderLoader extends ORMQueryBuilderLoader
      *
      * @return Query
      */
-    private function applyQuery($query, $permission = 'VIEW', $checkRelations = true)
+    protected function applyQuery($query, $permission = 'VIEW', $checkRelations = true)
     {
         return $this->aclHelper->apply($query, $permission, $checkRelations);
     }
