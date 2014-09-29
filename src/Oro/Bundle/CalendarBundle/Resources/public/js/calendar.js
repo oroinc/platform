@@ -78,6 +78,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this.colorManager = new ColorManager();
         },
 
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.getCalendarElement().data('fullCalendar')) {
+                this.getCalendarElement().fullCalendar('destroy');
+            }
+            Backbone.View.prototype.dispose.call(this);
+        },
+
         getEventsView: function (model) {
             if (!this.eventView) {
                 // create a view for event details
