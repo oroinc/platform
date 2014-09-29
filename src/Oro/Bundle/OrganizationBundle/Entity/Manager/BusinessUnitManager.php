@@ -165,7 +165,7 @@ class BusinessUnitManager
     /**
      * @param int $businessUnitId
      * @param array $tree
-     * @return null
+     * @return array
      */
     protected function getBuWithChildTree($businessUnitId, $tree)
     {
