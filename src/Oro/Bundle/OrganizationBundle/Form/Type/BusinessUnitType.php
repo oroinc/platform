@@ -4,16 +4,11 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class BusinessUnitType extends AbstractType
 {
@@ -22,19 +17,19 @@ class BusinessUnitType extends AbstractType
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var OrganizationManager */
-    protected $organizationManager;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /**
      * @param BusinessUnitManager $businessUnitManager
-     * @param OrganizationManager $organizationManager
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         BusinessUnitManager $businessUnitManager,
-        OrganizationManager $organizationManager
+        SecurityFacade $securityFacade
     ) {
         $this->businessUnitManager = $businessUnitManager;
-        $this->organizationManager = $organizationManager;
+        $this->securityFacade      = $securityFacade;
     }
 
     /**
@@ -52,33 +47,26 @@ class BusinessUnitType extends AbstractType
                 )
             )
             ->add(
-                'organization',
-                'entity',
-                [
-                    'class'       => 'OroOrganizationBundle:Organization',
-                    'property'    => 'name',
-                    'label'       => 'oro.organization.businessunit.organization.label',
-                    'empty_value' => 'oro.organization.form.choose_organization',
-                    'required'    => false,
-                    'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
-                    'attr'        => [
-                        'class' => 'oro_bu_by_org_select_org'
-                    ],
-                    'disabled'    => true
-                ]
-            )
-            ->add(
                 'businessUnit',
-                'oro_business_unit_tree',
+                'oro_business_unit_tree_select',
                 [
-                    'label'         => 'oro.organization.businessunit.parent.label',
-                    'empty_value'   => 'oro.business_unit.form.none_business_user',
+                    'label' => 'oro.organization.businessunit.parent.label',
+                    'empty_value' => 'oro.business_unit.form.none_business_user',
                     'property_path' => 'owner',
-                    'required'      => false,
-                    'choices'       => [],
-                    'attr'          => [
+                    'required' => false,
+                    'choices' => $this->getBusinessUnitChoices(
+                        $this->businessUnitManager->getBusinessUnitsTree(
+                            null,
+                            $this->securityFacade->getOrganizationId()
+                        )
+                    ),
+                    'attr' => [
                         'class' => 'oro_bu_by_org_select_bu'
                     ],
+                    'business_unit_ids' => $this->businessUnitManager->getBusinessUnitIds(
+                        null,
+                        $this->securityFacade->getOrganizationId()
+                    )
                 ]
             )
             ->add(
@@ -133,135 +121,6 @@ class BusinessUnitType extends AbstractType
                     'multiple' => true,
                 )
             );
-
-        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPreSetData']);
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        if (!$form->get('organization')->getData()) {
-            $view->children['organization']->vars['disabled'] = false;
-            $view->children['organization']->vars['required'] = true;
-        } else {
-            $selectedOrganizationId = $form->get('organization')->getData()->getId();
-            $businessUnitTreeIds    = $this->businessUnitManager->getBusinessUnitRepo()
-                ->getOrganizationBusinessUnitsTree($selectedOrganizationId);
-
-            $view->vars['business_unit_tree_ids'] = $businessUnitTreeIds;
-            $view->vars['selected_organization']  = $selectedOrganizationId;
-            $view->vars['selected_business_unit'] = $form->get('businessUnit')->getData()
-                ? $form->get('businessUnit')->getData()->getId()
-                : null;
-        }
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function onPreSubmit(FormEvent $event)
-    {
-        $selectedOrganizationId = null;
-        $selectedBusinessUnitId = null;
-
-        $data = $event->getData();
-        if (isset($data['organization']) && $data['organization'] !== null) {
-            $selectedOrganizationId = $data['organization'];
-        }
-
-        if (isset($data['businessUnit']) && $data['businessUnit'] !== null) {
-            $selectedBusinessUnitId = $data['businessUnit'];
-        }
-
-        if ($selectedOrganizationId && $selectedBusinessUnitId) {
-            $event->getForm()->remove('businessUnit');
-            $event->getForm()->add(
-                'businessUnit',
-                'oro_business_unit_tree',
-                [
-                    'label'         => 'oro.organization.businessunit.parent.label',
-                    'empty_value'   => 'oro.business_unit.form.none_business_user',
-                    'required'      => false,
-                    'property_path' => 'owner',
-                    'choices'       => $selectedOrganizationId
-                            ? $this->getBusinessUnitChoices(
-                                $this->businessUnitManager->getBusinessUnitsTree(null, $selectedOrganizationId)
-                            )
-                            : [],
-                    'attr'          => [
-                        'class' => 'oro_bu_by_org_select_bu'
-                    ],
-                    'data'          => $this->businessUnitManager->getUserRepo()->find($selectedBusinessUnitId),
-                ]
-            );
-        }
-
-        if (!$event->getForm()->getData()->getId()) {
-            /** @var Organization $selectedOrganization */
-            $selectedOrganization = $this->organizationManager->getOrganizationRepo()->find($selectedOrganizationId);
-            $event->getForm()->remove('organization');
-            $event->getForm()->add(
-                'organization',
-                'entity',
-                [
-                    'class'       => 'OroOrganizationBundle:Organization',
-                    'property'    => 'name',
-                    'label'       => 'oro.organization.businessunit.organization.label',
-                    'empty_value' => 'oro.organization.form.choose_organization',
-                    'required'    => true,
-                    'choices'     => $this->organizationManager->getOrganizationRepo()->getEnabled(),
-                    'attr'        => [
-                        'class' => 'oro_bu_by_org_select_org'
-                    ],
-                    'data'        => $selectedOrganization,
-                    'disabled' => false,
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    public function onPreSetData(FormEvent $event)
-    {
-        $form = $event->getForm();
-        $data = $form->getData();
-        if ($data) {
-            $selectedOrganizationId = null;
-
-            /** @var Organization|null $selectedOrganization */
-            $selectedOrganization = null;
-            if ($data->getOrganization()) {
-                $selectedOrganization   = $data->getOrganization();
-                $selectedOrganizationId = $selectedOrganization->getId();
-            }
-
-            if ($selectedOrganization) {
-                $event->getForm()->remove('businessUnit');
-                $event->getForm()->add(
-                    'businessUnit',
-                    'oro_business_unit_tree',
-                    [
-                        'label'         => 'oro.organization.businessunit.parent.label',
-                        'empty_value'   => 'oro.business_unit.form.none_business_user',
-                        'required'      => false,
-                        'property_path' => 'owner',
-                        'choices'       => $selectedOrganizationId
-                                ? $this->getBusinessUnitChoices(
-                                    $this->businessUnitManager->getBusinessUnitsTree(null, $selectedOrganizationId)
-                                )
-                                : [],
-                        'attr'          => [
-                            'class' => 'oro_bu_by_org_select_bu'
-                        ],
-                    ]
-                );
-            }
-        }
     }
 
     /**
@@ -273,9 +132,6 @@ class BusinessUnitType extends AbstractType
             array(
                 'data_class'              => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
                 'ownership_disabled'      => true,
-                'business_unit_tree_ids'  => [],
-                'selected_organizations'  => [],
-                'selected_business_units' => [],
             )
         );
     }
