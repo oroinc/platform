@@ -111,6 +111,40 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type'  => NumberFilterType::DATA_INTEGER
                 ),
             ),
+            'percent_float'        => array(
+                'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'),
+                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34),
+                'viewData'      => array(
+                    'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'),
+                    'formatter_options' => array(
+                        'decimals'         => 2,
+                        'grouping'         => false,
+                        'orderSeparator' => '',
+                        'decimalSeparator' => '.',
+                        'percent'          => true
+                    )
+                ),
+                'customOptions' => array(
+                    'data_type'  => NumberFilterType::PERCENT
+                ),
+            ),
+            'percent_int'          => array(
+                'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'),
+                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12),
+                'viewData'      => array(
+                    'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'),
+                    'formatter_options' => array(
+                        'decimals'         => 2,
+                        'grouping'         => false,
+                        'orderSeparator' => '',
+                        'decimalSeparator' => '.',
+                        'percent'          => true
+                    )
+                ),
+                'customOptions' => array(
+                    'data_type'  => NumberFilterType::PERCENT
+                ),
+            ),
             'money'                => array(
                 'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
                 'formData'      => array(

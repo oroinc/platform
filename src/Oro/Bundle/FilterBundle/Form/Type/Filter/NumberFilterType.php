@@ -22,7 +22,7 @@ class NumberFilterType extends AbstractType
 
     const DATA_INTEGER = 'data_integer';
     const DATA_DECIMAL = 'data_decimal';
-    const PERCENT = 'percent';
+    const PERCENT      = 'percent';
 
     /**
      * @var TranslatorInterface
@@ -96,7 +96,7 @@ class NumberFilterType extends AbstractType
         switch ($dataType) {
             case self::PERCENT:
                 $formatterOptions['decimals'] = 2;
-                $formatterOptions['grouping'] = true;
+                $formatterOptions['grouping'] = false;
                 $formatterOptions['percent'] = true;
                 break;
             case self::DATA_DECIMAL:
