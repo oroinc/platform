@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\Form\ChoiceList;
 
 use Doctrine\ORM\EntityManager;
@@ -62,18 +63,6 @@ class AclProtectedQueryBuilderLoader extends ORMQueryBuilderLoader
     }
 
     /**
-     * @param Query  $query
-     * @param string $permission
-     * @param bool   $checkRelations
-     *
-     * @return Query
-     */
-    private function applyQuery($query, $permission = 'VIEW', $checkRelations = true)
-    {
-        return $this->aclHelper->apply($query, $permission, $checkRelations);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getEntitiesByIds($identifier, array $values)
@@ -97,5 +86,17 @@ class AclProtectedQueryBuilderLoader extends ORMQueryBuilderLoader
         $query = $qb->getQuery();
 
         return $this->applyQuery($query)->getResult();
+    }
+
+    /**
+     * @param Query  $query
+     * @param string $permission
+     * @param bool   $checkRelations
+     *
+     * @return Query
+     */
+    private function applyQuery($query, $permission = 'VIEW', $checkRelations = true)
+    {
+        return $this->aclHelper->apply($query, $permission, $checkRelations);
     }
 }

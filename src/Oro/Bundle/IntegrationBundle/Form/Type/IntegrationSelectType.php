@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -32,12 +33,18 @@ class IntegrationSelectType extends AbstractType
      * @param EntityManager    $em
      * @param TypesRegistry    $typesRegistry
      * @param CoreAssetsHelper $assetHelper
+     * @param AclHelper        $aclHelper
      */
-    public function __construct(EntityManager $em, TypesRegistry $typesRegistry, CoreAssetsHelper $assetHelper)
-    {
+    public function __construct(
+        EntityManager $em,
+        TypesRegistry $typesRegistry,
+        CoreAssetsHelper $assetHelper,
+        AclHelper $aclHelper
+    ) {
         $this->em            = $em;
         $this->typesRegistry = $typesRegistry;
         $this->assetHelper   = $assetHelper;
+        $this->aclHelper     = $aclHelper;
     }
 
     /**
@@ -58,7 +65,12 @@ class IntegrationSelectType extends AbstractType
         $choiceList        = function (Options $options) use ($em) {
             $types = $options->has('allowed_types') ? $options->get('allowed_types') : null;
 
-            return new EntityChoiceList($em, 'OroIntegrationBundle:Channel', 'name', new Loader($em, $types));
+            return new EntityChoiceList(
+                $em,
+                'OroIntegrationBundle:Channel',
+                'name',
+                new Loader($this->aclHelper, $em, $types)
+            );
         };
 
         $resolver->setDefaults(

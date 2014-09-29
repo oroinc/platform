@@ -71,6 +71,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_integration.manager.types_registry
             - @templating.helper.assets
+            - @oro_security.acl_helper
         scope: request
         tags:
             - { name: form.type, alias: oro_integration_select }
