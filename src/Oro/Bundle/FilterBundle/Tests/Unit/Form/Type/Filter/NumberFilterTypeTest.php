@@ -69,6 +69,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * {@inheritDoc}
      */
     public function bindDataProvider()
