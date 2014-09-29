@@ -59,7 +59,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
         $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
 
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth');
+            ->method('checkPreAuth');
 
         $resultToken = $this->provider->authenticate($token);
         $this->assertInstanceOf(
@@ -83,7 +83,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
         $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
 
         $this->userChecker->expects($this->once())
-            ->method('checkPostAuth');
+            ->method('checkPreAuth');
 
         $this->setExpectedException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
         $this->provider->authenticate($token);

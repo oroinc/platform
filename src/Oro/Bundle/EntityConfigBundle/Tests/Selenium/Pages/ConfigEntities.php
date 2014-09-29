@@ -23,7 +23,7 @@ class ConfigEntities extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create Entity']")->click();
+        $this->test->byXPath("//a[@title='Create entity']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $entity = new ConfigEntity($this->test);

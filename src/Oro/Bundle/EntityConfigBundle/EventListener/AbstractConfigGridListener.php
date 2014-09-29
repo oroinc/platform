@@ -246,7 +246,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
             foreach ($gridActions as $config) {
                 $configItem = array(
-                    'label'        => ucfirst($config['name']),
+                    'label'        => $config['name'],
                     'icon'         => isset($config['icon']) ? $config['icon'] : 'question-sign',
                     'link'         => strtolower($config['name']) . '_link',
                     'type'         => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,

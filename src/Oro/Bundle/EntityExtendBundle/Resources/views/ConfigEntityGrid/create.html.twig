@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
-{% oro_title_set({params : {"%entityName%": 'N/A' }}) %}
+{% oro_title_set({params : {"%entityName%": 'N/A'|trans}}) %}
 
 {% set formAction = path('oro_entityextend_entity_create') %}
 
@@ -15,8 +15,8 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': 'New Entity'|trans,
+        'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
+        'entityTitle': 'oro.entity_extend.config_grid.new_entity'|trans,
     } %}
 
     {{ parent() }}

@@ -143,18 +143,19 @@ class PdoMysql extends BaseDriver
         array $searchCondition,
         $setOrderBy = true
     ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldValue     = $searchCondition['fieldValue'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
-        $result = "MATCH_AGAINST(textField.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
+        $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
         $qb->setParameter($valueParameter, implode('* ', $words) . '*');
 
         if ($this->isConcreteField($fieldName)) {
             $result = $qb->expr()->andX(
                 $result,
-                "textField.field = :$fieldParameter"
+                "$joinAlias.field = :$fieldParameter"
             );
             $qb->setParameter($fieldParameter, $fieldName);
         }
@@ -164,8 +165,7 @@ class PdoMysql extends BaseDriver
             $qb->select(
                 array(
                     'search as item',
-                    'textField',
-                    "MATCH_AGAINST(textField.value, :$rawValueParameter) AS rankField"
+                    "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
                 )
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
         }
@@ -189,18 +189,19 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
-        $fieldName       = $searchCondition['fieldName'];
-        $fieldValue      = $searchCondition['fieldValue'];
+        $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName  = $searchCondition['fieldName'];
+        $fieldValue = $searchCondition['fieldValue'];
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
-            $result->add("textField.value LIKE :$valueParameter");
+            $result->add("$joinAlias.value LIKE :$valueParameter");
             $qb->setParameter($valueParameter, $value . '%');
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;
-            $result = $qb->expr()->andX($result, "textField.field = :$fieldParameter");
+            $result = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
             $qb->setParameter($fieldParameter, $fieldValue);
         }
 
@@ -220,6 +221,7 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
@@ -227,9 +229,9 @@ class PdoMysql extends BaseDriver
         // TODO Need to clarify requirements for "not contains" in scope of CRM-215
         $qb->setParameter($valueParameter, '%' . implode('%', $words) . '%');
 
-        $whereExpr = 'textField.value NOT LIKE :' . $valueParameter;
+        $whereExpr = "$joinAlias.value NOT LIKE :$valueParameter";
         if ($this->isConcreteField($fieldName)) {
-            $whereExpr .= ' AND textField.field = :' . $fieldParameter;
+            $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
             $qb->setParameter($fieldParameter, $fieldName);
 
             return $whereExpr;

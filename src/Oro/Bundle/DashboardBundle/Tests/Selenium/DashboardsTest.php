@@ -52,7 +52,7 @@ class DashboardsTest extends Selenium2TestCase
         /** @var Dashboards $login */
         $login->openDashboards('Oro\Bundle\DashboardBundle')
             ->filterBy('Label', $dashboardName)
-            ->action(array($dashboardName), 'Update')
+            ->action(array($dashboardName), 'Edit')
             ->edit()
             ->assertTitle($dashboardName . ' - Edit - Manage dashboards - Dashboards')
             ->setLabel($newDashboardName)

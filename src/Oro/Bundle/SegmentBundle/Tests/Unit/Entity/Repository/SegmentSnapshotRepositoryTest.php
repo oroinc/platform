@@ -142,7 +142,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
     protected function createEntities($count = 1)
     {
         $entities = [];
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 1; $i <= $count; $i++) {
             $entity = new StubEntity();
             $entity->setId($i);
             $entity->setName('name-' . $i);

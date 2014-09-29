@@ -58,13 +58,10 @@ class MergeMassAction extends AbstractMassAction
 
             $options['max_element_count'] = $metadata->getMaxEntitiesCount();
 
-            $pluralLabel = $this->translator
-                ->trans($metadata->get('label'));
-
             $options['label'] = $this->translator
                 ->trans(
                     'oro.entity_merge.action.merge',
-                    ['{{ label }}' => strtolower($pluralLabel)]
+                    ['{{ label }}' => $metadata->get('label')]
                 );
         }
 

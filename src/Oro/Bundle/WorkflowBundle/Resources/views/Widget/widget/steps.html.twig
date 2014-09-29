@@ -4,8 +4,9 @@
         {% set isProcessed = true %}
         {% for step in steps %}
             {% set isCurrent = currentStep and step.name == currentStep.name %}
+            {# Transaltions temporary disabled due to BAP-5355 #}
             <li class="{% if isCurrent %}current{% elseif isProcessed %}processed{% endif %}">
-                {{ step.label|trans }}
+                {{ step.label }}
             </li>
             {% if isCurrent %}
                 {% set isProcessed = false %}

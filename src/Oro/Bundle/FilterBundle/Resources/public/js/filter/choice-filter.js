@@ -37,6 +37,11 @@ define([
         },
 
         /**
+         * @property {boolean}
+         */
+        wrapHintValue: true,
+
+        /**
          * Filter events
          *
          * @property
@@ -140,22 +145,24 @@ define([
          */
         _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var option = null;
 
-            if (!value.type) {
-                throw new Error('Missing "type" option');
-            }
+            if (!_.isUndefined(value.type)) {
+                var type = value.type;
+                option = this._getChoiceOption(type);
 
-            var option = this._getChoiceOption(value.type);
-
-            if (this.isEmptyType(value.type)) {
-                return option ? option.label : this.placeholder;
+                if (this.isEmptyType(type)) {
+                    return option ? option.label : this.placeholder;
+                }
             }
 
             if (!value.value) {
                 return this.placeholder;
             }
 
-            return (option ? option.label + ' ' : '') + '"' + value.value + '"';
+            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+
+            return (option ? option.label + ' ' : '') + hintValue;
         },
 
         /**

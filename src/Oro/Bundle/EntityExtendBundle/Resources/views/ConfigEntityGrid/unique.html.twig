@@ -4,19 +4,19 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_view', {id: entity_id})) }}
-    {{ UI.saveAndCloseButton('Save') }}
+    {{ UI.saveAndCloseButton('Save'|trans) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': 'Unique Keys',
+        'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
+        'entityTitle': 'oro.entity_extend.config_grid.unique_keys'|trans,
         'additional': [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: entity_id}),
-                'indexLabel' : entity_config.get('label')|default('N/A'),
+                'indexLabel' : entity_config.get('label')|default('N/A')|trans,
             },
         ]
     } %}

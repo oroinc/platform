@@ -73,7 +73,7 @@ datagrid:
                 link:         update_link
                 acl_resource: oro_integration_update
                 icon:         edit
-                label:        oro.integration.datagrid.action.update
+                label:        oro.grid.action.update
                 rowAction:    true
             schedule:
                 type:         schedule-sync
@@ -86,7 +86,7 @@ datagrid:
                 link:         delete_link
                 acl_resource: oro_integration_delete
                 icon:         trash
-                label:        oro.integration.datagrid.action.delete
+                label:        oro.grid.action.delete
                 defaultMessages:
                     confirm_content: oro.integration.delete_sync_integration_window.content
                     confirm_ok:      oro.integration.delete_sync_integration_window.button_ok

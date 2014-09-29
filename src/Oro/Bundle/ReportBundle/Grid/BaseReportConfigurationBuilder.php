@@ -65,7 +65,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         $viewAction = [
             'view' => [
                 'type'         => 'navigate',
-                'label'        => 'View',
+                'label'        => 'oro.report.datagrid.view',
                 'acl_resource' => 'VIEW;entity:' . $className,
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',
