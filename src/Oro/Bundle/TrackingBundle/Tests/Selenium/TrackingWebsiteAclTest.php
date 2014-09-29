@@ -4,6 +4,8 @@ namespace Oro\Bundle\TrackingBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\TrackingBundle\Tests\Selenium\Pages\TrackingWebsites;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 /**
  * Class TrackingWebsiteAcl
@@ -17,10 +19,11 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
     {
         $randomPrefix = mt_rand();
         $login = $this->login();
+        /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
-            ->setEntity('Tracking Website', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
+            ->setEntity('Tracking Website', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
             ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
@@ -40,6 +43,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         $username = 'User_'.mt_rand();
 
         $login = $this->login();
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')
@@ -119,9 +123,16 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
         }
     }
 
+    /**
+     * @param $login
+     * @param $roleName
+     * @param $username
+     * @param $identifier
+     */
     public function deleteAcl($login, $roleName, $username, $identifier)
     {
-        $login->openRoles('Oro\Bundle\UserBundle')
+        /** @var Roles $login */
+        $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
             ->setEntity('Tracking Website', array('Delete'), 'None')
@@ -129,8 +140,9 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
-            ->submit()
-            ->openTrackingWebsites('Oro\Bundle\TrackingBundle')
+            ->submit();
+        /** @var TrackingWebsites $login */
+        $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->filterBy('Identifier', $identifier)
             ->checkActionMenu('Delete')
             ->open(array($identifier))
@@ -141,7 +153,8 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
 
     public function updateAcl($login, $roleName, $username, $identifier)
     {
-        $login->openRoles('Oro\Bundle\UserBundle')
+        /** @var Roles $login */
+        $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
             ->setEntity('Tracking Website', array('Edit'), 'None')
@@ -149,8 +162,9 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
-            ->submit()
-            ->openTrackingWebsites('Oro\Bundle\TrackingBundle')
+            ->submit();
+        /** @var TrackingWebsites $login */
+        $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->filterBy('Identifier', $identifier)
             ->checkActionMenu('Update')
             ->open(array($identifier))
@@ -161,7 +175,8 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
 
     public function createAcl($login, $roleName, $username)
     {
-        $login->openRoles('Oro\Bundle\UserBundle')
+        /** @var Roles $login */
+        $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
             ->setEntity('Tracking Website', array('Create'), 'None')
@@ -169,8 +184,9 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
-            ->submit()
-            ->openTrackingWebsites('Oro\Bundle\TrackingBundle')
+            ->submit();
+        /** @var TrackingWebsites $login */
+        $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->assertElementNotPresent(
                 "//div[@class='pull-right title-buttons-container']//a[contains(., 'Create Tracking Website')]"
             );
@@ -178,7 +194,8 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
 
     public function viewAcl($login, $username, $roleName)
     {
-        $login->openRoles('Oro\Bundle\UserBundle')
+        /** @var Roles $login */
+        $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
             ->setEntity('Tracking Website', array('View'), 'None')
@@ -186,8 +203,9 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
-            ->submit()
-            ->openTrackingWebsites('Oro\Bundle\TrackingBundle')
+            ->submit();
+        /** @var TrackingWebsites $login */
+        $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->assertTitle('403 - Forbidden');
     }
 
