@@ -59,7 +59,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     {
         $query = $this->queryBuilder->getQuery();
 
-        return $this->applyQuery($query)->execute();
+        return $this->applyACL($query)->execute();
     }
 
     /**
@@ -85,7 +85,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 
         $query = $qb->getQuery();
 
-        return $this->applyQuery($query)->getResult();
+        return $this->applyACL($query)->getResult();
     }
 
     /**
@@ -95,7 +95,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
      *
      * @return Query
      */
-    protected function applyQuery($query, $permission = 'VIEW', $checkRelations = true)
+    protected function applyACL($query, $permission = 'VIEW', $checkRelations = true)
     {
         return $this->aclHelper->apply($query, $permission, $checkRelations);
     }
