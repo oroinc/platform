@@ -4,14 +4,14 @@ oro_entity_config:
             require_js:                     ['oroentityextend/js/init-entity-extend-apply', 'oroentityextend/js/init-entity-extend-relation']
             grid_action:
                 -
-                    name:                   'Remove'
+                    name:                   oro.entity_extend.entity_config.extend.entity.grid_action.remove
                     route:                  'oro_entityextend_entity_remove'
                     type:                   'ajaxdelete'
                     icon:                   'trash'
                     filter:                 { owner: 'Custom', state: ['New', 'Requires update', 'Active']}
                     args:                   ['id']
                 -
-                    name:                   'Restore'
+                    name:                   oro.entity_extend.entity_config.extend.entity.grid_action.restore
                     route:                  'oro_entityextend_entity_unremove'
                     type:                   'ajax'
                     icon:                   'backward'
@@ -19,7 +19,7 @@ oro_entity_config:
                     args:                   ['id']
             layout_action:
                 -
-                    name:                   'Create Entity'
+                    name:                   oro.entity_extend.entity_config.extend.entity.layout_action.create_entity
                     route:                  'oro_entityextend_entity_create'
             items:
                 owner:
@@ -30,7 +30,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               string
-                        label:              'Type'
+                        label:              oro.entity_extend.entity_config.extend.entity.items.owner
                         filter_type:        choice
                         choices:            {System: 'System', Custom: 'Custom'}
                         required:           true
@@ -46,7 +46,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               boolean
-                        label:              'Is Extend'
+                        label:              oro.entity_extend.entity_config.extend.entity.items.is_extend
                         filter_type:        boolean
                         required:           true
                         sortable:           true
@@ -60,7 +60,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               string
-                        label:              'Schema status'
+                        label:              oro.entity_extend.entity_config.extend.entity.items.state
                         filter_type:        choice
                         choices:            {system: '', new: 'New', active: 'Active', updated: 'Requires update', deleted: 'To be deleted'}
                         required:           true
@@ -116,14 +116,14 @@ oro_entity_config:
         field:
             grid_action:
                 -
-                    name:                   'Remove'
+                    name:                   oro.entity_extend.entity_config.extend.field.grid_action.remove
                     route:                  'oro_entityextend_field_remove'
                     type:                   'ajax'
                     icon:                   'trash'
                     filter:                 { owner: 'Custom', state: ['New', 'Requires update', 'Active'] }
                     args:                   ['id']
                 -
-                    name:                   'Restore'
+                    name:                   oro.entity_extend.entity_config.extend.field.grid_action.restore
                     route:                  'oro_entityextend_field_unremove'
                     type:                   'ajax'
                     icon:                   'backward'
@@ -131,17 +131,17 @@ oro_entity_config:
                     args:                   ['id']
             layout_action:
                 -
-                    name:                   'Manage unique keys'
+                    name:                   oro.entity_extend.entity_config.extend.field.layout_action.manage_unique_keys
                     route:                  'oro_entityextend_entity_unique_key'
                     entity_id:              true
                     filter:                 { is_extend: true, mode: 'default' }
                 -
-                    name:                   'Create field'
+                    name:                   oro.entity_extend.entity_config.extend.field.layout_action.create_field
                     route:                  'oro_entityextend_field_create'
                     entity_id:              true
                     filter:                 { is_extend: true, mode: 'default', state: ['New', 'Requires update', 'Active'] }
                 -
-                    name:                   'Update schema'
+                    name:                   oro.entity_extend.entity_config.extend.field.layout_action.update_schema
                     route:                  'oro_entityextend_update'
                     entity_id:              true
                     aCss:                   'btn-danger entity-extend-apply'
@@ -156,7 +156,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               string
-                        label:              'Type'
+                        label:              oro.entity_extend.entity_config.extend.field.items.owner
                         filter_type:        string
                         required:           true
                         sortable:           true
@@ -170,7 +170,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               string
-                        label:              'Schema status'
+                        label:              oro.entity_extend.entity_config.extend.field.items.state
                         filter_type:        choice
                         choices:            { new: 'New', applied: 'Applied', updated: 'Requires update', deleted: 'To be deleted'}
                         required:           true
@@ -202,7 +202,7 @@ oro_entity_config:
                         type:               oro_entity_extend_text
                         options:
                             required:       false
-                            label:          'Length'
+                            label:          oro.entity_extend.entity_config.extend.field.items.length
                             block:          general
                             subblock:       properties
 
@@ -224,7 +224,7 @@ oro_entity_config:
                         type:               oro_entity_extend_text
                         options:
                             required:       false
-                            label:          'Precision'
+                            label:          oro.entity_extend.entity_config.extend.field.items.precision
                             block:          general
                             subblock:       properties
 
@@ -246,7 +246,7 @@ oro_entity_config:
                         type:               oro_entity_extend_text
                         options:
                             required:       false
-                            label:          'Scale'
+                            label:          oro.entity_extend.entity_config.extend.field.items.scale
                             block:          general
                             subblock:       properties
 
@@ -340,7 +340,7 @@ oro_entity_config:
                             required:       false
                             choices:        ['No', 'Yes']
                             empty_value:    false
-                            label:          'Expanded'
+                            label:          oro.entity_extend.entity_config.extend.field.items.set_expanded
                             attr:
                                 class:      is-option-set-expanded
                             block:          general
@@ -355,7 +355,7 @@ oro_entity_config:
                         type:               oro_entity_option_set_collection
                         options:
                             required:       false
-                            label:          'Options'
+                            label:          oro.entity_extend.entity_config.extend.field.items.set_options
                             block:          general
                             subblock:       properties
                             type:           oro_entity_option_set

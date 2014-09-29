@@ -1,13 +1,13 @@
 oro_system_configuration:
     groups:
         sidebar_settings:
-            title:       'Sidebar settings'
+            title:       oro.sidebar.system_configuration.groups.sidebar_settings.title
     fields:
         oro_sidebar.sidebar_left_active:
             data_type: boolean
             type: choice
             options:
-                label: 'Enable left sidebar'
+                label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
                 choices:
                     - No
                     - Yes
@@ -15,7 +15,7 @@ oro_system_configuration:
             data_type: boolean
             type: choice
             options:
-                label: 'Enable right sidebar'
+                label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
                 choices:
                     - No
                     - Yes

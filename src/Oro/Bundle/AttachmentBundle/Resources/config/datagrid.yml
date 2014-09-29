@@ -48,7 +48,7 @@ datagrid:
             update:
                 type:          dialog
                 acl_resource:  oro_attachment_update
-                label:         oro.attachment.action.button.update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
                 widget:
@@ -65,6 +65,6 @@ datagrid:
             delete:
                 type:          delete
                 acl_resource:  oro_attachment_delete
-                label:         oro.attachment.action.button.delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link

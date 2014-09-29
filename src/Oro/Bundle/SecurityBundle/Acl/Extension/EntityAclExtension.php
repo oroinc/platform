@@ -148,9 +148,14 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevelNames($object)
     {
+        $minLevel = AccessLevel::BASIC_LEVEL;
         $maxLevel = AccessLevel::SYSTEM_LEVEL;
+
         if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $minLevel = AccessLevel::BASIC_LEVEL;
+            /**
+             * In community version root entity should not have GLOBAL(Organization) access level
+             */
+            return AccessLevel::getAccessLevelNames($minLevel, $maxLevel, [AccessLevel::GLOBAL_LEVEL]);
         } else {
             $metadata = $this->getMetadata($object);
             if (!$metadata->hasOwner()) {

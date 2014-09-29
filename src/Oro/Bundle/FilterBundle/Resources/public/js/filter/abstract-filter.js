@@ -3,9 +3,10 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     'backbone',
     'oroui/js/tools'
-], function ($, _, Backbone, tools) {
+], function ($, _, __, Backbone, tools) {
     'use strict';
 
     var AbstractFilter;
@@ -75,14 +76,14 @@ define([
          *
          * @property
          */
-        placeholder: 'All',
+        placeholder: __('All'),
 
         /**
          * Label of filter
          *
          * @property {String}
          */
-        label: 'Input Label',
+        label: __('Input Label'),
 
         /**
          * Is filter label visible

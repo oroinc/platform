@@ -125,7 +125,6 @@ services:
             - @oro_security.owner.ownership_metadata_provider
             - @oro_organization.business_unit_manager
             - @oro_security.security_facade
-            - @translator
             - @?security.acl.voter.basic_permissions
             - @oro_security.ownership_tree_provider
         tags:

@@ -50,6 +50,7 @@ class EmailType extends AbstractType
                 'template',
                 'oro_email_template_list',
                 [
+                    'label' => 'oro.email.template.label',
                     'required' => false,
                     'depends_on_parent_field' => 'entityClass',
                     'configs' => [
@@ -61,6 +62,7 @@ class EmailType extends AbstractType
                 'type',
                 'choice',
                 [
+                    'label'      => 'oro.email.type.label',
                     'required'   => true,
                     'data'       => 'txt',
                     'choices'  => [

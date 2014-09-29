@@ -6,28 +6,17 @@ use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $translator;
-
-    /**
      * @var OwnershipType
      */
     protected $type;
 
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('trans'))
-            ->getMockForAbstractClass();
-
-        $this->type = new OwnershipType($this->translator);
+        $this->type = new OwnershipType();
     }
 
     protected function tearDown()
     {
-        unset($this->translator);
         unset($this->type);
     }
 
