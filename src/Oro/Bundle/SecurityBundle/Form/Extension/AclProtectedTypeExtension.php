@@ -37,11 +37,10 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $that   = $this;
-        $loader = function (Options $options) use ($that) {
+        $loader = function (Options $options) use ($this) {
             if (null !== $options['query_builder']) {
                 return new AclProtectedQueryBuilderLoader(
-                    $that->aclHelper,
+                    $this->aclHelper,
                     $options['query_builder'],
                     $options['em'],
                     $options['class']

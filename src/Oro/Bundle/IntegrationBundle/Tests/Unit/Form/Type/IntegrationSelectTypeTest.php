@@ -37,8 +37,10 @@ class IntegrationSelectTypeTest extends OrmTestCase
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
             ->disableOriginalConstructor()->getMock();
         $this->em          = $this->getTestEntityManager();
+        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->type = new IntegrationSelectType($this->em, $this->registry, $this->assetHelper);
+        $this->type = new IntegrationSelectType($this->em, $this->registry, $this->assetHelper, $aclHelper);
     }
 
     public function tearDown()

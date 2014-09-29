@@ -479,7 +479,7 @@ services:
         arguments:
             - @oro_security.acl_helper
         tags:
-            - { name: form.type_extension, alias: genemu_jqueryselect2_entity }
+            - { name: form.type_extension, alias: entity }
 
     oro_security.listener.search_listener:
           class: %oro_security.listener.search_listener.class%

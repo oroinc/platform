@@ -58,7 +58,8 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
 
         $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
 
-        $this->userChecker->expects($this->once())
+        $this->userChecker
+            ->expects($this->once())
             ->method('checkPreAuth');
 
         $resultToken = $this->provider->authenticate($token);
