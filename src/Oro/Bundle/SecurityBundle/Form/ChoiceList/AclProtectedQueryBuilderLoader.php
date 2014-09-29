@@ -17,21 +17,31 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * Contains the query builder that builds the query for fetching the
-     * entities
-     *
-     * This property should only be accessed through queryBuilder.
-     *
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     protected $queryBuilder;
 
+    /** @var string */
+    protected $permission;
+
+    /** @var bool */
+    protected $checkRelations;
+
     /**
-     * {@inheritdoc}
+     * @param AclHelper $aclHelper
+     * @param           $queryBuilder
+     * @param null      $manager
+     * @param null      $class
+     * @param string    $permission
+     * @param bool      $checkRelations
      */
-    public function __construct(AclHelper $aclHelper, $queryBuilder, $manager = null, $class = null)
-    {
+    public function __construct(
+        AclHelper $aclHelper,
+        $queryBuilder,
+        $manager = null,
+        $class = null,
+        $permission = 'VIEW',
+        $checkRelations = false
+    ) {
         if (!($queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         }
@@ -48,8 +58,10 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
             }
         }
 
-        $this->queryBuilder = $queryBuilder;
-        $this->aclHelper    = $aclHelper;
+        $this->queryBuilder   = $queryBuilder;
+        $this->aclHelper      = $aclHelper;
+        $this->permission     = $permission;
+        $this->checkRelations = $checkRelations;
     }
 
     /**
@@ -75,7 +87,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         // Guess type
         $entity   = current($qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
-        if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
+        if (in_array($metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
             $parameterType = Connection::PARAM_INT_ARRAY;
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;
@@ -89,14 +101,12 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     }
 
     /**
-     * @param Query  $query
-     * @param string $permission
-     * @param bool   $checkRelations
+     * @param Query $query
      *
      * @return Query
      */
-    protected function applyACL($query, $permission = 'VIEW', $checkRelations = true)
+    protected function applyACL($query)
     {
-        return $this->aclHelper->apply($query, $permission, $checkRelations);
+        return $this->aclHelper->apply($query, $this->permission, $this->checkRelations);
     }
 }
