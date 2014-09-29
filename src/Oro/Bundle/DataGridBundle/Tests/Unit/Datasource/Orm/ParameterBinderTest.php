@@ -158,6 +158,34 @@ class ParameterBinderTest extends \PHPUnit_Framework_TestCase
                     $this->createQueryParameter('entity_name', 'test'),
                 ]
             ],
+            'default empty array' => [
+                'bindParameters' => [
+                    'entity_name' => [
+                        'default' => [0],
+                    ]
+                ],
+                'datagridParameters' => [
+                    'entity_name' => []
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    $this->createQueryParameter('entity_name', [0]),
+                ]
+            ],
+            'default array with empty string' => [
+                'bindParameters' => [
+                    'entity_name' => [
+                        'default' => [0],
+                    ]
+                ],
+                'datagridParameters' => [
+                    'entity_name' => ['']
+                ],
+                'oldQueryParameters' => [],
+                'expectedQueryParameters' => [
+                    $this->createQueryParameter('entity_name', [0]),
+                ]
+            ],
             'default catch exception' => [
                 'bindParameters' => [
                     'entity_name' => [
