@@ -17,5 +17,10 @@ require({
     },
     paths: {
         'oro/translations': '{{ url('oro_translation_jstranslation')[0:-3] }}'
+    },
+    config: {
+        'orotranslation/js/translator': {
+            'debugTranslator': {{ oro_translation_debug_translator()|json_encode|raw }}
+        }
     }
 });

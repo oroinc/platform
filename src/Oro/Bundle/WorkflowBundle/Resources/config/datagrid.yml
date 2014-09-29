@@ -68,7 +68,7 @@ datagrid:
             view:
                 type:         navigate
                 acl_resource: oro_process_definition_view
-                label:        oro.workflow.processdefinition.datagrid.view
+                label:        oro.grid.action.view
                 icon:         eye-open
                 link:         view_link
                 rowAction:    true
@@ -185,7 +185,7 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_view
-                label:         oro.workflow.workflowdefinition.datagrid.view
+                label:         oro.grid.action.view
                 icon:          eye-open
                 link:          view_link
                 rowAction:     true
@@ -204,19 +204,19 @@ datagrid:
             clone:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_create
-                label:         oro.workflow.workflowdefinition.datagrid.clone
+                label:         oro.grid.action.clone
                 icon:          copy
                 link:          clone_link
             update:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_update
-                label:         oro.workflow.workflowdefinition.datagrid.update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
                 acl_resource:  oro_workflow_definition_delete
-                label:         oro.workflow.workflowdefinition.datagrid.delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
         action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getWorkflowDefinitionPermissions"]

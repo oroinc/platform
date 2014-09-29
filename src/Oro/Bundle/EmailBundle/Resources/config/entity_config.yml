@@ -12,4 +12,4 @@ oro_entity_config:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Available in email templates'
+                            label:          oro.email.entity_config.email.field.items.available_in_template

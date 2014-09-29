@@ -1,11 +1,11 @@
 oro_system_configuration:
     groups:
         platform:
-            title: 'System configuration'
+            title: oro.config.system_configuration.groups.platform.title
             icon:  icon-hdd
 
         general_setup:
-            title: 'General setup'
+            title: oro.config.system_configuration.groups.general_setup.title
 
     tree:
         system_configuration:

@@ -18,8 +18,8 @@
         {% for button in buttonConfig %}
             {{ UI.addButton({
                 'path': path(button.route, button.args|default({})),
-                'title': button.title|default(button.name),
-                'label': button.name,
+                'title': button.title|default(button.name)|trans,
+                'label': button.name|trans,
                 'aCss': button.aCss|default('')
             }) }}
         {% endfor %}

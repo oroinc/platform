@@ -38,5 +38,13 @@ oro:
         updated_at:     Updated At
         system_configuration:
             groups:
-                navbar_settings:
-                    title: 'Navigation bar'
+                navbar_settings.title: 'Navigation bar'
+                application_settings.title: 'Application Settings'
+                application_name_settings.title: 'URL'
+            fields:
+                application_url.label: 'Application URL'
+                navbar_position:
+                    label: 'Position'
+                    choices:
+                        top: 'Top'
+                        left: 'Left'

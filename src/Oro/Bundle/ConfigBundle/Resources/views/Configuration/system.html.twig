@@ -10,8 +10,8 @@
 
 {% block content %}
     {% set pageReload    = attribute(form.vars.block_config, activeSubGroup).page_reload %}
-    {% set saveButton    = UI.saveAndCloseButton('Save Settings') %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Saved Values' }) %}
+    {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
     {% set formAction    = path(
         'oro_config_configuration_system',
         {activeGroup: activeGroup, activeSubGroup: activeSubGroup}

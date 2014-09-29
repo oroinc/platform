@@ -3,7 +3,7 @@ oro_dashboard_config:
         quick_launchpad:
             items:
                 settings:
-                    label:      Settings
+                    label:      oro.dashboard.widgets.quick_launchpad.title
                     icon:       cogs
                     route:      oro_config_configuration_system
                     acl:        oro_config_system

@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     './app/views/base/view'
-], function ($, _, BaseView) {
+], function ($, _, __, BaseView) {
     'use strict';
 
     var LoadingMaskView;
@@ -27,7 +28,7 @@ define([
         className: 'loading-mask',
 
         /** @property {String} */
-        loadingHint: 'Loading...',
+        loadingHint: __('Loading...'),
 
         /** @property */
         template: _.template(
