@@ -11,15 +11,13 @@ use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
 
 class AclProtectedTypeExtension extends AbstractTypeExtension
 {
-    /**
-     * @var AclHelper
-     */
+    /** @var AclHelper */
     private $aclHelper;
 
     /**
      * @param AclHelper $aclHelper
      */
-    function __construct(AclHelper $aclHelper)
+    public function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
     }
@@ -37,15 +35,19 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $loader = function (Options $options) use ($this) {
-            if (null !== $options['query_builder']) {
-                return new AclProtectedQueryBuilderLoader(
-                    $this->aclHelper,
-                    $options['query_builder'],
-                    $options['em'],
-                    $options['class']
-                );
-            }
+        $aclHelper = $this->aclHelper;
+        $loader = function (Options $options) use ($aclHelper) {
+            // create simple QB in order to prevent loading all entities from repo by EntityChoiceList
+            $qb = (null !== $options['query_builder'])
+                ? $options['query_builder']
+                : $options['em']->getRepository($options['class'])->createQueryBuilder('e');
+
+            return new AclProtectedQueryBuilderLoader(
+                $aclHelper,
+                $qb,
+                $options['em'],
+                $options['class']
+            );
         };
         $resolver->setDefaults(['loader' => $loader]);
     }
