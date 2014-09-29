@@ -4,6 +4,7 @@ oro_menu_config:
             label: 'oro.organization.businessunit.entity_plural_label'
             route: 'oro_business_unit_index'
             extras:
+                position: 40
                 routes: ['oro_business_unit_*']
                 description: 'oro.business_unit.menu.list.description'
 
@@ -11,6 +12,7 @@ oro_menu_config:
             label: 'oro.organization.entity_plural_label'
             route: 'oro_organization_update_current'
             extras:
+                position: 50
                 routes: ['oro_organization_*']
                 description: 'oro.organization.menu.list.description'
 

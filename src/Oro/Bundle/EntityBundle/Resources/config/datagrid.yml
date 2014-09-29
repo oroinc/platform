@@ -62,9 +62,8 @@ datagrid:
     entity-relation-grid:
         options:
             entityHint: entity
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            routerEnabled: false
+            rowSelection:
                 dataField: id
                 columnName: assigned
                 selectors:

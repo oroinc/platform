@@ -47,12 +47,6 @@ define([
             // should be implemented in descendants
         },
 
-        getCurrentModel: function () {
-            return this.collection.find(function (model) {
-                return mediator.execute('compareUrl', model.get('url'));
-            });
-        },
-
         toRemove: function (model) {
             model.destroy({
                 wait: true,
@@ -92,7 +86,7 @@ define([
 
         onPageStateChange: function () {
             var model, url;
-            model = this.getCurrentModel();
+            model = this.collection.getCurrentModel();
             if (model) {
                 url = mediator.execute('currentUrl');
                 model.set('url', url);

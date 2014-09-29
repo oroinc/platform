@@ -10,6 +10,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
@@ -36,6 +37,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected $fieldHelper;
 
     /**
+     * @var DatabaseHelper
+     */
+    protected $databaseHelper;
+
+    /**
      * @var array
      */
     protected $cachedEntities = array();
@@ -43,11 +49,13 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     /**
      * @param ImportStrategyHelper $helper
      * @param FieldHelper $fieldHelper
+     * @param DatabaseHelper $databaseHelper
      */
-    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper)
+    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper, DatabaseHelper $databaseHelper)
     {
         $this->strategyHelper = $helper;
         $this->fieldHelper = $fieldHelper;
+        $this->databaseHelper = $databaseHelper;
     }
 
     /**
@@ -112,14 +120,14 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
             if (!$isPersistNew) {
                 return null;
             }
-            $this->resetEntityIdentifier($entity);
+            $this->databaseHelper->resetIdentifier($entity);
             $this->cachedEntities[$oid] = $entity;
         }
 
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $identifierName = $this->getEntityIdentifierFieldName($entityName);
+                $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
                 $excludedFields = array($identifierName);
 
                 foreach ($fields as $key => $field) {
@@ -163,7 +171,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
             if ($this->fieldHelper->isRelation($field)) {
                 $fieldName = $field['name'];
                 $isFullRelation = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
-                $isPersistRelation = $this->isCascadePersist($entityName, $fieldName);
+                $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
 
                 // single relation
                 if ($this->fieldHelper->isSingleRelation($field)) {
@@ -215,13 +223,12 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected function findExistingEntity($entity, array $fields)
     {
         $entityName = ClassUtils::getClass($entity);
-        $entityManager = $this->strategyHelper->getEntityManager($entityName);
-        $identifier = $this->getEntityIdentifier($entity);
+        $identifier = $this->databaseHelper->getIdentifier($entity);
         $existingEntity = null;
 
         // find by identifier
         if ($identifier) {
-            $existingEntity = $entityManager->find($entityName, $identifier);
+            $existingEntity = $this->databaseHelper->find($entityName, $identifier);
         }
 
         // find by identity fields
@@ -239,7 +246,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
             // try to find entity by identity fields if at least one is specified
             foreach ($identityValues as $value) {
                 if (null !== $value && '' !== $value) {
-                    $existingEntity = $entityManager->getRepository($entityName)->findOneBy($identityValues);
+                    $existingEntity = $this->databaseHelper->findOneBy($entityName, $identityValues);
                     break;
                 }
             }
@@ -263,7 +270,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         // increment context counter
-        $identifier = $this->getEntityIdentifier($entity);
+        $identifier = $this->databaseHelper->getIdentifier($entity);
         if ($identifier) {
             $this->context->incrementReplaceCount();
         } else {
@@ -271,40 +278,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
-    }
-
-    /**
-     * @param object $entity
-     * @return int|null
-     */
-    protected function getEntityIdentifier($entity)
-    {
-        $entityName = ClassUtils::getClass($entity);
-        $entityManager = $this->strategyHelper->getEntityManager($entityName);
-        $identifier = $entityManager->getClassMetadata($entityName)->getIdentifierValues($entity);
-        return current($identifier);
-    }
-
-    /**
-     * @param string $entityName
-     * @return string
-     */
-    protected function getEntityIdentifierFieldName($entityName)
-    {
-        $entityManager = $this->strategyHelper->getEntityManager($entityName);
-        return $entityManager->getClassMetadata($entityName)->getSingleIdentifierFieldName();
-    }
-
-    /**
-     * @param string $entityName
-     * @param string $fieldName
-     * @return bool
-     */
-    protected function isCascadePersist($entityName, $fieldName)
-    {
-        $metadata = $this->strategyHelper->getEntityManager($entityName)->getClassMetadata($entityName);
-        $association = $metadata->getAssociationMapping($fieldName);
-        return !empty($association['cascade']) && in_array('persist', $association['cascade']);
     }
 
     /**
@@ -326,16 +299,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if (!$entity instanceof $entityName) {
             throw new InvalidArgumentException(sprintf('Imported entity must be instance of %s', $entityName));
         }
-    }
-
-    /**
-     * @param object $entity
-     */
-    protected function resetEntityIdentifier($entity)
-    {
-        $entityName = ClassUtils::getClass($entity);
-        $identifierName = $this->getEntityIdentifierFieldName($entityName);
-        $this->fieldHelper->setObjectValue($entity, $identifierName, null);
     }
 
     /**

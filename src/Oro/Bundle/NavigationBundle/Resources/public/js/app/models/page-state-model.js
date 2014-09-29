@@ -9,9 +9,8 @@ define([
 
     PageStateModel = BaseModel.extend({
         defaults: {
-            restore   : false,
             pageId : '',
-            data   : {},
+            data   : '',
             pagestate : {
                 pageId : '',
                 data   : ''

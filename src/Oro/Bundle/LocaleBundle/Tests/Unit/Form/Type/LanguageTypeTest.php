@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
+use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
 
 class LanguageTypeTest extends FormIntegrationTestCase
 {
@@ -15,8 +16,14 @@ class LanguageTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $cmMock;
 
+    /**
+     * @var string
+     */
+    protected $locale;
+
     protected function setUp()
     {
+        $this->locale = \Locale::getDefault();
         parent::setUp();
         $this->cmMock   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -25,6 +32,7 @@ class LanguageTypeTest extends FormIntegrationTestCase
 
     protected function tearDown()
     {
+        \Locale::setDefault($this->locale);
         parent::tearDown();
         unset($this->cmMock, $this->formType);
     }
@@ -48,9 +56,14 @@ class LanguageTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm(array $configData, $defaultLang, array $choicesKeysExpected)
     {
+        IntlTestHelper::requireIntl($this);
+
+        \Locale::setDefault($defaultLang);
+
         $this->cmMock->expects($this->at(0))->method('get')
             ->with($this->equalTo(LanguageType::CONFIG_KEY), $this->equalTo(true))
             ->will($this->returnValue($defaultLang));
+
         $this->cmMock->expects($this->at(1))->method('get')
             ->with($this->equalTo(TranslationStatusInterface::CONFIG_KEY))
             ->will($this->returnValue($configData));

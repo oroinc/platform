@@ -111,6 +111,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_organization.business_unit_manager
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_organizations_select }
     #

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -236,10 +235,6 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitDatasourceNoFields()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
             ->with(self::ENTITY_NAME)
@@ -251,8 +246,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->never())
             ->method('getDQLPart');
 
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-        $datasource->setQueryBuilder($qb);
+        $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->never())->method('getQueryBuilder');
 
         $config = $this->getDatagridConfiguration();
         $this->extension->visitDatasource($config, $datasource);
@@ -260,10 +257,6 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitDatasourceForNotConfigurableEntity()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
             ->with(self::ENTITY_NAME)
@@ -280,8 +273,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->never())
             ->method('getDQLPart');
 
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-        $datasource->setQueryBuilder($qb);
+        $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->never())->method('getQueryBuilder');
 
         $config = $this->getDatagridConfiguration();
         $this->extension->visitDatasource($config, $datasource);
@@ -324,8 +319,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($alias . '.' . self::FIELD_NAME)
             ->will($this->returnSelf());
 
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-        $datasource->setQueryBuilder($qb);
+        $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
 
         $config = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();
@@ -410,8 +409,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
             ->will($this->returnSelf());
 
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-        $datasource->setQueryBuilder($qb);
+        $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
 
         $config = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();
@@ -484,8 +487,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($alias . '.' . $snapshotFieldName)
             ->will($this->returnSelf());
 
-        $datasource = new OrmDatasource($em, $this->getEventDispatcherMock());
-        $datasource->setQueryBuilder($qb);
+        $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
 
         $config = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();

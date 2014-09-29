@@ -20,17 +20,13 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EntityAclExtension
-     */
+    /** @var EntityAclExtension */
     private $extension;
 
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
-    /**
-     * @var OwnerTree
-     */
+    /** @var OwnerTree */
     private $tree;
 
     /** @var Organization */
@@ -432,7 +428,13 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $object = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $this->assertEquals(
-            array('NONE', 'BASIC', 'LOCAL', 'DEEP', 'GLOBAL', 'SYSTEM'),
+            [
+                0 => 'NONE',
+                1 => 'BASIC',
+                2 => 'LOCAL',
+                3 => 'DEEP',
+                5 => 'SYSTEM'
+            ],
             $this->extension->getAccessLevelNames($object)
         );
     }

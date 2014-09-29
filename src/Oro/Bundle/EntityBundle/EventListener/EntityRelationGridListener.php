@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
-
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -93,21 +92,13 @@ class EntityRelationGridListener
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
+        /** @var OrmDatasource $datasource */
+        $datasource = $datagrid->getDatasource();
 
         $entityId = $datagrid->getParameters()->get('id');
-        $added    = $this->request->get('added');
-        $removed  = $this->request->get('removed');
 
-        $parameters = [
-            'data_in'     => empty($added) ? [0] : explode(',', $added),
-            'data_not_in' => empty($removed) ? [0] : explode(',', $removed)
-        ];
         if ($entityId) {
-            $parameters['relation'] = $entityId;
+            $datasource->bindParameters(['relation']);
         }
-
-        /** @var QueryBuilder $qb */
-        $qb = $datagrid->getDatasource()->getQueryBuilder();
-        $qb->setParameters($parameters);
     }
 }

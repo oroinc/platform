@@ -19,14 +19,18 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $parameterBinder;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->parameterBinder = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datasource\\ParameterBinderInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->datasource      = new OrmDatasource($this->em, $this->eventDispatcher);
+        $this->datasource      = new OrmDatasource($this->em, $this->eventDispatcher, $this->parameterBinder);
     }
 
     /**
@@ -176,5 +180,42 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
+    }
+
+    public function testBindParametersWorks()
+    {
+        $parameters = ['foo'];
+        $append = true;
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $configs['query'] = [
+            'select' => ['t'],
+            'from'   => [
+                ['table' => 'Test', 'alias' => 't']
+            ]
+        ];
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        $this->parameterBinder->expects($this->once())
+            ->method('bindParameters')
+            ->with($datagrid, $parameters, $append);
+
+        $this->datasource->process($datagrid, $configs);
+        $this->datasource->bindParameters($parameters, $append);
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method is not allowed when datasource is not processed.
+     */
+    public function testBindParametersFailsWhenDatagridIsEmpty()
+    {
+        $this->datasource->bindParameters(['foo']);
     }
 }

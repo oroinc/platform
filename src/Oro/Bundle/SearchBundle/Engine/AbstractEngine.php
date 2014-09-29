@@ -6,10 +6,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
+use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
@@ -28,6 +31,11 @@ abstract class AbstractEngine implements EngineInterface
     protected $registry;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
@@ -43,18 +51,21 @@ abstract class AbstractEngine implements EngineInterface
     protected $logQueries = false;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ObjectMapper    $mapper
+     * @param ManagerRegistry          $registry
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param ObjectMapper             $mapper
      */
     public function __construct(
         ManagerRegistry $registry,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper
     ) {
-        $this->registry       = $registry;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->mapper         = $mapper;
+        $this->registry        = $registry;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->mapper          = $mapper;
     }
 
     /**
@@ -84,6 +95,10 @@ abstract class AbstractEngine implements EngineInterface
      */
     public function search(Query $query)
     {
+        $event = new BeforeSearchEvent($query);
+        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $query = $event->getQuery();
+
         // search must be performed as fast as possible and it might return lots of entities (10M and more)
         // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
