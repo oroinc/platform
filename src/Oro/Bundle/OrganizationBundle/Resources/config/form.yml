@@ -30,7 +30,6 @@ services:
         class: %oro_organization.form.type.business_unit.class%
         arguments:
             - @oro_organization.business_unit_manager
-            - @oro_organization.organization_manager
             - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_business_unit }
