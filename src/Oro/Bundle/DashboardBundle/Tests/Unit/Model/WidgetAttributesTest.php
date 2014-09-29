@@ -104,4 +104,54 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey($applicableItem, $result);
         $this->assertArrayHasKey($expectedItem, $result);
     }
+
+    public function testGetWidgetConfigs()
+    {
+        $notAllowedAcl      = 'invalid_acl';
+        $allowedAcl         = 'valid_acl';
+        $expectedItem       = 'expected_item';
+        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl];
+        $notGrantedItem     = 'not_granted_item';
+        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl];
+        $applicableItem     = 'applicable_item';
+        $applicable         = ['label' => 'applicable is set and resolved to true', 'applicable' => '@true'];
+        $notApplicableItem  = 'not_applicable_item';
+        $notApplicable      = ['label' => 'applicable is set and resolved to false', 'applicable' => '@false'];
+        $configs            = [
+            $expectedItem      => $expectedValue,
+            $notGrantedItem    => $notGrantedValue,
+            $applicableItem    => $applicable,
+            $notApplicableItem => $notApplicable
+        ];
+
+        $this->configProvider->expects($this->once())
+            ->method('getWidgetConfigs')
+            ->will($this->returnValue($configs));
+
+        $this->securityFacade->expects($this->exactly(2))
+            ->method('isGranted')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [['@true'], [], true],
+                        [$allowedAcl, null, true]
+                    ]
+                )
+            );
+        $this->resolver->expects($this->exactly(2))
+            ->method('resolve')
+            ->will(
+                $this->returnValueMap(
+                    [
+
+                        [['@false'], [], [false]],
+                        [['@true'], [], [true]],
+                    ]
+                )
+            );
+
+        $result = $this->target->getWidgetConfigs();
+        $this->assertArrayHasKey($applicableItem, $result);
+        $this->assertArrayHasKey($expectedItem, $result);
+    }
 }
