@@ -5,6 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\ORMException;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -33,6 +34,11 @@ class QueryValidator extends ConstraintValidator
     protected $gridBuilder;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var bool
      */
     protected $isDebug;
@@ -42,15 +48,18 @@ class QueryValidator extends ConstraintValidator
      *
      * @param ChainConfigurationProvider $configurationProvider
      * @param Builder                    $gridBuilder
+     * @param TranslatorInterface        $translator
      * @param bool                       $isDebug
      */
     public function __construct(
         ChainConfigurationProvider $configurationProvider,
         Builder $gridBuilder,
+        TranslatorInterface $translator,
         $isDebug
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->gridBuilder           = $gridBuilder;
+        $this->translator            = $translator;
         $this->isDebug               = $isDebug;
     }
 
@@ -81,14 +90,16 @@ class QueryValidator extends ConstraintValidator
             $qb->setMaxResults(1);
         }
 
+        $message = $this->translator->trans($constraint->message);
+
         try {
             $dataSource->getResults();
         } catch (DBALException $e) {
-            $this->context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
+            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
         } catch (ORMException $e) {
-            $this->context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
+            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
         } catch (InvalidConfigurationException $e) {
-            $this->context->addViolation($constraint->message);
+            $this->context->addViolation($message);
         }
     }
 
