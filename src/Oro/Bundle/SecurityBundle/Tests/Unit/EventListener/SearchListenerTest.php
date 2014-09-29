@@ -57,7 +57,7 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
         $metadata = new OwnershipMetadata('ORGANIZATION', 'organization', 'organization_id', 'organization', '');
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
-            ->willReturn($metadata);
+            ->will($this->returnValue($metadata));
 
         $event = new PrepareEntityMapEvent($entity, get_class($entity), $data);
         $this->listener->prepareEntityMapEvent($event);
@@ -73,7 +73,7 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
             ->andWhere('name', '~', 'string');
         $this->securityFacade->expects($this->once())
             ->method('getOrganizationId')
-            ->willReturn(5);
+            ->will($this->returnValue(5));
         $event = new BeforeSearchEvent($query);
 
         $this->listener->beforeSearchEvent($event);
