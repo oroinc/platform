@@ -82,7 +82,7 @@ class DashboardController extends Controller
             array(
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
+                'widgets'    => $this->get('oro_dashboard.widget_attributes')->getWidgetConfigs(),
             )
         );
     }
