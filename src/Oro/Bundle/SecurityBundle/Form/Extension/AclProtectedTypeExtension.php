@@ -1,10 +1,11 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
-use Oro\Bundle\SecurityBundle\ChoiceList\AclProtectedQueryBuilderLoader;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader;
 
 class AclProtectedTypeExtension extends AbstractTypeExtension
 {
@@ -13,18 +14,20 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
      */
     private $aclHelper;
 
+    /**
+     * @param AclHelper $aclHelper
+     */
     function __construct(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
     }
-
 
     /**
      * {@inheritdoc}
      */
     public function getExtendedType()
     {
-        return 'genemu_jqueryselect2_entity';
+        return 'entity';
     }
 
     /**
@@ -32,11 +35,15 @@ class AclProtectedTypeExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $type = $this;
-        $loader = function (Options $options) use ($type) {
+        $that   = $this;
+        $loader = function (Options $options) use ($that) {
             if (null !== $options['query_builder']) {
-                //TODO change this class
-                return new AclProtectedQueryBuilderLoader($options['em'], $options['query_builder'], $options['class'], $this->aclHelper);
+                return new AclProtectedQueryBuilderLoader(
+                    $that->aclHelper,
+                    $options['query_builder'],
+                    $options['em'],
+                    $options['class']
+                );
             }
         };
         $resolver->setDefaults(['loader' => $loader]);
