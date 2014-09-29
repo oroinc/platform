@@ -62,9 +62,6 @@ class BusinessUnitType extends AbstractType
                             $this->securityFacade->getOrganizationId()
                         )
                     ),
-                    'attr' => [
-                        'class' => 'oro_bu_by_org_select_bu'
-                    ],
                     'business_unit_ids' => $this->businessUnitManager->getBusinessUnitIds(
                         null,
                         $this->securityFacade->getOrganizationId()
@@ -151,9 +148,6 @@ class BusinessUnitType extends AbstractType
                                 $this->securityFacade->getOrganizationId()
                             )
                         ),
-                        'attr' => [
-                            'class' => 'oro_bu_by_org_select_bu'
-                        ],
                         'forbidden_business_unit_ids' => $this->businessUnitManager->getChildBusinessUnitIds(
                             $data->getId(),
                             $this->securityFacade->getOrganizationId()
