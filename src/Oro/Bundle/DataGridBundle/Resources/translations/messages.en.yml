@@ -28,3 +28,10 @@ oro:
             update: Edit
             delete: Delete
             clone: Clone
+
+        system_configuration:
+            groups:
+                look_and_feel.title: 'Display settings'
+                grid_settings.title: 'Data Grid settings'
+            fields:
+                default_per_page.label: 'Items per Page by Default'
