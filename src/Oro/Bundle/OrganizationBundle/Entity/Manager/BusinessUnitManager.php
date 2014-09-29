@@ -51,6 +51,24 @@ class BusinessUnitManager
     }
 
     /**
+     * Get Current BU ID with child BU IDs
+     *
+     * @param int $businessUnitId
+     * @param int $organizationId
+     * @return array
+     */
+    public function getChildBusinessUnitIds($businessUnitId, $organizationId)
+    {
+        $tree = $this->getBusinessUnitsTree(null, $organizationId);
+        $currentBuTree = $this->getBuWithChildTree($businessUnitId, $tree);
+
+        return array_merge(
+            [$currentBuTree['id']],
+            isset($currentBuTree['children']) ? $this->getTreeIds($currentBuTree['children']) : []
+        );
+    }
+
+    /**
      * @param array $criteria
      * @param array $orderBy
      * @return BusinessUnit
@@ -125,5 +143,44 @@ class BusinessUnitManager
     public function getUserRepo()
     {
         return $this->em->getRepository('OroUserBundle:User');
+    }
+
+    /**
+     * @param array $children
+     * @return array
+     */
+    protected function getTreeIds($children)
+    {
+        $result = [];
+        foreach ($children as $bu) {
+            if (!empty($bu['children'])) {
+                $result = array_merge($result, $this->getTreeIds($bu['children']));
+            }
+            $result[] = $bu['id'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $businessUnitId
+     * @param array $tree
+     * @return null
+     */
+    protected function getBuWithChildTree($businessUnitId, $tree)
+    {
+        $result = null;
+        foreach ($tree as $bu) {
+            if (!empty($bu['children'])) {
+                $result = $this->getBuWithChildTree($businessUnitId, $bu['children']);
+            }
+            if ($bu['id'] === $businessUnitId) {
+                $result = $bu;
+            }
+
+            if ($result) {
+                return $result;
+            }
+        }
     }
 }

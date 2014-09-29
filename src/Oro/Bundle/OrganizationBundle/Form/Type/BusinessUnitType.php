@@ -4,6 +4,8 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -121,6 +123,45 @@ class BusinessUnitType extends AbstractType
                     'multiple' => true,
                 )
             );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onPreSetData(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $data = $event->getData();
+        if ($data) {
+            if ($data->getId()) {
+                $form->remove('businessUnit');
+                $form->add(
+                    'businessUnit',
+                    'oro_business_unit_tree_select',
+                    [
+                        'label' => 'oro.organization.businessunit.parent.label',
+                        'empty_value' => 'oro.business_unit.form.none_business_user',
+                        'property_path' => 'owner',
+                        'required' => false,
+                        'choices' => $this->getBusinessUnitChoices(
+                            $this->businessUnitManager->getBusinessUnitsTree(
+                                null,
+                                $this->securityFacade->getOrganizationId()
+                            )
+                        ),
+                        'attr' => [
+                            'class' => 'oro_bu_by_org_select_bu'
+                        ],
+                        'forbidden_business_unit_ids' => $this->businessUnitManager->getChildBusinessUnitIds(
+                            $data->getId(),
+                            $this->securityFacade->getOrganizationId()
+                        )
+                    ]
+                );
+            }
+        }
     }
 
     /**
