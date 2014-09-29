@@ -187,3 +187,5 @@ datagrid:
                 where:
                     and:
                         - w.identifier = :websiteIdentifier
+            bind_parameters:
+                - websiteIdentifier

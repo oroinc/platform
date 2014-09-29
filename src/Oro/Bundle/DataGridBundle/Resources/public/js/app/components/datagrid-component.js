@@ -225,7 +225,7 @@ define(function (require) {
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
-                routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options,
+                routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions)
             };
         }

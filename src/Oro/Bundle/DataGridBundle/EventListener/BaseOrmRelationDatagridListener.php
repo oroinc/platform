@@ -13,6 +13,10 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
  * @package Oro\Bundle\DataGridBundle\EventListener
  *
  * Event listener should be applied when entities relation managed via datagrid
+ *
+ * @deprecated Deperecated since 1.4.1 in favor of RowSelectionListener and "bind_parameters" option in source
+ * @see RowSelectionListener
+ * @see DatasourceBindParametersListener
  */
 class BaseOrmRelationDatagridListener
 {

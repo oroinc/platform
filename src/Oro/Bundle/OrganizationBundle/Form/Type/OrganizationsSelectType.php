@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
 class OrganizationsSelectType extends AbstractType
@@ -21,10 +22,22 @@ class OrganizationsSelectType extends AbstractType
     /** @var BusinessUnitManager */
     protected $buManager;
 
-    public function __construct(EntityManager $em, BusinessUnitManager $buManager)
-    {
-        $this->em        = $em;
-        $this->buManager = $buManager;
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /**
+     * @param EntityManager       $em
+     * @param BusinessUnitManager $buManager
+     * @param SecurityFacade      $securityFacade
+     */
+    public function __construct(
+        EntityManager $em,
+        BusinessUnitManager $buManager,
+        SecurityFacade $securityFacade
+    ) {
+        $this->em              = $em;
+        $this->buManager       = $buManager;
+        $this->securityFacade  = $securityFacade;
     }
 
     /**
@@ -34,6 +47,7 @@ class OrganizationsSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'label'                   => 'oro.user.business_units.label',
                 'configs'                 => [
                     'is_translated_option' => false,
                     'is_safe'              => false,
@@ -60,10 +74,17 @@ class OrganizationsSelectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
+            'default_organization',
+            'hidden',
+            [
+                'mapped' => false,
+                'data'   => $this->securityFacade->getOrganizationId(),
+            ]
+        );
+        $builder->add(
             'organizations',
             'entity',
             [
-                'label'    => 'oro.user.organizations.label',
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
                 'multiple' => true,
@@ -78,7 +99,6 @@ class OrganizationsSelectType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,
-                'label'    => 'oro.user.business_units.label'
             ]
         );
     }
@@ -88,19 +108,11 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $buTree = $this->buManager->getBusinessUnitRepo()->getOrganizationBusinessUnitsTree();
+        $buTree = $this->buManager->getBusinessUnitRepo()->getOrganizationBusinessUnitsTree(
+            $this->securityFacade->getOrganizationId()
+        );
 
         $view->vars['organization_tree_ids'] = $buTree;
-
-        /** @var PersistentCollection $organizationsData */
-        $organizationsData = $view->vars['data']->getOrganizations();
-        if ($organizationsData) {
-            $organizationsData = $organizationsData->map(
-                function ($item) {
-                    return $item->getId();
-                }
-            )->getValues();
-        }
 
         /** @var PersistentCollection $businessUnitData */
         $businessUnitData = $view->vars['data']->getBusinessUnits();
@@ -112,7 +124,7 @@ class OrganizationsSelectType extends AbstractType
             )->getValues();
         }
 
-        $view->vars['selected_organizations']  = $organizationsData;
+        $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
     }
 

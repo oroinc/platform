@@ -43,6 +43,7 @@ oro:
                 clone: Clone
 
             # email template system variables
+            organization_name:   Organization name of logged in user
             user_name:           Username of logged in user
             user_first_name:     First name of logged in user
             user_last_name:      Last name of logged in user
@@ -53,7 +54,6 @@ oro:
             current_datetime:    Current date & time
             current_date:        Current date
             current_time:        Current time
-            app_organization_name: Application's current organization name
 
         menu:
             emailtemplate_list.description: List of email templates

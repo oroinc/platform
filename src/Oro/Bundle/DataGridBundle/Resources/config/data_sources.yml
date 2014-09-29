@@ -1,5 +1,6 @@
 parameters:
-    oro_datagrid.datasource.orm.class:       Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource
+    oro_datagrid.datasource.orm.class:                  Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource
+    oro_datagrid.datasource.orm.parameter_binder.class: Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder
 
 services:
     oro_datagrid.datasource.orm:
@@ -7,5 +8,9 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_datagrid.event.dispatcher
+            - @oro_datagrid.datasource.orm.parameter_binder
         tags:
             - { name: oro_datagrid.datasource, type: orm }
+
+    oro_datagrid.datasource.orm.parameter_binder:
+        class: %oro_datagrid.datasource.orm.parameter_binder.class%

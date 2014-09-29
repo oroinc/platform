@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
@@ -58,14 +59,12 @@ class TranslationServiceProvider
     }
 
     /**
-     * Loop through the generated files in $dir and merge them with downloaded in $targetDir
+     * Loop through the generated files in $dirs and merge them with downloaded in $targetDir
      * merge generated files over downloaded and upload result back to remote
      *
-     * @param string $dir
-     *
-     * @return mixed
+     * @param array|string[] $dirs
      */
-    public function update($dir)
+    public function update($dirs)
     {
         $targetDir  = $this->getTmpDir('oro-trans');
         $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
@@ -76,32 +75,35 @@ class TranslationServiceProvider
             return false;
         }
 
-        $finder = Finder::create()->files()->name('*.yml')->in($dir);
-        foreach ($finder->files() as $fileInfo) {
-            $localContents = file($fileInfo);
-            $remoteFile    = $targetDir . $fileInfo->getRelativePathname();
+        foreach ($dirs as $dir) {
+            $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
-            if (file_exists($remoteFile)) {
-                $remoteContents = file($remoteFile);
-                array_shift($remoteContents); // remove dashes from the beginning of file
-            } else {
-                $remoteContents = [];
+            /** @var SplFileInfo $fileInfo */
+            foreach ($finder->files() as $fileInfo) {
+                $localContents = file($fileInfo);
+                $remoteFile    = $targetDir . $fileInfo->getRelativePathname();
+
+                if (file_exists($remoteFile)) {
+                    $remoteContents = file($remoteFile);
+                    array_shift($remoteContents); // remove dashes from the beginning of file
+                } else {
+                    $remoteContents = [];
+                }
+
+                $content = array_unique(array_merge($remoteContents, $localContents));
+                $content = implode('', $content);
+
+                $remoteDir = dirname($remoteFile);
+                if (!is_dir($remoteDir)) {
+                    mkdir($remoteDir, 0777, true);
+                }
+                file_put_contents($remoteFile, $content);
             }
-
-            $content = array_unique(array_merge($remoteContents, $localContents));
-            $content = implode('', $content);
-
-            $remoteDir = dirname($remoteFile);
-            if (!is_dir($remoteDir)) {
-                mkdir($remoteDir, 0777, true);
-            }
-            file_put_contents($remoteFile, $content);
         }
 
-        $result = $this->upload($targetDir, 'update');
-        $this->cleanup($targetDir);
 
-        return $result;
+        $this->upload($targetDir, 'update');
+        $this->cleanup($targetDir);
     }
 
     /**
@@ -143,19 +145,10 @@ class TranslationServiceProvider
         $this->cleanup($targetDir);
 
         $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
-        try {
-            $isExtracted = $this->unzip(
-                $pathToSave,
-                is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
-            );
-        } catch (\RuntimeException $e) {
-            // try to check possible error messages in file
-            if ($e->getCode() === \ZipArchive::ER_NOZIP) {
-                $this->adapter->parseResponse(file_get_contents($pathToSave));
-            }
-
-            throw $e;
-        }
+        $isExtracted  = $this->unzip(
+            $pathToSave,
+            is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
+        );
 
         if ($locale == 'en') {
             // check and fix exported file names, replace $locale_XX locale in file names to $locale
