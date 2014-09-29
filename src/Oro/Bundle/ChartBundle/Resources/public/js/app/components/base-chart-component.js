@@ -40,9 +40,9 @@ define(function(require) {
          * @overrides
          */
         dispose: function() {
-            this.$chart.unbind(this.cid);
-            BaseComponent.prototype.dispose.call(this);
-            $(window).unbind(this.cid);
+            this.$chart.unbind('.' + this.cid);
+            $(window).unbind('.' + this.cid);
+            BaseChartComponent.__super__.dispose.call(this);
         },
 
         renderBaseLayout: function() {
