@@ -37,6 +37,11 @@ define([
         },
 
         /**
+         * @property {boolean}
+         */
+        wrapHintValue: true,
+
+        /**
          * Filter events
          *
          * @property
@@ -155,7 +160,9 @@ define([
                 return this.placeholder;
             }
 
-            return (option ? option.label + ' ' : '') + '"' + value.value + '"';
+            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+
+            return (option ? option.label + ' ' : '') + hintValue;
         },
 
         /**
