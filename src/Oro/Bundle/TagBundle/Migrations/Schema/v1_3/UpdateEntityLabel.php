@@ -23,5 +23,13 @@ class UpdateEntityLabel implements Migration
                 'oro.tag.entity_label'
             )
         );
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\TagBundle\Entity\Tag',
+                'entity',
+                'plural_label',
+                'oro.tag.entity_plural_label'
+            )
+        );
     }
 }

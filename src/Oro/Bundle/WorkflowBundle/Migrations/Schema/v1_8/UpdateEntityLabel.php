@@ -25,9 +25,26 @@ class UpdateEntityLabel implements Migration
         );
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
+                'entity',
+                'plural_label',
+                'oro.workflow.workflowdefinition.entity_plural_label'
+            )
+        );
+
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
                 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition',
                 'entity',
                 'label',
+                'oro.workflow.processdefinition.entity_label'
+            )
+        );
+        $queries->addQuery(
+            new UpdateEntityConfigEntityValueQuery(
+                'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition',
+                'entity',
+                'plural_label',
                 'oro.workflow.processdefinition.entity_label'
             )
         );
