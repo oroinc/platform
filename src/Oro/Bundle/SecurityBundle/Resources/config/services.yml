@@ -62,6 +62,7 @@ parameters:
     oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
 
     oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
+    oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
 
 services:
     oro_security.security_facade:
@@ -470,3 +471,12 @@ services:
           tags:
               - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
+
+    oro_security.listener.search_listener:
+          class: %oro_security.listener.search_listener.class%
+          arguments:
+              - @oro_security.owner.ownership_metadata_provider
+              - @oro_security.security_facade
+          tags:
+              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent }
+              - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }

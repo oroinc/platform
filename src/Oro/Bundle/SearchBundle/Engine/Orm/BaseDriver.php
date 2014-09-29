@@ -209,12 +209,14 @@ abstract class BaseDriver
      */
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $stringQuery = '';
         if ($useFieldName) {
-            $stringQuery = 'textField.field = :field' . $index . ' AND ';
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . 'textField.value LIKE :value' . $index;
+        return $stringQuery . $joinAlias . '.value LIKE :value' . $index;
     }
 
     /**
@@ -227,12 +229,14 @@ abstract class BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $stringQuery = '';
         if ($useFieldName) {
-            $stringQuery = 'textField.field = :field' . $index . ' AND ';
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . 'textField.value NOT LIKE :value' . $index;
+        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
     }
 
     /**
@@ -259,7 +263,7 @@ abstract class BaseDriver
      */
     protected function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
-        $joinAlias = $searchCondition['fieldType'] . 'Field';
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         $qb->setParameter('value' . $index, $searchCondition['fieldValue']);
 
@@ -307,20 +311,20 @@ abstract class BaseDriver
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
         $qb = $this->createQueryBuilder('search')
-            ->select(array('search as item', 'textField'))
-            ->leftJoin('search.textFields', 'textField')
-            ->leftJoin('search.integerFields', 'integerField')
-            ->leftJoin('search.decimalFields', 'decimalField')
-            ->leftJoin('search.datetimeFields', 'datetimeField');
+            ->select('search as item');
 
         $this->setFrom($query, $qb);
 
         $whereExpr = array();
         if (count($query->getOptions())) {
             foreach ($query->getOptions() as $index => $searchCondition) {
+                $joinField = sprintf('search.%sFields', $searchCondition['fieldType']);
+                $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+                $qb->leftJoin($joinField, $joinAlias);
+
                 if ($searchCondition['fieldType'] == Query::TYPE_TEXT) {
                     if ($searchCondition['fieldValue'] === '') {
-                        $whereExpr[] = 'textField.field = :field' . $index;
+                        $whereExpr[] = $joinAlias . '.field = :field' . $index;
                         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
                     } else {
                         $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
@@ -341,6 +345,16 @@ abstract class BaseDriver
         }
 
         return $qb;
+    }
+
+    /**
+     * @param string $fieldType
+     * @param int $index
+     * @return string
+     */
+    protected function getJoinAlias($fieldType, $index)
+    {
+        return sprintf('%sField%s', $fieldType, $index);
     }
 
     /**

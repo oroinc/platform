@@ -52,13 +52,15 @@ class PdoPgsql extends BaseDriver
      */
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
-        $stringQuery = '(TsvectorTsquery(textField.value, :non_value' . $index . ')) = TRUE';
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :non_value' . $index . ')) = TRUE';
 
         if ($useFieldName) {
-            $stringQuery .= ' AND textField.field = :field' . $index;
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
         }
 
-        $stringQuery .= ' AND TsRank(textField.value, :value' . $index . ') > ' . Query::FINITY;
+        $stringQuery .= ' AND TsRank(' . $joinAlias . '.value, :value' . $index . ') > ' . Query::FINITY;
 
         return $stringQuery;
     }
@@ -73,10 +75,12 @@ class PdoPgsql extends BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
-        $stringQuery = '(TsvectorTsquery(textField.value, :value' . $index . ')) = TRUE';
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :value' . $index . ')) = TRUE';
 
         if ($useFieldName) {
-            $stringQuery .= ' AND textField.field = :field' . $index;
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
         }
 
         return $stringQuery;
@@ -120,11 +124,12 @@ class PdoPgsql extends BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $qb->select(
             [
                 'search as item',
-                'textField',
-                'TsRank(textField.value, :value' . $index . ') AS rankField'
+                'TsRank(' . $joinAlias . '.value, :value' . $index . ') AS rankField'
             ]
         );
         $qb->orderBy('rankField', 'DESC');
