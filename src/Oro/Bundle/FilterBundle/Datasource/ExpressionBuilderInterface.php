@@ -175,4 +175,13 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function trim($x);
+
+    /**
+     * Creates an instance of COALESCE() function, with the given argument.
+     *
+     * @param array $x Argument to be used as argument of COALESCE() function.
+     *
+     * @return mixed
+     */
+    public function coalesce(array $x);
 }

@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
@@ -184,7 +185,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             ],
         ];
         if ($functionExpr !== null) {
-            $columnOptions[DatagridGuesser::FILTER]['filter_by_having'] = true;
+            $columnOptions[DatagridGuesser::FILTER][FilterUtility::BY_HAVING_KEY] = true;
         }
         $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
         $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);

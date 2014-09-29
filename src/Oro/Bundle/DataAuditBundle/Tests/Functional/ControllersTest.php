@@ -32,6 +32,14 @@ class ControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+
+        $organization = $this->client->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->findOneBy([], ['id' => 'asc']);
+        if ($organization) {
+            $this->userData['organizations'] = $organization->getName();
+        }
     }
 
     public function prepareFixture()
@@ -123,7 +131,6 @@ class ControllersTest extends WebTestCase
         }
 
         $this->assertEquals('John Doe  - admin@example.com', $result['author']);
-
     }
 
     protected function clearResult($result)
