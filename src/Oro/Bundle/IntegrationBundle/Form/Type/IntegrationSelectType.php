@@ -4,7 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -18,6 +17,7 @@ use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class IntegrationSelectType extends AbstractType
 {
