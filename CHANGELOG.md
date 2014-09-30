@@ -25,22 +25,22 @@ Previously, email templates were used only for email notifications. Now their ro
 Support for variables in templates was extended: in addition to "contextual" variables that were related to attributes of the template entity, templates may include "system-wide" variables like current user's first name, or current time, or name of the organization. It is also possible to create a "generic" template that is not related to any entity; in this case it may contain only system variables.
 New templates are subject to ACL and have owner of user type.
  * Other improvements
-  * Multiple improvements to Web API
-  * A new implementation of option sets
-  * Improved grids
+ <ul><li>Multiple improvements to Web API</li>
+ <li>A new implementation of option sets</li>
+ <li>Improved grids</li></ul>
  * Community requests.
 Here is the list of Community requests that were addressed in this version.
 Features & improvements
-  * #50 Add the way to filter on empty fields
-  * #116 Add custom templates to workflow transitions
-  * #118 Extending countries
-  * #136 Console command for CSV import/export
-  * #149 New "link" type for datagrid column format
+  <ul><li>#50 Add the way to filter on empty fields</li>
+  <li>#116 Add custom templates to workflow transitions</li>
+  <li>#118 Extending countries</li>
+  <li>#136 Console command for CSV import/export</li>
+  <li>#149 New "link" type for datagrid column format</li></ul>
  * Bugs fixed
-  * #47 Problems with scrolling in iOS 7
-  * #62 Problems with the Recent Emails widget
-  * #139 Error 500 after removing unique key of entity
-  * #158 Update doctrine version to 2.4.4
+  <ul><li>#47 Problems with scrolling in iOS 7</li>
+  <li>#62 Problems with the Recent Emails widget</li>
+  <li>#139 Error 500 after removing unique key of entity</li>
+  <li>#158 Update doctrine version to 2.4.4</li></ul>
 
 CHANGELOG for 1.3.1
 ===================
