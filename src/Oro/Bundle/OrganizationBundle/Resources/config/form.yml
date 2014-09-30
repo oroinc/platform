@@ -120,7 +120,6 @@ services:
     oro_organization.form.extension.owner:
         class: %oro_organization.form.extension.owner.class%
         arguments:
-            - @security.context
             - @doctrine
             - @oro_security.owner.ownership_metadata_provider
             - @oro_organization.business_unit_manager

@@ -32,6 +32,7 @@ class BusinessUnitManager
      *
      * @param User     $entity
      * @param int|null $organizationId
+     *
      * @return array
      */
     public function getBusinessUnitsTree(User $entity = null, $organizationId = null)
@@ -43,6 +44,7 @@ class BusinessUnitManager
      * Get business units ids
      *
      * @param int|null $organizationId
+     *
      * @return array
      */
     public function getBusinessUnitIds($organizationId = null)
@@ -55,6 +57,7 @@ class BusinessUnitManager
      *
      * @param int $businessUnitId
      * @param int $organizationId
+     *
      * @return array
      */
     public function getChildBusinessUnitIds($businessUnitId, $organizationId)
@@ -71,6 +74,7 @@ class BusinessUnitManager
     /**
      * @param array $criteria
      * @param array $orderBy
+     *
      * @return BusinessUnit
      */
     public function getBusinessUnit(array $criteria = array(), array $orderBy = null)
@@ -86,6 +90,7 @@ class BusinessUnitManager
      * @param string            $accessLevel
      * @param OwnerTreeProvider $treeProvider
      * @param Organization      $organization
+     *
      * @return bool
      */
     public function canUserBeSetAsOwner(
@@ -148,16 +153,17 @@ class BusinessUnitManager
     /**
      * Prepare choice options for a hierarchical select
      *
-     * @param $options
-     * @param int $level
+     * @param array $options
+     * @param int   $level
+     *
      * @return array
      */
     public function getTreeOptions($options, $level = 0)
     {
-        $choices = array();
-        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
+        $choices = [];
+        $blanks  = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
         foreach ($options as $option) {
-            $choices += array($option['id'] => $blanks . htmlspecialchars($option['name']));
+            $choices += [$option['id'] => $blanks . htmlspecialchars($option['name'])];
             if (isset($option['children'])) {
                 $choices += $this->getTreeOptions($option['children'], $level + 1);
             }
@@ -168,6 +174,7 @@ class BusinessUnitManager
 
     /**
      * @param array $children
+     *
      * @return array
      */
     protected function getTreeIds($children)
@@ -184,8 +191,9 @@ class BusinessUnitManager
     }
 
     /**
-     * @param int $businessUnitId
+     * @param int   $businessUnitId
      * @param array $tree
+     *
      * @return array
      */
     protected function getBuWithChildTree($businessUnitId, $tree)
