@@ -9,7 +9,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               boolean
-                        label:              'Auditable'
+                        label:              oro.dataaudit.entity_config.entity.items.auditable
                         filter_type:        boolean
                         required:           true
                         sortable:           true
@@ -21,7 +21,7 @@ oro_entity_config:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Auditable'
+                            label:          oro.dataaudit.entity_config.entity.items.auditable
         field:
             items:
                 auditable:
@@ -32,7 +32,7 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               boolean
-                        label:              'Auditable'
+                        label:              oro.dataaudit.entity_config.field.items.auditable
                         filter_type:        boolean
                         required:           true
                         sortable:           true
@@ -44,4 +44,4 @@ oro_entity_config:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Auditable'
+                            label:          oro.dataaudit.entity_config.field.items.auditable

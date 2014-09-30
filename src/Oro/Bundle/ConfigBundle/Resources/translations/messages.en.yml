@@ -3,8 +3,10 @@ oro:
         module_label: "System configuration"
 
         actions:
-            collapse_all: Collapse All
-            expand_all:   Expand All
+            collapse_all:  "Collapse All"
+            expand_all:    "Expand All"
+            save_settings: "Save settings"
+            restore_saved_values: "Restore Saved Values"
 
         menu:
             system_configuration.label:       "Configuration"
@@ -14,4 +16,12 @@ oro:
             config.saved.message: "Configuration saved"
             page.reload.message:  "Please wait until page will be reloaded..."
 
-"Settings": "Settings"
+        system_configuration:
+            groups:
+                platform.title: "System configuration"
+                general_setup.title: "General setup"
+            use_default: "Use default"
+
+    dashboard:
+        widgets:
+            quick_launchpad.title: "Settings"

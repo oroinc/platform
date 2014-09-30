@@ -47,7 +47,7 @@ class WorkflowDefinitionType extends AbstractType
                 'transition_prototype_icon',
                 'oro_icon_select',
                 array(
-                    'label' => 'Button icon',
+                    'label' => 'oro.workflow.form.button_icon.label',
                     'mapped' => false,
                     'tooltip' => 'oro.workflow.workflowdefinition.transition.icon.tooltip'
                 )

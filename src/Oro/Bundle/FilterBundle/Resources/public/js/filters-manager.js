@@ -7,9 +7,10 @@ define([
     'backbone',
     'oroui/js/mediator',
     'oroui/js/tools',
+    'orotranslation/js/translator',
     './multiselect-decorator',
     './datafilter-wrapper'
-], function ($, _, Backbone, mediator, tools, MultiselectDecorator, filterWrapper) {
+], function ($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
     'use strict';
 
     var FiltersManager;
@@ -55,7 +56,7 @@ define([
          *
          * @property
          */
-        addButtonHint: 'Manage filters',
+        addButtonHint: __('oro_datagrid.label_add_filter'),
 
         /**
          * Select widget object

@@ -6,3 +6,23 @@ oro:
             audit_list.label:       "Data Audit"
             audit_list.description: "Data Audit"
 
+        datagrid:
+            author: Author
+            logged_at: Logged at
+            old_values: Old values
+            new_values: New values
+            action: Action
+            version: Version
+            entity_type: Entity type
+            entity_name: Entity name
+            entity_id: Entity id
+            data: Data
+            organization: Organization
+
+        entity_config:
+            entity:
+                items:
+                    auditable: Auditable
+            field:
+                items:
+                    auditable: Auditable

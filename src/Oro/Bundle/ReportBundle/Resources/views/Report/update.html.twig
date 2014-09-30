@@ -76,9 +76,9 @@
                 {
                     'title': '',
                     'data': [
-                        form_row(form.name, {'label': 'oro.report.name.label'|trans}),
+                        form_row(form.name, {'label': 'oro.report.name.label'}),
                         form_row(form.description, {
-                            'label': 'oro.report.description.label'|trans,
+                            'label': 'oro.report.description.label',
                             'attr': {
                                 'class': 'report-descr'
                             }
@@ -88,8 +88,8 @@
                 {
                     'title': '',
                     'data': [
-                        form_row(form.entity, {'label': 'oro.report.entity.label'|trans}),
-                        form_row(form.type, {'label': 'oro.report.type.label'|trans}),
+                        form_row(form.entity, {'label': 'oro.report.entity.label'}),
+                        form_row(form.type, {'label': 'oro.report.type.label'}),
                         ownerDataBlock.dataBlocks[0].subblocks[0].data[0]
                     ]
                 }
@@ -162,7 +162,7 @@
                 'title': 'oro.report.reporttype.chart.label'|trans,
                 'data': [
                     form_widget(form.chartOptions, {
-                        'label': 'oro.report.reporttype.chart.label'|trans,
+                        'label': 'oro.report.reporttype.chart.label',
                     })
                 ]
             }

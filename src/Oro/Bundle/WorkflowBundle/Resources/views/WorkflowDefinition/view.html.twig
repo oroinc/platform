@@ -14,9 +14,9 @@
                 'aCss':  'no-hash btn-danger',
                 'iCss':  'icon-remove',
                 'id':    idButton,
-                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'label': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
                 'path':  path('oro_workflow_api_rest_workflow_deactivate', {'entityClass': entity.relatedEntity}),
-                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.deactivate'|trans,
             }) }}
             <script type="text/javascript">
                 require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
@@ -48,9 +48,9 @@
                 'aCss':  'no-hash btn-success',
                 'iCss':  'icon-ok',
                 'id':    idButton,
-                'label': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'label': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
                 'path':  path('oro_workflow_api_rest_workflow_activate', {'workflowDefinition': entity.name}),
-                'title': 'oro.workflow.workflowdefinition.datagrid.activate',
+                'title': 'oro.workflow.workflowdefinition.datagrid.activate'|trans,
             }) }}
             <script type="text/javascript">
                 require(['jquery', 'oroworkflow/js/activation-handler', 'oroui/js/mediator'],
@@ -75,8 +75,8 @@
 
     {{ UI.button({
         'iCss': 'icon-copy',
-        'label': 'oro.workflow.workflowdefinition.datagrid.clone',
-        'title': 'oro.workflow.workflowdefinition.datagrid.clone',
+        'label': 'oro.workflow.workflowdefinition.datagrid.clone'|trans,
+        'title': 'oro.workflow.workflowdefinition.datagrid.clone'|trans,
         'path': path('oro_workflow_definition_clone', {'name': entity.name}),
     }) }}
     {% if not entity.system %}

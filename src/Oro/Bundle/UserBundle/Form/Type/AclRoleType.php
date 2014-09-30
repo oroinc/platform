@@ -35,7 +35,7 @@ class AclRoleType extends AbstractType
             'text',
             array(
                 'required' => true,
-                'label' => 'Role'
+                'label' => 'oro.user.role.role.label'
             )
         );
 

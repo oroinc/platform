@@ -15,28 +15,20 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $organizationManager */
-        $organizationManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager')
+        /** @var \PHPUnit_Framework_MockObject_MockObject $securityFacade */
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $organizationManager */
-        $organizationRepo =
-            $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $organizationRepo
-            ->expects($this->any())
-            ->method('getEnabled')
+        $businessUnitManager->expects($this->any())
+            ->method('getBusinessUnitsTree')
             ->will($this->returnValue([]));
 
-        $organizationManager
-            ->expects($this->any())
-            ->method('getOrganizationRepo')
-            ->will($this->returnValue($organizationRepo));
+        $businessUnitManager->expects($this->any())
+            ->method('getBusinessUnitIds')
+            ->will($this->returnValue([]));
 
-
-        $this->form = new BusinessUnitType($businessUnitManager, $organizationManager);
+        $this->form = new BusinessUnitType($businessUnitManager, $securityFacade);
     }
 
     public function testSetDefaultOptions()
@@ -47,10 +39,7 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-                    'ownership_disabled'      => true,
-                    'business_unit_tree_ids'  => [],
-                    'selected_organizations'  => [],
-                    'selected_business_units' => [],
+                    'ownership_disabled'      => true
                 ]
             );
         $this->form->setDefaultOptions($optionResolver);

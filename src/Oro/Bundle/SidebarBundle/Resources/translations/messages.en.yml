@@ -1,0 +1,7 @@
+oro.sidebar:
+    system_configuration:
+        groups:
+            sidebar_settings.title: 'Sidebar settings'
+        fields:
+            sidebar_left_active.label: 'Enable left sidebar'
+            sidebar_right_active.label: 'Enable right sidebar'

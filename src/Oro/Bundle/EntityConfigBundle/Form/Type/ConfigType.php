@@ -68,6 +68,7 @@ class ConfigType extends AbstractType
                 'fieldName',
                 'text',
                 array(
+                    'label'     => 'oro.entity_config.form.name.label',
                     'block'     => 'general',
                     'disabled'  => true,
                     'data'      => $fieldName,
@@ -77,6 +78,7 @@ class ConfigType extends AbstractType
                 'type',
                 'choice',
                 array(
+                    'label'       => 'oro.entity_config.form.type.label',
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,

@@ -4,6 +4,7 @@ parameters:
     oro_filter.select_row_filter.class:           Oro\Bundle\FilterBundle\Filter\SelectRowFilter
     oro_filter.number_filter.class:               Oro\Bundle\FilterBundle\Filter\NumberFilter
     oro_filter.percent_filter.class:              Oro\Bundle\FilterBundle\Filter\PercentFilter
+    oro_filter.currency_filter.class:             Oro\Bundle\FilterBundle\Filter\CurrencyFilter
     oro_filter.choice_filter.class:               Oro\Bundle\FilterBundle\Filter\ChoiceFilter
     oro_filter.entity_filter.class:               Oro\Bundle\FilterBundle\Filter\EntityFilter
     oro_filter.boolean_filter.class:              Oro\Bundle\FilterBundle\Filter\BooleanFilter
@@ -46,6 +47,14 @@ services:
             - @oro_filter.filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: percent }
+
+    oro_filter.currency_filter:
+        class: %oro_filter.currency_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: currency }
 
     oro_filter.choice_filter:
         class: %oro_filter.choice_filter.class%

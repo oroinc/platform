@@ -42,6 +42,7 @@ class EmailTemplateSelectType extends AbstractType
 
         $resolver->setDefaults(
             array(
+                'label'                   => null,
                 'class'                   => 'OroEmailBundle:EmailTemplate',
                 'property'                => 'name',
                 'query_builder'           => null,

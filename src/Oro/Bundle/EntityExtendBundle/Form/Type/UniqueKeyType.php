@@ -31,6 +31,7 @@ class UniqueKeyType extends AbstractType
             'name',
             'text',
             array(
+                'label' => 'oro.entity_extend.form.name.label',
                 'required' => true,
             )
         );
@@ -39,6 +40,7 @@ class UniqueKeyType extends AbstractType
             'key',
             'choice',
             array(
+                'label' => 'oro.entity_extend.form.key.label',
                 'multiple' => true,
                 'choices'  => $this->fields,
                 'required' => true,
