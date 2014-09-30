@@ -156,7 +156,7 @@
                 </optgroup>
             {% else %}
                 {% set disable = '' %}
-                {% if forbidden_business_unit_ids is defined  %}
+                {% if forbidden_business_unit_ids is defined and forbidden_business_unit_ids|length %}
                     {% if choice.value in forbidden_business_unit_ids %}
                         {% set disable = 'disabled="disabled"' %}
                     {% endif %}

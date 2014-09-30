@@ -146,6 +146,27 @@ class BusinessUnitManager
     }
 
     /**
+     * Prepare choice options for a hierarchical select
+     *
+     * @param $options
+     * @param int $level
+     * @return array
+     */
+    public function getTreeOptions($options, $level = 0)
+    {
+        $choices = array();
+        $blanks = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
+        foreach ($options as $option) {
+            $choices += array($option['id'] => $blanks . htmlspecialchars($option['name']));
+            if (isset($option['children'])) {
+                $choices += $this->getTreeOptions($option['children'], $level + 1);
+            }
+        }
+
+        return $choices;
+    }
+
+    /**
      * @param array $children
      * @return array
      */

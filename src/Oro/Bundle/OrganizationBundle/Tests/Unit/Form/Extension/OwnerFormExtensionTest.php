@@ -229,6 +229,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                     'is_translated_option' => true,
                     'is_safe'              => true
                 ),
+                'choices' => null,
                 'constraints' => array(new NotBlank()),
                 'required' => true,
             )
