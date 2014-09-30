@@ -95,7 +95,7 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $data = $this->connection->fetchColumn($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
-        $data = $this->connection->convertToPHPValue($data, Type::TARRAY);
+        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
         $data[$this->scope][$this->code] = $this->value;
         $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
