@@ -42,8 +42,6 @@ class GroupingValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
      * @param array $definition
      * @param mixed $expected
      *
@@ -77,6 +75,7 @@ class GroupingValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function groupingDataProvider()
     {
