@@ -14,13 +14,9 @@ class UniqueKeysValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (empty($value)) {
-            return;
-        }
-
         /** @var UniqueKeys $constraint */
         $names = ArrayUtils::arrayColumn($value, 'name');
-        if ($names != array_unique($names)) {
+        if ($names && $names != array_unique($names)) {
             $this->context->addViolation(
                 $constraint->message
             );
@@ -29,7 +25,7 @@ class UniqueKeysValidator extends ConstraintValidator
         }
 
         $keys = ArrayUtils::arrayColumn($value, 'key');
-        if ($keys != array_unique($keys, SORT_REGULAR)) {
+        if ($keys && $keys != array_unique($keys, SORT_REGULAR)) {
             $this->context->addViolation(
                 $constraint->message
             );

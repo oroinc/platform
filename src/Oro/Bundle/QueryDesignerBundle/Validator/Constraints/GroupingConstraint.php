@@ -4,12 +4,12 @@ namespace Oro\Bundle\QueryDesignerBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class QueryConstraint extends Constraint
+class GroupingConstraint extends Constraint
 {
     /**
      * @var string
      */
-    public $message = 'oro.query_designer.validation.query';
+    public $message = 'oro.query_designer.validation.grouping';
 
     /**
      * {@inheritdoc}
@@ -24,6 +24,6 @@ class QueryConstraint extends Constraint
      */
     public function validatedBy()
     {
-        return 'oro_query_designer.query_validator';
+        return 'oro_query_designer.grouping_validator';
     }
 }

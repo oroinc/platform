@@ -10,6 +10,8 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 {
+    const MESSAGE = 'Invalid query';
+
     /**
      * @var QueryValidator
      */
@@ -35,6 +37,11 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected $gridBuilder;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
+
     protected function setUp()
     {
         $this->chainConfigurationProvider = $this->getMock(
@@ -46,9 +53,12 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
         $this->validator = new QueryValidator(
             $this->chainConfigurationProvider,
             $this->gridBuilder,
+            $this->translator,
             false
         );
 
@@ -56,13 +66,20 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
 
         $this->constraint = new QueryConstraint();
+
+        $this->translator
+            ->expects($this->any())
+            ->method('trans')
+            ->with($this->equalTo($this->constraint->message))
+            ->will($this->returnValue(self::MESSAGE));
     }
 
     public function testValidateNotMatchedQuery()
     {
         $this->context
             ->expects($this->never())
-            ->method('addViolation');
+            ->method('addViolation')
+            ->with($this->equalTo(self::MESSAGE));
 
         $this->validator->validate(new \stdClass(), $this->constraint);
     }
@@ -154,7 +171,8 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context
             ->expects($exception ? $this->once() : $this->never())
-            ->method('addViolation');
+            ->method('addViolation')
+            ->with($this->equalTo(self::MESSAGE));
 
         $this->validator->validate(new Segment(), $this->constraint);
     }
