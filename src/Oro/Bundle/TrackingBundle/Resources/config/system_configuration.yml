@@ -1,10 +1,10 @@
 oro_system_configuration:
     groups:
         tracking:
-            title: 'Tracking'
+            title:  oro.tracking.system_configuration.groups.tracking.title
             icon:  'icon-screenshot'
         tracking_settings:
-            title: 'Tracking settings'
+            title:  oro.tracking.system_configuration.groups.tracking_settings.title
             icon:  'icon-screenshot'
 
     fields:
@@ -13,7 +13,7 @@ oro_system_configuration:
             type: oro_config_checkbox
             priority: 50
             options:
-                label: 'Enable dynamic tracking'
+                label: oro.tracking.system_configuration.fields.dynamic_tracking_enabled.label
                 tooltip: oro.tracking.form.tooltip.dynamic_tracking_enabled
                 required: true
 
@@ -22,25 +22,25 @@ oro_system_configuration:
             type: choice
             priority: 40
             options:
-                label: 'Log Rotation Interval'
+                label: oro.tracking.system_configuration.fields.log_rotate_interval.label
                 tooltip: oro.tracking.form.tooltip.log_rotate_interval
                 required: true
                 constraints:
                     - NotBlank: ~
                 choices:
-                    60: '1 hour'
-                    30: '30 minutes'
-                    20: '20 minutes'
-                    15: '15 minutes'
-                    10: '10 minutes'
-                    5:  '5 minutes'
+                    60: oro.tracking.system_configuration.fields.log_rotate_interval.choices.60
+                    30: oro.tracking.system_configuration.fields.log_rotate_interval.choices.30
+                    20: oro.tracking.system_configuration.fields.log_rotate_interval.choices.20
+                    15: oro.tracking.system_configuration.fields.log_rotate_interval.choices.15
+                    10: oro.tracking.system_configuration.fields.log_rotate_interval.choices.10
+                    5:  oro.tracking.system_configuration.fields.log_rotate_interval.choices.5
 
         oro_tracking.piwik_host:
             data_type: string
             type: text
             priority: 20
             options:
-                label: 'Piwik Host'
+                label: oro.tracking.system_configuration.fields.piwik_host.label
                 tooltip: oro.tracking.form.tooltip.piwik_host
                 required: false
 
@@ -49,7 +49,7 @@ oro_system_configuration:
             type: text
             priority: 10
             options:
-                label: 'Piwik Token Auth'
+                label: oro.tracking.system_configuration.fields.piwik_token_auth.label
                 tooltip: oro.tracking.form.tooltip.piwik_token_auth
                 required: false
 

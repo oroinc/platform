@@ -25,6 +25,7 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
         'translator.class',
         'oro_translation.controller.class',
         'oro_translation.js_translation.domains',
+        'oro_translation.debug_translator'
     );
 
     /**
@@ -80,12 +81,12 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
 
         foreach ($this->expectedDefinitions as $serviceId) {
             $this->assertArrayHasKey($serviceId, $actualDefinitions);
-            $this->assertNotEmpty($actualDefinitions[$serviceId]);
+            $this->assertNotNull($actualDefinitions[$serviceId]);
         }
 
         foreach ($this->expectedParameters as $parameterName) {
             $this->assertArrayHasKey($parameterName, $actualParameters);
-            $this->assertNotEmpty($actualParameters[$parameterName]);
+            $this->assertNotNull($actualParameters[$parameterName]);
         }
     }
 }

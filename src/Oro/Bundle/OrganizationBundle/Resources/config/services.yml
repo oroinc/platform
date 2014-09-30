@@ -64,8 +64,6 @@ services:
     #
     oro_organization.form.type.ownership_type:
         class: %oro_organization.form.type.ownership_type.class%
-        arguments:
-            - @translator
         tags:
             - { name: form.type, alias: oro_type_choice_ownership_type }
 

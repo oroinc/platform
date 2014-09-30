@@ -89,7 +89,7 @@ class FieldType extends AbstractType
             'fieldName',
             'text',
             [
-                'label'       => 'Field Name',
+                'label'       => 'oro.entity_extend.form.field_name.label',
                 'block'       => 'general',
                 'constraints' => [
                     new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])

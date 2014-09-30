@@ -18,8 +18,6 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *      routeView="oro_process_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "label"="Process",
- *              "plural_label"="Processes",
  *              "icon"="icon-inbox"
  *          },
  *          "security"={

@@ -27,7 +27,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_business_unit_index'),
-        'indexLabel':  'oro.organization.businessunit.entity_plural_label',
+        'indexLabel':  'oro.organization.businessunit.entity_plural_label'|trans,
         'entityTitle': entity.name|default('N/A'),
     } %}
     {{ parent() }}

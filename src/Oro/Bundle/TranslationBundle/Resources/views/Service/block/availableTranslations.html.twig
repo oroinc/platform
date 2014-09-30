@@ -45,18 +45,18 @@
                 </td>
                 <td>
                     {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        {{ _self.renderButton(language.code, 'download', 'Download') }}
+                        {{ _self.renderButton(language.code, 'download', 'oro.translation.action.download'|trans) }}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
-                        {{ _self.renderButton(language.code, 'enable', 'Enable') }}
+                        {{ _self.renderButton(language.code, 'enable', 'oro.translation.action.enable'|trans) }}
 
                         {% if not oro_translation_is_fresh(language.code) %}
-                            {{ _self.renderButton(language.code, 'update', 'Update') }}
+                            {{ _self.renderButton(language.code, 'update', 'oro.translation.action.update'|trans) }}
                         {% endif %}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
-                        {{ _self.renderButton(language.code, 'disable', 'Disable') }}
+                        {{ _self.renderButton(language.code, 'disable', 'oro.translation.action.disable'|trans) }}
 
                         {% if not oro_translation_is_fresh(language.code) %}
-                            {{ _self.renderButton(language.code, 'update', 'Update') }}
+                            {{ _self.renderButton(language.code, 'update', 'oro.translation.action.update'|trans) }}
                         {% endif %}
                     {% endif %}
                 </td>
@@ -79,6 +79,6 @@
 #}
 {% macro renderButton(langCode, action, label) %}
     <button class="btn btn-mini" data-lang="{{ langCode }}" data-action="{{ action }}">
-        {{ label|trans }}
+        {{ label }}
     </button>
 {% endmacro %}

@@ -75,4 +75,8 @@ oro:
             success: Integration and all related data were deleted
 
         form:
-          no_available_integrations: No integrations available
+            no_available_integrations: No integrations available
+
+        system_configuration:
+            groups:
+                integrations.title:         'Integrations'

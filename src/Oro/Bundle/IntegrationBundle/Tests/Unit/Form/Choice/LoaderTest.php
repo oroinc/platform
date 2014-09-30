@@ -17,10 +17,16 @@ class LoaderTest extends OrmTestCase
      */
     public function testQueryConfiguration($allowedTypes, $expectedDQL)
     {
-        $em     = $this->getTestEntityManager();
-        $loader = new Loader($em, $allowedTypes);
+        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+            ->disableOriginalConstructor()->getMock();
 
-        $ref = new \ReflectionProperty('Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader', 'queryBuilder');
+        $em     = $this->getTestEntityManager();
+        $loader = new Loader($aclHelper, $em, $allowedTypes);
+
+        $ref = new \ReflectionProperty(
+            'Oro\Bundle\SecurityBundle\Form\ChoiceList\AclProtectedQueryBuilderLoader',
+            'queryBuilder'
+        );
         $ref->setAccessible(true);
 
         /** @var QueryBuilder $qb */

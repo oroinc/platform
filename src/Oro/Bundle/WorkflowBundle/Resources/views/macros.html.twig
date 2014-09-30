@@ -39,6 +39,7 @@
         {% endif %}
     {% endif %}
 
+    {# Transaltions temporary disabled due to BAP-5355 #}
     <a href="{{ transitionData['transition-url'] }}"
         {% for key, value in transitionData %}
             data-{{ key }}="{{ value|e('html_attr')|raw }}"
@@ -46,7 +47,7 @@
         {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
             data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
         {% endif %}
-        title="{{ transition.label|trans }}"
+        title="{{ transition.label }}"
         class="btn icons-holder-text
             {% if transition.displayType == 'dialog' %}no-hash{% endif %}
             {% if not transitionData.enabled %}disabled{% endif %}
@@ -55,7 +56,7 @@
         {% if transition.frontendOptions is defined and transition.frontendOptions.icon is defined %}
             <i class="{{ transition.frontendOptions.icon }}"></i>
         {%- endif -%}
-        {{ transition.label|trans }}
+        {{ transition.label }}
     </a>
 {% endmacro %}
 
@@ -106,11 +107,11 @@
     {% set resetButtonId = 'workflow-item-' ~ data.workflow_item_id ~ '-reset' %}
     <a href="javascript:void(0);"
        data-url="{{ data.url }}"
-       title="{{ data.title|trans }}"
+       title="{{ data.title }}"
        class="btn icons-holder-text btn-primary"
        id="{{ resetButtonId }}">
             <i class="icon-repeat"></i>
-            {{ data.title|trans }}
+            {{ data.title }}
     </a>
 
     <script type="text/javascript">

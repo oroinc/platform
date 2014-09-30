@@ -4,7 +4,7 @@ oro_system_configuration:
             data_type: array
             type:  oro_translation_available_translations
             options:
-                label:      'Available translations'
+                label: oro.translation.system_configuration.fields.available_translations.label
                 required:   false
                 resettable: false
 

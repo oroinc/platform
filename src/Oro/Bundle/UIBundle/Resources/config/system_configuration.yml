@@ -2,11 +2,11 @@ oro_system_configuration:
     groups:
         application_settings:
             icon:        icon-desktop
-            title:       'Application Settings'
+            title:       oro.ui.system_configuration.groups.application_settings.title
             page_reload: true
 
         application_name_settings:
-            title: 'URL'
+            title: oro.ui.system_configuration.groups.application_name_settings.title
 
         navbar_settings:
             title: oro.ui.system_configuration.groups.navbar_settings.title
@@ -16,15 +16,15 @@ oro_system_configuration:
             data_type: string
             type: text
             options:
-                label: 'Application URL'
+                label: oro.ui.system_configuration.fields.application_url.label
         oro_ui.navbar_position:
             data_type: string
             type: choice
             options:
-                label: 'Position'
+                label: oro.ui.system_configuration.fields.navbar_position.label
                 choices:
-                    top: Top
-                    left: Left
+                    top: oro.ui.system_configuration.fields.navbar_position.choices.top
+                    left: oro.ui.system_configuration.fields.navbar_position.choices.left
 
     tree:
         system_configuration:
