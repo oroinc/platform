@@ -13,8 +13,6 @@ class BusinessUnit extends AbstractPageEntity
 {
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $businessUnitName;
-    /** @var  string */
-    protected $organization = "//select[@id = 'oro_business_unit_form_organization']";
 
     public function init()
     {
