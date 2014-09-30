@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -61,7 +62,11 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
             $this->em->flush();
 
             $this->em->commit();
-            $this->em->clear();
+
+            $skipClear = true === $this->stepExecution->getExecutionContext()->get('writer_skip_clear');
+            if (!$skipClear) {
+                $this->em->clear();
+            }
         } catch (\Exception $exception) {
             $this->em->rollback();
             $this->ensureEntityManagerReady();
