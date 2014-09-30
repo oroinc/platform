@@ -78,8 +78,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->context
             ->expects($this->never())
-            ->method('addViolation')
-            ->with($this->equalTo(self::MESSAGE));
+            ->method('addViolation');
 
         $this->validator->validate(new \stdClass(), $this->constraint);
     }
@@ -171,8 +170,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->context
             ->expects($exception ? $this->once() : $this->never())
-            ->method('addViolation')
-            ->with($this->equalTo(self::MESSAGE));
+            ->method('addViolation');
 
         $this->validator->validate(new Segment(), $this->constraint);
     }

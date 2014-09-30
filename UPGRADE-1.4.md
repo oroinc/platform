@@ -88,6 +88,10 @@ UPGRADE FROM 1.3 to 1.4
 - New argument `$criteria` in `Controller\Api\Soap\SoapApiReadInterface` method `handleGetListRequest`  has been added after argument `$limit`
 - New events `Event\FindAfter` with name `oro_api.request.find.after` and `Event\GetListBefore` with name `oro_api.request.get_list.before` has been added
 
+####TranslationBunle:
+- Added debug translator that highlights translated and not translated strings on UI, see "Configuration" section of
+`TranslationBundle` documentation for more details
+
 ####UIBundle:
 - In `Tools\ArrayUtils` new method `arrayMergeRecursiveDistinct` has been added
 
@@ -100,3 +104,4 @@ UPGRADE FROM 1.3 to 1.4
 
 ####WorkflowBundle:
 - `Acl\Voter\WorkflowEntityVoter` now extends from `Acl\Voter\AbstractEntityVoter`
+- Workflow transitions might have custom templates, see transition options `dialog_template` and `page_template`
