@@ -25,9 +25,9 @@ Previously, email templates were used only for email notifications. Now their ro
 Support for variables in templates was extended: in addition to "contextual" variables that were related to attributes of the template entity, templates may include "system-wide" variables like current user's first name, or current time, or name of the organization. It is also possible to create a "generic" template that is not related to any entity; in this case it may contain only system variables.
 New templates are subject to ACL and have owner of user type.
  * Other improvements
-  * Multiple improvements to Web API
-  * A new implementation of option sets
-  * Improved grids
+  ** Multiple improvements to Web API
+  ** A new implementation of option sets
+  ** Improved grids
  * Community requests.
 Here is the list of Community requests that were addressed in this version.
 Features & improvements
