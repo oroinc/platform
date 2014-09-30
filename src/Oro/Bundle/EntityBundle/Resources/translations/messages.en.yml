@@ -10,6 +10,9 @@ oro:
             entity_fields:          Fields
             entity_related:         Related
 
+        plural_label: Entities
+        item: "Item #%id%"
+
         validation:
             unique_field: Value for field "%field%" must be unique|Combination of values for "%field%" fields must be unique
 

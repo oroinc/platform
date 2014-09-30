@@ -54,7 +54,7 @@ class ArrayUtils
         $result = [];
 
         if (empty($array)) {
-            throw new \InvalidArgumentException('Array is empty');
+            return [];
         }
 
         if (empty($columnKey)) {
