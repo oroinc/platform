@@ -79,6 +79,7 @@ services:
         arguments:
             - @oro_datagrid.configuration.provider.chain
             - @oro_datagrid.datagrid.builder
+            - @translator
             - %kernel.debug%
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
