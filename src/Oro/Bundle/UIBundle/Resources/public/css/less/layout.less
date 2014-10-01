@@ -1,30 +1,83 @@
-.responsive-cell, .responsive-block {
-  float: left;
-  width: 50%;
-  &:only-child {
+// Section has only one cell
+.responsive-section.responsive-small.responsive-single-cell,
+.responsive-section.responsive-medium.responsive-single-cell,
+.responsive-section.responsive-big.responsive-single-cell {
+  .responsive-cell {
     width: 100%;
     float: none;
   }
 }
 
-.responsive-cell{
-  .forScreen(@mediumScreen, width, 100%);
-  .forScreen(@mediumScreen, float, none);
+// Cell has only one block
+.responsive-section.responsive-cell.responsive-single-block {
+  .responsive-block {
+    width: 100%;
+    float: none;
+  }
 }
 
-.responsive-block{
-  .forScreen(@smallScreen, width, 100%);
-  .forScreen(@smallScreen, float, none);
-}
-.ui-dialog{
-  max-width: 100%;
-  /**
-   * That's a temporary solution and needs to be updated
-   */
+// Medium screen
+.responsive-section.responsive-medium {
   .responsive-cell {
-    width: auto;
+    width: 100;
+    float: none;
+
+    .responsive-block {
+      width: 50%;
+      float: left;
+    }
+  }
+
+  .responsive-cell:first-child {
+    padding-right: 0;
+  }
+}
+
+.responsive-section.responsive-no-blocks.responsive-medium {
+  .responsive-cell {
+    width: 50%;
     float: left;
   }
+
+  // hide vertical separator on medium screen
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+
+  .responsive-cell:first-child {
+    padding-right: 0;
+  }
+}
+
+// Big screen
+.responsive-section.responsive-big {
+  .responsive-cell,
+  .responsive-block {
+    float: left;
+    width: 50%;
+  }
+}
+
+// Small screen
+.responsive-section.responsive-small {
+  .responsive-cell {
+    width: 100%;
+    float: none;
+
+    .responsive-block {
+      width: 50%;
+      float: left;
+    }
+  }
+
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+}
+
+.ui-dialog {
+  max-width: 100%;
+
   .row-fluid.row-fluid-divider {
     background: none;
   }
@@ -32,6 +85,7 @@
 .responsive-cell {
   margin-bottom: 35px;
 }
+
 .container-fluid > .responsive-section {
   margin: 0 -@horizontalPadding;
   padding-right: @horizontalPadding;
@@ -43,7 +97,6 @@
   }
   .responsive-cell:first-child {
     padding-right: @horizontalPadding;
-    .forScreen(@mediumScreen, padding-right, 0px);
   }
 }
 .responsive-section {

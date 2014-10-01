@@ -1,6 +1,8 @@
 /*global define*/
 define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
-        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger', 'orotranslation/js/translator', 'jquery.dialog.extended'
+        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger',
+        'orotranslation/js/translator', 'jquery.dialog.extended',
+        'oroui/js/responsive-jquery-widget'
     ], function ($, _, tools, error, AbstractWidget, StateModel, messenger, __) {
     'use strict';
 
