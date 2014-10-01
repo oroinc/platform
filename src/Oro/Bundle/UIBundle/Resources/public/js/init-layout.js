@@ -198,7 +198,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from height_fix.js
      * ============================================================ */
-    (function () {
+    $(function () {
         if (tools.isMobile()) {
             return;
         }
@@ -303,10 +303,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         mediator.on('layout:adjustHeight', adjustHeight);
         mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
 
-        $(function () {
-            adjustHeight();
-        });
-    }());
+        adjustHeight();
+    });
 
     /* ============================================================
      * from form_buttons.js
