@@ -1220,7 +1220,7 @@ footer {
 .navigation {
   position: relative;
   .top-action-box {
-    padding: 4px 0 0;
+    padding: 3px 12px;
     background-color: #fff;
     float:right;
   }
@@ -2885,16 +2885,28 @@ label.radio.error {
   border: 0;
   -webkit-box-shadow:  none;
   box-shadow:  none;
-  height: 28px;
+  height: 26px;
+  width: 26px;
+  &:hover{
+    background: #eee;
+    .icon-star:before,
+    .icon-pushpin:before {
+      color: #d7d7d7;
+    }
+  }
 }
-.btn.minimize-button { margin-right:12px; }
+.btn.favorite-button {
+  padding: 1px 0;
+}
 .btn.favorite-button .icon-star:before,
 .btn.minimize-button .icon-pushpin:before {
   color:#e7e7e7;
   font-size:19px;
 }
 .btn.favorite-button.gold-icon i:before,
-.btn.minimize-button.gold-icon i:before{
+.btn.favorite-button.gold-icon:hover i:before,
+.btn.minimize-button.gold-icon i:before,
+.btn.minimize-button.gold-icon:hover i:before{
   color:#ffd631;
 }
 #pin-button-div {
