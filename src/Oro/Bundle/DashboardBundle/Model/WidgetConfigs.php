@@ -6,7 +6,7 @@ use Oro\Component\Config\Resolver\ResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class WidgetAttributes
+class WidgetConfigs
 {
     /** @var ConfigProvider */
     protected $configProvider;
