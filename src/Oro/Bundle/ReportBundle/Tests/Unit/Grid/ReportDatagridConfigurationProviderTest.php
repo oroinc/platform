@@ -231,7 +231,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
         $expectedActions = [
             'view' => [
                 'type'         => 'navigate',
-                'label'        => 'View',
+                'label'        => 'oro.report.datagrid.view',
                 'acl_resource' => 'VIEW;entity:Oro\Bundle\AddressBundle\Entity\Address',
                 'icon'         => 'eye-open',
                 'link'         => 'view_link',

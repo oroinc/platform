@@ -30,6 +30,6 @@ class ParentScopeCheckbox extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(['required' => false, 'label' => 'Use default']);
+        $resolver->setDefaults(['required' => false, 'label' => 'oro.config.system_configuration.use_default']);
     }
 }

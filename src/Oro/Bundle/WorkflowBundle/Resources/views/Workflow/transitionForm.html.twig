@@ -4,9 +4,9 @@
 
 {% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
-    {% set title = pageParams.title %}
+    {% set pageTitle = pageParams.title %}
 {% else %}
-    {% set title = transition.label %}
+    {% set pageTitle = transition.label %}
 {% endif %}
 
 {% if pageParams.parent_label is defined %}
@@ -21,7 +21,7 @@
     {% set indexPath = null %}
 {% endif %}
 
-{% oro_title_set({params : {"%workflow_title%": title|trans ~ ' - ' ~ indexLabel|trans} }) %}
+{% oro_title_set({params : {"%workflow_title%": pageTitle|trans ~ ' - ' ~ indexLabel|trans} }) %}
 
 {% block navButtons %}
     {% if indexPath %}
@@ -41,8 +41,8 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'indexPath': indexPath,
-        'indexLabel': indexLabel,
-        'entityTitle': title|trans
+        'indexLabel': indexLabel|trans,
+        'entityTitle': pageTitle|trans
     } %}
 
     {% block stats %}{% endblock %}

@@ -24,6 +24,7 @@ define([
             confirm_title: 'Mass Action Confirmation',
             confirm_content: 'Are you sure you want to do this?',
             confirm_ok: 'Yes, do it',
+            confirm_cancel: 'Cancel',
             success: 'Mass action performed.',
             error: 'Mass action is not performed.',
             empty_selection: 'Please, select items to perform mass action.'

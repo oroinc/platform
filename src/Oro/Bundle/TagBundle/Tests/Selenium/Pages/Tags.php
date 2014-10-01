@@ -60,7 +60,7 @@ class Tags extends AbstractPageFilteredGrid
         $action->click();
         $action->click();
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Update']")->click();
+        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $tag = new Tag($this->test);

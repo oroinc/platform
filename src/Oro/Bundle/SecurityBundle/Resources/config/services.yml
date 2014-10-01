@@ -59,10 +59,12 @@ parameters:
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
     oro_security.authentication.organization_rememberme.services.simplehash.class: Oro\Bundle\SecurityBundle\Http\RememberMe\OrganizationTokenBasedRememberMeServices
-    oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
 
+    oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
     oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
     oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
+
+    oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
 services:
     oro_security.security_facade:
@@ -471,6 +473,13 @@ services:
           tags:
               - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
+
+    oro_security.form.extension.aclprotected_type:
+        class: %oro_security.form.extension.aclprotected_type.class%
+        arguments:
+            - @oro_security.acl_helper
+        tags:
+            - { name: form.type_extension, alias: entity }
 
     oro_security.listener.search_listener:
           class: %oro_security.listener.search_listener.class%

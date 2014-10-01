@@ -1,3 +1,47 @@
+CHANGELOG for 1.4.0-RC1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.0-RC1 versions.
+* 1.4.0-RC1 (2014-09-30)
+ * The re-introduction of Channels.
+We started the implementation of a new vision for the Channels in 1.3 version and now we bring Channels back, although under a new definition.
+The general idea behind channels may be explained as follows: a channel in OroCRM represents an outside source customer and sales data, where "customer" and "sales" must be understood in the broadest sense possible. Depending on the nature of the outside source, the channel may or may not require a data integration.
+This new definition leads to multiple noticeable changes across the system.
+ * Integration management.
+Albeit the Integrations grid still displays all integrations that exist in the system, you now may create only "non-customer" standalone integrations, such as Zendesk integration. The "customer" integrations, such as Magento integration, may be created only in scope of a channel and cannot exist without it.
+ * Marketing lists.
+Marketing lists serve as the basis for marketing activities, such as email campaigns (see below). They represent a target auditory of the activity—that is, people, who will be contacted when the activity takes place. Marketing lists have little value by themselves; they exist in scope of some marketing campaign and its activities.
+Essentially, marketing list is a segment of entities that contain some contact information, such as email or phone number or physical address. Lists are build based on some rules using Oro filtering tool. Similarly to segments, marketing lists can be static or dynamic; the rules are the same. The user can build marketing lists of contacts, Magento customers, leads, etc.
+In addition to filtering rules, the user can manually tweak contents of the marketing list by removing items ("subscribers") from it. Removed subscribers will no longer appear in the list even if they fit the conditions. It is possible to move them back in the list, too.
+Every subscriber can also unsubscribe from the list. In this case, he will remain in the list, but will no longer receive email campaigns that are sent to this list. Note that subscription status is managed on per-list basis; the same contact might be subscribed to one list and unsubscribed from another.
+ * Email campaigns.
+Email campaign is a first example of marketing activity implemented in OroCRM. The big picture is following: Every marketing campaign might contain multiple marketing activities, e.g. an email newsletter, a context ad campaign, a targeted phone advertisement. All these activities serve the common goal of the "big" marketing campaign.
+In its current implementation, email campaign is a one-time dispatch of an email to a list of subscribers. Hence, the campaign consists of three basic parts:
+Recipients—represented by a Marketing list.
+Email itself—the user may choose a template, or create a campaign email from scratch.
+Sending rules—for now, only one-time dispatch is available.
+Email campaign might be tied to a marketing campaign, but it might exist on its own as well.
+ * Improved Email templates.
+Previously, email templates were used only for email notifications. Now their role is expanded: it is now possible to use templates in email activities to create a new email from the template, and for email campaigns.
+Support for variables in templates was extended: in addition to "contextual" variables that were related to attributes of the template entity, templates may include "system-wide" variables like current user's first name, or current time, or name of the organization. It is also possible to create a "generic" template that is not related to any entity; in this case it may contain only system variables.
+New templates are subject to ACL and have owner of user type.
+ * Other improvements
+ <ul><li>Multiple improvements to Web API</li>
+ <li>A new implementation of option sets</li>
+ <li>Improved grids</li></ul>
+ * Community requests.
+Here is the list of Community requests that were addressed in this version.
+Features & improvements
+  <ul><li>#50 Add the way to filter on empty fields</li>
+  <li>#116 Add custom templates to workflow transitions</li>
+  <li>#118 Extending countries</li>
+  <li>#136 Console command for CSV import/export</li>
+  <li>#149 New "link" type for datagrid column format</li></ul>
+ * Bugs fixed
+  <ul><li>#47 Problems with scrolling in iOS 7</li>
+  <li>#62 Problems with the Recent Emails widget</li>
+  <li>#139 Error 500 after removing unique key of entity</li>
+  <li>#158 Update doctrine version to 2.4.4</li></ul>
+
 CHANGELOG for 1.3.1
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.3.1 versions.

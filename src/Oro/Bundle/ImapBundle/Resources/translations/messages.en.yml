@@ -1,0 +1,7 @@
+oro.imap:
+    configuration:
+        host.label: Host
+        port.label: Port
+        ssl.label: SSL
+        user.label: User
+        password.label: Passowrd

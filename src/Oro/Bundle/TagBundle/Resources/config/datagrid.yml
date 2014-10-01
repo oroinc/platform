@@ -68,20 +68,20 @@ datagrid:
         actions:
             search:
                 type:          navigate
-                label:         Search by tag
+                label:         oro.tag.datagrid.search
                 link:          search_link
                 icon:          search
                 acl_resource:  oro_tag_view
                 rowAction:     true
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_tag_update
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_tag_delete

@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependencyPass;
+use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
 
 class OroTranslationBundle extends Bundle
 {
@@ -14,8 +15,7 @@ class OroTranslationBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        parent::build($container);
-
         $container->addCompilerPass(new TranslatorDependencyPass());
+        $container->addCompilerPass(new DebugTranslatorPass());
     }
 }

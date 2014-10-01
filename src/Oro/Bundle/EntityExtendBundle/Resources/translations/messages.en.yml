@@ -1,5 +1,12 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
+"System": "System"
+"Custom": "Custom"
+"New": "New"
+"Requires update": "Requires update"
+"Active": "Active"
+"Deleted": "Deleted"
+
 oro:
     entity_extend:
         datagrid:
@@ -40,6 +47,10 @@ oro:
                 object:             Binary
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
+            field_name.label:       Field name
+            name.label:             Name
+            key.label:              Key
+
         enum_name:    Option Set Name
         enum_public:  Public
         enum_options: Options
@@ -62,7 +73,42 @@ oro:
             config_field:
                 message:
                     saved: "Field saved"
-        unique_keys: Unique Keys
+        unique_keys: "Unique Keys"
+
+        entity_config:
+            extend:
+                entity:
+                    grid_action:
+                        remove: "Remove"
+                        restore: "Restore"
+                    layout_action:
+                        create_entity: "Create entity"
+                    items:
+                        owner: "Type"
+                        is_extend: "Is Extend"
+                        state: "Schema status"
+                field:
+                    grid_action:
+                        remove: "Remove"
+                        restore: "Restore"
+                    layout_action:
+                        manage_unique_keys: "Manage unique keys"
+                        create_field: "Create field"
+                        update_schema: "Update schema"
+                    items:
+                        owner: "Type"
+                        state: "Schema status"
+                        length: "Length"
+                        precision: "Precision"
+                        scale: "Scale"
+                        set_expanded: "Expanded"
+                        set_options: "Options"
+
+        config_grid:
+            entities: Entities
+            new_entity: New entity
+            unique_keys: Unique keys
+            new_field: New field
 
     entityextend:
         enumvalue:

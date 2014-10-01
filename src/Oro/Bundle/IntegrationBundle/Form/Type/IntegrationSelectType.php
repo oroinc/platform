@@ -17,6 +17,7 @@ use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class IntegrationSelectType extends AbstractType
 {
@@ -32,12 +33,18 @@ class IntegrationSelectType extends AbstractType
      * @param EntityManager    $em
      * @param TypesRegistry    $typesRegistry
      * @param CoreAssetsHelper $assetHelper
+     * @param AclHelper        $aclHelper
      */
-    public function __construct(EntityManager $em, TypesRegistry $typesRegistry, CoreAssetsHelper $assetHelper)
-    {
+    public function __construct(
+        EntityManager $em,
+        TypesRegistry $typesRegistry,
+        CoreAssetsHelper $assetHelper,
+        AclHelper $aclHelper
+    ) {
         $this->em            = $em;
         $this->typesRegistry = $typesRegistry;
         $this->assetHelper   = $assetHelper;
+        $this->aclHelper     = $aclHelper;
     }
 
     /**
@@ -58,7 +65,12 @@ class IntegrationSelectType extends AbstractType
         $choiceList        = function (Options $options) use ($em) {
             $types = $options->has('allowed_types') ? $options->get('allowed_types') : null;
 
-            return new EntityChoiceList($em, 'OroIntegrationBundle:Channel', 'name', new Loader($em, $types));
+            return new EntityChoiceList(
+                $em,
+                'OroIntegrationBundle:Channel',
+                'name',
+                new Loader($this->aclHelper, $em, $types)
+            );
         };
 
         $resolver->setDefaults(

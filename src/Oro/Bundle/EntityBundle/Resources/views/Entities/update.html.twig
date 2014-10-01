@@ -2,7 +2,7 @@
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
 {% set entityName = entity.id
-    ? 'Item #'~entity.id
+    ? 'oro.entity.item'|trans({'%id%': entity.id})
     : 'oro.ui.create_entity'|trans({'%entityName%': entity_config.get('label')|trans})
 %}
 {% oro_title_set({params : {"%entityName%": entityName} }) %}
@@ -26,7 +26,7 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'oro.entity.plural_label'|trans,
         'entityTitle': entityName,
         'additional': [
             {

@@ -70,7 +70,7 @@ class NavigationListener
             $systemTabMenuItem->addChild(
                 'package_manager',
                 [
-                    'label'          => 'Package Manager',
+                    'label'          => 'oro.distribution.package_manager.label',
                     'uri'            => $uri,
                     'linkAttributes' => ['class' => 'no-hash'],
                     'extras'         => ['position' => '110'],

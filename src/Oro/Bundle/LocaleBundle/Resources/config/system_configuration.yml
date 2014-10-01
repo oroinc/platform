@@ -1,18 +1,18 @@
 oro_system_configuration:
     groups:
         localization:
-            title: 'Localization'
+            title: oro.locale.system_configuration.groups.localization.title
             icon:  'icon-flag'
             page_reload: true
         language_settings:
-            title: 'Language settings'
+            title: oro.locale.system_configuration.groups.language_settings.title
             icon:  'icon-font'
         language_languages:
-            title: 'Languages'
+            title: oro.locale.system_configuration.groups.language_languages.title
         locale_settings:
-            title: 'Localization options'
+            title: oro.locale.system_configuration.groups.locale_settings.title
         map_settings:
-            title: 'Map options'
+            title: oro.locale.system_configuration.groups.map_settings.title
 
     fields:
         oro_locale.locale:
@@ -20,7 +20,7 @@ oro_system_configuration:
             type: oro_locale
             priority: 70
             options:
-                label: 'Locale'
+                label: oro.locale.system_configuration.fields.locale.label
                 tooltip: oro.locale.form.tooltip.locale
                 required: true
                 constraints:
@@ -31,7 +31,7 @@ oro_system_configuration:
             type: oro_locale_country
             priority: 60
             options:
-                label: 'Primary Location'
+                label: oro.locale.system_configuration.fields.country.label
                 tooltip: oro.locale.form.tooltip.location
                 required: true
                 constraints:
@@ -42,7 +42,7 @@ oro_system_configuration:
             type: oro_config_checkbox
             priority: 50
             options:
-                label: 'Format address per country'
+                label: oro.locale.system_configuration.fields.format_address_by_address_country.label
                 tooltip: oro.locale.form.tooltip.format_address_by_address_country
                 required: true
 
@@ -51,7 +51,7 @@ oro_system_configuration:
             type: oro_language
             priority: 40
             options:
-                label: 'Default Language'
+                label: oro.locale.system_configuration.fields.language.label
                 tooltip: oro.locale.form.tooltip.language
                 required: true
                 constraints:
@@ -62,7 +62,7 @@ oro_system_configuration:
             type: oro_language
             priority: 35
             options:
-                label: 'Supported languages'
+                label: oro.locale.system_configuration.fields.languages.label
                 tooltip: oro.locale.form.tooltip.languages
                 required: true
                 multiple: true
@@ -74,7 +74,7 @@ oro_system_configuration:
             type: oro_locale_timezone
             priority: 30
             options:
-                label: 'Timezone'
+                label: oro.locale.system_configuration.fields.timezone.label
                 tooltip: oro.locale.form.tooltip.timezone
                 required: true
                 constraints:
@@ -85,7 +85,7 @@ oro_system_configuration:
             type: oro_currency
             priority: 20
             options:
-                label: 'Currency'
+                label: oro.locale.system_configuration.fields.currency.label
                 tooltip: oro.locale.form.tooltip.currency
                 required: true
                 constraints:
@@ -96,7 +96,7 @@ oro_system_configuration:
             type: oro_quarter
             priority: 30
             options:
-                label: 'First Quarter Starts on'
+                label: oro.locale.system_configuration.fields.quarter_start.label
                 tooltip: oro.locale.form.tooltip.quarter_start
                 required: true
                 constraints:
@@ -107,29 +107,29 @@ oro_system_configuration:
             type: choice
             priority: 20
             options:
-                label: 'Temperature Unit'
+                label: oro.locale.system_configuration.fields.temperature_unit.label
                 tooltip: oro.locale.form.tooltip.temperature_unit
                 required: true
                 constraints:
                     - NotBlank: ~
                 choices:
-                    fahrenheit: 'Fahrenheit'
-                    celsius: 'Celsius'
+                    fahrenheit: oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit
+                    celsius: oro.locale.system_configuration.fields.temperature_unit.choices.celsius
 
         oro_locale.wind_speed_unit:
             data_type: string
             type: choice
             priority: 10
             options:
-                label: 'Wind Speed Unit'
+                label: oro.locale.system_configuration.fields.wind_speed_unit.label
                 tooltip: oro.locale.form.tooltip.wind_speed_unit
                 required: true
                 constraints:
                     - NotBlank: ~
                 choices:
-                    miles_per_hour: 'Miles per hour'
-                    kilometers_per_hour: 'Kilometers per hour'
-                    meters_per_second: 'Meters per second'
+                    miles_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour
+                    kilometers_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour
+                    meters_per_second: oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second
 
     tree:
         system_configuration:

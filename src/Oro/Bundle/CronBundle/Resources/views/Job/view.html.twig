@@ -8,8 +8,8 @@
     {% set breadcrumbs = {
         entity:      entity,
         indexPath:   path('oro_cron_job_index'),
-        indexLabel:  'Jobs',
-        entityTitle: 'Job "' ~ entity.command ~ '"'
+        indexLabel:  'oro.cron.header.jobs'|trans,
+        entityTitle: 'oro.cron.header.job'|trans({'%name%': entity.command})
     }
     %}
     {{ parent() }}

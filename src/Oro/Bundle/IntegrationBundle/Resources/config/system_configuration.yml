@@ -1,5 +1,5 @@
 oro_system_configuration:
     groups:
         integrations:
-            title: 'Integrations'
+            title: oro.integration.system_configuration.groups.integrations.title
 

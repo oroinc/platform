@@ -159,7 +159,7 @@
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {% if ('column' in showItems) %}
         {{ form_row(form.name, {
-            'label': 'oro.query_designer.form.column'|trans,
+            'label': 'oro.query_designer.form.column',
             'entity_choice_selector': '#' ~ params.entity_choice_id,
             'attr': {
                 'data-purpose': 'column-selector',
@@ -170,7 +170,7 @@
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {% if ('label' in showItems) %}
         {{ form_row(form.label, {
-            'label': 'oro.query_designer.form.label'|trans,
+            'label': 'oro.query_designer.form.label',
             'attr': {
                 'class': 'label-text',
                 'data-purpose': 'label',
@@ -180,7 +180,7 @@
         {% endif %}
         {% if ('function' in showItems) %}
         {{ form_row(form.func, {
-            'label': 'oro.query_designer.form.function'|trans,
+            'label': 'oro.query_designer.form.function',
             'attr': {
                 'class': 'function-selector',
                 'data-purpose': 'function-selector'
@@ -189,7 +189,7 @@
         {% endif %}
         {% if ('sorting' in showItems) %}
         {{ form_row(form.sorting, {
-            'label': 'oro.query_designer.form.sorting'|trans,
+            'label': 'oro.query_designer.form.sorting',
             'attr': {
                 'class': 'sorting-selector',
                 'data-purpose': 'sorting-selector'
@@ -224,7 +224,7 @@
         {# @todo own formtype for this kind field based on hidden input #}
         {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {{ form_row(form.columnNames, {
-            'label': 'oro.query_designer.form.grouping_columns'|trans,
+            'label': 'oro.query_designer.form.grouping_columns',
             'entity_choice_selector': '#' ~ params.entity_choice_id,
             'attr': {
                 'data-purpose': 'column-selector',

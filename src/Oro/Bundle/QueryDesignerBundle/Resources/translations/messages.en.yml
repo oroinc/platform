@@ -36,3 +36,6 @@ oro:
                 field_condition:   Field Condition
                 conditions_group:  Conditions Group
             choose_entity_field: Choose a field...
+        validation:
+            grouping: "%columns% must appear in grouping."
+            query: Invalid query

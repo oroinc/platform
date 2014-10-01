@@ -30,7 +30,7 @@ services:
         class: %oro_organization.form.type.business_unit.class%
         arguments:
             - @oro_organization.business_unit_manager
-            - @oro_organization.organization_manager
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_business_unit }
 
@@ -38,7 +38,7 @@ services:
         class: %oro_organization.form.type.business_unit.api.class%
         arguments:
             - @oro_organization.business_unit_manager
-            - @oro_organization.organization_manager
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: business_unit }
 
@@ -120,12 +120,10 @@ services:
     oro_organization.form.extension.owner:
         class: %oro_organization.form.extension.owner.class%
         arguments:
-            - @security.context
             - @doctrine
             - @oro_security.owner.ownership_metadata_provider
             - @oro_organization.business_unit_manager
             - @oro_security.security_facade
-            - @translator
             - @?security.acl.voter.basic_permissions
             - @oro_security.ownership_tree_provider
         tags:

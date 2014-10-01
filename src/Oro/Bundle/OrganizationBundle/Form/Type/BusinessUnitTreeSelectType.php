@@ -28,6 +28,7 @@ class BusinessUnitTreeSelectType extends AbstractType
                     'is_safe'              => false,
                 ),
                 'business_unit_ids' => [],
+                'forbidden_business_unit_ids' => []
             )
         );
     }
@@ -46,5 +47,6 @@ class BusinessUnitTreeSelectType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['business_unit_ids'] = $options['business_unit_ids'];
+        $view->vars['forbidden_business_unit_ids'] = $options['forbidden_business_unit_ids'];
     }
 }

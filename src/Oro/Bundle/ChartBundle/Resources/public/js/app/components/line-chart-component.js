@@ -1,5 +1,6 @@
 define(function(require) {
     var Flotr = require('flotr2');
+    var dataFormatter = require('orochart/js/data_formatter');
     var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
     var BarChartComponent;
 

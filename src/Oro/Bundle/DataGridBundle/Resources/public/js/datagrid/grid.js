@@ -332,7 +332,7 @@ define(function (require) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
                     launcherOptions: {
-                        label: 'Refresh',
+                        label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
                         iconClassName: 'icon-refresh'
                     }
@@ -362,7 +362,7 @@ define(function (require) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
                     launcherOptions: {
-                        label: 'Reset',
+                        label: __('oro_datagrid.action.reset'),
                         className: 'btn',
                         iconClassName: 'icon-repeat'
                     }

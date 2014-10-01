@@ -22,7 +22,7 @@ class BusinessUnitSoap extends BusinessUnit implements SoapEntityInterface
     protected $name;
 
     /**
-     * @Soap\ComplexType("int", nillable=false)
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $organization;
 

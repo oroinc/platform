@@ -70,21 +70,37 @@ class ConfigurationType extends AbstractType
         );
 
         $builder
-            ->add('host', 'text', array('required' => true))
-            ->add('port', 'number', array('required' => true))
+            ->add(
+                'host',
+                'text',
+                array('label' => 'oro.imap.configuration.host.label', 'required' => true)
+            )
+            ->add(
+                'port',
+                'number',
+                array('label' => 'oro.imap.configuration.port.label', 'required' => true)
+            )
             ->add(
                 'ssl',
                 'choice',
                 array(
-                    'label'       => 'SSL',
+                    'label'       => 'oro.imap.configuration.ssl.label',
                     'choices'     => array('ssl' => 'SSL', 'tls' => 'TLS'),
                     'empty_data'  => null,
                     'empty_value' => '',
                     'required'    => false
                 )
             )
-            ->add('user', 'text', array('required' => true))
-            ->add('password', 'password', array('required' => true));
+            ->add(
+                'user',
+                'text',
+                array('label' => 'oro.imap.configuration.user.label', 'required' => true)
+            )
+            ->add(
+                'password',
+                'password',
+                array('label' => 'oro.imap.configuration.password.label', 'required' => true)
+            );
     }
 
     /**
