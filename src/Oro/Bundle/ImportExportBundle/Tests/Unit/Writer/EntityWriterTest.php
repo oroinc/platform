@@ -3,23 +3,19 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
-use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 
 class EntityWriterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $detachFixer;
 
-    /**
-     * @var EntityWriter
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $contextRegistry;
+
+    /** @var EntityWriter */
     protected $writer;
 
     protected function setUp()
@@ -32,10 +28,17 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->writer = new EntityWriter($this->entityManager, $this->detachFixer);
+        $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+
+        $this->writer = new EntityWriter($this->entityManager, $this->detachFixer, $this->contextRegistry);
     }
 
-    public function testWrite()
+    /**
+     * @param array $configuration
+     *
+     * @dataProvider configurationProvider
+     */
+    public function testWrite($configuration)
     {
         $fooItem = $this->getMock('FooItem');
         $barItem = $this->getMock('BarItem');
@@ -59,7 +62,38 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->at(2))
             ->method('flush');
 
-        $items = array($fooItem, $barItem);
-        $this->writer->write($items);
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context->expects($this->once())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
+
+        $this->contextRegistry->expects($this->once())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->will($this->returnValue($context));
+
+        if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
+            $this->entityManager->expects($this->at(3))
+                ->method('clear');
+        }
+
+        $this->writer->setStepExecution($stepExecution);
+        $this->writer->write([$fooItem, $barItem]);
+    }
+
+    /**
+     * @return array
+     */
+    public function configurationProvider()
+    {
+        return [
+            'no clear flag'    => [[]],
+            'clear flag false' => [[EntityWriter::SKIP_CLEAR => false]],
+            'clear flag true'  => [[EntityWriter::SKIP_CLEAR => true]],
+        ];
     }
 }

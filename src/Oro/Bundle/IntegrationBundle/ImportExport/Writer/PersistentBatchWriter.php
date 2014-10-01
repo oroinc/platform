@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
-use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -11,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
