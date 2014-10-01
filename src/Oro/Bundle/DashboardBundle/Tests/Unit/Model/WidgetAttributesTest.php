@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 
 class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WidgetAttributes */
+    /** @var WidgetConfigs */
     protected $target;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -30,7 +30,7 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
 
-        $this->target = new WidgetAttributes($this->configProvider, $this->securityFacade, $this->resolver);
+        $this->target = new WidgetConfigs($this->configProvider, $this->securityFacade, $this->resolver);
     }
 
     public function testGetWidgetAttributesForTwig()
