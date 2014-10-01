@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
+
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
