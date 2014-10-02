@@ -95,10 +95,16 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param bool   $isFullData
      * @param bool   $isPersistNew
      * @param mixed|array|null $itemData
+     * @param array $searchContext
      * @return null|object
      */
-    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, $itemData = null)
-    {
+    protected function processEntity(
+        $entity,
+        $isFullData = false,
+        $isPersistNew = false,
+        $itemData = null,
+        array $searchContext = array()
+    ) {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
             return $entity;
@@ -108,7 +114,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         $fields = $this->fieldHelper->getFields($entityName, true);
 
         // find and cache existing or new entity
-        $existingEntity = $this->findExistingEntity($entity, $fields);
+        $existingEntity = $this->findExistingEntity($entity, $fields, $searchContext);
         if ($existingEntity) {
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
@@ -172,6 +178,17 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                 $fieldName = $field['name'];
                 $isFullRelation = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
+                $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
+
+                // additional search parameters to find only related entities
+                $searchContext = array();
+                if ($inversedFieldName && $this->databaseHelper->getIdentifier($entity)) {
+                    if ($this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
+                        $searchContext[$inversedFieldName] = $entity;
+                    } else {
+                        $searchContext[$inversedFieldName] = array($entity);
+                    }
+                }
 
                 // single relation
                 if ($this->fieldHelper->isSingleRelation($field)) {
@@ -182,7 +199,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                             $relationEntity,
                             $isFullRelation,
                             $isPersistRelation,
-                            $relationItemData
+                            $relationItemData,
+                            $searchContext
                         );
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
@@ -199,7 +217,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                                 $collectionEntity,
                                 $isFullRelation,
                                 $isPersistRelation,
-                                $entityItemData
+                                $entityItemData,
+                                $searchContext
                             );
 
                             if ($collectionEntity) {
@@ -218,9 +237,10 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     /**
      * @param object $entity
      * @param array $fields
+     * @param array $searchContext
      * @return null|object
     */
-    protected function findExistingEntity($entity, array $fields)
+    protected function findExistingEntity($entity, array $fields, array $searchContext = array())
     {
         $entityName = ClassUtils::getClass($entity);
         $identifier = $this->databaseHelper->getIdentifier($entity);
@@ -233,7 +253,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
         // find by identity fields
         if (!$existingEntity) {
-            $identityValues = array();
+            $identityValues = $searchContext;
             foreach ($fields as $field) {
                 $fieldName = $field['name'];
                 if (!$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
