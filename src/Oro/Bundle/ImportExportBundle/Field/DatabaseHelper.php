@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class DatabaseHelper
@@ -42,10 +44,35 @@ class DatabaseHelper
      */
     public function findOneBy($entityName, array $criteria)
     {
-        $storageKey = serialize($criteria);
+        $serializationCriteria = array();
+        $where = array();
+
+        foreach ($criteria as $field => $value) {
+            if (is_array($value)) {
+                $value = current($value);
+                $criteria[$field] = $value;
+                $serializationCriteria[$field] = $this->getIdentifier($value);
+                $where[] = sprintf(':%s MEMBER OF e.%s', $field, $field);
+            } elseif (is_object($value)) {
+                $serializationCriteria[$field] = $this->getIdentifier($value);
+                $where[] = sprintf('e.%s = :%s', $field, $field);
+            } else {
+                $serializationCriteria[$field] = $value;
+                $where[] = sprintf('e.%s = :%s', $field, $field);
+            }
+        }
+
+        $storageKey = serialize($serializationCriteria);
+
         if (empty($this->entities[$entityName]) || !array_key_exists($storageKey, $this->entities[$entityName])) {
-            $this->entities[$entityName][$storageKey]
-                = $this->registry->getRepository($entityName)->findOneBy($criteria);
+            /** @var EntityRepository $entityRepository */
+            $entityRepository = $this->registry->getRepository($entityName);
+            $queryBuilder = $entityRepository->createQueryBuilder('e')
+                ->andWhere(implode(' AND ', $where))
+                ->setParameters($criteria)
+                ->setMaxResults(1);
+
+            $this->entities[$entityName][$storageKey] = $queryBuilder->getQuery()->getOneOrNullResult();
         }
 
         return $this->entities[$entityName][$storageKey];
@@ -90,6 +117,42 @@ class DatabaseHelper
         $entityManager = $this->registry->getManagerForClass($entityName);
         $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
         return !empty($association['cascade']) && in_array('persist', $association['cascade']);
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @return bool
+     */
+    public function getInversedRelationFieldName($entityName, $fieldName)
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityName);
+        $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
+
+        if (!empty($association['mappedBy'])) {
+            return $association['mappedBy'];
+        }
+
+        if (!empty($association['inversedBy'])) {
+            return $association['inversedBy'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @return bool
+     */
+    public function isSingleInversedRelation($entityName, $fieldName)
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityName);
+        $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
+
+        return in_array($association['type'], array(ClassMetadata::ONE_TO_ONE, ClassMetadata::ONE_TO_MANY));
     }
 
     /**
