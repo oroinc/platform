@@ -13,11 +13,19 @@ class TestUser implements UserInterface, EmailOwnerInterface
 
     private $lastName;
 
-    public function __construct($email = null, $firstName = null, $lastName = null)
+    private $organization;
+
+    public function __construct($email = null, $firstName = null, $lastName = null, $organization = null)
     {
         $this->email = $email;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+        $this->organization = $organization;
+    }
+
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 
     public function getEmail()
