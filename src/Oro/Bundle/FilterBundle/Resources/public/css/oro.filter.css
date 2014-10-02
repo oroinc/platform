@@ -190,9 +190,22 @@
 .ui-multiselect.filter-list {
     background: none;
     border: none;
-    padding: 6px 0 4px 6px;
     font-size: 13px;
     font-weight: bold;
+    padding: 9px 0 7px 6px;
+    line-height: 1em;
+}
+
+.ui-multiselect.filter-list:hover #add-filter-button span.caret {
+    border-top-color: #005099; /* @linkColorHover; */
+}
+
+.ui-multiselect.filter-list:hover a {
+    color: #005099; /* @linkColorHover; */
+}
+
+.ui-multiselect.filter-list.select-filter-widget span.caret {
+    margin-top: 5px;
 }
 
 .ui-multiselect.filter-list.ui-state-hover {
