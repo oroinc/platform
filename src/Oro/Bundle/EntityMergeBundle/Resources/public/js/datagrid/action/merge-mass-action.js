@@ -55,7 +55,7 @@ define([
 
             if (length < 2) {
                 options.doExecute = false;
-                messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error'));
+                messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error', {number: maxLength}));
             }
         }
     });
