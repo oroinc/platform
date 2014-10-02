@@ -1,0 +1,46 @@
+<?php
+
+namespace Oro\Bundle\EmailBundle\EventListener;
+
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+
+class SearchListener
+{
+    const EMAIL_CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\Email';
+
+    /**
+     * @param PrepareEntityMapEvent $event
+     */
+    public function prepareEntityMapEvent(PrepareEntityMapEvent $event)
+    {
+        $data = $event->getData();
+        $className = $event->getClassName();
+        if ($className === self::EMAIL_CLASS_NAME) {
+            /** @var $entity Email */
+            $entity = $event->getEntity();
+            $organizationsId = [];
+            $recipients = $entity->getRecipients();
+            /** @var  $recipient EmailRecipient */
+            foreach ($recipients as $recipient) {
+                $owner = $recipient->getEmailAddress()->getOwner();
+                if ($owner instanceof UserInterface) {
+                    $organizationsId[] = $owner->getOrganization()->getId();
+                }
+            }
+            if (!empty($organizationsId)) {
+                $data['integer']['organization'] = array_unique($organizationsId);
+            } else {
+                $data['integer']['organization'] = 0;
+            }
+
+
+        }
+
+        $event->setData($data);
+    }
+}
