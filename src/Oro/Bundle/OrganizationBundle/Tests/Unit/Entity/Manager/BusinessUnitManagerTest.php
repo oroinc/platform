@@ -57,6 +57,64 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         $this->businessUnitManager = new BusinessUnitManager($this->em);
     }
 
+    public function testGetTreeOptions()
+    {
+        $inputData = [
+            [
+                'id' => '3',
+                'name' => 'First BU',
+                'parent' => null,
+                'organization' => 1,
+                'children' => [
+                    [
+                        'id' => '5',
+                        'name' => 'Sub First BU',
+                        'parent' => null,
+                        'organization' => 1,
+                        'children' => [
+                            [
+                                'id' => '4',
+                                'name' => 'Sub Sub First BU',
+                                'parent' => null,
+                                'organization' => 1,
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'id' => '10',
+                'name' => 'Second BU',
+                'parent' => null,
+                'organization' => 1,
+                'children' => [
+                    [
+                        'id' => 11,
+                        'name' => 'Sub Second BU',
+                        'parent' => null,
+                        'organization' => 1,
+                    ]
+                ],
+            ],
+            [
+                'id' => '15',
+                'name' => 'BU wo children',
+                'parent' => null,
+                'organization' => 1,
+            ]
+        ];
+        $result = $this->businessUnitManager->getTreeOptions($inputData);
+        $expectedResult = [
+            '3'  => 'First BU',
+            '5'  => '&nbsp;&nbsp;&nbsp;Sub First BU',
+            '4'  => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sub Sub First BU',
+            '10' => 'Second BU',
+            '11' => '&nbsp;&nbsp;&nbsp;Sub Second BU',
+            '15' => 'BU wo children'
+        ];
+        $this->assertEquals($expectedResult, $result);
+    }
+
     public function testGetBusinessUnitsTree()
     {
         $this->buRepo->expects($this->once())

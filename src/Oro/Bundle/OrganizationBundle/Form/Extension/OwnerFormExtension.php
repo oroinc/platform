@@ -7,7 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -37,9 +36,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnerFormExtension extends AbstractTypeExtension
 {
-    /** @var SecurityContextInterface */
-    protected $securityContext;
-
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -77,7 +73,6 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $oldOwner;
 
     /**
-     * @param SecurityContextInterface  $securityContext
      * @param ManagerRegistry           $managerRegistry
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
      * @param BusinessUnitManager       $businessUnitManager
@@ -86,7 +81,6 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param OwnerTreeProvider         $treeProvider
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
         ManagerRegistry $managerRegistry,
         OwnershipMetadataProvider $ownershipMetadataProvider,
         BusinessUnitManager $businessUnitManager,
@@ -94,7 +88,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
-        $this->securityContext = $securityContext;
         $this->managerRegistry = $managerRegistry;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
         $this->businessUnitManager = $businessUnitManager;
@@ -158,7 +151,9 @@ class OwnerFormExtension extends AbstractTypeExtension
         } elseif ($metadata->isBusinessUnitOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
             if (!$this->checkIsBusinessUnitEntity($dataClassName)) {
-                $defaultOwner = $this->getCurrentBusinessUnit();
+                $defaultOwner = $this->getCurrentBusinessUnit(
+                    $this->securityFacade->getOrganization()
+                );
             }
         }
 
@@ -243,7 +238,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                         $newOwner,
                         $this->accessLevel,
                         $this->treeProvider,
-                        $this->securityContext->getToken()->getOrganizationContext()
+                        $this->securityFacade->getOrganization()
                     );
                 } elseif ($metadata->isBusinessUnitOwned()) {
                     $isCorrect = in_array($newOwner->getId(), $this->getBusinessUnitIds());
@@ -398,6 +393,12 @@ class OwnerFormExtension extends AbstractTypeExtension
                         'configs'           => array(
                             'is_translated_option' => true,
                             'is_safe' => true,
+                        ),
+                        'choices' => $this->businessUnitManager->getTreeOptions(
+                            $this->businessUnitManager->getBusinessUnitsTree(
+                                null,
+                                $this->getOrganizationContextId()
+                            )
                         )
                     ),
                     $validation
@@ -425,16 +426,22 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
+     * @param Organization $organization
+     *
      * @return null|BusinessUnit
      */
-    protected function getCurrentBusinessUnit()
+    protected function getCurrentBusinessUnit(Organization $organization)
     {
         $user = $this->getCurrentUser();
         if (!$user) {
             return null;
         }
 
-        $businessUnits = $user->getBusinessUnits();
+        $businessUnits = $user->getBusinessUnits()->filter(
+            function (BusinessUnit $businessUnit) use ($organization) {
+                return $businessUnit->getOrganization()->getId() === $organization->getId();
+            }
+        );
         if (!$this->isAssignGranted) {
             return $businessUnits->first();
         }
@@ -458,14 +465,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getCurrentUser()
     {
         if (null === $this->currentUser) {
-            $token = $this->securityContext->getToken();
-            if (!$token) {
-                $this->currentUser = false;
-                return false;
-            }
-
-            /** @var User $user */
-            $user = $token->getUser();
+            $user = $this->securityFacade->getLoggedUser();
             if (!$user || is_string($user)) {
                 $this->currentUser = false;
                 return false;
@@ -482,7 +482,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     protected function getCurrentOrganization()
     {
-        $businessUnit = $this->getCurrentBusinessUnit();
+        $businessUnit = $this->getCurrentBusinessUnit($this->securityFacade->getOrganization());
         if (!$businessUnit) {
             return true;
         }
@@ -495,12 +495,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     protected function getOrganizationContextId()
     {
-        $token = $this->securityContext->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            return $token->getOrganizationContext()->getId();
-        }
-
-        return null;
+        return $this->securityFacade->getOrganizationId();
     }
 
     /**
