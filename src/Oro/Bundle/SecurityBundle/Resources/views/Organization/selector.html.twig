@@ -44,17 +44,17 @@
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">
                     <h1 class="logo">
-
-                            {% if oro_theme_logo() %}
-                                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                            {% else %}
-                                {{ organization_name }}
-                            {% endif %}
+                        {% if oro_theme_logo() %}
+                            <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
+                        {% else %}
+                            {{ organization_name }}
+                        {% endif %}
+                        <span class="caret"></span>
                     </h1>
                 </a>
                 <ul class="dropdown-menu">
                     {% for organization in organizations %}
-                        <li {% if curr_organization and curr_organization.getId() == organization.id %}class="disabled"{% endif %}>
+                        <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
                             <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash">
                                 {{ organization.name }}
                             </a>

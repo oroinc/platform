@@ -32,12 +32,18 @@
 .mobile-version {
   #oroplatform-header {
     .nav.organization-switcher {
+      .caret, .caret:hover {
+        border-bottom-color: #fff;
+        border-top-color: #fff;
+        color: #fff;
+        margin-top: 15px;
+      }
       .dropdown-menu {
         li a {
           color: #444;
           padding: 2px 12px;
         }
-        li.disabled a {
+        li.current a {
           font-weight: bold;
         }
         &:after {
