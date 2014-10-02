@@ -284,7 +284,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     }
 
     /**
-     * Clear entity multiple relations if entity isn't valid
+     * Clear entity multiple relations if entity isn't valid,
+     * used to prevent usage of this entity in related collections
+     *
      * @param object $entity
      */
     protected function clearEntityRelations($entity)
