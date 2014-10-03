@@ -97,7 +97,8 @@ class ObjectMapper extends AbstractMapper
                                 $objectData,
                                 $field['relation_fields'],
                                 $relationObject,
-                                $field['name']
+                                $field['name'],
+                                true
                             );
                         }
                         break;

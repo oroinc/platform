@@ -61,6 +61,8 @@ services:
 
     oro_form.type.icon:
         class: %oro_form.type.icon.class%
+        arguments:
+            - @kernel
         tags:
             - { name: form.type, alias: oro_icon_select }
 

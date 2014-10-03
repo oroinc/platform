@@ -82,20 +82,28 @@ abstract class AbstractMapper
      * @param array  $relationFields
      * @param object $relationObject
      * @param string $parentName
+     * @param bool   $isArray
      *
      * @return array
      */
-    protected function setRelatedFields($alias, $objectData, $relationFields, $relationObject, $parentName)
-    {
+    protected function setRelatedFields(
+        $alias,
+        $objectData,
+        $relationFields,
+        $relationObject,
+        $parentName,
+        $isArray = false
+    ) {
         foreach ($relationFields as $relationObjectField) {
             $value = $this->getFieldValue($relationObject, $relationObjectField['name']);
             if ($value) {
                 $relationObjectField['name'] = $parentName;
-                $objectData                  = $this->setDataValue(
+                $objectData = $this->setDataValue(
                     $alias,
                     $objectData,
                     $relationObjectField,
-                    $value
+                    $value,
+                    $isArray
                 );
             }
         }
@@ -110,10 +118,11 @@ abstract class AbstractMapper
      * @param array  $objectData
      * @param array  $fieldConfig
      * @param mixed  $value
+     * @param bool   $isArray
      *
      * @return array
      */
-    protected function setDataValue($alias, $objectData, $fieldConfig, $value)
+    protected function setDataValue($alias, $objectData, $fieldConfig, $value, $isArray = false)
     {
         if ($value) {
             //check if field have target_fields parameter
@@ -123,7 +132,12 @@ abstract class AbstractMapper
 
             if ($fieldConfig['target_type'] != Query::TYPE_TEXT) {
                 foreach ($targetFields as $targetField) {
-                    $objectData[$fieldConfig['target_type']][$targetField] = $value;
+                    if ($isArray) {
+                        $objectData[$fieldConfig['target_type']][$targetField][] = $value;
+                    } else {
+                        $objectData[$fieldConfig['target_type']][$targetField] = $value;
+                    }
+
                 }
             } else {
                 foreach ($targetFields as $targetField) {
