@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\EventListener;
 
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
@@ -20,6 +21,19 @@ class ReleaseDataFixtureListener
      * @var Migration
      */
     protected $dataMigration;
+
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
+
+    /**
+     * @param KernelInterface $kernel
+     */
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+    }
 
     /**
      * @param PreMigrationEvent $event
@@ -52,6 +66,8 @@ class ReleaseDataFixtureListener
      */
     protected function getMappingData()
     {
-        return Yaml::parse(realpath(__DIR__ . '/data/1.0.0/platform.yml'));
+        $filePath = $this->kernel->locateResource('@OroMigrationBundle/EventListener/data/1.0.0/platform.yml');
+
+        return Yaml::parse(realpath($filePath));
     }
 }

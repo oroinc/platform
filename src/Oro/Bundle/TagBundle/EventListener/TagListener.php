@@ -31,7 +31,7 @@ class TagListener implements ContainerAwareInterface
             $this->manager = $this->container->get('oro_tag.tag.manager');
         }
 
-        if (($resource = $args->getEntity()) and $resource instanceof Taggable) {
+        if (($resource = $args->getEntity()) && $resource instanceof Taggable) {
             $this->manager->deleteTaggingByParams(
                 null,
                 ClassUtils::getClass($resource),
