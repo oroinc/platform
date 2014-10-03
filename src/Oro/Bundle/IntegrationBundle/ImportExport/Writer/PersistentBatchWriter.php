@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
+use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
@@ -29,6 +30,9 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
 
     /** @var StepExecution */
     protected $stepExecution;
+
+    /** @var ContextRegistry */
+    protected $contextRegistry;
 
     /**
      * @param RegistryInterface        $registry
@@ -59,9 +63,15 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
             }
 
             $this->em->flush();
-
             $this->em->commit();
-            $this->em->clear();
+
+            $configuration = $this->contextRegistry
+                ->getByStepExecution($this->stepExecution)
+                ->getConfiguration();
+
+            if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
+                $this->em->clear();
+            }
         } catch (\Exception $exception) {
             $this->em->rollback();
             $this->ensureEntityManagerReady();

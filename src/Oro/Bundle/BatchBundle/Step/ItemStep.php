@@ -7,13 +7,10 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 /**
  * Basic step implementation that read items, process them and write them
- *
  */
 class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterface
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $batchSize = null;
 
     /**

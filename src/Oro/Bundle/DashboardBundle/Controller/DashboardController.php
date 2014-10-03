@@ -14,7 +14,7 @@ use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -82,7 +82,7 @@ class DashboardController extends Controller
             array(
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
+                'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs(),
             )
         );
     }
@@ -177,7 +177,7 @@ class DashboardController extends Controller
     {
         return $this->render(
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
-            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -191,7 +191,7 @@ class DashboardController extends Controller
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var WidgetAttributes $manager */
-        $manager = $this->get('oro_dashboard.widget_attributes');
+        $manager = $this->get('oro_dashboard.widget_configs');
 
         $params = array_merge(
             [
