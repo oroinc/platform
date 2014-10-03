@@ -540,7 +540,6 @@ class Item
             $this->setFieldData($record, $fieldName, $data);
             $fields->add($record);
         }
-
     }
 
     /**
