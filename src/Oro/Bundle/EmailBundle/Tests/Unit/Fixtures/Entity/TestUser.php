@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
 
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class TestUser implements UserInterface, EmailOwnerInterface
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+
+class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareInterface
 {
     private $email;
 
@@ -26,6 +29,11 @@ class TestUser implements UserInterface, EmailOwnerInterface
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    public function setOrganization(OrganizationInterface $organization)
+    {
+        $this->organization = $organization;
     }
 
     public function getEmail()

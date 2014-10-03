@@ -5,9 +5,9 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 
 class SearchListener
 {
@@ -28,7 +28,7 @@ class SearchListener
             /** @var  $recipient EmailRecipient */
             foreach ($recipients as $recipient) {
                 $owner = $recipient->getEmailAddress()->getOwner();
-                if ($owner instanceof UserInterface) {
+                if ($owner instanceof UserInterface && $owner instanceof OrganizationAwareInterface) {
                     $organizationsId[] = $owner->getOrganization()->getId();
                 }
             }
@@ -37,8 +37,6 @@ class SearchListener
             } else {
                 $data['integer']['organization'] = 0;
             }
-
-
         }
 
         $event->setData($data);
