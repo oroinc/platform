@@ -28,8 +28,10 @@ class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $storage->addProvider($oroCrmProvider);
         $storage->addProvider($acmeProvider);
 
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+
         $warmer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer')
-            ->setConstructorArgs(array($storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy'))
+            ->setConstructorArgs(array($storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy', $kernel))
             ->setMethods(array('createFilesystem', 'createTwigEnvironment', 'writeCacheFile'))
             ->getMock();
 
