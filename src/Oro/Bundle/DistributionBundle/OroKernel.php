@@ -223,11 +223,13 @@ abstract class OroKernel extends Kernel
         include_once $this->getRootDir() . '/OroRequirements.php';
 
         if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
-            die(sprintf(
-                'PHP version must be at least %s (%s is installed)',
-                OroRequirements::REQUIRED_PHP_VERSION,
-                $phpVersion
-            ));
+            throw new \Exception(
+                sprintf(
+                    'PHP version must be at least %s (%s is installed)',
+                    OroRequirements::REQUIRED_PHP_VERSION,
+                    $phpVersion
+                )
+            );
         }
 
         parent::boot();
