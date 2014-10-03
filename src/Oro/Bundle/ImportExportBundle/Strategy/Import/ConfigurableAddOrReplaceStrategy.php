@@ -266,6 +266,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+            $this->clearEntityRelations($entity);
+
             return null;
         }
 
@@ -278,6 +280,23 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
+    }
+
+    /**
+     * Clear entity multiple relations if entity isn't valid
+     * @param object $entity
+     */
+    protected function clearEntityRelations($entity)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        $fields = $this->fieldHelper->getFields($entityName, true);
+
+        foreach ($fields as $field) {
+            if ($this->fieldHelper->isMultipleRelation($field)) {
+                $fieldName = $field['name'];
+                $this->fieldHelper->setObjectValue($entity, $fieldName, new ArrayCollection());
+            }
+        }
     }
 
     /**
