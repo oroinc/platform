@@ -90,7 +90,11 @@ define([
     });
 
     reuses = [];
-    promiseLoads = [];
+    promiseLoads = [
+        // add DOM Ready promise to loads promises,
+        // in order to prevent route action execution before the page is ready
+        $.ready.promise()
+    ];
 
     /**
      * Collects compositions to reuse before controller action
