@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
 use Doctrine\Common\Persistence\ObjectManager;
@@ -12,8 +14,23 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-abstract class AbstractEmailFixture extends AbstractFixture implements DependentFixtureInterface
+abstract class AbstractEmailFixture extends AbstractFixture implements
+    DependentFixtureInterface,
+    ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
      */

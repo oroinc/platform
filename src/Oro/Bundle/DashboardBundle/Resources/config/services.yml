@@ -2,7 +2,7 @@ parameters:
     oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
     oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
-    oro_dashboard.widget_attributes.class:       Oro\Bundle\DashboardBundle\Model\WidgetAttributes
+    oro_dashboard.widget_configs.class:          Oro\Bundle\DashboardBundle\Model\WidgetConfigs
     oro_dashboard.factory.class:                 Oro\Bundle\DashboardBundle\Model\Factory
     oro_dashboard.config_provider.class:         Oro\Bundle\DashboardBundle\Model\ConfigProvider
     oro_dashboard.dashboard_entity.class:        Oro\Bundle\DashboardBundle\Entity\Dashboard
@@ -17,8 +17,8 @@ services:
         arguments:
             - @service_container
 
-    oro_dashboard.widget_attributes:
-        class: %oro_dashboard.widget_attributes.class%
+    oro_dashboard.widget_configs:
+        class: %oro_dashboard.widget_configs.class%
         arguments:
             - @oro_dashboard.config_provider
             - @oro_security.security_facade

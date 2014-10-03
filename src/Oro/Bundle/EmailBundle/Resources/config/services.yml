@@ -1,6 +1,7 @@
 parameters:
     oro_email.email.entity.class:                 Oro\Bundle\EmailBundle\Entity\Email
     oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
+    oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
     oro_email.email.holder.helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
@@ -56,6 +57,8 @@ parameters:
     #Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
 
+    oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
+
 services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
@@ -64,6 +67,7 @@ services:
             - %oro_email.entity.cache_dir%
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
+            - @kernel
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
@@ -356,3 +360,7 @@ services:
             - @oro_email.email.holder.helper
         tags:
             - { name: twig.extension }
+    oro_email.listener.search_listener:
+          class: %oro_email.listener.search_listener.class%
+          tags:
+              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 10 }
