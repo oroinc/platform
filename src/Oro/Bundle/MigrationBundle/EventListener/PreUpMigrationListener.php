@@ -2,31 +2,32 @@
 
 namespace Oro\Bundle\MigrationBundle\EventListener;
 
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
-
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 use Oro\Bundle\MigrationBundle\Migration\UpdateEntityConfigMigration;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-class PreUpMigrationListener implements ContainerAwareInterface
+class PreUpMigrationListener
 {
-
-    /** @var ContainerInterface */
-    private $container;
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
 
     /**
-     * {@inheritdoc}
+     * @param KernelInterface $kernel
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(KernelInterface $kernel)
     {
-        $this->container = $container;
+        $this->kernel = $kernel;
     }
 
+    /**
+     * @param PreMigrationEvent $event
+     */
     public function onPreUp(PreMigrationEvent $event)
     {
         if ($event->isTableExist(CreateMigrationTableMigration::MIGRATION_TABLE)) {
@@ -47,13 +48,11 @@ class PreUpMigrationListener implements ContainerAwareInterface
             // @todo: this transient solution can be removed in a future
             // when we ensure RC1 and RC2 are updated for all clients
             if ($event->isTableExist('oro_installer_bundle_version')) {
-                $oroTableDataConfig = $this->container
-                    ->get('kernel')
+                $oroTableDataConfig = $this->kernel
                     ->locateResource('@OroMigrationBundle/EventListener/MigrationTableData/Oro.yml');
                 $bundleVersions = Yaml::parse(realpath($oroTableDataConfig));
 
-                $oroCrmTableDataConfig = $this->container
-                    ->get('kernel')
+                $oroCrmTableDataConfig = $this->kernel
                     ->locateResource('@OroMigrationBundle/EventListener/MigrationTableData/OroCRM.yml');
 
                 if ($event->isTableExist('orocrm_account')) {

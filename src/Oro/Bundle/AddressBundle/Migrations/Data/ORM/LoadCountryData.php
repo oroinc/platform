@@ -15,9 +15,9 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadCountryData
-    extends AbstractTranslatableEntityFixture
-    implements VersionedFixtureInterface, ContainerAwareInterface
+class LoadCountryData extends AbstractTranslatableEntityFixture implements
+    VersionedFixtureInterface,
+    ContainerAwareInterface
 {
     const COUNTRY_PREFIX = 'country';
     const REGION_PREFIX  = 'region';
@@ -37,7 +37,9 @@ class LoadCountryData
      */
     protected $structureFileName = '/data/countries.yml';
 
-    /** @var ContainerInterface */
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
     /**
@@ -71,12 +73,9 @@ class LoadCountryData
      */
     protected function getFileName()
     {
-        $fileName = $this->container
+        return $this->container
             ->get('kernel')
-            ->locateResource('@OroAddressBundle/Migrations/Data/ORM'.$this->structureFileName);
-        $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
-
-        return $fileName;
+            ->locateResource('@OroAddressBundle/Migrations/Data/ORM' . $this->structureFileName);
     }
 
     /**

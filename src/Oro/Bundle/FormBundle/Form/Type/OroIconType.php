@@ -1,27 +1,27 @@
 <?php
+
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Component\Yaml\Yaml;
 
-class OroIconType extends AbstractType implements ContainerAwareInterface
+class OroIconType extends AbstractType
 {
-    /** @var ContainerInterface */
-    private $container;
+    /**
+     * @var KernelInterface
+     */
+    protected $kernel;
 
     /**
-     * {@inheritdoc}
+     * @param KernelInterface $kernel
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(KernelInterface $kernel)
     {
-        $this->container = $container;
+        $this->kernel = $kernel;
     }
 
     /**
@@ -46,9 +46,7 @@ class OroIconType extends AbstractType implements ContainerAwareInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $configFile = $this->container
-            ->get('kernel')
-            ->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
+        $configFile = $this->kernel->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
         $config      = Yaml::parse($configFile);
         $choices     =  array_flip($config['oro_icon_select']);
 
