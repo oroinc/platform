@@ -27,12 +27,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $router;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $container;
+    private $dispatcher;
 
     /**
      * @var array
@@ -128,34 +123,9 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
             ->setDescription('description')
             ->setCreateDate(new \DateTime());
 
-        $this->router = $this
-            ->getMockBuilder('Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->router->expects($this->any())
-            ->method('generate')
-            ->will($this->returnValue('http://example.com'));
-
-        $params = array('router' => $this->router);
-
-        $this->container->expects($this->any())
-            ->method('get')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('test_manager'),
-                    $this->equalTo('router')
-                )
-            )
-            ->will(
-                $this->returnCallback(
-                    function ($param) use (&$params) {
-                        return $params[$param];
-                    }
-                )
-            );
-
-        $this->mapper = new ObjectMapper($this->container, $this->mappingConfig);
+        $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
     }
 
     public function testMapObject()

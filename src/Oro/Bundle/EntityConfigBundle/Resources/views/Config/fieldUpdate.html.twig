@@ -2,8 +2,8 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEntityConfigBundle:Include:fields.html.twig'] %}
 
 {% oro_title_set({params : {
-    "%entityName%": (entity_config.get('label')|trans)|default('N/A'),
-    "%fieldName%": (field_config.get('label')|trans)|default('N/A')|trans,
+    "%entityName%": entity_config.get('label')|default('N/A')|trans,
+    "%fieldName%": field.fieldName|default('N/A')|trans,
 }}) %}
 
 {% set audit_entity_class = field.entity.className|replace('\\', '_') %}
@@ -30,12 +30,12 @@
     {% set breadcrumbs = {
         'entity'      : 'entity',
         'indexPath'   : path('oro_entityconfig_index'),
-        'indexLabel'  : 'Entities',
+        'indexLabel'  : 'oro.entity_config.entity.plural_label'|trans,
         'entityTitle' : entityTitle,
         'additional'  : [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: field.entity.id}),
-                'indexLabel' : entity_config.get('label')|default('N/A'),
+                'indexLabel' : entity_config.get('label')|default('N/A')|trans,
             },
         ]
     }%}

@@ -2,19 +2,19 @@
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
 {% set entityName = entity.id
-    ? 'Item #'~entity.id
+    ? 'oro.entity.item'|trans({'%id%': entity.id})
     : 'oro.ui.create_entity'|trans({'%entityName%': entity_config.get('label')|trans})
 %}
 {% oro_title_set({params : {"%entityName%": entityName} }) %}
 
-{% set formAction = path('oro_entity_update', {'entity_id': entity_id, id: entity.id}) %}
+{% set formAction = path('oro_entity_update', {entityName: entity_name, id: entity.id}) %}
 
 {% set audit_entity_class = entity_config.getId.getClassName|replace('\\', '_') %}
 {% set audit_entity_id = entity.id %}
 {% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
-    {{ UI.cancelButton(path('oro_entity_index', {id: entity_id})) }}
+    {{ UI.cancelButton(path('oro_entity_index', {entityName: entity_name})) }}
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
         {% set html = UI.saveAndCloseButton() %}
         {% set html = html ~ UI.saveAndStayButton() %}
@@ -26,11 +26,11 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'oro.entity.plural_label'|trans,
         'entityTitle': entityName,
         'additional': [
             {
-                'indexPath'  : path('oro_entity_index', {id: entity_id}),
+                'indexPath'  : path('oro_entity_index', {entityName: entity_name}),
                 'indexLabel' : (entity_config.get('label')|trans)|default('N/A')
             },
         ]

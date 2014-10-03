@@ -51,7 +51,7 @@
     <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
-        <h3>{% trans %}Loading ...{% endtrans %}</h3>
+        <h3>{% trans %}Loading...{% endtrans %}</h3>
         <div class="progress progress-striped active">
             <div class="bar" style="width: 90%;"></div>
         </div>
@@ -200,15 +200,17 @@
     </body>
     </html>
 {% else %}
-{# Template for hash tag navigation#}
-{% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
-{% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
-    with {
-        'data': {
-            'scripts': block('head_script'),
-            'content': block('page_container'),
-            'breadcrumb': block('breadcrumb')|trim
+    {# Title should be generated as least once in order to pass data to title service #}
+    {% set title = oro_title_render() %}
+    {# Template for hash tag navigation#}
+    {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
+    {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
+        with {
+            'data': {
+                'scripts': block('head_script'),
+                'content': block('page_container'),
+                'breadcrumb': block('breadcrumb')|trim
+            }
         }
-    }
-%}
+    %}
 {% endif %}

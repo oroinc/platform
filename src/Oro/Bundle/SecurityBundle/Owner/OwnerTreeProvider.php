@@ -13,19 +13,13 @@ class OwnerTreeProvider
 {
     const CACHE_KEY = 'data';
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var OwnerTree
-     */
+    /** @var OwnerTree */
     protected $tree;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $cache;
 
     /**
@@ -35,7 +29,7 @@ class OwnerTreeProvider
     public function __construct(EntityManager $em, CacheProvider $cache)
     {
         $this->cache = $cache;
-        $this->em = $em;
+        $this->em    = $em;
     }
 
     /**
@@ -111,14 +105,16 @@ class OwnerTreeProvider
      */
     protected function fillTree(OwnerTree $tree)
     {
-        $users = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')->findAll();
+        $users         = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')->findAll();
         $businessUnits = $this->em->getRepository('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')->findAll();
 
         foreach ($businessUnits as $businessUnit) {
-            /** @var \Oro\Bundle\OrganizationBundle\Entity\BusinessUnit $businessUnit */
-            $tree->addBusinessUnit($businessUnit->getId(), $businessUnit->getOrganization()->getId());
-            if ($businessUnit->getOwner()) {
-                $tree->addBusinessUnitRelation($businessUnit->getId(), $businessUnit->getOwner()->getId());
+            if ($businessUnit->getOrganization()) {
+                /** @var \Oro\Bundle\OrganizationBundle\Entity\BusinessUnit $businessUnit */
+                $tree->addBusinessUnit($businessUnit->getId(), $businessUnit->getOrganization()->getId());
+                if ($businessUnit->getOwner()) {
+                    $tree->addBusinessUnitRelation($businessUnit->getId(), $businessUnit->getOwner()->getId());
+                }
             }
         }
 
@@ -126,8 +122,15 @@ class OwnerTreeProvider
             /** @var \Oro\Bundle\UserBundle\Entity\User $user */
             $owner = $user->getOwner();
             $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
-            foreach ($user->getBusinessUnits() as $businessUnit) {
-                $tree->addUserBusinessUnit($user->getId(), $businessUnit->getId());
+            foreach ($user->getOrganizations() as $organization) {
+                $tree->addUserOrganization($user->getId(), $organization->getId());
+                foreach ($user->getBusinessUnits() as $businessUnit) {
+                    $organizationId   = $organization->getId();
+                    $buOrganizationId = $businessUnit->getOrganization()->getId();
+                    if ($organizationId == $buOrganizationId) {
+                        $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());
+                    }
+                }
             }
         }
     }
@@ -139,8 +142,8 @@ class OwnerTreeProvider
      */
     protected function checkDatabase()
     {
-        $tableName  = $this->em->getClassMetadata('Oro\Bundle\UserBundle\Entity\User')->getTableName();
-        $result = false;
+        $tableName = $this->em->getClassMetadata('Oro\Bundle\UserBundle\Entity\User')->getTableName();
+        $result    = false;
         try {
             $conn = $this->em->getConnection();
 

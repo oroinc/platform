@@ -29,6 +29,8 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  *      order.products|left|WITH|products.orderId = order AND products.active = true
  *          - represents "order -> products" join with custom condition and forces to use LEFT JOIN
  * The join identifier for the root table is empty string.
+ * @todo: need to think how to reduce the complexity of this class
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JoinIdentifierHelper
 {
@@ -247,6 +249,43 @@ class JoinIdentifierHelper
         }
 
         return false !== strpos($joinId, '::', $startDelimiter + 2);
+    }
+
+    /**
+     * Checks if given join identifier represents unidirectional join with already prepared conditions
+     * Possible use cases in virtual fields join with unidirectional join
+     *
+     * @param string $joinId
+     *
+     * @return bool
+     */
+    public function isUnidirectionalJoinWithCondition($joinId)
+    {
+        $lastItemDelimiter = $this->getStartPosition($joinId, '+');
+        $startDelimiter    = strpos($joinId, '::', $lastItemDelimiter);
+
+        return (false === $startDelimiter) && (false === strpos($this->getUnidirectionalJoinEntityName($joinId), '.'));
+    }
+
+    /**
+     * Fetches entity name from unidirectional join or join part form prepared conditioned join
+     *
+     * @param string $joinId
+     *
+     * @return string
+     */
+    public function getUnidirectionalJoinEntityName($joinId)
+    {
+        $startDelimiter = $this->getStartPosition($joinId, '+');
+        $endDelimiter   = strpos($joinId, '|', $startDelimiter);
+
+        $lastJoinPart  = false === $endDelimiter
+            ? substr($joinId, $startDelimiter)
+            : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
+
+        $lastDelimiter = $this->getStartPosition($lastJoinPart, '::');
+
+        return $lastDelimiter > 0 ? substr($lastJoinPart, $lastDelimiter) : $lastJoinPart;
     }
 
     /**

@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Knp\Menu\Iterator\RecursiveItemIterator;
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -44,6 +45,7 @@ class ShortcutController extends Controller
 
     /**
      * @param ItemInterface $items
+     *
      * @return array
      */
     protected function getResults(ItemInterface $items)
@@ -55,7 +57,7 @@ class ShortcutController extends Controller
         $result = array();
         /** @var $item ItemInterface */
         foreach ($iterator as $key => $item) {
-            if ($item->getExtra('isAllowed') && !in_array($item->getUri(), $this->uris) && $item->getUri() !== '#') {
+            if ($this->isItemAllowed($item)) {
                 $result[$key] = array(
                     'url' => $item->getUri(),
                     'label' => $item->getLabel(),
@@ -66,5 +68,20 @@ class ShortcutController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * @param MenuItem $item
+     *
+     * @return bool
+     */
+    protected function isItemAllowed(MenuItem $item)
+    {
+        return (
+            $item->getExtra('isAllowed')
+            && !in_array($item->getUri(), $this->uris)
+            && $item->getUri() !== '#'
+            && $item->isDisplayed()
+        );
     }
 }

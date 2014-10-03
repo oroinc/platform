@@ -8,9 +8,11 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
@@ -63,12 +65,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
-        $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
-        $columns    = $gridConfig->offsetGet('columns');
+        if ($this->context->getValue('columns')) {
+            $columns = $this->context->getValue('columns');
+        } elseif ($this->context->hasOption('gridName')) {
+            $gridName   = $this->context->getOption('gridName');
+            $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
+            $columns    = $gridConfig->offsetGet('columns');
+        } else {
+            throw new InvalidConfigurationException(
+                'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
+            );
+        }
 
         $result = array();
         foreach ($columns as $columnName => $column) {
+            if (isset($column['renderable']) && false === $column['renderable']) {
+                continue;
+            }
+
             $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
             $result[$this->translator->trans($column['label'])] = $val;
@@ -82,13 +96,16 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        throw new \RuntimeException('The convertToImportFormat method is not implemented.');
+        throw new RuntimeException('The convertToImportFormat method is not implemented.');
     }
 
     /**
      * @param mixed       $val
      * @param array       $options
+     *
      * @return string|null
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {
@@ -122,7 +139,10 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                     }
                     break;
                 case PropertyInterface::TYPE_HTML:
-                    $val = $this->formatHtmlFrontendType($val);
+                    $val = $this->formatHtmlFrontendType(
+                        $val,
+                        isset($options['export_type']) ? $options['export_type'] : null
+                    );
                     break;
             }
         }
@@ -134,17 +154,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * Converts HTML to its string representation
      *
      * @param string $val
+     * @param string $exportType
+     *
      * @return string
      */
-    protected function formatHtmlFrontendType($val)
+    protected function formatHtmlFrontendType($val, $exportType)
     {
-        return trim(
+        $result = trim(
             str_replace(
                 "\xC2\xA0", // non-breaking space (&nbsp;)
                 ' ',
                 html_entity_decode(strip_tags($val))
             )
         );
+        if ($exportType === 'list') {
+            $result = preg_replace('/\s*\n\s*/', ';', $result);
+        }
+
+        return $result;
     }
 
     /**

@@ -93,20 +93,20 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_tracking_website_view
-                label:         View
+                label:         oro.grid.action.view
                 icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_tracking_website_update
-                label:         Update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
                 acl_resource:  oro_tracking_website_delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
 
@@ -187,3 +187,5 @@ datagrid:
                 where:
                     and:
                         - w.identifier = :websiteIdentifier
+            bind_parameters:
+                - websiteIdentifier

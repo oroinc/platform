@@ -78,7 +78,12 @@ form {
   background-color: #f6f5f5;
 }
 
-
+label.disabled {
+  cursor: default;
+}
+.ui-sortable-handle.disabled {
+  cursor: not-allowed;
+}
 
 // Bootstrap - Form
 label, input, button, select, textarea { font-size:13px;}
@@ -108,6 +113,10 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
+        width: 100%;
+        word-wrap: break-word;
+      }
+      label.control-label {
         width: auto;
       }
     }
@@ -858,7 +867,7 @@ footer {
 }
 .application-menu .home span {
   display: block;
-  margin: 3px 0 0;
+  margin: 4px 0 0;
   width: 17px;
   height: 19px;
   text-indent: -9999px;
@@ -1080,6 +1089,7 @@ footer {
 }
 .status-disabled,
 .status-enabled {
+  margin-left: 5px;
   margin-top:-4px;
   text-shadow:none;
   padding:3px 10px 3px 5px;
@@ -2188,7 +2198,7 @@ div.selector select {
   top: 0px;
   left: -2px;
   opacity: 0;
-  z-index: 700;
+  z-index: 1;
   padding: 0 5px;
 }
 
@@ -2639,22 +2649,31 @@ div.uploader.focus,
 label.validation-error {
   color: #C81717 !important;
 }
-.validation-error .error {
-  border:1px solid #e9322d;
-  outline: 0;
-  outline: thin dotted \9;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
-  color: #555;
-  &.validate-group {
-    margin-left: -6px;
-    padding-left: 5px;
+.validation-error {
+  .error {
+    border: 1px solid #e9322d;
+    .border-radius(3px);
+    outline: 0;
+    outline: thin dotted \9;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(211, 33, 33, 0.6);
+    color: #555;
+    &.validate-group {
+      margin-left: -6px;
+      padding-left: 5px;
+    }
   }
-}
-.validation-error div.selector {
-  display: inline-block;
-  vertical-align: middle;
+  .input-append.error, .input-prepend.error {
+    border-width: 0;
+  }
+  .input-append.error > *, .input-prepend.error > * {
+    border: 1px solid #e9322d;
+  }
+  div.selector {
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 /*.validation-error div.selector {
   border: 1px solid #d32121;
@@ -2789,7 +2808,7 @@ label.radio.error {
 #orocrm_contact_form_addresses_collection.oro-item-collection {
   &>div {
     position: relative;
-    padding: 10px 0 0;
+    padding: 10px 15px 0 0;
     margin: 0 0 10px;
     border: 1px dashed #ededed;
   }
@@ -2800,6 +2819,12 @@ label.radio.error {
     position: absolute;
     top: 0;
     right: 10px;
+  }
+}
+
+.mobile-version #orocrm_contact_form_addresses_collection.oro-item-collection {
+  &>div {
+    padding: 10px 15px 0;
   }
 }
 .add-list-item {
@@ -2823,7 +2848,7 @@ label.radio.error {
     right: 10px;
   }
   .row-oro.oro-multiselect-holder {
-    margin: 0 0 5px
+    margin: 0 0 5px;
   }
 }
 
@@ -2910,7 +2935,7 @@ label.radio.error {
 }
 
 #orocrm_contact_address_form { min-width:400px; }
-.email-holder {
+.float-holder {
   float: left;
   .removeRow {
     margin: 0;
@@ -3116,7 +3141,13 @@ span.validation-failed {
 .create-select-entity.grid .entity-select-btn {
   display: none;
 }
-
+.icon-bars:before {
+  content: "\f0c9";
+  font-size: 14px;
+  font-family: 'FontAwesome';
+  line-height: 21px;
+  font-style: normal;
+}
 .oro-tabs {
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
@@ -3194,8 +3225,13 @@ span.validation-failed {
 }
 
 .popover {
+  max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding-right: 25px;
+    padding: 6px 25px 6px 8px;
+  }
+  .oro-popover-content {
+    overflow-y: auto;
+    max-height: 60px;
   }
   .popover-close {
     position: absolute;

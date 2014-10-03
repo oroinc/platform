@@ -1,8 +1,16 @@
 parameters:
     oro_organization.importexport.template_fixture.business_unit.class: Oro\Bundle\OrganizationBundle\ImportExport\TemplateFixture\BusinessUnitFixture
+    oro_organization.importexport.template_fixture.organization.class: Oro\Bundle\OrganizationBundle\ImportExport\TemplateFixture\OrganizationFixture
 
 services:
     oro_organization.importexport.template_fixture.business_unit:
         class: %oro_organization.importexport.template_fixture.business_unit.class%
+        tags:
+            - { name: oro_importexport.template_fixture }
+
+    oro_organization.importexport.template_fixture.organization:
+        class: %oro_organization.importexport.template_fixture.organization.class%
+        arguments:
+            - @doctrine
         tags:
             - { name: oro_importexport.template_fixture }

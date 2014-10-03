@@ -11,14 +11,16 @@ require([
     BaseController.loadBeforeAction([
         'oronavigation/js/content-manager'
     ], function (contentManager) {
-        mediator.setHandler('pageCache:init', contentManager.init);
-        mediator.setHandler('pageCache:add', contentManager.add);
-        mediator.setHandler('pageCache:get', contentManager.get);
-        mediator.setHandler('pageCache:remove', contentManager.remove);
-        mediator.setHandler('pageCache:state:save', contentManager.saveState);
-        mediator.setHandler('pageCache:state:fetch', contentManager.fetchState);
-        mediator.setHandler('pageCache:state:check', contentManager.checkState);
-        mediator.setHandler('compareUrl', contentManager.compareUrl);
-        mediator.setHandler('currentUrl', contentManager.currentUrl);
+        mediator.setHandler('pageCache:init', contentManager.init, contentManager);
+        mediator.setHandler('pageCache:add', contentManager.add, contentManager);
+        mediator.setHandler('pageCache:get', contentManager.get, contentManager);
+        mediator.setHandler('pageCache:remove', contentManager.remove, contentManager);
+        mediator.setHandler('pageCache:state:save', contentManager.saveState, contentManager);
+        mediator.setHandler('pageCache:state:fetch', contentManager.fetchState, contentManager);
+        mediator.setHandler('pageCache:state:check', contentManager.checkState, contentManager);
+        mediator.setHandler('compareUrl', contentManager.compareUrl, contentManager);
+        mediator.setHandler('currentUrl', contentManager.currentUrl, contentManager);
+        mediator.setHandler('changeUrl', contentManager.changeUrl, contentManager);
+        mediator.setHandler('changeUrlParam', contentManager.changeUrlParam, contentManager);
     });
 });

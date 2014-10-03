@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
@@ -38,6 +40,11 @@ class ResponseHistoryListener
      */
     protected $titleService = null;
 
+    /**
+     * @var Organization
+     */
+    protected $organization;
+
     public function __construct(
         ItemFactory $navigationItemFactory,
         SecurityContextInterface $securityContext,
@@ -45,16 +52,23 @@ class ResponseHistoryListener
         TitleServiceInterface $titleService
     ) {
         $this->navItemFactory = $navigationItemFactory;
-        $this->user = !$securityContext->getToken() ||  is_string($securityContext->getToken()->getUser())
-                      ? null : $securityContext->getToken()->getUser();
+        $this->user           = !$securityContext->getToken() || is_string($securityContext->getToken()->getUser())
+            ? null : $securityContext->getToken()->getUser();
+
+        $token = $securityContext->getToken() ? $securityContext->getToken() : null;
+        if ($token instanceof OrganizationContextTokenInterface) {
+            $this->organization = $securityContext->getToken()->getOrganizationContext();
+        }
+
         $this->entityManager = $entityManager;
-        $this->titleService = $titleService;
+        $this->titleService  = $titleService;
     }
 
     /**
      * Process onResponse event, updates user history information
      *
      * @param  FilterResponseEvent $event
+     *
      * @return bool|null
      */
     public function onResponse(FilterResponseEvent $event)
@@ -64,7 +78,7 @@ class ResponseHistoryListener
             return null;
         }
 
-        $request = $event->getRequest();
+        $request  = $event->getRequest();
         $response = $event->getResponse();
 
         // check if a current request can be added to a history
@@ -73,8 +87,9 @@ class ResponseHistoryListener
         }
 
         $postArray = array(
-            'url'  => $request->getRequestUri(),
-            'user' => $this->user,
+            'url'          => $request->getRequestUri(),
+            'user'         => $this->user,
+            'organization' => $this->organization
         );
 
         /** @var $historyItem  NavigationHistoryItem */
@@ -83,6 +98,20 @@ class ResponseHistoryListener
             ->findOneBy($postArray);
 
         if (!$historyItem) {
+            $routeParameters = $request->get('_route_params');
+            unset($routeParameters['id']);
+
+            $entityId = filter_var($request->get('id'), FILTER_VALIDATE_INT);
+            if (false !== $entityId) {
+                $entityId = (int)$entityId;
+            } else {
+                $entityId = null;
+            }
+
+            $postArray['route']           = $request->get('_route');
+            $postArray['routeParameters'] = $routeParameters;
+            $postArray['entityId']        = $entityId;
+
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
                 NavigationHistoryItem::NAVIGATION_HISTORY_ITEM_TYPE,
@@ -116,6 +145,7 @@ class ResponseHistoryListener
      *
      * @param  Response $response
      * @param  Request  $request
+     *
      * @return bool
      */
     private function canAddToHistory(Response $response, Request $request)
@@ -129,7 +159,7 @@ class ResponseHistoryListener
             && $this->user;
 
         if ($result) {
-            $route = $request->get('_route');
+            $route  = $request->get('_route');
             $result = $route[0] != '_' && $route != 'oro_default';
         }
 

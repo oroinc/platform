@@ -41,6 +41,12 @@ class CmsUser
      */
     public $address;
 
+    /**
+     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @JoinColumn(name="organization", referencedColumnName="id")
+     */
+    public $organization;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection;
@@ -83,5 +89,21 @@ class CmsUser
             $this->address = $address;
             $address->setUser($this);
         }
+    }
+
+    /**
+     * @param mixed $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

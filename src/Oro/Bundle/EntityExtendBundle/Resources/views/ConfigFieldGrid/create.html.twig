@@ -7,19 +7,19 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_entityconfig_view', {'id':entity_id})) }}
-    {{ UI.saveAndCloseButton('Continue') }}
+    {{ UI.saveAndCloseButton('Continue'|trans) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': 'New Field',
+        'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
+        'entityTitle': 'oro.entity_extend.config_grid.new_field'|trans,
         'additional': [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: entity_id}),
-                'indexLabel' : entity_config.get('label')|default('N/A')
+                'indexLabel' : entity_config.get('label')|default('N/A')|trans
             },
         ]
     } %}
@@ -41,11 +41,14 @@
             $(function() {
                 $(document).on('change', 'form select#oro_entity_extend_field_type_type', function (e) {
                     var el = $(this),
-                        relation = el.find('option:selected').attr('value').split('||'),
+                        complexFieldType = el.find('option:selected').attr('value').split('||'),
                         field_name = $('input#oro_entity_extend_field_type_fieldName');
 
-                    if (relation !== 'undefined' && relation.length > 1 && relation[1]) {
-                        $(field_name).val(relation[1]).attr('readonly', 'readonly');
+                    if (complexFieldType !== 'undefined'
+                        && complexFieldType.length > 1
+                        && complexFieldType[0].split('|').length === 4
+                        && complexFieldType[1]) {
+                        $(field_name).val(complexFieldType[1]).attr('readonly', 'readonly');
                     }
                     else if ($(field_name).attr('readonly')) {
                         $(field_name).val('').removeAttr('readonly');

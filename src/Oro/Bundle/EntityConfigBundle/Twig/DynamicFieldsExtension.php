@@ -11,6 +11,8 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\FormBundle\Entity\PriorityItem;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -30,6 +32,11 @@ class DynamicFieldsExtension extends \Twig_Extension
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var FieldTypeHelper
+     */
+    protected $fieldTypeHelper;
 
     /**
      * @var ConfigProviderInterface
@@ -68,27 +75,24 @@ class DynamicFieldsExtension extends \Twig_Extension
 
     /**
      * @param ConfigManager $configManager
-     * @param ConfigProviderInterface $extendProvider
-     * @param ConfigProviderInterface $entityProvider
-     * @param ConfigProviderInterface $viewProvider
+     * @param FieldTypeHelper $fieldTypeHelper
      * @param DateTimeFormatter $dateTimeFormatter
      * @param UrlGeneratorInterface $router
      */
     public function __construct(
         ConfigManager $configManager,
-        ConfigProviderInterface $extendProvider,
-        ConfigProviderInterface $entityProvider,
-        ConfigProviderInterface $viewProvider,
+        FieldTypeHelper $fieldTypeHelper,
         DateTimeFormatter $dateTimeFormatter,
         UrlGeneratorInterface $router
     ) {
         $this->configManager = $configManager;
-        $this->extendProvider = $extendProvider;
-        $this->entityProvider = $entityProvider;
-        $this->viewProvider = $viewProvider;
+        $this->fieldTypeHelper = $fieldTypeHelper;
         $this->dateTimeFormatter = $dateTimeFormatter;
         $this->router = $router;
 
+        $this->extendProvider = $configManager->getProvider('extend');
+        $this->entityProvider = $configManager->getProvider('entity');
+        $this->viewProvider = $configManager->getProvider('view');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -121,14 +125,16 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldConfigId = $field->getId();
 
             $fieldName = $fieldConfigId->getFieldName();
+            $fieldType = $fieldConfigId->getFieldType();
+            $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             /** Prepare OptionSet field type */
-            if ($fieldConfigId->getFieldType() == 'optionSet') {
+            if ($fieldType == 'optionSet') {
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
             }
 
-            if ($value && $fieldConfigId->getFieldType() == 'manyToOne') {
+            if ($value && $underlyingFieldType == 'manyToOne') {
                 $value = $this->propertyAccessor->getValue(
                     FieldAccessor::getValue($entity, $fieldName),
                     $field->get('target_field')
@@ -146,7 +152,7 @@ class DynamicFieldsExtension extends \Twig_Extension
                 $label = $fieldName;
             }
             $dynamicRow[$fieldName] = array(
-                'type'  => $fieldConfigId->getFieldType(),
+                'type'  => $fieldType,
                 'label' => $label,
                 'value' => $value,
             );
@@ -195,62 +201,82 @@ class DynamicFieldsExtension extends \Twig_Extension
     }
 
     /**
-     * @param Collection $collection
+     * @param Collection        $collection
      * @param ConfigIdInterface $fieldConfig
+     *
      * @return array
      */
     protected function getValueForCollection(Collection $collection, ConfigIdInterface $fieldConfig)
     {
-        $extendConfig = $this->extendProvider->getConfigById($fieldConfig);
+        $extendConfig   = $this->extendProvider->getConfigById($fieldConfig);
         $titleFieldName = $extendConfig->get('target_title');
-        $targetEntity = $extendConfig->get('target_entity');
 
-        /** generate link for related entities collection */
-        $route = false;
-        $routeParams = false;
-        if (class_exists($targetEntity)) {
-            /** @var EntityMetadata $metadata */
-            $metadata = $this->configManager->getEntityMetadata($targetEntity);
-            if ($metadata && $metadata->routeView) {
-                $route = $metadata->routeView;
-                $routeParams = array(
-                    'id' => null
-                );
-            }
+        $value = $this->getEntityRouteOptions($extendConfig->get('target_entity'));
 
-            $relationExtendConfig = $this->extendProvider->getConfig($targetEntity);
-            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                $route = $this->entityViewRoute;
-                $routeParams = array(
-                    'entity_id' => str_replace('\\', '_', $targetEntity),
-                    'id' => null
-                );
-            }
-        }
-
-        $value = array(
-            'route' => $route,
-            'route_params' => $routeParams,
-            'values' => array()
-        );
-
+        $values     = [];
+        $priorities = [];
         /** @var object $item */
         foreach ($collection as $item) {
-            $routeParams['id'] = $item->getId();
+            $value['route_params']['id'] = $item->getId();
 
-            $title = array();
+            $title = [];
             foreach ($titleFieldName as $fieldName) {
                 $title[] = $this->propertyAccessor->getValue($item, $fieldName);
             }
 
-            $value['values'][] = array(
-                'id' => $item->getId(),
-                'link' => $route ? $this->router->generate($route, $routeParams) : false,
+            $values[] = [
+                'id'    => $item->getId(),
+                'link'  => $value['route'] ? $this->router->generate($value['route'], $value['route_params']) : false,
                 'title' => implode(' ', $title)
-            );
+            ];
+            if ($item instanceof PriorityItem) {
+                $priorities[] = $item->getPriority();
+            }
         }
 
+        // sort values by priority if needed
+        if (!empty($priorities) && count($priorities) === count($values)) {
+            array_multisort($priorities, $values);
+        }
+
+        $value['values'] = $values;
+
         return $value;
+    }
+
+    /**
+     * @param string $entityClassName
+     *
+     * @return array
+     */
+    protected function getEntityRouteOptions($entityClassName)
+    {
+        $route       = false;
+        $routeParams = false;
+        if (class_exists($entityClassName)) {
+            /** @var EntityMetadata $metadata */
+            $metadata = $this->configManager->getEntityMetadata($entityClassName);
+            if ($metadata && $metadata->routeView) {
+                $route       = $metadata->routeView;
+                $routeParams = [
+                    'id' => null
+                ];
+            }
+
+            $relationExtendConfig = $this->extendProvider->getConfig($entityClassName);
+            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                $route       = $this->entityViewRoute;
+                $routeParams = [
+                    'entityName' => str_replace('\\', '_', $entityClassName),
+                    'id'        => null
+                ];
+            }
+        }
+
+        return [
+            'route'        => $route,
+            'route_params' => $routeParams
+        ];
     }
 
     /**
@@ -263,15 +289,28 @@ class DynamicFieldsExtension extends \Twig_Extension
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $extendConfig->getId();
 
-        return
-            $config->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$config->is('state', ExtendScope::STATE_NEW)
-            && !$config->is('is_deleted')
-            && $this->viewProvider->getConfigById($config->getId())->is('is_displayable')
-            && !(
-                in_array($fieldConfigId->getFieldType(), array('oneToMany', 'manyToOne', 'manyToMany'))
-                && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
-            );
+        // skip system, new and deleted fields
+        if (!$config->is('owner', ExtendScope::OWNER_CUSTOM)
+            || $config->is('state', ExtendScope::STATE_NEW)
+            || $config->is('is_deleted')
+        ) {
+            return false;
+        }
+
+        // skip invisible fields
+        if (!$this->viewProvider->getConfigById($config->getId())->is('is_displayable')) {
+            return false;
+        }
+
+        // skip relations if they are referenced to deleted entity
+        $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
+        if (in_array($underlyingFieldType, array('oneToMany', 'manyToOne', 'manyToMany'))
+            && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

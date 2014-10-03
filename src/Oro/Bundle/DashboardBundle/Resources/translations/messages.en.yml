@@ -14,6 +14,7 @@ oro:
         name.label:          Name
         owner.label:         Owner
         widgets.label:       Widgets
+        organization.label:  Organization
 
         start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
@@ -30,6 +31,7 @@ oro:
 
         add_dashboard_widgets:
             add_to_dashboard: Add
+            add_widget: Add widget
 
         list: List
 

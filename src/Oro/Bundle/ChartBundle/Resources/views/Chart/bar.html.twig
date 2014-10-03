@@ -1,3 +1,5 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
 {# Chart variables format:
 
     "options":
@@ -17,126 +19,9 @@
     ]
 
 #}
+
 {% if data|length>0  %}
-    {% set containerId = "chart-container-" ~ random() %}
-    <div class="chart-container">
-        <div class="clearfix">
-            <div id="{{ containerId }}-chart" class="bar-chart chart pull-left"></div>
-        </div>
-    </div>
-    <script type="text/javascript">
-        require(['jquery', 'oroui/js/layout', 'flotr2', 'orolocale/js/formatter/number'],
-                function($, layout, Flotr, numberFormatter){
-                    $(function () {
-                        var $chart = $('#{{ containerId }}-chart');
-                        var $widgetContent = $chart.parents('.chart-container').parent();
-                        var setChartSize = function () {
-                            var chartWidth = Math.round($widgetContent.width() * 0.9);
-                            if (chartWidth != $chart.width()) {
-                                $chart.width(chartWidth);
-                                $chart.height(Math.min(Math.round(chartWidth * 0.4), 350));
-                                return true;
-                            }
-                            return false;
-                        };
-                        var setChartContainerSize = function () {
-                            $chart.closest('.clearfix').width($chart.width());
-                        };
-                        var drawChart = function () {
-
-                            if (!$chart.get(0).clientWidth) {
-                                return;
-                            }
-                            var data = {{ data|json_encode|raw }};
-                            var colors = {{ config.default_settings.chartColors|json_encode|raw }};
-                            var chartData = [];
-                            var xLabels = [];
-                            var xNumber = 0;
-                            for(var i in data){
-                                chartData.push([xNumber++, parseInt(data[i]['value'])]);
-                                xLabels.push(data[i]['label']);
-                            }
-                            var chart = {
-                                data: chartData,
-                                color: colors[0],
-                                markers: {
-                                    show: true,
-                                    position: 'ct',
-                                    labelFormatter: function (data) {
-                                        {% if options.data_schema.value.formatter is defined %}
-                                        return numberFormatter.{{ options.data_schema.value.formatter }}(data.y);
-                                        {% else %}
-                                        return data.y;
-                                        {% endif %}
-                                    }
-                                }
-                            };
-                            Flotr.draw(
-                                    $chart.get(0),
-                                    [chart],
-                                    {
-                                        colors: {{ options.settings.chartColors|json_encode|raw }},
-                                        fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
-                                        fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                                        bars : {
-                                            show : true,
-                                            horizontal : false,
-                                            shadowSize : 0,
-                                            barWidth : 0.5
-                                        },
-                                        mouse : {
-                                            track : true,
-                                            relative : true,
-                                            trackFormatter: function (data) {
-                                                {% if options.data_schema.value.formatter is defined %}
-                                                var yValue = numberFormatter.{{ options.data_schema.value.formatter }}(data.y)
-                                                {% else %}
-                                                var yValue = data.y;
-                                                {% endif %}
-
-                                                return xLabels[parseInt(data.x)] + ': ' + yValue;
-                                            }
-                                        },
-                                        yaxis: {
-                                            min: 0,
-                                            tickFormatter: function (y) {
-                                                {% if options.data_schema.value.formatter is defined %}
-                                                return numberFormatter.formatCurrency(y);
-                                                {% else %}
-                                                return y;
-                                                {% endif %}
-                                            }
-                                        },
-                                        xaxis: {
-                                            {% if options.settings.xNoTicks is defined %}
-                                            noTicks: {{ options.settings.xNoTicks }},
-                                            {% endif %}
-                                            tickFormatter: function (x) {
-                                                return xLabels[parseInt(x)];
-                                            }
-                                        },
-                                        grid: {
-                                            verticalLines : false
-                                        }
-                                    }
-                            );
-                        };
-
-                        layout.onPageRendered(function () {
-                            setChartSize();
-                            drawChart();
-                            setChartContainerSize();
-                        });
-
-                        $(window).resize(function () {
-                            if (setChartSize()) {
-                                drawChart();
-                                setChartContainerSize();
-                            }
-                        });
-                    });
-                });
-    </script>
+    {{ chart.renderChart(data, options, config) }}
 {% else %}
     <div class="container-fluid grid-container-parent">
         <div class="grid-container">

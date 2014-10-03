@@ -33,7 +33,7 @@ require([
         'jquery',
         'oronavigation/js/app/views/favorite/main-view',
         'oronavigation/js/app/models/base/model',
-        'oroui/js/app/models/base/collection'
+        'oronavigation/js/app/models/base/collection'
     ], function ($, FavoriteView, Model, Collection) {
         var collection;
 
@@ -58,21 +58,23 @@ require([
         });
     });
 
-    /**
-     * Init PinBar related views
-     */
     BaseController.loadBeforeAction([
         'jquery',
         'oronavigation/js/app/views/pin/main-view',
         'oronavigation/js/app/models/base/model',
-        'oroui/js/app/models/base/collection'
-    ], function ($, PinView, Model, Collection) {
-        var collection;
+        'oronavigation/js/app/models/base/collection',
+        'oronavigation/js/app/views/page-state-view',
+        'oronavigation/js/app/models/page-state-model'
+    ], function ($, PinView, Model, Collection, PageStateView, PageStateModel) {
+        var pinCollection, stateModel;
 
-        collection = new Collection([], {
+        pinCollection = new Collection([], {
             model: Model
         });
 
+        /**
+         * Init PinBar related views
+         */
         BaseController.addToReuse('pagePin', PinView, {
             el: 'body',
             keepElement: true,
@@ -92,23 +94,18 @@ require([
                 listSelector: 'ul',
                 fallbackSelector: '.pin-bar-empty'
             },
-            collection: collection
+            collection: pinCollection
         });
-    });
 
-    /**
-     * Init PageState view
-     */
-    BaseController.loadBeforeAction([
-        'oronavigation/js/app/views/page-state-view',
-        'oronavigation/js/app/models/page-state-model'
-    ], function (PageStateView, PageStateModel) {
-        var model;
-        model = new PageStateModel();
+        /**
+         * Init PageState view
+         */
+        stateModel = new PageStateModel();
         BaseController.addToReuse('pageState', PageStateView, {
             el: '#container',
             keepElement: true,
-            model: model
+            model: stateModel,
+            collection: pinCollection
         });
     });
 });

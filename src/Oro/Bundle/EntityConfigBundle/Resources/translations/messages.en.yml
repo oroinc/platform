@@ -25,7 +25,6 @@ oro:
             entity_management.label:       Entity Management
             entity_management.description: List of entities
 
-
         controller:
             config_entity:
                 message:
@@ -36,6 +35,7 @@ oro:
                     saved: Field saved
 
         entity:
+            plural_label:      Entities
             information.label: Entity Information
             unique.label:      Unique Keys
 
@@ -46,7 +46,12 @@ oro:
         field_config:
             field_name.label: Name
             type.label:       Data Type
+            records_count.label: Number of records
 
         info:
             new_field.label:     New Field
-            records_count.label: Number of records
+            records_count.label: Number of records: %count%
+
+        form:
+            name.label: Name
+            type.label: Type

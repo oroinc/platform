@@ -31,6 +31,12 @@ class CmsComment
      */
     public $article;
 
+    /**
+     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @JoinColumn(name="organization", referencedColumnName="id")
+     */
+    public $organization;
+
     public function setArticle(CmsArticle $article)
     {
         $this->article = $article;
@@ -39,5 +45,21 @@ class CmsComment
     public function __toString()
     {
         return __CLASS__."[id=".$this->id."]";
+    }
+
+    /**
+     * @param mixed $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

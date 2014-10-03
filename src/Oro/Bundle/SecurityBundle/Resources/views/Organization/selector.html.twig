@@ -1,0 +1,56 @@
+{% set curr_organization = get_current_organization() %}
+{% set organizations = get_enabled_organizations() %}
+
+{% set organization_name %}
+{% spaceless %}
+    {% placeholder organization_name %}
+{% endspaceless %}
+{% endset %}
+
+{% if organizations|length > 1 %}
+    <div class="nav top-search fix_logo">
+        <div class="dropdown header-utility-dropdown">
+            <i class="icon-ellipsis-vertical dropdown-toggle btn-organization-switcher" data-toggle="dropdown"></i>
+            <ul class="dropdown-menu dropdown-organization-switcher">
+                {% for organization in organizations %}
+                    <li>
+                        {% if curr_organization and curr_organization.getId() == organization.id %}
+                        <span class="selected"><b>{{ organization.name }}</b></span>
+                        {% else %}
+                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
+                           class="organization-switcher no-hash">
+                            {{ organization.name }}
+                        </a>
+                        {% endif %}
+                    </li>
+                    {% if not loop.last %}
+                    <li class="divider"><span></span></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {{ _self.organization_name_and_logo(organization_name) }}
+    </div>
+    <script type="text/javascript">
+        require(['orosecurity/js/init-organization-selector'])
+    </script>
+{% else %}
+    {{ _self.organization_name_and_logo(organization_name) }}
+{% endif %}
+
+{% macro organization_name_and_logo(organization_name) %}
+    {% if organization_name|length %}
+        {% set logo = oro_theme_logo() %}
+        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
+                {% if logo %}
+                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
+                {% else %}
+                    {{- organization_name -}}
+                {% endif %}
+            </a>
+        </h1>
+    {% else %}
+        <span class="logo-placeholder"></span>
+    {% endif %}
+{% endmacro %}

@@ -1,4 +1,5 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
@@ -23,7 +24,7 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'oro.entity_config.entity.plural_label'|trans,
         'entityTitle': entity_config.get('label')|default('N/A')|trans,
     } %}
 
@@ -35,23 +36,14 @@
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
     {% if link is defined and link %}
         <li>
-            {{ [
-            '<a href="', link, '">',
-            'oro.entity_config.info.records_count.label'|trans,
-            ': ',
-            entity_count|default(0) ,
-            '</a>'
-            ]|join|raw }}
+            {{ UI.link({
+                'path': link,
+                'label': 'oro.entity_config.info.records_count.label'|trans({'%count%': entity_count|default(0)})
+            }) }}
         </li>
     {% else %}
         <li>
-            {{ [
-            '<span>',
-            'oro.entity_config.info.records_count.label'|trans,
-            ': ',
-            entity_count|default(0) ,
-            '</span>'
-            ]|join|raw }}
+            <span>{{ 'oro.entity_config.info.records_count.label'|trans({'%count%': entity_count|default(0)}) }}</span>
         </li>
     {% endif %}
 {% endblock stats%}

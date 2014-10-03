@@ -25,7 +25,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -286,10 +285,38 @@ class ConfigManager
     }
 
     /**
-     * @param string $scope
-     * @param string $className
-     * @param bool   $withHidden Set true if you need all configurable entities,
-     *                           including entities marked as mode="hidden"
+     * Gets configuration data for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className.
+     *
+     * @param string      $scope
+     * @param string|null $className
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
+     *
+     * @return array|ConfigInterface[]
+     */
+    public function getConfigs($scope, $className = null, $withHidden = false)
+    {
+        if (!$this->modelManager->checkDatabase()) {
+            return [];
+        }
+
+        return array_map(
+            function ($model) use ($scope) {
+                return $this->getConfig($this->getConfigIdByModel($model, $scope));
+            },
+            $this->modelManager->getModels($className, $withHidden)
+        );
+    }
+
+    /**
+     * Gets a list of ids for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className.
+     *
+     * @param string      $scope
+     * @param string|null $className
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
      * @return array
      */
     public function getIds($scope, $className = null, $withHidden = false)
@@ -298,22 +325,11 @@ class ConfigManager
             return [];
         }
 
-        if ($withHidden) {
-            $models = $this->modelManager->getModels($className);
-        } else {
-            $models = array_filter(
-                $this->modelManager->getModels($className),
-                function (AbstractConfigModel $model) {
-                    return $model->getMode() != ConfigModelManager::MODE_HIDDEN;
-                }
-            );
-        }
-
         return array_map(
             function ($model) use ($scope) {
                 return $this->getConfigIdByModel($model, $scope);
             },
-            $models
+            $this->modelManager->getModels($className, $withHidden)
         );
     }
 
@@ -444,9 +460,10 @@ class ConfigManager
             $this->getEntityManager()->persist($model);
         }
 
+        // @todo: need investigation if we can call this flush only if !empty($models)
         $this->getEntityManager()->flush();
 
-        if ($this->cache) {
+        if ($this->cache && !empty($models)) {
             $this->cache->removeAllConfigurable();
         }
 

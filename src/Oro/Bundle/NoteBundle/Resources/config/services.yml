@@ -28,6 +28,7 @@ services:
 
     oro_note.manager.api:
         class: %oro_note.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_note.entity.class%
             - @doctrine.orm.entity_manager

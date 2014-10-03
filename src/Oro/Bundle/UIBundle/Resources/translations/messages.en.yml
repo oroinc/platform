@@ -5,6 +5,8 @@
 "Edit": "Edit"
 "Refresh": "Refresh"
 "Reset": "Reset"
+"All": "All"
+"Any": "Any"
 "Expand All": "Expand All"
 "Collapse All": "Collapse All"
 "Ascending Order": "Ascending order - Click to sort in descending order"
@@ -36,5 +38,13 @@ oro:
         updated_at:     Updated At
         system_configuration:
             groups:
-                navbar_settings:
-                    title: 'Navigation bar'
+                navbar_settings.title: 'Navigation bar'
+                application_settings.title: 'Application Settings'
+                application_name_settings.title: 'URL'
+            fields:
+                application_url.label: 'Application URL'
+                navbar_position:
+                    label: 'Position'
+                    choices:
+                        top: 'Top'
+                        left: 'Left'

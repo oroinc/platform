@@ -43,8 +43,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'application_name'  => ['value' => 'ORO'],
-                'application_title' => ['value' => 'ORO Business Application Platform'],
+                'organization_name'  => ['value' => 'ORO'],
                 'application_url'   => ['value' => 'http://localhost/oro/'],
                 'navbar_position'   => ['value' => 'top'],
             ]

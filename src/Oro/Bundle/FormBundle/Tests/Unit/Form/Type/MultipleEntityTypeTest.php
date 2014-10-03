@@ -67,14 +67,18 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with(
                 array(
-                    'add_acl_resource'      => null,
-                    'class'                 => null,
-                    'default_element'       => null,
-                    'extend'                => false,
-                    'grid_url'              => null,
-                    'initial_elements'      => null,
-                    'mapped'                => false,
-                    'selector_window_title' => null,
+                    'add_acl_resource'           => null,
+                    'class'                      => null,
+                    'default_element'            => null,
+                    'extend'                     => false,
+                    'grid_url'                   => null,
+                    'initial_elements'           => null,
+                    'mapped'                     => false,
+                    'selector_window_title'      => null,
+                    'extra_config'               => null,
+                    'selection_url'              => null,
+                    'selection_route'            => null,
+                    'selection_route_parameters' => array(),
                 )
             );
         $this->type->setDefaultOptions($optionsResolver);
@@ -89,8 +93,7 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
     public function testFinishView($options, $expectedKey, $expectedValue)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
         if (isset($options['add_acl_resource'])) {
             $this->securityFacade->expects($this->once())
@@ -165,6 +168,26 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
                 array(),
                 'default_element',
                 null
+            ),
+            array(
+                '$formOptions'   => array('grid_url' => 'testUrl'),
+                '$expectedKey'   => 'grid_url',
+                '$expectedValue' => 'testUrl',
+            ),
+            array(
+                '$formOptions'   => array('selection_url' => 'testUrlSelection'),
+                '$expectedKey'   => 'selection_url',
+                '$expectedValue' => 'testUrlSelection',
+            ),
+            array(
+                '$formOptions'   => array('selection_route' => 'testRoute'),
+                '$expectedKey'   => 'selection_route',
+                '$expectedValue' => 'testRoute',
+            ),
+            array(
+                '$formOptions'   => array('selection_route_parameters' => array('testParam1')),
+                '$expectedKey'   => 'selection_route_parameters',
+                '$expectedValue' => array('testParam1'),
             )
         );
     }

@@ -7,23 +7,29 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         routing = require('routing'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        mediator = require('oroui/js/mediator');
+        mediator = require('oroui/js/mediator'),
+        options = {
+            successMessage: 'oro.segment.refresh_dialog.success',
+            errorMessage: 'oro.segment.refresh_dialog.error',
+            title: 'oro.segment.refresh_dialog.title',
+            okText: 'oro.segment.refresh_dialog.okText',
+            content: 'oro.segment.refresh_dialog.content',
+            reloadRequired: false
+        };
 
     function run(url, reloadRequired) {
         mediator.execute('showLoading');
         $.post(url, function () {
-            var successMessage = __('Segment successfully processed.');
             if (reloadRequired) {
                 mediator.once("page:update", function () {
-                    mediator.execute('showFlashMessage', 'success', successMessage);
+                    mediator.execute('showFlashMessage', 'success', __(options.successMessage));
                 });
                 mediator.execute('refreshPage');
             } else {
-                mediator.execute('showFlashMessage', 'success', successMessage);
+                mediator.execute('showFlashMessage', 'success', __(options.successMessage));
             }
         }).error(function () {
-            mediator.execute('showFlashMessage',
-                'error', __('An unidentified error has occurred. Please contact your Administrator.'));
+            mediator.execute('showFlashMessage', 'error', __(options.errorMessage));
         }).always(function () {
             mediator.execute('hideLoading');
         });
@@ -34,9 +40,9 @@ define(function (require) {
         e.preventDefault();
 
         confirm = new DeleteConfirmation({
-            title:    __('Confirm action'),
-            okText:   __('Yes, I Agree'),
-            content:  __('Please confirm that you want to refresh this segment.')
+            title:   __(options.title),
+            okText:  __(options.okText),
+            content: __(options.content)
         });
 
         url = $(e.target).data('url');
@@ -45,7 +51,8 @@ define(function (require) {
         confirm.open();
     }
 
-    return function (options) {
+    return function (additionalOptions) {
+        _.extend(options, additionalOptions || {});
         var reloadRequired, button;
         reloadRequired = Boolean(options.reloadRequired);
         button = options._sourceElement;

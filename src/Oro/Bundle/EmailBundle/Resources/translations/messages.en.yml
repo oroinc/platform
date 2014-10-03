@@ -11,6 +11,9 @@ oro:
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template:                   "Choose a template..."
 
+        system_configuration:
+            email_configuration: Email Configuration
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
@@ -28,19 +31,25 @@ oro:
             entity_name.label:   Entity name
             type.label:          Type
             translations.label:  Translations
+            organization.label:  Organization
 
             # sections for email template variables
             variables:
                 system: 'System variables'
                 entity: 'Entity variables'
 
+            action:
+                preview: Preview
+                clone: Clone
+
             # email template system variables
+            organization_name:   Organization name of logged in user
             user_name:           Username of logged in user
             user_first_name:     First name of logged in user
             user_last_name:      Last name of logged in user
             user_full_name:      Full name of logged in user
-            app_short_name:      Short name of application
-            app_full_name:       Full name of application
+            app_short_name:      Short name of application #@deprecated since 1.4 Provider\SystemVariablesProvider
+            app_full_name:       Full name of application  #@deprecated since 1.4 Provider\SystemVariablesProvider
             app_url:             Application URL
             current_datetime:    Current date & time
             current_date:        Current date
@@ -93,8 +102,17 @@ oro:
         subject.label:            Subject
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
+        template.label:           Template
+        type.label:               Type
 
         empty_body:               Empty body
+        unable_to_load_body:      Unfortunately we could not load the email body from the server. It is possible that it has been deleted.
+
+        entity_config:
+            email:
+                field:
+                    items:
+                        available_in_template: Available in email templates
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
@@ -107,3 +125,4 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
+"Content": "Content"

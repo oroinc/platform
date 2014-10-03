@@ -6,7 +6,7 @@
             {% for tab in tabs %}
                 <li{% if activeTab == tab.name %} class="active"{% endif %}><a
                     href="javascript:void(0);" class="no-hash tab-button"
-                    data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label|trans }}</a></li>
+                    data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label }}</a></li>
             {% endfor %}
         </ul>
         <div class="tab-content">

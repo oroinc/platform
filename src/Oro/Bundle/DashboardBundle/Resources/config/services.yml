@@ -1,4 +1,5 @@
 parameters:
+    oro_dashboard.config_resolver.class:         Oro\Component\Config\Resolver\SystemAwareResolver
     oro_dashboard.manager.state.class:           Oro\Bundle\DashboardBundle\Model\StateManager
     oro_dashboard.manager.class:                 Oro\Bundle\DashboardBundle\Model\Manager
     oro_dashboard.widget_attributes.class:       Oro\Bundle\DashboardBundle\Model\WidgetAttributes
@@ -11,11 +12,17 @@ parameters:
     oro_dashboard.form.type.select.class:        Oro\Bundle\DashboardBundle\Form\Type\DashboardSelectType
 
 services:
+    oro_dashboard.config_resolver:
+        class: %oro_dashboard.config_resolver.class%
+        arguments:
+            - @service_container
+
     oro_dashboard.widget_attributes:
         class: %oro_dashboard.widget_attributes.class%
         arguments:
             - @oro_dashboard.config_provider
             - @oro_security.security_facade
+            - @oro_dashboard.config_resolver
 
     oro_dashboard.manager:
         class: %oro_dashboard.manager.class%
@@ -23,6 +30,7 @@ services:
             - @oro_dashboard.factory
             - @doctrine.orm.entity_manager
             - @oro_security.acl_helper
+            - @security.context
 
     oro_dashboard.factory:
         class: %oro_dashboard.factory.class%

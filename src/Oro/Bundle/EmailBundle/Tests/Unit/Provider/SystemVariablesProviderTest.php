@@ -44,8 +44,6 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
             [
-                'appShortName' => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_short_name'],
-                'appFullName'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_full_name'],
                 'currentDate'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_date'],
                 'currentTime'  => ['type' => 'string', 'label' => 'oro.email.emailtemplate.current_time'],
                 'appURL'       => ['type' => 'string', 'label' => 'oro.email.emailtemplate.app_url'],
@@ -61,8 +59,8 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['oro_ui.application_name', false, false, 'applicationShortName'],
-                        ['oro_ui.application_title', false, false, 'applicationFullName'],
+                        ['oro_ui.application_name', false, false, ''],
+                        ['oro_ui.application_title', false, false, ''],
                         ['oro_ui.application_url', false, false, 'http://localhost/'],
                     ]
                 )
@@ -79,8 +77,8 @@ class SystemVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
             [
-                'appShortName' => 'applicationShortName',
-                'appFullName'  => 'applicationFullName',
+                'appShortName' => '',
+                'appFullName'  => '',
                 'appURL'       => 'http://localhost/',
                 'currentDate'  => 'date',
                 'currentTime'  => 'time',

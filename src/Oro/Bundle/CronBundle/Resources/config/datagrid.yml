@@ -86,7 +86,7 @@ datagrid:
         actions:
             view:
                 type:         navigate
-                label:        oro.cron.header.view
+                label:        oro.grid.action.view
                 link:         view_link
                 icon:         eye-open
                 acl_recource: oro_jobs

@@ -17,6 +17,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_2\OroUserBundle as UserAvatars;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActivities;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_4\AttachmentOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as EmailTemplateOwner;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -37,7 +38,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_8';
     }
 
     /**
@@ -90,12 +91,15 @@ class OroUserBundleInstaller implements
         $this->addOroUserEmailOriginForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
-        $this->addOroAccessRoleForeignKeys($schema);
         $this->addOroUserStatusForeignKeys($schema);
 
         EmailTemplateOwner::addOwnerToOroEmailTemplate($schema);
         OroUserBundle::addOwnerToOroEmailAddress($schema);
         UserEmailActivities::addActivityAssociations($schema, $this->activityExtension);
+
+        UserOrganization::addOrganizationFields($schema);
+        UserOrganization::oroUserOrganizationTable($schema);
+        UserOrganization::oroUserOrganizationForeignKeys($schema);
     }
 
     /**
@@ -122,11 +126,13 @@ class OroUserBundleInstaller implements
     {
         $table = $schema->createTable('oro_user_api');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('api_key', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addUniqueIndex(['api_key'], 'UNIQ_296B6993C912ED9D');
-        $table->addUniqueIndex(['user_id'], 'UNIQ_296B6993A76ED395');
+        $table->addColumn('api_key', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['api_key'], 'UNIQ_296B6993C912ED9D');
+        $table->addIndex(['user_id'], 'IDX_296B6993A76ED395', []);
+        $table->addIndex(['organization_id'], 'IDX_296B699332C8A3DE', []);
     }
 
     /**
@@ -264,11 +270,9 @@ class OroUserBundleInstaller implements
     {
         $table = $schema->createTable('oro_access_role');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
-        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('role', 'string', ['length' => 30, 'precision' => 0]);
         $table->addColumn('label', 'string', ['length' => 30, 'precision' => 0]);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
-        $table->addIndex(['business_unit_owner_id'], 'IDX_673F65E759294170', []);
         $table->setPrimaryKey(['id']);
     }
 
@@ -327,10 +331,16 @@ class OroUserBundleInstaller implements
     {
         $table = $schema->getTable('oro_user_api');
         $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            []
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 
@@ -479,22 +489,6 @@ class OroUserBundleInstaller implements
             ['role_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
-        );
-    }
-
-    /**
-     * Add oro_access_role foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroAccessRoleForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_access_role');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_business_unit'),
-            ['business_unit_owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL']
         );
     }
 

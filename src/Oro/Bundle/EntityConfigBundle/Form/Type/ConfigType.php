@@ -68,6 +68,7 @@ class ConfigType extends AbstractType
                 'fieldName',
                 'text',
                 array(
+                    'label'     => 'oro.entity_config.form.name.label',
                     'block'     => 'general',
                     'disabled'  => true,
                     'data'      => $fieldName,
@@ -77,6 +78,7 @@ class ConfigType extends AbstractType
                 'type',
                 'choice',
                 array(
+                    'label'       => 'oro.entity_config.form.type.label',
                     'choices'     => [],
                     'block'       => 'general',
                     'disabled'    => true,
@@ -110,6 +112,7 @@ class ConfigType extends AbstractType
             }
         }
 
+        /** @deprecated since 1.4, will be removed in 2.0 */
         if ($fieldType == 'optionSet') {
             $data['extend']['set_options'] = $this->configManager->getEntityManager()
                 ->getRepository(OptionSet::ENTITY_NAME)

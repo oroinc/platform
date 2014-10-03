@@ -4,13 +4,23 @@ namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
 use Doctrine\ORM\Query;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 
 class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 {
+    /**
+     * @var DatagridGuesser
+     */
+    protected $datagridGuesser;
+
     /**
      * @var DatagridConfiguration
      */
@@ -40,6 +50,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      * @var array
      */
     protected $leftJoins;
+
+    /**
+     * Constructor
+     *
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param DatagridGuesser               $datagridGuesser
+     */
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        ManagerRegistry $doctrine,
+        DatagridGuesser $datagridGuesser
+    ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+        $this->datagridGuesser = $datagridGuesser;
+    }
 
     /**
      * Converts a query specified in $source parameter to a datagrid configuration
@@ -143,37 +171,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             $fieldType = $this->getFieldType($entityClassName, $fieldName);
         }
 
-        // Add visible columns
-        $this->config->offsetSetByPath(
-            sprintf('[columns][%s]', $columnAlias),
-            [
-                'label'         => $columnLabel,
-                'translatable'  => false,
-                'frontend_type' => $this->getFrontendFieldType($fieldType)
-            ]
-        );
-
-        // Add sorters
-        $this->config->offsetSetByPath(
-            sprintf('[sorters][columns][%s]', $columnAlias),
-            [
+        $columnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label'        => $columnLabel,
+                'translatable' => false
+            ],
+            DatagridGuesser::SORTER    => [
                 'data_name' => $columnAlias
-            ]
-        );
-
-        // Add filters
-        $filter = [
-            'type'         => $this->getFilterType($fieldType),
-            'data_name'    => $columnAlias,
-            'translatable' => false,
+            ],
+            DatagridGuesser::FILTER    => [
+                'data_name'    => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnAlias),
+                'translatable' => false
+            ],
         ];
         if ($functionExpr !== null) {
-            $filter['filter_by_having'] = true;
+            $columnOptions[DatagridGuesser::FILTER][FilterUtility::BY_HAVING_KEY] = true;
         }
-        $this->config->offsetSetByPath(
-            sprintf('[filters][columns][%s]', $columnAlias),
-            $filter
-        );
+        $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
+        $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);
     }
 
     /**
@@ -272,36 +287,5 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             sprintf('[sorters][default][%s]', $columnAlias),
             $columnSorting
         );
-    }
-
-    /**
-     * Gets a datagrid column frontend type for the given field type
-     *
-     * @param string $fieldType
-     * @return string
-     */
-    protected function getFrontendFieldType($fieldType)
-    {
-        switch ($fieldType) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-                return PropertyInterface::TYPE_INTEGER;
-            case 'decimal':
-            case 'float':
-                return PropertyInterface::TYPE_DECIMAL;
-            case 'boolean':
-                return PropertyInterface::TYPE_BOOLEAN;
-            case 'date':
-                return PropertyInterface::TYPE_DATE;
-            case 'datetime':
-                return PropertyInterface::TYPE_DATETIME;
-            case 'money':
-                return PropertyInterface::TYPE_CURRENCY;
-            case 'percent':
-                return PropertyInterface::TYPE_PERCENT;
-        }
-
-        return PropertyInterface::TYPE_STRING;
     }
 }

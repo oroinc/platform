@@ -7,6 +7,6 @@ response:
     records_count: 9
     count: 0
     rest:
-        data: ~
+        data: []
     soap:
-        item: ~
+        item: []

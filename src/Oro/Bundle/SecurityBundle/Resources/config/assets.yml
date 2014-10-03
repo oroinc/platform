@@ -1,0 +1,3 @@
+css:
+    'orosecurity':
+        - 'bundles/orosecurity/css/selector.less'

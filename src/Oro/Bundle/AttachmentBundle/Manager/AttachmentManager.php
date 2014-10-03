@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -308,5 +310,18 @@ class AttachmentManager
                 'filter'   => $filerName
             ]
         );
+    }
+
+    /**
+     * if in form was clicked delete button and file has not file name - then delete this file record from the db
+     *
+     * @param File          $entity
+     * @param EntityManager $em
+     */
+    public function checkOnDelete(File $entity, EntityManager $em)
+    {
+        if ($entity->isEmptyFile() && $entity->getFilename() === null) {
+            $em->remove($entity);
+        }
     }
 }

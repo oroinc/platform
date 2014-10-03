@@ -40,13 +40,13 @@ datagrid:
             # @TODO check why those actions dont have ACL
             view:
                 type: navigate
-                label: View
+                label: oro.grid.action.view
                 icon: eye-open
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
-                label: Update
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
         sorters:
@@ -79,8 +79,16 @@ datagrid:
                     - cf.fieldName
                     - cf.type
                     - cf.mode
+                    - ce.id as entity_id
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                join:
+                    inner:
+                        - { join: cf.entity, alias: ce }
+                where:
+                    and:
+                        - ce.id = :entity_id
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
 
         columns:
             fieldName:
@@ -88,7 +96,9 @@ datagrid:
                 frontend_type: string
             type:
                 label: oro.entity_config.field_config.type.label
-                frontend_type: string
+                frontend_type: html
+                type: twig
+                template: OroEntityConfigBundle:Config:fieldType.html.twig
 
         properties:
             update_link:
@@ -100,7 +110,7 @@ datagrid:
             # @TODO check why those actions dont have ACL
             update:
                 type: navigate
-                label: Edit
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
                 rowAction: true
@@ -108,8 +118,6 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
-                type:
-                    data_name: cf.type
         filters: ~
 
     # Audit entity log grid

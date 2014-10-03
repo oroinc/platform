@@ -30,6 +30,7 @@ services:
 
     oro_user.manager.api:
         class: %oro_user.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_user.entity.class%
             - @doctrine.orm.entity_manager
@@ -79,6 +80,7 @@ services:
 
     oro_user.role_manager.api:
         class: %oro_user.role.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_user.role.entity.class%
             - @doctrine.orm.entity_manager
@@ -89,6 +91,7 @@ services:
 
     oro_user.group_manager.api:
         class: %oro_user.group.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_user.group.entity.class%
             - @doctrine.orm.entity_manager
@@ -137,23 +140,11 @@ services:
             - @form.factory
             - @security.context
 
-    oro_user.event_listener.role_users_grid_listener:
-        class: %oro_datagrid.event_listener.base_orm_relation.class%
-        arguments:
-          - role_id
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.role-users-grid, method: onBuildAfter }
-
-    oro_user.event_listener.group_users_grid_listener:
-        class: %oro_datagrid.event_listener.base_orm_relation.class%
-        arguments:
-          - group_id
-        tags:
-          - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.group-users-grid, method: onBuildAfter }
-
     oro_user.handler.delete:
         class: %oro_user.handler.delete.class%
         parent: oro_soap.handler.delete.abstract
+        calls:
+            - [ setSecurityFacade, [@oro_security.security_facade] ]
 
     oro_user.role.handler.delete:
         class: %oro_user.role.handler.delete.class%

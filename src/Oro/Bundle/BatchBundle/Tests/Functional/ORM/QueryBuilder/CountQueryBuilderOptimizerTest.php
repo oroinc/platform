@@ -161,14 +161,14 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->leftJoin('u.groups', 'g')
                     ->leftJoin('u.roles', 'r')
                     ->leftJoin('g.roles', 'gr', Join::WITH, 'aKey = :test')
-                    ->leftJoin('u.api', 'api')
+                    ->leftJoin('u.apiKeys', 'api')
                     ->select(array('u.id', 'u.username', 'api.apiKey as aKey'))
                     ->where('gr.id > 10'),
                 'expectedDQL' => 'SELECT DISTINCT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
                     . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
-                    . 'LEFT JOIN u.api api '
+                    . 'LEFT JOIN u.apiKeys api '
                     . 'WHERE gr.id > 10'
             ),
             'having_equal' => array(

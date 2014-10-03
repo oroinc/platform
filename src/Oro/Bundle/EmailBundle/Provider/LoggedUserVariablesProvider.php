@@ -9,6 +9,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
@@ -62,14 +63,38 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     {
         $result = [];
 
-        $user = $this->securityFacade->getLoggedUser();
+        $organization = $this->securityFacade->getOrganization();
+        $user         = $this->securityFacade->getLoggedUser();
 
+        $this->addOrganizationName($result, $organization, $addValue);
         $this->addUserName($result, $user, $addValue);
         $this->addUserFirstName($result, $user, $addValue);
         $this->addUserLastName($result, $user, $addValue);
         $this->addUserFullName($result, $user, $addValue);
 
         return $result;
+    }
+
+    /**
+     * @param array  $result
+     * @param object $organization
+     * @param bool   $addValue
+     */
+    protected function addOrganizationName(array &$result, $organization, $addValue)
+    {
+        if ($organization instanceof Organization) {
+            if ($addValue) {
+                $val = $organization->getName();
+            } else {
+                $val = [
+                    'type'  => 'string',
+                    'label' => $this->translator->trans('oro.email.emailtemplate.organization_name')
+                ];
+            }
+            $result['organizationName'] = $val;
+        } elseif ($addValue) {
+            $result['organizationName'] = '';
+        }
     }
 
     /**

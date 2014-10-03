@@ -30,7 +30,17 @@ define([
             },
             getter: function ($el, name, value) {
                 return value;
-            }
+            },
+            changed: false
+        },
+
+        /**
+         * Is this component changed by user
+         *
+         * @returns {boolean}
+         */
+        hasChanges: function () {
+            return this.changed;
         },
 
         _create: function () {
@@ -77,6 +87,7 @@ define([
                 });
             }
             this._updateActions();
+            this.changed = false;
         },
 
         _onSaveItem: function (e) {
@@ -155,6 +166,7 @@ define([
         },
 
         _onElementChange: function (e) {
+            this.changed = true;
             if (this.validated) {
                 this._validate(e.target);
             }

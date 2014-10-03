@@ -26,6 +26,18 @@ column_name:
 ```
 Represents url field, mostly used for generating urls for actions.
 
+### Link
+```
+column_name:
+    type: link
+    route: some_route # required
+    isAbsolute: true|false # optional
+    params: [] # optional params for route generating, will be took from record
+    anchor: string #optional, use it when need to add some #anchor to generated url
+    frontend_type: html #needed to display prepared link (a-tag) as html
+```
+Represents link field to display a link as html. Link text is value of records "column_name", values for url generation are specified via "params". 
+
 ### Twig
 ```
 column_name:
@@ -51,7 +63,7 @@ column_name:
     type: callback
     callable: @link # required
 ```
-Used when field should be formatted using some callback, format [see](./../../link.md).
+Used when field should be formatted using some callback, format [see](./../../references_in_configuration.md).
 
 ### Localized Number
 ```

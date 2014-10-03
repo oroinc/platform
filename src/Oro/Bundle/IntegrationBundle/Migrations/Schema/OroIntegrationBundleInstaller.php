@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -19,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_8';
     }
 
     /**
@@ -55,6 +56,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('synchronization_settings', 'object', ['comment' => '(DC2Type:object)']);
         $table->addColumn('mapping_settings', 'object', ['comment' => '(DC2Type:object)']);
         $table->addColumn('enabled', 'boolean', ['notnull' => false]);
+        $table->addColumn('edit_mode', 'integer', ['notnull' => true, 'default' => Channel::EDIT_MODE_ALLOW]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['transport_id'], 'UNIQ_55B9B9C59909C13F');
         $table->addIndex(['default_user_owner_id'], 'IDX_55B9B9C5A89019EA', []);

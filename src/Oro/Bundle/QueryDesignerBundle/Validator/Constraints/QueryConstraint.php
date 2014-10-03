@@ -9,7 +9,7 @@ class QueryConstraint extends Constraint
     /**
      * @var string
      */
-    public $message = 'Invalid query';
+    public $message = 'oro.query_designer.validation.query';
 
     /**
      * {@inheritdoc}

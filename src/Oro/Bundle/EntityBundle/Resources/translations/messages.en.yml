@@ -10,5 +10,37 @@ oro:
             entity_fields:          Fields
             entity_related:         Related
 
+        plural_label: Entities
+        item: "Item #%id%"
+
         validation:
             unique_field: Value for field "%field%" must be unique|Combination of values for "%field%" fields must be unique
+
+        datagrid:
+            assigned:     Assigned
+
+        entity_config:
+            entity:
+                entity:
+                    items:
+                        icon: Icon
+                        label: Label
+                        plural_label: Plural label
+                        description: Description
+                field:
+                    items:
+                        label: Label
+                        description: Description
+            datagrid:
+                field:
+                    items:
+                        is_visible: Show on grid
+                        show_filter: Show grid filter
+            form:
+                field:
+                    items:
+                        is_enabled: Show on form
+            view:
+                field:
+                    items:
+                        is_displayable: Show on view

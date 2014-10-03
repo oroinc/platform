@@ -55,6 +55,7 @@ oro:
         name.label:          Name
         owner.label:         Owner
         type.label:          Report type
+        organization.label:  Organization
 
         reporttype:
             entity_label:        Report Type
@@ -66,7 +67,6 @@ oro:
             hasChart:
                 label:   Report design
                 tooltip: Add chart to the report
-
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

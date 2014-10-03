@@ -33,18 +33,29 @@ class EmailTemplateSelectType extends AbstractType
             return array_merge($defaultConfigs, $configs);
         };
 
+        $resolver->setRequired(
+            array(
+                'data_route',
+                'depends_on_parent_field'
+            )
+        );
+
         $resolver->setDefaults(
             array(
+                'label'                   => null,
                 'class'                   => 'OroEmailBundle:EmailTemplate',
                 'property'                => 'name',
                 'query_builder'           => null,
                 'depends_on_parent_field' => 'entityName',
+                'target_field'            => null,
                 'selectedEntity'          => null,
                 'choices'                 => $choices,
                 'configs'                 => $defaultConfigs,
                 'empty_value'             => '',
                 'empty_data'              => null,
-                'required'                => true
+                'required'                => true,
+                'data_route'              => 'oro_api_get_emailtemplates',
+                'data_route_parameter'    => 'entityName'
             )
         );
         $resolver->setNormalizers(
@@ -59,7 +70,10 @@ class EmailTemplateSelectType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['depends_on_parent_field'] = $form->getConfig()->getOption('depends_on_parent_field');
+        $config = $form->getConfig();
+        $view->vars['depends_on_parent_field'] = $config->getOption('depends_on_parent_field');
+        $view->vars['data_route'] = $config->getOption('data_route');
+        $view->vars['data_route_parameter'] = $config->getOption('data_route_parameter');
     }
 
     /**

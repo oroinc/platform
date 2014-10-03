@@ -4,18 +4,25 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * Navigation History Entity
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository")
  * @ORM\HasLifecycleCallbacks
- * @ORM\Table(name="oro_navigation_history")
+ * @ORM\Table(
+ *      name="oro_navigation_history",
+ *      indexes={
+ *          @ORM\Index(name="oro_navigation_history_route_idx", columns={"route"}),
+ *          @ORM\Index(name="oro_navigation_history_entity_id_idx", columns={"entity_id"}),
+ *      }
+ * )
  */
 class NavigationHistoryItem implements NavigationItemInterface
 {
-    const NAVIGATION_HISTORY_ITEM_TYPE = 'history';
-
-    const NAVIGATION_HISTORY_COLUMN_VISITED_AT = 'visitedAt';
+    const NAVIGATION_HISTORY_ITEM_TYPE          = 'history';
+    const NAVIGATION_HISTORY_COLUMN_VISITED_AT  = 'visitedAt';
     const NAVIGATION_HISTORY_COLUMN_VISIT_COUNT = 'visitCount';
 
     /**
@@ -64,6 +71,35 @@ class NavigationHistoryItem implements NavigationItemInterface
     protected $visitCount = 0;
 
     /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * @var string $url
+     *
+     * @ORM\Column(name="route", type="string", length=128)
+     */
+    protected $route;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="route_parameters", type="array")
+     */
+    protected $routeParameters = [];
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
+     */
+    protected $entityId;
+
+    /**
      * Constructor
      */
     public function __construct(array $values = null)
@@ -86,7 +122,8 @@ class NavigationHistoryItem implements NavigationItemInterface
     /**
      * Set url
      *
-     * @param  string                $url
+     * @param  string $url
+     *
      * @return NavigationHistoryItem
      */
     public function setUrl($url)
@@ -109,7 +146,8 @@ class NavigationHistoryItem implements NavigationItemInterface
     /**
      * Set title
      *
-     * @param  string                $title
+     * @param  string $title
+     *
      * @return NavigationHistoryItem
      */
     public function setTitle($title)
@@ -132,7 +170,8 @@ class NavigationHistoryItem implements NavigationItemInterface
     /**
      * Set visitedAt
      *
-     * @param  \DateTime             $visitedAt
+     * @param  \DateTime $visitedAt
+     *
      * @return NavigationHistoryItem
      */
     public function setVisitedAt($visitedAt)
@@ -155,7 +194,8 @@ class NavigationHistoryItem implements NavigationItemInterface
     /**
      * Set visitCount
      *
-     * @param  int                   $visitCount
+     * @param  int $visitCount
+     *
      * @return NavigationHistoryItem
      */
     public function setVisitCount($visitCount)
@@ -176,9 +216,70 @@ class NavigationHistoryItem implements NavigationItemInterface
     }
 
     /**
+     * @param int $entityId
+     *
+     * @return NavigationHistoryItem
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @param string $route
+     *
+     * @return NavigationHistoryItem
+     */
+    public function setRoute($route)
+    {
+        $this->route = $route;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * @param array $routeParameters
+     *
+     * @return NavigationHistoryItem
+     */
+    public function setRouteParameters($routeParameters)
+    {
+        $this->routeParameters = $routeParameters;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouteParameters()
+    {
+        return $this->routeParameters;
+    }
+
+    /**
      * Set user
      *
      * @param  \Oro\Bundle\UserBundle\Entity\User $user
+     *
      * @return NavigationHistoryItem
      */
     public function setUser(\Oro\Bundle\UserBundle\Entity\User $user = null)
@@ -214,6 +315,18 @@ class NavigationHistoryItem implements NavigationItemInterface
         if (isset($values['user'])) {
             $this->setUser($values['user']);
         }
+        if (isset($values['organization'])) {
+            $this->setOrganization($values['organization']);
+        }
+        if (isset($values['route'])) {
+            $this->setRoute($values['route']);
+        }
+        if (isset($values['routeParameters'])) {
+            $this->setRouteParameters($values['routeParameters']);
+        }
+        if (isset($values['entityId'])) {
+            $this->setEntityId($values['entityId']);
+        }
     }
 
     /**
@@ -233,5 +346,29 @@ class NavigationHistoryItem implements NavigationItemInterface
     {
         $this->visitedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->visitCount++;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     *
+     * @return NavigationHistoryItem
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

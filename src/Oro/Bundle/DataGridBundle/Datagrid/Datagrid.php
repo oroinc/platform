@@ -16,22 +16,39 @@ class Datagrid implements DatagridInterface
     /** @var string */
     protected $name;
 
-    /** @var Acceptor */
-    protected $acceptor;
+    /** @var string */
+    protected $scope;
+
+    /** @var DatagridConfiguration */
+    protected $config;
 
     /** @var ParameterBag */
     protected $parameters;
 
+    /** @var Acceptor */
+    protected $acceptor;
+
     /**
-     * @param string $name
-     * @param Acceptor $acceptor
-     * @param ParameterBag $parameters
+     * @param string                $name
+     * @param DatagridConfiguration $config
+     * @param ParameterBag          $parameters
      */
-    public function __construct($name, Acceptor $acceptor, ParameterBag $parameters)
+    public function __construct($name, DatagridConfiguration $config, ParameterBag $parameters)
     {
-        $this->name = $name;
-        $this->setAcceptor($acceptor);
-        $this->setParameters($parameters);
+        $this->name       = $name;
+        $this->config     = $config;
+        $this->parameters = $parameters;
+
+        $this->initialize();
+    }
+
+    /**
+     * Performs an initialization of a data grid.
+     * You can override this method to perform modifications of grid configuration
+     * based on grid parameters.
+     */
+    public function initialize()
+    {
     }
 
     /**
@@ -40,6 +57,24 @@ class Datagrid implements DatagridInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getScope()
+    {
+        return $this->scope;
     }
 
     /**
@@ -116,14 +151,6 @@ class Datagrid implements DatagridInterface
     /**
      * {@inheritDoc}
      */
-    public function setParameters(ParameterBag $parameters)
-    {
-        $this->parameters = $parameters;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getParameters()
     {
         return $this->parameters;
@@ -134,6 +161,6 @@ class Datagrid implements DatagridInterface
      */
     public function getConfig()
     {
-        return $this->getAcceptor()->getConfig();
+        return $this->config;
     }
 }

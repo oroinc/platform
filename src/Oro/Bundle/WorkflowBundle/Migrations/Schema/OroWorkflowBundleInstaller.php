@@ -13,7 +13,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_8';
     }
 
     /**
@@ -223,6 +223,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('step_order', 'integer', []);
         $table->addColumn('is_final', 'boolean', []);
+        $table->addIndex(['name'], 'oro_workflow_step_name_idx', []);
         $table->addIndex(['workflow_name'], 'idx_4a35528c1bbc6e3d', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['workflow_name', 'name'], 'oro_workflow_step_unique_idx');

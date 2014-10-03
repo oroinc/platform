@@ -1,7 +1,9 @@
 datagrid:
     custom-entity-grid:
         options:
+            base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
             entityHint: entity
+            export: true
         source:
             acl_resource: ~
             type: orm
@@ -9,26 +11,26 @@ datagrid:
                 select:
                     - ce.id
                 from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
+                    - { table: ENTITY_NAME, alias: ce }
         columns: # no static columns
             id: {renderable: false} #required because of OrmSorterExtension
         properties:
             id: ~
             update_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_update
                 params:
                     - id
             view_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_view
                 params:
                     - id
             delete_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_subscriber->getLinkProperty
+                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
                 route: oro_entity_delete
                 params:
                     - id
@@ -36,29 +38,32 @@ datagrid:
             # TODO: add dynamic acl_resources
             view:
                 type: navigate
-                label: View
+                label: oro.grid.action.view
                 icon: eye-open
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
-                label: Update
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
             delete:
                 type: delete
-                label: Delete
+                label: oro.grid.action.delete
                 icon: trash
                 link: delete_link
-        sorters: { columns: { id: { data_name: ce.id } } }
-        filters: ~
+        sorters:
+            columns:
+                id:
+                    data_name: ce.id
+        filters:
+            columns: []
 
     entity-relation-grid:
         options:
             entityHint: entity
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            routerEnabled: false
+            rowSelection:
                 dataField: id
                 columnName: assigned
                 selectors:
@@ -67,15 +72,10 @@ datagrid:
         source:
             acl_resource: ~
             type: orm
-            query:
-                select:
-                    - ce.id
-                from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
         columns:
             assigned:
                 frontend_type: boolean
-                label: Assigned
+                label: oro.entity.datagrid.assigned
                 editable: true
         properties:
             id: ~

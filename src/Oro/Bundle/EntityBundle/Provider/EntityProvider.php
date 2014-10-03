@@ -125,27 +125,34 @@ class EntityProvider
     protected function addEntities(array &$result, $applyExclusions, $translate)
     {
         // only configurable entities are supported
-        $configs = $this->entityConfigProvider->getConfigs();
-        foreach ($configs as $config) {
-            $className = $config->getId()->getClassName();
+        $entityConfigs = $this->entityConfigProvider->getConfigs();
+
+        foreach ($entityConfigs as $entityConfig) {
+            $entityConfigId = $entityConfig->getId();
+
+            $isStateCorrect = $this->extendConfigProvider
+                ->getConfigById($entityConfigId)
+                ->in(
+                    'state',
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
+                );
+            if (false == $isStateCorrect) {
+                continue;
+            }
+
+            $className = $entityConfigId->getClassName();
             if ($applyExclusions && $this->isIgnoredEntity($className)) {
                 continue;
             }
 
-            if ($this->extendConfigProvider->getConfig($className)->in(
-                'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
-            )
-            ) {
-                $this->addEntity(
-                    $result,
-                    $className,
-                    $config->get('label'),
-                    $config->get('plural_label'),
-                    $config->get('icon'),
-                    $translate
-                );
-            }
+            $this->addEntity(
+                $result,
+                $className,
+                $entityConfig->get('label'),
+                $entityConfig->get('plural_label'),
+                $entityConfig->get('icon'),
+                $translate
+            );
         }
     }
 

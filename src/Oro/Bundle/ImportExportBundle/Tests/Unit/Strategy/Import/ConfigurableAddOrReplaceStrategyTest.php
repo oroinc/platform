@@ -25,27 +25,12 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $entity;
+    protected $databaseHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $context;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $em;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $metadata;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $repository;
 
     /**
      * @var ConfigurableAddOrReplaceStrategy
@@ -59,34 +44,23 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-
-        $this->importStrategyHelper
-            ->expects($this->any())
-            ->method('getEntityManager')
-            ->will($this->returnValue($this->em));
-
         $this->fieldHelper = $this
             ->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->databaseHelper = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\DatabaseHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->context = $this
             ->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
 
-        $this->metadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repository = $this
-            ->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->strategy = new ConfigurableAddOrReplaceStrategy(
             $this->importStrategyHelper,
-            $this->fieldHelper
+            $this->fieldHelper,
+            $this->databaseHelper
         );
     }
 
@@ -125,7 +99,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string      $className
      * @param array       $fields
-     * @param array       $identifier
+     * @param string      $identifier
      * @param object|null $existingEntity
      * @param array       $objectValue
      * @param array       $itemData optional
@@ -135,13 +109,12 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     public function testProcess(
         $className,
         array $fields,
-        array $identifier,
+        $identifier,
         $existingEntity,
         array $objectValue,
         $itemData = null
     ) {
-        $singleIdentifier = !empty($identifier[0]) ? $identifier[0] : null;
-        $object           = new $className;
+        $object = new $className;
 
         $this->context->expects($this->once())
             ->method('getValue')
@@ -155,7 +128,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 ->with(
                     $existingEntity,
                     $object,
-                    $this->calcExcludedFields($fields, $singleIdentifier, $itemData)
+                    $this->calcExcludedFields($fields, $identifier, $itemData)
                 )
                 ->will($this->returnSelf());
         } else {
@@ -180,25 +153,12 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         return isset($field[$type]) ? $field[$type] : $default;
                     }
                 )
-            );$this->metadata
-            ->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue($singleIdentifier));
+            );
 
-        $this->metadata
-            ->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue($singleIdentifier));
-        $this->metadata
-            ->expects($this->atLeastOnce())
-            ->method('getIdentifierValues')
+        $this->databaseHelper->expects($this->any())
+            ->method('getIdentifierFieldName')
+            ->with($className)
             ->will($this->returnValue($identifier));
-
-        $this->em
-            ->expects($this->atLeastOnce())
-            ->method('getClassMetadata')
-            ->with($this->equalTo($className))
-            ->will($this->returnValue($this->metadata));
 
         if (!empty($objectValue)) {
             $this->fieldHelper
@@ -207,23 +167,15 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 ->with($this->equalTo($object))
                 ->will($this->returnValue(reset($objectValue)));
 
-            $this->repository
-                ->expects($this->any())
+            $this->databaseHelper->expects($this->any())
                 ->method('findOneBy')
-                ->with($this->equalTo($objectValue))
+                ->with($className, $objectValue)
                 ->will($this->returnValue($existingEntity));
-
-            $this->em
-                ->expects($this->any())
-                ->method('getRepository')
-                ->with($this->equalTo($className))
-                ->will($this->returnValue($this->repository));
         }
 
-        $this->em
-            ->expects($this->any())
+        $this->databaseHelper->expects($this->any())
             ->method('find')
-            ->with($this->equalTo($className), $this->equalTo($singleIdentifier))
+            ->with($className, $identifier)
             ->will($this->returnValue($existingEntity));
 
         $this->strategy->setImportExportContext($this->context);
@@ -243,7 +195,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             'empty' => array(
                 'className'      => self::ENTITY,
                 'fields'         => [],
-                'identifier'     => [],
+                'identifier'     => null,
                 'existingEntity' => null,
                 'objectValue'    => []
             ),
@@ -261,7 +213,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         'identity' => false,
                     ),
                 ),
-                'identifier'     => array('id'),
+                'identifier'     => 'id',
                 'existingEntity' => null,
                 'objectValue'    => array(
                     'identity' => 'value'
@@ -281,7 +233,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         'identity' => false,
                     ),
                 ),
-                'identifier'     => array('id'),
+                'identifier'     => 'id',
                 'existingEntity' => $object,
                 'objectValue'    => array(
                     'identity' => 'value'
@@ -306,7 +258,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         'identity' => false,
                     ),
                 ),
-                'identifier'     => array('id'),
+                'identifier'     => 'id',
                 'existingEntity' => $object,
                 'objectValue'    => array(
                     'identity' => 'value',
@@ -322,11 +274,11 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $className
      * @param array  $fields
-     * @param array  $identifier
+     * @param string $identifier
      *
      * @dataProvider relationEntityProvider
      */
-    public function testProcessRelation($className, array $fields, array $identifier)
+    public function testProcessRelation($className, array $fields, $identifier)
     {
         $object = new $className;
 
@@ -392,21 +344,14 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->metadata
-            ->expects($this->atLeastOnce())
-            ->method('getIdentifierValues')
+        $this->databaseHelper->expects($this->any())
+            ->method('getIdentifierFieldName')
+            ->with($className)
             ->will($this->returnValue($identifier));
 
-        $this->em
-            ->expects($this->atLeastOnce())
-            ->method('getClassMetadata')
-            ->with($this->equalTo($className))
-            ->will($this->returnValue($this->metadata));
-
-        $this->em
-            ->expects($this->any())
+        $this->databaseHelper->expects($this->any())
             ->method('find')
-            ->with($this->equalTo($className), $this->equalTo($identifier[0]))
+            ->with($className, $identifier)
             ->will($this->returnValue($object));
 
         $this->strategy->setImportExportContext($this->context);
@@ -433,7 +378,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         'value'               => $object
                     ],
                 ],
-                'identifier' => ['id'],
+                'identifier' => 'id',
             ],
             'multiple' => [
                 'className'  => self::ENTITY,
@@ -445,7 +390,7 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
                         'value'               => new ArrayCollection([$object, $object])
                     ],
                 ],
-                'identifier' => ['id'],
+                'identifier' => 'id',
             ],
         ];
     }
@@ -460,16 +405,10 @@ class ConfigurableAddOrReplaceStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getFields')
             ->will($this->returnValue([]));
 
-        $this->metadata
-            ->expects($this->atLeastOnce())
-            ->method('getIdentifierValues')
-            ->will($this->returnValue(['id']));
-
-        $this->em
-            ->expects($this->atLeastOnce())
-            ->method('getClassMetadata')
-            ->with($this->equalTo(self::ENTITY))
-            ->will($this->returnValue($this->metadata));
+        $this->databaseHelper->expects($this->any())
+            ->method('getIdentifierFieldName')
+            ->with(self::ENTITY)
+            ->will($this->returnValue('id'));
 
         $this->importStrategyHelper
             ->expects($this->once())

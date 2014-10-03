@@ -7,8 +7,12 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -41,9 +45,11 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $fieldTypeHelper = $this->getMock('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper');
         $this->extendOptionsManager = new ExtendOptionsManager();
-        $this->extendOptionsParser  = new ExtendOptionsParser($this->entityMetadataHelper, $fieldTypeHelper);
+        $this->extendOptionsParser  = new ExtendOptionsParser(
+            $this->entityMetadataHelper,
+            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+        );
         $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 
@@ -84,6 +90,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertExtendOptions($schema, []);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testSchema()
     {
         $schema = new ExtendSchema(
@@ -91,14 +100,17 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             $this->nameGenerator
         );
 
+        $table2 = $schema->createTable('table2');
+        $table2->addColumn('id', 'integer', ['autoincrement' => true]);
+
         $table1 = $schema->createTable('table1');
         $table1->addColumn('column1', 'string', ['length' => 100]);
         $configurableColumn1 = $table1->addColumn(
             'configurable_column1',
             'string',
             [
-                'length'      => 100,
-                'oro_options' => [
+                'length'        => 100,
+                OroOptions::KEY => [
                     'datagrid' => ['is_visible' => false, 'other' => 'val'],
                 ]
             ]
@@ -107,25 +119,40 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             'extend_column1',
             'string',
             [
-                'length'      => 100,
-                'oro_options' => [
-                    'extend'   => ['is_extend' => true, 'owner' => 'Custom'],
+                'length'        => 100,
+                OroOptions::KEY => [
+                    'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
                     'datagrid' => ['is_visible' => false],
                 ]
             ]
+        );
+        $table1->addColumn(
+            'ref_column1',
+            'integer',
+            [
+                OroOptions::KEY => [
+                    ExtendOptionsManager::TYPE_OPTION => 'ref-one'
+                ]
+            ]
+        );
+        $table1->addForeignKeyConstraint(
+            $table2,
+            ['ref_column1'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
         );
 
         $table1->addOption('comment', 'test');
 
         $table1->addOption(
-            'oro_options',
+            OroOptions::KEY,
             [
                 'entity' => ['icon' => 'icon1'],
             ]
         );
         $configurableColumn1->setOptions(
             [
-                'oro_options' => [
+                OroOptions::KEY => [
                     'datagrid' => ['is_visible' => true],
                     'form'     => ['is_enabled' => false],
                 ]
@@ -136,11 +163,16 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertSchemaSql(
             $schema,
             [
+                'CREATE TABLE table2 (id INT AUTO_INCREMENT NOT NULL)',
                 'CREATE TABLE table1 ('
+                . 'ref_column1 INT NOT NULL, '
                 . 'column1 VARCHAR(100) NOT NULL, '
                 . 'configurable_column1 VARCHAR(100) NOT NULL, '
-                . 'extend_column1 VARCHAR(100) DEFAULT NULL) '
-                . 'COMMENT = \'test\' '
+                . 'extend_column1 VARCHAR(100) DEFAULT NULL, '
+                . 'INDEX idx_table1_ref_column1 (ref_column1)) '
+                . 'COMMENT = \'test\' ',
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_ref_column1 '
+                . 'FOREIGN KEY (ref_column1) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
         $this->assertExtendOptions(
@@ -161,9 +193,12 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                         'extend_column1'       => [
                             'type'    => 'string',
                             'configs' => [
-                                'extend'   => ['extend' => true, 'is_extend' => true, 'owner' => 'Custom'],
+                                'extend'   => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
                                 'datagrid' => ['is_visible' => false]
                             ]
+                        ],
+                        'ref_column1'          => [
+                            'type' => 'ref-one'
                         ]
                     ]
                 ]

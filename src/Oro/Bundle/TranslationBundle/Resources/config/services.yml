@@ -12,8 +12,9 @@ parameters:
     oro_translation.crowdin.adapter.class:                      Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
     oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
     oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
-    oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
+    oro_translation.guzzle_client.class:                        Guzzle\Http\Client
 
+    oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
     oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
 
@@ -51,21 +52,29 @@ services:
             - @oro_translation.oro_translation_adapter
             - @oro_translation.packages_provider
 
-    oro_translation.curl_request:
-        class: %oro_translation.curl_request.class%
+    # guzzle http client for crowdin
+    oro_translation.guzzle_crowdin_client:
+        class: %oro_translation.guzzle_client.class%
+        arguments:
+            - %oro_translation.api.crowdin.endpoint%
+
+    # guzzle http client for oro proxy
+    oro_translation.guzzle_oro_client:
+        class: %oro_translation.guzzle_client.class%
+        arguments:
+            - %oro_translation.api.oro_service.endpoint%
 
     oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.crowdin.adapter.class%
         arguments:
-            - %oro_translation.api.crowdin.endpoint%
-            - @oro_translation.curl_request
+            - @oro_translation.guzzle_crowdin_client
 
     oro_translation.oro_translation_adapter:
         class: %oro_translation.oro_translation.adapter.class%
         arguments:
-            - @oro_translation.curl_request
-            - %oro_translation.api.oro_service.endpoint%
-            - %oro_translation.api.oro_service.key%
+            - @oro_translation.guzzle_oro_client
+        calls:
+            - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
@@ -105,6 +114,13 @@ services:
             - %kernel.root_dir%
             - %kernel.default_locale%
         lazy: true
+
+    oro_translation.twig.translation.extension:
+        class: %oro_translation.twig.translation.extension.class%
+        arguments:
+            - %oro_translation.debug_translator%
+        tags:
+            - { name: twig.extension }
 
     oro_translation.twig.translation_status.extension:
         class: %oro_translation.twig.translation_status.extension.class%

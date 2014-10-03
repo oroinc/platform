@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
@@ -31,9 +31,9 @@ abstract class AbstractEngine implements EngineInterface
     protected $registry;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
-    protected $dispatcher;
+    protected $eventDispatcher;
 
     /**
      * @var DoctrineHelper
@@ -51,21 +51,21 @@ abstract class AbstractEngine implements EngineInterface
     protected $logQueries = false;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param EventDispatcher $dispatcher
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ObjectMapper    $mapper
+     * @param ManagerRegistry          $registry
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param ObjectMapper             $mapper
      */
     public function __construct(
         ManagerRegistry $registry,
-        EventDispatcher $dispatcher,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
         ObjectMapper $mapper
     ) {
-        $this->registry       = $registry;
-        $this->dispatcher     = $dispatcher;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->mapper         = $mapper;
+        $this->registry        = $registry;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->mapper          = $mapper;
     }
 
     /**
@@ -95,10 +95,13 @@ abstract class AbstractEngine implements EngineInterface
      */
     public function search(Query $query)
     {
+        $event = new BeforeSearchEvent($query);
+        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $query = $event->getQuery();
+
+        // search must be performed as fast as possible and it might return lots of entities (10M and more)
+        // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
-        foreach ($searchResult['results'] as $resultRecord) {
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($resultRecord));
-        }
         $result = new Result($query, $searchResult['results'], $searchResult['records_count']);
 
         if ($this->logQueries) {
@@ -178,8 +181,8 @@ abstract class AbstractEngine implements EngineInterface
     protected function reindexSingleEntity($entityName)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getRepository($entityName);
-        $queryBuilder = $entityManager->createQueryBuilder('entity');
+        $entityManager = $this->registry->getManagerForClass($entityName);
+        $queryBuilder = $entityManager->getRepository($entityName)->createQueryBuilder('entity');
         $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
@@ -192,12 +195,14 @@ abstract class AbstractEngine implements EngineInterface
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $this->save($entities, true);
-                $entities[] = array();
+                $entityManager->clear();
+                $entities = array();
             }
         }
 
         if ($itemsCount % static::BATCH_SIZE > 0) {
             $this->save($entities, true);
+            $entityManager->clear();
         }
 
         return $itemsCount;

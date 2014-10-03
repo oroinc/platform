@@ -108,20 +108,20 @@ datagrid:
         actions:
             view:
                 type:          navigate
-                label:         View
+                label:         oro.grid.action.view
                 link:          view_link
                 icon:          eye-open
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_user_update
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_user_delete
@@ -159,14 +159,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_group_delete
@@ -221,14 +221,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_role_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_role_delete
@@ -293,9 +293,11 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_role
+            bind_parameters:
+                - role_id
         columns:
             has_role:
-                label: Has role
+                label: oro.user.role.has_role.label
                 editable: true
                 frontend_type: boolean
             firstName:
@@ -334,9 +336,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_role
                 selectors:
@@ -357,9 +357,11 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_group
+            bind_parameters:
+                - group_id
         columns:
             has_group:
-                label: Has group
+                label: oro.user.group.has_group.label
                 editable: true
                 frontend_type: boolean
             firstName:
@@ -397,9 +399,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_group
                 selectors:
@@ -482,7 +482,7 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
-            skip_acl_walker_check: true
+            skip_acl_check: true
         source:
             acl_resource: oro_user_user_view
             type: orm

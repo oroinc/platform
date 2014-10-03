@@ -35,16 +35,16 @@
 
                     <div class="entity-type{% if selected %} selected{% endif %}">
                         {% if selected %}
-                        {{ label|trans }} ({{ type.count }})
-                        <i class="{{ iconClass }}"></i>
-                        <div class="arrow">
-                          <i class="icon-chevron-right"></i>
-                        </div>
+                            {{ label }} ({{ type.count }})
+                            <i class="{{ iconClass }}"></i>
+                            <div class="arrow">
+                              <i class="icon-chevron-right"></i>
+                            </div>
                         {% else %}
-                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
-                          <i class="{{ iconClass }}"></i>
-                          {{ label|trans }} ({{ type.count }})
-                        </a>
+                            <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
+                              <i class="{{ iconClass }}"></i>
+                              {{ label }} ({{ type.count }})
+                            </a>
                         {% endif %}
                     </div>
                 {% endfor %}

@@ -40,8 +40,8 @@
 {% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions, callbackMacro) %}
 <script type="text/javascript">
     require(['jquery', 'underscore', 'orocalendar/js/calendar', 'orocalendar/js/calendar/event/collection',
-        'orocalendar/js/calendar/connection/collection', 'orolocale/js/locale-settings'],
-    function($, _, Calendar, EventCollection, ConnectionCollection, localeSettings){
+        'orocalendar/js/calendar/connection/collection', 'orolocale/js/locale-settings', 'oroui/js/mediator'],
+    function($, _, Calendar, EventCollection, ConnectionCollection, localeSettings, mediator){
         var connections = new ConnectionCollection();
         connections.reset({{ render(path('oro_api_get_calendar_connections', {id: entity.id})) }});
         var events = new EventCollection();
@@ -59,7 +59,7 @@
 
         var options = {
             el: {{ containerSelector|json_encode|raw }},
-            calendar: {{ entity.id }},
+            calendar: {{ entity.id|json_encode|raw }},
             collection: events,
             eventsOptions: {
                 subordinate: true,
@@ -126,6 +126,7 @@
             renderCompleteCallback(calendar);
             {% endif %}
             calendar.$el.data('calendar', calendar);
+            mediator.on('page:beforeChange', _.bind(calendar.dispose, calendar));
         });
     });
 </script>

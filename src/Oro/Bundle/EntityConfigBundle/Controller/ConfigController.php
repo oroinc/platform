@@ -137,7 +137,7 @@ class ConfigController extends Controller
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
-        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
+        list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
         list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
 
         return [
@@ -260,7 +260,7 @@ class ConfigController extends Controller
                     ->findBy(
                         [
                             'entity' => $entity->getId(),
-                            'type'   => 'string'
+                            'type'   => array('integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money')
                         ]
                     );
 
@@ -400,7 +400,7 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['id' => str_replace('\\', '_', $entity->getClassName())]
+                    ['entityName' => str_replace('\\', '_', $entity->getClassName())]
                 );
             }
         }
@@ -422,30 +422,13 @@ class ConfigController extends Controller
 
         foreach ($configManager->getProviders() as $provider) {
             $layoutActions = $provider->getPropertyConfig()->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
-            foreach ($layoutActions as $config) {
-                if (isset($config['filter'])) {
-                    foreach ($config['filter'] as $key => $value) {
-                        if (is_array($value)) {
-                            $error = true;
-                            foreach ($value as $v) {
-                                if ($provider->getConfig($entity->getClassName())->get($key) == $v) {
-                                    $error = false;
-                                }
-                            }
-                            if ($error) {
-                                continue 2;
-                            }
-                        } elseif ($provider->getConfig($entity->getClassName())->get($key) != $value) {
-                            continue 2;
-                        }
+            foreach ($layoutActions as $action) {
+                if ($this->isLayoutActionApplicable($action, $entity, $provider)) {
+                    if (isset($action['entity_id']) && $action['entity_id'] == true) {
+                        $action['args'] = ['id' => $entity->getId()];
                     }
+                    $actions[] = $action;
                 }
-
-                if (isset($config['entity_id']) && $config['entity_id'] == true) {
-                    $config['args'] = ['id' => $entity->getId()];
-                }
-
-                $actions[] = $config;
             }
 
             $requireJsModules = array_merge(
@@ -455,5 +438,45 @@ class ConfigController extends Controller
         }
 
         return [$actions, $requireJsModules];
+    }
+
+    /**
+     * @param array             $action
+     * @param EntityConfigModel $entity
+     * @param ConfigProvider    $provider
+     *
+     * @return bool
+     */
+    protected function isLayoutActionApplicable(
+        array $action,
+        EntityConfigModel $entity,
+        ConfigProvider $provider
+    ) {
+        if (!isset($action['filter'])) {
+            return true;
+        }
+
+        $result = true;
+        foreach ($action['filter'] as $key => $value) {
+            if ($key === 'mode') {
+                if ($entity->getMode() !== $value) {
+                    $result = false;
+                    break;
+                }
+            } else {
+                $config = $provider->getConfig($entity->getClassName());
+                if (is_array($value)) {
+                    if (!$config->in($key, $value)) {
+                        $result = false;
+                        break;
+                    }
+                } elseif ($config->get($key) != $value) {
+                    $result = false;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 }

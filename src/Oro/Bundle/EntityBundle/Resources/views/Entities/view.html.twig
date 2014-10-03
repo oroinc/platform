@@ -3,13 +3,13 @@
 
 {% oro_title_set({params : {
     "%entityName%": entity_config.get('label')|default('N/A')|trans,
-    "%recordName%": 'Item #'~entity.id|default('N/A') },
+    "%recordName%": 'oro.entity.item'|trans({'%id%': entity.id}) },
 }) %}
 
 {% block navButtons %}
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
         {{ UI.editButton({
-            'path': path('oro_entity_update', { 'entity_id': parent, id: entity.id }),
+            'path': path('oro_entity_update', {entityName: entity_name, id: entity.id}),
             'entity_label': entity_config.get('label')|default('N/A')|trans
         }) }}
     {% endif %}
@@ -19,11 +19,11 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': 'Item #'~entity.id|default('N/A'),
+        'indexLabel': 'oro.entity.plural_label'|trans,
+        'entityTitle': 'oro.entity.item'|trans({'%id%': entity.id}),
         'additional': [{
-            'indexPath'  : path('oro_entity_index', {id: parent}),
-            'indexLabel' : entity_config.get('label')|default('N/A')
+            'indexPath'  : path('oro_entity_index', {entityName: entity_name}),
+            'indexLabel' : entity_config.get('label')|default('N/A')|trans
         }]
     }%}
 

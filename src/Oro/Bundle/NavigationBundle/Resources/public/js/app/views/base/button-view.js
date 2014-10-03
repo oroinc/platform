@@ -49,21 +49,15 @@ define([
             }
         },
 
-        getCurrentModel: function () {
-            return this.collection.find(function (model) {
-                return mediator.execute('compareUrl', model.get('url'));
-            });
-        },
-
         updateState: function () {
             var model;
-            model = this.getCurrentModel();
+            model = this.collection.getCurrentModel();
             this.$el.toggleClass('gold-icon', model != null);
         },
 
         onToggle: function () {
             var model, attrs, Model;
-            model = this.getCurrentModel();
+            model = this.collection.getCurrentModel();
             if (model) {
                 this.collection.trigger('toRemove', model);
             } else {

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
@@ -18,17 +20,13 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EntityAclExtension
-     */
+    /** @var EntityAclExtension */
     private $extension;
 
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
-    /**
-     * @var OwnerTree
-     */
+    /** @var OwnerTree */
     private $tree;
 
     /** @var Organization */
@@ -110,6 +108,15 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
          *                                     +-bu411
          *                                       |
          *                                       +-user411
+         *
+         * user1 user2 user3 user31 user4 user411
+         *
+         * org1  org2  org3  org3   org4  org4
+         * org2        org2
+         *
+         * bu1   bu2   bu3   bu31   bu4   bu411
+         * bu2         bu2
+         *
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);
@@ -139,8 +146,23 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUser('user41', 'bu41');
         $this->tree->addUser('user411', 'bu411');
 
-        $this->tree->addUserBusinessUnit('user4', 'bu3');
-        $this->tree->addUserBusinessUnit('user4', 'bu4');
+        $this->tree->addUserOrganization('user1', 'org1');
+        $this->tree->addUserOrganization('user1', 'org2');
+        $this->tree->addUserOrganization('user2', 'org2');
+        $this->tree->addUserOrganization('user3', 'org2');
+        $this->tree->addUserOrganization('user3', 'org3');
+        $this->tree->addUserOrganization('user31', 'org3');
+        $this->tree->addUserOrganization('user4', 'org4');
+        $this->tree->addUserOrganization('user411', 'org4');
+
+        $this->tree->addUserBusinessUnit('user1', 'org1', 'bu1');
+        $this->tree->addUserBusinessUnit('user1', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user2', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user3', 'org3', 'bu3');
+        $this->tree->addUserBusinessUnit('user3', 'org2', 'bu2');
+        $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
+        $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
+        $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
     }
 
     /**
@@ -272,7 +294,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider decideIsGrantingProvider
      */
-    public function testDecideIsGranting($triggeredMask, $user, $object, $expectedResult)
+    public function testDecideIsGranting($triggeredMask, $user, $organization, $object, $expectedResult)
     {
         $this->buildTestTree();
 
@@ -281,22 +303,28 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             if (is_a($owner, $this->metadataProvider->getOrganizationClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
+                    new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id', 'organization')
                 );
             } elseif (is_a($owner, $this->metadataProvider->getBusinessUnitClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
+                    new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
                 );
             } elseif (is_a($owner, $this->metadataProvider->getUserClass())) {
                 $this->metadataProvider->setMetadata(
                     get_class($object),
-                    new OwnershipMetadata('USER', 'owner', 'owner_id')
+                    new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization')
                 );
             }
         }
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token =
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $token->expects($this->any())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue($user));
@@ -400,12 +428,22 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $object = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
         $this->assertEquals(
-            array('NONE', 'BASIC', 'LOCAL', 'DEEP', 'GLOBAL', 'SYSTEM'),
+            [
+                0 => 'NONE',
+                1 => 'BASIC',
+                2 => 'LOCAL',
+                3 => 'DEEP',
+                5 => 'SYSTEM'
+            ],
             $this->extension->getAccessLevelNames($object)
         );
     }
 
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function decideIsGrantingProvider()
     {
         $this->org1 = new Organization('org1');
@@ -429,53 +467,209 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->user411 = new User('user411', $this->bu411);
 
         return array(
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, null, true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, null, true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, null, true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, null, true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, null, true),
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, 'foo', true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, 'foo', true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, 'foo', true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, 'foo', true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, 'foo', true),
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, new ObjectIdentity('test', 'foo'), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, new ObjectIdentity('test', 'foo'), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, new ObjectIdentity('test', 'foo'), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, new ObjectIdentity('test', 'foo'), true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, new ObjectIdentity('test', 'foo'), true),
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, new TestEntity(1), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, new TestEntity(1), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, new TestEntity(1), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, new TestEntity(1), true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, new TestEntity(1), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user3, new TestEntity(1, $this->org3), false),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->org4), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user3, new TestEntity(1, $this->bu3), false),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->bu4), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->bu411), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user3, new TestEntity(1, $this->bu3), false),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user4, new TestEntity(1, $this->bu4), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user4, new TestEntity(1, $this->bu411), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user3, new TestEntity(1, $this->bu3), false),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user4, new TestEntity(1, $this->bu4), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user4, new TestEntity(1, $this->bu411), false),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user3, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->user4), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->user411), true),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user3, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user4, new TestEntity(1, $this->user4), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user4, new TestEntity(1, $this->user411), true),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, $this->user4, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user3, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user4, new TestEntity(1, $this->user4), true),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user4, new TestEntity(1, $this->user411), false),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, $this->user4, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, $this->user3, new TestEntity(1, $this->user3), true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, $this->user4, new TestEntity(1, $this->user4), true),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, $this->user4, new TestEntity(1, $this->user411), false),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, $this->user4, new TestEntity(1, $this->user3), false),
+            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, null, true),
+            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, $this->org4, null, true),
+            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, $this->org4, null, true),
+            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, $this->org4, null, true),
+            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, $this->org4, null, true),
+            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, 'foo', true),
+            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, $this->org4, 'foo', true),
+            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, $this->org4, 'foo', true),
+            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, $this->org4, 'foo', true),
+            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, $this->org4, 'foo', true),
+            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, new ObjectIdentity('test', 'foo'), true),
+            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, $this->org4, new ObjectIdentity('test', 'foo'), true),
+            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, $this->org4, new ObjectIdentity('test', 'foo'), true),
+            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, $this->org4, new ObjectIdentity('test', 'foo'), true),
+            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, $this->org4, new ObjectIdentity('test', 'foo'), true),
+            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, null, $this->org4, new TestEntity(1), true),
+            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, null, $this->org4, new TestEntity(1), true),
+            array(EntityMaskBuilder::MASK_VIEW_DEEP, null, $this->org4, new TestEntity(1), true),
+            array(EntityMaskBuilder::MASK_VIEW_LOCAL, null, $this->org4, new TestEntity(1), true),
+            array(EntityMaskBuilder::MASK_VIEW_BASIC, null, $this->org4, new TestEntity(1), true),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->org3),
+                false
+            ),
+            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, $this->user4, $this->org4, new TestEntity(1, $this->org4), true),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->bu3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu411, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->bu3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu411, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->bu3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->bu411, $this->org4),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user411, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_GLOBAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user411, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_DEEP,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org4),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user411, $this->org4),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_LOCAL,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_BASIC,
+                $this->user3,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_BASIC,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user4, $this->org4),
+                true
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_BASIC,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user411, $this->org4),
+                false
+            ),
+            array(
+                EntityMaskBuilder::MASK_VIEW_BASIC,
+                $this->user4,
+                $this->org4,
+                new TestEntity(1, $this->user3, $this->org3),
+                false
+            ),
         );
     }
 

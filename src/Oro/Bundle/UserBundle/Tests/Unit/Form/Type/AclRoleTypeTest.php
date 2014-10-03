@@ -20,7 +20,7 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $builder->expects($this->at(0))->method('add')
-            ->with('label', 'text', array('required' => true, 'label' => 'Role'));
+            ->with('label', 'text', array('required' => true, 'label' => 'oro.user.role.role.label'));
         $builder->expects($this->at(1))->method('add')
             ->with(
                 'field',

@@ -15,6 +15,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 
 class OrmFilterExtension extends AbstractExtension
 {
@@ -30,6 +32,9 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /**
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -40,9 +45,9 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH, []);
+        $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
-        if (!$filters) {
+        if ($filters === null) {
             return false;
         }
 
@@ -74,6 +79,7 @@ class OrmFilterExtension extends AbstractExtension
     {
         $filters = $this->getFiltersToApply($config);
         $values  = $this->getValuesToApply($config);
+        /** @var OrmDatasource $datasource */
         $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
@@ -216,29 +222,37 @@ class OrmFilterExtension extends AbstractExtension
      * Takes param from request and merge with default filters
      *
      * @param DatagridConfiguration $config
-     * @param bool $readParameters
+     * @param bool                  $readParameters
      *
      * @return array
      */
     protected function getValuesToApply(DatagridConfiguration $config, $readParameters = true)
     {
-        $result         = array();
-        $filters        = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
 
-        if ($readParameters) {
-            $filterBy = $this->getParameters()->get(self::FILTER_ROOT_PARAM) ? : $defaultFilters;
-        } else {
-            $filterBy = $defaultFilters;
+        if (!$readParameters) {
+            return $defaultFilters;
         }
 
-        foreach ($filterBy as $column => $value) {
-            if (isset($filters[$column])) {
-                $result[$column] = $value;
-            }
+        $intersectKeys = array_intersect(
+            $this->getParameters()->keys(),
+            [
+                OrmSorterExtension::SORTERS_ROOT_PARAM,
+                PagerInterface::PAGER_ROOT_PARAM,
+                ParameterBag::ADDITIONAL_PARAMETERS,
+                ParameterBag::MINIFIED_PARAMETERS,
+                self::FILTER_ROOT_PARAM,
+                self::MINIFIED_FILTER_PARAM
+            ]
+        );
+
+        $gridHasInitialState = empty($intersectKeys);
+
+        if ($gridHasInitialState) {
+            return $defaultFilters;
         }
 
-        return $result;
+        return $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
     }
 
     /**

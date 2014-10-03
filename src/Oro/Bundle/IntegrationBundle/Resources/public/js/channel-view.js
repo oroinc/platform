@@ -60,7 +60,7 @@ define([
             var $el = $(this.options.transportTypeSelector);
 
             if ($el.find('option').length < 2) {
-                $el.parents('.control-group').hide();
+                $el.parents('.control-group:first').hide();
             }
         },
 
@@ -75,7 +75,7 @@ define([
                 if (!this.isEmpty()) {
                     var confirm = new DeleteConfirmation({
                         title:   __('oro.integration.change_type'),
-                        okText:  __('Yes, I Agree'),
+                        okText:  __('Yes'),
                         content: __('oro.integration.submit')
                     });
                     confirm.on('ok', _.bind(function () {
@@ -102,8 +102,6 @@ define([
         processChange: function ($el) {
             this.memoizeValue($el);
 
-            mediator.execute('showLoading');
-
             var $form = $(this.options.formSelector),
                 data = $form.serializeArray(),
                 url = $form.attr('action'),
@@ -116,19 +114,12 @@ define([
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            $.post(url, data, function (res, status, jqXHR) {
-                var formContent = $(res).find($form.selector);
-                if (formContent.length) {
-                    $form.replaceWith(formContent);
-                    formContent.validate({});
-                    // update wdt
-                    mediator.execute({name: 'updateDebugToolbar', silent: true}, jqXHR);
-                    // process UI decorators
-                    mediator.execute('afterPageChange');
-                }
-            }).always(function () {
-                mediator.execute('hideLoading');
-            });
+            var event = { formEl: $form, data: data, reloadManually: true };
+            mediator.trigger('integrationFormReload:before', event);
+
+            if (event.reloadManually) {
+                mediator.execute('submitPage', {url: url, type: $form.attr('method'), data: $.param(data)});
+            }
         },
 
         /**

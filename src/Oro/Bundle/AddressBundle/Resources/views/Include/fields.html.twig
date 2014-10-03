@@ -32,7 +32,7 @@
                     target: $('#{{ id }}'),
                     simpleEl: $('#{{ region_text_field.vars.id }}'),
                     collection: new RegionCollection(),
-                    showSelect: {{ showSelect|json_encode }}
+                    showSelect: {{ showSelect|json_encode|raw }}
                 });
             });
         });
@@ -60,7 +60,7 @@
 {% endblock oro_region_widget %}
 
 {% block oro_email_widget %}
-    <div class="email-holder {% if form.email.vars.errors|length > 0 %} validation-error{% endif %}">
+    <div class="float-holder {% if form.email.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.email) }}
             <label class="add-on" title="{{ 'Primary'|trans }}">
@@ -73,7 +73,7 @@
 {%  endblock %}
 
 {% block oro_phone_widget %}
-    <div class="email-holder {% if form.phone.vars.errors|length > 0 %} validation-error{% endif %}">
+    <div class="float-holder {% if form.phone.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.phone) }}
             <label class="add-on" title="{{ 'Primary'|trans }}">

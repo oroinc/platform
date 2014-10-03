@@ -3,8 +3,9 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     './app/views/base/view'
-], function ($, _, BaseView) {
+], function ($, _, __, BaseView) {
     'use strict';
 
     var LoadingMaskView;
@@ -27,7 +28,7 @@ define([
         className: 'loading-mask',
 
         /** @property {String} */
-        loadingHint: 'Loading...',
+        loadingHint: __('Loading...'),
 
         /** @property */
         template: _.template(
@@ -57,9 +58,19 @@ define([
 
             if (this.liveUpdate) {
                 updateProxy = $.proxy(this.updatePos, this);
-                $(window).resize(updateProxy).scroll(updateProxy);
+                $(window)
+                    .on('resize.' + this.cid, updateProxy)
+                    .on('scroll.' + this.cid, updateProxy);
             }
             LoadingMaskView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            $(window).off('.' + this.cid);
+            LoadingMaskView.__super__.dispose.call(this);
         },
 
         /**

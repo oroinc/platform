@@ -36,6 +36,7 @@ services:
 
     oro_tracking.tracking_website.manager.api:
         class: %oro_tracking.tracking_website.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_tracking.tracking_website.class%
             - @doctrine.orm.entity_manager
@@ -81,9 +82,3 @@ services:
             - %kernel.logs_dir%
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
-
-    oro_tracking.event_listener.website_tracking_events_grid_listener:
-        class: %oro_datagrid.event_listener.base_orm_relation.class%
-        arguments: ['websiteIdentifier', false]
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.website-tracking-events-grid, method: onBuildAfter }

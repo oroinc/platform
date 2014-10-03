@@ -27,7 +27,7 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
-    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}
@@ -41,13 +41,18 @@
         UI.attibuteRow('oro.email.subject.label'|trans, entity.subject)
     ] %}
 
-    {% if entity.emailBody.hasAttachments %}
-        {% set attributes = attributes | merge([UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments))]) %}
-    {% endif %}
-    {% if entity.emailBody.bodyContent is empty %}
-        {% set attributes = attributes | merge([UI.attibuteRow('', 'oro.email.empty_body'|trans)]) %}
+    {% if noBodyFound %}
+        {% set notFoundMessage %}<strong>{{ 'oro.email.unable_to_load_body'|trans}}</strong>{% endset %}
+        {% set attributes = attributes | merge([UI.attibuteRow('', notFoundMessage)]) %}
     {% else %}
-        {% set attributes = attributes | merge([EA.body(entity.emailBody)]) %}
+        {% if entity.emailBody.hasAttachments %}
+            {% set attributes = attributes | merge([UI.attibuteRow('Attachments'|trans, EA.attachments(entity.emailBody.attachments))]) %}
+        {% endif %}
+        {% if entity.emailBody.bodyContent is empty %}
+            {% set attributes = attributes | merge([UI.attibuteRow('', 'oro.email.empty_body'|trans)]) %}
+        {% else %}
+            {% set attributes = attributes | merge([EA.body(entity.emailBody)]) %}
+        {% endif %}
     {% endif %}
 
     {% set data = {

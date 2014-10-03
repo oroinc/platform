@@ -2,42 +2,29 @@ oro_system_configuration:
     groups:
         application_settings:
             icon:        icon-desktop
-            title:       'Application Settings'
+            title:       oro.ui.system_configuration.groups.application_settings.title
             page_reload: true
 
         application_name_settings:
-            title: 'Name'
+            title: oro.ui.system_configuration.groups.application_name_settings.title
 
         navbar_settings:
             title: oro.ui.system_configuration.groups.navbar_settings.title
 
     fields:
-        oro_ui.application_name:
-            data_type: string
-            type: text
-            options:
-                label: 'Short Name'
-
         oro_ui.application_url:
             data_type: string
             type: text
             options:
-                label: 'Application URL'
-
-        oro_ui.application_title:
-            data_type: string
-            type: text
-            options:
-                label: 'Full Name'
-
+                label: oro.ui.system_configuration.fields.application_url.label
         oro_ui.navbar_position:
             data_type: string
             type: choice
             options:
-                label: 'Position'
+                label: oro.ui.system_configuration.fields.navbar_position.label
                 choices:
-                    top: Top
-                    left: Left
+                    top: oro.ui.system_configuration.fields.navbar_position.choices.top
+                    left: oro.ui.system_configuration.fields.navbar_position.choices.left
 
     tree:
         system_configuration:
@@ -50,10 +37,7 @@ oro_system_configuration:
                                 children:
                                     application_name_settings:
                                         children:
-                                            - oro_ui.application_name
-                                            - oro_ui.application_title
                                             - oro_ui.application_url
-
                             look_and_feel:
                                 children:
                                     navbar_settings:
@@ -62,8 +46,6 @@ oro_system_configuration:
 
     api_tree:
         application:
-            oro_ui.application_name: ~
-            oro_ui.application_title: ~
             oro_ui.application_url: ~
         look-and-feel:
             oro_ui.navbar_position: ~

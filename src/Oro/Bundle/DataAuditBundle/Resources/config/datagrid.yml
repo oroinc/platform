@@ -23,6 +23,7 @@ datagrid:
                         ),
                         CONCAT(' - ', u.email)
                       ) as author
+                    - o.name as organization
                 from:
                     - { table: OroDataAuditBundle:Audit, alias: a }
                 join:
@@ -30,32 +31,38 @@ datagrid:
                         user:
                             join: a.user
                             alias: u
-
+                        organization:
+                            join: a.organization
+                            alias: o
+                where:
+                    and:
+                        - o.id = @oro_security.security_facade->getOrganizationId
         columns:
             action:
-                label: Action
+                label: oro.dataaudit.datagrid.action
             version:
-                label: Version
+                label: oro.dataaudit.datagrid.version
             objectClass:
-                label: Entity type
+                label: oro.dataaudit.datagrid.entity_type
                 frontend_type: select
                 choices: @oro_dataaudit.dataaudit_grid_service->getObjectClassOptions
             objectName:
-                label: Entity name
+                label: oro.dataaudit.datagrid.entity_name
             objectId:
-                label: Entity id
+                label: oro.dataaudit.datagrid.entity_id
                 frontend_type: integer
             data:
-                label: Data
+                label: oro.dataaudit.datagrid.data
                 type: twig
                 template: OroDataAuditBundle:Datagrid:Property/data.html.twig
                 frontend_type: html
             author:
-                label: Author
+                label: oro.dataaudit.datagrid.author
+            organization:
+                label: oro.dataaudit.datagrid.organization
             loggedAt:
-                label: Logged at
+                label: oro.dataaudit.datagrid.logged_at
                 frontend_type: datetime
-
         properties: ~
         sorters:
             columns:
@@ -77,7 +84,6 @@ datagrid:
                     data_name: a.loggedAt
             default:
                 loggedAt: DESC
-
         filters:
             columns:
                 action:
@@ -145,21 +151,21 @@ datagrid:
                         - a.objectClass = :objectClass AND a.objectId = :objectId
         columns:
             author:
-                label: Author
+                label: oro.dataaudit.datagrid.author
                 type: field
                 frontend_type: string
             loggedAt:
-                label: Logged at
+                label: oro.dataaudit.datagrid.logged_at
                 type: field
                 frontend_type: datetime
             old:
-                label: Old values
+                label: oro.dataaudit.datagrid.old_values
                 type: twig
                 template: OroDataAuditBundle:Datagrid:Property/old.html.twig
                 frontend_type: html
                 data_name: data
             new:
-                label: New values
+                label: oro.dataaudit.datagrid.new_values
                 type: twig
                 template: OroDataAuditBundle:Datagrid:Property/new.html.twig
                 frontend_type: html

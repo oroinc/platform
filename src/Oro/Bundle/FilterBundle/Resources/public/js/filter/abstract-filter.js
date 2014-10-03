@@ -3,9 +3,10 @@
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
     'backbone',
     'oroui/js/tools'
-], function ($, _, Backbone, tools) {
+], function ($, _, __, Backbone, tools) {
     'use strict';
 
     var AbstractFilter;
@@ -75,14 +76,14 @@ define([
          *
          * @property
          */
-        placeholder: 'All',
+        placeholder: __('All'),
 
         /**
          * Label of filter
          *
          * @property {String}
          */
-        label: 'Input Label',
+        label: __('Input Label'),
 
         /**
          * Is filter label visible
@@ -125,7 +126,7 @@ define([
                 this.emptyValue = {};
             }
             // init raw value of filter
-            this.value = _.clone(this.emptyValue);
+            this.value = tools.deepClone(this.emptyValue);
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
         },

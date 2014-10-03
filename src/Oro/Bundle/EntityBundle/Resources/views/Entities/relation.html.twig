@@ -1,6 +1,6 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 <div class="widget-content grid-widget-content">
-    {% set gridName = 'entity-relation-grid' %}
+    {% set gridName = oro_datagrid_build_fullname('entity-relation-grid', entity_name ~ '-' ~  field_name) %}
 
     {% set gridParams = {
         '_parameters' : {
@@ -8,9 +8,8 @@
             'data_not_in': app.request.get('removed')|split(','),
         },
         'class_name': entity_class,
-        'entity_id': entity_id,
-        'field_name': app.request.get('fieldName'),
-        'id': app.request.get('id')
+        'field_name': field_name,
+        'id': id
     } %}
 
     <style type="text/css">
@@ -78,7 +77,7 @@
                                         'oro_entity_detailed',
                                         {
                                             id: model.get('id'),
-                                            className: '{{ relation.get('target_entity')|replace('\\', '_') }}',
+                                            entityName: '{{ relation.get('target_entity')|replace('\\', '_') }}',
                                             fieldName: '{{ relation.getId().getFieldName() }}'
                                         }
                                 ),

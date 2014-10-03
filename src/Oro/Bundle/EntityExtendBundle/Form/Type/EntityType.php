@@ -33,7 +33,7 @@ class EntityType extends AbstractType
             'className',
             'text',
             [
-                'label'       => 'Name',
+                'label'       => 'oro.entity_extend.form.name.label',
                 'block'       => 'general',
                 'subblock'    => 'second',
                 'constraints' => [

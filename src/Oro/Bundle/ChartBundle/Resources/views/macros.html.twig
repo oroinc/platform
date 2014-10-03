@@ -1,0 +1,23 @@
+{#
+    Renders chart
+
+    parameters:
+        name: chart name
+        options: options for chart
+        config: config for chart
+        isMobileVersion: render for mobile
+#}
+{% macro renderChart(data, options, config, isMobileVersion) %}
+    {% set name = options.name|replace({'_chart': ''}) %}
+    {% set params = {
+        ratio: isMobileVersion ? '0.8' : '0.35',
+        data: data,
+        options: options,
+        config: config,
+        date: (options.settings.quarterDate is defined) ? options.settings.quarterDate|oro_format_date : ''
+    } %}
+
+
+    <div data-page-component-module="orochart/js/app/components/{{ name }}-chart-component"
+         data-page-component-options="{{ params|json_encode }}"></div>
+{% endmacro %}

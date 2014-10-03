@@ -4,6 +4,7 @@ parameters:
     oro_query_designer.config.resolver.class:                       Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
     oro_query_designer.grid.extension.orm_datasource.class:         Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
     oro_query_designer.validator.query_validator.class:             Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
+    oro_query_designer.validator.grouping_validator.class:          Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator
     oro_query_designer.grid.datagrid_configuration_builder.class:   Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
 services:
     oro_query_designer.query_designer.manager:
@@ -42,6 +43,7 @@ services:
         class: %oro_entity.virtual_field_provider.chain.class%
         calls:
             - [addProvider, [@oro_entity.virtual_field_provider]]
+            - [addProvider, [@oro_entity.virtual_field_provider.enum, 100]]
             - [addProvider, [@oro_entity.virtual_field_provider.dictionary, 100]]
 
     oro_query_designer.entity_provider:
@@ -70,12 +72,21 @@ services:
             - @oro_query_designer.query_designer.manager
             - @oro_query_designer.virtual_field_provider
             - @doctrine
+            - @oro_datagrid.datagrid.guesser
 
     oro_query_designer.validator.query_validator:
         class: %oro_query_designer.validator.query_validator.class%
         arguments:
             - @oro_datagrid.configuration.provider.chain
             - @oro_datagrid.datagrid.builder
+            - @translator
             - %kernel.debug%
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.query_validator }
+
+    oro_query_designer.validator.grouping_validator:
+        class: %oro_query_designer.validator.grouping_validator.class%
+        arguments:
+            - @translator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }

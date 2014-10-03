@@ -37,11 +37,11 @@
                     <div class="entity-type{% if selected %} selected{% endif %}">
                         <i class="{{ iconClass }}"></i>
                         {% if selected %}
-                            {{ label|trans }} ({{ type.count }})
+                            {{ label }} ({{ type.count }})
                             <div class="arrow"><i class="icon-chevron-right"></i></div>
                         {% else %}
                             <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
-                                {{ label|trans }} ({{ type.count }})
+                                {{ label }} ({{ type.count }})
                             </a>
                         {% endif %}
                     </div>
@@ -61,4 +61,9 @@
         {% trans %}Try modifying your search criteria or creating a new ...{% endtrans %}
     </div>
     {% endif %}
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $('.search-form #search').focusAndSetCaretAtEnd();
+        });
+    </script>
 {% endblock %}

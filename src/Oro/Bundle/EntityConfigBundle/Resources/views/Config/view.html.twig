@@ -1,4 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
@@ -11,11 +12,7 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
-        {{ UI.editButton({
-            'path': path('oro_entityconfig_update', { id: entity.id }),
-            'title': 'Edit entity',
-            'label': 'Edit'
-        }) }}
+        {{ UI.editButton({'path': path('oro_entityconfig_update', { id: entity.id })}) }}
         {% for button in button_config %}
             {{ UI.button({
                 'path'   : button.void is defined ? 'javascript:void(0);' : path(button.route, button.args|default({})),
@@ -24,8 +21,8 @@
                 },
                 'iCss'   : button.iCss|default(''),
                 'aCss'   : button.aCss|default(''),
-                'title'  : button.title|default(button.name),
-                'label'  : button.name
+                'title'  : button.title|default(button.name)|trans,
+                'label'  : button.name|trans
             }) }}
         {% endfor %}
     {% endif %}
@@ -35,7 +32,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
+        'indexLabel': 'oro.entity_config.entity.plural_label'|trans,
         'entityTitle': entity_config.get('label')|default(entity_name)|trans,
     }%}
 
@@ -47,23 +44,14 @@
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
     {% if link %}
     <li>
-        {{ [
-            '<a href="', link, '">',
-            'oro.entity_config.info.records_count.label'|trans,
-            ': ',
-            entity_count|default(0) ,
-            '</a>'
-        ]|join|raw }}
+        {{ UI.link({
+            'path': link,
+            'label': 'oro.entity_config.info.records_count.label'|trans({'%count%': entity_count|default(0)})
+        }) }}
     </li>
     {% else %}
     <li>
-        {{ [
-            '<span>',
-            'oro.entity_config.info.records_count.label'|trans,
-            ': ',
-            entity_count|default(0) ,
-            '</span>'
-        ]|join|raw }}
+        <span>{{ 'oro.entity_config.info.records_count.label'|trans({'%count%': entity_count|default(0)}) }}</span>
     </li>
     {% endif %}
 {% endblock stats%}

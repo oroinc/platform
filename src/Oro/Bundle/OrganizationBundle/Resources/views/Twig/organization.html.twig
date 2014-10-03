@@ -1,0 +1,21 @@
+{% if organizations|length > 1 %}
+    <div class="input-prepend">
+        {% if showLabels %}
+            <span class="add-on login_custom">{{ label }}</span>
+        {% endif %}
+        <select id="prependedInput3" class="span2 login_custom" name="_organization" required="required" >
+            <option value="">&nbsp;&nbsp;{{ 'Choose an organization...'|trans }}</option>
+            {% for organization in organizations %}
+                <option value="{{ organization.id }}">&nbsp;&nbsp;{{ organization.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% else %}
+    <input type="hidden"
+           id="prependedInput3"
+           class="span2"
+           name="_organization"
+           required="required"
+           value="{{ organizations[0].id }}"
+    />
+{% endif %}

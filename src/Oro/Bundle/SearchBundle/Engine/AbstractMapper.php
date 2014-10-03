@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Oro\Bundle\SearchBundle\Query\Query;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\SearchBundle\Query\Query;
 
 abstract class AbstractMapper
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @var array
      */
     protected $mappingConfig;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
 
     /**
      * Get object field value
@@ -30,7 +31,11 @@ abstract class AbstractMapper
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-        return $propertyAccessor->getValue($objectOrArray, $fieldName);
+        try {
+            return $propertyAccessor->getValue($objectOrArray, $fieldName);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -116,7 +121,7 @@ abstract class AbstractMapper
                 ? $fieldConfig['target_fields']
                 : [$fieldConfig['name']];
 
-            if ($fieldConfig['target_type'] != 'text') {
+            if ($fieldConfig['target_type'] != Query::TYPE_TEXT) {
                 foreach ($targetFields as $targetField) {
                     $objectData[$fieldConfig['target_type']][$targetField] = $value;
                 }

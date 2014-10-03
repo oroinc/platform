@@ -48,17 +48,15 @@
         {% set dataBlocks = [{
             'title': 'General'|trans,
             'class': 'active',
-            'subblocks': [
-                {
-                    'title': 'Embedded Form'|trans,
-                    'data': [
-                            form_row(form.title),
-                            form_row(form.formType),
-                            form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
-                            form_row(form.successMessage)
-                        ]
-                }
-            ]
+            'subblocks': [{
+                'title': 'Embedded Form'|trans,
+                'data': [
+                    form_row(form.title),
+                    form_row(form.formType),
+                    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
+                    form_row(form.successMessage)
+                ]
+            }]
         }] %}
 
         {% set data = {
@@ -77,11 +75,11 @@
                         forceDataLoading = false;
                     {% endif %}
                     new EmbeddedFormWatcher({
-                        formTypeFieldId: '{{ form.formType.vars.id }}',
-                        cssFieldId: '{{ form.css.vars.id }}',
-                        successMessageFieldId: '{{ form.successMessage.vars.id }}',
-                        defaultCss: '{{ defaultCss|escape('js') }}',
-                        defaultSuccessMessage: '{{ defaultSuccessMessage|raw }}'
+                        formTypeFieldId: {{ form.formType.vars.id|json_encode|raw }},
+                        cssFieldId: {{ form.css.vars.id|json_encode|raw }},
+                        successMessageFieldId: {{ form.successMessage.vars.id|json_encode|raw  }},
+                        defaultCss: {{ defaultCss|json_encode|raw }},
+                        defaultSuccessMessage: {{ defaultSuccessMessage|json_encode|raw }}
                     }).startWatching(forceDataLoading);
                 });
         </script>

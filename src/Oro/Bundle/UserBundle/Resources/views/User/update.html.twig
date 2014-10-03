@@ -82,7 +82,7 @@
                 'title': '',
                 'data': [
                     form_row(form.email),
-                    UI.collectionField(form.emails, 'oro.user.emails.label', 'Add another email'|trans),
+                    UI.collectionField(form.emails, 'oro.user.emails.label'|trans, 'Add another email'|trans),
                     form_row(form.tags)
                 ]
             }
@@ -145,6 +145,17 @@
         }] ) %}
     {% endif %}
 
+    {% if form.organizations is defined %}
+        {% set dataBlocks = dataBlocks|merge( [{
+            'title': 'Access Settings'|trans,
+            'subblocks': [{
+                'title': '',
+                'useSpan': false,
+                'data': [form_row(form.organizations)]
+            }]
+        }] ) %}
+    {% endif %}
+
     {% if form.change_password is defined %}
         {% set dataBlocks = dataBlocks|merge( [{
             'title': 'oro.user.password.label'|trans,
@@ -153,21 +164,6 @@
                     'title': '',
                     'data': [
                         form_widget(form.change_password)
-                    ]
-                }
-            ]
-        }] ) %}
-    {% endif %}
-
-    {% if form.businessUnits is defined %}
-        {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'oro.user.business_units.label'|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        form_row(form.businessUnits)
                     ]
                 }
             ]

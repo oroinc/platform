@@ -28,7 +28,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     $(function () {
         var $pageTitle = $('#page-title');
         if ($pageTitle.size()) {
-            document.title = _.unescape($pageTitle.text());
+            document.title = $('<div.>').html($('#page-title').text()).text();
         }
         layout.hideProgressBar();
 
@@ -179,6 +179,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         mediator.on('page:beforeChange', function () {
             $('.pin-menus.dropdown.open, .nav .dropdown.open').removeClass('open');
+            $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
+        });
+        mediator.on('page:afterChange', function() {
+            $('.dropdown .dropdown-menu.manually-hidden').css('display', '');
         });
 
         // fix + extend bootstrap.collapse functionality

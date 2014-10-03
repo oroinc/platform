@@ -24,7 +24,14 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Forces operation to be executed.'
             )
-            ->addOption('timeout', null, InputOption::VALUE_OPTIONAL, 'Timeout for child command execution', 300);
+            ->addOption(
+                'timeout',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Timeout for child command execution',
+                CommandExecutor::DEFAULT_TIMEOUT
+            )
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it') ;
     }
 
     /**
@@ -35,6 +42,13 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
+            $assetsOptions = array(
+                '--exclude' => array('OroInstallerBundle')
+            );
+            if ($input->hasOption('symlink') && $input->getOption('symlink')) {
+                $assetsOptions['--symlink'] = true;
+            }
+
             $commandExecutor = new CommandExecutor(
                 $input->hasOption('env') ? $input->getOption('env') : null,
                 $output,
@@ -49,7 +63,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-                ->runCommand('oro:assets:install', array('--exclude' => array('OroInstallerBundle')))
+                ->runCommand('oro:assets:install', $assetsOptions)
                 ->runCommand('assetic:dump')
                 ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
                 ->runCommand('oro:localization:dump')

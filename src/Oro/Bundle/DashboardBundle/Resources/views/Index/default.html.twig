@@ -1,6 +1,6 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% oro_title_set({params : {"%name%": dashboard.getLabel()|trans }}) %}
+{% oro_title_set({params : {"%name%": dashboard.getLabel() }}) %}
 {% block breadcrumb %}
     {% set breadcrumbs = [
         {'label': 'oro.dashboard.menu.dashboards_tab.label'|trans },
@@ -32,7 +32,7 @@
                         {% if allowEdit %}
                             <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
                                 <i class="icon-plus"></i>
-                                Add widget
+                                {{ 'oro.dashboard.add_dashboard_widgets.add_widget'|trans }}
                             </a>
                         {% endif %}
 
@@ -189,7 +189,7 @@
                 {% endfor %}
                 dashboardContainer.initialize({
                     widgetIds: {{ widgetIds|json_encode|raw }},
-                    dashboardId: {{ dashboard.id }},
+                    dashboardId: {{ dashboard.id|json_encode|raw }},
                     columnsSelector: '.dashboard-column',
                     allowEdit: {{ allowEdit ? 'true' : 'false' }}
                 });

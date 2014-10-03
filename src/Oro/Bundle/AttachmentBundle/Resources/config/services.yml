@@ -7,9 +7,9 @@ parameters:
 
     oro_attachment.twig.file_extension.class:             Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
-    oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityConfigDumperExtension
-    oro_attachment.config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentsConfigDumperExtension
-    oro_attachment.attachments.generator.extension.class: Oro\Bundle\AttachmentBundle\Tools\AttachmentsGeneratorExtension
+    oro_attachment.entity_config_dumper.extension.file.class:  Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
+    oro_attachment.entity_config_dumper.extension.class:  Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
+    oro_attachment.entity_generator.extension.class:      Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
     oro_attachment.migration.extension.attachment.class:  Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
 
     oro_attachment.serializer.file_normalizer.class:      Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
@@ -26,6 +26,7 @@ services:
 
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_attachment.entity.class%
             - @doctrine.orm.entity_manager
@@ -45,30 +46,28 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_attachment.entity_config_dumper.extension:
-        class: %oro_attachment.entity_config_dumper.extension.class%
+    oro_attachment.entity_config_dumper.extension.file:
+        class: %oro_attachment.entity_config_dumper.extension.file.class%
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_attachment.attachments.config_dumper.extension:
-        class: %oro_attachment.config_dumper.extension.class%
+    oro_attachment.entity_config_dumper.extension:
+        class: %oro_attachment.entity_config_dumper.extension.class%
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_attachment.attachments.generator.extension:
-        class: %oro_attachment.attachments.generator.extension.class%
+    oro_attachment.entity_generator.extension:
+        class: %oro_attachment.entity_generator.extension.class%
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
 
     oro_attachment.migration.extension.attachment:
         class: %oro_attachment.migration.extension.attachment.class%
-        arguments:
-            - @oro_entity_extend.migration.options_manager
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
 

@@ -1,3 +1,5 @@
+"Choose an organization...": Choose an organization...
+
 oro:
     custom_entity:
         owner.label:          Owner
@@ -8,28 +10,30 @@ oro:
             list.description: List of business units
         controller:
             message:
-                saved: "Business Unit saved"
+                saved: Business Unit saved
         form:
-            choose_business_user: "Choose a business unit..."
-            none_business_user: "None"
+            choose_business_user: Choose a business unit...
+            none_business_user: None
         datagrid:
             action:
-                view: "View"
-                update: "Update"
-                delete: "Delete"
-            owner: "Owner Business Unit"
+                view:   View
+                update: Update
+                delete: Delete
+            owner: Owner Business Unit
+            has_business_unit: Has business unit
 
     organization:
         entity_label:         Organization
         entity_plural_label:  Organizations
         entity_description:   Represent organization
-        id.label:        Id
-        precision.label: Precision
-        name.label:      Name
-        currency.label:  Currency
+        id.label:          Id
+        name.label:        Name
+        description.label: Description
+        enabled.label:     Status
         business_units.label: Bussines units
+        users.label:       Users
         form:
-            choose_organization: Choose a organization...
+            choose_organization: Choose an organization...
 
         businessunit:
             email.label:         Email
@@ -45,3 +49,7 @@ oro:
             phone.label:         Phone
             users.label:         Users
             website.label:       Website
+
+        controller:
+            message:
+                saved: Organization saved

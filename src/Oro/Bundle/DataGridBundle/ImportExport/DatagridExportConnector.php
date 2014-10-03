@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -116,6 +117,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
                     $context->getOption('gridName'),
                     $context->getOption('gridParameters')
                 );
+            $context->setValue('columns', $this->grid->getConfig()->offsetGet('columns'));
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export reader must contain "gridName".'
@@ -125,7 +127,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
 
     /**
      * @return ContextInterface
-     * @throws \LogicException If context is not set
+     * @throws LogicException If context is not set
      */
     protected function getContext()
     {

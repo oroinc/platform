@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 /**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * This class represents a tree of owners
  */
 class OwnerTree
@@ -53,6 +54,17 @@ class OwnerTree
     protected $userBusinessUnitIds;
 
     /**
+     * An associative array to store business units assigned to an user through organizations
+     * key = userId
+     * value = array:
+     *      key = organizationId
+     *      value = array of businessUnitIds
+     *
+     * @var array
+     */
+    protected $userOrganizationBusinessUnitIds;
+
+    /**
      * An associative array to store subordinate business units
      * key = businessUnitId
      * value = array of businessUnitId
@@ -71,6 +83,15 @@ class OwnerTree
     protected $businessUnitUserIds;
 
     /**
+     * An associative array to store users belong to a assigned business unit
+     * key = businessUnitId
+     * value = array of userId
+     *
+     * @var array
+     */
+    protected $assignedBusinessUnitUserIds;
+
+    /**
      * An associative array to store business units belong to an organization
      * key = organizationId
      * value = array of businessUnitId
@@ -78,6 +99,15 @@ class OwnerTree
      * @var array
      */
     protected $organizationBusinessUnitIds;
+
+    /**
+     * An associative array to store users belong to an organization
+     * key = organizationId
+     * value = array of userId
+     *
+     * @var array
+     */
+    protected $organizationUserIds;
 
     /**
      * Constructor
@@ -147,11 +177,18 @@ class OwnerTree
     /**
      * Gets all business unit ids assigned to the given user id
      *
-     * @param  int|string $userId
+     * @param  int|string      $userId
+     * @param  int|string|null $organizationId
      * @return array      of int|string
      */
-    public function getUserBusinessUnitIds($userId)
+    public function getUserBusinessUnitIds($userId, $organizationId = null)
     {
+        if ($organizationId) {
+            return isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])
+                ? $this->userOrganizationBusinessUnitIds[$userId][$organizationId]
+                : array();
+        }
+
         return isset($this->userBusinessUnitIds[$userId])
             ? $this->userBusinessUnitIds[$userId]
             : array();
@@ -231,12 +268,13 @@ class OwnerTree
     /**
      * Gets all user business unit ids with subordinate business unit ids
      *
-     * @param int $userId
+     * @param  int         $userId
+     * @param  int|string  $organizationId
      * @return array  of int|string
      */
-    public function getUserSubordinateBusinessUnitIds($userId)
+    public function getUserSubordinateBusinessUnitIds($userId, $organizationId = null)
     {
-        $buIds = $this->getUserBusinessUnitIds($userId);
+        $buIds = $this->getUserBusinessUnitIds($userId, $organizationId);
         $resultBuIds = array_merge($buIds, []);
         foreach ($buIds as $buId) {
             $diff = array_diff(
@@ -349,26 +387,55 @@ class OwnerTree
         }
 
         $this->userBusinessUnitIds[$userId] = array();
+        $this->userOrganizationBusinessUnitIds[$userId] = array();
+    }
+
+    /**
+     * @param $buId
+     * @return array
+     */
+    public function getUsersAssignedToBU($buId)
+    {
+        return isset($this->assignedBusinessUnitUserIds[$buId])
+            ? $this->assignedBusinessUnitUserIds[$buId]
+            : array();
     }
 
     /**
      * Add a business unit to the given user
      *
-     * @param  int|string      $userId
-     * @param  int|string      $businessUnitId
+     * @param  int|string $userId
+     * @param  int|string|null $organizationId
+     * @param  int|string $businessUnitId
      * @throws \LogicException
      */
-    public function addUserBusinessUnit($userId, $businessUnitId)
+    public function addUserBusinessUnit($userId, $organizationId, $businessUnitId)
     {
-        if (!isset($this->userBusinessUnitIds[$userId])) {
-            throw new \LogicException(sprintf('First call addUser for userId: %s.', (string) $userId));
+        if (!isset($this->userOrganizationBusinessUnitIds[$userId]) || !isset($this->userBusinessUnitIds[$userId])) {
+            throw new \LogicException(sprintf('First call addUser for userId: %s.', (string)$userId));
         }
         if ($businessUnitId !== null) {
-            $this->userBusinessUnitIds[$userId][] = $businessUnitId;
-            if (isset($this->businessUnitOwningOrganizationId[$businessUnitId])) {
-                $this->userOrganizationIds[$userId][] = $this->businessUnitOwningOrganizationId[$businessUnitId];
+            if (!isset($this->assignedBusinessUnitUserIds[$businessUnitId])) {
+                $this->assignedBusinessUnitUserIds[$businessUnitId] = [];
             }
+            $this->assignedBusinessUnitUserIds[$businessUnitId][] = $userId;
+            $this->userBusinessUnitIds[$userId][] = $businessUnitId;
+            if (!isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])) {
+                $this->userOrganizationBusinessUnitIds[$userId][$organizationId] = [];
+            }
+            $this->userOrganizationBusinessUnitIds[$userId][$organizationId][] = $businessUnitId;
         }
+    }
+
+    /**
+     * Add a organization to the given user
+     *
+     * @param int|string $userId
+     * @param int|string $organizationId
+     */
+    public function addUserOrganization($userId, $organizationId)
+    {
+        $this->userOrganizationIds[$userId][] = $organizationId;
     }
 
     /**
@@ -384,5 +451,7 @@ class OwnerTree
         $this->userOrganizationIds = array();
         $this->userBusinessUnitIds = array();
         $this->businessUnitUserIds = array();
+        $this->userOrganizationBusinessUnitIds = array();
+        $this->assignedBusinessUnitUserIds = array();
     }
 }

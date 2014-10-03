@@ -2,15 +2,16 @@ oro:
     attachment:
         entity_label:        Attachment
         entity_plural_label: Attachments
-        entity_description:  Attachments management
+        entity_description:  Represent attachments
 
         id.label:            Id
         comment.label:       Comment
         file.label:          File
         owner.label:         Owner
+        organization.label:  Organization
 
         block_titles:
-            attachments.label:  Attachments management
+            attachments.label:  Attachments
 
         enabled:              Enable attachments
         maxsize:              Max allowed file size, Mb

@@ -142,6 +142,7 @@ services:
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
@@ -155,6 +156,7 @@ services:
     # Email template API
     oro_email.manager.emailtemplate.api:
         class: %oro_email.manager.emailtemplate.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.emailtemplate.entity.class%
             - @doctrine.orm.entity_manager
@@ -185,6 +187,8 @@ services:
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
             - @oro_email.twig.email_sandbox
+            - @oro_locale.formatter.date_time
+            - @doctrine
         lazy: true
 
     oro_email.twig.email_security_policy:

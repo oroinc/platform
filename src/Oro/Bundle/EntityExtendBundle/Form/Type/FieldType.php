@@ -10,7 +10,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -20,9 +19,12 @@ class FieldType extends AbstractType
 {
     const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
     const TYPE_LABEL_PREFIX              = 'oro.entity_extend.form.data_type.';
+    const GROUP_TYPE_PREFIX              = 'oro.entity_extend.form.data_type_group.';
+    const GROUP_FIELDS                   = 'fields';
+    const GROUP_RELATIONS                = 'relations';
 
     protected $types = [
-        'fields'    => [
+        self::GROUP_FIELDS       => [
             'string',
             'integer',
             'smallint',
@@ -30,19 +32,22 @@ class FieldType extends AbstractType
             'boolean',
             'decimal',
             'date',
+            'datetime',
             'text',
             'float',
             'money',
             'percent',
             'file',
             'image',
+            'optionSet',
+            'enum',
+            'multiEnum',
         ],
-        'relations' => [
+        self::GROUP_RELATIONS    => [
             'oneToMany',
             'manyToOne',
             'manyToMany',
-            'optionSet'
-        ]
+        ],
     ];
 
     /**
@@ -84,7 +89,7 @@ class FieldType extends AbstractType
             'fieldName',
             'text',
             [
-                'label'       => 'Field Name',
+                'label'       => 'oro.entity_extend.form.field_name.label',
                 'block'       => 'general',
                 'constraints' => [
                     new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])
@@ -92,45 +97,9 @@ class FieldType extends AbstractType
             ]
         );
 
-        $entityProvider = $this->configManager->getProvider('entity');
-        $extendProvider = $this->configManager->getProvider('extend');
-        $entityConfig   = $extendProvider->getConfig($options['class_name']);
-
-        $inverseRelationTypes = [];
-        if ($entityConfig->is('relation')) {
-            $originalFieldNames = array();
-            $relations          = $entityConfig->get('relation');
-            foreach ($relations as $relationKey => $relation) {
-                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
-                    continue;
-                }
-
-                /** @var FieldConfigId $fieldId */
-                $fieldId = $relation['field_id'];
-                /** @var FieldConfigId $targetFieldId */
-                $targetFieldId = $relation['target_field_id'];
-
-                $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
-                $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
-
-                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
-                if (strlen($fieldName) > $maxFieldNameLength) {
-                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
-                    $originalFieldNames[$cutFieldName] = $fieldName;
-                    $fieldName                         = $cutFieldName;
-                }
-
-                $key                        = $relationKey . '||' . $fieldName;
-                $inverseRelationTypes[$key] = $this->translator->trans(
-                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
-                    [
-                        '%entity_name%' => $this->translator->trans($entityLabel),
-                        '%field_name%'  => $this->translator->trans($fieldLabel)
-                    ]
-                );
-            }
-
+        $originalFieldNames = [];
+        $reverseRelationTypes = $this->getReverseRelationTypes($options['class_name'], $originalFieldNames);
+        if (!empty($originalFieldNames)) {
             $builder->setAttribute(self::ORIGINAL_FIELD_NAMES_ATTRIBUTE, $originalFieldNames);
         }
 
@@ -138,7 +107,7 @@ class FieldType extends AbstractType
             'type',
             'genemu_jqueryselect2_choice',
             [
-                'choices'     => $this->getFieldTypeChoices($inverseRelationTypes),
+                'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'empty_value' => '',
                 'block'       => 'general',
                 'configs'     => [
@@ -179,32 +148,83 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @param array $inverseRelationTypes
+     * @param array $reverseRelationTypes
      *
      * @return array
      */
-    protected function getFieldTypeChoices($inverseRelationTypes)
+    protected function getFieldTypeChoices($reverseRelationTypes)
     {
-        $fieldTypes    = [];
-        $relationTypes = [];
+        $fieldTypes = $relationTypes = [];
 
-        foreach ($this->types['fields'] as $type) {
+        foreach ($this->types[self::GROUP_FIELDS] as $type) {
             $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
         }
-        foreach ($this->types['relations'] as $type) {
+        foreach ($this->types[self::GROUP_RELATIONS] as $type) {
             $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
-        if (!empty($inverseRelationTypes)) {
-            $relationTypes = array_merge($relationTypes, $inverseRelationTypes);
         }
 
         uasort($fieldTypes, 'strcasecmp');
         uasort($relationTypes, 'strcasecmp');
 
+        if (!empty($reverseRelationTypes)) {
+            uasort($reverseRelationTypes, 'strcasecmp');
+            $relationTypes = array_merge($relationTypes, $reverseRelationTypes);
+        }
+
         $result = [
-            $this->translator->trans('oro.entity_extend.form.data_type_group.fields')    => $fieldTypes,
-            $this->translator->trans('oro.entity_extend.form.data_type_group.relations') => $relationTypes
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_FIELDS)    => $fieldTypes,
+            $this->translator->trans(self::GROUP_TYPE_PREFIX . self::GROUP_RELATIONS) => $relationTypes,
         ];
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param array  $originalFieldNames
+     * @return array
+     */
+    protected function getReverseRelationTypes($className, array &$originalFieldNames)
+    {
+        $extendProvider = $this->configManager->getProvider('extend');
+        $entityConfig   = $extendProvider->getConfig($className);
+
+        $entityProvider = $this->configManager->getProvider('entity');
+
+        $result = [];
+        if ($entityConfig->is('relation')) {
+            $relations = $entityConfig->get('relation');
+            foreach ($relations as $relationKey => $relation) {
+                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
+                    continue;
+                }
+
+                /** @var FieldConfigId $fieldId */
+                $fieldId = $relation['field_id'];
+                /** @var FieldConfigId $targetFieldId */
+                $targetFieldId = $relation['target_field_id'];
+
+                $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
+                $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
+
+                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+                if (strlen($fieldName) > $maxFieldNameLength) {
+                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
+                    $originalFieldNames[$cutFieldName] = $fieldName;
+                    $fieldName                         = $cutFieldName;
+                }
+
+                $key          = $relationKey . '||' . $fieldName;
+                $result[$key] = $this->translator->trans(
+                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
+                    [
+                        '%entity_name%' => $this->translator->trans($entityLabel),
+                        '%field_name%'  => $this->translator->trans($fieldLabel)
+                    ]
+                );
+            }
+        }
 
         return $result;
     }
@@ -249,7 +269,7 @@ class FieldType extends AbstractType
 
         if ($fieldId
             && $extendProvider->hasConfigById($fieldId)
-            && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETED)
+            && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
         ) {
             return false;
         }

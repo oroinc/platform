@@ -11,5 +11,3 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
             - NotBlank: ~
         defaultUserOwner:
             - NotBlank: ~
-        organization:
-            - NotBlank: ~

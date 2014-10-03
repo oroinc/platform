@@ -8,46 +8,43 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 
 class ImapMessageIterator implements \Iterator, \Countable
 {
-    /**
-     * @var Imap
-     */
+    /** @var Imap */
     private $imap;
 
-    /**
-     * @var int[]
-     */
+    /** @var int[]|null */
     private $ids;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $reverse = false;
 
-    /**
-     * @var int
-     */
-    private $iterationMin = null;
+    /** @var int */
+    private $batchSize = 1;
 
-    /**
-     * @var int
-     */
-    private $iterationMax = null;
+    /** @var \Closure|null */
+    private $onBatchLoaded;
 
-    /**
-     * @var int
-     */
-    private $iterationPos = null;
+    /** @var Message[] an array is indexed by the Iterator keys */
+    private $batch = [];
+
+    /** @var int|null */
+    private $iterationMin;
+
+    /** @var int|null */
+    private $iterationMax;
+
+    /** @var int|null */
+    private $iterationPos;
 
     /**
      * Constructor
      *
-     * @param Imap $imap
+     * @param Imap       $imap
      * @param int[]|null $ids
      */
     public function __construct(Imap $imap, array $ids = null)
     {
         $this->imap = $imap;
-        $this->ids = $ids;
+        $this->ids  = $ids;
     }
 
     /**
@@ -64,15 +61,38 @@ class ImapMessageIterator implements \Iterator, \Countable
     }
 
     /**
+     * Sets batch size
+     *
+     * @param int $batchSize Determines how many messages can be loaded at once
+     */
+    public function setBatchSize($batchSize)
+    {
+        $this->batchSize = $batchSize;
+    }
+
+    /**
+     * Sets a callback function is called when a batch is loaded
+     *
+     * @param \Closure|null $callback The callback function is called when a batch is loaded
+     *                                function (Message[] $batch)
+     */
+    public function setBatchCallback(\Closure $callback = null)
+    {
+        $this->onBatchLoaded = $callback;
+    }
+
+    /**
      * The number of messages in this iterator
      *
      * @return int
      */
     public function count()
     {
+        $this->ensureInitialized();
+
         return $this->ids === null
-            ? $this->imap->count()
-            : count($this->ids);
+            ? $this->iterationMax
+            : $this->iterationMax + 1;
     }
 
     /**
@@ -82,11 +102,33 @@ class ImapMessageIterator implements \Iterator, \Countable
      */
     public function current()
     {
-        $msgId = $this->ids === null
-            ? $this->iterationPos
-            : $this->ids[$this->iterationPos];
+        if (!isset($this->batch[$this->iterationPos]) && !array_key_exists($this->iterationPos, $this->batch)) {
+            // initialize the batch
+            $this->batch = [];
+            if ($this->batchSize > 1) {
+                $ids = [];
+                $pos = $this->iterationPos;
+                $i   = 0;
+                while ($i < $this->batchSize && $this->isValidPosition($pos)) {
+                    $ids[$pos] = $this->getMessageId($pos);
+                    $this->increasePosition($pos);
+                    $i++;
+                }
+                $messages = $this->imap->getMessages(array_values($ids));
+                foreach ($ids as $pos => $id) {
+                    $this->batch[$pos] = isset($messages[$id]) ? $messages[$id] : null;
+                }
+            } else {
+                $this->batch[$this->iterationPos] = $this->imap->getMessage(
+                    $this->getMessageId($this->iterationPos)
+                );
+            }
+            if ($this->onBatchLoaded !== null) {
+                call_user_func($this->onBatchLoaded, $this->batch);
+            }
+        }
 
-        return $this->imap->getMessage($msgId);
+        return $this->batch[$this->iterationPos];
     }
 
     /**
@@ -94,11 +136,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      */
     public function next()
     {
-        if ($this->reverse) {
-            --$this->iterationPos;
-        } else {
-            ++$this->iterationPos;
-        }
+        $this->increasePosition($this->iterationPos);
     }
 
     /**
@@ -118,25 +156,39 @@ class ImapMessageIterator implements \Iterator, \Countable
      */
     public function valid()
     {
-        if ($this->iterationMin === null || $this->iterationMax === null) {
-            if ($this->ids === null) {
-                $this->iterationMin = 1;
-                $this->iterationMax = $this->imap->count();
-            } else {
-                $this->iterationMin = 0;
-                $this->iterationMax = count($this->ids) - 1;
-            }
-        }
+        $this->ensureInitialized();
 
-        return $this->iterationPos !== null
-            && $this->iterationPos >= $this->iterationMin
-            && $this->iterationPos <= $this->iterationMax;
+        return $this->isValidPosition($this->iterationPos);
     }
 
     /**
      * Rewind the Iterator to the first element
      */
     public function rewind()
+    {
+        $this->initialize();
+
+        $this->iterationPos = $this->reverse
+            ? $this->iterationMax
+            : $this->iterationMin;
+
+        $this->batch = [];
+    }
+
+    /**
+     * Makes sure the Iterator is ready to work
+     */
+    protected function ensureInitialized()
+    {
+        if ($this->iterationMin === null || $this->iterationMax === null) {
+            $this->initialize();
+        }
+    }
+
+    /**
+     * Prepares the Iterator to work
+     */
+    protected function initialize()
     {
         if ($this->ids === null) {
             $this->iterationMin = 1;
@@ -145,10 +197,48 @@ class ImapMessageIterator implements \Iterator, \Countable
             $this->iterationMin = 0;
             $this->iterationMax = count($this->ids) - 1;
         }
+    }
+
+    /**
+     * Get a message id by its position in the Iterator
+     *
+     * @param int $pos
+     *
+     * @return int
+     */
+    protected function getMessageId($pos)
+    {
+        return $this->ids === null
+            ? $pos
+            : $this->ids[$pos];
+    }
+
+    /**
+     * Move the given position of the Iterator to the next element
+     *
+     * @param int $pos
+     */
+    protected function increasePosition(&$pos)
+    {
         if ($this->reverse) {
-            $this->iterationPos = $this->iterationMax;
+            --$pos;
         } else {
-            $this->iterationPos = $this->iterationMin;
+            ++$pos;
         }
+    }
+
+    /**
+     * Checks if the given position is valid
+     *
+     * @param int $pos
+     *
+     * @return boolean
+     */
+    protected function isValidPosition($pos)
+    {
+        return
+            $pos !== null
+            && $pos >= $this->iterationMin
+            && $pos <= $this->iterationMax;
     }
 }

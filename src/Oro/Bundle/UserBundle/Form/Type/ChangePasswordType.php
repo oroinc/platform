@@ -36,7 +36,7 @@ class ChangePasswordType extends AbstractType
             'password',
             array(
                 'required' => false,
-                'label' => 'Current password',
+                'label' => 'oro.user.password.label',
                 'constraints' => array(
                     new UserPassword()
                 ),
@@ -55,8 +55,8 @@ class ChangePasswordType extends AbstractType
                         'class' => 'password-field'
                     )
                 ),
-                'first_options'  => array('label' => 'New password'),
-                'second_options' => array('label' => 'Repeat new password'),
+                'first_options'  => array('label' => 'oro.user.new_password.label'),
+                'second_options' => array('label' => 'oro.user.new_password_re.label'),
                 'mapped' => false,
                 'cascade_validation' => true,
             )

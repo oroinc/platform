@@ -91,12 +91,13 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $criteria = ['gender' => 'male'];
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
         $repository
             ->expects($this->once())
-            ->method('findBy')
-            ->with($this->equalTo($criteria))
-            ->will($this->returnValue([$entity]));
+            ->method('matching')
+            ->will($this->returnValue(new ArrayCollection([$entity])));
 
         $objectManager
             ->expects($this->once())
@@ -105,6 +106,13 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch');
+        $manager->setEventDispatcher($eventDispatcher);
 
         $result = $manager->getList(3, 1, $criteria);
 
@@ -152,6 +160,13 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch');
+        $manager->setEventDispatcher($eventDispatcher);
 
         $result = $manager->getList(3, 1, $criteria);
         $this->assertSame($result[0], $entity);

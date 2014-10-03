@@ -4,8 +4,10 @@ namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class LoadInternalEmailOrigins extends AbstractFixture
 {
@@ -16,9 +18,9 @@ class LoadInternalEmailOrigins extends AbstractFixture
     {
         $outboxFolder = new EmailFolder();
         $outboxFolder
-            ->setType(EmailFolder::SENT)
-            ->setName(EmailFolder::SENT)
-            ->setFullName(EmailFolder::SENT);
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
 
         $origin = new InternalEmailOrigin();
         $origin

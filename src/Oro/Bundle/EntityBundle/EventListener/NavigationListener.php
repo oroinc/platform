@@ -60,7 +60,7 @@ class NavigationListener
                     && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
                     && $extendConfig->in(
                         'state',
-                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
@@ -76,7 +76,7 @@ class NavigationListener
                         'options' => array(
                             'route'           => 'oro_entity_index',
                             'routeParameters' => array(
-                                'id' => str_replace('\\', '_', $config->getId()->getClassName())
+                                'entityName' => str_replace('\\', '_', $config->getId()->getClassName())
                             ),
                             'extras'          => array(
                                 'safe_label' => true,

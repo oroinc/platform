@@ -1,14 +1,15 @@
 /* jshint devel:true */
 /* global define */
-define(['underscore', 'translator', 'json'],
-function(_, Translator) {
+define(['underscore', 'translator', 'module', 'json'],
+function(_, Translator, module) {
     "use strict";
 
     var dict = {},
         debug = false,
         add = Translator.add,
         get = Translator.get,
-        fromJSON = Translator.fromJSON;
+        fromJSON = Translator.fromJSON,
+        config = module.config();
 
     Translator.placeHolderPrefix = '{{ ';
     Translator.placeHolderSuffix = ' }}';
@@ -32,8 +33,26 @@ function(_, Translator) {
      * @returns {string}
      */
     Translator.get = function (id) {
-        checkTranslation(id);
-        return get.apply(Translator, arguments);
+        var string = get.apply(Translator, arguments);
+        var hasTranslation = checkTranslation(id);
+
+        if (!config.debugTranslator) {
+            return string;
+        }
+
+        if (hasTranslation) {
+            if (string.indexOf(']JS') == -1) {
+                return '[' + string + ']JS';
+            } else {
+                return string;
+            }
+        } else {
+            if (string.indexOf('---!!!JS') == -1) {
+                return '!!!---' + string + '---!!!JS';
+            } else {
+                return string;
+            }
+        }
     };
 
     /**
@@ -59,7 +78,7 @@ function(_, Translator) {
      */
     function checkTranslation(id) {
         if (!debug) {
-            return;
+            return true;
         }
         var domains = Translator.defaultDomains,
             checker = function (domain) {
@@ -68,7 +87,9 @@ function(_, Translator) {
         domains = _.union([undefined], _.isArray(domains) ? domains : [domains]);
         if (!_.some(domains, checker)) {
             console.error('Untranslated: %s', id);
+            return false;
         }
+        return true;
     }
 
     _.mixin({

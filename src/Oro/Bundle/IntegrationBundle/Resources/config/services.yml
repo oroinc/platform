@@ -3,11 +3,11 @@ parameters:
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
     oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
-    oro_integration.form.handler.integration.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+    oro_integration.form.type.oro_integration_select.class:               Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType
+    oro_integration.form.handler.integration.class:                       Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
 
     oro_integration.form.subscriber.channel_subscriber.class:             Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
     oro_integration.form.subscriber.default_user_owner_subscriber.class:  Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber
-    oro_integration.form.subscriber.organization_subscriber.class:        Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
 
@@ -37,6 +37,7 @@ parameters:
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_integration.entity.class%
             - @doctrine.orm.entity_manager
@@ -50,10 +51,8 @@ services:
     oro_integration.form.type.channel:
         class: %oro_integration.form.type.channel.class%
         arguments:
-            - @oro_integration.manager.types_registry
             - @oro_integration.form.subscriber.default_user_owner_subscriber
             - @oro_integration.form.subscriber.channel_subscriber
-            - @oro_integration.form.subscriber.organization_subscriber
         tags:
             - { name: form.type, alias: oro_integration_channel_form }
 
@@ -61,11 +60,21 @@ services:
         class: %oro_integration.form.type.oro_integration_type_select.class%
         arguments:
             - @oro_integration.manager.types_registry
-            - @translator
             - @templating.helper.assets
         scope: request
         tags:
             - { name: form.type, alias: oro_integration_type_select }
+
+    oro_integration.form.type.oro_integration_select:
+        class: %oro_integration.form.type.oro_integration_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_integration.manager.types_registry
+            - @templating.helper.assets
+            - @oro_security.acl_helper
+        scope: request
+        tags:
+            - { name: form.type, alias: oro_integration_select }
 
     oro_integration.form.subscriber.channel_subscriber:
         class: %oro_integration.form.subscriber.channel_subscriber.class%
@@ -77,11 +86,6 @@ services:
         class: %oro_integration.form.subscriber.default_user_owner_subscriber.class%
         arguments:
             - @oro_security.security_facade
-
-    oro_integration.form.subscriber.organization_subscriber:
-        class: %oro_integration.form.subscriber.organization_subscriber.class%
-        arguments:
-            - @doctrine.orm.entity_manager
 
     oro_integration.form.handler.integration:
         class:                        %oro_integration.form.handler.integration.class%
@@ -123,6 +127,7 @@ services:
         arguments:
             - @oro_importexport.context_registry
             - @doctrine
+            - @oro_security.owner.ownership_metadata_provider
 
     oro_integration.helper.default_owner_helper:
         class: %oro_integration.helper.default_owner_helper.class%

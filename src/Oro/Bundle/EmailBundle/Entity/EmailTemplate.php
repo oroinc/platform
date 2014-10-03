@@ -12,6 +12,7 @@ use Gedmo\Translatable\Translatable;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -31,7 +32,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id"
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -165,6 +168,14 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     protected $translations;
 
     /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
      * @param $name
      * @param string $content
      * @param string $type
@@ -264,6 +275,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set parent
      *
      * @param integer $parent
+     *
      * @return EmailTemplate
      */
     public function setParent($parent)
@@ -284,10 +296,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set subject
-     *
-     * @param string $subject
-     * @return EmailTemplate
+     * {@inheritdoc}
      */
     public function setSubject($subject)
     {
@@ -297,9 +306,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Get subject
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSubject()
     {
@@ -307,10 +314,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Set content
-     *
-     * @param string $content
-     * @return EmailTemplate
+     * {@inheritdoc}
      */
     public function setContent($content)
     {
@@ -320,9 +324,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
-     * Get content
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getContent()
     {
@@ -502,5 +504,28 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return EmailTemplate
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

@@ -24,6 +24,7 @@ define([
             confirm_title: 'Mass Action Confirmation',
             confirm_content: 'Are you sure you want to do this?',
             confirm_ok: 'Yes, do it',
+            confirm_cancel: 'Cancel',
             success: 'Mass action performed.',
             error: 'Mass action is not performed.',
             empty_selection: 'Please, select items to perform mass action.'
@@ -31,7 +32,11 @@ define([
 
         initialize: function (options) {
             MassAction.__super__.initialize.apply(this, arguments);
-            _.extend(this.route_parameters, {
+
+            var extended_options = {};
+            extended_options[this.datagrid.name] = this.datagrid.collection.urlParams || {};
+
+            _.extend(this.route_parameters, extended_options, {
                 gridName: this.datagrid.name,
                 actionName: this.name
             });

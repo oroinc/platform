@@ -4,6 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -15,7 +16,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
     {
         $segment       = $this->getSegment();
         $doctrine      = $this->getDoctrine(
-            [self::TEST_ENTITY => []],
+            [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -33,7 +34,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine
+            $doctrine,
+            new DatagridGuesserMock()
         );
 
         $builder->setGridName(self::TEST_GRID_NAME);
@@ -54,7 +56,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
     {
         $segment       = $this->getSegment();
         $doctrine      = $this->getDoctrine(
-            [self::TEST_ENTITY => []],
+            [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -63,7 +65,8 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine
+            $doctrine,
+            new DatagridGuesserMock()
         );
 
         $builder->setConfigManager($configManager);
@@ -73,7 +76,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $result   = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition();
 
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     public function getExpectedDefinition($route = null)
@@ -127,7 +130,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                         'view' => [
                             'type'         => 'navigate',
                             'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
-                            'label'        => 'View',
+                            'label'        => 'oro.report.datagrid.view',
                             'icon'         => 'eye-open',
                             'link'         => 'view_link',
                             'rowAction'    => true,

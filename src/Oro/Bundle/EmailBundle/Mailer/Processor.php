@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
@@ -38,6 +39,9 @@ class Processor
 
     /** @var  EmailActivityManager */
     protected $emailActivityManager;
+
+    /** @var array */
+    protected $origins = array();
 
     /**
      * @param DoctrineHelper       $doctrineHelper
@@ -101,7 +105,7 @@ class Processor
             $messageDate
         );
 
-        $email->addFolder($origin->getFolder(EmailFolder::SENT));
+        $email->addFolder($origin->getFolder(FolderType::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
 
@@ -131,29 +135,33 @@ class Processor
      */
     public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
     {
-        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-            $this->getEntityManager(),
-            $this->emailAddressHelper->extractPureEmailAddress($email)
-        );
-
-        if ($emailOwner instanceof User) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                function ($item) {
-                    return $item instanceof InternalEmailOrigin;
-                }
+        $originKey = $originName . $email;
+        if (!array_key_exists($originKey, $this->origins)) {
+            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+                $this->getEntityManager(),
+                $this->emailAddressHelper->extractPureEmailAddress($email)
             );
 
-            $origin = $origins->isEmpty() ? null : $origins->first();
-            if ($origin == null) {
-                $origin = $this->createUserInternalOrigin($emailOwner);
+            if ($emailOwner instanceof User) {
+                $origins = $emailOwner->getEmailOrigins()->filter(
+                    function ($item) {
+                        return $item instanceof InternalEmailOrigin;
+                    }
+                );
+
+                $origin = $origins->isEmpty() ? null : $origins->first();
+                if ($origin == null) {
+                    $origin = $this->createUserInternalOrigin($emailOwner);
+                }
+            } else {
+                $origin = $this->getEntityManager()
+                    ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                    ->findOneBy(array('internalName' => $originName));
             }
-        } else {
-            $origin = $this->getEntityManager()
-                ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                ->findOneBy(array('internalName' => $originName));
+            $this->origins[$originKey] = $origin;
         }
 
-        return $origin;
+        return $this->origins[$originKey];
     }
 
     /**
@@ -166,9 +174,9 @@ class Processor
 
         $outboxFolder = new EmailFolder();
         $outboxFolder
-            ->setType(EmailFolder::SENT)
-            ->setName(EmailFolder::SENT)
-            ->setFullName(EmailFolder::SENT);
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
 
         $origin = new InternalEmailOrigin();
         $origin

@@ -49,6 +49,8 @@ class CustomEntityType extends AbstractType
         'oneToMany'  => 'oro_multiple_entity',
         'manyToMany' => 'oro_multiple_entity',
         'optionSet'  => 'oro_option_select',
+        'enum'       => 'oro_enum_select',
+        'multiEnum'  => 'oro_enum_choice',
     ];
 
     /**
@@ -118,6 +120,17 @@ class CustomEntityType extends AbstractType
                         $options['entityClassName'] = $className;
                         $options['entityFieldName'] = $fieldConfigId->getFieldName();
                         break;
+                    case 'enum':
+                        $options['enum_code'] = $this->configManager->getProvider('enum')
+                            ->getConfig($className, $fieldConfigId->getFieldName())
+                            ->get('enum_code');
+                        break;
+                    case 'multiEnum':
+                        $options['expanded'] = true;
+                        $options['enum_code'] = $this->configManager->getProvider('enum')
+                            ->getConfig($className, $fieldConfigId->getFieldName())
+                            ->get('enum_code');
+                        break;
                     case 'manyToOne':
                         $options['entity_class'] = $extendConfig->get('target_entity');
                         $options['configs']      = [
@@ -145,9 +158,9 @@ class CustomEntityType extends AbstractType
                             'grid_url'              => $this->router->generate(
                                 'oro_entity_relation',
                                 [
-                                    'id'        => (($data && $data->getId()) ? $data->getId() : 0),
-                                    'className' => str_replace('\\', '_', $className),
-                                    'fieldName' => $fieldConfigId->getFieldName()
+                                    'id'         => (($data && $data->getId()) ? $data->getId() : 0),
+                                    'entityName' => str_replace('\\', '_', $className),
+                                    'fieldName'  => $fieldConfigId->getFieldName()
                                 ]
                             ),
                             'selector_window_title' => $selectorWindowTitle,
@@ -237,9 +250,9 @@ class CustomEntityType extends AbstractType
                         $this->router->generate(
                             'oro_entity_relation',
                             [
-                                'id'        => $dataId,
-                                'className' => str_replace('\\', '_', $className),
-                                'fieldName' => $fieldName
+                                'id'         => $dataId,
+                                'entityName' => str_replace('\\', '_', $className),
+                                'fieldName'  => $fieldName
                             ]
                         );
 
@@ -294,9 +307,9 @@ class CustomEntityType extends AbstractType
                 'link'      => $this->router->generate(
                     'oro_entity_detailed',
                     [
-                        'id'        => $entity->getId(),
-                        'className' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
-                        'fieldName' => $extendConfig->getId()->getFieldName()
+                        'id'         => $entity->getId(),
+                        'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
+                        'fieldName'  => $extendConfig->getId()->getFieldName()
                     ]
                 ),
                 'extraData' => $extraData,

@@ -23,7 +23,6 @@ services:
         class: %oro_search.engine.class%
         arguments:
             - @doctrine
-            - @event_dispatcher
             - @oro_entity.doctrine_helper
             - @oro_search.mapper
         calls:

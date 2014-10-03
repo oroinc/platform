@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
+
 class ChainConfigurationProvider implements ConfigurationProviderInterface
 {
     /**
@@ -41,7 +43,7 @@ class ChainConfigurationProvider implements ConfigurationProviderInterface
         }
 
         if ($foundProvider === null) {
-            throw new \RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
+            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
         }
 
         return $foundProvider->getConfiguration($gridName);

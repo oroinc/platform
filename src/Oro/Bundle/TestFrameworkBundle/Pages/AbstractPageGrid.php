@@ -23,7 +23,16 @@ abstract class AbstractPageGrid extends AbstractPage
      *
      * @return mixed
      */
-    abstract public function open($entityData = array());
+    public function open($entityData = array())
+    {
+        $task = $this->getEntity($entityData, 1);
+        $task->click();
+        $this->waitPageToLoad();
+        sleep(1);
+        $this->waitForAjax();
+
+        return $this;
+    }
 
     /**
      * Select random entity from current page
@@ -346,6 +355,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $rowData = array();
         foreach ($columnData as $value) {
             /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $value */
+            $this->test->moveto($value);
             $rowData[] = $value->text();
         }
         return $rowData;

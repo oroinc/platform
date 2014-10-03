@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -67,37 +68,29 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     }
 
     /**
+     * @deprecated since 1.4 Avoid usage of "{{ system.appShortName }}" in email templates
+     *
      * @param array $result
      * @param bool  $addValue
      */
     protected function addApplicationShortName(array &$result, $addValue)
     {
         if ($addValue) {
-            $val = $this->configManager->get('oro_ui.application_name');
-        } else {
-            $val = [
-                'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.app_short_name')
-            ];
+            $result['appShortName'] = '';
         }
-        $result['appShortName'] = $val;
     }
 
     /**
+     * @deprecated since 1.4 Avoid usage of "{{ system.appFullName }}" in email templates
+     *
      * @param array $result
      * @param bool  $addValue
      */
     protected function addApplicationFullName(array &$result, $addValue)
     {
         if ($addValue) {
-            $val = $this->configManager->get('oro_ui.application_title');
-        } else {
-            $val = [
-                'type'  => 'string',
-                'label' => $this->translator->trans('oro.email.emailtemplate.app_full_name')
-            ];
+            $result['appFullName'] = '';
         }
-        $result['appFullName'] = $val;
     }
 
     /**

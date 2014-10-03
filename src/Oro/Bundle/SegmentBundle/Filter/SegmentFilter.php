@@ -88,7 +88,7 @@ class SegmentFilter extends EntityFilter
             $className = $configId->getClassName();
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
             )
             ) {
                 $classMetadata         = $em->getClassMetadata($className);

@@ -11,6 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Attachment
@@ -26,7 +27,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
  *      "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="owner_id"
+ *              "owner_column_name"="owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *      },
  *      "security"={
  *          "type"="ACL"
@@ -58,6 +61,14 @@ class Attachment extends ExtendAttachment
      * @ORM\JoinColumn(name="owner_user_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="businessUnits")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * @var string
@@ -247,5 +258,28 @@ class Attachment extends ExtendAttachment
         return $this->getFile() && (string)$this->getFile()->getFilename()
             ? $this->getFile()->getFilename() . ' (' . $this->getFile()->getOriginalFilename() . ')'
             : '';
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Attachment
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

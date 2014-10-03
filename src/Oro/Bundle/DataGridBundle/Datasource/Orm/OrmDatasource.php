@@ -10,13 +10,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
+use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
+use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
+use Oro\Bundle\DataGridBundle\Exception\BadMethodCallException;
+use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 
-class OrmDatasource implements DatasourceInterface
+class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterface
 {
     const TYPE = 'orm';
 
@@ -37,12 +41,17 @@ class OrmDatasource implements DatasourceInterface
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var ParameterBinderInterface */
+    protected $parameterBinder;
+
     public function __construct(
         EntityManager $em,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ParameterBinderInterface $parameterBinder
     ) {
         $this->em = $em;
         $this->eventDispatcher = $eventDispatcher;
+        $this->parameterBinder = $parameterBinder;
     }
 
     /**
@@ -66,7 +75,7 @@ class OrmDatasource implements DatasourceInterface
                 if ($qb instanceof QueryBuilder) {
                     $this->qb = $qb;
                 } else {
-                    throw new \Exception(
+                    throw new DatasourceException(
                         sprintf(
                             '%s::%s() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                             get_class($repository),
@@ -76,11 +85,11 @@ class OrmDatasource implements DatasourceInterface
                     );
                 }
             } else {
-                throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
+                throw new DatasourceException(sprintf('%s has no method %s', get_class($repository), $method));
             }
 
         } else {
-            throw new \Exception(get_class($this).' expects to be configured with query or repository method');
+            throw new DatasourceException(get_class($this).' expects to be configured with query or repository method');
         }
 
         if (isset($config['hints'])) {
@@ -172,5 +181,25 @@ class OrmDatasource implements DatasourceInterface
                 $query->setHint($name, $value);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameterBinder()
+    {
+        return $this->parameterBinder;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bindParameters(array $datasourceToDatagridParameters, $append = true)
+    {
+        if (!$this->datagrid) {
+            throw new BadMethodCallException('Method is not allowed when datasource is not processed.');
+        }
+
+        return $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
     }
 }

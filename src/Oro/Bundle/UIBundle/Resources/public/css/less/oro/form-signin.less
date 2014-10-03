@@ -14,7 +14,7 @@
 }
 .form-signin {
   margin: 0 auto;
-  max-width: 400px;
+  max-width: 410px;
   padding: 0;
   background: #fff;
   border: 0;
@@ -51,7 +51,7 @@
     }
   } // Ends .title-box
   .add-on {
-    width:95px;
+    width: 105px;
     height: 36px;
     font: bold 14px/36px @baseFontFamily;
     color: #5b636d;
@@ -59,7 +59,8 @@
     padding:0 10px;
   }
   input[type="text"],
-  input[type="password"] {
+  input[type="password"],
+  select{
     height: 16px;
     font: 14px/16px @baseFontFamily;
     color: #000;
@@ -70,12 +71,26 @@
       color:#999
     }
   }
+  .organization-selector-arrow{
+    position: relative;
+    top: 8px;
+    left: -15px;
+    margin-right: -9px;
+    z-index: 5;
+  }
   .add-on {
     & + input[type="text"],
-    & + input[type="password"] {
+    & + input[type="password"],
+    & + select{
       width: 205px;
       border-left-color:#ccc;
       .border-radius(0 5px 5px 0);
+    }
+    & + select{
+      display: inline-block;
+      height: 34px;
+      width: 225px;
+      padding: 0;
     }
   }
   .forgot-pass {

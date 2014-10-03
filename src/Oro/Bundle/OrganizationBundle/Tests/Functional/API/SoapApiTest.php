@@ -16,12 +16,10 @@ class SoapApiTest extends WebTestCase
     protected $fixtureData = array(
         'business_unit' => array(
             'name' => 'BU Name',
-            'organization' => '1',
             'phone' => '123-123-123',
             'website' => 'http://localhost',
             'email' => 'email@email.localhost',
             'fax' => '321-321-321',
-            'owner' => '1',
         )
     );
 

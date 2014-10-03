@@ -16,6 +16,7 @@ oro_menu_config:
             label: 'oro.user.entity_plural_label'
             route: 'oro_user_index'
             extras:
+                position: 10
                 routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+)\w+$/']
                 description: 'oro.user.menu.user_list.description'
         user_create:
@@ -25,12 +26,14 @@ oro_menu_config:
             label: 'oro.user.role.entity_plural_label'
             route: 'oro_user_role_index'
             extras:
+                position: 20
                 routes: ['oro_user_role_*']
                 description: 'oro.user.menu.user_roles.description'
         user_groups:
             label: 'oro.user.group.entity_plural_label'
             route: 'oro_user_group_index'
             extras:
+                position: 30
                 routes: ['oro_user_group_*']
                 description: 'oro.user.menu.user_groupes.description'
         shortcut_new_user:

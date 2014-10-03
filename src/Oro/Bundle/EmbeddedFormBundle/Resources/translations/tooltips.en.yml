@@ -1,4 +1,6 @@
 oro:
     embeddedform:
+        css:
+            tooltip: Only CSS is allowed.
         success_message:
             tooltip: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.

@@ -10,18 +10,18 @@
                 'aCss':  'no-hash btn-danger',
                 'iCss':  'icon-remove',
                 'id':    idButton,
-                'label': 'oro.workflow.action.process.deactivate',
+                'label': 'oro.workflow.action.process.deactivate'|trans,
                 'path':  path('oro_workflow_api_rest_process_deactivate', {'processDefinition': entity.name}),
-                'title': 'oro.workflow.action.process.deactivate',
+                'title': 'oro.workflow.action.process.deactivate'|trans,
             }) }}
         {% else %}
             {{ UI.button({
                 'iCss':  'icon-ok',
                 'aCss':  'no-hash btn-success',
                 'id':    idButton,
-                'label': 'oro.workflow.action.process.activate',
+                'label': 'oro.workflow.action.process.activate'|trans,
                 'path':  path('oro_workflow_api_rest_process_activate', {'processDefinition': entity.name}),
-                'title': 'oro.workflow.action.process.activate',
+                'title': 'oro.workflow.action.process.activate'|trans,
             }) }}
         {% endif %}
         <script type="text/javascript">
@@ -54,11 +54,11 @@
 {% block breadcrumbs %}
     {{ parent() }}
 
-    <div class="status-enabled pull-left">
+    <div class="pull-left">
         {% if entity.enabled %}
             <div class="badge badge-enabled status-enabled"><i class="icon-status-enabled icon-circle"></i>{{ 'Active'|trans }}</div>
         {% else %}
-            <div class="badge badge-enabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
+            <div class="badge badge-disabled status-disabled"><i class="icon-status-disabled icon-circle"></i>{{ 'Inactive'|trans }}</div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}

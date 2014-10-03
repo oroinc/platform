@@ -27,6 +27,7 @@ define([
             confirm_title: 'Delete Confirmation',
             confirm_content: 'Are you sure you want to delete this item?',
             confirm_ok: 'Yes, Delete',
+            confirm_cancel: 'Cancel',
             success: 'Item deleted'
         },
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid;
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
@@ -31,8 +32,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
         $doctrine         = $this->getDoctrine(
             [
-                $en => ['column1' => 'string'],
-                $en => ['column2' => 'string']
+                $en => ['column1' => 'string', 'column2' => 'string']
             ]
         );
         $functionProvider = $this->getFunctionProvider(
@@ -74,7 +74,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                         'column2(Count,string,aggregates)' => 'c2'
                     ],
                 ],
-                'hints' => [
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
@@ -97,10 +97,10 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
                     'c2' => [
-                        'data_name'        => 'c2',
-                        'type'             => 'number',
-                        'translatable'     => false,
-                        'filter_by_having' => true
+                        'data_name'                  => 'c2',
+                        'type'                       => 'number',
+                        'translatable'               => false,
+                        FilterUtility::BY_HAVING_KEY => true
                     ],
                 ]
             ]
@@ -222,6 +222,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'rc4'     => ['nullable' => true]
                 ],
                 $en2 => ['column3' => 'float'],
+                $en3 => ['column5' => 'string'],
             ]
         );
 
@@ -295,7 +296,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                         ]
                     ]
                 ],
-                'hints' => [
+                'hints'        => [
                     [
                         'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',

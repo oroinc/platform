@@ -108,7 +108,9 @@ class SyncCommand extends AbstractSyncCronCommand
         if ($integrationId) {
             $integration = $repository->getOrLoadById($integrationId);
             if (!$integration) {
-                throw new \InvalidArgumentException('Integration with given ID not found');
+                $logger->critical(sprintf('Integration with given ID "%d" not found', $integrationId));
+
+                return self::STATUS_FAILED;
             }
             $integrations = [$integration];
         } else {

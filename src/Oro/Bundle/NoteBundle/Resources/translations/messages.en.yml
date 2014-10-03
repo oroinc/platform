@@ -1,11 +1,15 @@
 oro:
     note:
         enabled:              Enable notes
+
         entity_label:         Note
         entity_plural_label:  Notes
+        entity_description:   Represent notes
+
         id.label:             Id
         message.label:        Message
         owner.label:          Created By
+        organization.label:   Organization
         updated_by.label:     Updated By
 
         action:

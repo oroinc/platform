@@ -74,6 +74,7 @@ services:
         arguments:
             - @oro_entity_config.cache.file_cache
             - @oro_entity_config.model.file_cache
+            - %kernel.debug%
 
     oro_entity_config.cache.file_cache:
         parent: oro.cache.abstract
@@ -127,9 +128,7 @@ services:
         class: %oro_entity_config.twig.extension.dynamic_fields.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_entity_config.provider.extend
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.view
+            - @oro_entity_extend.extend.field_type_helper
             - @oro_locale.formatter.date_time
             - @router
         tags:

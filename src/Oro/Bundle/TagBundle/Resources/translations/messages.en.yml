@@ -12,6 +12,7 @@ oro:
             choose_or_create_tag: "Select an existing tag or create new"
         datagrid:
             usage_count: Usage Count
+            search:      Search by tag
 
         created_by.label:    Created By
         entity_description:  Show records tagged by this tag
@@ -22,6 +23,7 @@ oro:
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
+        organization.label:  Organization
 
         action:
             assign_unassign: "Tag assign/unassign"

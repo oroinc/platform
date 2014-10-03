@@ -41,6 +41,7 @@ parameters:
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
+    oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
@@ -52,6 +53,18 @@ parameters:
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
+    oro_security.authentication.listener.form.class:           Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
+    oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
+    oro_security.authentication.listener.organization_rememberme.class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationRememberMeListener
+    oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
+    oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
+    oro_security.authentication.organization_rememberme.services.simplehash.class: Oro\Bundle\SecurityBundle\Http\RememberMe\OrganizationTokenBasedRememberMeServices
+
+    oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
+    oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
+    oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
+
+    oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
 services:
     oro_security.security_facade:
@@ -60,6 +73,7 @@ services:
             - @security.context
             - @oro_security.acl.annotation_provider
             - @oro_security.acl.object_identity_factory
+            - @oro_entity.orm.entity_class_resolver
             - @logger
         tags:
             - { name: monolog.logger, channel: security }
@@ -313,6 +327,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_security.twig.security_organization_extension:
+        class: %oro_security.twig.security_organization_extension%
+        arguments:
+            - @security.context
+        tags:
+            - { name: twig.extension }
+
     oro_security.encoder.mcrypt:
         class: %oro_security.encoder.mcrypt.class%
         arguments: [ %kernel.secret% ]
@@ -372,3 +393,99 @@ services:
             - @oro_security.link.ownership_tree_provider
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+
+    oro_security.authentication.listener.form:
+        class: %oro_security.authentication.listener.form.class%
+        parent: security.authentication.listener.abstract
+        abstract: true
+        calls:
+            - [setEntityManager, [@doctrine.orm.entity_manager]]
+
+    oro_security.authentication.listener.organization_rememberme:
+        class: %oro_security.authentication.listener.organization_rememberme.class%
+        arguments:
+            - @security.context
+            - @security.authentication.rememberme
+            - @security.authentication.manager
+            - @logger
+            - @event_dispatcher
+        abstract: true
+        tags:
+          - {name: monolog.logger, channel: security }
+
+    oro_security.authentication.listener.basic:
+        class: %oro-security.authentication.listener.basic.class%
+        arguments:
+            - @security.context
+            - @security.authentication.manager
+            - null
+            - null
+            - @oro_organization.organization_manager
+            - @?logger
+        public: false
+        abstract: true
+
+    oro_security.authentication.provider.username_password_organization:
+        class: %oro_security.authentication.provider.username_password_organization.class%
+        arguments:
+            - null
+            - @security.user_checker
+            - null
+            - @security.encoder_factory
+            - %security.authentication.hide_user_not_found%
+        abstract: true
+        public: false
+
+    oro_security.authentication.provider.organization_rememberme:
+        class: %oro_security.authentication.provider.organization_rememberme.class%
+        arguments:
+            - @security.user_checker
+        abstract: true
+        public: false
+
+    oro_security.authentication.organization_rememberme.services.simplehash:
+        class: %oro_security.authentication.organization_rememberme.services.simplehash.class%
+        arguments:
+          - ~
+          - null
+          - null
+          - ~
+          - @logger
+        calls:
+          - [setEntityManager, [@doctrine.orm.entity_manager]]
+        abstract: true
+
+    oro_security.listener.context_listener:
+        class: %oro_security.listener.context_listener.class%
+        arguments:
+            - @security.context
+            - @oro_organization.organization_manager
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_security.listener.api_listener:
+          class: %oro_security.listener.api_listener.class%
+          arguments:
+              - @request
+              - @oro_security.security_facade
+              - @oro_security.acl_helper
+          scope: request
+          tags:
+              - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
+              - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
+
+    oro_security.form.extension.aclprotected_type:
+        class: %oro_security.form.extension.aclprotected_type.class%
+        arguments:
+            - @oro_security.acl_helper
+        tags:
+            - { name: form.type_extension, alias: entity }
+
+    oro_security.listener.search_listener:
+          class: %oro_security.listener.search_listener.class%
+          arguments:
+              - @oro_security.owner.ownership_metadata_provider
+              - @oro_security.security_facade
+          tags:
+              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent }
+              - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }

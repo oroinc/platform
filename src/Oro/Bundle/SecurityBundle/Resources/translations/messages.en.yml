@@ -11,6 +11,8 @@ oro:
             BASIC: User
             LOCAL: Business Unit
             DEEP: Division
-            GLOBAL: Organization
+            GLOBAL: System
             SYSTEM: System
             NONE: None
+        organization:
+            access_denied: You don't have access to organization "%organization_name%"

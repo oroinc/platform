@@ -1,3 +1,5 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
 {# Chart variables format:
 
     "options":
@@ -18,131 +20,7 @@
 
 #}
 {% if data|length>0  %}
-{% set containerId = "chart-container-" ~ random() %}
-
-<div class="chart-container">
-    <div class="clearfix">
-        <div id="{{ containerId }}-chart" class="pie-chart chart pull-left"></div>
-        <div id="{{ containerId }}-legend" class="pie-chart-legend chart-legend pull-left"></div>
-    </div>
-</div>
-
-<script type="text/javascript">
-    require(['jquery', 'oroui/js/layout', 'flotr2'],
-        function ($, layout, Flotr) {
-            $(function () {
-                var ratio = {{ isMobileVersion() ? '0.8' : '0.35' }};
-                var $chart = $('#{{ containerId }}-chart');
-                var $chartLegend = $('#{{ containerId }}-legend');
-                var $widgetContent = $chart.parents('.chart-container').parent();
-                var setChartSize = function () {
-                    var chartWidth = Math.min(Math.round($widgetContent.width() * ratio), 350);
-                    if (chartWidth != $chart.width()) {
-                        $chart.width(chartWidth);
-                        $chart.height(chartWidth);
-                        $chartLegend.height(chartWidth);
-                        return true;
-                    }
-                    return false;
-                };
-                var setChartContainerSize = function () {
-                    var $chartLegendTable = $chartLegend.find('table');
-                    var $td = $chartLegendTable.find('td');
-                    var padding = parseInt($td.css('padding-bottom'));
-                    if (padding > 0 && ($chartLegendTable.height() + 20) > $chartLegend.height()) {
-                        while (($chartLegendTable.height() + 20) > $chartLegend.height()) {
-                            padding = padding - 1;
-                            $td.css('padding-bottom', padding + 'px');
-                            if (padding <= 0) {
-                                break;
-                            }
-                        }
-                    } else if (padding < 7 && ($chartLegendTable.height() + 20) < $chartLegend.height()) {
-                        while (($chartLegendTable.height() + 20) < $chartLegend.height()) {
-                            padding = padding + 1;
-                            $td.css('padding-bottom', padding + 'px');
-                            if (padding >= 7) {
-                                break;
-                            }
-                        }
-                    }
-                    $chart.closest('.clearfix').width(
-                            $chart.width() +
-                                    $chartLegendTable.outerWidth() +
-                                    parseInt($chartLegendTable.css('margin-left'))
-                    );
-                };
-                var drawChart = function () {
-                    if (!$chart.get(0).clientWidth) {
-                        return;
-                    }
-                    var data = [];
-                    var rawData = {{ data|json_encode|raw }};
-                    var xNumber = 0;
-                    for(var i in rawData){
-                        data.push({data: [[0, rawData[i]['fraction']]], label: rawData[i]['label']});
-                    }
-                    Flotr.draw(
-                            $chart.get(0),
-                            data,
-                            {
-                                colors: {{ options.settings.chartColors|json_encode|raw }},
-                                fontColor: {{ options.settings.chartFontColor|json_encode|raw }},
-                                fontSize: {{ options.settings.chartFontSize|json_encode|raw }},
-                                shadowSize: 0,
-                                HtmlText: true,
-                                xaxis : {
-                                    showLabels : false
-                                },
-                                yaxis : {
-                                    showLabels : false
-                                },
-                                grid : {
-                                    color: {{ options.settings.chartFontColor|json_encode|raw }},
-                                    verticalLines : false,
-                                    horizontalLines : false,
-                                    outlineWidth: 0
-                                },
-                                pie : {
-                                    show : true,
-                                    explode : 0,
-                                    sizeRatio: 0.8,
-                                    startAngle: Math.PI/3.5
-                                },
-                                mouse : {
-                                    track : true,
-                                    relative: true,
-                                    lineColor: {{ options.settings.chartHighlightColor|json_encode|raw }},
-                                    trackFormatter: function (obj) {
-                                        return obj.series.label + '&nbsp;&nbsp;&nbsp;' + parseFloat(obj.fraction * 100).toFixed(2) + ' %';
-                                    }
-                                },
-                                legend : {
-                                    position : 'ne',
-                                    container: $chartLegend.get(0),
-                                    labelBoxWidth: 20,
-                                    labelBoxHeight: 13,
-                                    labelBoxMargin: 0
-                                }
-                            }
-                    );
-                };
-
-                layout.onPageRendered(function () {
-                    setChartSize();
-                    drawChart();
-                    setChartContainerSize();
-                });
-
-                $(window).resize(function () {
-                    if (setChartSize()) {
-                        drawChart();
-                        setChartContainerSize();
-                    }
-                });
-            });
-        });
-</script>
+    {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
     <div class="container-fluid grid-container-parent">
         <div class="grid-container">

@@ -34,7 +34,6 @@ class ControllersRoleTest extends WebTestCase
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_role_form[label]'] = 'testRole';
-        $form['oro_user_role_form[owner]']= 1;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

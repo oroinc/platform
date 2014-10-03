@@ -54,14 +54,14 @@ services:
     oro_entity.form.type.entity_select:
         class: %oro_entity.form.type.entity_select.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_select }
 
     oro_entity.form.handler.entity_select:
         class: %oro_entity.form.handler.entity_select.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+        calls:
+            - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
 
@@ -74,7 +74,7 @@ services:
         tags:
             - { name: form.type_guesser, priority: 20 }
 
-    oro_entityg.form.guesser.doctrine_type:
+    oro_entity.form.guesser.doctrine_type:
         class: %oro_entity.form.guesser.doctrine_type.class%
         arguments:
             - @doctrine

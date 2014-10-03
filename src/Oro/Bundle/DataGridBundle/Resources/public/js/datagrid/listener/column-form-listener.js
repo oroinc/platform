@@ -290,13 +290,15 @@ define([
         gridOptions = options.metadata.options || {};
         gridInitialization = options.gridPromise;
 
-        if (gridOptions.columnListener) {
+        var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
+
+        if (gridListenerOptions) {
             gridInitialization.done(function (grid) {
                 var listener, listenerOptions;
                 listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name
-                }, gridOptions.columnListener);
+                }, gridListenerOptions);
 
                 listener = new ColumnFormListener(listenerOptions);
                 deferred.resolve(listener);

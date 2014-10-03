@@ -9,53 +9,39 @@ oro_entity_config:
                         indexed:            true
                     grid:
                         type:               boolean
-                        label:              'Auditable'
+                        label:              oro.dataaudit.entity_config.entity.items.auditable
                         filter_type:        boolean
                         required:           true
                         sortable:           true
                         filterable:         true
                         show_filter:        false
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Auditable'
+                            label:          oro.dataaudit.entity_config.entity.items.auditable
         field:
             items:
                 auditable:
                     options:
                         priority:           60
                         default_value:      false
-                        allowed_type:
-                          - string
-                          - integer
-                          - smallint
-                          - bigint
-                          - boolean
-                          - decimal
-                          - date
-                          - text
-                          - float
-                          - money
-                          - percent
-                          - manyToOne
-                          - manyToMany
-                          - ref-many
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many]
                         indexed:            true
                     grid:
                         type:               boolean
-                        label:              'Auditable'
+                        label:              oro.dataaudit.entity_config.field.items.auditable
                         filter_type:        boolean
                         required:           true
                         sortable:           true
                         filterable:         false
                         show_filter:        false
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Auditable'
+                            label:          oro.dataaudit.entity_config.field.items.auditable

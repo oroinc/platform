@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
  * Use carefully on large data sets - do not run this task too often.
@@ -15,6 +17,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ReindexCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName('oro:search:reindex')
@@ -27,14 +32,23 @@ class ReindexCommand extends ContainerAwareCommand
              ->setDescription('Rebuild search index');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $class       = $input->getArgument('class');
+        $class = $input->getArgument('class');
+        if ($class) {
+            // convert from short format to FQСN
+            $class = $this->getContainer()->get('doctrine')
+                ->getManagerForClass($class)->getClassMetadata($class)->getName();
+        }
+
         $placeholder = $class ? '"' . $class .'" entity' : 'all mapped entities';
 
         $output->writeln('Starting reindex task for ' . $placeholder);
 
-        /** @var $searchEngine \Oro\Bundle\SearchBundle\Engine\AbstractEngine */
+        /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
         $recordsCount = $searchEngine->reindex($class);
 

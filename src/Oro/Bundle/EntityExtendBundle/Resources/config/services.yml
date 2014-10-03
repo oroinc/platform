@@ -4,12 +4,14 @@ parameters:
     oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.entity_config_dumper.extension.index.class:     Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension
-    oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationDataConfigDumperExtension
+    oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension
+    oro_entity_extend.entity_config_dumper.extension.enum.class:      Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension
     oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
     oro_entity_extend.validator.not_sql_keyword.class:        Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator
-    oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\UniqueKeysValidator
+    oro_entity_extend.validator.unique_keys.class:            Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator
+    oro_entity_extend.validator.unique_enum_name.class:       Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumNameValidator
     oro_entity_extend.migration.config_processor.class:       Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
     oro_entity_extend.migration.update_config.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
@@ -23,6 +25,11 @@ parameters:
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
+    oro_entity_extend.enum_synchronizer.class:                Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer
+    oro_entity_extend.enum_filter.class:                      Oro\Bundle\EntityExtendBundle\Filter\EnumFilter
+    oro_entity_extend.multi_enum_filter.class:                Oro\Bundle\EntityExtendBundle\Filter\MultiEnumFilter
+    oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
+    oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -47,7 +54,6 @@ services:
 
     oro_entity_extend.entity_generator.extension:
         class: %oro_entity_extend.entity_generator.extension.class%
-        arguments:
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
@@ -56,6 +62,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_entity_extend.db_id_name_generator
+            - @oro_entity_extend.extend.field_type_helper
             - @oro_entity_extend.entity_generator
             - %kernel.cache_dir%
 
@@ -69,13 +76,25 @@ services:
         class: %oro_entity_extend.entity_config_dumper.extension.index.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
         tags:
-            - { name: oro_entity_extend.entity_config_dumper_extension }
+            - { name: oro_entity_extend.entity_config_dumper_extension, priority: -255 }
 
     oro_entity_extend.entity_config_dumper.extension.relation:
         class: %oro_entity_extend.entity_config_dumper.extension.relation.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension, priority: 255 }
+
+    oro_entity_extend.entity_config_dumper.extension.enum:
+        class: %oro_entity_extend.entity_config_dumper.extension.enum.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.relation_builder
+            - @oro_entity_extend.extend.field_type_helper
+            - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -101,6 +120,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_keys }
 
+    oro_entity_extend.validator.unique_enum_name:
+        class: %oro_entity_extend.validator.unique_enum_name.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_enum_name }
+
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
         arguments:
@@ -116,11 +142,14 @@ services:
 
     oro_entity_extend.extend.field_type_helper:
         class: %oro_entity_extend.extend.field_type_helper.class%
+        arguments:
+            - []
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
         arguments:
             - @oro_entity_config.tools.command_executor
+            - @oro_entity_config.config_manager
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
 
@@ -178,3 +207,42 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
+
+    oro_entity_extend.enum_synchronizer:
+        class: %oro_entity_extend.enum_synchronizer.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @doctrine
+            - @translator
+            - @oro_translation.database_translation.metadata.cache
+
+    oro_entity_extend.enum_filter:
+        class: %oro_entity_extend.enum_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: enum }
+
+    oro_entity_extend.multi_enum_filter:
+        class: %oro_entity_extend.multi_enum_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @oro_filter.builder.many_relation
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }
+
+    oro_entity_extend.twig.extension.enum:
+        class: %oro_entity_extend.twig.extension.enum.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: twig.extension }
+
+    oro_entity_extend.datagrid.column_options_guesser:
+        class: %oro_entity_extend.datagrid.column_options_guesser.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: oro_datagrid.column_options_guesser }

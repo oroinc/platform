@@ -5,12 +5,11 @@ oro_entity_config:
                 available_in_template:
                     options:
                         default_value:      true
-                        is_bool:            true
-                        allowed_type:       [string,integer,smallint,bigint,boolean,decimal,datetime,date,time,text,float,money,percent,optionSet,file,image,ref-one,manyToOne]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, optionSet, enum, multiEnum, file, image, ref-one, manyToOne]
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Available in email templates'
+                            label:          oro.email.entity_config.email.field.items.available_in_template

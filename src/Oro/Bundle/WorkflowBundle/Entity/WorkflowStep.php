@@ -11,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      name="oro_workflow_step",
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(name="oro_workflow_step_unique_idx", columns={"workflow_name", "name"})
+ *      },
+ *      indexes={
+ *          @ORM\Index(name="oro_workflow_step_name_idx", columns={"name"})
  *      }
  * )
  * @ORM\Entity

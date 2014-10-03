@@ -1,0 +1,137 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroTagBundle:Form:fields.html.twig'] %}
+
+{% set fullname = form.vars.value|oro_format_name|default('N/A') %}
+{% oro_title_set({params : {"%username%": fullname }}) %}
+
+{% if editRoute %}
+    {% set formAction = path(editRoute) %}
+{% else %}
+    {% set formAction = form.vars.value.id ? path('oro_user_update', { id: form.vars.value.id}) : path('oro_user_create') %}
+{% endif %}
+
+{% block navButtons %}
+    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
+            'dataRedirect': path('oro_user_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-user',
+            'dataId':  form.vars.value.id,
+            'entity_label': 'oro.user.entity_label'|trans,
+            'disabled': not allow_delete
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+    {{ UI.cancelButton(path(cancelRoute)) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% if form.vars.value.id %}
+        {% set breadcrumbs = {
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_user_index'),
+            'indexLabel': 'oro.user.entity_plural_label'|trans,
+            'entityTitle': fullname,
+        }
+        %}
+        {% set avatar = oro_configured_image_url(form.vars.value, 'avatar') %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block stats %}
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ form.vars.value.updatedAt ? form.vars.value.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.last_login.label'|trans }}: {{ form.vars.value.lastLogin ? form.vars.value.lastLogin|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.login_count.label'|trans }}: {{ form.vars.value.loginCount|default(0) }}</li>
+{% endblock stats %}
+
+{% block content_data %}
+<div class="user-profile-cols">
+    {% set id = 'user-profile' %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.enabled),
+                    form_row(form.username),
+                    form.plainPassword is defined ? form_row(form.plainPassword) : '',
+                    form_row(form.namePrefix),
+                    form_row(form.firstName),
+                    form_row(form.middleName),
+                    form_row(form.lastName),
+                    form_row(form.nameSuffix),
+                    form_row(form.birthday),
+                    form_row(form.avatar),
+                    form.vars.value.id ? '' : form_row(form.inviteUser),
+                ]
+            },
+            {
+                'title': '',
+                'data': [
+                    form_row(form.email),
+                    UI.collectionField(form.emails, 'oro.user.emails.label'|trans, 'Add another email'|trans),
+                    form_row(form.tags)
+                ]
+            }
+        ]
+    }] %}
+
+    {% if form.additional is defined and form.additional.children|length > 0 %}
+        {% set additionalData = [] %}
+        {% for value in form.additional %}
+            {% set additionalData = additionalData|merge([form_row(value)]) %}
+        {% endfor %}
+
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'Additional'|trans,
+            'subblocks': [{
+                'title': '',
+                'useSpan': false,
+                'data' : additionalData
+            }]
+        }] ) %}
+    {% endif %}
+
+    {% if form.change_password is defined %}
+        {% set dataBlocks = dataBlocks|merge( [{
+            'title': 'oro.user.password.label'|trans,
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_widget(form.change_password)
+                    ]
+                }
+            ]
+        }] ) %}
+    {% endif %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'oro.user.imap_configuration.label'|trans,
+        'subblocks': [{
+            'title': '',
+            'data': [form_widget(form.imapConfiguration)]
+        }]
+    }]) %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+    </div>
+{% endblock content_data %}

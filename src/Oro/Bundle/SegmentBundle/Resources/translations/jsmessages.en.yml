@@ -1,8 +1,16 @@
-"Confirm action": "Confirm action"
-"Please confirm that you want to refresh this segment.": "Please confirm that you want to refresh this segment."
-"Segment successfully processed.": "Segment successfully processed."
-"An unidentified error has occurred. Please contact your Administrator.": "An unidentified error has occurred. Please contact your Administrator."
-
 oro:
     segment:
         change_entity_confirmation: Changing the entity will erase all segment filters and columns. Do you want to continue?
+        refresh_dialog:
+            title: Confirm action
+            content: Please confirm that you want to refresh this segment.
+            success: Segment successfully processed.
+            error: An unidentified error has occurred. Please contact your Administrator.
+            okText: Yes
+        confirm:
+            unsaved_changes:
+                title: Unsaved changes
+                message: You have unsaved changes in {{ components }} that will be lost. Proceed anyway?
+        report_column_editor: the Report Column Editor
+        grouping_editor: the Grouping Editor
+
