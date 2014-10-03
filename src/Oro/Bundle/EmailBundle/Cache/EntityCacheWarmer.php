@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
+
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EntityCacheWarmer extends CacheWarmer
@@ -29,23 +31,31 @@ class EntityCacheWarmer extends CacheWarmer
     private $entityProxyNameTemplate;
 
     /**
+     * @var KernelInterface
+     */
+    protected $kernel;
+
+    /**
      * Constructor.
      *
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param string                    $entityCacheDir
      * @param string                    $entityCacheNamespace
      * @param string                    $entityProxyNameTemplate
+     * @param KernelInterface           $kernel
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         $entityCacheDir,
         $entityCacheNamespace,
-        $entityProxyNameTemplate
+        $entityProxyNameTemplate,
+        KernelInterface $kernel
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityCacheDir            = $entityCacheDir;
         $this->entityCacheNamespace      = $entityCacheNamespace;
         $this->entityProxyNameTemplate   = $entityProxyNameTemplate;
+        $this->kernel                    = $kernel;
     }
 
     /**
@@ -84,7 +94,7 @@ class EntityCacheWarmer extends CacheWarmer
      */
     protected function createTwigEnvironment()
     {
-        $entityTemplateDir = __DIR__ . '/../Resources/cache/Entity';
+        $entityTemplateDir = $this->kernel->locateResource('@OroEmailBundle/Resources/cache/Entity');
 
         return new \Twig_Environment(new \Twig_Loader_Filesystem($entityTemplateDir));
     }
