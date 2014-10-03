@@ -40,18 +40,20 @@
     {% endif %}
 {% else %}
     {% if organizations|length > 1 %}
-        <ul class="nav organization-switcher pull-left">
+        <ul class="nav organization-switcher">
             <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">
-                    <h1 class="logo">
-                        {% if oro_theme_logo() %}
-                            <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                        {% else %}
-                            {{ organization_name }}
-                        {% endif %}
+                <h1 class="logo dropdown-toggle" data-toggle="dropdown">
+                    <span>
+                        <a href="javascript: void(0);">
+                            {% if oro_theme_logo() %}
+                                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
+                            {% else %}
+                                {{ organization_name }}
+                            {% endif %}
+                        </a>
                         <span class="caret"></span>
-                    </h1>
-                </a>
+                    </span>
+                </h1>
                 <ul class="dropdown-menu">
                     {% for organization in organizations %}
                         <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
@@ -68,13 +70,15 @@
         </script>
     {% else %}
         <h1 class="logo">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-                {% if oro_theme_logo() %}
-                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                {% else %}
-                    {{ organization_name }}
-                {% endif %}
-            </a>
+            <span>
+                <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
+                    {% if oro_theme_logo() %}
+                        <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
+                    {% else %}
+                        {{ organization_name }}
+                    {% endif %}
+                </a>
+            </span>
         </h1>
     {% endif %}
 {% endif %}
