@@ -21,7 +21,7 @@ define([
             // button view
             button = new ButtonView({
                 autoRender: true,
-                el: 'pinButton',
+                el: 'favButton',
                 collection: collection
             });
             this.subview('button', button);
@@ -32,7 +32,7 @@ define([
             });
             tabOptions = _.extend(options.tabOptions, {
                 autoRender: true,
-                el: 'pinTab',
+                el: 'favTab',
                 collection: collection,
                 itemView: TabItemView
             });

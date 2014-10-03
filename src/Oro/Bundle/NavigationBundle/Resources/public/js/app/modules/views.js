@@ -46,8 +46,8 @@ require([
             keepElement: true,
             dataSource: '#favorite-content [data-data]',
             regions: {
-                pinButton: '#pin-button-div .favorite-button',
-                pinTab: '#favorite-content'
+                favButton: '#pin-button-div .favorite-button',
+                favTab: '#favorite-content'
             },
             tabItemTemplate: $('#template-dot-menu-item').html(),
             tabOptions: {
@@ -66,8 +66,9 @@ require([
         'oronavigation/js/app/views/page-state-view',
         'oronavigation/js/app/models/page-state-model'
     ], function ($, PinView, Model, Collection, PageStateView, PageStateModel) {
-        var pinCollection, stateModel;
+        var pinCollection, stateModel, template;
 
+        template = $('#template-list-pin-item').html();
         pinCollection = new Collection([], {
             model: Model
         });
@@ -78,18 +79,17 @@ require([
         BaseController.addToReuse('pagePin', PinView, {
             el: 'body',
             keepElement: true,
-            dataSource: '#pinbar-content [data-data]',
+            dataSource: '#pinbar [data-data]',
             regions: {
                 pinButton: '#pin-button-div .minimize-button',
-                pinTab: '#pinbar-content',
-                pinBar: '.list-bar'
+                pinTab: '#pinbar .show-more',
+                pinBar: '#pinbar .list-bar'
             },
-            tabItemTemplate: $('#template-dot-menu-item').html(),
+            tabItemTemplate: template,
             tabOptions: {
-                listSelector: '.extra-list',
-                fallbackSelector: '.dot-menu-empty-message'
+                listSelector: '.dropdown-menu ul'
             },
-            barItemTemplate: $('#template-list-pin-item').html(),
+            barItemTemplate: template,
             barOptions: {
                 listSelector: 'ul',
                 fallbackSelector: '.pin-bar-empty'
