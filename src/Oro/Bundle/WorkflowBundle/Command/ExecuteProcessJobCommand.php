@@ -63,8 +63,8 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
         }
 
         /** @var EntityManager $entityManager */
-        $entityManager = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
-        $processHandler    = $this->getContainer()->get('oro_workflow.process.process_handler');
+        $entityManager  = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
+        $processHandler = $this->getContainer()->get('oro_workflow.process.process_handler');
 
         /** @var ProcessJob $processJob */
         foreach ($processJobs as $processJob) {
@@ -72,9 +72,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             $entityManager->beginTransaction();
             try {
                 $processHandler->handleJob($processJob);
-                $entityManager->remove($processJob);
-                $entityManager->flush();
-                $entityManager->commit();
+                $this->finishJob($entityManager, $processJob);
 
                 $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
             } catch (\Exception $e) {
@@ -83,5 +81,16 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
                 $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
             }
         }
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     * @param ProcessJob $processJob
+     */
+    protected function finishJob(EntityManager $entityManager, ProcessJob $processJob)
+    {
+        $entityManager->remove($processJob);
+        $entityManager->flush();
+        $entityManager->commit();
     }
 }
