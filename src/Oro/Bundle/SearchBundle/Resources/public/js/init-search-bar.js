@@ -1,6 +1,11 @@
 /* global require */
-require(['jquery', 'underscore', 'routing', 'oroui/js/mediator'],
-function($, _, routing, mediator) {
+require([
+    'jquery',
+    'underscore',
+    'routing',
+    'oroui/js/mediator',
+    'orotranslation/js/translator'
+], function($, _, routing, mediator, __) {
   'use strict';
       $(function() {
           var _searchFlag = false,
@@ -64,27 +69,22 @@ function($, _, routing, mediator) {
                           max_results: 5
                       },
                       success: function(data) {
+                          var noResults;
                           searchBarContainer.removeClass('header-search-focused');
                           searchDropdown.html(data);
 
                           var countAll = searchDropdown.find('ul').attr('data-count');
                           var count = searchDropdown.find('li').length;
 
-                          if (countAll > count) {
+                          if (count === 0) {
+                              noResults = __('oro.search.quick_search.noresults');
+                              searchDropdown.html('<li><span>' + noResults + '</span></li>');
+                          } else if (countAll > count) {
                               searchDropdown.append($('.search-more').html());
                           }
 
                           $('#recordsCount').val(count);
-
-                          if (count > 0) {
-                              searchBarContainer.addClass('header-search-focused');
-
-                              /**
-                               * Backbone event. Fired when search ajax request is complete
-                               * @event top_search_request:complete
-                               */
-                              mediator.trigger('top_search_request:complete');
-                          }
+                          searchBarContainer.addClass('header-search-focused');
                       }
                   });
               }
