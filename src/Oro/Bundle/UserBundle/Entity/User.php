@@ -27,6 +27,8 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
@@ -76,7 +78,8 @@ class User extends ExtendUser implements
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
-    AdvancedApiUserInterface
+    AdvancedApiUserInterface,
+    OrganizationAwareInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -1701,10 +1704,10 @@ class User extends ExtendUser implements
     /**
      * Set organization
      *
-     * @param Organization $organization
+     * @param OrganizationInterface $organization
      * @return User
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
 
@@ -1714,7 +1717,7 @@ class User extends ExtendUser implements
     /**
      * Get organization
      *
-     * @return Organization
+     * @return OrganizationInterface
      */
     public function getOrganization()
     {

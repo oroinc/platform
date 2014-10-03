@@ -37,7 +37,10 @@ use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements NotificationEmailInterface, \Serializable
+class Organization extends ExtendOrganization implements
+    OrganizationInterface,
+    NotificationEmailInterface,
+    \Serializable
 {
     /**
      * @var integer
@@ -252,7 +255,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
      */
     public function __toString()
     {
-        return (string) $this->getName();
+        return (string)$this->getName();
     }
 
     /**
@@ -296,7 +299,7 @@ class Organization extends ExtendOrganization implements NotificationEmailInterf
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (boolean) $enabled;
+        $this->enabled = (boolean)$enabled;
 
         return $this;
     }
