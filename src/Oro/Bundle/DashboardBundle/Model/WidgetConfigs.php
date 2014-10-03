@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\Config\Resolver\ResolverInterface;
 
-class WidgetAttributes
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
+class WidgetConfigs
 {
     /** @var ConfigProvider */
     protected $configProvider;
@@ -62,6 +63,17 @@ class WidgetAttributes
     }
 
     /**
+     * Returns filtered list of widget configuration
+     * based on applicable flags and acl
+     *
+     * @return array
+     */
+    public function getWidgetConfigs()
+    {
+        return $this->filterWidgets($this->configProvider->getWidgetConfigs());
+    }
+
+    /**
      * Returns a list of items for the given widget
      *
      * @param string $widgetName The name of widget
@@ -72,11 +84,25 @@ class WidgetAttributes
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
+        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
+        $items = $this->filterWidgets($items);
+
+        return $items;
+    }
+
+    /**
+     * Filter widget configs based on acl and applicable flag
+     *
+     * @param array $items
+     *
+     * @return array filtered items
+     */
+    protected function filterWidgets(array $items)
+    {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
 
-        $items = isset($widgetConfig['items']) ? $widgetConfig['items'] : [];
-        $items = array_filter(
+        return array_filter(
             $items,
             function (&$item) use ($securityFacade, $resolver) {
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
@@ -91,7 +117,5 @@ class WidgetAttributes
                 return $accessGranted && $applicable;
             }
         );
-
-        return $items;
     }
 }
