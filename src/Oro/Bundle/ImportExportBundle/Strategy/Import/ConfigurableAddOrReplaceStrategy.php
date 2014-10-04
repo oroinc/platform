@@ -183,16 +183,14 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
                 // additional search parameters to find only related entities
                 $searchContext = array();
-                if ($inversedFieldName && $this->databaseHelper->getIdentifier($entity)) {
-                    if ($this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
-                        $searchContext[$inversedFieldName] = $entity;
-                    } else {
-                        $searchContext[$inversedFieldName] = array($entity);
-                    }
+                if ($isPersistRelation && $inversedFieldName
+                    && $this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)
+                ) {
+                    $searchContext[$inversedFieldName] = $entity;
                 }
 
-                // single relation
                 if ($this->fieldHelper->isSingleRelation($field)) {
+                    // single relation
                     $relationEntity = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationEntity) {
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
@@ -240,7 +238,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param array $fields
      * @param array $searchContext
      * @return null|object
-    */
+     */
     protected function findExistingEntity($entity, array $fields, array $searchContext = array())
     {
         $entityName = ClassUtils::getClass($entity);
@@ -253,27 +251,33 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         // find by identity fields
-        if (!$existingEntity) {
+        if (!$existingEntity
+            && (!$searchContext || $this->databaseHelper->getIdentifier(current($searchContext)))
+        ) {
             $identityValues = $searchContext;
-            foreach ($fields as $field) {
-                $fieldName = $field['name'];
-                if (!$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                    && $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                ) {
-                    $identityValues[$fieldName] = $this->fieldHelper->getObjectValue($entity, $fieldName);
-                }
-            }
-
-            // try to find entity by identity fields if at least one is specified
-            foreach ($identityValues as $value) {
-                if (null !== $value && '' !== $value) {
-                    $existingEntity = $this->databaseHelper->findOneBy($entityName, $identityValues);
-                    break;
-                }
-            }
+            $identityValues += $this->fieldHelper->getIdentityValues($entity, $fields);
+            $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
         }
 
         return $existingEntity;
+    }
+
+    /**
+     * Try to find entity by identity fields if at least one is specified
+     *
+     * @param string $entityName
+     * @param array $identityValues
+     * @return null|object
+     */
+    protected function findEntityByIdentityValues($entityName, array $identityValues)
+    {
+        foreach ($identityValues as $value) {
+            if (null !== $value && '' !== $value) {
+                return $this->databaseHelper->findOneBy($entityName, $identityValues);
+            }
+        }
+
+        return null;
     }
 
     /**
