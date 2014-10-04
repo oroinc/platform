@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 
@@ -13,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 
 class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
@@ -25,6 +28,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @var ContextInterface
      */
     protected $context;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @var ImportStrategyHelper
@@ -47,12 +55,18 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected $cachedEntities = array();
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $helper
      * @param FieldHelper $fieldHelper
      * @param DatabaseHelper $databaseHelper
      */
-    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper, DatabaseHelper $databaseHelper)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ImportStrategyHelper $helper,
+        FieldHelper $fieldHelper,
+        DatabaseHelper $databaseHelper
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
         $this->strategyHelper = $helper;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
@@ -331,7 +345,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function beforeProcessEntity($entity)
     {
-        return $entity;
+        $event = new StrategyEvent($this, $entity);
+        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_BEFORE, $event);
+        return $event->getEntity();
     }
 
     /**
@@ -340,6 +356,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function afterProcessEntity($entity)
     {
-        return $entity;
+        $event = new StrategyEvent($this, $entity);
+        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_AFTER, $event);
+        return $event->getEntity();
     }
 }
