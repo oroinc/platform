@@ -10,6 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -47,10 +48,8 @@ class OrganizationFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!empty($options['data_class']) && $this->isClassSupported($options['data_class'])) {
-            // listener must be executed before validation
-            $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
-        }
+        // listener must be executed before validation
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
     }
 
     /**
@@ -58,9 +57,33 @@ class OrganizationFormExtension extends AbstractTypeExtension
      */
     public function onPostSubmit(FormEvent $event)
     {
-        $entity = $event->getData();
+        $data = $event->getForm()->getData();
+        if (!$data) {
+            return;
+        }
+
+        if (is_array($data) || $data instanceof \Traversable) {
+            foreach ($data as $value) {
+                if (is_object($value)) {
+                    $this->updateOrganization($value);
+                }
+            }
+        } elseif (is_object($data)) {
+            $this->updateOrganization($data);
+        }
+    }
+
+    /**
+     * @param object $entity
+     */
+    protected function updateOrganization($entity)
+    {
+        if (!$this->isClassSupported(ClassUtils::getClass($entity))) {
+            return;
+        }
+
         $organization = $this->securityFacade->getOrganization();
-        if ($entity && $organization) {
+        if ($organization) {
             $propertyAccessor = $this->getPropertyAccessor();
             if (!$propertyAccessor->getValue($entity, self::RELATION_NAME)) {
                 $propertyAccessor->setValue($entity, self::RELATION_NAME, $organization);

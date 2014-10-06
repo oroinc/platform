@@ -428,4 +428,28 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    public function testGetIdentityValues()
+    {
+        $this->config['stdClass'] = array(
+            'excludedField' => array('excluded' => true),
+            'identityField' => array('identity' => true),
+            'regularField'  => array(),
+        );
+
+        $fields = array(
+            array('name' => 'excludedField'),
+            array('name' => 'identityField'),
+            array('name' => 'regularField'),
+        );
+
+        $entity = new \stdClass();
+        $entity->excludedField = 'excludedValue';
+        $entity->identityField = 'identityValue';
+        $entity->regularField  = 'regularValue';
+
+        $expectedIdentityValues = array('identityField' => 'identityValue');
+
+        $this->assertEquals($expectedIdentityValues, $this->helper->getIdentityValues($entity, $fields));
+    }
 }
