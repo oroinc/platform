@@ -85,7 +85,8 @@ table.grid .number-cell,
 table.grid .integer-cell {
     text-align: right;
 }
-table.grid .datetime-cell {
+table.grid .datetime-cell,
+table.grid .date-cell {
     white-space: nowrap;
 }
 table.grid .string-cell ul.unstyled {
