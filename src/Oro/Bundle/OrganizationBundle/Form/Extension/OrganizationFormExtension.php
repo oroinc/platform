@@ -58,9 +58,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
     public function onPostSubmit(FormEvent $event)
     {
         $data = $event->getForm()->getData();
-        if (!$data) {
-            return;
-        }
 
         if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $value) {
