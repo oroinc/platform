@@ -299,13 +299,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         layout.onPageRendered(adjustHeight);
 
-        $(window).on('resize', _.debounce(adjustHeight, 40));
+        $(window).on('resize', adjustHeight);
 
         mediator.on("page:afterChange", adjustReloaded);
 
         mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);
-        mediator.on('datagrid:rendered datagrid_filters:rendered widget_remove', scrollspy.adjust);
+        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
 
         adjustHeight();
     });

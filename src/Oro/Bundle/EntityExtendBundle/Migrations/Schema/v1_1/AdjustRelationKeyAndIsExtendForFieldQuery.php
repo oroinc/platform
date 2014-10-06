@@ -76,7 +76,7 @@ class AdjustRelationKeyAndIsExtendForFieldQuery extends ParametrizedMigrationQue
                     if (count($parts) === 4 && $parts[0] !== $this->fieldTypeHelper->getUnderlyingType($parts[0])) {
                         // change field type to relation type in extend.relation_key attribute
                         $parts[0] = $this->fieldTypeHelper->getUnderlyingType($parts[0]);
-                        $data['extend']['relation_key'] = implode('|', $parts[0]);
+                        $data['extend']['relation_key'] = implode('|', $parts);
                     }
                 }
 
