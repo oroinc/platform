@@ -8,9 +8,6 @@ table.grid thead th span.caret {
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
 }
-table.grid thead .btn-group .btn .caret {
-    margin-top:11px;
-}
 table.grid thead th.ascending span.caret {
     margin-top:4px;
     display: inline-block;
