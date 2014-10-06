@@ -48,18 +48,12 @@ class DatabaseHelper
         $where = array();
 
         foreach ($criteria as $field => $value) {
-            if (is_array($value)) {
-                $value = current($value);
-                $criteria[$field] = $value;
+            if (is_object($value)) {
                 $serializationCriteria[$field] = $this->getIdentifier($value);
-                $where[] = sprintf(':%s MEMBER OF e.%s', $field, $field);
-            } elseif (is_object($value)) {
-                $serializationCriteria[$field] = $this->getIdentifier($value);
-                $where[] = sprintf('e.%s = :%s', $field, $field);
             } else {
                 $serializationCriteria[$field] = $value;
-                $where[] = sprintf('e.%s = :%s', $field, $field);
             }
+            $where[] = sprintf('e.%s = :%s', $field, $field);
         }
 
         $storageKey = serialize($serializationCriteria);

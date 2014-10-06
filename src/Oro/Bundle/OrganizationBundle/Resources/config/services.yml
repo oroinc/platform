@@ -15,6 +15,7 @@ parameters:
     oro_organization.listener.config_subscriber.class:         Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
+    oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
 
     oro_organization.provider.business_units.class:            Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
 
@@ -131,6 +132,13 @@ services:
         class: %oro_organization.listener.config_subscriber.class%
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_organization.import_strategy.listener:
+        class: %oro_organization.import_strategy.listener.class%
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
 
     #
     # DataGrid

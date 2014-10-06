@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -221,5 +222,27 @@ class FieldHelper
         }
 
         return !empty($data[$fieldName]) ? $data[$fieldName] : array();
+    }
+
+    /**
+     * @param object $entity
+     * @param array $fields
+     * @return array
+     */
+    public function getIdentityValues($entity, array $fields)
+    {
+        $entityName = ClassUtils::getClass($entity);
+
+        $identityValues = array();
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
+                && $this->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $identityValues[$fieldName] = $this->getObjectValue($entity, $fieldName);
+            }
+        }
+
+        return $identityValues;
     }
 }

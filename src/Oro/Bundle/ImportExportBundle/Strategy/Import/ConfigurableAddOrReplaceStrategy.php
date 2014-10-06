@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 
@@ -14,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
+use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 
 class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
 {
@@ -26,6 +28,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @var ContextInterface
      */
     protected $context;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @var ImportStrategyHelper
@@ -48,12 +55,18 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected $cachedEntities = array();
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $helper
      * @param FieldHelper $fieldHelper
      * @param DatabaseHelper $databaseHelper
      */
-    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper, DatabaseHelper $databaseHelper)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ImportStrategyHelper $helper,
+        FieldHelper $fieldHelper,
+        DatabaseHelper $databaseHelper
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
         $this->strategyHelper = $helper;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
@@ -183,16 +196,14 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
                 // additional search parameters to find only related entities
                 $searchContext = array();
-                if ($inversedFieldName && $this->databaseHelper->getIdentifier($entity)) {
-                    if ($this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
-                        $searchContext[$inversedFieldName] = $entity;
-                    } else {
-                        $searchContext[$inversedFieldName] = array($entity);
-                    }
+                if ($isPersistRelation && $inversedFieldName
+                    && $this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)
+                ) {
+                    $searchContext[$inversedFieldName] = $entity;
                 }
 
-                // single relation
                 if ($this->fieldHelper->isSingleRelation($field)) {
+                    // single relation
                     $relationEntity = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationEntity) {
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
@@ -240,7 +251,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param array $fields
      * @param array $searchContext
      * @return null|object
-    */
+     */
     protected function findExistingEntity($entity, array $fields, array $searchContext = array())
     {
         $entityName = ClassUtils::getClass($entity);
@@ -253,27 +264,33 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         // find by identity fields
-        if (!$existingEntity) {
+        if (!$existingEntity
+            && (!$searchContext || $this->databaseHelper->getIdentifier(current($searchContext)))
+        ) {
             $identityValues = $searchContext;
-            foreach ($fields as $field) {
-                $fieldName = $field['name'];
-                if (!$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                    && $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                ) {
-                    $identityValues[$fieldName] = $this->fieldHelper->getObjectValue($entity, $fieldName);
-                }
-            }
-
-            // try to find entity by identity fields if at least one is specified
-            foreach ($identityValues as $value) {
-                if (null !== $value && '' !== $value) {
-                    $existingEntity = $this->databaseHelper->findOneBy($entityName, $identityValues);
-                    break;
-                }
-            }
+            $identityValues += $this->fieldHelper->getIdentityValues($entity, $fields);
+            $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
         }
 
         return $existingEntity;
+    }
+
+    /**
+     * Try to find entity by identity fields if at least one is specified
+     *
+     * @param string $entityName
+     * @param array $identityValues
+     * @return null|object
+     */
+    protected function findEntityByIdentityValues($entityName, array $identityValues)
+    {
+        foreach ($identityValues as $value) {
+            if (null !== $value && '' !== $value) {
+                return $this->databaseHelper->findOneBy($entityName, $identityValues);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -287,8 +304,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
-            $this->clearEntityRelations($entity);
-
             return null;
         }
 
@@ -301,25 +316,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
-    }
-
-    /**
-     * Clear entity multiple relations if entity isn't valid,
-     * used to prevent usage of this entity in related collections
-     *
-     * @param object $entity
-     */
-    protected function clearEntityRelations($entity)
-    {
-        $entityName = ClassUtils::getClass($entity);
-        $fields = $this->fieldHelper->getFields($entityName, true);
-
-        foreach ($fields as $field) {
-            if ($this->fieldHelper->isMultipleRelation($field)) {
-                $fieldName = $field['name'];
-                $this->fieldHelper->setObjectValue($entity, $fieldName, new ArrayCollection());
-            }
-        }
     }
 
     /**
@@ -349,7 +345,9 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function beforeProcessEntity($entity)
     {
-        return $entity;
+        $event = new StrategyEvent($this, $entity);
+        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_BEFORE, $event);
+        return $event->getEntity();
     }
 
     /**
@@ -358,6 +356,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      */
     protected function afterProcessEntity($entity)
     {
-        return $entity;
+        $event = new StrategyEvent($this, $entity);
+        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_AFTER, $event);
+        return $event->getEntity();
     }
 }
