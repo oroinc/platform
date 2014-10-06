@@ -202,7 +202,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from height_fix.js
      * ============================================================ */
-    (function () {
+    $(function () {
         if (tools.isMobile()) {
             return;
         }
@@ -299,18 +299,16 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         layout.onPageRendered(adjustHeight);
 
-        $(window).on('resize', adjustHeight);
+        $(window).on('resize', _.debounce(adjustHeight, 40));
 
         mediator.on("page:afterChange", adjustReloaded);
 
         mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);
-        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
+        mediator.on('datagrid:rendered datagrid_filters:rendered widget_remove', scrollspy.adjust);
 
-        $(function () {
-            adjustHeight();
-        });
-    }());
+        adjustHeight();
+    });
 
     /* ============================================================
      * from form_buttons.js
