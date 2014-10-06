@@ -62,7 +62,7 @@ class RefreshContextListener
         }
 
         $user = $token->getUser();
-        if ($user && (!$className || $className == ClassUtils::getClass($user))) {
+        if (is_object($user) && (!$className || $className == ClassUtils::getClass($user))) {
             $user = $this->refreshEntity($user);
             if ($user) {
                 $token->setUser($user);
@@ -71,7 +71,7 @@ class RefreshContextListener
 
         if ($token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
-            if ($organization && (!$className || $className == ClassUtils::getClass($organization))) {
+            if (is_object($organization) && (!$className || $className == ClassUtils::getClass($organization))) {
                 /** @var Organization $organization */
                 $organization = $this->refreshEntity($organization);
                 if ($organization) {
