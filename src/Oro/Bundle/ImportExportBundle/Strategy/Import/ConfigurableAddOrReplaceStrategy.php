@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -14,10 +15,10 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
-use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
-use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 
-class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
+class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
+    ContextAwareInterface,
+    EntityNameAwareInterface
 {
     /**
      * @var string
@@ -66,7 +67,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper
     ) {
-        $this->eventDispatcher = $eventDispatcher;
+        parent::__construct($eventDispatcher);
+
         $this->strategyHelper = $helper;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
@@ -127,6 +129,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         $entityName = ClassUtils::getClass($entity);
         $fields = $this->fieldHelper->getFields($entityName, true);
 
+        // update relations
+        if ($isFullData) {
+            $this->updateRelations($entity, $fields, $itemData);
+        }
+
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $fields, $searchContext);
         if ($existingEntity) {
@@ -147,35 +154,47 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
-                $excludedFields = array($identifierName);
-
-                foreach ($fields as $key => $field) {
-                    $fieldName = $field['name'];
-
-                    // exclude fields marked as "excluded" and not specified field
-                    // do not exclude identity fields
-                    if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                        || $itemData !== null && !array_key_exists($fieldName, $itemData)
-                        && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                    ) {
-                        $excludedFields[] = $fieldName;
-                        unset($fields[$key]); // do not update relations for excluded fields
-                    }
-                }
-
-                $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
+                $this->importExistingEntity($existingEntity, $entity, $itemData);
             }
 
             $entity = $existingEntity;
         }
 
-        // update relations
-        if ($isFullData) {
-            $this->updateRelations($entity, $fields, $itemData);
+        return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param object $existingEntity
+     * @param mixed|array|null $itemData
+     * @param array $excludedFields
+     */
+    protected function importExistingEntity(
+        $entity,
+        $existingEntity,
+        $itemData = null,
+        array $excludedFields = array()
+    ) {
+        $entityName = ClassUtils::getClass($entity);
+        $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $excludedFields[] = $identifierName;
+        $fields = $this->fieldHelper->getFields($entityName, true);
+
+        foreach ($fields as $key => $field) {
+            $fieldName = $field['name'];
+
+            // exclude fields marked as "excluded" and not specified field
+            // do not exclude identity fields
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
+                || $itemData !== null && !array_key_exists($fieldName, $itemData)
+                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $excludedFields[] = $fieldName;
+                unset($fields[$key]); // do not update relations for excluded fields
+            }
         }
 
-        return $entity;
+        $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
     }
 
     /**
@@ -221,7 +240,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                     $relationCollection = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationCollection instanceof Collection) {
                         $collectionItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
-                        $collectionEntities = array();
+                        $collectionEntities = new ArrayCollection();
 
                         foreach ($relationCollection as $collectionEntity) {
                             $entityItemData = $this->fieldHelper->getItemData(array_shift($collectionItemData));
@@ -234,12 +253,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                             );
 
                             if ($collectionEntity) {
-                                $collectionEntities[] = $collectionEntity;
+                                $collectionEntities->add($collectionEntity);
                             }
                         }
 
-                        $relationCollection->clear();
-                        $this->fieldHelper->setObjectValue($entity, $fieldName, $collectionEntities);
+                        $this->mergeCollections($relationCollection, $collectionEntities);
                     }
                 }
             }
@@ -337,27 +355,5 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if (!$entity instanceof $entityName) {
             throw new InvalidArgumentException(sprintf('Imported entity must be instance of %s', $entityName));
         }
-    }
-
-    /**
-     * @param object $entity
-     * @return object
-     */
-    protected function beforeProcessEntity($entity)
-    {
-        $event = new StrategyEvent($this, $entity);
-        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_BEFORE, $event);
-        return $event->getEntity();
-    }
-
-    /**
-     * @param object $entity
-     * @return object
-     */
-    protected function afterProcessEntity($entity)
-    {
-        $event = new StrategyEvent($this, $entity);
-        $this->eventDispatcher->dispatch(StrategyEvent::PROCESS_AFTER, $event);
-        return $event->getEntity();
     }
 }

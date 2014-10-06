@@ -26,6 +26,9 @@ class FieldHelper
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
+    /** @var array */
+    protected $fieldsCache = array();
+
     /**
      * @param EntityFieldProvider     $fieldProvider
      * @param ConfigProviderInterface $configProvider
@@ -60,15 +63,21 @@ class FieldHelper
         $applyExclusions = false,
         $translate = true
     ) {
-        return $this->fieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            $withVirtualFields,
-            $withEntityDetails,
-            $withUnidirectional,
-            $applyExclusions,
-            $translate
-        );
+        $args = func_get_args();
+        $cacheKey = implode(':', $args);
+        if (!array_key_exists($cacheKey, $this->fieldsCache)) {
+            $this->fieldsCache[$cacheKey] = $this->fieldProvider->getFields(
+                $entityName,
+                $withRelations,
+                $withVirtualFields,
+                $withEntityDetails,
+                $withUnidirectional,
+                $applyExclusions,
+                $translate
+            );
+        }
+
+        return $this->fieldsCache[$cacheKey];
     }
 
     /**
