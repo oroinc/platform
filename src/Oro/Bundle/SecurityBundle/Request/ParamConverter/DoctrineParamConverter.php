@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -38,12 +38,12 @@ class DoctrineParamConverter extends BaseParamConverter
     /**
      * Stores the object in the request.
      *
-     * @param Request                $request
-     * @param ConfigurationInterface $configuration
+     * @param Request        $request
+     * @param ParamConverter $configuration
      * @return bool
      * @throws AccessDeniedException When User doesn't have permission to the object
      */
-    public function apply(Request $request, ConfigurationInterface $configuration)
+    public function apply(Request $request, ParamConverter $configuration)
     {
         $request->attributes->set('_oro_access_checked', false);
         $isSet = parent::apply($request, $configuration);
