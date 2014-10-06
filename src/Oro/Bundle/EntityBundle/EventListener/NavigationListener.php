@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Symfony\Component\Translation\Translator;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
@@ -16,30 +17,24 @@ class NavigationListener
      */
     protected $securityFacade;
 
-    /** @var ConfigProvider $entityConfigProvider */
-    protected $entityConfigProvider = null;
-
-    /** @var ConfigProvider $entityExtendProvider */
-    protected $entityExtendProvider = null;
+    /** @var ConfigManager $configManager */
+    protected $configManager;
 
     /** @var  Translator */
     protected $translator;
 
     /**
      * @param SecurityFacade $securityFacade
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $entityExtendProvider
+     * @param ConfigManager  $configManager
      * @param Translator     $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        ConfigProvider $entityConfigProvider,
-        ConfigProvider $entityExtendProvider,
+        ConfigManager $configManager,
         Translator $translator
     ) {
         $this->securityFacade       = $securityFacade;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->entityExtendProvider = $entityExtendProvider;
+        $this->configManager        = $configManager;
         $this->translator           = $translator;
     }
 
@@ -53,7 +48,13 @@ class NavigationListener
 
         $entitiesMenuItem = $menu->getChild('system_tab')->getChild('entities_list');
         if ($entitiesMenuItem) {
-            $extendConfigs = $this->entityExtendProvider->getConfigs();
+            /** @var ConfigProvider $entityConfigProvider */
+            $entityConfigProvider = $this->configManager->getProvider('entity');
+
+            /** @var ConfigProvider $entityExtendProvider */
+            $entityExtendProvider = $this->configManager->getProvider('extend');
+
+            $extendConfigs = $entityExtendProvider->getConfigs();
 
             foreach ($extendConfigs as $extendConfig) {
                 if ($extendConfig->is('is_extend')
@@ -63,7 +64,7 @@ class NavigationListener
                         [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                     )
                 ) {
-                    $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
+                    $config = $entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
                     if (!class_exists($config->getId()->getClassName()) ||
                         !$this->securityFacade->hasLoggedUser() ||
                         !$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
