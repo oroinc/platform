@@ -61,7 +61,7 @@ class MergeMassAction extends AbstractMassAction
             $options['label'] = $this->translator
                 ->trans(
                     'oro.entity_merge.action.merge',
-                    ['{{ label }}' => $metadata->get('label')]
+                    ['{{ label }}' => $this->translator->trans($metadata->get('label'))]
                 );
         }
 
