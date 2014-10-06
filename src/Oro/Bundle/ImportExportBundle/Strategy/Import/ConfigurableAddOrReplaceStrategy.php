@@ -93,8 +93,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * @param object $entity
-     * @param bool   $isFullData
-     * @param bool   $isPersistNew
+     * @param bool $isFullData
+     * @param bool $isPersistNew
      * @param mixed|array|null $itemData
      * @return null|object
      */
@@ -106,7 +106,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         $entityName = ClassUtils::getClass($entity);
-        $fields = $this->fieldHelper->getFields($entityName, true);
+        $fields = $this->getEntityFields($entityName);
 
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $fields);
@@ -128,24 +128,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
-                $excludedFields = array($identifierName);
-
-                foreach ($fields as $key => $field) {
-                    $fieldName = $field['name'];
-
-                    // exclude fields marked as "excluded" and not specified field
-                    // do not exclude identity fields
-                    if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                        || $itemData !== null && !array_key_exists($fieldName, $itemData)
-                        && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                    ) {
-                        $excludedFields[] = $fieldName;
-                        unset($fields[$key]); // do not update relations for excluded fields
-                    }
-                }
-
-                $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
+                $this->importExistingEntity($existingEntity, $entity, $itemData);
             }
 
             $entity = $existingEntity;
@@ -157,6 +140,49 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param object $existingEntity
+     * @param mixed|array|null $itemData
+     * @param array $excludedFields
+     */
+    protected function importExistingEntity(
+        $entity,
+        $existingEntity,
+        $itemData,
+        array $excludedFields = array()
+    ) {
+        $entityName = ClassUtils::getClass($entity);
+        $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $excludedFields[] = $identifierName;
+        $fields = $this->getEntityFields($entityName);
+
+        foreach ($fields as $key => $field) {
+            $fieldName = $field['name'];
+
+            // exclude fields marked as "excluded" and not specified field
+            // do not exclude identity fields
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
+                || $itemData !== null && !array_key_exists($fieldName, $itemData)
+                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $excludedFields[] = $fieldName;
+                unset($fields[$key]); // do not update relations for excluded fields
+            }
+        }
+
+        $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
+    }
+
+    /**
+     * @param string $entityName
+     * @return array
+     */
+    protected function getEntityFields($entityName)
+    {
+        return $this->fieldHelper->getFields($entityName, true);
     }
 
     /**
@@ -220,7 +246,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @param object $entity
      * @param array $fields
      * @return null|object
-    */
+     */
     protected function findExistingEntity($entity, array $fields)
     {
         $entityName = ClassUtils::getClass($entity);
