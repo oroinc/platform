@@ -136,9 +136,12 @@ services:
     oro_organization.import_strategy.listener:
         class: %oro_organization.import_strategy.listener.class%
         arguments:
-            - @oro_security.security_facade
+            - @doctrine
+            - @oro_security.security_facade.link
+            - @oro_security.owner.ownership_metadata_provider.link
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
+            - { name: doctrine.event_listener, event: onClear }
 
     #
     # DataGrid

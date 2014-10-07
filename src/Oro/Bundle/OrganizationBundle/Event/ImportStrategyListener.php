@@ -2,22 +2,59 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ImportStrategyListener
 {
     /**
-     * @var SecurityFacade
+     * @var ManagerRegistry
      */
-    protected $securityFacade;
+    protected $registry;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @var ServiceLink
      */
-    public function __construct(SecurityFacade $securityFacade)
-    {
-        $this->securityFacade = $securityFacade;
+    protected $securityFacadeLink;
+
+    /**
+     * @var ServiceLink
+     */
+    protected $metadataProviderLink;
+
+    /**
+     * @var Organization
+     */
+    protected $defaultOrganization;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
+     * @param ManagerRegistry $registry
+     * @param ServiceLink $securityFacadeLink
+     * @param ServiceLink $metadataProviderLink
+     */
+    public function __construct(
+        ManagerRegistry $registry,
+        ServiceLink $securityFacadeLink,
+        ServiceLink $metadataProviderLink
+    ) {
+        $this->registry = $registry;
+        $this->securityFacadeLink = $securityFacadeLink;
+        $this->metadataProviderLink = $metadataProviderLink;
     }
 
     /**
@@ -27,23 +64,72 @@ class ImportStrategyListener
     {
         $entity = $event->getEntity();
 
-        if (!$this->isSupported($entity) || $entity->getOrganization()) {
+        /** @var OwnershipMetadataProvider $metadataProvider */
+        $metadataProvider = $this->metadataProviderLink->getService();
+
+        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getOrganizationFieldName();
+        if (!$organizationField) {
             return;
         }
 
-        $organization = $this->securityFacade->getOrganization();
+        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
         if ($organization) {
-            $entity->setOrganization($organization);
+            return;
         }
+
+        /** @var SecurityFacade $securityFacade */
+        $securityFacade = $this->securityFacadeLink->getService();
+        $organization = $securityFacade->getOrganization();
+        if (!$organization) {
+            $organization = $this->getDefaultOrganization();
+        }
+
+        if (!$organization) {
+            return;
+        }
+
+        $this->getPropertyAccessor()->setValue($entity, $organizationField, $organization);
     }
 
     /**
-     * @param object $entity
-     * @return bool
+     * Clear default organization on doctrine entity manager clear
      */
-    protected function isSupported($entity)
+    public function onClear()
     {
-        // TODO: use OrganizationAwareInterface after implementation of https://magecore.atlassian.net/browse/BAP-5542
-        return method_exists($entity, 'getOrganization') && method_exists($entity, 'setOrganization');
+        $this->defaultOrganization = null;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getDefaultOrganization()
+    {
+        if (null === $this->defaultOrganization) {
+            /** @var EntityRepository $entityRepository */
+            $entityRepository = $this->registry->getRepository('OroOrganizationBundle:Organization');
+            $organizations = $entityRepository->createQueryBuilder('e')
+                ->setMaxResults(2)
+                ->getQuery()
+                ->getResult();
+            if (count($organizations) == 1) {
+                $this->defaultOrganization = current($organizations);
+            } else {
+                $this->defaultOrganization = false;
+            }
+        }
+
+        return $this->defaultOrganization ?: null;
     }
 }
