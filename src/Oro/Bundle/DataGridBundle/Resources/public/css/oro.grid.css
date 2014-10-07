@@ -30,6 +30,7 @@ table.grid thead th.ascending span.caret {
     border-bottom: 4px solid #000000;
 }
 table.grid thead th.descending span.caret {
+    margin-top: 4px;
     display: inline-block;
     border-bottom:4px solid transparent;
     border-top: 4px solid #000000;
