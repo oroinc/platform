@@ -176,7 +176,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         $entityName = ClassUtils::getClass($entity);
         $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
         $excludedFields[] = $identifierName;
-        $fields = $this->getEntityFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
