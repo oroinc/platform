@@ -2820,16 +2820,23 @@ label.radio.error {
   &>div {
     position: relative;
     padding: 10px 15px 0 0;
-    margin: 0 0 10px;
-    border: 1px dashed #ededed;
+    margin: 0 0 20px;
+    border: 1px solid #e6e6e6;
+    background: #f8f8f8;
+    border-radius: 4px;
   }
   .add-list-item {
     margin-left: 183px;
   }
   .removeRow {
     position: absolute;
-    top: 0;
-    right: 10px;
+    width: 28px;
+    top: 4px;
+    right: 4px;
+    text-decoration: none;
+    &:after {
+      color: #bbb;
+    }
   }
 }
 
