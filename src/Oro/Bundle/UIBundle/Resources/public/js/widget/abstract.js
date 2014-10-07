@@ -598,7 +598,6 @@ define([
             this._show();
             mediator.execute('layout:init', this.widget);
             mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
         },
 
         /**

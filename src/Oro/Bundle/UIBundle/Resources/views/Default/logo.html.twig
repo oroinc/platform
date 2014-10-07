@@ -1,19 +1,8 @@
 {% if isDesktopVersion() %}
     {% placeholder organization_selector %}
 {% else %}
-    {% set organization_name %}
-        {% placeholder organization_name %}
-    {% endset %}
     <span id="main-menu-toggle">
         <i class="icon-menu-bars"></i>
     </span>
-    <h1 class="logo">
-        <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-            {% if oro_theme_logo() %}
-                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-            {% else %}
-                {{ organization_name }}
-            {% endif %}
-        </a>
-    </h1>
+    {% placeholder organization_selector %}
 {% endif %}

@@ -190,9 +190,22 @@
 .ui-multiselect.filter-list {
     background: none;
     border: none;
-    padding: 6px 0 4px 6px;
     font-size: 13px;
     font-weight: bold;
+    padding: 9px 0 7px 6px;
+    line-height: 1em;
+}
+
+.ui-multiselect.filter-list:hover #add-filter-button span.caret {
+    border-top-color: #005099; /* @linkColorHover; */
+}
+
+.ui-multiselect.filter-list:hover a {
+    color: #005099; /* @linkColorHover; */
+}
+
+.ui-multiselect.filter-list.select-filter-widget span.caret {
+    margin-top: 5px;
 }
 
 .ui-multiselect.filter-list.ui-state-hover {
@@ -209,7 +222,8 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     color:#444;
 }
 .filter-criteria .dropdown-menu a:hover {
-  background:#3875d7;
+    background:#3875d7;
+    color:#444;
 }
 .filter-criteria .nav-tabs-oro a:hover,
 .filter-criteria .nav-tabs-oro a:focus{
