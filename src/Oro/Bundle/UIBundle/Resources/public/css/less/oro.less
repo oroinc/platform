@@ -876,7 +876,7 @@ footer {
   background: url("../../img/general-sprite.png") no-repeat 0 -156px;
 }
 .page-title h1 {
-  min-height:30px;
+  min-height:28px;
   font-size:20px;
   line-height:1.2em;
 }
@@ -1109,12 +1109,13 @@ footer {
 
 .more-bar-holder {
   .dropdown-toggle {
-    float: left;
     padding: 0;
-    margin-top:-14px;
     color:#999;
     font-size:16px;
-    line-height:.1em;
+    line-height:.7em;
+    width: 23px;
+    height: 19px;
+    float: left;
     &:hover,
     &:focus {
       border: 0;
@@ -1192,7 +1193,7 @@ footer {
   overflow: auto;
 }
 .navbar-extra {
-  padding: 10px 0;
+  padding: 0;
   .customer-info-top-actions a {
     height: 24px;
     line-height: 24px;
@@ -1203,6 +1204,14 @@ footer {
   .icons-holder a {
     height: 24px;
     line-height: 24px;
+  }
+  > .row > .pull-left{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  > .row > .pull-right{
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 }
 .icons-holder .icons-holder-text [class^="icon-"] {
@@ -1219,7 +1228,7 @@ footer {
 .navigation {
   position: relative;
   .top-action-box {
-    padding: 4px 0 0;
+    padding: 3px 12px;
     background-color: #fff;
     float:right;
   }
@@ -1586,8 +1595,14 @@ footer {
   border: 1px solid #bbb;
 }
 .user-info-state {
-  padding: 10px 0 0;
   clear: right;
+  .inline-decorate-container{
+    margin-top:10px;
+    margin-bottom:-10px;
+    .inline-decorate{
+      margin-bottom:10px;
+    }
+  }
 }
 .user-profile-cols .label {
   display:block;
@@ -1695,21 +1710,27 @@ footer {
         font:11px 'FontAwesome';
         color:#ccc;
       }
+      &:hover:before {
+        color:#999;
+      }
     }
   }
 }
 
 .sub-title a { color:#888; }
 .customer-info {
-  padding-top:3px;
+  padding-top: 4px;
   padding-left: 60px;
   padding-bottom: 0;
   line-height: 18px;
+  &.customer-simple {
+    padding:0 4px 0 0;
+  }
   .sub-title {
     font-size: 17px;
     color: #999;
     float: left;
-    margin-bottom: 7px;
+    margin-bottom: 3px;
   }
   .separator {
     float: left;
@@ -1718,7 +1739,7 @@ footer {
     font-size: 18px;
   }
   .user-name {
-    margin: 0 10px 7px 0;
+    margin: 0 10px 3px 0;
     font-size: 19px;
     min-height: 15px;
     line-height: 22px;
@@ -1740,7 +1761,7 @@ footer {
     width: 60px;
     margin: 0 0 0 -60px;
     img {
-      margin-top:-3px;
+      margin-top:-4px;
       .border-radius(3px);
       width: 45px;
     }
@@ -2521,8 +2542,8 @@ div.selector.disabled span {
 h5.user-fieldset {
   font-weight:bold;
   font-size:15px;
-  line-height:18px;
-  margin: 0 10px 10px 0;
+  line-height:15px;
+  margin: 0 10px 20px 0;
 }
 /*.user-fieldset span {
   display:block;
@@ -2746,9 +2767,6 @@ label.radio.error {
 .search-results-column .customer-info {
   padding-left: 65px;
 }
-.customer-info.customer-simple {
-   padding:4px 4px 4px 0px;
-}
 .search-entity-types-column .entity-type > img {
   position: relative;
   top: -2px;
@@ -2809,16 +2827,23 @@ label.radio.error {
   &>div {
     position: relative;
     padding: 10px 15px 0 0;
-    margin: 0 0 10px;
-    border: 1px dashed #ededed;
+    margin: 0 0 20px;
+    border: 1px solid #e6e6e6;
+    background: #f8f8f8;
+    border-radius: 4px;
   }
   .add-list-item {
     margin-left: 183px;
   }
   .removeRow {
     position: absolute;
-    top: 0;
-    right: 10px;
+    width: 28px;
+    top: 4px;
+    right: 4px;
+    text-decoration: none;
+    &:after {
+      color: #bbb;
+    }
   }
 }
 
@@ -2884,16 +2909,28 @@ label.radio.error {
   border: 0;
   -webkit-box-shadow:  none;
   box-shadow:  none;
-  height: 28px;
+  height: 26px;
+  width: 26px;
+  &:hover{
+    background: #eee;
+    .icon-star:before,
+    .icon-pushpin:before {
+      color: #d7d7d7;
+    }
+  }
 }
-.btn.minimize-button { margin-right:12px; }
+.btn.favorite-button {
+  padding: 1px 0;
+}
 .btn.favorite-button .icon-star:before,
 .btn.minimize-button .icon-pushpin:before {
   color:#e7e7e7;
   font-size:19px;
 }
 .btn.favorite-button.gold-icon i:before,
-.btn.minimize-button.gold-icon i:before{
+.btn.favorite-button.gold-icon:hover i:before,
+.btn.minimize-button.gold-icon i:before,
+.btn.minimize-button.gold-icon:hover i:before{
   color:#ffd631;
 }
 #pin-button-div {
