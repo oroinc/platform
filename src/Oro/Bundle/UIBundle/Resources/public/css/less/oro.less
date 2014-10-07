@@ -1194,7 +1194,7 @@ footer {
   overflow: auto;
 }
 .navbar-extra {
-  padding: 10px 0;
+  padding: 0;
   .customer-info-top-actions a {
     height: 24px;
     line-height: 24px;
@@ -1205,6 +1205,14 @@ footer {
   .icons-holder a {
     height: 24px;
     line-height: 24px;
+  }
+  > .row > .pull-left{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  > .row > .pull-right{
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 }
 .icons-holder .icons-holder-text [class^="icon-"] {
@@ -1712,15 +1720,18 @@ footer {
 
 .sub-title a { color:#888; }
 .customer-info {
-  padding-top:3px;
+  padding-top: 4px;
   padding-left: 60px;
   padding-bottom: 0;
   line-height: 18px;
+  &.customer-simple {
+    padding:0 4px 0 0;
+  }
   .sub-title {
     font-size: 17px;
     color: #999;
     float: left;
-    margin-bottom: 7px;
+    margin-bottom: 3px;
   }
   .separator {
     float: left;
@@ -1729,7 +1740,7 @@ footer {
     font-size: 18px;
   }
   .user-name {
-    margin: 0 10px 7px 0;
+    margin: 0 10px 3px 0;
     font-size: 19px;
     min-height: 15px;
     line-height: 22px;
@@ -1751,7 +1762,7 @@ footer {
     width: 60px;
     margin: 0 0 0 -60px;
     img {
-      margin-top:-3px;
+      margin-top:-4px;
       .border-radius(3px);
       width: 45px;
     }
@@ -2756,9 +2767,6 @@ label.radio.error {
 }
 .search-results-column .customer-info {
   padding-left: 65px;
-}
-.customer-info.customer-simple {
-   padding:4px 4px 4px 0px;
 }
 .search-entity-types-column .entity-type > img {
   position: relative;
