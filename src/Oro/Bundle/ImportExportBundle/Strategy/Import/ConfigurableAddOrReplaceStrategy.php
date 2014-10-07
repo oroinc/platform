@@ -146,18 +146,18 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
             $this->cachedEntities[$oid] = $entity;
         }
 
-        // update relations
-        if ($isFullData) {
-            $this->updateRelations($entity, $fields, $itemData);
-        }
-
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $this->importExistingEntity($existingEntity, $entity, $itemData);
+                $this->importExistingEntity($entity, $existingEntity, $itemData);
             }
 
             $entity = $existingEntity;
+        }
+
+        // update relations
+        if ($isFullData) {
+            $this->updateRelations($entity, $fields, $itemData);
         }
 
         return $entity;
