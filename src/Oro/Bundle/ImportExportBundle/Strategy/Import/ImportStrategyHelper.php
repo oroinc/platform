@@ -95,8 +95,15 @@ class ImportStrategyHelper
         );
 
         foreach ($importedEntityProperties as $propertyName) {
-            $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
+            /** @var \ReflectionProperty $reflectionProperty */
+            $reflectionProperty = $entityMetadata->getReflectionProperty($propertyName);
+            $reflectionProperty->setAccessible(true); // just to make sure
+            $importedValue = $reflectionProperty->getValue($importedEntity);
+            $reflectionProperty->setValue($basicEntity, $importedValue);
+
+            // TODO: Find better way to set values without reflections
+            // $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
+            // $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
     }
 
