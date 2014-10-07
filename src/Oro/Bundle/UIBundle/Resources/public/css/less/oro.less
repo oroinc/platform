@@ -100,7 +100,7 @@ label, input, button, select, textarea { font-size:13px;}
     label.control-label {
       float:left;
       width:160px;
-      padding-top:5px;
+      padding-top:7px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
@@ -113,6 +113,7 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
+        padding-top:7px;
         width: 100%;
         word-wrap: break-word;
       }
@@ -147,7 +148,10 @@ label, input, button, select, textarea { font-size:13px;}
   }
 }
 
-input[type='checkbox'] + label { margin-bottom:2px; }
+input[type='checkbox'] + label {
+  margin-bottom:2px;
+  display: inline-block;
+}
 textarea, input, select,
 .uneditable-input,
 body .select2-container {
@@ -1194,6 +1198,7 @@ footer {
 }
 .navbar-extra {
   padding: 0;
+  margin-bottom: 5px;
   .customer-info-top-actions a {
     height: 24px;
     line-height: 24px;
@@ -1207,11 +1212,11 @@ footer {
   }
   > .row > .pull-left{
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   > .row > .pull-right{
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 }
 .icons-holder .icons-holder-text [class^="icon-"] {
@@ -1926,6 +1931,7 @@ label.required em,
 .form-horizontal label.required em {
   color: #c30b25;
   font-size: 15px;
+  line-height: 1px;
 }
 
 /*.form-horizontal .span6 .controls div.selector {
@@ -1978,14 +1984,18 @@ textarea {
 }
 .horizontal .oro-clearfix input[type="checkbox"],
 .horizontal .oro-clearfix input[type="radio"] {
-  float: left;
-  margin: 3px 10px 0 0;
+  margin: -4px 10px 0 0;
 }
 .horizontal .oro-clearfix .label {
   float: left;
 }
-.controls .horizontal {
-  padding-top: 5px;
+.controls {
+  .horizontal {
+    padding-top: 5px;
+  }
+  > input[type=checkbox]:only-child {
+    margin-top: 6px;
+  }
 }
 .dot-menu-empty-message {
   padding: 4px 15px;
@@ -2182,7 +2192,7 @@ select {
 }
 div.selector {
   line-height: 28px;
-  height: 28px;
+  height: 30px;
   position: relative;
   width: 235px;
   font-size: 12px;
