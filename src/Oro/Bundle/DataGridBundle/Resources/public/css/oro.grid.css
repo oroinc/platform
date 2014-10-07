@@ -1,3 +1,18 @@
+.table th, .table td {
+    /* should center content in cell right */
+    line-height: 19px; /*@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);*/
+}
+table.grid thead th {
+    vertical-align: top;
+}
+table.grid thead th > a {
+    display: block;
+    line-height: 12px;
+    padding: 7px 0 5px;
+}
+table.grid thead th > a:focus {
+    outline: none;
+}
 table.grid thead th > a,
 table.grid thead th > span {
     text-transform: uppercase;
@@ -9,9 +24,9 @@ table.grid thead th span.caret {
     border-left: 4px solid transparent;
 }
 table.grid thead th.ascending span.caret {
-    margin-top:4px;
+    margin-top: 0;
     display: inline-block;
-    border-top:4px solid transparent;
+    border-top: 4px solid transparent;
     border-bottom: 4px solid #000000;
 }
 table.grid thead th.descending span.caret {
@@ -100,6 +115,9 @@ table.grid td:first-child:before {
     content: '';
     min-height: 14px;
     display: inline-block;
+}
+table.grid .select-row-cell input[type=checkbox] {
+    margin-top: -3px;
 }
 
 .grid-views {
