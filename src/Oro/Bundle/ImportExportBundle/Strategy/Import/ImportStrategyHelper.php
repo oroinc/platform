@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ImportStrategyHelper
 {
@@ -33,26 +32,18 @@ class ImportStrategyHelper
     protected $translator;
 
     /**
-     * @var FieldHelper
-     */
-    protected $fieldHelper;
-
-    /**
      * @param ManagerRegistry $managerRegistry
      * @param ValidatorInterface $validator
      * @param TranslatorInterface $translator
-     * @param FieldHelper $fieldHelper
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
-        TranslatorInterface $translator,
-        FieldHelper $fieldHelper
+        TranslatorInterface $translator
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
-        $this->fieldHelper = $fieldHelper;
     }
 
     /**
@@ -95,8 +86,11 @@ class ImportStrategyHelper
         );
 
         foreach ($importedEntityProperties as $propertyName) {
-            $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
+            /** @var \ReflectionProperty $reflectionProperty */
+            $reflectionProperty = $entityMetadata->getReflectionProperty($propertyName);
+            $reflectionProperty->setAccessible(true); // just to make sure
+            $importedValue = $reflectionProperty->getValue($importedEntity);
+            $reflectionProperty->setValue($basicEntity, $importedValue);
         }
     }
 
