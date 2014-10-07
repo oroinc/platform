@@ -9,6 +9,7 @@ services:
             - @doctrine
             - @validator
             - @translator
+            - @oro_importexport.field.field_helper
 
     oro_importexport.strategy.configurable_add_or_replace:
         class: %oro_importexport.strategy.configurable_add_or_replace.class%

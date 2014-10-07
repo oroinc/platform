@@ -147,24 +147,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
-                $excludedFields = array($identifierName);
-
-                foreach ($fields as $key => $field) {
-                    $fieldName = $field['name'];
-
-                    // exclude fields marked as "excluded" and not specified field
-                    // do not exclude identity fields
-                    if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                        || $itemData !== null && !array_key_exists($fieldName, $itemData)
-                        && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                    ) {
-                        $excludedFields[] = $fieldName;
-                        unset($fields[$key]); // do not update relations for excluded fields
-                    }
-                }
-
-                $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
+                $this->importExistingEntity($existingEntity, $entity, $itemData);
             }
 
             $entity = $existingEntity;
@@ -176,6 +159,40 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param object $existingEntity
+     * @param mixed|array|null $itemData
+     * @param array $excludedFields
+     */
+    protected function importExistingEntity(
+        $entity,
+        $existingEntity,
+        $itemData = null,
+        array $excludedFields = array()
+    ) {
+        $entityName = ClassUtils::getClass($entity);
+        $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $excludedFields[] = $identifierName;
+        $fields = $this->getEntityFields($entityName);
+
+        foreach ($fields as $key => $field) {
+            $fieldName = $field['name'];
+
+            // exclude fields marked as "excluded" and not specified field
+            // do not exclude identity fields
+            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
+                || $itemData !== null && !array_key_exists($fieldName, $itemData)
+                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $excludedFields[] = $fieldName;
+                unset($fields[$key]); // do not update relations for excluded fields
+            }
+        }
+
+        $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
     }
 
     /**
