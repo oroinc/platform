@@ -129,11 +129,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
         $entityName = ClassUtils::getClass($entity);
         $fields = $this->fieldHelper->getFields($entityName, true);
 
-        // update relations
-        if ($isFullData) {
-            $this->updateRelations($entity, $fields, $itemData);
-        }
-
         // find and cache existing or new entity
         $existingEntity = $this->findExistingEntity($entity, $fields, $searchContext);
         if ($existingEntity) {
@@ -149,6 +144,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
             }
             $this->databaseHelper->resetIdentifier($entity);
             $this->cachedEntities[$oid] = $entity;
+        }
+
+        // update relations
+        if ($isFullData) {
+            $this->updateRelations($entity, $fields, $itemData);
         }
 
         // import entity fields
@@ -257,7 +257,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
                             }
                         }
 
-                        $this->mergeCollections($relationCollection, $collectionEntities);
+                        $relationCollection->clear();
+                        $this->fieldHelper->setObjectValue($entity, $fieldName, $collectionEntities);
                     }
                 }
             }

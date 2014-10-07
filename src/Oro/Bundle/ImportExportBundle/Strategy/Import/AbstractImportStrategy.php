@@ -25,25 +25,6 @@ abstract class AbstractImportStrategy implements StrategyInterface
     }
 
     /**
-     * @param Collection $source
-     * @param Collection $mixin
-     */
-    protected function mergeCollections(Collection $source, Collection $mixin)
-    {
-        foreach ($source as $item) {
-            if (!$mixin->contains($item)) {
-                $source->removeElement($item);
-            }
-        }
-
-        foreach ($mixin as $item) {
-            if (!$source->contains($item)) {
-                $mixin->add($item);
-            }
-        }
-    }
-
-    /**
      * @param object $entity
      * @return object
      */
