@@ -1,9 +1,8 @@
 /*global define*/
 define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
-        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger',
-        'orotranslation/js/translator', 'jquery.dialog.extended',
-        'oroui/js/responsive-jquery-widget'
-    ], function ($, _, tools, error, AbstractWidget, StateModel, messenger, __) {
+        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger', 'oroui/js/layout',
+        'orotranslation/js/translator', 'jquery.dialog.extended'
+    ], function ($, _, tools, error, AbstractWidget, StateModel, messenger, layout, __) {
     'use strict';
 
     /**
@@ -263,6 +262,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
                     $el.height(height);
                 }
             },this));
+            layout.updateResponsiveLayout();
         },
 
         /**
