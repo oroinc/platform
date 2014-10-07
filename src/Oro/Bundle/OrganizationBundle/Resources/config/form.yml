@@ -136,7 +136,8 @@ services:
         class: %oro_organization.form.extension.organization.class%
         arguments:
             - @doctrine
-            - @oro_security.security_facade
+            - @oro_security.security_facade.link
+            - @oro_security.owner.ownership_metadata_provider.link
         tags:
             - { name: form.type_extension, alias: form }
     #

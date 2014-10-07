@@ -13,20 +13,25 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class OrganizationFormExtension extends AbstractTypeExtension
 {
-    const RELATION_NAME = 'organization';
-
     /**
      * @var ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @var SecurityFacade
+     * @var ServiceLink
      */
-    protected $securityFacade;
+    protected $securityFacadeLink;
+
+    /**
+     * @var ServiceLink
+     */
+    protected $metadataProviderLink;
 
     /**
      * @var PropertyAccessor
@@ -35,12 +40,17 @@ class OrganizationFormExtension extends AbstractTypeExtension
 
     /**
      * @param ManagerRegistry $registry
-     * @param SecurityFacade $securityFacade
+     * @param ServiceLink $securityFacadeLink
+     * @param ServiceLink $metadataProviderLink
      */
-    public function __construct(ManagerRegistry $registry, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ServiceLink $securityFacadeLink,
+        ServiceLink $metadataProviderLink
+    ) {
         $this->registry = $registry;
-        $this->securityFacade = $securityFacade;
+        $this->securityFacadeLink = $securityFacadeLink;
+        $this->metadataProviderLink = $metadataProviderLink;
     }
 
     /**
@@ -75,17 +85,27 @@ class OrganizationFormExtension extends AbstractTypeExtension
      */
     protected function updateOrganization($entity)
     {
-        if (!$this->isClassSupported(ClassUtils::getClass($entity))) {
+        /** @var OwnershipMetadataProvider $metadataProvider */
+        $metadataProvider = $this->metadataProviderLink->getService();
+
+        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getOrganizationFieldName();
+        if (!$organizationField) {
             return;
         }
 
-        $organization = $this->securityFacade->getOrganization();
+        $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
         if ($organization) {
-            $propertyAccessor = $this->getPropertyAccessor();
-            if (!$propertyAccessor->getValue($entity, self::RELATION_NAME)) {
-                $propertyAccessor->setValue($entity, self::RELATION_NAME, $organization);
-            }
+            return;
         }
+
+        /** @var SecurityFacade $securityFacade */
+        $securityFacade = $this->securityFacadeLink->getService();
+        $organization = $securityFacade->getOrganization();
+        if (!$organization) {
+            return;
+        }
+
+        $this->getPropertyAccessor()->setValue($entity, $organizationField, $organization);
     }
 
     /**
@@ -94,20 +114,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
     public function getExtendedType()
     {
         return 'form';
-    }
-
-    /**
-     * @param string $class
-     * @return bool
-     */
-    protected function isClassSupported($class)
-    {
-        $entityManager = $this->registry->getManagerForClass($class);
-        if ($entityManager) {
-            return $entityManager->getClassMetadata($class)->hasAssociation(self::RELATION_NAME);
-        }
-
-        return false;
     }
 
     /**
