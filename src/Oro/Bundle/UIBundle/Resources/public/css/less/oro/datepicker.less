@@ -92,11 +92,15 @@ body {
       border-width: 0 0 1px;
       -webkit-border-radius: 0;
       border-radius: 0;
-      padding: 4px 0 6px;
+      padding: 5px 0;
     }
     .ui-widget-header{
       .ui-datepicker-month{
         margin-right: 3px;
+        margin-bottom: 0 !important;
+      }
+      .ui-datepicker-year{
+        margin-bottom: 0 !important;
       }
       .ui-icon-circle-triangle-w{
         background-position: -95px 0;
@@ -112,9 +116,15 @@ body {
         -webkit-border-radius: 2px;
         border-radius: 2px;
       }
+      .ui-datepicker-next {
+        right: 4px;
+      }
+      .ui-datepicker-prev {
+        left: 4px;
+      }
       .ui-datepicker-next-hover{
         top: 6px;
-        right: 2px;
+        right: 4px;
         background-color: #ffffff;
         background-image: url("../images/ui-icons_222222_256x240.png");
         border-color: #dfdfdf;
@@ -124,7 +134,7 @@ body {
       }
       .ui-datepicker-prev-hover{
         top: 6px;
-        left: 2px;
+        left: 4px;
         background-color: #ffffff;
         background-image: url("../images/ui-icons_222222_256x240.png");
         border-color: #dfdfdf;
@@ -135,12 +145,12 @@ body {
     }
   }
   .ui-datevariables-div {
-    padding: 10px 15px 5px;
+    padding: 14px 15px 10px;
     ul{
       color: #006cc6;
-      margin-left: 15px;
+      margin: 5px 0 0 15px;
       li{
-        margin-bottom: 8px;
+        margin: 1px 0 2px;
         a{
           color: #006cc6;
           &:hover{
@@ -195,11 +205,11 @@ body {
           margin-right: 6px;
           display: inline-block;
           vertical-align: middle;
+          top: -1px;
+          position: relative;
         }
         &.calendar:before{
           content: "\f073";
-          position: relative;
-          top: -2px;
         }
         &.variables:before{
           content: "\f0ca";
