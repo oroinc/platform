@@ -42,6 +42,11 @@ class Daemon
     protected $pid;
 
     /**
+     * @var \DateTime
+     */
+    protected $dateStart;
+
+    /**
      *
      * @param string $rootDir
      * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
@@ -49,9 +54,10 @@ class Daemon
      */
     public function __construct($rootDir, $maxJobs = 5, $env = 'prod')
     {
-        $this->rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR);
-        $this->maxJobs = (int)$maxJobs;
-        $this->env     = $env;
+        $this->rootDir   = rtrim($rootDir, DIRECTORY_SEPARATOR);
+        $this->maxJobs   = (int)$maxJobs;
+        $this->env       = $env;
+        $this->dateStart = new \DateTime('now');
     }
 
     /**
@@ -120,6 +126,14 @@ class Daemon
         }
 
         return $this->pid;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateStart()
+    {
+        return $this->dateStart;
     }
 
     /**
