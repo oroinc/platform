@@ -11,7 +11,6 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
-use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 
 class SyncProcessor
 {
@@ -175,7 +174,8 @@ class SyncProcessor
                     [
                         'processorAlias' => reset($processorAliases),
                         'entityName'     => $realConnector->getImportEntityFQCN(),
-                        'channel'        => $integration->getId()
+                        'channel'        => $integration->getId(),
+                        'channelType'    => $integration->getType(),
                     ],
                     $parameters
                 ),
