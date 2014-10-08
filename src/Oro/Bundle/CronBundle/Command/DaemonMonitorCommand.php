@@ -47,7 +47,7 @@ class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandI
                 InputOption::VALUE_NONE,
                 'If option exists Daemon will restart'
             )
-            ->setDescription('Monitor Daemon and restart it once a day');
+            ->setDescription('Monitor Daemon and restart it once a day if it has pid');
     }
 
     /**
