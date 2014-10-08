@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -13,9 +15,10 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
-use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
-class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwareInterface, EntityNameAwareInterface
+class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy implements
+    ContextAwareInterface,
+    EntityNameAwareInterface
 {
     /**
      * @var string
@@ -26,6 +29,11 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
      * @var ContextInterface
      */
     protected $context;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @var ImportStrategyHelper
@@ -48,12 +56,19 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected $cachedEntities = array();
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param ImportStrategyHelper $helper
      * @param FieldHelper $fieldHelper
      * @param DatabaseHelper $databaseHelper
      */
-    public function __construct(ImportStrategyHelper $helper, FieldHelper $fieldHelper, DatabaseHelper $databaseHelper)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ImportStrategyHelper $helper,
+        FieldHelper $fieldHelper,
+        DatabaseHelper $databaseHelper
+    ) {
+        parent::__construct($eventDispatcher);
+
         $this->strategyHelper = $helper;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
@@ -93,23 +108,29 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
 
     /**
      * @param object $entity
-     * @param bool $isFullData
-     * @param bool $isPersistNew
+     * @param bool   $isFullData
+     * @param bool   $isPersistNew
      * @param mixed|array|null $itemData
+     * @param array $searchContext
      * @return null|object
      */
-    protected function processEntity($entity, $isFullData = false, $isPersistNew = false, $itemData = null)
-    {
+    protected function processEntity(
+        $entity,
+        $isFullData = false,
+        $isPersistNew = false,
+        $itemData = null,
+        array $searchContext = array()
+    ) {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
             return $entity;
         }
 
         $entityName = ClassUtils::getClass($entity);
-        $fields = $this->getEntityFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         // find and cache existing or new entity
-        $existingEntity = $this->findExistingEntity($entity, $fields);
+        $existingEntity = $this->findExistingEntity($entity, $fields, $searchContext);
         if ($existingEntity) {
             $existingOid = spl_object_hash($existingEntity);
             if (isset($this->cachedEntities[$existingOid])) {
@@ -128,7 +149,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
-                $this->importExistingEntity($existingEntity, $entity, $itemData);
+                $this->importExistingEntity($entity, $existingEntity, $itemData);
             }
 
             $entity = $existingEntity;
@@ -151,13 +172,13 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     protected function importExistingEntity(
         $entity,
         $existingEntity,
-        $itemData,
+        $itemData = null,
         array $excludedFields = array()
     ) {
         $entityName = ClassUtils::getClass($entity);
         $identifierName = $this->databaseHelper->getIdentifierFieldName($entityName);
         $excludedFields[] = $identifierName;
-        $fields = $this->getEntityFields($entityName);
+        $fields = $this->fieldHelper->getFields($entityName, true);
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
@@ -177,15 +198,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     }
 
     /**
-     * @param string $entityName
-     * @return array
-     */
-    protected function getEntityFields($entityName)
-    {
-        return $this->fieldHelper->getFields($entityName, true);
-    }
-
-    /**
      * @param object $entity
      * @param array $fields
      * @param array|null $itemData
@@ -199,9 +211,18 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                 $fieldName = $field['name'];
                 $isFullRelation = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
+                $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
 
-                // single relation
+                // additional search parameters to find only related entities
+                $searchContext = array();
+                if ($isPersistRelation && $inversedFieldName
+                    && $this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)
+                ) {
+                    $searchContext[$inversedFieldName] = $entity;
+                }
+
                 if ($this->fieldHelper->isSingleRelation($field)) {
+                    // single relation
                     $relationEntity = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationEntity) {
                         $relationItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
@@ -209,7 +230,8 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                             $relationEntity,
                             $isFullRelation,
                             $isPersistRelation,
-                            $relationItemData
+                            $relationItemData,
+                            $searchContext
                         );
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
@@ -218,7 +240,7 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                     $relationCollection = $this->fieldHelper->getObjectValue($entity, $fieldName);
                     if ($relationCollection instanceof Collection) {
                         $collectionItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
-                        $collectionEntities = array();
+                        $collectionEntities = new ArrayCollection();
 
                         foreach ($relationCollection as $collectionEntity) {
                             $entityItemData = $this->fieldHelper->getItemData(array_shift($collectionItemData));
@@ -226,11 +248,12 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
                                 $collectionEntity,
                                 $isFullRelation,
                                 $isPersistRelation,
-                                $entityItemData
+                                $entityItemData,
+                                $searchContext
                             );
 
                             if ($collectionEntity) {
-                                $collectionEntities[] = $collectionEntity;
+                                $collectionEntities->add($collectionEntity);
                             }
                         }
 
@@ -245,9 +268,10 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
     /**
      * @param object $entity
      * @param array $fields
+     * @param array $searchContext
      * @return null|object
      */
-    protected function findExistingEntity($entity, array $fields)
+    protected function findExistingEntity($entity, array $fields, array $searchContext = array())
     {
         $entityName = ClassUtils::getClass($entity);
         $identifier = $this->databaseHelper->getIdentifier($entity);
@@ -259,27 +283,33 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         // find by identity fields
-        if (!$existingEntity) {
-            $identityValues = array();
-            foreach ($fields as $field) {
-                $fieldName = $field['name'];
-                if (!$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                    && $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-                ) {
-                    $identityValues[$fieldName] = $this->fieldHelper->getObjectValue($entity, $fieldName);
-                }
-            }
-
-            // try to find entity by identity fields if at least one is specified
-            foreach ($identityValues as $value) {
-                if (null !== $value && '' !== $value) {
-                    $existingEntity = $this->databaseHelper->findOneBy($entityName, $identityValues);
-                    break;
-                }
-            }
+        if (!$existingEntity
+            && (!$searchContext || $this->databaseHelper->getIdentifier(current($searchContext)))
+        ) {
+            $identityValues = $searchContext;
+            $identityValues += $this->fieldHelper->getIdentityValues($entity, $fields);
+            $existingEntity = $this->findEntityByIdentityValues($entityName, $identityValues);
         }
 
         return $existingEntity;
+    }
+
+    /**
+     * Try to find entity by identity fields if at least one is specified
+     *
+     * @param string $entityName
+     * @param array $identityValues
+     * @return null|object
+     */
+    protected function findEntityByIdentityValues($entityName, array $identityValues)
+    {
+        foreach ($identityValues as $value) {
+            if (null !== $value && '' !== $value) {
+                return $this->databaseHelper->findOneBy($entityName, $identityValues);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -293,8 +323,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
-            $this->clearEntityRelations($entity);
-
             return null;
         }
 
@@ -307,25 +335,6 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         }
 
         return $entity;
-    }
-
-    /**
-     * Clear entity multiple relations if entity isn't valid,
-     * used to prevent usage of this entity in related collections
-     *
-     * @param object $entity
-     */
-    protected function clearEntityRelations($entity)
-    {
-        $entityName = ClassUtils::getClass($entity);
-        $fields = $this->fieldHelper->getFields($entityName, true);
-
-        foreach ($fields as $field) {
-            if ($this->fieldHelper->isMultipleRelation($field)) {
-                $fieldName = $field['name'];
-                $this->fieldHelper->setObjectValue($entity, $fieldName, new ArrayCollection());
-            }
-        }
     }
 
     /**
@@ -347,23 +356,5 @@ class ConfigurableAddOrReplaceStrategy implements StrategyInterface, ContextAwar
         if (!$entity instanceof $entityName) {
             throw new InvalidArgumentException(sprintf('Imported entity must be instance of %s', $entityName));
         }
-    }
-
-    /**
-     * @param object $entity
-     * @return object
-     */
-    protected function beforeProcessEntity($entity)
-    {
-        return $entity;
-    }
-
-    /**
-     * @param object $entity
-     * @return object
-     */
-    protected function afterProcessEntity($entity)
-    {
-        return $entity;
     }
 }

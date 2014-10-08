@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -20,6 +22,9 @@ class FieldHelper
 
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
 
     /** @var array */
     protected $fieldsCache = array();
@@ -175,15 +180,12 @@ class FieldHelper
     public function getObjectValue($object, $fieldName)
     {
         try {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
-            return $propertyAccessor->getValue($object, $fieldName);
+            return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
             if (property_exists($class, $fieldName)) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
                 $reflection->setAccessible(true);
-
                 return $reflection->getValue($object);
             } else {
                 throw $e;
@@ -200,8 +202,7 @@ class FieldHelper
     public function setObjectValue($object, $fieldName, $value)
     {
         try {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            $propertyAccessor->setValue($object, $fieldName, $value);
+            $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
             if (property_exists($class, $fieldName)) {
@@ -230,5 +231,39 @@ class FieldHelper
         }
 
         return !empty($data[$fieldName]) ? $data[$fieldName] : array();
+    }
+
+    /**
+     * @param object $entity
+     * @param array $fields
+     * @return array
+     */
+    public function getIdentityValues($entity, array $fields)
+    {
+        $entityName = ClassUtils::getClass($entity);
+
+        $identityValues = array();
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
+                && $this->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $identityValues[$fieldName] = $this->getObjectValue($entity, $fieldName);
+            }
+        }
+
+        return $identityValues;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

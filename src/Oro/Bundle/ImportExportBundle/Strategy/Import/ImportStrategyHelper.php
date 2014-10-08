@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -96,7 +97,16 @@ class ImportStrategyHelper
 
         foreach ($importedEntityProperties as $propertyName) {
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
-            $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
+
+            // collections MUST override existing values to avoid dirty data
+            if ($importedValue instanceof Collection) {
+                /** @var \ReflectionProperty $reflectionProperty */
+                $reflectionProperty = $entityMetadata->getReflectionProperty($propertyName);
+                $reflectionProperty->setAccessible(true); // just to make sure
+                $reflectionProperty->setValue($basicEntity, $importedValue);
+            } else {
+                $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
+            }
         }
     }
 
