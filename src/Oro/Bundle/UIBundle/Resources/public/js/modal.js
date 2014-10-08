@@ -21,6 +21,15 @@ define([
         /** @property {String} */
         className: 'modal',
 
+            // WebSys
+            initialize: function(options){
+                options = _.extend({
+                    okText: __('OK'),
+                    cancelText: __('Cancel')
+                }, options);
+                Backbone.BootstrapModal.prototype.initialize.call(this, options);
+            },
+
         /**
          * Renders and shows the modal
          *
