@@ -109,7 +109,13 @@ class Daemon
 
         $process->run();
 
-        return $process->isSuccessful();
+        if ($process->isSuccessful()) {
+            $this->pid = $this->findProcessPid(
+                sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
+            );
+        }
+
+        return $this->getPid() ? false : true;
     }
 
     /**
