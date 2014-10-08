@@ -132,6 +132,43 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetMetadataSetsOrganizationFieldName()
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $provider = new OwnershipMetadataProvider(
+            array(
+                'organization' => 'AcmeBundle\Entity\Organization',
+                'business_unit' => 'AcmeBundle\Entity\BusinessUnit',
+                'user' => 'AcmeBundle\Entity\User',
+            ),
+            $configProvider,
+            null
+        );
+
+        $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
+        $config->set('owner_type', 'ORGANIZATION');
+        $config->set('owner_field_name', 'test_field');
+        $config->set('owner_column_name', 'test_column');
+
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($this->equalTo('SomeClass'))
+            ->will($this->returnValue(true));
+
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($this->equalTo('SomeClass'))
+            ->will($this->returnValue($config));
+
+        $this->assertEquals(
+            new OwnershipMetadata('ORGANIZATION', 'test_field', 'test_column', 'test_field', 'test_column'),
+            $provider->getMetadata('SomeClass')
+        );
+    }
+
     public function testGetMetadataUndefinedClassWithCache()
     {
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
