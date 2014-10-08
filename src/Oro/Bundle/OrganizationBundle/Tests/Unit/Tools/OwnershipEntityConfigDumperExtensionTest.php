@@ -142,10 +142,18 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                     ]
                 )
             );
-
-        $this->ownershipMetadataProvider->expects($this->exactly($getOwnerClassMethodNameCalls))
-            ->method($getOwnerClassMethodName)
-            ->will($this->returnValue('Test\Owner'));
+        if ($getOwnerClassMethodNameCalls == 1) {
+            $this->ownershipMetadataProvider->expects($this->exactly(1))
+                ->method($getOwnerClassMethodName)
+                ->will($this->returnValue('Test\Owner'));
+        } else {
+            $this->ownershipMetadataProvider->expects($this->once())
+                ->method($getOwnerClassMethodName)
+                ->will($this->returnValue('Test\Owner'));
+            $this->ownershipMetadataProvider->expects($this->once())
+                ->method('getOrganizationClass')
+                ->will($this->returnValue('Test\Organization'));
+        }
 
         $this->relationBuilder->expects($this->exactly($getOwnerClassMethodNameCalls))
             ->method('addManyToOneRelation');
@@ -205,7 +213,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                     ->method('addManyToOneRelation')
                     ->with(
                         $this->identicalTo($extendConfig1),
-                        'Test\Owner',
+                        'Test\Organization',
                         'organization_field',
                         'id',
                         [

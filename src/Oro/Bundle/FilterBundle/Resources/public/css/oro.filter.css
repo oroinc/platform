@@ -222,7 +222,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     color:#444;
 }
 .filter-criteria .dropdown-menu a:hover {
-  background:#3875d7;
+    background:#3875d7;
+    color:#444;
+    outline: none !important;
 }
 .filter-criteria .nav-tabs-oro a:hover,
 .filter-criteria .nav-tabs-oro a:focus{
