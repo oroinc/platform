@@ -1,6 +1,9 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Loggable;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
@@ -23,6 +26,11 @@ class LoggableManagerTest extends AbstractMetadataTest
      * @var ClassMetadata
      */
     protected $config;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityContext;
 
     /**
      * @var LoggableClass
@@ -49,7 +57,21 @@ class LoggableManagerTest extends AbstractMetadataTest
             ->method('isConfigurable')
             ->will($this->returnValue(false));
 
-        $this->loggableManager = new LoggableManager('Oro\Bundle\DataAuditBundle\Entity\Audit', $provider);
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+
+        $securityContextLink =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $securityContextLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->securityContext));
+
+        $this->loggableManager = new LoggableManager(
+            'Oro\Bundle\DataAuditBundle\Entity\Audit',
+            $provider,
+            $securityContextLink
+        );
         $this->loggableManager->addConfig($this->config);
 
         $this->loggableClass = new LoggableClass();

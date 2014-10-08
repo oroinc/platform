@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 
 class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
@@ -71,12 +72,47 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
     public function testFindOneBy()
     {
         $entity = new \stdClass();
-        $criteria = ['id' => 1];
+        $entity->id = 1;
+        $relatedEntity = new \stdClass();
+        $relatedEntity->id = 2;
+        $criteria = ['id' => 1, 'related' => $relatedEntity];
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($relatedEntity)
+            ->will($this->returnValue($relatedEntity->id));
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getOneOrNullResult'))
+            ->getMockForAbstractClass();
+        $query->expects($this->once())
+            ->method('getOneOrNullResult')
+            ->will($this->returnValue($entity));
+
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('e.id = :id AND e.related = :related')
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('setParameters')
+            ->with($criteria)
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $this->repository->expects($this->once())
-            ->method('findOneBy')
-            ->with($criteria)
-            ->will($this->returnValue($entity));
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->will($this->returnValue($queryBuilder));
 
         // findOneBy executed two times to check internal cache
         $this->assertEquals($entity, $this->helper->findOneBy(self::TEST_CLASS, $criteria));
@@ -180,5 +216,73 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fieldName));
 
         $this->helper->resetIdentifier($entity);
+    }
+
+    /**
+     * @param array $association
+     * @param string $expectedField
+     * @dataProvider getInversedRelationFieldNameDataProvider
+     */
+    public function testGetInversedRelationFieldName(array $association, $expectedField)
+    {
+        $fieldName = 'relation';
+
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->will($this->returnValue($association));
+
+        $this->assertEquals($expectedField, $this->helper->getInversedRelationFieldName(self::TEST_CLASS, $fieldName));
+    }
+
+    /**
+     * @return array
+     */
+    public function getInversedRelationFieldNameDataProvider()
+    {
+        return array(
+            'mapped by field' => array(
+                'association' => array('mappedBy' => 'field'),
+                'expectedField' => 'field',
+            ),
+            'inversed by field' => array(
+                'association' => array('inversedBy' => 'field'),
+                'expectedField' => 'field',
+            ),
+            'no inversed field' => array(
+                'association' => array(),
+                'expectedField' => null,
+            ),
+        );
+    }
+
+    /**
+     * @param string $type
+     * @param bool $expected
+     * @dataProvider isSingleInversedRelationDataProvider
+     */
+    public function testIsSingleInversedRelation($type, $expected)
+    {
+        $fieldName = 'relation';
+
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->will($this->returnValue(array('type' => $type)));
+
+        $this->assertEquals($expected, $this->helper->isSingleInversedRelation(self::TEST_CLASS, $fieldName));
+    }
+
+    /**
+     * @return array
+     */
+    public function isSingleInversedRelationDataProvider()
+    {
+        return array(
+            'one to one'   => array(ClassMetadata::ONE_TO_ONE, true),
+            'one to many'  => array(ClassMetadata::ONE_TO_MANY, true),
+            'many to one'  => array(ClassMetadata::MANY_TO_ONE, false),
+            'many to many' => array(ClassMetadata::MANY_TO_MANY, false),
+        );
     }
 }
