@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Symfony\Component\Translation\Translator;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -57,13 +58,7 @@ class NavigationListener
             $extendConfigs = $entityExtendProvider->getConfigs();
 
             foreach ($extendConfigs as $extendConfig) {
-                if ($extendConfig->is('is_extend')
-                    && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
-                    && $extendConfig->in(
-                        'state',
-                        [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-                    )
-                ) {
+                if ($this->checkAvailability($extendConfig)) {
                     $config = $entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
                     if (!class_exists($config->getId()->getClassName()) ||
                         !$this->securityFacade->hasLoggedUser() ||
@@ -94,5 +89,21 @@ class NavigationListener
             }
         }
 
+    }
+
+    /**
+     * @param Config $extendConfig
+     *
+     * @return bool
+     */
+    protected function checkAvailability(Config $extendConfig)
+    {
+        return
+            $extendConfig->is('is_extend')
+            && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
+            && $extendConfig->in(
+                'state',
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
+            );
     }
 }
