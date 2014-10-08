@@ -27,9 +27,14 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             // key to store added classes via jquery.data
             addedClassesDataName: 'responsive-classes',
 
-            hasSingleCellModifier: 'responsive-single-cell',
-            hasSingleBlockModifier: 'responsive-single-block',
-            hasNoBlocksModifier: 'responsive-no-blocks',
+            sectionSingleCellModifier: 'responsive-section-single-cell',
+            cellSingleBlockModifier: 'responsive-cell-single-block',
+
+            sectionNoBlocksModifier: 'responsive-section-no-blocks',
+            cellNoBlocksModifier: 'responsive-cell-no-blocks',
+
+            sectionHasBlocksModifier: 'responsive-section-has-blocks',
+            cellHasBlocksModifier: 'responsive-cell-has-blocks',
 
             sizes: [{
                 modifierClassName: 'responsive-small',
@@ -91,7 +96,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var hasNoBlocks = true;
 
             if($cells.length === 1) {
-                classNames.push(options.hasSingleCellModifier);
+                classNames.push(options.sectionSingleCellModifier);
             }
 
             this._updateClasses($section, classNames);
@@ -99,13 +104,15 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             $cells.each(function(index, cell) {
                 var $cell = $(cell);
                 context._updateCell($cell);
-                if(!$cell.hasClass(options.hasNoBlocksModifier)) {
+                if(!$cell.hasClass(options.cellNoBlocksModifier)) {
                     hasNoBlocks = false;
                 }
             });
 
             if(hasNoBlocks) {
-                $section.addClass(options.hasNoBlocksModifier);
+                $section.addClass(options.sectionNoBlocksModifier);
+            } else {
+                $section.addClass(options.sectionHasBlocksModifier);
             }
         },
 
@@ -121,9 +128,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var classNames = [];
 
             if($blocks.length === 1) {
-                classNames.push(options.hasSingleBlockModifier);
+                classNames.push(options.cellSingleBlockModifier);
             } else if ($blocks.length === 0) {
-                classNames.push(options.hasNoBlocksModifier);
+                classNames.push(options.cellNoBlocksModifier);
             }
 
             this._updateClasses($cell, classNames);
