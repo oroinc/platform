@@ -85,10 +85,10 @@ class Daemon
         }
 
         $this->pid = shell_exec(sprintf(
-                '%s > %s 2>&1 & echo $!',
-                $this->getQueueRunCmd(),
-                $outputFile
-            ));
+            '%s > %s 2>&1 & echo $!',
+            $this->getQueueRunCmd(),
+            $outputFile
+        ));
 
         $this->dateStart = new \DateTime('now');
 
