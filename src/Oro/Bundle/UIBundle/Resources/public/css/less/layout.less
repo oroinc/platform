@@ -1,75 +1,78 @@
-// Section has only one cell
-.responsive-section.responsive-small.responsive-single-cell,
-.responsive-section.responsive-medium.responsive-single-cell,
-.responsive-section.responsive-big.responsive-single-cell {
-  .responsive-cell {
-    width: 100%;
-    float: none;
+.responsive-inline-position () {
+  float: left;
+  width: 50%;
+}
+.responsive-block-position () {
+  float: none;
+  width: 100%;
+}
+
+.responsive-section {
+  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
+    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
 
-// Cell has only one block
-.responsive-section.responsive-cell.responsive-single-block {
-  .responsive-block {
-    width: 100%;
-    float: none;
-  }
+//
+// By default there are two cells on one line
+//
+.responsive-cell {
+  margin-bottom: 35px;
+  .responsive-inline-position();
 }
 
-// Medium screen
-.responsive-section.responsive-medium {
-  .responsive-cell {
-    width: 100;
-    float: none;
+//
+// By default there are two blocks on one line
+//
+.responsive-block {
+  .responsive-inline-position();
+}
 
-    .responsive-block {
-      width: 50%;
-      float: left;
-    }
-  }
+//
+// If section has only one cell then cell gets 100% of width
+//
+.responsive-section-single-cell .responsive-cell {
+  .responsive-block-position();
+}
 
+//
+// If cell has only one block then block gets 100% of width
+//
+.responsive-cell-single-block .responsive-block {
+  .responsive-block-position();
+}
+
+//
+// If section has blocks then cell gets 100% of width in medium screen
+//
+.responsive-medium {
   .responsive-cell:first-child {
     padding-right: 0;
   }
-}
 
-.responsive-section.responsive-no-blocks.responsive-medium {
-  .responsive-cell {
-    width: 50%;
-    float: left;
-  }
-
-  // hide vertical separator on medium screen
+  // remove horizontal separator
   .row-fluid.row-fluid-divider {
     background: none;
   }
-
-  .responsive-cell:first-child {
-    padding-right: 0;
-  }
 }
-
-// Big screen
-.responsive-section.responsive-big {
-  .responsive-cell,
-  .responsive-block {
-    float: left;
-    width: 50%;
-  }
-}
-
-// Small screen
-.responsive-section.responsive-small {
+.responsive-medium.responsive-section-has-blocks {
   .responsive-cell {
-    width: 100%;
-    float: none;
+    .responsive-block-position();
+  }
+}
 
-    .responsive-block {
-      width: 50%;
-      float: left;
-    }
+//
+// On small screen all element should get 100% if width
+//
+.responsive-small {
+  .responsive-cell {
+    .responsive-block-position();
+  }
+  .responsive-block {
+    .responsive-block-position();
   }
 
+  // remove horizontal separator
   .row-fluid.row-fluid-divider {
     background: none;
   }
@@ -81,9 +84,6 @@
   .row-fluid.row-fluid-divider {
     background: none;
   }
-}
-.responsive-cell {
-  margin-bottom: 35px;
 }
 
 .container-fluid > .responsive-section {
@@ -97,10 +97,5 @@
   }
   .responsive-cell:first-child {
     padding-right: @horizontalPadding;
-  }
-}
-.responsive-section {
-  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
-    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
