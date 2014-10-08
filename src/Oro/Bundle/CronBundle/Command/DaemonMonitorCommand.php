@@ -70,15 +70,23 @@ class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandI
             $start = true;
         }
 
-        if ($stop && $daemon->getPid()) {
-            if ($daemon->stop()) {
-                $logger->info('Daemon was stopped');
+        if ($stop) {
+            try {
+                if ($daemon->stop()) {
+                    $logger->info('Daemon was stopped');
+                }
+            } catch (\Exception $e) {
+                $logger->info('Daemon already stopped');
             }
         }
 
-        if ($start && !$daemon->getPid()) {
-            if ($daemon->run()) {
-                $logger->info('Daemon was started');
+        if ($start) {
+            try {
+                if ($daemon->run()) {
+                    $logger->info('Daemon was started');
+                }
+            } catch (\Exception $e) {
+                $logger->info('Daemon can`t be started');
             }
         }
     }
