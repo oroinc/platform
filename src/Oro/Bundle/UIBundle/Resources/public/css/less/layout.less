@@ -1,37 +1,91 @@
-.responsive-cell, .responsive-block {
+.responsive-inline-position () {
   float: left;
   width: 50%;
-  &:only-child {
-    width: 100%;
-    float: none;
+}
+.responsive-block-position () {
+  float: none;
+  width: 100%;
+}
+
+.responsive-section {
+  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
+    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
 
-.responsive-cell{
-  .forScreen(@mediumScreen, width, 100%);
-  .forScreen(@mediumScreen, float, none);
+//
+// By default there are two cells on one line
+//
+.responsive-cell {
+  margin-bottom: 35px;
+  .responsive-inline-position();
 }
 
-.responsive-block{
-  .forScreen(@smallScreen, width, 100%);
-  .forScreen(@smallScreen, float, none);
+//
+// By default there are two blocks on one line
+//
+.responsive-block {
+  .responsive-inline-position();
 }
-.ui-dialog{
-  max-width: 100%;
-  /**
-   * That's a temporary solution and needs to be updated
-   */
-  .responsive-cell {
-    width: auto;
-    float: left;
+
+//
+// If section has only one cell then cell gets 100% of width
+//
+.responsive-section-single-cell .responsive-cell {
+  .responsive-block-position();
+}
+
+//
+// If cell has only one block then block gets 100% of width
+//
+.responsive-cell-single-block .responsive-block {
+  .responsive-block-position();
+}
+
+//
+// If section has blocks then cell gets 100% of width in medium screen
+//
+.responsive-medium {
+  .responsive-cell:first-child {
+    padding-right: 0;
   }
+
+  // remove horizontal separator
   .row-fluid.row-fluid-divider {
     background: none;
   }
 }
-.responsive-cell {
-  margin-bottom: 35px;
+.responsive-medium.responsive-section-has-blocks {
+  .responsive-cell {
+    .responsive-block-position();
+  }
 }
+
+//
+// On small screen all element should get 100% if width
+//
+.responsive-small {
+  .responsive-cell {
+    .responsive-block-position();
+  }
+  .responsive-block {
+    .responsive-block-position();
+  }
+
+  // remove horizontal separator
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+}
+
+.ui-dialog {
+  max-width: 100%;
+
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+}
+
 .container-fluid > .responsive-section {
   margin: 0 -@horizontalPadding;
   padding-right: @horizontalPadding;
@@ -43,11 +97,5 @@
   }
   .responsive-cell:first-child {
     padding-right: @horizontalPadding;
-    .forScreen(@mediumScreen, padding-right, 0px);
-  }
-}
-.responsive-section {
-  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
-    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
