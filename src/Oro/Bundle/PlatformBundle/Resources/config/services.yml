@@ -47,3 +47,16 @@ services:
             - @oro_platform.composer.version_helper
         tags:
             - { name: twig.extension }
+
+    oro_platform.optional_listeners.manager:
+        class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
+        arguments:
+           - ~
+           - @service_container
+
+    oro_platform.event_listener.optional_listeners:
+        class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
+        arguments:
+            - "@oro_platform.optional_listeners.manager"
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
