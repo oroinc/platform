@@ -13,8 +13,8 @@ define(function (require) {
     var Modal = require('oroui/js/modal');
     var constants = require('../constants');
 
-    // WebSys
     var __ = require('orotranslation/js/translator');
+
     /**
      * @export  orosidebar/js/widget-container/widget-add-view
      * @class   orosidebar.widgetContainer.WidgetAddView
@@ -31,12 +31,9 @@ define(function (require) {
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetAddTemplate, {
-                'availableWidgets': options.sidebar.getAvailableWidgets(),
-                // WebSys
-                'addWidgetText': __('Add widget')
+                'availableWidgets': options.sidebar.getAvailableWidgets()
             });
-            // WebSys
-            options.title = __('Select widget to add');
+            options.title = __('oro.sidebar.widget.add.dialog.title');
 
             Modal.prototype.initialize.apply(this, arguments);
         },
