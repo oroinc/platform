@@ -13,6 +13,7 @@ parameters:
     oro_organization.form.type.ownership_type.class:                 Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
 
     oro_organization.form.extension.owner.class:                     Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
+    oro_organization.form.extension.organization.class:              Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
 
 services:
     #
@@ -126,6 +127,17 @@ services:
             - @oro_security.security_facade
             - @?security.acl.voter.basic_permissions
             - @oro_security.ownership_tree_provider
+        tags:
+            - { name: form.type_extension, alias: form }
+    #
+    # Organizations
+    #
+    oro_organization.form.extension.organization:
+        class: %oro_organization.form.extension.organization.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade.link
+            - @oro_security.owner.ownership_metadata_provider.link
         tags:
             - { name: form.type_extension, alias: form }
     #

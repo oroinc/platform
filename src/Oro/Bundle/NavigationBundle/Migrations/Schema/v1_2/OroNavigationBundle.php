@@ -70,7 +70,7 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
                 $route     = $routeData['_route'];
 
                 unset($routeData['_controller'], $routeData['id'], $routeData['_route']);
-                
+
                 $queries->addPostQuery(
                     sprintf(
                         'UPDATE oro_navigation_history ' .
@@ -81,6 +81,7 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
                         $navItem['id']
                     )
                 );
+
             } catch (\RuntimeException $e) {
                 $queries->addPostQuery(
                     sprintf(
