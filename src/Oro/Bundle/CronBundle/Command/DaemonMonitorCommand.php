@@ -98,8 +98,11 @@ class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandI
      */
     protected function needToRestart(Daemon $daemon)
     {
-        $interval = date_diff($daemon->getDateStart(), new \DateTime('now'));
+        if ($daemon->getPid()) {
+            $interval = date_diff($daemon->getDateStart(), new \DateTime('now'));
+            return ((int)$interval->format('%d')) >= 1;
+        }
 
-        return ((int)$interval->format('%d')) >= 1;
+        return false;
     }
 }

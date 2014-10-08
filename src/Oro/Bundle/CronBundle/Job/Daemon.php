@@ -79,6 +79,8 @@ class Daemon
 
             $wsh->Run($this->getQueueRunCmd(), 0, false);
 
+            $this->dateStart = new \DateTime('now');
+
             return $this->getPid();
         }
 
@@ -87,6 +89,8 @@ class Daemon
             $this->getQueueRunCmd(),
             $outputFile
         ));
+
+        $this->dateStart = new \DateTime('now');
 
         return $this->getPid();
     }
@@ -113,6 +117,7 @@ class Daemon
             $this->pid = $this->findProcessPid(
                 sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
             );
+            $this->dateStart = null;
         }
 
         return $this->getPid() ? false : true;
