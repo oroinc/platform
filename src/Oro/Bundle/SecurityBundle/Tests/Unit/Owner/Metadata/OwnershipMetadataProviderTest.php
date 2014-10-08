@@ -132,7 +132,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetMetadataSetsOrganizationFielNane()
+    public function testGetMetadataSetsOrganizationFieldName()
     {
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
