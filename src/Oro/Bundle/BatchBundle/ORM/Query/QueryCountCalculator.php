@@ -70,6 +70,10 @@ class QueryCountCalculator
             foreach ($query->getHints() as $name => $value) {
                 $countQuery->setHint($name, $value);
             }
+            if (!$countQuery->hasHint(CountWalker::HINT_DISTINCT)) {
+                $countQuery->setHint(CountWalker::HINT_DISTINCT, true);
+            }
+            
             $this->appendTreeWalker($countQuery, 'Oro\Bundle\BatchBundle\ORM\Query\Walker\CountWalker');
             $countQuery->setFirstResult(null)->setMaxResults(null);
 
