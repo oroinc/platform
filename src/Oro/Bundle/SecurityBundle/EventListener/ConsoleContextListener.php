@@ -50,7 +50,7 @@ class ConsoleContextListener
             new InputOption(
                 self::OPTION_USER,
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'ID or username of the user that should be used as current user'
             )
         );
@@ -58,7 +58,7 @@ class ConsoleContextListener
             new InputOption(
                 self::OPTION_ORGANIZATION,
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'ID or name of the organization that should be used as current organization'
             )
         );
