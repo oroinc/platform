@@ -28,7 +28,7 @@ class RefreshContextListener
     protected $registry;
 
     /**
-     * @var ManagerRegistry
+     * @var DoctrineHelper
      */
     protected $doctrineHelper;
 
