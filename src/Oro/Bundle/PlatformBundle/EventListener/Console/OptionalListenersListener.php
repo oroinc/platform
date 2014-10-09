@@ -8,12 +8,13 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+use Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class OptionalListenersListener
 {
-    const DISABLE_ALL_OPTIONAL_LISTENERS = 'disable_all_listeners';
-    const DISABLE_OPTIONAL_LISTENERS = 'disable_listener';
+    const ALL_OPTIONAL_LISTENERS_VALUE = 'all';
+    const DISABLE_OPTIONAL_LISTENERS   = 'disabled_listeners';
 
     /**
      * @var OptionalListenerManager
@@ -51,18 +52,15 @@ class OptionalListenersListener
         $inputDefinition = $command->getApplication()->getDefinition();
         $inputDefinition->addOption(
             new InputOption(
-                self::DISABLE_ALL_OPTIONAL_LISTENERS,
-                null,
-                InputOption::VALUE_NONE,
-                'Disable all optional listeners'
-            )
-        );
-        $inputDefinition->addOption(
-            new InputOption(
                 self::DISABLE_OPTIONAL_LISTENERS,
                 null,
                 InputOption::VALUE_OPTIONAL|InputOption::VALUE_IS_ARRAY,
-                'Disable given optional listeners'
+                sprintf(
+                    'Disable optional listeners. To disable all listeners, use value "%s". '
+                    .'Use "%s" command to see list of available optional listeners',
+                    self::ALL_OPTIONAL_LISTENERS_VALUE,
+                    OptionalListenersCommand::NAME
+                )
             )
         );
 
@@ -78,12 +76,13 @@ class OptionalListenersListener
     {
         $listeners = null;
         $input->bind($command->getDefinition());
-        if ($input->getOption(self::DISABLE_ALL_OPTIONAL_LISTENERS)) {
-            $listeners = [];
-        }
         $listenerList = $input->getOption(self::DISABLE_OPTIONAL_LISTENERS);
         if (!empty($listenerList)) {
-            $listeners = $listenerList;
+            if (count($listenerList) === 1 && $listenerList[0] == self::ALL_OPTIONAL_LISTENERS_VALUE) {
+                $listeners = [];
+            } else {
+                $listeners = $listenerList;
+            }
         }
 
         return $listeners;

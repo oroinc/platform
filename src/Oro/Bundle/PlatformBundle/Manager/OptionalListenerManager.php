@@ -26,6 +26,14 @@ class OptionalListenerManager
     }
 
     /**
+     * @return array
+     */
+    public function getListeners()
+    {
+        return $this->optionalListeners;
+    }
+
+    /**
      * Set one listener as disabled
      *
      * @param string $listenerId

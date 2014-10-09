@@ -20,6 +20,6 @@ class OroPlatformBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new OptionalListenersCompilerPass());
+        $container->addCompilerPass(new OptionalListenersCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

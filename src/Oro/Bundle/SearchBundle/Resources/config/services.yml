@@ -53,7 +53,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: oro.optional_listener}
 
     oro_search.twig.search_extension:
         class:                        %oro_search.twig_extension.class%

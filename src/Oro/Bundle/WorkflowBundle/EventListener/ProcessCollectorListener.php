@@ -11,6 +11,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -20,7 +21,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 
-class ProcessCollectorListener
+class ProcessCollectorListener implements OptionalListenerInterface
 {
     /**
      * @var ManagerRegistry
@@ -73,6 +74,11 @@ class ProcessCollectorListener
     protected $forceQueued = false;
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param ManagerRegistry     $registry
      * @param DoctrineHelper      $doctrineHelper
      * @param ProcessHandler      $handler
@@ -91,6 +97,14 @@ class ProcessCollectorListener
         $this->handler        = $handler;
         $this->logger         = $logger;
         $this->triggerCache   = $triggerCache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
     }
 
     /**
@@ -171,6 +185,10 @@ class ProcessCollectorListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
         $entityClass = $this->getClass($entity);
         $event       = ProcessTrigger::EVENT_CREATE;
@@ -191,6 +209,10 @@ class ProcessCollectorListener
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
         $entityClass = $this->getClass($entity);
         $event       = ProcessTrigger::EVENT_UPDATE;
@@ -223,6 +245,10 @@ class ProcessCollectorListener
      */
     public function preRemove(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
         $entityClass = $this->getClass($entity);
         $event       = ProcessTrigger::EVENT_DELETE;
@@ -248,6 +274,10 @@ class ProcessCollectorListener
      */
     public function onClear(OnClearEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $isClears = $args->clearsAllEntities();
         if ($isClears || $args->getEntityClass() == 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger') {
             $this->triggers = null;
@@ -265,6 +295,10 @@ class ProcessCollectorListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entityManager = $args->getEntityManager();
 
         // handle processes
