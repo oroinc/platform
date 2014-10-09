@@ -57,8 +57,7 @@ class QueryCountCalculator
     public function getCount(Query $query)
     {
         if ($this->useWalker($query)) {
-            // cheap way to test whether query is distinct
-            if (stripos($query->getDQL(), 'DISTINCT') === false) {
+            if (!$query->contains('DISTINCT')) {
                 $query->setHint(CountWalker::HINT_DISTINCT, false);
             }
 
@@ -73,7 +72,7 @@ class QueryCountCalculator
             if (!$countQuery->hasHint(CountWalker::HINT_DISTINCT)) {
                 $countQuery->setHint(CountWalker::HINT_DISTINCT, true);
             }
-            
+
             $this->appendTreeWalker($countQuery, 'Oro\Bundle\BatchBundle\ORM\Query\Walker\CountWalker');
             $countQuery->setFirstResult(null)->setMaxResults(null);
 
