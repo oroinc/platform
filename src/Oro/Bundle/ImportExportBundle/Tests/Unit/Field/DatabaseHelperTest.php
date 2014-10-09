@@ -66,62 +66,11 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper);
-    }
-
-    public function testFindOneBy()
-    {
-        $entity = new \stdClass();
-        $entity->id = 1;
-        $relatedEntity = new \stdClass();
-        $relatedEntity->id = 2;
-        $criteria = ['id' => 1, 'related' => $relatedEntity];
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($relatedEntity)
-            ->will($this->returnValue($relatedEntity->id));
-
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getOneOrNullResult'))
-            ->getMockForAbstractClass();
-        $query->expects($this->once())
-            ->method('getOneOrNullResult')
-            ->will($this->returnValue($entity));
-
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
-        $queryBuilder->expects($this->once())
-            ->method('andWhere')
-            ->with('e.id = :id AND e.related = :related')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())
-            ->method('setParameters')
-            ->with($criteria)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())
-            ->method('setMaxResults')
-            ->with(1)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
 
-        $this->repository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('e')
-            ->will($this->returnValue($queryBuilder));
-
-        // findOneBy executed two times to check internal cache
-        $this->assertEquals($entity, $this->helper->findOneBy(self::TEST_CLASS, $criteria));
-        $this->assertEquals($entity, $this->helper->findOneBy(self::TEST_CLASS, $criteria));
-
-        // test clearing of internal cache
-        $this->assertAttributeNotEmpty('entities', $this->helper);
-        $this->helper->onClear();
-        $this->assertAttributeEmpty('entities', $this->helper);
+        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper, $fieldHelper);
     }
 
     public function testFind()
