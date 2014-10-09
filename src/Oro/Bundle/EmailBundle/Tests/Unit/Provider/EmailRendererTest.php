@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
 
@@ -28,6 +31,9 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     /** @var EmailRenderer */
     protected $renderer = 'test.key';
 
+    /** @var TranslatorInterface */
+    protected $translation;
+
     /**
      * setup mocks
      */
@@ -51,6 +57,10 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translation = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -157,10 +167,10 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $subject = 'subject';
 
         $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $emailTemplate->expects($this->once())
+        $emailTemplate->expects($this->exactly(2))
             ->method('getContent')
             ->will($this->returnValue($content));
-        $emailTemplate->expects($this->once())
+        $emailTemplate->expects($this->exactly(2))
             ->method('getSubject')
             ->will($this->returnValue($subject));
 
@@ -188,6 +198,45 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $result);
     }
 
+    public function testNotExistField()
+    {
+        $content    = 'content {{ entity.sub.crp }}';
+        $subject    = 'subject';
+        $systemVars = ['testVar' => 'test_system'];
+
+        $entity = new TestEntityForVariableProvider();
+        $entity->setField1('Test');
+
+        $entityClass = get_class($entity);
+        $template       = new EmailTemplate($subject, $content);
+        $templateParams = [
+            'entity' => $entity,
+            'system' => $systemVars
+        ];
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with($this->cacheKey)
+            ->will(
+                $this->returnValue(
+                    serialize(
+                        [
+                            'properties' => [],
+                            'methods'    => [
+                                $entityClass => ['getField1']
+                            ]
+                        ]
+                    )
+                )
+            );
+
+        $renderer = $this->getRendererInstance();
+
+        $renderer->compileMessage($template, $templateParams);
+
+        $this->assertEquals($template->getContent(), 'content <>');
+    }
 
     /**
      * Compile template preview test
@@ -266,8 +315,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 $this->cache,
                 $this->cacheKey,
                 $this->sandbox,
-                $dateTimeFormatter,
-                $doctrine,
+                $this->translation
             )
         );
     }

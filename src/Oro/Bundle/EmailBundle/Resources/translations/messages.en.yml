@@ -10,6 +10,7 @@ oro:
     email:
         controller.emailtemplate.saved.message: "Template saved"
         form.choose_template:                   "Choose a template..."
+        variable.not.found:                     Variable not found!
 
         system_configuration:
             email_configuration: Email Configuration
