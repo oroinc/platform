@@ -164,7 +164,8 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
 }
 ```
 
-Please pay attention on the enum code parameter. Each option set should have code and it should be unique system wide.
+Please pay attention on the enum code parameter. Each option set should have code and it should be unique system wide and it's length should be no more than 21 characters (due to dynamic name generation and prefix).
+Same principle applied to field name, in case above - it should be less than 27 symbols, due to suffix _id will be applied (30-3).
 To load a list of options you can use data fixtures, for example:
 
 ``` php
