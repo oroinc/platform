@@ -62,7 +62,7 @@ class QueryCountCalculator
             }
 
             // fix of doctrine count walker bug
-            // TODO revert changes when doctrine version >= 2.5
+            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
             /* @var $countQuery Query */
             $countQuery = clone $query;
             $countQuery->setParameters(clone $query->getParameters());
