@@ -42,6 +42,11 @@ class Daemon
     protected $pid;
 
     /**
+     * @var \DateTime
+     */
+    protected $dateStart;
+
+    /**
      *
      * @param string $rootDir
      * @param int    $maxJobs [optional] Maximum number of concurrent jobs. Default value is 5.
@@ -49,9 +54,10 @@ class Daemon
      */
     public function __construct($rootDir, $maxJobs = 5, $env = 'prod')
     {
-        $this->rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR);
-        $this->maxJobs = (int)$maxJobs;
-        $this->env     = $env;
+        $this->rootDir   = rtrim($rootDir, DIRECTORY_SEPARATOR);
+        $this->maxJobs   = (int)$maxJobs;
+        $this->env       = $env;
+        $this->dateStart = new \DateTime('now');
     }
 
     /**
@@ -73,6 +79,8 @@ class Daemon
 
             $wsh->Run($this->getQueueRunCmd(), 0, false);
 
+            $this->dateStart = new \DateTime('now');
+
             return $this->getPid();
         }
 
@@ -81,6 +89,8 @@ class Daemon
             $this->getQueueRunCmd(),
             $outputFile
         ));
+
+        $this->dateStart = new \DateTime('now');
 
         return $this->getPid();
     }
@@ -103,7 +113,14 @@ class Daemon
 
         $process->run();
 
-        return $process->isSuccessful();
+        if ($process->isSuccessful()) {
+            $this->pid = $this->findProcessPid(
+                sprintf('%sconsole jms-job-queue:run', $this->rootDir . DIRECTORY_SEPARATOR)
+            );
+            $this->dateStart = null;
+        }
+
+        return $this->getPid() ? false : true;
     }
 
     /**
@@ -120,6 +137,14 @@ class Daemon
         }
 
         return $this->pid;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateStart()
+    {
+        return $this->dateStart;
     }
 
     /**

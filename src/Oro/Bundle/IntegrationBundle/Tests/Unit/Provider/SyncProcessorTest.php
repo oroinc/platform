@@ -122,6 +122,11 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('testChannel'));
 
         $this->integration
+            ->expects($this->atLeastOnce())
+            ->method('getType')
+            ->will($this->returnValue('testChannelType'));
+
+        $this->integration
             ->expects($this->once())
             ->method('getEnabled')
             ->will($this->returnValue(true));
@@ -150,6 +155,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                         'processorAlias' => false,
                         'entityName'     => 'testEntity',
                         'channel'        => 'testChannel',
+                        'channelType'    => 'testChannelType',
                         'testParameter'  => 'testValue'
                     ]
                 ]
