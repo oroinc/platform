@@ -23,9 +23,7 @@ class CustomEntityType extends AbstractType
 {
     const NAME = 'custom_entity_type';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
     // TODO: Replace manual mapping with form type guessing,
@@ -55,8 +53,8 @@ class CustomEntityType extends AbstractType
 
     /**
      * @param ConfigManager $configManager
-     * @param Router $router
-     * @param Translator $translator
+     * @param Router        $router
+     * @param Translator    $translator
      */
     public function __construct(ConfigManager $configManager, Router $router, Translator $translator)
     {
@@ -87,17 +85,7 @@ class CustomEntityType extends AbstractType
             // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-1722
             $extendConfig = $extendConfigProvider->getConfig($className, $formConfig->getId()->getFieldName());
 
-            // TODO: Convert this check to method in separate helper service and reuse it in ExtendEntityExtension,
-            // TODO: should be done in scope of https://magecore.atlassian.net/browse/BAP-1721
-            if ($formConfig->get('is_enabled') && !$extendConfig->is('is_deleted')
-                && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-                && !in_array($formConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
-                && !(
-                    in_array($formConfig->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
-                    && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
-                )
-            ) {
+            if ($this->checkAvailability($className, $formConfig)) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $formConfig->getId();
                 $entityConfig  = $entityConfigProvider->getConfig(
@@ -126,7 +114,7 @@ class CustomEntityType extends AbstractType
                             ->get('enum_code');
                         break;
                     case 'multiEnum':
-                        $options['expanded'] = true;
+                        $options['expanded']  = true;
                         $options['enum_code'] = $this->configManager->getProvider('enum')
                             ->getConfig($className, $fieldConfigId->getFieldName())
                             ->get('enum_code');
@@ -191,12 +179,9 @@ class CustomEntityType extends AbstractType
     }
 
     /**
-     * @param FormView $view
+     * @param FormView      $view
      * @param FormInterface $form
-     * @param array $options
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @param array         $options
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
@@ -227,16 +212,7 @@ class CustomEntityType extends AbstractType
         foreach ($formConfigs as $formConfig) {
             $extendConfig = $extendConfigProvider->getConfig($className, $formConfig->getId()->getFieldName());
 
-            if ($formConfig->get('is_enabled')
-                && !$extendConfig->is('is_deleted')
-                && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-                && !in_array($formConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
-                && (
-                    in_array($formConfig->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
-                    && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', false)
-                )
-            ) {
+            if ($this->checkAvailability($className, $formConfig)) {
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $formConfig->getId();
                 if (in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
@@ -275,9 +251,10 @@ class CustomEntityType extends AbstractType
     }
 
     /**
-     * @param $entities
-     * @param $default
+     * @param                 $entities
+     * @param                 $default
      * @param ConfigInterface $extendConfig
+     *
      * @return array
      */
     protected function getInitialElements($entities, $default, ConfigInterface $extendConfig)
@@ -319,6 +296,33 @@ class CustomEntityType extends AbstractType
         }
 
         return $result;
+    }
+
+    /**
+     * @param string          $className
+     * @param ConfigInterface $formConfig
+     *
+     * @return bool
+     */
+    protected function checkAvailability($className, ConfigInterface $formConfig)
+    {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+
+        // TODO: refactor ConfigIdInterface to allow extracting of field name,
+        // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-1722
+        $extendConfig = $extendConfigProvider->getConfig($className, $formConfig->getId()->getFieldName());
+
+        // TODO: Convert this check to method in separate helper service and reuse it in ExtendEntityExtension,
+        // TODO: should be done in scope of https://magecore.atlassian.net/browse/BAP-1721
+        return ($formConfig->get('is_enabled') && !$extendConfig->is('is_deleted')
+            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
+            && !in_array($formConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
+            && !(
+                in_array($formConfig->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
+                && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
+            )
+        );
     }
 
     /**
