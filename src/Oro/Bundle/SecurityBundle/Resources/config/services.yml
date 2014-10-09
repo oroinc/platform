@@ -62,6 +62,7 @@ parameters:
     oro_security.listener.refresh_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
     oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
     oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
+    oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
@@ -485,6 +486,14 @@ services:
             - @oro_entity.doctrine_helper
         tags:
             - { name: doctrine.event_listener, event: onClear }
+
+    oro_security.listener.console_context_listener:
+        class: %oro_security.listener.console_context_listener.class%
+        arguments:
+            - @doctrine
+            - @security.context
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
     oro_security.form.extension.aclprotected_type:
         class: %oro_security.form.extension.aclprotected_type.class%
