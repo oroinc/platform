@@ -51,7 +51,7 @@ services:
     oro_platform.optional_listeners.manager:
         class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
         arguments:
-           - ~
+           - []
            - @service_container
 
     oro_platform.event_listener.optional_listeners:
