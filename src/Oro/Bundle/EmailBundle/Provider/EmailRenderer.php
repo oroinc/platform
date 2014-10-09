@@ -3,18 +3,18 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+
 
 class EmailRenderer extends \Twig_Environment
 {
+    const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
+
     /** @var VariablesProvider */
     protected $variablesProvider;
 
@@ -24,11 +24,8 @@ class EmailRenderer extends \Twig_Environment
     /** @var  string */
     protected $cacheKey;
 
-    /** @var  DateTimeFormatter */
-    protected $dateTimeFormatter;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var TranslatorInterface */
+    protected $translator;
 
     /**
      * @param \Twig_LoaderInterface   $loader
@@ -37,8 +34,7 @@ class EmailRenderer extends \Twig_Environment
      * @param Cache                   $cache
      * @param                         $cacheKey
      * @param \Twig_Extension_Sandbox $sandbox
-     * @param DateTimeFormatter       $dateTimeFormatter
-     * @param ManagerRegistry         $doctrine
+     * @param TranslatorInterface     $translator
      */
     public function __construct(
         \Twig_LoaderInterface $loader,
@@ -47,8 +43,7 @@ class EmailRenderer extends \Twig_Environment
         Cache $cache,
         $cacheKey,
         \Twig_Extension_Sandbox $sandbox,
-        DateTimeFormatter $dateTimeFormatter,
-        ManagerRegistry $doctrine
+        TranslatorInterface $translator
     ) {
         parent::__construct($loader, $options);
 
@@ -59,8 +54,7 @@ class EmailRenderer extends \Twig_Environment
         $this->addExtension($sandbox);
         $this->configureSandbox();
 
-        $this->dateTimeFormatter = $dateTimeFormatter;
-        $this->doctrine          = $doctrine;
+        $this->translator = $translator;
     }
 
     /**
@@ -153,8 +147,10 @@ class EmailRenderer extends \Twig_Environment
      *   -- datetime variables with formatting will be skipped, e.g. {{ entity.createdAt|date('F j, Y, g:i A') }}
      *   -- processes ONLY variables that passed without formatting, e.g. {{ entity.createdAt }}
      *
-     * Note: Rendering \DateTime objects (without formatting) in twig
-     *       causes Calling "__tostring" method on a "DateTime" object is not allowed
+     * Note:
+     *  - add oro_format_datetime filter to all items which implement \DateTimeInterface
+     *  - if value does not exists and PropertyAccess::getValue throw an error
+     *    it will change on self::VARIABLE_NOT_FOUND
      *
      * @param EmailTemplateInterface $emailTemplate
      * @param                        $entity
@@ -163,40 +159,95 @@ class EmailRenderer extends \Twig_Environment
      */
     protected function processDateTimeVariables(EmailTemplateInterface $emailTemplate, $entity)
     {
-        $entityManager  = $this->doctrine->getManager();
-        $entityMetadata = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
-        if ($entityMetadata) {
-            $accessor = PropertyAccess::createPropertyAccessor();
+        $emailTemplateContent = $emailTemplate->getContent();
+        $emailTemplateSubject = $emailTemplate->getSubject();
 
-            $emailTemplateContent = $emailTemplate->getContent();
-            $emailTemplateSubject = $emailTemplate->getSubject();
+        $contentMatch         = $this->getTagsFromSubject('/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/', $emailTemplateContent);
+        $emailTemplateContent = $this->modifyTags(
+            $emailTemplateContent,
+            $contentMatch,
+            $entity,
+            function ($path) {
+                return '{{ ' . $path . '|oro_format_datetime }}';
+            }
+        );
 
-            $entityFieldMappings = $entityMetadata->fieldMappings;
-            array_walk(
-                $entityFieldMappings,
-                function ($field) use ($entity, $accessor, &$emailTemplateContent, &$emailTemplateSubject) {
-                    if (in_array($field['type'], [Type::DATE, Type::TIME, Type::DATETIME, Type::DATETIMETZ])) {
-                        $value   = $accessor->getValue($entity, $field['fieldName']);
-                        $pattern = '/{{(\s|)entity.' . $field['fieldName'] . '(\s|)}}/';
+        $subjectMatch         = $this->getTagsFromSubject('/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/', $emailTemplateSubject);
+        $emailTemplateSubject = $this->modifyTags(
+            $emailTemplateSubject,
+            $subjectMatch,
+            $entity,
+            function ($path) {
+                return '{{ ' . $path . '|oro_format_datetime }}';
+            }
+        );
 
-                        $emailTemplateContent = preg_replace(
-                            $pattern,
-                            $this->dateTimeFormatter->format($value),
-                            $emailTemplateContent
-                        );
-                        $emailTemplateSubject = preg_replace(
-                            $pattern,
-                            $this->dateTimeFormatter->format($value),
-                            $emailTemplateSubject
-                        );
-                    }
-                }
-            );
-
-            $emailTemplate->setContent($emailTemplateContent);
-            $emailTemplate->setSubject($emailTemplateSubject);
-        }
+        $emailTemplate->setContent($emailTemplateContent);
+        $emailTemplate->setSubject($emailTemplateSubject);
 
         return $emailTemplate;
+    }
+
+    /**
+     * @param Object $entity
+     * @param string $path
+     *
+     * @return mixed
+     */
+    protected function getValue($entity, $path)
+    {
+        $accessor = PropertyAccess::createPropertyAccessor();
+
+        return $accessor->getValue($entity, $path);
+    }
+
+    /**
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return array
+     */
+    protected function getTagsFromSubject($pattern, $subject)
+    {
+        $match = [];
+        preg_match_all($pattern, $subject, $match);
+
+        return empty($match[1]) ? [] : $match[1];
+    }
+
+    /**
+     * @param string   $subject
+     * @param array    $match
+     * @param Object   $entity
+     * @param callable $replacePattern
+     *
+     * @return string
+     */
+    protected function modifyTags($subject, array $match, $entity, \Closure $replacePattern)
+    {
+        foreach ($match as $path) {
+            $split         = explode('.', $path);
+            $searchPattern = '/{{[\s]*?' . $path . '[\s]*?}}/';
+
+            if ($split[0] && 'entity' === $split[0]) {
+                unset($split[0]);
+            }
+
+            try {
+                $result = $this->getValue($entity, implode('.', $split));
+
+                if ($result instanceof \DateTimeInterface) {
+                    $subject = preg_replace($searchPattern, $replacePattern($path), $subject);
+                }
+            } catch (\Exception $e) {
+                $subject = preg_replace(
+                    $searchPattern,
+                    '<' . $this->translator->trans(self::VARIABLE_NOT_FOUND) . '>',
+                    $subject
+                );
+            }
+        }
+
+        return $subject;
     }
 }
