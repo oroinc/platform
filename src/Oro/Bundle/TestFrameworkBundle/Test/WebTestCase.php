@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -273,14 +273,13 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = array())
     {
-        array_unshift($params, $name);
-
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        $input = new ArrayInput($params);
+        array_unshift($params, 'application', $name);
+        $input = new ArgvInput($params);
         $input->setInteractive(false);
 
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');
