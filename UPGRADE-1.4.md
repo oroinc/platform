@@ -55,6 +55,9 @@ UPGRADE FROM 1.3 to 1.4
 - `Manager\DTO\Email` now is extended by `Oro\Bundle\EmailBundle\Model\EmailHeader`
 - In `Manager\ImapEmailManager` new method `hasCapability` has been added
 
+####ImportExportBundle:
+- Added console command `oro:import:csv` to perform import from CSV file using CLI
+
 ####InstallerBundle:
 - New option `symlink` has been added into `Command\InstallCommand` and `Command\PlatformUpdateCommand`
 
