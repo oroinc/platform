@@ -18,6 +18,39 @@ define([
             'remove collection': 'recheck'
         },
 
+        initialize: function (options) {
+            _.extend(this, _.pick(options, ['position']));
+            CollectionView.__super__.initialize.apply(this, arguments);
+            // handle resize event once per frame (1000 ms / 25 frames)
+            $(window).on('resize.' + this.cid, _.debounce(_.bind(this.onPageResize, this), 40));
+        },
+
+        dispose: function () {
+            $(window).off('.' + this.cid);
+            CollectionView.__super__.dispose.call(this);
+        },
+
+        render: function () {
+            CollectionView.__super__.render.call(this);
+            this.positionUpdate();
+            return this;
+        },
+
+        onPageResize: function () {
+            this.positionUpdate();
+            this.recheck();
+        },
+
+        /**
+         * Updates position of root element
+         */
+        positionUpdate: function () {
+            var pos = _.result(this, 'position');
+            if (pos) {
+                this.$el.css('left', pos.left);
+            }
+        },
+
         recheck: function () {
             var visibilityChanged;
 
@@ -58,7 +91,7 @@ define([
         },
 
         updateVisibilityList: function () {
-            this.$list[this.visibleItems.length > 0 ? 'show' : 'hide']();
+            this.$el[this.visibleItems.length > 0 ? 'show' : 'hide']();
         }
     });
 

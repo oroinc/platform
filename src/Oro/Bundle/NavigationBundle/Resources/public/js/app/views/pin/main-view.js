@@ -6,9 +6,10 @@ define([
     'oroui/js/mediator',
     '../base/main-view',
     '../base/button-view',
-    './collection-view',
+    './pinbar-view',
+    './dropdown-view',
     './item-view'
-], function (_, mediator, MainView, ButtonView, CollectionView, ItemView) {
+], function (_, mediator, MainView, ButtonView, PinBarView, DropdownView, ItemView) {
     'use strict';
 
     var PinView;
@@ -22,11 +23,10 @@ define([
         },
 
         createSubViews: function (options) {
-            var _this, collection, button,
+            var collection, button,
                 barView, BarItemView, barOptions,
-                tabView, TabItemView, tabOptions;
+                dropdownView, DropdownItemView, dropdownOptions;
 
-            _this = this;
             collection = this.collection;
 
             // button view
@@ -45,29 +45,34 @@ define([
                 autoRender: true,
                 el: 'pinBar',
                 collection: collection,
-                itemView: BarItemView,
-                filterer: function (item, index) {
-                    return index < _this.maxItems;
-                }
+                itemView: BarItemView
             });
-            barView = new CollectionView(barOptions);
+            barView = new PinBarView(barOptions);
             this.subview('bar', barView);
 
             // tab view
-            TabItemView = ItemView.extend({
+            DropdownItemView = ItemView.extend({
                 template: options.tabItemTemplate
             });
-            tabOptions = _.extend(options.tabOptions, {
+            dropdownOptions = _.extend(options.tabOptions, {
                 autoRender: true,
                 el: 'pinTab',
                 collection: collection,
-                itemView: TabItemView,
-                filterer: function (item, index) {
-                    return index >= _this.maxItems;
+                itemView: DropdownItemView,
+                filterer: function (item) {
+                    return !barView.isVisibleItem(item);
+                },
+                position: function () {
+                    var itemView, pos = {};
+                    itemView = barView.getLastVisibleView();
+                    if (itemView) {
+                        pos.left = itemView.el.getBoundingClientRect().right;
+                    }
+                    return pos;
                 }
             });
-            tabView = new CollectionView(tabOptions);
-            this.subview('tab', tabView);
+            dropdownView = new DropdownView(dropdownOptions);
+            this.subview('dropdown', dropdownView);
         },
 
         actualizeAttributes: function (model) {
@@ -77,7 +82,6 @@ define([
 
         onAdd: function (model) {
             mediator.execute({name: 'pageCache:add', silent: true});
-            this.reorder();
             if (model.get('url') !== mediator.execute('currentUrl')) {
                 // if URL was changed on server, applies this changes for current page
                 mediator.execute('changeUrl', model.get('url'), {replace: true});
@@ -88,20 +92,10 @@ define([
             var url;
             url = model.get('url');
             mediator.execute({name: 'pageCache:remove', silent: true}, url);
-            this.reorder();
             if (mediator.execute('compareUrl', model.get('url'))) {
                 // remove 'restore' param from URL, if pin was removed for current page
                 mediator.execute('changeUrlParam', 'restore', null);
             }
-        },
-
-        /**
-         * Change position property of model based on current order
-         */
-        reorder: function () {
-            this.collection.each(function (module, position) {
-                module.set({position: position});
-            });
         }
     });
 
