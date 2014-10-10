@@ -14,7 +14,7 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 class OptionalListenersListener
 {
     const ALL_OPTIONAL_LISTENERS_VALUE = 'all';
-    const DISABLE_OPTIONAL_LISTENERS   = 'disabled_listeners';
+    const DISABLE_OPTIONAL_LISTENERS   = 'disabled-listeners';
 
     /**
      * @var OptionalListenerManager
@@ -37,8 +37,8 @@ class OptionalListenersListener
         $command = $event->getCommand();
         $input = $event->getInput();
 
-        $this->addOptionsToCommand($command);
-        $listeners = $this->getListenersToDisable($input, $command);
+        $this->addOptionsToCommand($command, $input);
+        $listeners = $this->getListenersToDisable($input);
         if (!empty($listeners)) {
             $this->listenersManager->disableListeners($listeners);
         }
@@ -46,8 +46,9 @@ class OptionalListenersListener
 
     /**
      * @param Command $command
+     * @param InputInterface $input
      */
-    protected function addOptionsToCommand(Command $command)
+    protected function addOptionsToCommand(Command $command, InputInterface $input)
     {
         $inputDefinition = $command->getApplication()->getDefinition();
         $inputDefinition->addOption(
@@ -56,8 +57,8 @@ class OptionalListenersListener
                 null,
                 InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
                 sprintf(
-                    'Disable optional listeners. To disable all listeners, use value "%s". '
-                    .'Use "%s" command to see list of available optional listeners',
+                    'Disable optional listeners, "%s" to disable all listeners, '
+                    .'command "%s" shows all listeners',
                     self::ALL_OPTIONAL_LISTENERS_VALUE,
                     OptionalListenersCommand::NAME
                 )
@@ -65,18 +66,18 @@ class OptionalListenersListener
         );
 
         $command->mergeApplicationDefinition();
+        $input->bind($command->getDefinition());
     }
 
     /**
-     * @param InputInterface $input
-     * @param Command        $command
      *
-     * @return array|mixed
+     * @param InputInterface $input
+     * @return array
      */
-    protected function getListenersToDisable(InputInterface $input, Command $command)
+    protected function getListenersToDisable(InputInterface $input)
     {
         $listeners = [];
-        $input->bind($command->getDefinition());
+
         $listenerList = $input->getOption(self::DISABLE_OPTIONAL_LISTENERS);
         if (!empty($listenerList)) {
             if (count($listenerList) === 1 && $listenerList[0] == self::ALL_OPTIONAL_LISTENERS_VALUE) {
