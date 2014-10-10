@@ -19,7 +19,7 @@ class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandI
     const COMMAND_NAME  = 'oro:cron:daemon';
 
     /** @var array */
-    protected $repeatTime = [5, 10, 15, 25, 25 ];
+    protected $repeatTime = [5, 10, 15, 25, 25];
 
     /**
      * {@inheritdoc}
