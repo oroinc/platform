@@ -33,6 +33,11 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
     protected $securityContext;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $userManager;
+
+    /**
      * @var ConsoleContextListener
      */
     protected $listener;
@@ -46,6 +51,10 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->userRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $this->organizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+
+        $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())
@@ -65,7 +74,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->listener = new ConsoleContextListener($registry, $this->securityContext);
+        $this->listener = new ConsoleContextListener($registry, $this->securityContext, $this->userManager);
     }
 
     public function testNoOptions()
@@ -89,6 +98,8 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organizationId = 2;
         $organization = new Organization();
         $organization->setId($organizationId);
+        $organization->setEnabled(true);
+        $user->addOrganization($organization);
 
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
@@ -132,6 +143,8 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $organizationName = 'test_organization';
         $organization = new Organization();
         $organization->setName($organizationName);
+        $organization->setEnabled(true);
+        $user->addOrganization($organization);
 
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
@@ -145,9 +158,9 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
             ->will($this->returnValue($organizationName));
 
-        $this->userRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['username' => $username])
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with($username)
             ->will($this->returnValue($user));
         $this->organizationRepository->expects($this->once())
             ->method('findOneBy')
@@ -162,6 +175,119 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken', $token);
         $this->assertEquals($user, $token->getUser());
         $this->assertEquals($organization, $token->getOrganizationContext());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Can't find user with identifier test_user
+     */
+    public function testNoUserFound()
+    {
+        $username = 'test_user';
+
+        $event = $this->getEvent();
+        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        $input = $event->getInput();
+        $input->expects($this->at(0))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_USER)
+            ->will($this->returnValue($username));
+
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with($username)
+            ->will($this->returnValue(null));
+
+        $this->listener->onConsoleCommand($event);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Can't find organization with identifier test_organization
+     */
+    public function testNoOrganizationFound()
+    {
+        $organizationName = 'test_organization';
+
+        $event = $this->getEvent();
+        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        $input = $event->getInput();
+        $input->expects($this->at(1))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
+            ->will($this->returnValue($organizationName));
+
+        $this->organizationRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['name' => $organizationName])
+            ->will($this->returnValue(null));
+
+        $this->listener->onConsoleCommand($event);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Organization test_organization is not enabled
+     */
+    public function testNotEnabledOrganization()
+    {
+        $organizationName = 'test_organization';
+        $organization = new Organization();
+        $organization->setName($organizationName);
+
+        $event = $this->getEvent();
+        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        $input = $event->getInput();
+        $input->expects($this->at(1))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
+            ->will($this->returnValue($organizationName));
+
+        $this->organizationRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['name' => $organizationName])
+            ->will($this->returnValue($organization));
+
+        $this->listener->onConsoleCommand($event);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage User test_user is not in organization test_organization
+     */
+    public function testUserNotInOrganization()
+    {
+        $username = 'test_user';
+        $user = new User();
+        $user->setUsername($username);
+
+        $organizationName = 'test_organization';
+        $organization = new Organization();
+        $organization->setName($organizationName);
+        $organization->setEnabled(true);
+
+        $event = $this->getEvent();
+        /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
+        $input = $event->getInput();
+        $input->expects($this->at(0))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_USER)
+            ->will($this->returnValue($username));
+        $input->expects($this->at(1))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
+            ->will($this->returnValue($organizationName));
+
+        $this->userManager->expects($this->once())
+            ->method('findUserByUsernameOrEmail')
+            ->with($username)
+            ->will($this->returnValue($user));
+        $this->organizationRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['name' => $organizationName])
+            ->will($this->returnValue($organization));
+
+        $this->listener->onConsoleCommand($event);
     }
 
     /**

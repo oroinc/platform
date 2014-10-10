@@ -14,7 +14,7 @@ so, to save user and organization listener creates instance of ConsoleToken and 
 
 Listener uses following options:
 
-- *--current-user* - ID or username of the user that should be used as current user;
+- *--current-user* - ID, username or email of the user that should be used as current user;
 - *--current-organization* - ID or name of the organization that should be used as current organization.
 
 Example:
