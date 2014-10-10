@@ -54,6 +54,19 @@ class OptionalListenerManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($testListener->enabled);
     }
 
+    public function testDisableNonExistsListener()
+    {
+        $listenerId = 'test.bad_listener';
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            sprintf(
+                'Optional listener "&s" does not exists',
+                $listenerId
+            )
+        );
+        $this->manager->disableListener($listenerId);
+    }
+
     public function testDisableAllListeners()
     {
         $listener1 = new TestListener();

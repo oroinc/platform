@@ -92,7 +92,7 @@ Please note that setting added through _app.yml_ can be overwrote in _app/config
 
 ## Optional Doctrine listeners ##
 
-Doctrine listeners can be a very slow processes. And during ron console command, you can disable this listeners.
+Doctrine listeners can be a very slow processes. And during console command execution, you can disable this listeners.
 
 Each console command have additional option `disabled_listeners`. Using this option, you can disable some of doctrine listeners.
 

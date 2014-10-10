@@ -37,11 +37,20 @@ class OptionalListenerManager
      * Set one listener as disabled
      *
      * @param string $listenerId
+     *
+     * @throws \InvalidArgumentException When given listener doesn't exist
      */
     public function disableListener($listenerId)
     {
         if (in_array($listenerId, $this->optionalListeners)) {
             $this->container->get($listenerId)->setEnabled(false);
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Optional listener "&s" does not exists',
+                    $listenerId
+                )
+            );
         }
     }
 

@@ -62,10 +62,6 @@ class EntityListener implements OptionalListenerInterface
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        if (!$this->enabled) {
-            return;
-        }
-
         if ($event->getClassMetadata()->getReflectionClass()
             && $metadata = $this->metadataFactory->extendLoadMetadataForClass($event->getClassMetadata())
         ) {

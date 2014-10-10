@@ -39,7 +39,7 @@ class OptionalListenersListener
 
         $this->addOptionsToCommand($command);
         $listeners = $this->getListenersToDisable($input, $command);
-        if (!is_null($listeners)) {
+        if (!empty($listeners)) {
             $this->listenersManager->disableListeners($listeners);
         }
     }
@@ -54,7 +54,7 @@ class OptionalListenersListener
             new InputOption(
                 self::DISABLE_OPTIONAL_LISTENERS,
                 null,
-                InputOption::VALUE_OPTIONAL|InputOption::VALUE_IS_ARRAY,
+                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
                 sprintf(
                     'Disable optional listeners. To disable all listeners, use value "%s". '
                     .'Use "%s" command to see list of available optional listeners',
@@ -69,17 +69,18 @@ class OptionalListenersListener
 
     /**
      * @param InputInterface $input
+     * @param Command        $command
      *
-     * @return array|null
+     * @return array|mixed
      */
     protected function getListenersToDisable(InputInterface $input, Command $command)
     {
-        $listeners = null;
+        $listeners = [];
         $input->bind($command->getDefinition());
         $listenerList = $input->getOption(self::DISABLE_OPTIONAL_LISTENERS);
         if (!empty($listenerList)) {
             if (count($listenerList) === 1 && $listenerList[0] == self::ALL_OPTIONAL_LISTENERS_VALUE) {
-                $listeners = [];
+                $listeners = $this->listenersManager->getListeners();
             } else {
                 $listeners = $listenerList;
             }
