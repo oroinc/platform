@@ -42,8 +42,8 @@ class ConsoleContextListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
-        $command = $event->getCommand();
-        $input = $event->getInput();
+        $command    = $event->getCommand();
+        $input      = $event->getInput();
         $definition = $command->getApplication()->getDefinition();
 
         $definition->addOption(
@@ -63,11 +63,8 @@ class ConsoleContextListener
             )
         );
 
-        $command->mergeApplicationDefinition();
-        $input->bind($definition);
-
-        $user         = $input->getOption(self::OPTION_USER);
-        $organization = $input->getOption(self::OPTION_ORGANIZATION);
+        $user         = $input->getParameterOption('--' . self::OPTION_USER);
+        $organization = $input->getParameterOption('--' . self::OPTION_ORGANIZATION);
 
         if (!$user && !$organization) {
             return;
