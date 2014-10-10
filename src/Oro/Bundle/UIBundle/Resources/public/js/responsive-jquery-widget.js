@@ -3,6 +3,11 @@
 define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
     'use strict';
 
+    var SERVICE_AREA = 60, // extra area for some kind of sidebars, etc.
+        SCREEN_SMALL = 1280 - SERVICE_AREA, //WXGA 16:9 1280x720
+        SCREEN_MEDIUM = 1360 - SERVICE_AREA, //HD ~16:9 1360x768
+        SCREEN_LARGE = 1600 - SERVICE_AREA; //HD+ 16:9 1600x900
+
     /**
      * Widget makes layout responive
      *
@@ -27,9 +32,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             // key to store added classes via jquery.data
             addedClassesDataName: 'responsive-classes',
 
-            sectionSingleCellModifier: 'responsive-section-single-cell',
-            cellSingleBlockModifier: 'responsive-cell-single-block',
-
             sectionNoBlocksModifier: 'responsive-section-no-blocks',
             cellNoBlocksModifier: 'responsive-cell-no-blocks',
 
@@ -40,18 +42,24 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
                 modifierClassName: 'responsive-small',
                 width: {
                     from: 0,
-                    to: 1024
+                    to: SCREEN_SMALL
                 }
             }, {
                 modifierClassName: 'responsive-medium',
                 width: {
-                    from: 1025,
-                    to: 1340
+                    from: SCREEN_SMALL + 1,
+                    to: SCREEN_MEDIUM
                 }
             }, {
                 modifierClassName: 'responsive-big',
                 width: {
-                    from: 1341,
+                    from: SCREEN_MEDIUM + 1,
+                    to: SCREEN_LARGE
+                }
+            }, {
+                modifierClassName: '',
+                width: {
+                    from: SCREEN_LARGE + 1,
                     to: null // to infinity
                 }
             }]
@@ -95,10 +103,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var classNames = [size.modifierClassName];
             var hasNoBlocks = true;
 
-            if($cells.length === 1) {
-                classNames.push(options.sectionSingleCellModifier);
-            }
-
             this._updateClasses($section, classNames);
 
             $cells.each(function(index, cell) {
@@ -127,9 +131,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var $blocks = this._getBlocksFromCell($cell);
             var classNames = [];
 
-            if($blocks.length === 1) {
-                classNames.push(options.cellSingleBlockModifier);
-            } else if ($blocks.length === 0) {
+            if ($blocks.length === 0) {
                 classNames.push(options.cellNoBlocksModifier);
             }
 
@@ -188,10 +190,11 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
          * @potected
          */
         _getSize: function(sectionWidth) {
-            return _.find(this.options.sizes, function(value) {
+            var size = _.find(this.options.sizes, function(value) {
                 return (sectionWidth >= value.width.from &&
                     (sectionWidth <= value.width.to || value.width.to === null));
             });
+            return size;
         },
 
         /**
