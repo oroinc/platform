@@ -235,12 +235,12 @@ class FieldHelper
 
     /**
      * @param object $entity
-     * @param array $fields
      * @return array
      */
-    public function getIdentityValues($entity, array $fields)
+    public function getIdentityValues($entity)
     {
         $entityName = ClassUtils::getClass($entity);
+        $fields = $this->getFields($entityName, true);
 
         $identityValues = array();
         foreach ($fields as $field) {
