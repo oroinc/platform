@@ -151,7 +151,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $className = ExtendHelper::buildEnumValueClassName($enumCode);
 
-        $options = array_merge(
+        $options = array_replace_recursive(
             [
                 ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_HIDDEN,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
