@@ -60,7 +60,7 @@ class OptionalListenerManagerTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(
             '\InvalidArgumentException',
             sprintf(
-                'Optional listener "&s" does not exists',
+                'Optional listener "%s" does not exists',
                 $listenerId
             )
         );

@@ -47,7 +47,7 @@ class OptionalListenerManager
         } else {
             throw new \InvalidArgumentException(
                 sprintf(
-                    'Optional listener "&s" does not exists',
+                    'Optional listener "%s" does not exists',
                     $listenerId
                 )
             );
