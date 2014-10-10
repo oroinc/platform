@@ -92,23 +92,41 @@ class DaemonMonitorCommand extends ContainerAwareCommand implements CronCommandI
         }
 
         if ($stop && $isClearQueue) {
-            try {
-                if ($daemon->stop()) {
-                    $logger->info('Daemon was stopped');
-                }
-            } catch (\Exception $e) {
-                $logger->info('Daemon already stopped');
-            }
+            $this->doStop($daemon, $logger);
         }
 
         if ($start && $isClearQueue) {
-            try {
-                if ($daemon->run()) {
-                    $logger->info('Daemon was started');
-                }
-            } catch (\Exception $e) {
-                $logger->info('Daemon can`t be started');
+            $this->doStart($daemon, $logger);
+        }
+    }
+
+    /**
+     * @param Daemon $daemon
+     * @param OutputLogger $logger
+     */
+    protected function doStop(Daemon $daemon, OutputLogger $logger)
+    {
+        try {
+            if ($daemon->stop()) {
+                $logger->info('Daemon was stopped');
             }
+        } catch (\Exception $e) {
+            $logger->info('Daemon already stopped');
+        }
+    }
+
+    /**
+     * @param Daemon $daemon
+     * @param OutputLogger $logger
+     */
+    protected function doStart(Daemon $daemon, OutputLogger $logger)
+    {
+        try {
+            if ($daemon->run()) {
+                $logger->info('Daemon was started');
+            }
+        } catch (\Exception $e) {
+            $logger->info('Daemon can`t be started');
         }
     }
 
