@@ -280,8 +280,16 @@ abstract class WebTestCase extends BaseWebTestCase
 
         $argv = ['application', $name];
         foreach ($params as $k => $v) {
-            $argv[] = $k;
-            $argv[] = $v;
+            if (is_bool($v)) {
+                if ($v) {
+                    $argv[] = $k;
+                }
+            } else {
+                if (!is_int($k)) {
+                    $argv[] = $k;
+                }
+                $argv[] = $v;
+            }
         }
         $input = new ArgvInput($argv);
         $input->setInteractive(false);
