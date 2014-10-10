@@ -492,6 +492,7 @@ services:
         arguments:
             - @doctrine
             - @security.context
+            - @oro_user.manager
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
