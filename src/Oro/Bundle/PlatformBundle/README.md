@@ -104,6 +104,6 @@ As value, this option takes `all` string or array of optional doctrine listener 
 
 In this case, command will be run with disabled doctrine listeners: first_listener and second_listener.
 
-See the list of optional listeners you can by run command `oro.platform.optional_listeners`.
+See the list of optional listeners you can by run command `oro:platform:optional-listeners`.
 
 To mark your doctrine listener as optional, your listener must implement `Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface` interface and set skips in your code if $enabled = false.
