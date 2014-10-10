@@ -22,6 +22,7 @@
         "ext-gd": "*",
         "ext-xml": "*",
         "symfony/symfony": "2.3.*",
+        "twig/twig": "1.16.0",
         "doctrine/orm": "2.4.5",
         "doctrine/doctrine-bundle": "1.2.0",
         "doctrine/dbal": "2.4.x-dev",
