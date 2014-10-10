@@ -10,7 +10,6 @@ use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
-
 class EmailRenderer extends \Twig_Environment
 {
     const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
