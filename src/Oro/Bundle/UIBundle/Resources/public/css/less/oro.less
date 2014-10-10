@@ -2974,7 +2974,9 @@ label.radio.error {
   .box-content {
     padding: 20px 15px;
     background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .forScreen(@smallScreen, background, none);
+    .responsive-small & {
+      background: none;
+    }
   }
   .list-inline {
     margin-left: 0;
@@ -3237,8 +3239,7 @@ span.validation-failed {
     .nav-tabs{
       & > li{
         & > a{
-          border-top-width: 0;
-          .forScreen(@mediumScreen, border-top-width, 1px);
+          margin-top: -1px;
         }
       }
     }
