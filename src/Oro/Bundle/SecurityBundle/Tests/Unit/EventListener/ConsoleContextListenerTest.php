@@ -93,13 +93,13 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
         $input = $event->getInput();
-        $input->expects($this->at(1))
-            ->method('getOption')
-            ->with(ConsoleContextListener::OPTION_USER)
+        $input->expects($this->at(0))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_USER)
             ->will($this->returnValue($userId));
-        $input->expects($this->at(2))
-            ->method('getOption')
-            ->with(ConsoleContextListener::OPTION_ORGANIZATION)
+        $input->expects($this->at(1))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
             ->will($this->returnValue($organizationId));
 
         $this->userRepository->expects($this->once())
@@ -136,13 +136,13 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
         /** @var \PHPUnit_Framework_MockObject_MockObject  $input */
         $input = $event->getInput();
-        $input->expects($this->at(1))
-            ->method('getOption')
-            ->with(ConsoleContextListener::OPTION_USER)
+        $input->expects($this->at(0))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_USER)
             ->will($this->returnValue($username));
-        $input->expects($this->at(2))
-            ->method('getOption')
-            ->with(ConsoleContextListener::OPTION_ORGANIZATION)
+        $input->expects($this->at(1))
+            ->method('getParameterOption')
+            ->with('--' . ConsoleContextListener::OPTION_ORGANIZATION)
             ->will($this->returnValue($organizationName));
 
         $this->userRepository->expects($this->once())
@@ -172,7 +172,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $application */
         $definition = $this->getMockBuilder('Symfony\Component\Console\Input\InputDefinition')
             ->disableOriginalConstructor()
-            ->setMethods(['addOption', 'getOption'])
+            ->setMethods(['addOption', 'getParameterOption'])
             ->getMock();
         $definition->expects($this->at(0))
             ->method('addOption')
@@ -208,17 +208,11 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|Command $command */
         $command = $this->getMockBuilder('Symfony\Component\Console\Command\Command')
             ->disableOriginalConstructor()
-            ->setMethods(['mergeApplicationDefinition'])
+            ->setMethods(null)
             ->getMock();
         $command->setApplication($application);
-        $command->expects($this->once())
-            ->method('mergeApplicationDefinition');
 
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $input->expects($this->once())
-            ->method('bind')
-            ->with($definition);
-
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
         return new ConsoleCommandEvent($command, $input, $output);
