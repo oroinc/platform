@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Cache\Cache;
@@ -25,6 +27,9 @@ class EmailRenderer extends \Twig_Environment
 
     /** @var TranslatorInterface */
     protected $translator;
+
+    /** @var PropertyAccessor */
+    protected $accessor;
 
     /**
      * @param \Twig_LoaderInterface   $loader
@@ -160,26 +165,28 @@ class EmailRenderer extends \Twig_Environment
     {
         $emailTemplateContent = $emailTemplate->getContent();
         $emailTemplateSubject = $emailTemplate->getSubject();
-
-        $contentMatch         = $this->getTagsFromSubject('/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/', $emailTemplateContent);
-        $emailTemplateContent = $this->modifyTags(
-            $emailTemplateContent,
-            $contentMatch,
-            $entity,
-            function ($path) {
-                return '{{ ' . $path . '|oro_format_datetime }}';
+        $searchPattern        = '/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/';
+        $callback             = function ($match) use ($entity) {
+            $path = $match[1];
+            $split = explode('.', $path);
+            if ($split[0] && 'entity' === $split[0]) {
+                unset($split[0]);
             }
-        );
 
-        $subjectMatch         = $this->getTagsFromSubject('/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/', $emailTemplateSubject);
-        $emailTemplateSubject = $this->modifyTags(
-            $emailTemplateSubject,
-            $subjectMatch,
-            $entity,
-            function ($path) {
-                return '{{ ' . $path . '|oro_format_datetime }}';
+            try {
+                $result = $this->getValue($entity, implode('.', $split));
+
+                if ($result instanceof \DateTimeInterface) {
+                    return '{{ ' . $path . '|oro_format_datetime }}';
+                }
+            } catch (\Exception $e) {
+                return '<' . $this->translator->trans(self::VARIABLE_NOT_FOUND) . '>';
             }
-        );
+            return $match[0];
+        };
+
+        $emailTemplateContent = preg_replace_callback($searchPattern, $callback, $emailTemplateContent);
+        $emailTemplateSubject = preg_replace_callback($searchPattern, $callback, $emailTemplateSubject);
 
         $emailTemplate->setContent($emailTemplateContent);
         $emailTemplate->setSubject($emailTemplateSubject);
@@ -195,58 +202,20 @@ class EmailRenderer extends \Twig_Environment
      */
     protected function getValue($entity, $path)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccess = $this->getPropertyAccess();
 
-        return $accessor->getValue($entity, $path);
+        return $propertyAccess->getValue($entity, $path);
     }
 
     /**
-     * @param string $pattern
-     * @param string $subject
-     *
-     * @return array
+     * @return PropertyAccessor
      */
-    protected function getTagsFromSubject($pattern, $subject)
+    protected function getPropertyAccess()
     {
-        $match = [];
-        preg_match_all($pattern, $subject, $match);
-
-        return empty($match[1]) ? [] : $match[1];
-    }
-
-    /**
-     * @param string   $subject
-     * @param array    $match
-     * @param Object   $entity
-     * @param callable $replacePattern
-     *
-     * @return string
-     */
-    protected function modifyTags($subject, array $match, $entity, \Closure $replacePattern)
-    {
-        foreach ($match as $path) {
-            $split         = explode('.', $path);
-            $searchPattern = '/{{[\s]*?' . $path . '[\s]*?}}/';
-
-            if ($split[0] && 'entity' === $split[0]) {
-                unset($split[0]);
-            }
-
-            try {
-                $result = $this->getValue($entity, implode('.', $split));
-
-                if ($result instanceof \DateTimeInterface) {
-                    $subject = preg_replace($searchPattern, $replacePattern($path), $subject);
-                }
-            } catch (\Exception $e) {
-                $subject = preg_replace(
-                    $searchPattern,
-                    '<' . $this->translator->trans(self::VARIABLE_NOT_FOUND) . '>',
-                    $subject
-                );
-            }
+        if (!$this->accessor instanceof PropertyAccessor) {
+            $this->accessor = PropertyAccess::createPropertyAccessor();
         }
 
-        return $subject;
+        return $this->accessor;
     }
 }

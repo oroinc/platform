@@ -61,7 +61,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->translation = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
             ->getMock();
     }
 
