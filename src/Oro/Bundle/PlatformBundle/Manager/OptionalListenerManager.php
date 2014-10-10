@@ -9,7 +9,7 @@ class OptionalListenerManager
     /**
      * @var array
      */
-    protected $optionalListeners;
+    protected $optionalListeners = [];
 
     /**
      * @var ContainerInterface
@@ -18,8 +18,9 @@ class OptionalListenerManager
 
     /**
      * @param array $optionalListeners
+     * @param ContainerInterface $container
      */
-    public function __construct($optionalListeners, ContainerInterface $container)
+    public function __construct(array $optionalListeners, ContainerInterface $container)
     {
         $this->optionalListeners = $optionalListeners;
         $this->container = $container;
@@ -46,25 +47,18 @@ class OptionalListenerManager
             $this->container->get($listenerId)->setEnabled(false);
         } else {
             throw new \InvalidArgumentException(
-                sprintf(
-                    'Optional listener "&s" does not exists',
-                    $listenerId
-                )
+                sprintf('Listener "%s" does not exist or not optional', $listenerId)
             );
         }
     }
 
     /**
-     * Disable array of listeners ore all listeners
+     * Disable specified listeners
      *
      * @param array $listeners
      */
-    public function disableListeners($listeners = [])
+    public function disableListeners(array $listeners)
     {
-        if (empty($listeners)) {
-            $listeners = $this->optionalListeners;
-        }
-
         foreach ($listeners as $listener) {
             $this->disableListener($listener);
         }

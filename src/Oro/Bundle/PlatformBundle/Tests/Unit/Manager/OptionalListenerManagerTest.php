@@ -54,47 +54,13 @@ class OptionalListenerManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($testListener->enabled);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Listener "test.bad_listener" does not exist or not optional
+     */
     public function testDisableNonExistsListener()
     {
-        $listenerId = 'test.bad_listener';
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            sprintf(
-                'Optional listener "&s" does not exists',
-                $listenerId
-            )
-        );
-        $this->manager->disableListener($listenerId);
-    }
-
-    public function testDisableAllListeners()
-    {
-        $listener1 = new TestListener();
-        $listener2 = new TestListener();
-        $listener3 = new TestListener();
-        $listener1->enabled = false;
-        $listener2->enabled = false;
-        $listener3->enabled = false;
-        $listeners = [
-            'test.listener1' => $listener1,
-            'test.listener2' => $listener2,
-            'test.listener3' => $listener3,
-        ];
-
-
-        $this->container->expects($this->exactly(3))
-            ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($listenerName) use ($listeners) {
-                        return $listeners[$listenerName];
-                    }
-                )
-            );
-        $this->manager->disableListeners();
-        $this->assertFalse($listener1->enabled);
-        $this->assertFalse($listener2->enabled);
-        $this->assertFalse($listener3->enabled);
+        $this->manager->disableListener('test.bad_listener');
     }
 
     public function testDisableOneListener()
