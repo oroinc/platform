@@ -448,8 +448,14 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $entity->identityField = 'identityValue';
         $entity->regularField  = 'regularValue';
 
-        $expectedIdentityValues = array('identityField' => 'identityValue');
+        $this->fieldProvider->expects($this->once())
+            ->method('getFields')
+            ->with(get_class($entity), true)
+            ->will($this->returnValue($fields));
 
-        $this->assertEquals($expectedIdentityValues, $this->helper->getIdentityValues($entity, $fields));
+        $this->assertEquals(
+            array('identityField' => 'identityValue'),
+            $this->helper->getIdentityValues($entity, $fields)
+        );
     }
 }
