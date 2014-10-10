@@ -278,8 +278,12 @@ abstract class WebTestCase extends BaseWebTestCase
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        array_unshift($params, 'application', $name);
-        $input = new ArgvInput($params);
+        $argv = ['application', $name];
+        foreach ($params as $k => $v) {
+            $argv[] = $k;
+            $argv[] = $v;
+        }
+        $input = new ArgvInput($argv);
         $input->setInteractive(false);
 
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');
