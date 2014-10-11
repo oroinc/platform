@@ -20,7 +20,9 @@ class ExtendConfigDumper
     const ACTION_PRE_UPDATE  = 'preUpdate';
     const ACTION_POST_UPDATE = 'postUpdate';
 
-    const ENTITY         = 'Extend\\Entity\\';
+    /** @deprecated Use ExtendHelper::getExtendEntityProxyClassName and ExtendHelper::ENTITY_NAMESPACE instead */
+    const ENTITY = 'Extend\\Entity\\';
+
     const DEFAULT_PREFIX = 'default_';
 
     /** @var string */
