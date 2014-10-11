@@ -13,57 +13,39 @@
   }
 }
 
-//
-// By default there are two cells on one line
-//
+// by default, huge screen, cells: inline, blocks: inline
 .responsive-cell {
   margin-bottom: 35px;
   .responsive-inline-position();
 }
-
-//
-// By default there are two blocks on one line
-//
 .responsive-block {
   .responsive-inline-position();
 }
 
-//
-// If section has only one cell then cell gets 100% of width
-//
-.responsive-section-single-cell .responsive-cell {
-  .responsive-block-position();
-}
-
-//
-// If cell has only one block then block gets 100% of width
-//
-.responsive-cell-single-block .responsive-block {
-  .responsive-block-position();
-}
-
-//
-// If section has blocks then cell gets 100% of width in medium screen
-//
-.responsive-medium {
-  .responsive-cell:first-child {
-    padding-right: 0;
-  }
-
-  // remove horizontal separator
-  .row-fluid.row-fluid-divider {
-    background: none;
-  }
-}
-.responsive-medium.responsive-section-has-blocks {
-  .responsive-cell {
+// big screen, cells: inline, blocks: wrapped
+.responsive-big {
+  .responsive-block {
     .responsive-block-position();
   }
 }
 
-//
-// On small screen all element should get 100% if width
-//
+// medium screen, cells: wrapped (if there are blocks), blocks: inline
+.responsive-medium {
+  &:not(.responsive-section-no-blocks) {
+    .responsive-cell {
+      .responsive-block-position();
+    }
+    // remove horizontal separator if cells are wrapped
+    .row-fluid.row-fluid-divider {
+      background: none;
+    }
+  }
+  .responsive-block {
+    .responsive-inline-position();
+  }
+}
+
+// small screen, cells: wrapped, blocks: wrapped
 .responsive-small {
   .responsive-cell {
     .responsive-block-position();
@@ -71,16 +53,24 @@
   .responsive-block {
     .responsive-block-position();
   }
-
-  // remove horizontal separator
+  // remove horizontal separator if cells are wrapped
   .row-fluid.row-fluid-divider {
     background: none;
   }
 }
 
+// the only cell and the only block -- with 100%;
+.responsive-section {
+  .responsive-cell:only-child {
+    .responsive-block-position();
+  }
+  .responsive-block:only-child {
+    .responsive-block-position();
+  }
+}
+
 .ui-dialog {
   max-width: 100%;
-
   .row-fluid.row-fluid-divider {
     background: none;
   }
@@ -97,5 +87,10 @@
   }
   .responsive-cell:first-child {
     padding-right: @horizontalPadding;
+  }
+  &.responsive-medium .responsive-cell,
+  &.responsive-small .responsive-cell,
+  .responsive-cell:only-child {
+    padding-right: 0;
   }
 }
