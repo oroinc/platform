@@ -41,6 +41,9 @@ UPGRADE FROM 1.3 to 1.4
 
 ####EntityExtendBundle:
 - `EntityConfig\ExtendScope` constants `STATE_UPDATED` and `STATE_DELETED` have been deprecated
+- `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated
+- Naming of proxy classes for extended entities has been changed to fix naming conflicts
+- Adding of extended fields to form has been changed. From now `form.additional` is not available in TWIG template, because extended fields are added to main form and have  `extra_field` flag. The following statement can be used to loop through extended fields in TWIG template: `{% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}`.
 
 ####FilterBundle:
 - `Datasource\FilterDatasourceAdapterInterface` now has mandatory method `getFieldByAlias`
