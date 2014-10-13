@@ -166,21 +166,22 @@ class EmailRenderer extends \Twig_Environment
         $emailTemplateContent = $emailTemplate->getContent();
         $emailTemplateSubject = $emailTemplate->getSubject();
         $searchPattern        = '/{{\s([\w\d\.\_\-]*?)\s}}/';
-        $callback             = function ($match) use ($entity) {
-            $path = $match[1];
+        $that                 = $this;
+        $callback             = function ($match) use ($entity, $that) {
+            $path  = $match[1];
             $split = explode('.', $path);
             if ($split[0] && 'entity' === $split[0]) {
                 unset($split[0]);
             }
 
             try {
-                $result = $this->getValue($entity, implode('.', $split));
+                $result = $that->getValue($entity, implode('.', $split));
 
                 if ($result instanceof \DateTimeInterface) {
                     return '{{ ' . $path . '|oro_format_datetime }}';
                 }
             } catch (\Exception $e) {
-                return '<' . $this->translator->trans(self::VARIABLE_NOT_FOUND) . '>';
+                return '<' . $that->translator->trans(self::VARIABLE_NOT_FOUND) . '>';
             }
             return $match[0];
         };
