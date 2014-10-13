@@ -62,6 +62,12 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->translation = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
+        $this->translation
+            ->expects($this->any())
+            ->method('trans')
+            ->with(EmailRenderer::VARIABLE_NOT_FOUND)
+            ->will($this->returnValue('Variable not found!'))
+        ;
     }
 
     /**
@@ -199,7 +205,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testNotExistField()
     {
-        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, {{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
+        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, '.
+            '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
         $subject    = 'subject';
         $systemVars = ['testVar' => 'test_system'];
 
@@ -240,7 +247,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $template->getContent(),
-            'content <>, {{ entity.field1|oro_format_datetime }}, {{ entity.field2.field1|oro_format_datetime }}, <>'
+            'content <Variable not found!>, {{ entity.field1|oro_format_datetime }}, '.
+            '{{ entity.field2.field1|oro_format_datetime }}, <Variable not found!>'
         );
     }
 
