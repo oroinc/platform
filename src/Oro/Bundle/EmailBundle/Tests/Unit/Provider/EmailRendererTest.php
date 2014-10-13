@@ -66,7 +66,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('trans')
             ->with(EmailRenderer::VARIABLE_NOT_FOUND)
-            ->will($this->returnValue('Variable not found!'))
+            ->will($this->returnValue('N/A'))
         ;
     }
 
@@ -247,8 +247,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $template->getContent(),
-            'content <Variable not found!>, {{ entity.field1|oro_format_datetime }}, '.
-            '{{ entity.field2.field1|oro_format_datetime }}, <Variable not found!>'
+            'content N/A, {{ entity.field1|oro_format_datetime }}, {{ entity.field2.field1|oro_format_datetime }}, N/A'
         );
     }
 

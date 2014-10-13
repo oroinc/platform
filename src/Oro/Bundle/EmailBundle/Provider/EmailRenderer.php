@@ -181,7 +181,7 @@ class EmailRenderer extends \Twig_Environment
                     return '{{ ' . $path . '|oro_format_datetime }}';
                 }
             } catch (\Exception $e) {
-                return '<' . $that->translator->trans(self::VARIABLE_NOT_FOUND) . '>';
+                return $that->translator->trans(self::VARIABLE_NOT_FOUND);
             }
             return $match[0];
         };
