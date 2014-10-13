@@ -9,6 +9,9 @@ parameters:
 
     oro_platform.twig.platform_extension.class:     Oro\Bundle\PlatformBundle\Twig\PlatformExtension
 
+    oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
+    oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
+
 services:
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
@@ -47,3 +50,16 @@ services:
             - @oro_platform.composer.version_helper
         tags:
             - { name: twig.extension }
+
+    oro_platform.optional_listeners.manager:
+        class: %oro_platform.optional_listeners.manager.class%
+        arguments:
+           - []
+           - @service_container
+
+    oro_platform.event_listener.optional_listeners:
+        class: %oro_platform.event_listener.optional_listeners.class%
+        arguments:
+            - "@oro_platform.optional_listeners.manager"
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }

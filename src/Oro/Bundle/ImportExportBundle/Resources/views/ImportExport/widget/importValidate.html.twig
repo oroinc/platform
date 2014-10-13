@@ -33,7 +33,14 @@
     </style>
 
     <div class="validation-info">
-        <strong>{{ 'Import validation results'|trans }}</strong>
+        <strong>
+        {% if showStrategy %}
+            {{ 'Import validation results with strategy "%strategy%"'|trans({'%strategy%': ('oro.importexport.import.' ~ processorAlias)|trans}) }}
+        {% else %}
+            {{ 'Import validation results'|trans }}
+        {% endif %}
+        </strong>
+
         <table class="table table-condensed table-hover">
             <thead>
                 <tr>

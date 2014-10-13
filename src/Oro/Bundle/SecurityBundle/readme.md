@@ -50,5 +50,6 @@ Also the following permissions are supported:
 - [UI](./Resources/doc/ui.md)
 - [ACL manager](./Resources/doc/acl-manager.md)
 - [Access levels] (./Resources/doc/access-levels.md)
+- [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 
