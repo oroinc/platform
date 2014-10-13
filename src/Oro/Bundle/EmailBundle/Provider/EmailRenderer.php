@@ -124,12 +124,16 @@ class EmailRenderer extends \Twig_Environment
     {
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
+        $subject = $template->getSubject();
+        $content = $template->getContent();
+
         if (isset($templateParams['entity'])) {
-            $template = $this->processDateTimeVariables($template, $templateParams['entity']);
+            $subject = $this->processDateTimeVariables($template->getSubject(), $templateParams['entity']);
+            $content = $this->processDateTimeVariables($template->getContent(), $templateParams['entity']);
         }
 
-        $templateRendered = $this->render($template->getContent(), $templateParams);
-        $subjectRendered  = $this->render($template->getSubject(), $templateParams);
+        $templateRendered = $this->render($content, $templateParams);
+        $subjectRendered  = $this->render($subject, $templateParams);
 
         return array($subjectRendered, $templateRendered);
     }
@@ -156,15 +160,13 @@ class EmailRenderer extends \Twig_Environment
      *  - if value does not exists and PropertyAccess::getValue throw an error
      *    it will change on self::VARIABLE_NOT_FOUND
      *
-     * @param EmailTemplateInterface $emailTemplate
-     * @param                        $entity
+     * @param string $emailTemplate
+     * @param        $entity
      *
      * @return EmailTemplate
      */
-    protected function processDateTimeVariables(EmailTemplateInterface $emailTemplate, $entity)
+    protected function processDateTimeVariables($emailTemplate, $entity)
     {
-        $emailTemplateContent = $emailTemplate->getContent();
-        $emailTemplateSubject = $emailTemplate->getSubject();
         $searchPattern        = '/{{\s([\w\d\.\_\-]*?)\s}}/';
         $that                 = $this;
         $callback             = function ($match) use ($entity, $that) {
@@ -186,11 +188,7 @@ class EmailRenderer extends \Twig_Environment
             return $match[0];
         };
 
-        $emailTemplateContent = preg_replace_callback($searchPattern, $callback, $emailTemplateContent);
-        $emailTemplateSubject = preg_replace_callback($searchPattern, $callback, $emailTemplateSubject);
-
-        $emailTemplate->setContent($emailTemplateContent);
-        $emailTemplate->setSubject($emailTemplateSubject);
+        $emailTemplate = preg_replace_callback($searchPattern, $callback, $emailTemplate);
 
         return $emailTemplate;
     }

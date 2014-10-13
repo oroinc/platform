@@ -168,7 +168,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1 }} {{ system.testVar }}';
+        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1 }} N/A';
         $subject = 'subject';
 
         $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
@@ -205,10 +205,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testNotExistField()
     {
-        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, '.
+        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, ' .
             '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
-        $subject    = 'subject';
-        $systemVars = ['testVar' => 'test_system'];
 
         $entity2 = new TestEntityForVariableProvider();
         $entity2->setField1(new \DateTime('now'));
@@ -218,11 +216,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $entity->setField2($entity2);
 
         $entityClass    = get_class($entity);
-        $template       = new EmailTemplate($subject, $content);
-        $templateParams = [
-            'entity' => $entity,
-            'system' => $systemVars
-        ];
 
         $this->cache
             ->expects($this->once())
@@ -243,10 +236,13 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $renderer = $this->getRendererInstance();
 
-        $renderer->compileMessage($template, $templateParams);
+        $reflection = new \ReflectionMethod('Oro\Bundle\EmailBundle\Provider\EmailRenderer', 'processDateTimeVariables');
+        $reflection->setAccessible(true);
+
+        $result = $reflection->invoke($renderer, $content, $entity);
 
         $this->assertEquals(
-            $template->getContent(),
+            $result,
             'content N/A, {{ entity.field1|oro_format_datetime }}, {{ entity.field2.field1|oro_format_datetime }}, N/A'
         );
     }
