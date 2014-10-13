@@ -2,10 +2,10 @@
 /*global define*/
 define([
     'underscore',
-    '../base/main-view',
-    '../base/button-view',
+    './base/bookmark-component',
+    '../views/base/button-view',
     'oroui/js/app/views/base/collection-view',
-    '../base/item-view'
+    '../views/base/item-view'
 ], function (_, MainView, ButtonView, CollectionView, ItemView) {
     'use strict';
 

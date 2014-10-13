@@ -31,7 +31,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/favorite/main-view',
+        'oronavigation/js/app/components/favorite-component',
         'oronavigation/js/app/models/base/model',
         'oronavigation/js/app/models/base/collection'
     ], function ($, FavoriteView, Model, Collection) {
@@ -60,7 +60,7 @@ require([
 
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/pin/main-view',
+        'oronavigation/js/app/components/pin-component',
         'oronavigation/js/app/models/base/model',
         'oronavigation/js/app/models/base/collection',
         'oronavigation/js/app/views/page-state-view',

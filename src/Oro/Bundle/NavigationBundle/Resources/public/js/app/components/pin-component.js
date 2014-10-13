@@ -4,11 +4,11 @@
 define([
     'underscore',
     'oroui/js/mediator',
-    '../base/main-view',
-    '../base/button-view',
-    './pinbar-view',
-    './dropdown-view',
-    './item-view'
+    './base/bookmark-component',
+    '../views/base/button-view',
+    '../views/pin/pinbar-view',
+    '../views/pin/dropdown-view',
+    '../views/pin/item-view'
 ], function (_, mediator, MainView, ButtonView, PinBarView, DropdownView, ItemView) {
     'use strict';
 
