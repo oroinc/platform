@@ -5,74 +5,102 @@ define([
     'underscore',
     'oroui/js/mediator',
     './base/bookmark-component',
-    '../views/base/button-view',
-    '../views/pin/pinbar-view',
-    '../views/pin/dropdown-view',
-    '../views/pin/item-view'
-], function (_, mediator, MainView, ButtonView, PinBarView, DropdownView, ItemView) {
+    '../views/bookmark-button-view',
+    '../views/pin-bar-view',
+    '../views/pin-dropdown-view',
+    '../views/pin-item-view'
+], function (_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
     'use strict';
 
-    var PinView;
+    var PinComponent;
 
-    PinView = MainView.extend({
-        maxItems: 7,
-
+    PinComponent = BaseBookmarkComponent.extend({
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove'
         },
 
-        createSubViews: function (options) {
-            var collection, button,
-                barView, BarItemView, barOptions,
-                dropdownView, DropdownItemView, dropdownOptions;
+        _createSubViews: function () {
+            this._createButtonView();
+            this._createBarView();
+            this._createDropdownView();
+        },
 
+        /**
+         * Create view for pin button
+         *
+         * @protected
+         */
+        _createButtonView: function () {
+            var options, collection;
+
+            options = this._options.buttonOptions || {};
             collection = this.collection;
 
-            // button view
-            button = new ButtonView({
+            _.extend(options, {
                 autoRender: true,
-                el: 'pinButton',
                 collection: collection
             });
-            this.subview('button', button);
 
-            // bar view
+            this.button = new ButtonView(options);
+        },
+
+        /**
+         * Create view for pin bar
+         *
+         * @protected
+         */
+        _createBarView: function () {
+            var options, collection, BarItemView;
+
+            options = this._options.barOptions || {};
+            collection = this.collection;
             BarItemView = ItemView.extend({
-                template: options.barItemTemplate
+                template: this._options.barItemTemplate
             });
-            barOptions = _.extend(options.barOptions, {
+
+            _.extend(options, {
                 autoRender: true,
-                el: 'pinBar',
                 collection: collection,
                 itemView: BarItemView
             });
-            barView = new PinBarView(barOptions);
-            this.subview('bar', barView);
 
-            // tab view
+            this.pinBar = new PinBarView(options);
+        },
+
+        /**
+         * Create view for pins in dropdown
+         *
+         * @protected
+         */
+        _createDropdownView: function () {
+            var options, collection, pinBar, DropdownItemView;
+
+            options = this._options.dropdownOptions || {};
+            collection = this.collection;
+            pinBar = this.pinBar;
             DropdownItemView = ItemView.extend({
-                template: options.tabItemTemplate
+                template: this._options.dropdownItemTemplate
             });
-            dropdownOptions = _.extend(options.tabOptions, {
+
+            _.extend(options, {
                 autoRender: true,
-                el: 'pinTab',
                 collection: collection,
                 itemView: DropdownItemView,
                 filterer: function (item) {
-                    return !barView.isVisibleItem(item);
+                    return !pinBar.isVisibleItem(item);
                 },
                 position: function () {
                     var itemView, pos = {};
-                    itemView = barView.getLastVisibleView();
+                    itemView = pinBar.getLastVisibleView();
                     if (itemView) {
                         pos.left = itemView.el.getBoundingClientRect().right;
                     }
                     return pos;
                 }
             });
-            dropdownView = new DropdownView(dropdownOptions);
-            this.subview('dropdown', dropdownView);
+
+            this.dropdown = new DropdownView(options);
         },
 
         actualizeAttributes: function (model) {
@@ -99,5 +127,5 @@ define([
         }
     });
 
-    return PinView;
+    return PinComponent;
 });
