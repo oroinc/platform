@@ -62,11 +62,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->translation = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
-        $this->translation
-            ->expects($this->any())
-            ->method('trans')
-            ->with(EmailRenderer::VARIABLE_NOT_FOUND)
-            ->will($this->returnValue('N/A'))
+        $this->translation->expects($this->any())->method('trans')
+            ->will($this->returnArgument(0));
         ;
     }
 
@@ -151,9 +148,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $entityClass = get_class($entity);
         $systemVars  = ['testVar' => 'test_system'];
 
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->once())->method('fetch')
             ->with($this->cacheKey)
             ->will(
                 $this->returnValue(
@@ -172,15 +167,12 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $subject = 'subject';
 
         $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
-        $emailTemplate->expects($this->exactly(2))
-            ->method('getContent')
+        $emailTemplate->expects($this->once())->method('getContent')
             ->will($this->returnValue($content));
-        $emailTemplate->expects($this->exactly(2))
-            ->method('getSubject')
+        $emailTemplate->expects($this->once())->method('getSubject')
             ->will($this->returnValue($subject));
 
-        $this->variablesProvider->expects($this->once())
-            ->method('getSystemVariableValues')
+        $this->variablesProvider->expects($this->once())->method('getSystemVariableValues')
             ->will($this->returnValue($systemVars));
 
         $templateParams = array(
@@ -235,15 +227,15 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             );
 
         $renderer = $this->getRendererInstance();
+        $renderer->expects($this->any())->method('render')
+            ->will($this->returnArgument(0));
 
-        $reflection = new \ReflectionMethod('Oro\Bundle\EmailBundle\Provider\EmailRenderer', 'processDateTimeVariables');
-        $reflection->setAccessible(true);
-
-        $result = $reflection->invoke($renderer, $content, $entity);
+        $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            $result,
-            'content N/A, {{ entity.field1|oro_format_datetime }}, {{ entity.field2.field1|oro_format_datetime }}, N/A'
+            $renderedContent = $result[1],
+            'content oro.email.variable.not.found, {{ entity.field1|oro_format_datetime }}, ' .
+            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found'
         );
     }
 
@@ -294,11 +286,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function getRendererInstance()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject */
-        $dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         /** @var \PHPUnit_Framework_MockObject_MockObject */
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
