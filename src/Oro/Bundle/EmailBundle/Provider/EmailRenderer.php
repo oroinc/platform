@@ -128,8 +128,8 @@ class EmailRenderer extends \Twig_Environment
         $content = $template->getContent();
 
         if (isset($templateParams['entity'])) {
-            $subject = $this->processDateTimeVariables($template->getSubject(), $templateParams['entity']);
-            $content = $this->processDateTimeVariables($template->getContent(), $templateParams['entity']);
+            $subject = $this->processDateTimeVariables($subject, $templateParams['entity']);
+            $content = $this->processDateTimeVariables($content, $templateParams['entity']);
         }
 
         $templateRendered = $this->render($content, $templateParams);
@@ -160,16 +160,16 @@ class EmailRenderer extends \Twig_Environment
      *  - if value does not exists and PropertyAccess::getValue throw an error
      *    it will change on self::VARIABLE_NOT_FOUND
      *
-     * @param string $emailTemplate
-     * @param        $entity
+     * @param string $template
+     * @param object $entity
      *
      * @return EmailTemplate
      */
-    protected function processDateTimeVariables($emailTemplate, $entity)
+    protected function processDateTimeVariables($template, $entity)
     {
-        $searchPattern        = '/{{\s([\w\d\.\_\-]*?)\s}}/';
-        $that                 = $this;
-        $callback             = function ($match) use ($entity, $that) {
+        $searchPattern = '/{{\s([\w\d\.\_\-]*?)\s}}/';
+        $that          = $this;
+        $callback      = function ($match) use ($entity, $that) {
             $path  = $match[1];
             $split = explode('.', $path);
             if ($split[0] && 'entity' === $split[0]) {
@@ -185,12 +185,11 @@ class EmailRenderer extends \Twig_Environment
             } catch (\Exception $e) {
                 return $that->translator->trans(self::VARIABLE_NOT_FOUND);
             }
+
             return $match[0];
         };
 
-        $emailTemplate = preg_replace_callback($searchPattern, $callback, $emailTemplate);
-
-        return $emailTemplate;
+        return preg_replace_callback($searchPattern, $callback, $template);
     }
 
     /**
