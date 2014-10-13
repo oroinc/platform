@@ -31,26 +31,24 @@ require([
      */
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/favorite/main-view',
+        'oronavigation/js/app/components/favorite-component',
         'oronavigation/js/app/models/base/model',
         'oronavigation/js/app/models/base/collection'
-    ], function ($, FavoriteView, Model, Collection) {
+    ], function ($, FavoriteComponent, Model, Collection) {
         var collection;
 
         collection = new Collection([], {
             model: Model
         });
 
-        BaseController.addToReuse('pageFavorite', FavoriteView, {
-            el: 'body',
-            keepElement: true,
+        BaseController.addToReuse('favoritePage', FavoriteComponent, {
             dataSource: '#favorite-content [data-data]',
-            regions: {
-                pinButton: '#pin-button-div .favorite-button',
-                pinTab: '#favorite-content'
+            buttonOptions: {
+                el: '#pin-button-div .favorite-button'
             },
             tabItemTemplate: $('#template-dot-menu-item').html(),
             tabOptions: {
+                el: '#favorite-content',
                 listSelector: '.extra-list',
                 fallbackSelector: '.dot-menu-empty-message'
             },
@@ -60,14 +58,15 @@ require([
 
     BaseController.loadBeforeAction([
         'jquery',
-        'oronavigation/js/app/views/pin/main-view',
+        'oronavigation/js/app/components/pin-component',
         'oronavigation/js/app/models/base/model',
         'oronavigation/js/app/models/base/collection',
         'oronavigation/js/app/views/page-state-view',
         'oronavigation/js/app/models/page-state-model'
-    ], function ($, PinView, Model, Collection, PageStateView, PageStateModel) {
-        var pinCollection, stateModel;
+    ], function ($, PinComponent, Model, Collection, PageStateView, PageStateModel) {
+        var pinCollection, stateModel, template;
 
+        template = $('#template-list-pin-item').html();
         pinCollection = new Collection([], {
             model: Model
         });
@@ -75,22 +74,19 @@ require([
         /**
          * Init PinBar related views
          */
-        BaseController.addToReuse('pagePin', PinView, {
-            el: 'body',
-            keepElement: true,
-            dataSource: '#pinbar-content [data-data]',
-            regions: {
-                pinButton: '#pin-button-div .minimize-button',
-                pinTab: '#pinbar-content',
-                pinBar: '.list-bar'
+        BaseController.addToReuse('pagePin', PinComponent, {
+            dataSource: '#pinbar [data-data]',
+            buttonOptions: {
+                el: '#pin-button-div .minimize-button'
             },
-            tabItemTemplate: $('#template-dot-menu-item').html(),
-            tabOptions: {
-                listSelector: '.extra-list',
-                fallbackSelector: '.dot-menu-empty-message'
+            dropdownItemTemplate: template,
+            dropdownOptions: {
+                el: '#pinbar .show-more',
+                listSelector: '.dropdown-menu ul'
             },
-            barItemTemplate: $('#template-list-pin-item').html(),
+            barItemTemplate: template,
             barOptions: {
+                el: '#pinbar .list-bar',
                 listSelector: 'ul',
                 fallbackSelector: '.pin-bar-empty'
             },
