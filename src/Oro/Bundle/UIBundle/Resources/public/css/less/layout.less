@@ -14,23 +14,25 @@
 }
 
 // by default, huge screen, cells: inline, blocks: inline
-.responsive-cell {
-  margin-bottom: 35px;
-  .responsive-inline-position();
-}
-.responsive-block {
-  .responsive-inline-position();
+.responsive-section {
+  .responsive-cell {
+    margin-bottom: 35px;
+    .responsive-inline-position();
+  }
+  .responsive-block {
+    .responsive-inline-position();
+  }
 }
 
 // big screen, cells: inline, blocks: wrapped
-.responsive-big {
+.responsive-section.responsive-big {
   .responsive-block {
     .responsive-block-position();
   }
 }
 
 // medium screen, cells: wrapped (if there are blocks), blocks: inline
-.responsive-medium {
+.responsive-section.responsive-medium {
   &:not(.responsive-section-no-blocks) {
     .responsive-cell {
       .responsive-block-position();
@@ -46,10 +48,8 @@
 }
 
 // small screen, cells: wrapped, blocks: wrapped
-.responsive-small {
-  .responsive-cell {
-    .responsive-block-position();
-  }
+.responsive-section.responsive-small {
+  .responsive-cell,
   .responsive-block {
     .responsive-block-position();
   }
@@ -61,9 +61,7 @@
 
 // the only cell and the only block -- with 100%;
 .responsive-section {
-  .responsive-cell:only-child {
-    .responsive-block-position();
-  }
+  .responsive-cell:only-child,
   .responsive-block:only-child {
     .responsive-block-position();
   }
