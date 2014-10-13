@@ -165,7 +165,7 @@ class EmailRenderer extends \Twig_Environment
     {
         $emailTemplateContent = $emailTemplate->getContent();
         $emailTemplateSubject = $emailTemplate->getSubject();
-        $searchPattern        = '/{{[\s]*?([\w\d\.\_\-]*?)[\s]*?}}/';
+        $searchPattern        = '/{{\s([\w\d\.\_\-]*?)\s}}/';
         $callback             = function ($match) use ($entity) {
             $path = $match[1];
             $split = explode('.', $path);

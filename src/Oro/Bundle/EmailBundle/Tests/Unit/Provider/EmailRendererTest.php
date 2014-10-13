@@ -199,14 +199,18 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testNotExistField()
     {
-        $content    = 'content {{ entity.sub.crp }}';
+        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, {{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
         $subject    = 'subject';
         $systemVars = ['testVar' => 'test_system'];
 
-        $entity = new TestEntityForVariableProvider();
-        $entity->setField1('Test');
+        $entity2 = new TestEntityForVariableProvider();
+        $entity2->setField1(new \DateTime('now'));
 
-        $entityClass = get_class($entity);
+        $entity = new TestEntityForVariableProvider();
+        $entity->setField1(new \DateTime('now'));
+        $entity->setField2($entity2);
+
+        $entityClass    = get_class($entity);
         $template       = new EmailTemplate($subject, $content);
         $templateParams = [
             'entity' => $entity,
@@ -234,7 +238,10 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $renderer->compileMessage($template, $templateParams);
 
-        $this->assertEquals($template->getContent(), 'content <>');
+        $this->assertEquals(
+            $template->getContent(),
+            'content <>, {{ entity.field1|oro_format_datetime }}, {{ entity.field2.field1|oro_format_datetime }}, <>'
+        );
     }
 
     /**
