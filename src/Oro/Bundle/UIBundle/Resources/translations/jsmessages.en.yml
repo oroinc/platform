@@ -11,7 +11,6 @@
 "Saving...": "Saving..."
 "Deleting...": "Deleting..."
 "Unexpected error occurred. Please contact system administrator.": "Unexpected error occurred. Please contact system administrator."
-"More": "More"
 Now: Now
 Prev: Prev
 Next: Next
@@ -42,3 +41,6 @@ oro:
     ui:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
+        page_header:
+            button:
+                more: "More"
