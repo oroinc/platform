@@ -1,16 +1,17 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
+    'jquery',
     'underscore',
     'oroui/js/mediator',
-    'oroui/js/app/views/base/view',
+    'oroui/js/app/components/base/component',
     'oroui/js/error'
-], function (_, mediator, BaseView, error) {
+], function ($, _, mediator, BaseComponent, error) {
     'use strict';
 
-    var MainView;
+    var BaseBookmarkComponent;
 
-    MainView = BaseView.extend({
+    BaseBookmarkComponent = BaseComponent.extend({
         /**
          * Keeps separately extended options,
          * to prevent disposing the view each time by Composer
@@ -28,22 +29,21 @@ define([
         initialize: function (options) {
             var data, extraOptions, $dataEl;
 
-            $dataEl = this.$(options.dataSource);
+            $dataEl = $(options.dataSource);
             data = $dataEl.data('data');
             extraOptions = $dataEl.data('options');
             $dataEl.remove();
+
+            // create own property _options (not spoil prototype)
             this._options = _.defaults({}, options || {}, extraOptions);
 
-            MainView.__super__.initialize.call(this, options);
+            BaseBookmarkComponent.__super__.initialize.call(this, options);
 
             this.collection.reset(data);
+            this._createSubViews();
         },
 
-        render: function () {
-            this.createSubViews(this._options);
-        },
-
-        createSubViews: function (options) {
+        _createSubViews: function () {
             // should be implemented in descendants
         },
 
@@ -116,5 +116,5 @@ define([
         }
     });
 
-    return MainView;
+    return BaseBookmarkComponent;
 });
