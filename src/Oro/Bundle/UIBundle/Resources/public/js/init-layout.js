@@ -202,95 +202,103 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from height_fix.js
      * ============================================================ */
-    $(function () {
+    //@TODO should be refactored in BAP-4020
+     $(function () {
+        var anchor, content,
+            initializeContent, adjustHeight,
+            $main, $topPage, $leftPanel, $rightPanel;
+
         if (tools.isMobile()) {
-            return;
-        }
-        /* dynamic height for central column */
-        var anchor = $('#bottom-anchor'),
+            adjustHeight = function () {
+                layout.updateResponsiveLayout();
+            }
+        } else {
+            /* dynamic height for central column */
+            anchor = $('#bottom-anchor');
             content = false;
 
-        var initializeContent = function () {
-            if (!content) {
-                content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                if (!tools.isMobile()) {
-                    content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
-                } else {
-                    content.css('overflow', 'hidden');
-                    content.last().css('overflow-y', 'auto');
-                }
-            }
-        };
-        var $main = $('#main');
-        var $topPage = $('#top-page');
-        var $leftPanel = $('#left-panel');
-        var $rightPanel = $('#right-panel');
-        var adjustHeight = function () {
-            initializeContent();
-
-            // set width for #main container
-            $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
-            layout.updateResponsiveLayout();
-
-            var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
-            var anchorTop = anchor.position().top;
-            var footerHeight = $('#footer:visible').height() || 0;
-            var fixContent = 1;
-
-            $(content.get().reverse()).each(function (pos, el) {
-                el = $(el);
-                el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
-            });
-
-            // set height for #left-panel and #right-panel
-            $leftPanel.add($rightPanel).height($main.height());
-
-            scrollspy.adjust();
-
-            var fixDialog = 2;
-            var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
-
-            $('#dialog-extend-fixed-container').css({
-                position: 'fixed',
-                bottom: footersHeight + fixDialog,
-                zIndex: 9999
-            });
-
-            $('.sidebar').css({
-                'margin-bottom': footersHeight
-            });
-        };
-
-        if (!anchor.length) {
-            anchor = $('<div id="bottom-anchor"/>')
-                .css({
-                    position: 'fixed',
-                    bottom: '0',
-                    left: '0',
-                    width: '1px',
-                    height: '1px'
-                })
-                .appendTo($(document.body));
-        }
-
-        if ($('.sf-toolbar').length) {
-            adjustHeight = (function () {
-                var orig = adjustHeight;
-                var waitForDebugBar = function (attempt) {
-                    if ($('.sf-toolbar').children().length) {
-                        $('body').addClass('dev-mode');
-                        _.delay(orig, 10);
-                    } else if (attempt < 100) {
-                        _.delay(waitForDebugBar, 500, attempt + 1);
+            initializeContent = function () {
+                if (!content) {
+                    content = $('.scrollable-container').filter(':parents(.ui-widget)');
+                    if (!tools.isMobile()) {
+                        content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
+                    } else {
+                        content.css('overflow', 'hidden');
+                        content.last().css('overflow-y', 'auto');
                     }
-                };
+                }
+            };
+            $main = $('#main');
+            $topPage = $('#top-page');
+            $leftPanel = $('#left-panel');
+            $rightPanel = $('#right-panel');
+            adjustHeight = function () {
+                initializeContent();
 
-                return _.wrap(adjustHeight, function (orig) {
-                    $('body').removeClass('dev-mode');
-                    orig();
-                    waitForDebugBar(0);
+                // set width for #main container
+                $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
+                layout.updateResponsiveLayout();
+
+                var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
+                var anchorTop = anchor.position().top;
+                var footerHeight = $('#footer:visible').height() || 0;
+                var fixContent = 1;
+
+                $(content.get().reverse()).each(function (pos, el) {
+                    el = $(el);
+                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
                 });
-            }());
+
+                // set height for #left-panel and #right-panel
+                $leftPanel.add($rightPanel).height($main.height());
+
+                scrollspy.adjust();
+
+                var fixDialog = 2;
+                var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
+
+                $('#dialog-extend-fixed-container').css({
+                    position: 'fixed',
+                    bottom: footersHeight + fixDialog,
+                    zIndex: 9999
+                });
+
+                $('.sidebar').css({
+                    'margin-bottom': footersHeight
+                });
+            };
+
+            if (!anchor.length) {
+                anchor = $('<div id="bottom-anchor"/>')
+                    .css({
+                        position: 'fixed',
+                        bottom: '0',
+                        left: '0',
+                        width: '1px',
+                        height: '1px'
+                    })
+                    .appendTo($(document.body));
+            }
+
+            if ($('.sf-toolbar').length) {
+                adjustHeight = (function () {
+                    var orig = adjustHeight;
+                    var waitForDebugBar = function (attempt) {
+                        if ($('.sf-toolbar').children().length) {
+                            $('body').addClass('dev-mode');
+                            _.delay(orig, 10);
+                        } else if (attempt < 100) {
+                            _.delay(waitForDebugBar, 500, attempt + 1);
+                        }
+                    };
+
+                    return _.wrap(adjustHeight, function (orig) {
+                        $('body').removeClass('dev-mode');
+                        orig();
+                        waitForDebugBar(0);
+                    });
+                }());
+            }
         }
 
         var adjustReloaded = function () {
