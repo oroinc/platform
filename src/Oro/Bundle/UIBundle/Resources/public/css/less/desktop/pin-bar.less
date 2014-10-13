@@ -226,6 +226,9 @@
     clear: both;
     display: block;
     height: 24px;
+    &:empty {
+      display: none;
+    }
   }
   li {
     color: @headerTextColor;
