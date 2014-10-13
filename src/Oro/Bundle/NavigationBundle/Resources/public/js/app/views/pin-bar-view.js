@@ -16,9 +16,7 @@ define([
          * @returns {boolean}
          */
         isVisibleItem: function (model) {
-            var itemView = _.find(this.subviews, function (itemView) {
-                return itemView.model === model;
-            });
+            var itemView = this.subview("itemView:" + model.cid);
             return this.isVisibleView(itemView);
         },
 
@@ -38,8 +36,18 @@ define([
          * @returns {Chaplin.View|undefined}
          */
         getLastVisibleView: function () {
-            var itemView;
-            itemView = _.find(this.subviews.slice().reverse(), this.isVisibleView, this);
+            var itemView, i, models;
+            models = this.collection.models;
+
+            // iterate from the end of models list until first visible view
+            for (i = models.length - 1; i >= 0; i -= 1) {
+                itemView = this.subview("itemView:" + models[i].cid);
+                if (this.isVisibleView(itemView)) {
+                    break;
+                }
+                itemView = null;
+            }
+
             return itemView;
         }
     });

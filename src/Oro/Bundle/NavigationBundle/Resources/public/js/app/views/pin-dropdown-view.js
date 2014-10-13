@@ -7,38 +7,40 @@ define([
 ], function (_, Chaplin, BaseCollectionView) {
     'use strict';
 
-    var CollectionView, utils;
+    var DropdownCollectionView, utils;
 
     utils = Chaplin.utils;
-    CollectionView = BaseCollectionView.extend({
-
+    DropdownCollectionView = BaseCollectionView.extend({
         listen: {
-            'visibilityChange': 'updateVisibilityList',
-            'add collection': 'recheck',
-            'remove collection': 'recheck'
+            'visibilityChange': 'updateVisibility',
+            'add collection': 'updateDropdown',
+            'remove collection': 'updateDropdown'
         },
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ['position']));
-            CollectionView.__super__.initialize.apply(this, arguments);
+            DropdownCollectionView.__super__.initialize.apply(this, arguments);
             // handle resize event once per frame (1000 ms / 25 frames)
-            $(window).on('resize.' + this.cid, _.debounce(_.bind(this.onPageResize, this), 40));
+            $(window).on('resize.' + this.cid, _.debounce(_.bind(this.updateDropdown, this), 40));
         },
 
         dispose: function () {
             $(window).off('.' + this.cid);
-            CollectionView.__super__.dispose.call(this);
+            DropdownCollectionView.__super__.dispose.call(this);
         },
 
         render: function () {
-            CollectionView.__super__.render.call(this);
+            DropdownCollectionView.__super__.render.call(this);
             this.positionUpdate();
             return this;
         },
 
-        onPageResize: function () {
+        /**
+         * Updates dropdown content and its position
+         */
+        updateDropdown: function () {
+            this.recheckItems();
             this.positionUpdate();
-            this.recheck();
         },
 
         /**
@@ -51,22 +53,25 @@ define([
             }
         },
 
-        recheck: function () {
+        /**
+         * Runs filterer and filterCallback methods for each model and its view
+         */
+        recheckItems: function () {
             var visibilityChanged;
 
             this.collection.each(function (model, index) {
                 var view, included, visibleItemsIndex;
-                view = _.find(this.subviews, function (view) {
-                    return view.model === model;
-                });
+                view = this.subview("itemView:" + model.cid);
                 included = this.filterer(model, index);
                 this.filterCallback(view, included);
 
                 visibleItemsIndex = utils.indexOf(this.visibleItems, model);
                 if (included && visibleItemsIndex === -1) {
+                    // included -- push model to visible items list
                     this.visibleItems.push(model);
                     visibilityChanged = true;
                 } else if (!included && visibleItemsIndex !== -1) {
+                    // excluded -- remove model from visible items list
                     this.visibleItems.splice(visibleItemsIndex, 1);
                     visibilityChanged = true;
                 }
@@ -77,23 +82,28 @@ define([
             }
         },
 
+        /**
+         * Update visibility of item-view
+         *
+         * @param {Chaplin.View} view
+         * @param {boolean} included
+         */
         filterCallback: function (view, included) {
-            if (included) {
-                view.$el.css('display', '');
-            } else {
-                view.$el.css('display', 'none');
-            }
+            view.$el.css('display', included ? '' : 'none');
         },
 
         renderAllItems: function () {
-            CollectionView.__super__.renderAllItems.apply(this, arguments);
-            this.updateVisibilityList();
+            DropdownCollectionView.__super__.renderAllItems.apply(this, arguments);
+            this.updateVisibility();
         },
 
-        updateVisibilityList: function () {
+        /**
+         * Handles visibility change
+         */
+        updateVisibility: function () {
             this.$el[this.visibleItems.length > 0 ? 'show' : 'hide']();
         }
     });
 
-    return CollectionView;
+    return DropdownCollectionView;
 });

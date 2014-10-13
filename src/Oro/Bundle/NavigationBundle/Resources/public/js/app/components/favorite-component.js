@@ -3,41 +3,60 @@
 define([
     'underscore',
     './base/bookmark-component',
-    '../views/base/button-view',
+    '../views/bookmark-button-view',
     'oroui/js/app/views/base/collection-view',
-    '../views/base/item-view'
-], function (_, MainView, ButtonView, CollectionView, ItemView) {
+    '../views/bookmark-item-view'
+], function (_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
     'use strict';
 
-    var FavoriteView;
+    var FavoriteComponent;
 
-    FavoriteView = MainView.extend({
-        createSubViews: function (options) {
-            var collection, button,
-                tabView, TabItemView, tabOptions;
+    FavoriteComponent = BaseBookmarkComponent.extend({
+        _createSubViews: function () {
+            this._createButtonView()
+            this._createTabView();
+        },
 
+        /**
+         * Create view for pin button
+         *
+         * @protected
+         */
+        _createButtonView: function () {
+            var options, collection;
+
+            options = this._options.buttonOptions || {};
             collection = this.collection;
 
-            // button view
-            button = new ButtonView({
+            _.extend(options, {
                 autoRender: true,
-                el: 'favButton',
                 collection: collection
             });
-            this.subview('button', button);
 
-            // tab view
+            this.button = new ButtonView(options);
+        },
+
+        /**
+         * Create view for favorite tabs in dot-menu
+         *
+         * @protected
+         */
+        _createTabView: function () {
+            var options, collection, TabItemView;
+
+            options = this._options.tabOptions || {};
+            collection = this.collection;
             TabItemView = ItemView.extend({
-                template: options.tabItemTemplate
+                template: this._options.tabItemTemplate
             });
-            tabOptions = _.extend(options.tabOptions, {
+
+            _.extend(options, {
                 autoRender: true,
-                el: 'favTab',
                 collection: collection,
                 itemView: TabItemView
             });
-            tabView = new CollectionView(tabOptions);
-            this.subview('tab', tabView);
+
+            this.tabs = new CollectionView(options);
         },
 
         actualizeAttributes: function (model) {
@@ -46,5 +65,5 @@ define([
         }
     });
 
-    return FavoriteView;
+    return FavoriteComponent;
 });
