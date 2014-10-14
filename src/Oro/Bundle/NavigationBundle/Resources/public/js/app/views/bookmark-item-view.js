@@ -8,9 +8,9 @@ define([
 ], function ($, _, BaseView, mediator) {
     'use strict';
 
-    var ItemView;
+    var BookmarkItemView;
 
-    ItemView = BaseView.extend({
+    BookmarkItemView = BaseView.extend({
         tagName:  'li',
 
         events: {
@@ -50,12 +50,12 @@ define([
         },
 
         getTemplateData: function () {
-            var data = ItemView.__super__.getTemplateData.call(this);
+            var data = BookmarkItemView.__super__.getTemplateData.call(this);
             // to support previously saved urls without leading slash
             data.url = (data.url[0] !== '/' ? '/' : '') + data.url;
             return data;
         }
     });
 
-    return ItemView;
+    return BookmarkItemView;
 });
