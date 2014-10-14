@@ -159,6 +159,7 @@ class EmailRenderer extends \Twig_Environment
      *  - add oro_format_datetime filter to all items which implement \DateTimeInterface
      *  - if value does not exists and PropertyAccess::getValue throw an error
      *    it will change on self::VARIABLE_NOT_FOUND
+     *  - all tags that do not start with `entity` will be ignored
      *
      * TODO find a common way for processing formatter
      * @param string $template
@@ -173,18 +174,19 @@ class EmailRenderer extends \Twig_Environment
             $result = $match[0];
             $path   = $match[1];
             $split  = explode('.', $path);
+
             if ($split[0] && 'entity' === $split[0]) {
                 unset($split[0]);
-            }
 
-            try {
-                $value = $that->getValue($entity, implode('.', $split));
+                try {
+                    $value = $that->getValue($entity, implode('.', $split));
 
-                if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
-                    $result = sprintf('{{ %s|oro_format_datetime }}', $path);
+                    if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+                        $result = sprintf('{{ %s|oro_format_datetime }}', $path);
+                    }
+                } catch (\Exception $e) {
+                    $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);
                 }
-            } catch (\Exception $e) {
-                $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);
             }
 
             return $result;
