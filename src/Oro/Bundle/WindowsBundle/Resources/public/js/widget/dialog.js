@@ -158,7 +158,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             saveData.dialogOptions.title = $(e.target).dialog('option', 'title');
             saveData.dialogOptions.state = data.state;
             saveData.dialogOptions.snapshot = data.snapshot;
-
+            saveData.wid = this.getWid();
             if (this.model) {
                 this.model.save({data: saveData});
             }
