@@ -197,7 +197,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testNotExistField()
     {
-        $content    = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, ' .
+        $content = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, ' .
             '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
 
         $entity2 = new TestEntityForVariableProvider();
@@ -206,8 +206,6 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $entity = new TestEntityForVariableProvider();
         $entity->setField1(new \DateTime('now'));
         $entity->setField2($entity2);
-
-        $entityClass    = get_class($entity);
 
         $this->cache
             ->expects($this->once())
@@ -219,7 +217,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                         [
                             'properties' => [],
                             'methods'    => [
-                                $entityClass => ['getField1']
+                                get_class($entity) => ['getField1']
                             ]
                         ]
                     )
@@ -233,9 +231,9 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            $renderedContent = $result[1],
             'content oro.email.variable.not.found, {{ entity.field1|oro_format_datetime }}, ' .
-            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found'
+            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found',
+            $renderedContent = $result[1]
         );
     }
 
@@ -244,8 +242,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testCompilePreview()
     {
-        $entity      = new TestEntityForVariableProvider();
-        $entityClass = get_class($entity);
+        $entity = new TestEntityForVariableProvider();
 
         $this->cache
             ->expects($this->once())
@@ -257,7 +254,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                         [
                             'properties' => [],
                             'methods'    => [
-                                $entityClass => ['getField1']
+                                get_class($entity) => ['getField1']
                             ]
                         ]
                     )
