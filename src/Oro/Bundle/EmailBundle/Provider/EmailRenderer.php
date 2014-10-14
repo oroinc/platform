@@ -160,6 +160,7 @@ class EmailRenderer extends \Twig_Environment
      *  - if value does not exists and PropertyAccess::getValue throw an error
      *    it will change on self::VARIABLE_NOT_FOUND
      *
+     * TODO find a common way for processing formatter
      * @param string $template
      * @param object $entity
      *
@@ -167,29 +168,29 @@ class EmailRenderer extends \Twig_Environment
      */
     protected function processDateTimeVariables($template, $entity)
     {
-        $searchPattern = '/{{\s([\w\d\.\_\-]*?)\s}}/';
-        $that          = $this;
-        $callback      = function ($match) use ($entity, $that) {
-            $path  = $match[1];
-            $split = explode('.', $path);
+        $that     = $this;
+        $callback = function ($match) use ($entity, $that) {
+            $result = $match[0];
+            $path   = $match[1];
+            $split  = explode('.', $path);
             if ($split[0] && 'entity' === $split[0]) {
                 unset($split[0]);
             }
 
             try {
-                $result = $that->getValue($entity, implode('.', $split));
+                $value = $that->getValue($entity, implode('.', $split));
 
-                if ($result instanceof \DateTimeInterface) {
-                    return '{{ ' . $path . '|oro_format_datetime }}';
+                if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+                    $result = sprintf('{{ %s|oro_format_datetime }}', $path);
                 }
             } catch (\Exception $e) {
-                return $that->translator->trans(self::VARIABLE_NOT_FOUND);
+                $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);
             }
 
-            return $match[0];
+            return $result;
         };
 
-        return preg_replace_callback($searchPattern, $callback, $template);
+        return preg_replace_callback('/{{\s([\w\d\.\_\-]*?)\s}}/u', $callback, $template);
     }
 
     /**
