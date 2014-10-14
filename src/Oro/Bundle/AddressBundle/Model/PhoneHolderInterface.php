@@ -10,7 +10,7 @@ interface PhoneHolderInterface
     /**
      * Gets a primary phone number of entity
      *
-     * @return string
+     * @return string|null
      */
     public function getPrimaryPhoneNumber();
 
