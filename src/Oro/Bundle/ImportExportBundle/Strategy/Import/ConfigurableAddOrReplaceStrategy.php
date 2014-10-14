@@ -66,6 +66,11 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             $this->cachedEntities[$oid] = $entity;
         }
 
+        // update relations
+        if ($isFullData) {
+            $this->updateRelations($entity, $itemData);
+        }
+
         // import entity fields
         if ($existingEntity) {
             if ($isFullData) {
@@ -73,11 +78,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             }
 
             $entity = $existingEntity;
-        }
-
-        // update relations
-        if ($isFullData) {
-            $this->updateRelations($entity, $itemData);
         }
 
         return $entity;
@@ -102,19 +102,30 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
-
-            // exclude fields marked as "excluded" and not specified field
-            // do not exclude identity fields
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false)
-                || $itemData !== null && !array_key_exists($fieldName, $itemData)
-                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false)
-            ) {
+            if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
                 $excludedFields[] = $fieldName;
-                unset($fields[$key]); // do not update relations for excluded fields
+                unset($fields[$key]);
             }
         }
 
         $this->strategyHelper->importEntity($existingEntity, $entity, $excludedFields);
+    }
+
+    /**
+     * Exclude fields marked as "excluded" and skipped not identity fields
+     *
+     * @param string $entityName
+     * @param string $fieldName
+     * @param array|mixed|null $itemData
+     * @return bool
+     */
+    protected function isFieldExcluded($entityName, $fieldName, $itemData = null)
+    {
+        $isExcluded = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded', false);
+        $isIdentity = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity', false);
+        $isSkipped  = $itemData !== null && !array_key_exists($fieldName, $itemData);
+
+        return $isExcluded || $isSkipped && !$isIdentity;
     }
 
     /**
