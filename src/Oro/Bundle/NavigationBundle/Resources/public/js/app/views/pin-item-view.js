@@ -3,13 +3,13 @@
 define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
-    '../base/item-view'
-], function (__, mediator, ItemView) {
+    './bookmark-item-view'
+], function (__, mediator, BookmarkItemView) {
     'use strict';
 
     var PinItemView;
 
-    PinItemView = ItemView.extend({
+    PinItemView = BookmarkItemView.extend({
         remove: function () {
             mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             PinItemView.__super__.remove.call(this);

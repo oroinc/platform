@@ -59,7 +59,6 @@ oro_menu_config:
         dots_menu:
             type: dots_menu
             children:
-                pinbar: ~
                 history: ~
                 favorite: ~
                 mostviewed: ~
