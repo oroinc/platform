@@ -3,19 +3,19 @@
 namespace Oro\Bundle\AddressBundle\Model;
 
 /**
- * Represents a subject which may provide phone numbers for call activity
+ * Represents a subject which may provide phone numbers
  */
 interface PhoneHolderInterface
 {
     /**
-     * Gets a primary phone number of entity which can be used to log call
+     * Gets a primary phone number of entity
      *
      * @return string
      */
     public function getPrimaryPhoneNumber();
 
     /**
-     * Gets list of entity phone numbers which can be used to log call
+     * Gets list of entity phone numbers
      *
      * @return array
      */
