@@ -198,7 +198,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
     public function testNotExistField()
     {
         $content = 'content {{ entity.sub.crp }}, {{ entity.field1 }}, ' .
-            '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}';
+            '{{ entity.field2.field1 }}, {{ entity.field2.25453 }}, {{ system.currentDate }}';
 
         $entity2 = new TestEntityForVariableProvider();
         $entity2->setField1(new \DateTime('now'));
@@ -232,7 +232,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'content oro.email.variable.not.found, {{ entity.field1|oro_format_datetime }}, ' .
-            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found',
+            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found, {{ system.currentDate }}',
             $renderedContent = $result[1]
         );
     }
