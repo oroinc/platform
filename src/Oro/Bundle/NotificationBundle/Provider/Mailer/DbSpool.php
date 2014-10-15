@@ -104,11 +104,11 @@ class DbSpool extends \Swift_ConfigurableSpool
         foreach ($emails as $email) {
             $email->setStatus(self::STATUS_PROCESSING);
             $this->em->persist($email);
-            $this->em->flush();
+            $this->em->flush($email);
 
             $count += $transport->send($email->getMessage(), $failedRecipients);
             $this->em->remove($email);
-            $this->em->flush();
+            $this->em->flush($email);
 
             if ($this->getTimeLimit() && (time() - $time) >= $this->getTimeLimit()) {
                 break;

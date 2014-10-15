@@ -36,7 +36,7 @@ class DashboardController extends Controller
                     'activeTab'        => $activeTab,
                     'activeTabContent' => $activeTabContent
                 ],
-                $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
+                $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
             );
 
             return $this->render(

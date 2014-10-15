@@ -6,3 +6,5 @@ Oro\Bundle\TagBundle\Entity\Tag:
             - NotBlank:     ~
             - Length:
                 max:        50
+        organization:
+            - NotBlank: ~

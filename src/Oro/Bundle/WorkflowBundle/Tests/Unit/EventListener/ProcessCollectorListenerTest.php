@@ -235,11 +235,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         // test
         $this->listener->onClear($args);
 
-        if ($hasTriggers) {
-            $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
-        } else {
-            $this->assertAttributeEquals(null, 'triggers', $this->listener);
-        }
+        $this->assertAttributeEquals(null, 'triggers', $this->listener);
+
         if ($hasScheduledProcesses) {
             $this->assertAttributeNotEmpty('scheduledProcesses', $this->listener);
         } else {

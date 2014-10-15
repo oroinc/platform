@@ -36,6 +36,8 @@ Oro\Bundle\UserBundle\Entity\User:
                 max:        100
         birthday:
             - Date:         ~
+        organization:
+            - NotBlank: ~
 
 Oro\Bundle\UserBundle\Entity\Role:
     constraints:
@@ -54,6 +56,8 @@ Oro\Bundle\UserBundle\Entity\Group:
             - NotBlank:     ~
             - Length:
                 max:        30
+        organization:
+            - NotBlank: ~
 #        roles:
 #            - Count:
 #                min:        1

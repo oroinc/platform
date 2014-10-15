@@ -159,8 +159,8 @@ define([
             this._disposeComponents();
 
             attributes = model.getAttributes();
-            this.publishEvent('page:update', attributes, options.actionArgs, options.xhr);
             this.adjustTitle(attributes.title);
+            this.publishEvent('page:update', attributes, options.actionArgs, options.xhr);
         },
 
         /**

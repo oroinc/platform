@@ -70,10 +70,19 @@ class ImportExportController extends Controller
      */
     public function importValidateAction($processorAlias)
     {
-        return $this->getImportHandler()->handleImportValidation(
+        $processorRegistry = $this->get('oro_importexport.processor.registry');
+        $entityName = $processorRegistry
+            ->getProcessorEntityName(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $processorAlias);
+        $existingAliases = $processorRegistry
+            ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
+
+        $result = $this->getImportHandler()->handleImportValidation(
             JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
             $processorAlias
         );
+        $result['showStrategy'] = count($existingAliases) > 1;
+
+        return $result;
     }
 
     /**

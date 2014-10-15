@@ -70,6 +70,18 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
                 $route     = $routeData['_route'];
 
                 unset($routeData['_controller'], $routeData['id'], $routeData['_route']);
+
+                $queries->addPostQuery(
+                    sprintf(
+                        'UPDATE oro_navigation_history ' .
+                        'SET route = \'%s\', entity_id = %d, route_parameters=\'%s\' WHERE id = %d',
+                        $route,
+                        $entityId,
+                        serialize($routeData),
+                        $navItem['id']
+                    )
+                );
+
             } catch (\RuntimeException $e) {
                 $queries->addPostQuery(
                     sprintf(
@@ -79,17 +91,6 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
                     )
                 );
             }
-
-            $queries->addPostQuery(
-                sprintf(
-                    'UPDATE oro_navigation_history ' .
-                    'SET route = \'%s\', entity_id = %d, route_parameters=\'%s\' WHERE id = %d',
-                    $route,
-                    $entityId,
-                    serialize($routeData),
-                    $navItem['id']
-                )
-            );
         }
     }
 }
