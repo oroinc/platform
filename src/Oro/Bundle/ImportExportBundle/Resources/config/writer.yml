@@ -19,6 +19,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_importexport.writer.entity_detach_fixer
+            - @oro_importexport.context_registry
 
     oro_importexport.writer.entity_detach_fixer:
         class: %oro_importexport.writer.entity_detach_fixer.class%

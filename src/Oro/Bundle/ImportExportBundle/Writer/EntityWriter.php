@@ -3,24 +3,37 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Doctrine\ORM\EntityManager;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
-class EntityWriter implements ItemWriterInterface
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+
+class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
-    /**
-     * @var EntityManager
-     */
+    const SKIP_CLEAR = 'writer_skip_clear';
+
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var EntityDetachFixer
-     */
+    /** @var EntityDetachFixer */
     protected $detachFixer;
 
-    public function __construct(EntityManager $entityManager, EntityDetachFixer $detachFixer)
-    {
-        $this->entityManager = $entityManager;
-        $this->detachFixer = $detachFixer;
+    /** @var StepExecution */
+    protected $stepExecution;
+
+    /** @var ContextRegistry */
+    protected $contextRegistry;
+
+    public function __construct(
+        EntityManager $entityManager,
+        EntityDetachFixer $detachFixer,
+        ContextRegistry $contextRegistry
+    ) {
+        $this->entityManager   = $entityManager;
+        $this->detachFixer     = $detachFixer;
+        $this->contextRegistry = $contextRegistry;
     }
 
     /**
@@ -33,6 +46,21 @@ class EntityWriter implements ItemWriterInterface
             $this->detachFixer->fixEntityAssociationFields($item, 1);
         }
         $this->entityManager->flush();
-        $this->entityManager->clear();
+
+        $configuration = $this->contextRegistry
+            ->getByStepExecution($this->stepExecution)
+            ->getConfiguration();
+
+        if (empty($configuration[self::SKIP_CLEAR])) {
+            $this->entityManager->clear();
+        }
+    }
+
+    /**
+     * @param StepExecution $stepExecution
+     */
+    public function setStepExecution(StepExecution $stepExecution)
+    {
+        $this->stepExecution = $stepExecution;
     }
 }

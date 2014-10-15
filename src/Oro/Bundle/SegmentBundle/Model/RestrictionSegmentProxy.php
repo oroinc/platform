@@ -50,7 +50,7 @@ class RestrictionSegmentProxy extends AbstractSegmentProxy
                 $decoded,
                 [
                     'columns' => [
-                        ['name' => $identifier]
+                        ['name' => $identifier, 'distinct' => true]
                     ]
                 ]
             );

@@ -9,11 +9,21 @@ services:
             - @doctrine
             - @validator
             - @translator
+            - @oro_importexport.field.field_helper
+
+    oro_importexport.strategy.add:
+        abstract: true
+        arguments:
+            - @event_dispatcher
+            - @oro_importexport.strategy.import.helper
+            - @oro_importexport.field.field_helper
+            - @oro_importexport.field.database_helper
 
     oro_importexport.strategy.configurable_add_or_replace:
         class: %oro_importexport.strategy.configurable_add_or_replace.class%
         abstract: true
         arguments:
+            - @event_dispatcher
             - @oro_importexport.strategy.import.helper
             - @oro_importexport.field.field_helper
             - @oro_importexport.field.database_helper

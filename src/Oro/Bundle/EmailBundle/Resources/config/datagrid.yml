@@ -92,7 +92,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - f.type = '%oro_email.email_folder.entity.class%::INBOX'
+                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
         columns:
             receivedAt:
                 label: oro.email.received_at.label
@@ -120,7 +120,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - f.type = '%oro_email.email_folder.entity.class%::SENT'
+                        - f.type = '%oro_email.email_folder.model.class%::SENT'
         columns:
             sentAt:
                 label: oro.email.sent_at.label

@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Composer;
 
 use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandler;
 use Symfony\Component\Filesystem\Filesystem;
+
 use Composer\Script\CommandEvent;
 
 class ScriptHandler extends SensioScriptHandler
