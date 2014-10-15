@@ -141,20 +141,20 @@ class ResponseHistoryListener
     /**
      * Is request valid for adding to history
      *
-     * @param Response      $response
-     * @param Request       $request
-     * @param UserInterface $user
+     * @param Response $response
+     * @param Request  $request
+     * @param          $user
      *
      * @return bool
      */
-    private function canAddToHistory(Response $response, Request $request, UserInterface $user = null)
+    private function canAddToHistory(Response $response, Request $request, $user = null)
     {
         $result = $response->getStatusCode() == 200
             && $request->getRequestFormat() == 'html'
             && $request->getMethod() == 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            && $user;
+            && ($user instanceof UserInterface);
 
         if ($result) {
             $route  = $request->get('_route');
