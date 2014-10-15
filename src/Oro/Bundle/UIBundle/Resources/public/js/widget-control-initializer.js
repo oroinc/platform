@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 'oroui/js/mediator'],
-    function ($, _, DialogWidget, WidgetManager, mediator) {
+define(['jquery', 'underscore', 'oroui/js/widget-manager', 'oroui/js/mediator'],
+    function ($, _, WidgetManager, mediator) {
         'use strict';
 
         /**

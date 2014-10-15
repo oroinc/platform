@@ -7,12 +7,16 @@ define([
 ], function (_, Backbone, Chaplin) {
     'use strict';
 
-    var BaseComponent;
+    var BaseComponent, componentOptions;
+
+    componentOptions = ['model', 'collection'];
 
     // base component's constructor
     BaseComponent = function (options) {
         this.cid = _.uniqueId('component');
+        _.extend(this, _.pick(options, componentOptions));
         this.initialize(options);
+        this.delegateListeners();
     };
 
     // defines static methods
@@ -42,7 +46,9 @@ define([
     });
 
     // defines prototype properties and  methods
-    _.extend(BaseComponent.prototype, Backbone.Events, Chaplin.EventBroker, {
+    _.extend(BaseComponent.prototype, Backbone.Events, Chaplin.EventBroker,
+        // copy useful methods Chaplin.View
+        _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener']), {
         /**
          * Defer object, helps to notify environment that component is initialized
          * in case it work in asynchronous way
