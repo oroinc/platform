@@ -41,13 +41,9 @@ class Dashboards extends AbstractPageFilteredGrid
      */
     public function open($entityData = array())
     {
-        $user = $this->getEntity($entityData);
-        $user->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
+        $page = parent::open($entityData);
 
-        return new Dashboard($this->test);
+        return new Dashboard($page->test);
     }
 
     public function edit()

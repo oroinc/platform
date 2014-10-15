@@ -6,11 +6,11 @@ define([
 ], function (mediator, PageRegionView) {
     'use strict';
 
-    var ButtonView, document;
+    var BookmarkButtonView, document;
 
     document = window.document;
 
-    ButtonView = PageRegionView.extend({
+    BookmarkButtonView = PageRegionView.extend({
         pageItems: ['showPinButton', 'titleShort', 'titleSerialized'],
 
         events: {
@@ -81,5 +81,5 @@ define([
         }
     });
 
-    return ButtonView;
+    return BookmarkButtonView;
 });

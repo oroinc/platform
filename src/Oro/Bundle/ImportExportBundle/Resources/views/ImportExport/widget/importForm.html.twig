@@ -1,9 +1,4 @@
 <div class="widget-content">
-    <style type="text/css">
-        .ui-dialog .form-horizontal .control-group .controls {
-            margin-left: 130px;
-        }
-    </style>
     <div class="form-container">
         <form method="post"
               data-nohash="true"
@@ -12,12 +7,12 @@
               class="form-horizontal"
               {{ form_enctype(form) }}>
 
-            <fieldset>
+            <fieldset class="form">
                 <div class="import-file">
-                    {{ form_row(form.file, {'label': 'File'}) }}
+                    {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
                 </div>
-                <div style="display: none;">
-                    {{ form_row(form.processorAlias, {'label': 'Strategy'}) }}
+                <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                    {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
                 </div>
                 {{ form_rest(form) }}
             </fieldset>

@@ -12,7 +12,12 @@ use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
-class LoadCountryData extends AbstractTranslatableEntityFixture implements VersionedFixtureInterface
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class LoadCountryData extends AbstractTranslatableEntityFixture implements
+    VersionedFixtureInterface,
+    ContainerAwareInterface
 {
     const COUNTRY_PREFIX = 'country';
     const REGION_PREFIX  = 'region';
@@ -31,6 +36,19 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
      * @var string
      */
     protected $structureFileName = '/data/countries.yml';
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
 
     /**
      * {@inheritdoc}
@@ -55,10 +73,9 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
      */
     protected function getFileName()
     {
-        $fileName = __DIR__ . $this->structureFileName;
-        $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
-
-        return $fileName;
+        return $this->container
+            ->get('kernel')
+            ->locateResource('@OroAddressBundle/Migrations/Data/ORM' . $this->structureFileName);
     }
 
     /**
@@ -173,10 +190,9 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
                     }
                 }
             }
-
-            $manager->flush();
         }
 
+        $manager->flush();
         $manager->clear();
     }
 }

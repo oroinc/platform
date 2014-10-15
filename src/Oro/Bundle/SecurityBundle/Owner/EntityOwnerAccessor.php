@@ -77,7 +77,7 @@ class EntityOwnerAccessor
      * Gets organization of the given entity
      *
      * @param $object
-     * @return object
+     * @return object|null
      * @throws InvalidEntityException
      */
     public function getOrganization($object)

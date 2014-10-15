@@ -34,9 +34,9 @@ class DashboardModel implements EntityModelInterface
      */
     public function __construct(Dashboard $dashboard, Collection $widgets, array $config)
     {
-        $this->entity = $dashboard;
+        $this->entity  = $dashboard;
         $this->widgets = $widgets;
-        $this->config = $config;
+        $this->config  = $config;
     }
 
     /**
@@ -178,8 +178,9 @@ class DashboardModel implements EntityModelInterface
             function ($first, $second) {
                 /** @var WidgetModel $first */
                 /** @var WidgetModel $second */
-                $firstPosition = $first->getLayoutPosition();
+                $firstPosition  = $first->getLayoutPosition();
                 $secondPosition = $second->getLayoutPosition();
+
                 return $firstPosition[1] - $secondPosition[1];
             }
         );

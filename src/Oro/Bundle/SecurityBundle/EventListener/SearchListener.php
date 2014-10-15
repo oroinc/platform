@@ -59,7 +59,7 @@ class SearchListener
                 $propertyAccessor = PropertyAccess::createPropertyAccessor();
                 /** @var Organization $organization */
                 $organization = $propertyAccessor->getValue($entity, $organizationField);
-                if ($organization) {
+                if ($organization && null !== $organization->getId()) {
                     $organizationId = $organization->getId();
                 }
             }

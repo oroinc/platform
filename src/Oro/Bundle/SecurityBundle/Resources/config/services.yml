@@ -45,8 +45,6 @@ parameters:
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
-    oro_security.acl.listenerclass:                            Oro\Bundle\SecurityBundle\EventListener\AclListener
-
     oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
@@ -61,8 +59,10 @@ parameters:
     oro_security.authentication.organization_rememberme.services.simplehash.class: Oro\Bundle\SecurityBundle\Http\RememberMe\OrganizationTokenBasedRememberMeServices
 
     oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
+    oro_security.listener.refresh_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
     oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
     oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
+    oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
@@ -78,6 +78,10 @@ services:
         tags:
             - { name: monolog.logger, channel: security }
         lazy: true
+
+    security.context.link:
+        tags:
+            - { name: oro_service_link,  service: security.context }
 
     oro_security.security_facade.link:
         tags:
@@ -474,6 +478,24 @@ services:
               - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
 
+    oro_security.listener.refresh_context_listener:
+        class: %oro_security.listener.refresh_context_listener.class%
+        arguments:
+            - @security.context.link
+            - @doctrine
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: doctrine.event_listener, event: onClear }
+
+    oro_security.listener.console_context_listener:
+        class: %oro_security.listener.console_context_listener.class%
+        arguments:
+            - @doctrine
+            - @security.context
+            - @oro_user.manager
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+
     oro_security.form.extension.aclprotected_type:
         class: %oro_security.form.extension.aclprotected_type.class%
         arguments:
@@ -487,5 +509,5 @@ services:
               - @oro_security.owner.ownership_metadata_provider
               - @oro_security.security_facade
           tags:
-              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent }
+              - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
               - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }

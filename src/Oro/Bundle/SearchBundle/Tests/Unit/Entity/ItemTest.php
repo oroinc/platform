@@ -157,7 +157,8 @@ class ItemTest extends \PHPUnit_Framework_TestCase
                     'test_field' => 'test text'
                 ),
                 'integer' => array(
-                    'test_integer' => 10
+                    'test_integer' => 10,
+                    'test_integer_array' => [2, 3]
                 ),
                 'datetime' => array(
                     'test_datetime' => new \DateTime('2013-01-01')
@@ -171,10 +172,26 @@ class ItemTest extends \PHPUnit_Framework_TestCase
         $textFields = $this->item->getTextFields();
         $this->assertEquals('test text', $textFields->get(0)->getValue());
         $integerFields = $this->item->getIntegerFields();
+        $this->assertEquals(3, $integerFields->count());
         $this->assertEquals(10, $integerFields->get(0)->getValue());
+        $this->assertEquals(2, $integerFields->get(1)->getValue());
+        $this->assertEquals(3, $integerFields->get(2)->getValue());
         $datetimeFields = $this->item->getDatetimeFields();
         $this->assertEquals('2013-01-01', $datetimeFields->get(0)->getValue()->format('Y-m-d'));
         $decimalFields = $this->item->getDecimalFields();
         $this->assertEquals(10.26, $decimalFields->get(0)->getValue());
+
+        $this->item->saveItemData(
+            array(
+                'integer' => array(
+                    'test_integer' => 10,
+                    'test_integer_array' => [5]
+                ),
+            )
+        );
+
+        $integerFields = $this->item->getIntegerFields();
+        $this->assertEquals(2, $integerFields->count());
+        $this->assertEquals(5, $integerFields->get(3)->getValue());
     }
 }

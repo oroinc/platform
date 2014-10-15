@@ -3,12 +3,6 @@
 }
 
 #oroplatform-header {
-  .logo {
-    a {
-      text-transform: uppercase;
-      color: #fff;
-    }
-  }
   .logo, #main-menu-toggle {
     margin: 0 10px;
     float: left;
@@ -20,11 +14,37 @@
       .header-button-inactive;
     }
   }
+  .logo {
+    margin: 0;
+    padding: 0 150px 0 52px;
+    width: 100%;
+    display: inline-block;
+    line-height: 0;
+    > span {
+      padding-right: 16px;
+      display: inline-block;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #fff;
+      line-height: 54px;
+    }
+    a {
+      text-transform: uppercase;
+      color: #fff;
+    }
+  }
   #search-bar-search{
     width: 100%;
   }
-  #main-menu-toggle.open > [class^=icon-] {
-    .header-button-active;
+  #main-menu-toggle {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    &.open > [class^=icon-] {
+      .header-button-active;
+    }
   }
   .container {
     .divider-vertical.small-divider {
@@ -32,6 +52,17 @@
     }
   }
   .nav.top-search {
+    position: absolute;
+    z-index: 1;
+    left: inherit;
+    top: 54px;
+    width: 100%;
+    height: 0;
+    overflow: visible;
+    padding-right: 54px;
+    .header-utility-dropdown {
+      margin-left: 15px;
+    }
     .dropdown{
       .dropdown-menu{
         .nav-header{
@@ -41,21 +72,25 @@
       }
     }
     .header-dropdown-shortcut {
+      float: right;
+      margin: -54px 55px 0 0;
       .dropdown-menu {
         left: auto;
         right: 0;
         width: 100%;
         &:before {
           left: auto;
-          right: 124px;
+          right: 117px;
         }
         &:after {
           left: auto;
-          right: 125px;
+          right: 118px;
         }
       }
     }
     .header-dropdown-search {
+      float: right;
+      margin: -54px 8px 0 0;
       .dropdown-menu {
         left: auto;
         right: 0;
@@ -69,11 +104,11 @@
         }
         &:before {
           left: auto;
-          right: 77px;
+          right: 70px;
         }
         &:after {
           left: auto;
-          right: 78px;
+          right: 71px;
         }
       }
       .search-form {
@@ -88,6 +123,12 @@
     }
   }
   .nav.user-menu {
+    position: absolute;
+    z-index: 1;
+    left: inherit;
+    right: 0;
+    top: 0;
+    width: 54px;
     .dropdown {
       > a {
         padding: 10px
@@ -137,18 +178,6 @@
   max-width: 320px;
 }
 
-#oroplatform-header #search-bar-button {
-}
-
-#oroplatform-header .top-search.shortcuts {
-  float: right !important;
-  margin-right: 18px;
-}
-
-#oroplatform-header .top-search.shortcuts .header-utility-dropdown {
-  margin-left: 15px;
-}
-
 #oroplatform-header .dropdown-toggle {
   padding-top: 0px !important;
 }
@@ -156,8 +185,7 @@
 #oroplatform-header .icon-user,
 #oroplatform-header .icon-search,
 #oroplatform-header .icon-share-sign,
-#oroplatform-header .icon-menu-bars,
-#oroplatform-header .logo {
+#oroplatform-header .icon-menu-bars {
   font-size: 24px !important;
   line-height: 32px !important;
   margin: 0px !important;
