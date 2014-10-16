@@ -51,7 +51,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \LogicException
      * @expectedExceptionMessage Entity pagination is not boolean
      */
     public function testProcessException()
