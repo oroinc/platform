@@ -56,7 +56,7 @@ class EntityRoutingHelper
     {
         $result = str_replace('_', '\\', $className);
         if (strpos($result, ExtendConfigDumper::ENTITY) === 0) {
-            // a custom entity can contains _ in class name
+            // a custom entity can contain _ in class name
             $result = ExtendConfigDumper::ENTITY . substr($className, strlen(ExtendConfigDumper::ENTITY));
         }
 
