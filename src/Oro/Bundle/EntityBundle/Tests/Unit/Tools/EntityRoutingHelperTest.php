@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,6 +65,15 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         return [
             ['Acme_Bundle_TestClass', 'Acme\Bundle\TestClass'],
             ['Acme\Bundle\TestClass', 'Acme\Bundle\TestClass'],
+            [ExtendConfigDumper::ENTITY . 'TestClass', ExtendConfigDumper::ENTITY . 'TestClass'],
+            [
+                str_replace('\\', '_', ExtendConfigDumper::ENTITY) . 'TestClass',
+                ExtendConfigDumper::ENTITY . 'TestClass'
+            ],
+            [
+                str_replace('\\', '_', ExtendConfigDumper::ENTITY) . 'Test_Class',
+                ExtendConfigDumper::ENTITY . 'Test_Class'
+            ],
         ];
     }
 
@@ -95,6 +105,71 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'test_url',
             $this->entityRoutingHelper->generateUrl('test_route', 'Acme\Bundle\TestClass', 123, ['param1' => 'test'])
+        );
+    }
+
+    public function testGenerateUrlByRequest()
+    {
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->exactly(2))
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entityClass', null, false, 'Acme\Bundle\TestClass'],
+                        ['entityId', null, false, 123],
+                    ]
+                )
+            );
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with(
+                'test_route',
+                [
+                    'entityClass' => 'Acme_Bundle_TestClass',
+                    'entityId'    => '123',
+                    'param1' => 'test'
+                ]
+            )
+            ->will($this->returnValue('test_url'));
+
+        $this->assertEquals(
+            'test_url',
+            $this->entityRoutingHelper->generateUrlByRequest('test_route', $request, ['param1' => 'test'])
+        );
+    }
+
+    public function testGenerateUrlByRequestNoEntityClass()
+    {
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entityClass', null, false, null],
+                    ]
+                )
+            );
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with(
+                'test_route',
+                [
+                    'param1' => 'test'
+                ]
+            )
+            ->will($this->returnValue('test_url'));
+
+        $this->assertEquals(
+            'test_url',
+            $this->entityRoutingHelper->generateUrlByRequest('test_route', $request, ['param1' => 'test'])
         );
     }
 

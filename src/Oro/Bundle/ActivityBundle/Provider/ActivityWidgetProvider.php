@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
@@ -72,9 +73,15 @@ class ActivityWidgetProvider implements WidgetProviderInterface
         foreach ($items as $item) {
             if (empty($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
                 $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
+                $alias  = sprintf(
+                    '%s_%s_%s',
+                    strtolower(ExtendHelper::getShortClassName($item['className'])),
+                    dechex(crc32($item['className'])),
+                    $item['associationName']
+                );
                 $widget = [
                     'widgetType' => 'block',
-                    'alias'      => $item['associationName'],
+                    'alias'      => $alias,
                     'label'      => $this->translator->trans($item['label']),
                     'url'        => $url
                 ];
