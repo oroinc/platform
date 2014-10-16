@@ -33,7 +33,7 @@ class ImportCommand extends ContainerAwareCommand
             ->addArgument(
                 self::ARGUMENT_FILE,
                 InputArgument::REQUIRED,
-                'File name from which to import the CSV data'
+                'File name, to import CSV data from'
             )
             ->addOption(
                 self::OPTION_VALIDATION_PROCESSOR,
