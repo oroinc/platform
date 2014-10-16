@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 
 use CG\Generator\PhpClass;
 use CG\Generator\PhpProperty;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -15,26 +16,18 @@ class SerializedDataGeneratorExtension extends AbstractEntityGeneratorExtension
     /**
      * @param ConfigProvider $extendConfigProvide
      */
-    public function __construct(
-        ConfigProvider $extendConfigProvide
-    ) {
+    public function __construct(ConfigProvider $extendConfigProvide)
+    {
         $this->extendConfigProvide = $extendConfigProvide;
     }
 
     /**
-     * This method is called during the PHP code generation.
-     * You can use it to make modifications of entity PHP code.
-     *
-     * @param array    $schema The entity schema
-     * @param PhpClass $class  The php class builder
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function generate(array &$schema, PhpClass $class)
     {
         $class->setProperty(PhpProperty::create('serialized_data')->setVisibility('protected'));
 
-        //$properties = $this->extendConfigProvide->getIds($class->getName());
         $schema['property']['serialized_data'] = 'serialized_data';
         $schema['doctrine'][$class->getName()]['fields']['serialized_data'] = [
             'column'   => 'serialized_data',
@@ -42,7 +35,6 @@ class SerializedDataGeneratorExtension extends AbstractEntityGeneratorExtension
             'nullable' => true,
         ];
     }
-
 
     /**
      * {@inheritdoc}
@@ -52,7 +44,6 @@ class SerializedDataGeneratorExtension extends AbstractEntityGeneratorExtension
         /** @var ConfigInterface $config */
         $config = $this->extendConfigProvide->getConfig($schema['class']);
 
-        //return true;
         return $config->get('has_serialized_data', false, false);
     }
 }
