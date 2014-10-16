@@ -16,6 +16,7 @@ parameters:
     oro_entity_extend.migration.refresh_cache.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\RefreshExtendCachePostUpMigrationListener
     oro_entity_extend.migration.update_config.post_up.listener.class:  Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener
     oro_entity_extend.migration.update_indices.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendIndicesPostUpMigrationListener
+    oro_entity_extend.migration.searilized_data.post_up.listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SerializedDataPostUpMigrationListener
     oro_entity_extend.migration.entity_metadata_helper.class: Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper
     oro_entity_extend.migration.options_manager.class:        Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
     oro_entity_extend.migration.options_parser.class:         Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser
@@ -167,6 +168,13 @@ services:
             - @oro_entity_extend.migration.entity_metadata_helper
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }
+
+    oro_entity_extend.migration.searilized_data.post_up.listener:
+          class: %oro_entity_extend.migration.searilized_data.post_up.listener.class%
+          arguments:
+              - @oro_entity_extend.migration.entity_metadata_helper
+          tags:
+              - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
 
     oro_entity_extend.migration.entity_metadata_helper:
         class: %oro_entity_extend.migration.entity_metadata_helper.class%
