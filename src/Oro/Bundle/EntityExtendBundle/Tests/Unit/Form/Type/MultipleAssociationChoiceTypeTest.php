@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 
@@ -10,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
@@ -30,17 +30,21 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $config3->set('groups', ['test']);
         $config4 = new Config(new EntityConfigId('grouping', 'Test\Entity4'));
         $config4->set('groups', ['test', 'test1']);
+        $config5 = new Config(new EntityConfigId('grouping', 'Test\Entity5'));
+        $config5->set('groups', ['test']);
         $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
         $this->groupingConfigProvider->expects($this->any())
             ->method('getConfigs')
-            ->will($this->returnValue([$config1, $config2, $config3, $config4]));
+            ->will($this->returnValue([$config1, $config2, $config3, $config4, $config5]));
 
         $entityConfig3 = new Config(new EntityConfigId('entity', 'Test\Entity3'));
         $entityConfig3->set('plural_label', 'Entity3');
         $entityConfig4 = new Config(new EntityConfigId('entity', 'Test\Entity4'));
         $entityConfig4->set('plural_label', 'Entity4');
+        $entityConfig5 = new Config(new EntityConfigId('entity', 'Test\Entity5'));
+        $entityConfig5->set('plural_label', 'Entity5');
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -51,6 +55,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
                     [
                         ['Test\Entity3', null, $entityConfig3],
                         ['Test\Entity4', null, $entityConfig4],
+                        ['Test\Entity5', null, $entityConfig5],
                     ]
                 )
             );
@@ -71,9 +76,22 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected)
+    public function testSubmit($newVal, $oldVal, $state, $isSetStateExpected, $immutable, $expectedData)
     {
-        $this->doTestSubmit(
+        $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
+        if ($immutable !== null) {
+            $testConfig->set('immutable', $immutable);
+        }
+        $this->testConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->with('Test\Entity', null)
+            ->will($this->returnValue(true));
+        $this->testConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->with('Test\Entity', null)
+            ->will($this->returnValue($testConfig));
+
+        $data = $this->doTestSubmit(
             'items',
             $this->type,
             [
@@ -89,19 +107,120 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             $state,
             $isSetStateExpected
         );
+
+        $this->assertEquals($expectedData, $data);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function submitProvider()
     {
         return [
-            [[], null, ExtendScope::STATE_ACTIVE, false],
-            [[], [], ExtendScope::STATE_ACTIVE, false],
-            [['Test\Entity3'], ['Test\Entity3'], ExtendScope::STATE_ACTIVE, false],
-            [[], ['Test\Entity3'], ExtendScope::STATE_ACTIVE, false],
-            [['Test\Entity3'], [], ExtendScope::STATE_ACTIVE, true],
-            [['Test\Entity3', 'Test\Entity4'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
-            [['Test\Entity3'], ['Test\Entity4'], ExtendScope::STATE_ACTIVE, true],
-            [['Test\Entity3'], [], ExtendScope::STATE_UPDATE, false],
+            'empty, no changes, oldVal is null'              => [
+                'newVal'             => [],
+                'oldVal'             => null,
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => false,
+                'immutable'          => [],
+                'expectedData'       => []
+            ],
+            'empty, no changes'                              => [
+                'newVal'             => [],
+                'oldVal'             => [],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => false,
+                'immutable'          => [],
+                'expectedData'       => []
+            ],
+            'no changes'                                     => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => ['Test\Entity3'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => false,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'remove item, empty result'                      => [
+                'newVal'             => [],
+                'oldVal'             => ['Test\Entity3'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => []
+            ],
+            'remove item'                                    => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => ['Test\Entity3', 'Test\Entity4'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'add item to null'                               => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => null,
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'add item to empty'                              => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => [],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'add item'                                       => [
+                'newVal'             => ['Test\Entity3', 'Test\Entity4'],
+                'oldVal'             => ['Test\Entity3'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3', 'Test\Entity4']
+            ],
+            'replace item'                                   => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => ['Test\Entity4'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'change order of items'                          => [
+                'newVal'             => ['Test\Entity4', 'Test\Entity3'],
+                'oldVal'             => ['Test\Entity3', 'Test\Entity4'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => false,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3', 'Test\Entity4']
+            ],
+            'has changes, but state is already STATE_UPDATE' => [
+                'newVal'             => ['Test\Entity3'],
+                'oldVal'             => [],
+                'state'              => ExtendScope::STATE_UPDATE,
+                'isSetStateExpected' => false,
+                'immutable'          => [],
+                'expectedData'       => ['Test\Entity3']
+            ],
+            'with immutable'                                 => [
+                'newVal'             => ['Test\Entity4', 'Test\Entity5'],
+                'oldVal'             => ['Test\Entity3', 'Test\Entity5'],
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => ['Test\Entity3'],
+                'expectedData'       => ['Test\Entity3', 'Test\Entity5', 'Test\Entity4']
+            ],
+            'with immutable, oldVal is null'                 => [
+                'newVal'             => ['Test\Entity4', 'Test\Entity5'],
+                'oldVal'             => null,
+                'state'              => ExtendScope::STATE_ACTIVE,
+                'isSetStateExpected' => true,
+                'immutable'          => ['Test\Entity3'],
+                'expectedData'       => ['Test\Entity4', 'Test\Entity5']
+            ],
         ];
     }
 
@@ -277,9 +396,9 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
         $this->assertEquals(
             [
-                'attr'  => [],
+                'attr'     => [],
                 'disabled' => true,
-                'value' => 'Test\Entity2'
+                'value'    => 'Test\Entity2'
             ],
             $view->children[1]->vars
         );
@@ -297,6 +416,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 
     /**
      * @param string|null $cssClass
+     *
      * @return array
      */
     protected function getDisabledFormView($cssClass = null)

@@ -66,6 +66,8 @@ class AbstractConfigTypeTestCase extends TypeTestCase
      * @param mixed                                      $oldVal
      * @param string                                     $state
      * @param bool                                       $isSetStateExpected
+     *
+     * @return mixed The form data
      */
     protected function doTestSubmit(
         $formName,
@@ -99,7 +101,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->method('getConfig')
             ->with('Test\Entity')
             ->will($this->returnValue($extendConfig));
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->any())
             ->method('getConfig')
             ->with($config->getId())
             ->will($this->returnValue($config));
@@ -138,8 +140,10 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
         $form->submit($newVal);
 
-        $this->assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized(), 'Expected that a form is synchronized');
         $this->assertEquals($expectedExtendConfig, $extendConfig);
+
+        return $form->getData();
     }
 
     protected function setConfigProvidersForSubmitTest(array &$configProviders)
