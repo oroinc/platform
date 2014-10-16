@@ -65,7 +65,8 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
- *          }
+ *          },
+ *          "extend"={"has_serialized_data"="true"}
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")
