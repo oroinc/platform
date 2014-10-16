@@ -37,7 +37,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
     /**
      * {@inheritdoc}
      */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array &$schema, PhpClass $class)
     {
         $this->generateAssociationMethods($schema, $class);
     }
