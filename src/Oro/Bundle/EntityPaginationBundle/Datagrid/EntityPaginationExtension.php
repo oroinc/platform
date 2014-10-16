@@ -37,8 +37,6 @@ class EntityPaginationExtension extends AbstractExtension
         }
 
         $pagination = $pagination ? true : false;
-
-        // replace config values by normalized
         $config->offsetSetByPath(self::ENTITY_PAGINATION_PATH, $pagination);
     }
 }
