@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\EntityExtendBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
@@ -10,14 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
-
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 /**
  * @RouteResource("entity_extend_enum")
@@ -43,10 +41,7 @@ class EnumController extends FOSRestController
      */
     public function getAction($entityName)
     {
-        $extendEntitySuffix = str_replace('\\', '_', ExtendConfigDumper::ENTITY);
-        $entityName         = strpos($entityName, $extendEntitySuffix) === 0
-            ? ExtendConfigDumper::ENTITY . substr($entityName, strlen($extendEntitySuffix))
-            : str_replace('_', '\\', $entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         /** @var EntityManager $em */
         $em       = $this->get('doctrine')->getManagerForClass($entityName);
