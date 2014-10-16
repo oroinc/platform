@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\AddressBundle\Model\PhoneHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -38,7 +39,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class BusinessUnit implements NotificationEmailInterface
+class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, PhoneHolderInterface
 {
     /**
      * @var integer
@@ -426,5 +427,27 @@ class BusinessUnit implements NotificationEmailInterface
         $emails[] = $this->getEmail();
 
         return $emails;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrimaryPhoneNumber()
+    {
+        return !empty($this->phone) ? $this->phone : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPhoneNumbers()
+    {
+        $phones = [];
+
+        if (!empty($this->phone)) {
+            $phones[] = $this->phone;
+        }
+
+        return $phones;
     }
 }
