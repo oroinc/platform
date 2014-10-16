@@ -25,7 +25,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     /**
      * {@inheritdoc}
      */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array &$schema, PhpClass $class)
     {
         if (!empty($schema['inherit'])) {
             $class->setParentClassName($schema['inherit']);

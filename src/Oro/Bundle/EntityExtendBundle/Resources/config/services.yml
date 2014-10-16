@@ -23,6 +23,7 @@ parameters:
     oro_entity_extend.migration.extension.rename.class:       Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
     oro_entity_extend.entity_generator.class:                 Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator
     oro_entity_extend.entity_generator.extension.class:       Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
+    oro_entity_extend.serialized_generator.extension.class:   Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\SerializedDataGeneratorExtension
     oro_entity_extend.relation_builder.class:                 Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder
     oro_entity_extend.association_builder.class:              Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder
     oro_entity_extend.enum_synchronizer.class:                Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer
@@ -51,6 +52,13 @@ services:
         class: %oro_entity_extend.entity_generator.class%
         arguments:
             - %kernel.cache_dir%
+
+    oro_entity_extend.serialized_generator.extension:
+        class: %oro_entity_extend.serialized_generator.extension.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
 
     oro_entity_extend.entity_generator.extension:
         class: %oro_entity_extend.entity_generator.extension.class%

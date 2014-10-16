@@ -27,7 +27,7 @@ abstract class AbstractEntityGeneratorExtension
      *
      * @return void
      */
-    abstract public function generate(array $schema, PhpClass $class);
+    abstract public function generate(array &$schema, PhpClass $class);
 
     /**
      * @param string $methodName
