@@ -11,14 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 class SerializedDataGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     /** @var ConfigProvider */
-    protected $extendConfigProvide;
+    protected $extendConfigProvider;
 
     /**
-     * @param ConfigProvider $extendConfigProvide
+     * @param ConfigProvider $extendConfigProvider
      */
-    public function __construct(ConfigProvider $extendConfigProvide)
+    public function __construct(ConfigProvider $extendConfigProvider)
     {
-        $this->extendConfigProvide = $extendConfigProvide;
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -42,7 +42,7 @@ class SerializedDataGeneratorExtension extends AbstractEntityGeneratorExtension
     public function supports(array $schema)
     {
         /** @var ConfigInterface $config */
-        $config = $this->extendConfigProvide->getConfig($schema['class']);
+        $config = $this->extendConfigProvider->getConfig($schema['class']);
 
         return $config->get('has_serialized_data', false, false);
     }
