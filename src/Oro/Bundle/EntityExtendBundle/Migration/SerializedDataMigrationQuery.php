@@ -48,10 +48,10 @@ class SerializedDataMigrationQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param ArrayLogger $logger
-     * @param bool        $dryRun
+     * @param LoggerInterface $logger
+     * @param bool            $dryRun
      */
-    protected function runSerializedData(ArrayLogger $logger, $dryRun = false)
+    protected function runSerializedData(LoggerInterface $logger, $dryRun = false)
     {
         $entities         = $this->getConfigurableEntitiesData($logger);
         $hasSchemaChanges = false;
