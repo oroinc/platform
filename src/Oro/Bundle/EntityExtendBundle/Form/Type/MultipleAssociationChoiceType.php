@@ -4,13 +4,46 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class MultipleAssociationChoiceType extends AbstractAssociationType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+
+        $builder->addEventListener(FormEvents::SUBMIT, array($this, 'submit'));
+    }
+
+    /**
+     * Check immutable multiple choice, if immutable choice is checked before save then add to event data
+     *
+     * @param FormEvent $event
+     */
+    public function submit(FormEvent $event)
+    {
+        $form    = $event->getForm();
+        $options = $form->getConfig()->getOptions();
+        $data = $event->getData();
+        /** @var ConfigIdInterface $configId */
+        $configId = $options['config_id'];
+        $previousValues = $this->configManager->getConfig($configId)->get($form->getName());
+        $immutableValues = $this->getReadOnlyValues($options);
+        $restoreValues = array_intersect($immutableValues, $previousValues);
+        $realValues = array_merge($data, $restoreValues);
+        $event->setData($realValues);
+    }
+
     /**
      * {@inheritdoc}
      */
