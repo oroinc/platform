@@ -2,25 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
-
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Psr\Log\LoggerInterface;
 
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class SerializedDataMigrationQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * @var Schema
-     */
+    /** @var Schema */
     protected $schema;
 
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $metadataHelper;
 
     /**
@@ -58,20 +53,20 @@ class SerializedDataMigrationQuery extends ParametrizedMigrationQuery
      */
     protected function runSerializedData(ArrayLogger $logger, $dryRun = false)
     {
-        $entities     = $this->getConfigurableEntitiesData($logger);
-        $hasNewFields = false;
-        $toSchema     = clone $this->schema;
+        $entities         = $this->getConfigurableEntitiesData($logger);
+        $hasSchemaChanges = false;
+        $toSchema         = clone $this->schema;
         foreach ($entities as $entityClass => $config) {
             if (isset($config['extend']['has_serialized_data']) && $config['extend']['has_serialized_data'] == true) {
                 $table = $toSchema->getTable($this->metadataHelper->getTableNameByEntityClass($entityClass));
                 if (!$table->hasColumn('serialized_data')) {
-                    $hasNewFields = true;
-                    $this->addSerializedDataField($table);
+                    $hasSchemaChanges = true;
+                    $table->addColumn('serialized_data', 'array', ['notnull' => false]);
                 }
             }
         }
 
-        if ($hasNewFields) {
+        if ($hasSchemaChanges) {
             $comparator = new Comparator();
             $platform   = $this->connection->getDatabasePlatform();
             $schemaDiff = $comparator->compare($this->schema, $toSchema);
@@ -84,14 +79,6 @@ class SerializedDataMigrationQuery extends ParametrizedMigrationQuery
                 }
             }
         }
-    }
-
-    /**
-     * @param Table $table
-     */
-    protected function addSerializedDataField(Table $table)
-    {
-        $table->addColumn('serialized_data', 'array', ['notnull' => false]);
     }
 
     /**

@@ -10,9 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class SerializedDataMigration implements Migration
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $metadataHelper;
 
     /**
