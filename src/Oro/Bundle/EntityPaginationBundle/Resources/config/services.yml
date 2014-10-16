@@ -1,8 +1,8 @@
 parameters:
-    oro_entity_pagination.extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension
+    oro_entity_pagination.datagrid.extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension
 
 services:
-    oro_entity_pagination.extension.orm_entity_pagination:
-        class: %oro_entity_pagination.extension.entity_pagination.class%
+    oro_entity_pagination.datagrid.extension.orm_entity_pagination:
+        class: %oro_entity_pagination.datagrid.extension.entity_pagination.class%
         tags:
             - { name: oro_datagrid.extension }
