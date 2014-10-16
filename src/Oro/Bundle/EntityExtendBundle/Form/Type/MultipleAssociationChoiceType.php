@@ -26,7 +26,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     }
 
     /**
-     * Check immutable multiple choice, if immutable choice is checked before save then add to event data
+     * SUBMIT event handler
      *
      * @param FormEvent $event
      */
@@ -34,14 +34,23 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
     {
         $form    = $event->getForm();
         $options = $form->getConfig()->getOptions();
-        $data = $event->getData();
         /** @var ConfigIdInterface $configId */
-        $configId = $options['config_id'];
-        $previousValues = $this->configManager->getConfig($configId)->get($form->getName());
-        $immutableValues = $this->getReadOnlyValues($options);
-        $restoreValues = array_intersect($immutableValues, $previousValues);
-        $realValues = array_merge($data, $restoreValues);
-        $event->setData($realValues);
+        $configId  = $options['config_id'];
+        $className = $configId->getClassName();
+
+        if (empty($className)) {
+            return;
+        }
+
+        $immutable = $this->typeHelper->getImmutable($configId->getScope(), $className);
+        if (is_array($immutable) && !empty($immutable)) {
+            // set new values, but keep existing immutable values
+            $existingValues = $this->configManager->getConfig($configId)->get($form->getName());
+            if ($existingValues === null) {
+                $existingValues = [];
+            }
+            $event->setData(array_merge(array_intersect($existingValues, $immutable), $event->getData()));
+        }
     }
 
     /**
@@ -97,13 +106,14 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
 
     /**
      * @param string $groupName
+     *
      * @return array
      */
     protected function getChoices($groupName)
     {
         $choices              = [];
         $entityConfigProvider = $this->configManager->getProvider('entity');
-        $owningSideEntities = $this->typeHelper->getOwningSideEntities($groupName);
+        $owningSideEntities   = $this->typeHelper->getOwningSideEntities($groupName);
         foreach ($owningSideEntities as $className) {
             $choices[$className] = $entityConfigProvider->getConfig($className)->get('plural_label');
         }
@@ -116,7 +126,14 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
      */
     protected function isSchemaUpdateRequired($newVal, $oldVal)
     {
-        return !empty($newVal) && $newVal != (array)$oldVal;
+        if (!is_array($oldVal)) {
+            $oldVal = (array)$oldVal;
+        }
+
+        sort($newVal, SORT_STRING);
+        sort($oldVal, SORT_STRING);
+
+        return $newVal != $oldVal;
     }
 
     /**
