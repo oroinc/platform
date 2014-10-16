@@ -143,14 +143,14 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'widgetType' => 'block',
-                    'alias'      => 'association2',
+                    'alias'      => 'activity2_b7f8a45c_association2',
                     'label'      => 'Label 2',
                     'url'        => 'url2',
                     'priority'   => 100,
                 ],
                 [
                     'widgetType' => 'block',
-                    'alias'      => 'association3',
+                    'alias'      => 'activity3_c0ff94ca_association3',
                     'label'      => 'Label 3',
                     'url'        => 'url3',
                 ],
