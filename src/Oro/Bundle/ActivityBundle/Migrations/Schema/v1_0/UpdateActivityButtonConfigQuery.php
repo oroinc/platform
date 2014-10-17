@@ -44,7 +44,7 @@ class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
 
             $query  = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
             $params = ['data' => $data, 'id' => $id];
-            $types  = ['values' => 'array', 'id' => 'integer'];
+            $types  = ['data' => 'array', 'id' => 'integer'];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
                 $this->connection->executeUpdate($query, $params, $types);
