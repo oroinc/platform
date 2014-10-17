@@ -115,16 +115,20 @@ class ActivityManager
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-            $widget         = $activityConfig->get('action_widget');
-            if (!empty($widget)) {
+            $buttonWidget   = $activityConfig->get('action_button_widget');
+            if (!empty($buttonWidget)) {
                 $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
                 $item = [
                     'className'       => $activityClassName,
                     'associationName' => $associationName,
-                    'widget'          => $widget
+                    'button_widget'   => $buttonWidget
                 ];
 
+                $linkWidget = $activityConfig->get('action_link_widget');
+                if (!empty($linkWidget)) {
+                    $item['link_widget'] = $linkWidget;
+                }
                 $group = $activityConfig->get('action_group');
                 if (!empty($group)) {
                     $item['group'] = $group;
@@ -149,6 +153,7 @@ class ActivityManager
      * @param mixed        $entityId            The target entity id
      * @param string|null  $activityEntityClass This parameter should be specified
      *                                          if the query has more than one root entity
+     *
      * @throws \RuntimeException
      */
     public function addFilterByTargetEntity(

@@ -54,3 +54,12 @@ services:
         class: %oro_note.migration.extension.note.class%
         tags:
             - { name: oro_migration.extension, extension_name: note }
+
+    oro_note.widget_provider.actions:
+        class: %oro_ui.widget_provider.action_button.class%
+        arguments:
+            - @oro_ui.placeholder.provider
+            - oro_add_note_button
+            - oro_add_note_link
+        tags:
+            - { name: oro_ui.view_action_provider }
