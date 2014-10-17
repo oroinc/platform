@@ -3,21 +3,21 @@
 namespace Oro\Bundle\AddressBundle\Model;
 
 /**
- * Represents a subject which may provide phone numbers
+ * Represents a subject which may be contacted by phone
  */
 interface PhoneHolderInterface
 {
     /**
-     * Gets a primary phone number of entity
+     * Gets a primary phone number
      *
      * @return string|null
      */
     public function getPrimaryPhoneNumber();
 
     /**
-     * Gets list of entity phone numbers
+     * Gets a list of all phone numbers
      *
-     * @return array
+     * @return string[]
      */
     public function getPhoneNumbers();
 }
