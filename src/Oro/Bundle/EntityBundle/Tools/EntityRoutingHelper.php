@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The helper class intended to use in controllers that works with entities
@@ -55,9 +55,9 @@ class EntityRoutingHelper
     public function decodeClassName($className)
     {
         $result = str_replace('_', '\\', $className);
-        if (strpos($result, ExtendConfigDumper::ENTITY) === 0) {
+        if (strpos($result, ExtendHelper::ENTITY_NAMESPACE) === 0) {
             // a custom entity can contain _ in class name
-            $result = ExtendConfigDumper::ENTITY . substr($className, strlen(ExtendConfigDumper::ENTITY));
+            $result = ExtendHelper::ENTITY_NAMESPACE . substr($className, strlen(ExtendHelper::ENTITY_NAMESPACE));
         }
 
         return $result;

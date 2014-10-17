@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,14 +65,14 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         return [
             ['Acme_Bundle_TestClass', 'Acme\Bundle\TestClass'],
             ['Acme\Bundle\TestClass', 'Acme\Bundle\TestClass'],
-            [ExtendConfigDumper::ENTITY . 'TestClass', ExtendConfigDumper::ENTITY . 'TestClass'],
+            [ExtendHelper::ENTITY_NAMESPACE . 'TestClass', ExtendHelper::ENTITY_NAMESPACE . 'TestClass'],
             [
-                str_replace('\\', '_', ExtendConfigDumper::ENTITY) . 'TestClass',
-                ExtendConfigDumper::ENTITY . 'TestClass'
+                str_replace('\\', '_', ExtendHelper::ENTITY_NAMESPACE) . 'TestClass',
+                ExtendHelper::ENTITY_NAMESPACE . 'TestClass'
             ],
             [
-                str_replace('\\', '_', ExtendConfigDumper::ENTITY) . 'Test_Class',
-                ExtendConfigDumper::ENTITY . 'Test_Class'
+                str_replace('\\', '_', ExtendHelper::ENTITY_NAMESPACE) . 'Test_Class',
+                ExtendHelper::ENTITY_NAMESPACE . 'Test_Class'
             ],
         ];
     }

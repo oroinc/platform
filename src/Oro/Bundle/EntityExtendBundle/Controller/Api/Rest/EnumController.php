@@ -15,8 +15,6 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-
 /**
  * @RouteResource("entity_extend_enum")
  * @NamePrefix("oro_api_")

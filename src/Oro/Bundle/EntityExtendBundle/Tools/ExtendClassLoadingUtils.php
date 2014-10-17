@@ -64,10 +64,6 @@ class ExtendClassLoadingUtils
         $aliases = self::getAliases($cacheDir);
         foreach ($aliases as $className => $alias) {
             if (class_exists($className) && !class_exists($alias, false)) {
-                $aliasArr   = explode('\\', $alias);
-                $shortAlias = array_pop($aliasArr);
-
-                class_alias($className, $shortAlias);
                 class_alias($className, $alias);
             }
         }
