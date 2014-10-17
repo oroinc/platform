@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Schema\Comparator;
@@ -57,7 +58,12 @@ class SerializedDataMigrationQuery extends ParametrizedMigrationQuery
         $hasSchemaChanges = false;
         $toSchema         = clone $this->schema;
         foreach ($entities as $entityClass => $config) {
-            if (isset($config['extend']['has_serialized_data']) && $config['extend']['has_serialized_data'] == true) {
+            if ((
+                    isset($config['extend']['has_serialized_data'])
+                    && $config['extend']['has_serialized_data'] == true
+                )
+                || $config['extend']['owner'] == ExtendScope::OWNER_CUSTOM
+            ) {
                 $table = $toSchema->getTable($this->metadataHelper->getTableNameByEntityClass($entityClass));
                 if (!$table->hasColumn('serialized_data')) {
                     $hasSchemaChanges = true;

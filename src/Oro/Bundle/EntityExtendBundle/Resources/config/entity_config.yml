@@ -366,6 +366,27 @@ oro_entity_config:
                             type:           oro_entity_option_set
                             tooltip:        oro.entity_extend.field.option_set.option.tooltip
 
+                #
+                # TODO: remove it, used for testing
+                #
+                is_serialized:
+                    options:
+                        indexed:            true
+                    form:
+                        type:               choice
+                        options:
+                            required:       false
+                            choices:        ['No', 'Yes']
+                            label:          is Serialized
+                            block:          other
+                    grid:
+                        type:               boolean
+                        label:              is Serialized
+                        filter_type:        boolean
+                        required:           true
+                        sortable:           true
+                        filterable:         true
+                        show_filter:        true
 
     enum:
         entity:

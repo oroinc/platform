@@ -149,7 +149,11 @@ class ConfigFieldGridController extends Controller
             'extend' => [
                 'is_extend' => true,
                 'owner'     => ExtendScope::OWNER_CUSTOM,
-                'state'     => ExtendScope::STATE_NEW,
+                //'state'     => ExtendScope::STATE_NEW,
+                /**
+                 * !!!! for testing -> remove it
+                 */
+                'state'     => ExtendScope::STATE_ACTIVE,
             ]
         ];
 
