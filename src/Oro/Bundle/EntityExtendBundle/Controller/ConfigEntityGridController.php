@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
@@ -98,7 +98,7 @@ class ConfigEntityGridController extends Controller
         $configManager = $this->get('oro_entity_config.config_manager');
 
         if ($request->getMethod() == 'POST') {
-            $className = ExtendConfigDumper::ENTITY . $request->request->get(
+            $className = ExtendHelper::ENTITY_NAMESPACE . $request->request->get(
                 'oro_entity_config_type[model][className]',
                 null,
                 true
