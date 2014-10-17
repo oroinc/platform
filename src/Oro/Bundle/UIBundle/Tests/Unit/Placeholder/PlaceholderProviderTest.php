@@ -59,11 +59,11 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
             ],
             'item8' => [
                 'template' => 'template8',
-                'acl'      => 'acl_ancestor1 && acl_ancestor2'
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
             ],
             'item9' => [
                 'template' => 'template9',
-                'acl'      => 'acl_ancestor1 && acl_ancestor2'
+                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
             ],
         ]
     ];
@@ -78,6 +78,9 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver, $this->securityFacade);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testGetPlaceholderItems()
     {
         $placeholderName = 'test_placeholder';

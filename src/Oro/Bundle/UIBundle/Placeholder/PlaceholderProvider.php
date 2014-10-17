@@ -96,33 +96,24 @@ class PlaceholderProvider
     /**
      * Checks if an access to a resource is granted to the caller
      *
-     * This method supports a single ACL identifier or a list of ACL identifier delimited by ' && '.
-     * In the last case an access is granted only when it is granted for all ACL identifiers.
-     * TODO: in the future Symfony Expression Language should be used here
-     *
-     * @param string $aclExpr
+     * @param string|array $acl
      *
      * @return bool
      */
-    protected function isGranted($aclExpr)
+    protected function isGranted($acl)
     {
-        if (empty($aclExpr)) {
-            return true;
-        }
-
-        $items = explode(' && ', $aclExpr);
-        if (count($items) === 1) {
-            return $this->securityFacade->isGranted($aclExpr);
+        if (!is_array($acl)) {
+            return $this->securityFacade->isGranted($acl);
         }
 
         $result = true;
-        foreach ($items as $item) {
-            if (!$this->securityFacade->isGranted($item)) {
+        foreach ($acl as $val) {
+            if (!$this->securityFacade->isGranted($val)) {
                 $result = false;
                 break;
             }
         }
-        
+
         return $result;
     }
 }
