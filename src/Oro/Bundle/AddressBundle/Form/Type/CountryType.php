@@ -20,7 +20,8 @@ class CountryType extends AbstractType
                 },
                 'configs' => array(
                     'allowClear' => true,
-                    'placeholder'   => 'oro.address.form.choose_country'
+                    'placeholder'   => 'oro.address.form.choose_country',
+                    'is_translated_option' => true
                 ),
                 'empty_value' => '',
                 'empty_data'  => null

@@ -69,7 +69,7 @@
             {% for child in form %}
                 <div class="oro-clearfix">
                     {{ form_widget(child) }}
-                    {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false}) }}
+                    {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false, 'is_translated_label' : configs.is_translated_option is defined and configs.is_translated_option ? true : false }) }}
                 </div>
             {% endfor %}
         </div>

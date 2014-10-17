@@ -23,6 +23,11 @@ class RelationType extends AbstractType
     protected $configProvider;
 
     /**
+     * @var Entity Config Provider
+     */
+    protected $entityProvider;
+
+    /**
      * @var Config
      */
     protected $config;
@@ -32,9 +37,10 @@ class RelationType extends AbstractType
      */
     protected $formFactory;
 
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigProvider $configProvider, ConfigProvider $entityProvider)
     {
         $this->configProvider = $configProvider;
+        $this->entityProvider = $entityProvider;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -44,7 +50,7 @@ class RelationType extends AbstractType
 
         $builder->add(
             'target_entity',
-            new TargetType($this->configProvider, $options['config_id']),
+            new TargetType($this->configProvider, $this->entityProvider, $options['config_id']),
             [
                 'constraints' => [new Assert\NotBlank()]
             ]
@@ -79,7 +85,7 @@ class RelationType extends AbstractType
                     'target_grid',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_grid'),
-                    'Related entity data fields',
+                    'oro.entity_extend.form.relation.entity_data_fields',
                     true
                 );
                 $this->addTargetField(
@@ -87,7 +93,7 @@ class RelationType extends AbstractType
                     'target_title',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_title'),
-                    'Related entity info title',
+                    'oro.entity_extend.form.relation.entity_info_title',
                     true
                 );
                 $this->addTargetField(
@@ -95,7 +101,7 @@ class RelationType extends AbstractType
                     'target_detailed',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_detailed'),
-                    'Related entity detailed',
+                    'oro.entity_extend.form.relation.entity_detailed',
                     true
                 );
             }

@@ -152,7 +152,10 @@ define(function (require) {
 
                 // bind uniform plugin to input:file elements
                 $elements = $container.find('input:file');
-                $elements.uniform({fileDefaultHtml: __('Please select a file...')});
+                $elements.uniform({
+                    fileDefaultHtml: __('Please select a file...'),
+                    fileButtonHtml: __('Choose File')
+                });
                 if ($elements.is('.error')) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }

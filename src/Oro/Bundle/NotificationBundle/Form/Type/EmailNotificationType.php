@@ -58,7 +58,8 @@ class EmailNotificationType extends AbstractType
                 'required'           => true,
                 'attr'               => array(
                     'data-ownership-entities' => json_encode($this->ownershipEntities)
-                )
+                ),
+                'empty_value'   => 'oro.notification.form.choose_entity'
             )
         );
 
@@ -76,7 +77,7 @@ class EmailNotificationType extends AbstractType
                 'configs' => array(
                     'placeholder' => 'oro.notification.form.choose_event',
                 ),
-                'empty_value'   => '',
+                'empty_value'   => 'oro.notification.form.choose_event',
                 'empty_data'    => null,
                 'required'      => true
             )
@@ -87,7 +88,8 @@ class EmailNotificationType extends AbstractType
             'oro_email_template_list',
             array(
                 'label'    => 'oro.notification.emailnotification.template.label',
-                'required' => true
+                'required' => true,
+                'empty_value'   => 'oro.notification.form.choose_template'
             )
         );
 

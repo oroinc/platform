@@ -14,6 +14,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
+
 class TargetType extends AbstractType
 {
     /**
@@ -22,15 +24,21 @@ class TargetType extends AbstractType
     protected $configProvider;
 
     /**
+     * @var Entity Config Provider
+     */
+    protected $entityConfigProvider;
+
+    /**
      * @var FieldConfigId
      */
     protected $configId;
 
-    public function __construct(ConfigProvider $configProvider, $configId)
+    public function __construct(ConfigProvider $configProvider, ConfigProvider $entityConfigProvider, $configId)
     {
         $this->configProvider = $configProvider;
         $this->configId = $configId;
         $this->targetEntity = $this->configProvider->getConfigById($this->configId)->get('target_entity');
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -45,18 +53,25 @@ class TargetType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $defaultConfigs = array(
+            'placeholder'             => 'oro.entity.form.choose_entity',
+            'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
+            'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
+        );
+
         $resolver->setDefaults(
             array(
                 'attr'        => array(
                     'class' => 'extend-rel-target-name'
                 ),
-                'label'       => 'Target entity',
-                'empty_value' => $this->targetEntity ? false : 'Please choice target entity...',
+                'label'       => 'oro.entity_extend.form.target.entity.label',
+                'empty_value' => $this->targetEntity ? false : 'oro.entity_extend.form.target.choose_entity.value',
                 'read_only'   => (bool) $this->targetEntity,
                 'choices'     => $this->getEntityChoiceList(
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
-                )
+                ),
+                'configs' => $defaultConfigs
             )
         );
     }
@@ -95,8 +110,15 @@ class TargetType extends AbstractType
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
             if ($className != $entityClassName) {
-                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
-                $choices[$className] = $moduleName . ':' . $entityName;
+                $entityConfig    = $this->entityConfigProvider->getConfig($className);
+                $choices[$className] = new ChoiceListItem(
+                    $entityConfig->get('label'),
+                    array(
+                        'data-label'        => $entityConfig->get('label'),
+                        'data-plural_label' => $entityConfig->get('plural_label'),
+                        'data-icon'         =>  $entityConfig->get('icon')
+                    )
+                );
             }
         }
 
@@ -108,7 +130,7 @@ class TargetType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return 'genemu_jqueryselect2_choice';
     }
 
     /**

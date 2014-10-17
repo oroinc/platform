@@ -50,6 +50,15 @@ oro:
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key
+            target:
+                entity.label:         'Target Entity'
+                choose_entity.value:  'Please choice target entity...'
+                field.label:          'Target Field'
+                choose_field.value:   'Please choice target field...'
+            relation:
+                entity_data_fields:   'Related Entity Data Fields'
+                entity_info_title:    'Related Entity Info Title'
+                entity_detailed:      'Related Entity Detailed'
 
         enum_name:    Option Set Name
         enum_public:  Public

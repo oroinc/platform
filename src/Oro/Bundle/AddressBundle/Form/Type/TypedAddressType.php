@@ -31,6 +31,9 @@ class TypedAddressType extends AbstractType
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
+                    'configs' => array(
+                        'is_translated_option' => true
+                    )
                 )
             )
             ->add(

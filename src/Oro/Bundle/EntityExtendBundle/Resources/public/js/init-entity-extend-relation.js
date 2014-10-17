@@ -4,7 +4,7 @@ require(['jquery', 'routing'],
 function($, routing) {
     'use strict';
     $(function() {
-        $(document).on('change', 'form select.extend-rel-target-name', function (e) {
+        $(document).on('change', '#oro_entity_config_type_extend_relation_target_entity', function (e) {
             var el     = $(this),
                 target = el.find('option:selected').attr('value').replace(/\\/g,'_'),
                 query =  routing.generate.apply(routing, ['oro_entityconfig_field_search', {id: target}]),

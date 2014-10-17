@@ -48,7 +48,12 @@ class OroIconType extends AbstractType
     {
         $configFile = $this->kernel->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
         $config      = Yaml::parse($configFile);
-        $choices     =  array_flip($config['oro_icon_select']);
+        $choices = array_map(
+            function($value) {
+                return 'oro.form.icon_select.' . $value;
+            },
+            array_flip($config['oro_icon_select'])
+        );
 
         $resolver->setDefaults(
             [

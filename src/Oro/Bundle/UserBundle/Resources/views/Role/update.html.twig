@@ -71,7 +71,7 @@
 
     {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': privilegeConfig.label,
+            'title': privilegeConfig.label|trans,
             'subblocks': [
                 {
                     'title': '',

@@ -31,8 +31,8 @@ class TargetFieldType extends AbstractType
         $resolver->setDefaults(
             array(
                 'attr'            => array('class' => 'extend-rel-target-field'),
-                'label'           => 'Target field',
-                'empty_value'     => 'Please choice target field...',
+                'label'           => 'oro.entity_extend.form.target.field.label',
+                'empty_value'     => 'oro.entity_extend.form.target.choose_field.value',
                 'choices'         => $this->getPropertyChoiceList(),
                 'auto_initialize' => false
             )
