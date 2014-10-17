@@ -17,7 +17,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @RouteResource("entity_extend_enum")
@@ -43,9 +43,9 @@ class EnumController extends FOSRestController
      */
     public function getAction($entityName)
     {
-        $extendEntitySuffix = str_replace('\\', '_', ExtendConfigDumper::ENTITY);
+        $extendEntitySuffix = str_replace('\\', '_', ExtendHelper::ENTITY_NAMESPACE);
         $entityName         = strpos($entityName, $extendEntitySuffix) === 0
-            ? ExtendConfigDumper::ENTITY . substr($entityName, strlen($extendEntitySuffix))
+            ? ExtendHelper::ENTITY_NAMESPACE . substr($entityName, strlen($extendEntitySuffix))
             : str_replace('_', '\\', $entityName);
 
         /** @var EntityManager $em */
