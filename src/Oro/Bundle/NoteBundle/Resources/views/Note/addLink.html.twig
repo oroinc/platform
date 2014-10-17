@@ -1,5 +1,5 @@
-{{ UI.clientButton({
-    'id': 'add-entity-note-button',
+{{ UI.clientLink({
+    'id': 'add-entity-note-link',
     'aCss': 'no-hash',
     'iCss': 'icon-comment-alt hide-text',
     'label' : 'oro.note.action.add'|trans
@@ -7,7 +7,7 @@
 <script type="text/javascript">
     require(['jquery', 'oroui/js/mediator'],
     function($, mediator){
-        $('#add-entity-note-button').on('click', function(e) {
+        $('#add-entity-note-link').on('click', function(e) {
             e.preventDefault();
             mediator.trigger('note:add');
         });

@@ -205,13 +205,15 @@ class ActivityManagerTest extends OrmTestCase
         $activity1EntityConfig = new Config(new EntityConfigId('entity', $activity1Class));
         $activity1EntityConfig->set('plural_label', 'lbl.activity1');
         $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
-        $activity1ActivityConfig->set('action_widget', 'widget1');
+        $activity1ActivityConfig->set('action_button_widget', 'button_widget1');
+        $activity1ActivityConfig->set('action_link_widget', 'link_widget1');
         $activity1ActivityConfig->set('action_group', 'group1');
 
         $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
-        $activity2ActivityConfig->set('action_widget', 'widget2');
+        $activity2ActivityConfig->set('action_button_widget', 'button_widget2');
+        $activity2ActivityConfig->set('action_link_widget', 'link_widget2');
         $activity2ActivityConfig->set('priority', 100);
 
         $this->entityConfigProvider->expects($this->any())
@@ -241,13 +243,15 @@ class ActivityManagerTest extends OrmTestCase
                 [
                     'className'       => 'Test\Activity1',
                     'associationName' => 'entity_1f801d4a',
-                    'widget'          => 'widget1',
+                    'button_widget'   => 'button_widget1',
+                    'link_widget'     => 'link_widget1',
                     'group'           => 'group1',
                 ],
                 [
                     'className'       => 'Test\Activity2',
                     'associationName' => 'entity_1f801d4a',
-                    'widget'          => 'widget2',
+                    'button_widget'   => 'button_widget2',
+                    'link_widget'     => 'link_widget2',
                     'priority'        => 100,
                 ],
             ],
