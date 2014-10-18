@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Twig;
+namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
