@@ -3,7 +3,7 @@ parameters:
     oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
     oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
-    oro_email.email.holder.helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
+    oro_email.email_holder_helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
@@ -20,7 +20,7 @@ parameters:
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
-    oro_entity.twig.extension.email.class:          Oro\Bundle\EmailBundle\Twig\EmailExtension
+    oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -85,8 +85,8 @@ services:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
 
-    oro_email.email.holder.helper:
-        class: %oro_email.email.holder.helper.class%
+    oro_email.email_holder_helper:
+        class: %oro_email.email_holder_helper.class%
         arguments:
             - @oro_entity_config.provider.extend
 
@@ -354,12 +354,13 @@ services:
         arguments:
             - @oro_entity_config.provider.activity
 
-    oro_entity.twig.extension.email:
-        class: %oro_entity.twig.extension.email.class%
+    oro_email.twig.extension.email:
+        class: %oro_email.twig.extension.email.class%
         arguments:
-            - @oro_email.email.holder.helper
+            - @oro_email.email_holder_helper
         tags:
             - { name: twig.extension }
+
     oro_email.listener.search_listener:
           class: %oro_email.listener.search_listener.class%
           tags:

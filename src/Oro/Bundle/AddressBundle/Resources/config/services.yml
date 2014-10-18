@@ -1,10 +1,9 @@
 parameters:
-    oro_address.address.entity.class: Oro\Bundle\AddressBundle\Entity\Address
-    oro_address.address.type.entity.class: Oro\Bundle\AddressBundle\Entity\AddressType
-
-    oro_address.address.manager.class: Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
-
-    oro_address.provider.address.class: Oro\Bundle\AddressBundle\Provider\AddressProvider
+    oro_address.address.entity.class:       Oro\Bundle\AddressBundle\Entity\Address
+    oro_address.address.type.entity.class:  Oro\Bundle\AddressBundle\Entity\AddressType
+    oro_address.address.manager.class:      Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
+    oro_address.provider.address.class:     Oro\Bundle\AddressBundle\Provider\AddressProvider
+    oro_address.phone_holder_helper.class:  Oro\Bundle\AddressBundle\Tools\PhoneHolderHelper
 
 services:
     oro_address.address.provider:
@@ -18,5 +17,7 @@ services:
         tags:
             - { name: oro_address.storage }
 
-
-
+    oro_address.phone_holder_helper:
+        class: %oro_address.phone_holder_helper.class%
+        arguments:
+            - @oro_entity_config.provider.extend

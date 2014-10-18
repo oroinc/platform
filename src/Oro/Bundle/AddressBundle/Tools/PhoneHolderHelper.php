@@ -1,24 +1,24 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tools;
+namespace Oro\Bundle\AddressBundle\Tools;
 
 use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\AddressBundle\Model\PhoneHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 /**
- * The aim of this class is to help getting an email address from an object.
- * The following algorithm is used to get an email address:
- * 1. check if an object has own email address
- * 2. loop through registered target entities ordered by priority and check if they have an email address
+ * The aim of this class is to help getting a phone number from an object.
+ * The following algorithm is used to get a phone number:
+ * 1. check if an object has own phone number
+ * 2. loop through registered target entities ordered by priority and check if they have a phone number
  */
-class EmailHolderHelper
+class PhoneHolderHelper
 {
-    const GET_EMAIL_METHOD = 'getEmail';
+    const GET_PHONE_METHOD  = 'getPhone';
 
     /** @var ConfigProviderInterface */
     protected $extendConfigProvider;
@@ -57,30 +57,30 @@ class EmailHolderHelper
     }
 
     /**
-     * Gets the email address of the given object
+     * Gets the phone number of the given object
      *
      * @param object $object
      *
-     * @return string|null The email address or null if the object has no email
+     * @return string|null The phone number or null if the object has no phone
      */
-    public function getEmail($object)
+    public function getPhoneNumber($object)
     {
         if (!is_object($object)) {
             return null;
         }
 
-        // check if an object has own email address
-        if ($object instanceof EmailHolderInterface) {
-            return $object->getEmail();
-        } elseif (method_exists($object, self::GET_EMAIL_METHOD)) {
-            $email = $object->getEmail();
-            if (!is_object($email)) {
-                return $email;
+        // check if an object has own phone number
+        if ($object instanceof PhoneHolderInterface) {
+            return $object->getPrimaryPhoneNumber();
+        } elseif (method_exists($object, self::GET_PHONE_METHOD)) {
+            $phone = $object->getPhone();
+            if (!is_object($phone)) {
+                return $phone;
             }
         }
 
-        // check if an object has related object with an email address
-        return $this->getEmailFromRelatedObject($object);
+        // check if an object has related object with a phone number
+        return $this->getPhoneNumberFromRelatedObject($object);
     }
 
     /**
@@ -88,7 +88,7 @@ class EmailHolderHelper
      *
      * @return string|null
      */
-    protected function getEmailFromRelatedObject($object)
+    protected function getPhoneNumberFromRelatedObject($object)
     {
         $applicableRelations = $this->getApplicableRelations($object);
         if (empty($applicableRelations)) {
@@ -102,7 +102,7 @@ class EmailHolderHelper
                 continue;
             }
             foreach ($applicableRelations[$className] as $fieldName) {
-                return $this->getEmail($propertyAccessor->getValue($object, $fieldName));
+                return $this->getPhoneNumber($propertyAccessor->getValue($object, $fieldName));
             }
         }
 
