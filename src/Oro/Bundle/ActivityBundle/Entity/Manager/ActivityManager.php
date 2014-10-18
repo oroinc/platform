@@ -129,10 +129,6 @@ class ActivityManager
                 if (!empty($linkWidget)) {
                     $item['link_widget'] = $linkWidget;
                 }
-                $group = $activityConfig->get('action_group');
-                if (!empty($group)) {
-                    $item['group'] = $group;
-                }
                 $priority = $activityConfig->get('priority');
                 if (!empty($priority)) {
                     $item['priority'] = $priority;

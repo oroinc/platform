@@ -49,6 +49,4 @@ items:
     view_buttons:
         template: OroUIBundle::buttons.html.twig
         applicable: @oro_ui.widget_provider.view_actions->supports($entity$)
-        data:
-            entityClass: Symfony\Component\Security\Core\Util\ClassUtils::getRealClass($entity$)
-            widgets: @oro_ui.widget_provider.view_actions->getWidgets($entity$)
+        data: @oro_ui.widget_provider.view_actions->getWidgets($entity$)

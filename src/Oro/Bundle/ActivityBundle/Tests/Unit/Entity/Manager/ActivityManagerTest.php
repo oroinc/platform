@@ -207,7 +207,6 @@ class ActivityManagerTest extends OrmTestCase
         $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
         $activity1ActivityConfig->set('action_button_widget', 'button_widget1');
         $activity1ActivityConfig->set('action_link_widget', 'link_widget1');
-        $activity1ActivityConfig->set('action_group', 'group1');
 
         $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
@@ -245,7 +244,6 @@ class ActivityManagerTest extends OrmTestCase
                     'associationName' => 'entity_1f801d4a',
                     'button_widget'   => 'button_widget1',
                     'link_widget'     => 'link_widget1',
-                    'group'           => 'group1',
                 ],
                 [
                     'className'       => 'Test\Activity2',

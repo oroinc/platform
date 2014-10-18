@@ -62,4 +62,4 @@ services:
             - oro_add_note_button
             - oro_add_note_link
         tags:
-            - { name: oro_ui.view_action_provider }
+            - { name: oro_ui.view_action_provider, group: activity, priority: -100 }

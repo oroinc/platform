@@ -106,4 +106,4 @@ services:
             - oro_add_attachment_button
             - oro_add_attachment_link
         tags:
-            - { name: oro_ui.view_action_provider }
+            - { name: oro_ui.view_action_provider, group: activity, priority: -90 }

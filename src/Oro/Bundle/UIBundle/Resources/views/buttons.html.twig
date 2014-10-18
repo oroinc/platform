@@ -1,20 +1,18 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% for group in data.widgets -%}
-    {% if group.widgets|length > 2 -%}
+{% for groupName, group in data -%}
+    {% if groupName is empty or group.widgets|length < 2 -%}
+        {% for widget in group.widgets -%}
+            {% include widget.button.template %}
+        {%- endfor -%}
+    {% else -%}
         {% set items = [] -%}
         {% for widget in group.widgets -%}
             {% set items = items|merge(['<li>' ~ include(widget.link.template) ~ '</li>']) -%}
         {% endfor -%}
-        {# TODO: change label in BAP-5668 with #}
-        {# group.label|default('oro.ui.actions')|trans({'%entityName%': oro_entity_config_value(data.entityClass, 'label')|trans}) #}
         {{ UI.dropdownButton({
-            'label': group.label|default('oro.ui.actions.activity')|trans,
+            'label': group.label,
             'aCss': 'pull-left',
             'html': items|join
         }) }}
-    {% else -%}
-        {% for widget in group.widgets -%}
-            {% include widget.button.template %}
-        {%- endfor -%}
     {%- endif -%}
 {% endfor %}

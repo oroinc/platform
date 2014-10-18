@@ -7,9 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * This class provides an algorithm to load prioritized widget providers for different kind of widgets
+ * This class provides an algorithm to load prioritized and grouped widget providers for different kind of widgets
  */
-abstract class AbstractWidgetProviderPass implements CompilerPassInterface
+abstract class AbstractGroupingWidgetProviderPass implements CompilerPassInterface
 {
     /**
      * Gets the id of chain widget provider service
@@ -27,6 +27,8 @@ abstract class AbstractWidgetProviderPass implements CompilerPassInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContainerBuilder $container)
     {
@@ -40,7 +42,8 @@ abstract class AbstractWidgetProviderPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($this->getProviderTagName());
         foreach ($taggedServices as $id => $attributes) {
             $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $providers[$priority][] = new Reference($id);
+            $group                  = isset($attributes[0]['group']) ? $attributes[0]['group'] : null;
+            $providers[$priority][] = [new Reference($id), $group];
         }
         if (empty($providers)) {
             return;
@@ -53,7 +56,7 @@ abstract class AbstractWidgetProviderPass implements CompilerPassInterface
         // register
         $serviceDef = $container->getDefinition($chainProviderServiceId);
         foreach ($providers as $provider) {
-            $serviceDef->addMethodCall('addProvider', [$provider]);
+            $serviceDef->addMethodCall('addProvider', $provider);
         }
     }
 }
