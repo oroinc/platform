@@ -3,6 +3,20 @@ namespace Test;
 class Entity
 {
     /**
+     * Checks if an entity of the given type can be associated with this entity
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportActivityTarget($targetClass)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+        if ($className === 'Test\TargetEntity1') { return true; }
+        if ($className === 'Test\TargetEntity2') { return true; }
+        return false;
+    }
+
+    /**
      * Removes the association of the given entity and this entity
      *
      * @param object $target Any configurable entity that can be associated with this type of entity
