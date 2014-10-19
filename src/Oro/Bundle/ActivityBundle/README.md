@@ -58,17 +58,16 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
 How to make an entity as activity
 ---------------------------------
 
-If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word and should implement [ActivityInterface](/Model/ActivityInterface.php). An example:
+If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word. An example:
 
 ``` php
 <?php
 
 namespace Oro\Bundle\EmailBundle\Model;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 
-class ExtendEmail implements ActivityInterface
+class ExtendEmail
 {
     use ExtendActivity;
 
@@ -85,7 +84,7 @@ class ExtendEmail implements ActivityInterface
 }
 ```
 
-And use this class as superclass for your entity. To include the entity in `activity` group you can use ORO entity configuration, for example:
+And use this class as superclass for your entity. Also your entity should implement [ActivityInterface](/Model/ActivityInterface.php). To include the entity in `activity` group you can use ORO entity configuration, for example:
 
 ``` php
 /**
@@ -95,7 +94,7 @@ And use this class as superclass for your entity. To include the entity in `acti
  *  }
  * )
  */
-class Email extends ExtendEmail
+class Email extends ExtendEmail implements ActivityInterface
 ```
 
 That's all. Now your entity will be recognized as the activity entity. But it is not enough to correct displaying your activity. The following section describes steps that should be done to configure UI of your activity.

@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
@@ -45,7 +46,7 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *      }
  * )
  */
-class Email extends ExtendEmail
+class Email extends ExtendEmail implements ActivityInterface
 {
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;

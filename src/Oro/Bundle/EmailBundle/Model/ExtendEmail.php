@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 
-class ExtendEmail implements ActivityInterface
+class ExtendEmail
 {
     use ExtendActivity;
 
