@@ -88,14 +88,16 @@ class ActivityManager
      * @param ActivityInterface $activityEntity
      * @param object            $targetEntity
      *
-     * @return bool TRUE if at least one association was added; otherwise, FALSE
+     * @return bool TRUE if an association was added; otherwise, FALSE
      */
     public function addActivityTarget(ActivityInterface $activityEntity, $targetEntity)
     {
-        if ($activityEntity->supportActivityTarget(get_class($targetEntity))
+        if ($targetEntity !== null
+            && $activityEntity->supportActivityTarget(get_class($targetEntity))
             && !$activityEntity->hasActivityTarget($targetEntity)
         ) {
             $activityEntity->addActivityTarget($targetEntity);
+
             return true;
         }
 
@@ -114,6 +116,7 @@ class ActivityManager
     public function addActivityTargets(ActivityInterface $activityEntity, array $targetEntities)
     {
         $hasChanges = false;
+
         foreach ($targetEntities as $targetEntity) {
             if ($this->addActivityTarget($activityEntity, $targetEntity)) {
                 $hasChanges = true;
@@ -121,6 +124,29 @@ class ActivityManager
         }
 
         return $hasChanges;
+    }
+
+    /**
+     * Removes an association of the given target entity with the activity entity
+     * If the target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $targetEntity
+     *
+     * @return bool TRUE if an association was removed; otherwise, FALSE
+     */
+    public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        if ($targetEntity !== null
+            && $activityEntity->supportActivityTarget(get_class($targetEntity))
+            && $activityEntity->hasActivityTarget($targetEntity)
+        ) {
+            $activityEntity->removeActivityTarget($targetEntity);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

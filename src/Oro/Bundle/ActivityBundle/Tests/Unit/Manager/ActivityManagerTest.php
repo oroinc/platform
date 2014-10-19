@@ -257,6 +257,22 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
+    public function testAddActivityTargetForNullTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $activityEntity->expects($this->never())
+            ->method('supportActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget');
+
+        $this->assertFalse(
+            $this->manager->addActivityTarget($activityEntity, null)
+        );
+    }
+
     public function testAddActivityTargets()
     {
         $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
@@ -320,6 +336,88 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->assertFalse(
             $this->manager->addActivityTargets($activityEntity, [$targetEntity])
+        );
+    }
+
+    public function testRemoveActivityTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNotExistingTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNotSupportedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNullTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $activityEntity->expects($this->never())
+            ->method('supportActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget');
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, null)
         );
     }
 
