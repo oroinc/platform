@@ -1,5 +1,5 @@
 parameters:
-    oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager
+    oro_activity.manager.class:                         Oro\Bundle\ActivityBundle\Manager\ActivityManager
     oro_activity.entity_config_dumper.extension.class:  Oro\Bundle\ActivityBundle\Tools\ActivityEntityConfigDumperExtension
     oro_activity.entity_generator.extension.class:      Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension
     oro_activity.migration.extension.activity.class:    Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension

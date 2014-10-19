@@ -2,71 +2,53 @@
 
 namespace Oro\Bundle\ActivityBundle\Model;
 
-trait ExtendActivity
+/**
+ * Provides an interface of an activity entity
+ */
+interface ActivityInterface
 {
     /**
      * Checks if an entity of the given type can be associated with this activity entity
      *
-     * The real implementation of this method is auto generated.
-     *
      * @param string $targetClass The class name of the target entity
+     *
      * @return bool
      */
-    public function supportActivityTarget($targetClass)
-    {
-        return false;
-    }
+    public function supportActivityTarget($targetClass);
 
     /**
      * Gets entities of the given type associated with this activity entity
      *
-     * The real implementation of this method is auto generated.
-     *
      * @param string $targetClass The class name of the target entity
+     *
      * @return object[]
      */
-    public function getActivityTargets($targetClass)
-    {
-        return null;
-    }
+    public function getActivityTargets($targetClass);
 
     /**
      * Checks is the given entity is associated with this activity entity
-     *
-     * The real implementation of this method is auto generated.
      *
      * @param object $target Any configurable entity that can be associated with this activity
      *
      * @return bool
      */
-    public function hasActivityTarget($target)
-    {
-        return false;
-    }
+    public function hasActivityTarget($target);
 
     /**
      * Associates the given entity with this activity entity
      *
-     * The real implementation of this method is auto generated.
-     *
      * @param object $target Any configurable entity that can be associated with this activity
-     * @return object This object
+     *
+     * @return self This object
      */
-    public function addActivityTarget($target)
-    {
-        return $this;
-    }
+    public function addActivityTarget($target);
 
     /**
      * Removes the association of the given entity with this activity entity
      *
-     * The real implementation of this method is auto generated.
-     *
      * @param object $target Any configurable entity that can be associated with this activity
-     * @return object This object
+     *
+     * @return self This object
      */
-    public function removeActivityTarget($target)
-    {
-        return $this;
-    }
+    public function removeActivityTarget($target);
 }

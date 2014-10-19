@@ -7,6 +7,7 @@ How to enable activity association using migrations
 ---------------------------------------------------
 
 Usually you do not need to provide predefined set of associations between the activity entity and other entities, rather it is the administrator chose to do this. But it is possible to create this type of association using migrations if you need. The following example shows how it can be done:
+
 ``` php
 <?php
 
@@ -57,16 +58,17 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
 How to make an entity as activity
 ---------------------------------
 
-If you created the new entity and want to make it as the activity one you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class, for example:
+If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word and should implement [ActivityInterface](/Model/ActivityInterface.php). An example:
 
 ``` php
 <?php
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 
-class ExtendEmail
+class ExtendEmail implements ActivityInterface
 {
     use ExtendActivity;
 
@@ -176,6 +178,7 @@ To add activity button on the view page of the entity your activity can be assig
 Create two TWIG templates responsible to render a button and a link in dropdown menu. Please note that you should provide both templates, because an action can be rendered as a button as a link and it can depends on a number of actions, UI theme, device (desktop/mobile) and so on. An example of TWIG templates:
 
 activityButton.html.twig
+
 ``` twig
 {{ UI.clientButton({
     'dataUrl': path(
@@ -208,6 +211,7 @@ activityButton.html.twig
 ```
 
 activityLink.html.twig
+
 ``` twig
 {{ UI.clientLink({
     'dataUrl': path(

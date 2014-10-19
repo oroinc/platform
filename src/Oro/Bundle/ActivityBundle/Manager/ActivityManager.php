@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Entity\Manager;
+namespace Oro\Bundle\ActivityBundle\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -59,6 +60,67 @@ class ActivityManager
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
 
         return !empty($activityClassNames);
+    }
+
+    /**
+     * Indicates whether the given entity type can be associated with the given activity or not
+     *
+     * @param string $entityClass
+     * @param string $activityEntityClass
+     *
+     * @return bool
+     */
+    public function hasActivityAssociation($entityClass, $activityEntityClass)
+    {
+        if (!$this->activityConfigProvider->hasConfig($entityClass)) {
+            return false;
+        }
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+
+        return !empty($activityClassNames) && in_array($activityEntityClass, $activityClassNames);
+    }
+
+    /**
+     * Associates the given target entity with the activity entity
+     * If the target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $targetEntity
+     *
+     * @return bool TRUE if at least one association was added; otherwise, FALSE
+     */
+    public function addActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        if ($activityEntity->supportActivityTarget(get_class($targetEntity))
+            && !$activityEntity->hasActivityTarget($targetEntity)
+        ) {
+            $activityEntity->addActivityTarget($targetEntity);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Associates the given target entities with the activity entity
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object|object[]   $targetEntities
+     *
+     * @return bool TRUE if at least one association was added; otherwise, FALSE
+     */
+    public function addActivityTargets(ActivityInterface $activityEntity, array $targetEntities)
+    {
+        $hasChanges = false;
+        foreach ($targetEntities as $targetEntity) {
+            if ($this->addActivityTarget($activityEntity, $targetEntity)) {
+                $hasChanges = true;
+            }
+        }
+
+        return $hasChanges;
     }
 
     /**

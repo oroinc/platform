@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 

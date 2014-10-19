@@ -13,7 +13,7 @@ class TestPhoneHolder implements PhoneHolderInterface
         $this->phone = $phone;
     }
 
-    public function getPrimaryPhoneNumber()
+    public function getPhoneNumber()
     {
         return $this->phone;
     }

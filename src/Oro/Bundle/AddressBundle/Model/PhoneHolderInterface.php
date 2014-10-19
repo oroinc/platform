@@ -8,11 +8,11 @@ namespace Oro\Bundle\AddressBundle\Model;
 interface PhoneHolderInterface
 {
     /**
-     * Gets a primary phone number
+     * Gets a phone number
      *
      * @return string|null
      */
-    public function getPrimaryPhoneNumber();
+    public function getPhoneNumber();
 
     /**
      * Gets a list of all phone numbers

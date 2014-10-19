@@ -123,14 +123,14 @@ class BusinessUnitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($businessUnit, $entity->getOwner());
     }
 
-    public function testGetPrimaryPhoneNumber()
+    public function testGetPhoneNumber()
     {
         $businessUnit = new BusinessUnit();
 
-        $this->assertNull($businessUnit->getPrimaryPhoneNumber());
+        $this->assertNull($businessUnit->getPhoneNumber());
 
         $businessUnit->setPhone('123-123');
-        $this->assertEquals('123-123', $businessUnit->getPrimaryPhoneNumber());
+        $this->assertEquals('123-123', $businessUnit->getPhoneNumber());
     }
 
     public function testGetPhoneNumbers()

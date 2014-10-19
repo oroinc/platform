@@ -71,7 +71,7 @@ class PhoneHolderHelper
 
         // check if an object has own phone number
         if ($object instanceof PhoneHolderInterface) {
-            return $object->getPrimaryPhoneNumber();
+            return $object->getPhoneNumber();
         } elseif (method_exists($object, self::GET_PHONE_METHOD)) {
             $phone = $object->getPhone();
             if (!is_object($phone)) {

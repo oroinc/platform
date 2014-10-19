@@ -37,6 +37,20 @@ class Entity
     }
 
     /**
+     * Checks is the given entity is associated with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return bool
+     */
+    public function hasActivityTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') { return $this->target_entity1_246e8211->contains($target); }
+        if ($className === 'Test\TargetEntity2') { return $this->target_entity2_bd67d3ab->contains($target); }
+        return false;
+    }
+
+    /**
      * Gets entities of the given type associated with this entity
      *
      * @param string $targetClass The class name of the target entity

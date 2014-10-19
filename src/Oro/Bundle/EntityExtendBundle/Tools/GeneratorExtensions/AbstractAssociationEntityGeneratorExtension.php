@@ -218,6 +218,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
 
         $supportMethodName = sprintf('support%sTarget', $prefix);
         $getMethodName     = sprintf('get%sTargets', $prefix);
+        $hasMethodName     = sprintf('has%sTarget', $prefix);
         $addMethodName     = sprintf('add%sTarget', $prefix);
         $removeMethodName  = sprintf('remove%sTarget', $prefix);
 
@@ -226,6 +227,9 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         ];
         $getMethodBody     = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);'
+        ];
+        $hasMethodBody     = [
+            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
         ];
         $addMethodBody     = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
@@ -253,6 +257,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 $targetClassName,
                 $fieldName
             );
+            $hasMethodBody[]     = str_replace(
+                ['{class}', '{field}'],
+                [$targetClassName, $fieldName],
+                "if (\$className === '{class}') { return \$this->{field}->contains(\$target); }"
+            );
             $addMethodBody[]     = str_replace(
                 ['{class}', '{field}'],
                 [$targetClassName, $fieldName],
@@ -274,6 +283,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
 
         $supportMethodBody[] = 'return false;';
         $getMethodBody[]     = $throwStmt;
+        $hasMethodBody[]     = 'return false;';
         $addMethodBody[]     = $throwStmt;
         $removeMethodBody[]  = $throwStmt;
 
@@ -288,6 +298,12 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " *\n"
             . " * @param string \$targetClass The class name of the target entity\n"
             . " * @return object[]\n"
+            . " */";
+        $hasMethodDocblock     = "/**\n"
+            . " * Checks is the given entity is associated with this entity\n"
+            . " *\n"
+            . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
+            . " * @return bool\n"
             . " */";
         $addMethodDocblock     = "/**\n"
             . " * Associates the given entity with this entity\n"
@@ -312,6 +328,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 $this
                     ->generateClassMethod($getMethodName, implode("\n", $getMethodBody), ['targetClass'])
                     ->setDocblock($getMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($hasMethodName, implode("\n", $hasMethodBody), ['target'])
+                    ->setDocblock($hasMethodDocblock)
             )
             ->setMethod(
                 $this

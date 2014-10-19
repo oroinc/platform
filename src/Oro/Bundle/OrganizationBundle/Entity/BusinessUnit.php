@@ -432,7 +432,7 @@ class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, 
     /**
      * {@inheritdoc}
      */
-    public function getPrimaryPhoneNumber()
+    public function getPhoneNumber()
     {
         return !empty($this->phone) ? $this->phone : null;
     }

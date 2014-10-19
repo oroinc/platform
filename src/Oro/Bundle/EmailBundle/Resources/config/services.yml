@@ -352,7 +352,7 @@ services:
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%
         arguments:
-            - @oro_entity_config.provider.activity
+            - @oro_activity.manager
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%
