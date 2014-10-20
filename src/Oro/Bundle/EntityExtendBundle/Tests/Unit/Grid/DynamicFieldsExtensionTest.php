@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Grid;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
-use Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
