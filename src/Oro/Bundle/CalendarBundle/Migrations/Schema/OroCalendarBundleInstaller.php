@@ -3,6 +3,9 @@
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -10,14 +13,25 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroCalendarBundleInstaller implements Installation
+class OroCalendarBundleInstaller implements Installation, ActivityExtensionAwareInterface
 {
+    /** @var ActivityExtension */
+    protected $activityExtension;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension)
+    {
+        $this->activityExtension = $activityExtension;
     }
 
     /**
@@ -34,6 +48,8 @@ class OroCalendarBundleInstaller implements Installation
         $this->addOroCalendarForeignKeys($schema);
         $this->addOroCalendarEventForeignKeys($schema);
         $this->addOroCalendarConnectionForeignKeys($schema);
+
+        $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'oro_user');
     }
 
     /**

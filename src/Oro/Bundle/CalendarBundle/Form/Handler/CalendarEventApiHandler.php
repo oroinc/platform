@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
-class CalendarEventHandler
+class CalendarEventApiHandler
 {
     /**
      * @var FormInterface
@@ -34,16 +34,6 @@ class CalendarEventHandler
         $this->form    = $form;
         $this->request = $request;
         $this->manager = $manager;
-    }
-
-    /**
-     * Get form, that build into handler, via handler service
-     *
-     * @return FormInterface
-     */
-    public function getForm()
-    {
-        return $this->form;
     }
 
     /**
