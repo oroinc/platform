@@ -6,8 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Doctrine\ORM\EntityRepository;
@@ -113,26 +111,26 @@ class TranslatableEntityType extends AbstractType
             return new ObjectChoiceList($entities, $options['property'], array(), null, $idField);
         };
 
+        $defaultConfigs = array(
+            'is_translated_option'    => true
+        );
+
         $resolver->setDefaults(
             array(
                 'property'      => null,
                 'query_builder' => null,
                 'choices'       => null,
                 'choice_list'   => $choiceList,
-                'configs' => array(
-                    'is_translated_option' => false
-                ),
+                'translation'   => $defaultConfigs
             )
         );
-
+        $resolver->setNormalizers(
+            array(
+                'translation' => function (Options $options, $configs) use ($defaultConfigs) {
+                    return array_merge($defaultConfigs, $configs);
+                }
+            )
+        );
         $resolver->setRequired(array('class'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['configs'] = $options['configs'];
     }
 }

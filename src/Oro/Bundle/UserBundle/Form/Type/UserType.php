@@ -61,7 +61,7 @@ class UserType extends AbstractType
         if ($this->securityFacade->isGranted('oro_user_role_view')) {
             $builder->add(
                 'roles',
-                'translatable_entity',
+                'entity',
                 array(
                     'property_path' => 'rolesCollection',
                     'label'         => 'oro.user.roles.label',
@@ -78,8 +78,8 @@ class UserType extends AbstractType
                     'required'      => !$this->isMyProfilePage,
                     'read_only'     => $this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
-                    'configs' => array(
-                        'is_translated_option'    => true
+                    'translation'   => array(
+                        'is_translated_option' => true
                     )
                 )
             );
@@ -88,7 +88,7 @@ class UserType extends AbstractType
         if ($this->securityFacade->isGranted('oro_user_group_view')) {
             $builder->add(
                 'groups',
-                'translatable_entity',
+                'entity',
                 array(
                     'label'     => 'oro.user.groups.label',
                     'class'     => 'OroUserBundle:Group',
@@ -98,8 +98,8 @@ class UserType extends AbstractType
                     'required'  => false,
                     'read_only' => $this->isMyProfilePage,
                     'disabled'  => $this->isMyProfilePage,
-                    'configs' => array(
-                        'is_translated_option'    => true
+                    'translation' => array(
+                        'is_translated_option' => true
                     )
                 )
             );

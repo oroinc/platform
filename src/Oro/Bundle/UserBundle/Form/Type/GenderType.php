@@ -50,7 +50,10 @@ class GenderType extends AbstractType
                 'choices'     => $this->genderProvider->getChoices(),
                 'multiple'    => false,
                 'expanded'    => false,
-                'empty_value' => 'oro.user.form.choose_gender'
+                'empty_value' => 'oro.user.form.choose_gender',
+                'translation' => array(
+                    'is_translated_option' => true
+                )
             )
         );
     }

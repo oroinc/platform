@@ -65,14 +65,4 @@ class ChoiceFilterType extends AbstractChoiceType
             $view->vars['null_value'] = $options['null_value'];
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function translateChoices(FormView $view, FormView $valueFormView, array $options)
-    {
-        if (!isset($options['is_translated_choices']) || !$options['is_translated_choices']) {
-            parent::translateChoices($view, $valueFormView, $options);
-        }
-    }
 }

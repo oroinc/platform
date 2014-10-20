@@ -49,7 +49,6 @@ class OrganizationsSelectType extends AbstractType
             [
                 'label'                   => 'oro.user.business_units.label',
                 'configs'                 => [
-                    'is_translated_option' => false,
                     'is_safe'              => false,
                 ],
                 'organization_tree_ids'   => [],

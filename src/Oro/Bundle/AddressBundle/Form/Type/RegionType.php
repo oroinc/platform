@@ -49,8 +49,7 @@ class RegionType extends AbstractType
                     'country_field' => null,
                     'configs' => array(
                         'placeholder' => 'oro.address.form.choose_region',
-                        'allowClear' => true,
-                        'is_translated_option' => true
+                        'allowClear' => true
                     ),
                     'empty_value' => '',
                     'empty_data'  => null

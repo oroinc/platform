@@ -213,8 +213,10 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'label' => 'oro.user.owner.label',
                 'business_unit_ids' => array(),
                 'configs'     => array(
-                    'is_translated_option' => true,
                     'is_safe'              => true
+                ),
+                'translation'     => array(
+                    'is_translated_option' => true
                 ),
                 'choices' => null,
                 'constraints' => array(new NotBlank()),
