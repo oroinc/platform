@@ -153,13 +153,6 @@ oro_entity_config:
                                 scope:      extend
                             code:           owner
                             value:          Custom
-                        #todo: move this config to EntitySerializedFieldBundle
-                        required_properties:
-                              -
-                                 config_id:
-                                    scope:  extend
-                                 code:      is_serialized
-                                 value:     false
                     form:
                         type:               choice
                         options:
