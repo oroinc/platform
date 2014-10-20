@@ -137,7 +137,6 @@ oro_entity_config:
                                 scope:      extend
                             code:           owner
                             value:          Custom
-
                     form:
                         type:               oro_entity_extend_choice
                         options:
@@ -145,6 +144,7 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
+
                 show_filter:
                     options:
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
@@ -153,7 +153,13 @@ oro_entity_config:
                                 scope:      extend
                             code:           owner
                             value:          Custom
-
+                        #todo: move this config to EntitySerializedFieldBundle
+                        required_properties:
+                              -
+                                 config_id:
+                                    scope:  extend
+                                 code:      is_serialized
+                                 value:     false
                     form:
                         type:               choice
                         options:
