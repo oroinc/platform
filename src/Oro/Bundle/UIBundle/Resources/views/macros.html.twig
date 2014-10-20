@@ -725,7 +725,7 @@
         <label class="control-label">{{ label }}</label>
         <div class="controls">
             <div class="row-oro">
-                <div class="collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
+                <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
                     {% for emailField in field.children %}
                         {{ _self.collection_prototype(emailField) }}
                     {% endfor %}

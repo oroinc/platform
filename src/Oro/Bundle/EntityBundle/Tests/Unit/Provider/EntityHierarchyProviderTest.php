@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 class EntityHierarchyProviderTest extends OrmTestCase
@@ -41,17 +41,17 @@ class EntityHierarchyProviderTest extends OrmTestCase
         $config3 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity3'));
 
         $newCustomEntityConfig = new Config(
-            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity4')
+            new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity4')
         );
         $newCustomEntityConfig->set('state', ExtendScope::STATE_NEW);
 
         $toBeDeletedCustomEntityConfig = new Config(
-            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity5')
+            new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity5')
         );
         $toBeDeletedCustomEntityConfig->set('state', ExtendScope::STATE_DELETE);
 
         $deletedCustomEntityConfig = new Config(
-            new EntityConfigId('extend', ExtendConfigDumper::ENTITY . '\TestEntity6')
+            new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity6')
         );
         $deletedCustomEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
         $deletedCustomEntityConfig->set('is_deleted', true);

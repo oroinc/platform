@@ -269,7 +269,7 @@ class EntitiesController extends Controller
             'custom_entity_type',
             $record,
             array(
-                'class_name'   => $entityClass,
+                'data_class'   => $entityClass,
                 'block_config' => array(
                     'general' => array(
                         'title' => 'General'
