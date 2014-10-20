@@ -6,45 +6,6 @@ use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 
 class MetadataTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider constructorProvider
-     */
-    public function testConstruct($options, $expectedExceptionMessage)
-    {
-        $this->setExpectedException(
-            '\Exception',
-            $expectedExceptionMessage
-        );
-
-        $metadata = new Metadata($options);
-    }
-
-    public function constructorProvider()
-    {
-        return [
-            'null'    => [
-                'options'                  => null,
-                'expectedExceptionMessage' => 'must be of the type array, null given',
-            ],
-            'bool'    => [
-                'options'                  => true,
-                'expectedExceptionMessage' => 'must be of the type array, boolean given',
-            ],
-            'integer' => [
-                'options'                  => 2,
-                'expectedExceptionMessage' => 'must be of the type array, integer given',
-            ],
-            'object'  => [
-                'options'                  => new \stdClass(),
-                'expectedExceptionMessage' => 'must be of the type array, object given',
-            ],
-            'string'  => [
-                'options'                  => 'argument',
-                'expectedExceptionMessage' => 'must be of the type array, string given',
-            ],
-        ];
-    }
-
     public function testGetExistingStrict()
     {
         $metadata = new Metadata(['code' => 'value']);
