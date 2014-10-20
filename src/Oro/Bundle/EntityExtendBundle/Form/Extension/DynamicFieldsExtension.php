@@ -21,7 +21,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ExtendEntityExtension extends AbstractTypeExtension
+class DynamicFieldsExtension extends AbstractTypeExtension
 {
     /** @var ConfigManager */
     protected $configManager;
