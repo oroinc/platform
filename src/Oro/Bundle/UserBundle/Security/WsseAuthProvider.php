@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 use Doctrine\ORM\PersistentCollection;
@@ -89,6 +90,7 @@ class WsseAuthProvider extends Provider
         $nonce            = $token->getAttribute('nonce');
         $secretsCount     = $secrets->count();
 
+        /** @var UserApi $userApi */
         foreach ($secrets as $userApi) {
             $currentIteration++;
             $isSecretValid = $this->validateDigest(
@@ -98,6 +100,10 @@ class WsseAuthProvider extends Provider
                 $userApi->getApiKey(),
                 $this->getSalt($user)
             );
+
+            if ($isSecretValid && !$userApi->getOrganization()->isEnabled()) {
+                throw new BadCredentialsException('Organization is not active.');
+            }
 
             // delete nonce from cache because user have another api keys
             if (!$isSecretValid && $secretsCount !== $currentIteration) {
