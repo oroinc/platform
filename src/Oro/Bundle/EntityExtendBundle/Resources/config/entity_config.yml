@@ -381,12 +381,12 @@ oro_entity_config:
                             block:          other
                     grid:
                         type:               boolean
-                        label:              is Serialized
+                        label:              DataBase field
                         filter_type:        boolean
                         required:           true
                         sortable:           true
                         filterable:         true
-                        show_filter:        true
+                        show_filter:        false
 
     enum:
         entity:
