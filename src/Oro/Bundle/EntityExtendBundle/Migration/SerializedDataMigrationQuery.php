@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
