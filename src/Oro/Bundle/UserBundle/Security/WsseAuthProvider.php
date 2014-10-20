@@ -102,12 +102,7 @@ class WsseAuthProvider extends Provider
             );
 
             if ($isSecretValid && !$userApi->getOrganization()->isEnabled()) {
-                throw new BadCredentialsException(
-                    sprintf(
-                        'Organization for API key "%s" is not active.',
-                        $userApi->getApiKey()
-                    )
-                );
+                throw new BadCredentialsException('Organization is not active.');
             }
 
             // delete nonce from cache because user have another api keys
