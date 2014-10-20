@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Fixtures;
 
-use Oro\Bundle\AddressBundle\Model\PhoneHolderInterface;
-
-class TestPhoneHolder implements PhoneHolderInterface
+class TestPhoneHolder
 {
     protected $phone;
 
@@ -24,6 +22,6 @@ class TestPhoneHolder implements PhoneHolderInterface
             return [];
         }
 
-        return [$this->phone];
+        return [[$this->phone, $this]];
     }
 }
