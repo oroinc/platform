@@ -148,7 +148,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
                         'entity_pagination' => true,
                     ],
                 ]
-
             ],
             [
                 'config' => [
@@ -156,7 +155,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
                         'entity_pagination' => false,
                     ],
                 ]
-
             ],
         ];
     }
