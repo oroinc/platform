@@ -29,11 +29,12 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new ActivityEntityGeneratorExtension($this->groupingConfigProvider);
     }
 
-    /**
-     * @dataProvider supportsProvider
-     */
-    public function testSupports($schemas, $expected)
+    public function testSupports()
     {
+        $schema = [
+            'class' => 'Test\Entity'
+        ];
+
         $config = new Config(new EntityConfigId('grouping', 'Test\Entity'));
         $config->set('groups', [ActivityScope::GROUP_ACTIVITY]);
 
@@ -46,9 +47,8 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity')
             ->will($this->returnValue($config));
 
-        $this->assertEquals(
-            $expected,
-            $this->extension->supports($schemas)
+        $this->assertTrue(
+            $this->extension->supports($schema)
         );
     }
 
@@ -101,89 +101,6 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->extension->supports(['class' => 'Test\Entity'])
         );
-    }
-
-    public function supportsProvider()
-    {
-        return [
-            [
-                [
-                    'class'        => 'Test\Entity',
-                    'relation'     => ['test' => 'test'],
-                    'relationData' => [
-                        'test' => [
-                            'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    ExtendHelper::buildAssociationName(
-                                        'Entity\Target',
-                                        ActivityScope::ASSOCIATION_KIND
-                                    ),
-                                    'manyToMany'
-                                ),
-                        ],
-                    ]
-                ],
-                true,
-            ],
-            [
-                [
-                    'class'        => 'Test\Entity',
-                    'relation'     => ['test' => 'test'],
-                    'relationData' => [
-                        'test' => [
-                            'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    'target',
-                                    'manyToMany'
-                                ),
-                        ],
-                    ]
-                ],
-                false,
-            ],
-            [
-                [
-                    'class'        => 'Test\Entity',
-                    'relation'     => ['test' => 'test'],
-                    'relationData' => [
-                        'test' => [
-                            'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    ExtendHelper::buildAssociationName(
-                                        'Entity\Target',
-                                        ActivityScope::ASSOCIATION_KIND
-                                    ),
-                                    'manyToOne'
-                                ),
-                        ],
-                    ]
-                ],
-                false,
-            ],
-            [
-                [
-                    'class'        => 'Test\Entity',
-                    'relation'     => [],
-                    'relationData' => []
-                ],
-                false,
-            ],
-            [
-                [
-                    'class' => 'Test\Entity',
-                ],
-                false,
-            ],
-        ];
     }
 
     public function testGenerate()
