@@ -3,21 +3,19 @@
 namespace Oro\Bundle\EntityPaginationBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
 class EntityPaginationListener
 {
-    const ENTITY_PAGINATION_PATH = '[options][entity_pagination]';
-    const TOTAL_RECORDS_PATH     = '[options][totalRecords]';
-
-    /**
-     * @var EntityPaginationStorage
-     */
+    /** @var EntityPaginationStorage  */
     protected $storage;
 
-    /** @var  DoctrineHelper */
+    /** @var DoctrineHelper  */
     protected $doctrineHelper;
 
     /**
@@ -37,12 +35,15 @@ class EntityPaginationListener
     {
         $paginationState = [];
         $dataGrid   = $event->getDatagrid();
-        $dataSource = $dataGrid->getDatasource();
 
-        if ($dataGrid->getConfig()->offsetGetByPath(self::ENTITY_PAGINATION_PATH) === true) {
+        if ($dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH) === true) {
+            /** @var OrmDatasource $dataSource */
+            $dataSource = $dataGrid->getDatasource();
             $queryBuilder = $dataSource->getQueryBuilder();
 
             $entityName = $queryBuilder->getRootEntities()[0];
+
+            $entityName = $this->doctrineHelper->getEntityMetadata($entityName)->getName();
             $gridName   = $dataGrid->getName();
 
             $paginationState['state'] = $dataGrid->getParameters()->all();
@@ -56,9 +57,7 @@ class EntityPaginationListener
 
             $result = ResultsObject::create([]);
             $dataGrid->getAcceptor()->acceptResult($result);
-            $paginationState['total']       = $result->offsetGetByPath(self::TOTAL_RECORDS_PATH);
-            $paginationState['previous_id'] = null;
-            $paginationState['next_id']     = null;
+            $paginationState['total'] = $result->offsetGetByPath(PagerInterface::TOTAL_PATH_PARAM);
 
             $this->storage->addData($entityName, $gridName, $paginationState);
         }
