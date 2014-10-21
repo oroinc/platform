@@ -58,6 +58,16 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testProcessGetRequest()
+    {
+        $this->form->expects($this->never())
+            ->method('submit');
+
+        $this->assertFalse(
+            $this->handler->process($this->entity)
+        );
+    }
+
     /**
      * @dataProvider supportedMethods
      */
