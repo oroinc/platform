@@ -3,6 +3,7 @@ parameters:
     oro_calendar.calendar_connection.entity.class:               Oro\Bundle\CalendarBundle\Entity\CalendarConnection
     oro_calendar.calendar_event.entity.class:                    Oro\Bundle\CalendarBundle\Entity\CalendarEvent
     oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
+    oro_calendar.listener.datagrid.activity.class:               Oro\Bundle\CalendarBundle\EventListener\Datagrid\ActivityGridListener
     oro_calendar.calendar_connection.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
@@ -15,6 +16,14 @@ services:
         class: %oro_calendar.listener.entity_listener.class%
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+
+    oro_calendar.listener.datagrid.activity:
+        class: %oro_calendar.listener.datagrid.activity.class%
+        arguments:
+            - @oro_activity.manager
+            - @oro_entity.routing_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-calendar-event-grid, method: onBuildAfter }
 
     oro_calendar.calendar_connection.manager.api:
         class: %oro_calendar.calendar_connection.manager.api.class%

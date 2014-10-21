@@ -2,9 +2,9 @@
 
 <div class="widget-content form-horizontal box-content row-fluid">
     <div class="responsive-block">
-        {{ ui.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, form.title|escape|nl2br) }}
-        {{ ui.renderProperty('oro.calendar.calendarevent.start.label'|trans, form.start|oro_format_datetime) }}
-        {{ ui.renderProperty('oro.calendar.calendarevent.end.label'|trans, form.end|oro_format_datetime) }}
-        {{ ui.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, form.allDay ? 'Yes'|trans : 'No'|trans) }}
+        {{ ui.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, entity.title|escape|nl2br) }}
+        {{ ui.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
+        {{ ui.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
+        {{ ui.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
     </div>
 </div>

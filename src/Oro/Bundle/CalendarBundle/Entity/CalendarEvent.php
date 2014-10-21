@@ -39,7 +39,6 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *              "immutable"=true
  *          },
  *          "activity"={
- *              "immutable"=true,
  *              "route"="oro_calendar_event_activity_view",
  *              "acl"="oro_calendar_view",
  *              "action_button_widget"="oro_add_calendar_event_button",

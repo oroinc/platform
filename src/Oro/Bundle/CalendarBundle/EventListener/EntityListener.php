@@ -2,24 +2,35 @@
 
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListener
 {
-    /** @var ClassMetadata */
-    protected $calendarMetadata;
+    /** @var ActivityManager */
+    protected $activityManager;
 
-    /** @var ClassMetadata */
-    protected $calendarConnectionMetadata;
+    /** @var ClassMetadata[] */
+    protected $metadataLocalCache = [];
+
+    /**
+     * @param ActivityManager $activityManager
+     */
+    public function __construct(ActivityManager $activityManager)
+    {
+        $this->activityManager = $activityManager;
+    }
 
     /**
      * @param OnFlushEventArgs $event
@@ -31,23 +42,33 @@ class EntityListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof User) {
-                $assignedOrganizations = $entity->getOrganizations();
-                foreach ($assignedOrganizations as $organization) {
-                    if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        $this->createCalendar($em, $uow, $entity, $organization);
-                    }
-                }
+                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
+            } elseif ($entity instanceof CalendarEvent) {
+                $this->assignCalendarEventActivity($entity, $em, $uow);
             }
+
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof User) {
-                $assignedOrganizations = $entity->getOrganizations();
-                foreach ($assignedOrganizations as $organization) {
-                    if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        $this->createCalendar($em, $uow, $entity, $organization);
-                    }
-                }
+                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
+            } elseif ($entity instanceof CalendarEvent) {
+                $this->ensureCalendarEventActivityArranged($entity, $em, $uow);
+            }
+        }
+    }
+
+    /**
+     * @param User          $entity
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
+     */
+    protected function ensureDefaultUserCalendarExist(User $entity, EntityManager $em, UnitOfWork $uow)
+    {
+        $assignedOrganizations = $entity->getOrganizations();
+        foreach ($assignedOrganizations as $organization) {
+            if (!$this->isCalendarExists($em, $entity, $organization)) {
+                $this->createCalendar($em, $uow, $entity, $organization);
             }
         }
     }
@@ -70,9 +91,9 @@ class EntityListener
 
         $em->persist($calendar);
         $em->persist($calendarConnection);
-        // can't inject entity manager through constructor because of circular dependency
-        $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
-        $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
+
+        $uow->computeChangeSet($this->getClassMetadata($calendar, $em), $calendar);
+        $uow->computeChangeSet($this->getClassMetadata($calendarConnection, $em), $calendarConnection);
     }
 
     /**
@@ -90,31 +111,62 @@ class EntityListener
     }
 
     /**
-     * @param EntityManager $entityManager
-     *
-     * @return ClassMetadata
+     * @param CalendarEvent $entity
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
      */
-    protected function getCalendarMetadata(EntityManager $entityManager)
+    protected function assignCalendarEventActivity(CalendarEvent $entity, EntityManager $em, UnitOfWork $uow)
     {
-        if (!$this->calendarMetadata) {
-            $this->calendarMetadata = $entityManager->getClassMetadata('OroCalendarBundle:Calendar');
+        $hasChanges = $this->activityManager->addActivityTarget($entity, $entity->getCalendar()->getOwner());
+        // recompute change set if needed
+        if ($hasChanges) {
+            $uow->computeChangeSet($this->getClassMetadata($entity, $em), $entity);
         }
-
-        return $this->calendarMetadata;
     }
 
     /**
-     * @param EntityManager $entityManager
+     * @param CalendarEvent $entity
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
+     */
+    protected function ensureCalendarEventActivityArranged(CalendarEvent $entity, EntityManager $em, UnitOfWork $uow)
+    {
+        $hasChanges = false;
+        $changeSet  = $uow->getEntityChangeSet($entity);
+        foreach ($changeSet as $field => $values) {
+            if ($field === 'calendar') {
+                /** @var Calendar $oldValue */
+                /** @var Calendar $newValue */
+                list($oldValue, $newValue) = $values;
+                if ($oldValue !== $newValue && $oldValue->getOwner() !== $newValue->getOwner()) {
+                    $hasChanges |= $this->activityManager->replaceActivityTarget(
+                        $entity,
+                        $oldValue->getOwner(),
+                        $newValue->getOwner()
+                    );
+                }
+                break;
+            }
+        }
+        // recompute change set if needed
+        if ($hasChanges) {
+            $uow->computeChangeSet($this->getClassMetadata($entity, $em), $entity);
+        }
+    }
+
+    /**
+     * @param object        $entity
+     * @param EntityManager $em
      *
      * @return ClassMetadata
      */
-    protected function getCalendarConnectionMetadata(EntityManager $entityManager)
+    protected function getClassMetadata($entity, EntityManager $em)
     {
-        if (!$this->calendarConnectionMetadata) {
-            $this->calendarConnectionMetadata
-                = $entityManager->getClassMetadata('OroCalendarBundle:CalendarConnection');
+        $className = ClassUtils::getClass($entity);
+        if (!isset($this->metadataLocalCache[$className])) {
+            $this->metadataLocalCache[$className] = $em->getClassMetadata($className);
         }
 
-        return $this->calendarConnectionMetadata;
+        return $this->metadataLocalCache[$className];
     }
 }
