@@ -38,7 +38,7 @@ datagrid:
                 end:
                     data_name: event.end
             default:
-                start: DESC
+                start: ASC
         properties:
             id: ~
         options:

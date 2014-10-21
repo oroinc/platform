@@ -37,12 +37,16 @@ class ActivityGridListener
             $entityClass = $this->entityRoutingHelper->decodeClassName($parameters->get('entityClass'));
             $entityId = $parameters->get('entityId');
 
+            $qb = $datasource->getQueryBuilder();
+
             // apply activity filter
-            $this->activityManager->addFilterByTargetEntity(
-                $datasource->getQueryBuilder(),
-                $entityClass,
-                $entityId
-            );
+            $this->activityManager->addFilterByTargetEntity($qb, $entityClass, $entityId);
+
+            // apply filter by date
+            $start = new \DateTime('now', new \DateTimeZone('UTC'));
+            $start->setTime(0, 0, 0);
+            $qb->andWhere('event.start >= :date OR event.end >= :date')
+                ->setParameter('date', $start);
         }
     }
 }

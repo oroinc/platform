@@ -107,6 +107,7 @@ class CalendarEvent extends ExtendCalendarEvent implements ActivityInterface, Re
 
     public function __construct()
     {
+        parent::__construct();
         $this->reminders = new ArrayCollection();
     }
 

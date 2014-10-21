@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Handler;
 
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Doctrine\Common\Persistence\ObjectManager;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class CalendarEventHandler
@@ -19,6 +22,9 @@ class CalendarEventHandler
     /** @var ObjectManager */
     protected $manager;
 
+    /** @var ActivityManager */
+    protected $activityManager;
+
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
@@ -26,17 +32,20 @@ class CalendarEventHandler
      * @param FormInterface       $form
      * @param Request             $request
      * @param ObjectManager       $manager
+     * @param ActivityManager     $activityManager
      * @param EntityRoutingHelper $entityRoutingHelper
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager,
+        ActivityManager $activityManager,
         EntityRoutingHelper $entityRoutingHelper
     ) {
         $this->form                = $form;
         $this->request             = $request;
         $this->manager             = $manager;
+        $this->activityManager     = $activityManager;
         $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
@@ -69,7 +78,7 @@ class CalendarEventHandler
                 if ($targetEntityClass) {
                     $targetEntityId = $this->request->get('entityId');
                     $targetEntity   = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
-                    $entity->addActivityTarget($targetEntity);
+                    $this->activityManager->addActivityTarget($entity, $targetEntity);
                 }
 
                 $this->onSuccess($entity);
