@@ -207,8 +207,10 @@ class OrmFilterExtension extends AbstractExtension
         $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
         foreach ($filtersConfig as $name => $definition) {
-            if (isset($definition[PropertyInterface::DISABLED_KEY]) && $definition[PropertyInterface::DISABLED_KEY]) {
-                // remove disabled filter
+            if (isset($definition[PropertyInterface::DISABLED_KEY])
+                && $definition[PropertyInterface::DISABLED_KEY]
+            ) {
+                // skip disabled filter
                 continue;
             }
 
