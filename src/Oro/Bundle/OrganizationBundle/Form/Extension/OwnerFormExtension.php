@@ -419,7 +419,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                             'choices' => $businessUnits,
                             'mapped' => true,
                             'label' => $this->fieldLabel,
-                            'translation'           => array(
+                            'translation' => array(
                                 'is_translated_option' => true,
                             )
                         ),

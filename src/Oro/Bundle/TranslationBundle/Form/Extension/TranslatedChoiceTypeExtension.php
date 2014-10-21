@@ -26,7 +26,7 @@ class TranslatedChoiceTypeExtension extends AbstractTypeExtension
         $resolver->setDefaults(
             array(
                 'translation' => array(
-                    'is_translated_option'    => false
+                    'is_translated_option' => false
                 )
             )
         );

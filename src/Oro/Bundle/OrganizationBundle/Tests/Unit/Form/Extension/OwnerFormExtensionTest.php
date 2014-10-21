@@ -242,7 +242,10 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
-                'label' => 'oro.user.owner.label'
+                'label' => 'oro.user.owner.label',
+                'translation' => array(
+                    'is_translated_option' => true
+                )
             )
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
