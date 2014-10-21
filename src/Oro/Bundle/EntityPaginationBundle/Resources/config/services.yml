@@ -12,6 +12,8 @@ services:
 
     oro_entity_pagination.storage:
         class: %oro_entity_pagination.storage.class%
+        arguments:
+            - @oro_config.global
         calls:
             - [ setRequest, [@?request=] ]
 

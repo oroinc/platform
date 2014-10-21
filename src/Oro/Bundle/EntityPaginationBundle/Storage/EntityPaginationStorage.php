@@ -4,14 +4,29 @@ namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 class EntityPaginationStorage
 {
     const STORAGE_NAME = 'entity_pagination_storage';
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @var Request
      */
     protected $request;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
 
     /**
      * @param Request $request
@@ -49,5 +64,13 @@ class EntityPaginationStorage
     public function getNext($entity)
     {
 
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return (bool)$this->configManager->get('oro_entity_pagination.enabled');
     }
 }

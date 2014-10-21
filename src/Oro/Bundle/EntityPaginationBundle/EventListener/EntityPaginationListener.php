@@ -33,8 +33,12 @@ class EntityPaginationListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
+        if (!$this->storage->isEnabled()) {
+            return;
+        }
+
         $paginationState = [];
-        $dataGrid   = $event->getDatagrid();
+        $dataGrid = $event->getDatagrid();
 
         if ($dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH) === true) {
             /** @var OrmDatasource $dataSource */

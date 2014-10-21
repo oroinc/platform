@@ -27,11 +27,11 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->storage = $this
-            ->getMock('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage');
+        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -39,20 +39,18 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $config
+     * @param array $config
+     * @param bool $isEnabled
      *
      * @dataProvider onBuildAfterProvider
      */
-    public function testOnBuildAfter($config)
+    public function testOnBuildAfter(array$config, $isEnabled = false)
     {
         $fieldName    = 'id';
-        $currentIds   =  [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];
+        $currentIds   = [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];
         $totalRecords = 41;
         $state        = [
-            '_pager'   => [
-                '_page'     => 2,
-                '_per_page' => 10
-            ],
+            '_pager'   => ['_page' => 2, '_per_page' => 10 ],
             '_sort_by' => [],
             '_filter'  => []
         ];
@@ -70,23 +68,30 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $acceptor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
 
-        $dataGrid->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue(DatagridConfiguration::create($config)));
+        $this->storage->expects($this->once())
+            ->method('isEnabled')
+            ->will($this->returnValue($isEnabled));
 
-        if ($config['options']['entity_pagination'] === true) {
+        if ($isEnabled) {
+            $dataGrid->expects($this->once())
+                ->method('getConfig')
+                ->will($this->returnValue(DatagridConfiguration::create($config)));
+        } else {
+            $dataGrid->expects($this->never())
+                ->method('getConfig')
+                ->will($this->returnValue(DatagridConfiguration::create($config)));
+        }
+
+        if ($isEnabled && $config['options']['entity_pagination'] === true) {
             $dataGrid->expects($this->once())
                 ->method('getDatasource')
                 ->will($this->returnValue($dataSource));
-
             $dataGrid->expects($this->once())
                 ->method('getParameters')
                 ->will($this->returnValue($parameters));
-
             $dataGrid->expects($this->once())
                 ->method('getName')
                 ->will($this->returnValue(self::GRID_NAME));
-
             $dataGrid->expects($this->once())
                 ->method('getAcceptor')
                 ->will($this->returnValue($acceptor));
@@ -94,7 +99,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
                 ->disableOriginalConstructor()
                 ->getMock();
-
             $queryBuilder->expects($this->once())
                 ->method('getRootEntities')
                 ->will($this->returnValue([self::ENTITY_NAME]));
@@ -142,19 +146,28 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
     public function onBuildAfterProvider()
     {
         return [
-            [
+            'config pagination disabled' => [
                 'config' => [
                     'options' => [
                         'entity_pagination' => true,
                     ],
-                ]
+                ],
             ],
-            [
+            'grid pagination enabled' => [
+                'config' => [
+                    'options' => [
+                        'entity_pagination' => true,
+                    ],
+                ],
+                'isEnabled' => true,
+            ],
+            'grid pagination disabled' => [
                 'config' => [
                     'options' => [
                         'entity_pagination' => false,
                     ],
-                ]
+                ],
+                'isEnabled' => true,
             ],
         ];
     }
