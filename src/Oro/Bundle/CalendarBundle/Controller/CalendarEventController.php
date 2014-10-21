@@ -95,6 +95,14 @@ class CalendarEventController extends Controller
     {
         $entity = new CalendarEvent();
 
+        /** @var SecurityFacade $securityFacade */
+        $securityFacade = $this->get('oro_security.security_facade');
+
+        $defaultCalendar = $this->getDoctrine()->getManager()
+            ->getRepository('OroCalendarBundle:Calendar')
+            ->findDefaultCalendar($this->getUser()->getId(), $securityFacade->getOrganization()->getId());
+        $entity->setCalendar($defaultCalendar);
+
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity->setStart($startTime);
         $entity->setEnd($startTime->add(new \DateInterval('PT1H')));

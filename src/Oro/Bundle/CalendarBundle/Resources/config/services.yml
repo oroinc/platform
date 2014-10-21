@@ -14,6 +14,8 @@ parameters:
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
+        arguments:
+            - @oro_activity.manager
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 

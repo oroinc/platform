@@ -107,7 +107,7 @@ class EntityListener
     {
         $calendarRepository = $em->getRepository('OroCalendarBundle:Calendar');
 
-        return (bool)$calendarRepository->findByUserAndOrganization($user->getId(), $organization->getId());
+        return (bool)$calendarRepository->findDefaultCalendar($user->getId(), $organization->getId());
     }
 
     /**
