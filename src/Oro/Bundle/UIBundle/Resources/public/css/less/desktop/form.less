@@ -1,4 +1,7 @@
-.oro-multiselect-holder {
+.oro-item-collection {
+  input[type="email"], input[type="text"] {
+    width: 261px;
+  }
   .input-append, .input-prepend {
     input[type="email"], input[type="text"] {
       width: 235px;
@@ -9,8 +12,27 @@
       width: 204px;
     }
   }
+  .collection-element-other {
+    margin-bottom: 5px;
+    input[type='email'],
+    input[type='text'],
+    textarea {
+      width: 259px;
+    }
+    select,
+    .selector {
+      width: 262px;
+      margin-left: 0;
+    }
+    .select2-container {
+      width: 271px;
+    }
+  }
 }
-.oro-multiselect-holder.not-removable {
+.oro-item-collection.not-removable {
+  input[type="email"], input[type="text"] {
+    width: 280px;
+  }
   .input-append, .input-prepend {
     input[type="email"], input[type="text"] {
       width: 257px;
@@ -20,5 +42,10 @@
     input[type="email"], input[type="text"] {
       width: 226px;
     }
+  }
+}
+.oro-address-collection.oro-item-collection {
+  input[type="email"], input[type="text"] {
+    width: 280px;
   }
 }

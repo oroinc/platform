@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Grid;
+namespace Oro\Bundle\EntityExtendBundle\Grid;
 
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
