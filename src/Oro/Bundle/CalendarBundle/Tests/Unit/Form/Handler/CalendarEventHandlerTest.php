@@ -135,7 +135,7 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->entityRoutingHelper->expects($this->once())
-            ->method('getEntity')
+            ->method('getEntityReference')
             ->with(get_class($targetEntity), $targetEntity->getId())
             ->will($this->returnValue($targetEntity));
 

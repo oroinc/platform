@@ -77,8 +77,10 @@ class CalendarEventHandler
                 $targetEntityClass = $this->request->get('entityClass');
                 if ($targetEntityClass) {
                     $targetEntityId = $this->request->get('entityId');
-                    $targetEntity   = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
-                    $this->activityManager->addActivityTarget($entity, $targetEntity);
+                    $this->activityManager->addActivityTarget(
+                        $entity,
+                        $this->entityRoutingHelper->getEntityReference($targetEntityClass, $targetEntityId)
+                    );
                 }
 
                 $this->onSuccess($entity);
