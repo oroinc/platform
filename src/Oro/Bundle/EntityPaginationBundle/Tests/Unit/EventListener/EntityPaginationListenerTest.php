@@ -19,14 +19,10 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityPaginationListener */
     protected $listener;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $storage;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
     public function setUp()
@@ -49,10 +45,10 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBuildAfter($config)
     {
-        $fieldName       = 'id';
-        $currentIds      =  [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];
-        $totalRecords    = 41;
-        $state           = [
+        $fieldName    = 'id';
+        $currentIds   =  [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];
+        $totalRecords = 41;
+        $state        = [
             '_pager'   => [
                 '_page'     => 2,
                 '_per_page' => 10
@@ -74,64 +70,65 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $acceptor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
 
-        if ($config['options']['entity_pagination'] !== true) {
-            return null;
-        }
-
         $dataGrid->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue(DatagridConfiguration::create($config)));
 
-        $dataGrid->expects($this->once())
-            ->method('getDatasource')
-            ->will($this->returnValue($dataSource));
+        if ($config['options']['entity_pagination'] === true) {
+            $dataGrid->expects($this->once())
+                ->method('getDatasource')
+                ->will($this->returnValue($dataSource));
 
-        $dataGrid->expects($this->once())
-            ->method('getParameters')
-            ->will($this->returnValue($parameters));
+            $dataGrid->expects($this->once())
+                ->method('getParameters')
+                ->will($this->returnValue($parameters));
 
-        $dataGrid->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue(self::GRID_NAME));
+            $dataGrid->expects($this->once())
+                ->method('getName')
+                ->will($this->returnValue(self::GRID_NAME));
 
-        $dataGrid->expects($this->once())
-            ->method('getAcceptor')
-            ->will($this->returnValue($acceptor));
+            $dataGrid->expects($this->once())
+                ->method('getAcceptor')
+                ->will($this->returnValue($acceptor));
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+            $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $queryBuilder->expects($this->once())
-            ->method('getRootEntities')
-            ->will($this->returnValue([self::ENTITY_NAME]));
+            $queryBuilder->expects($this->once())
+                ->method('getRootEntities')
+                ->will($this->returnValue([self::ENTITY_NAME]));
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(new ClassMetadata(self::ENTITY_NAME)));
+            $this->doctrineHelper->expects($this->once())
+                ->method('getEntityMetadata')
+                ->with(self::ENTITY_NAME)
+                ->will($this->returnValue(new ClassMetadata(self::ENTITY_NAME)));
 
-        $dataSource->expects($this->once())
-            ->method('getQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            $dataSource->expects($this->once())
+                ->method('getQueryBuilder')
+                ->will($this->returnValue($queryBuilder));
 
-        $acceptor->expects($this->once())
-            ->method('acceptResult')
-            ->with($this->isInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject'))
-            ->will($this->returnCallback(
-                function (ResultsObject $result) use ($totalRecords) {
-                    $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $totalRecords);
-                }
-            ));
+            $acceptor->expects($this->once())
+                ->method('acceptResult')
+                ->with($this->isInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject'))
+                ->will($this->returnCallback(
+                    function (ResultsObject $result) use ($totalRecords) {
+                        $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $totalRecords);
+                    }
+                ));
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with(self::ENTITY_NAME)
-            ->will($this->returnValue($fieldName));
+            $this->doctrineHelper->expects($this->once())
+                ->method('getSingleEntityIdentifierFieldName')
+                ->with(self::ENTITY_NAME)
+                ->will($this->returnValue($fieldName));
 
-        $this->storage->expects($this->once())
-            ->method('addData')
-            ->with(self::ENTITY_NAME, self::GRID_NAME, $paginationState);
+            $this->storage->expects($this->once())
+                ->method('addData')
+                ->with(self::ENTITY_NAME, self::GRID_NAME, $paginationState);
+        } else {
+            $this->storage->expects($this->never())
+                ->method('addData');
+        }
 
         $resultRecords = [];
         foreach ($currentIds as $id) {
@@ -151,7 +148,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
                         'entity_pagination' => true,
                     ],
                 ]
-
             ],
             [
                 'config' => [
@@ -159,7 +155,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
                         'entity_pagination' => false,
                     ],
                 ]
-
             ],
         ];
     }
