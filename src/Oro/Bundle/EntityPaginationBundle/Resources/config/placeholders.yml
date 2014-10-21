@@ -1,0 +1,8 @@
+placeholders:
+    view_pageActions_after:
+        items:
+            entity_pagination:
+                order: 100
+items:
+    entity_pagination:
+        template: OroEntityPaginationBundle:Placeholder:entityPagination.html.twig
