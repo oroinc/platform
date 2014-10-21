@@ -6,6 +6,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 
@@ -41,9 +43,11 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $config
      *
+     * @dataProvider onBuildAfterProvider
      */
-    public function testOnBuildAfter()
+    public function testOnBuildAfter($config)
     {
         $fieldName       = 'id';
         $currentIds      =  [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];
@@ -59,14 +63,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $paginationState = [
             'current_ids' => $currentIds,
             'state'       => $state,
-            'total'       => $totalRecords,
-            'previous_id' => null,
-            'next_id'     => null
-        ];
-        $config          = [
-            'options' => [
-                'entity_pagination' => true,
-            ],
+            'total'       => $totalRecords
         ];
 
         $parameters = new ParameterBag($state);
@@ -76,6 +73,10 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $acceptor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
+
+        if ($config['options']['entity_pagination'] !== true) {
+            return null;
+        }
 
         $dataGrid->expects($this->once())
             ->method('getConfig')
@@ -105,6 +106,11 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRootEntities')
             ->will($this->returnValue([self::ENTITY_NAME]));
 
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with(self::ENTITY_NAME)
+            ->will($this->returnValue(new ClassMetadata(self::ENTITY_NAME)));
+
         $dataSource->expects($this->once())
             ->method('getQueryBuilder')
             ->will($this->returnValue($queryBuilder));
@@ -114,7 +120,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject'))
             ->will($this->returnCallback(
                 function (ResultsObject $result) use ($totalRecords) {
-                    $result->offsetSetByPath(EntityPaginationListener::TOTAL_RECORDS_PATH, $totalRecords);
+                    $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $totalRecords);
                 }
             ));
 
@@ -134,5 +140,27 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new OrmResultAfter($dataGrid, $resultRecords);
         $this->listener->onResultAfter($event);
+    }
+
+    public function onBuildAfterProvider()
+    {
+        return [
+            [
+                'config' => [
+                    'options' => [
+                        'entity_pagination' => true,
+                    ],
+                ]
+
+            ],
+            [
+                'config' => [
+                    'options' => [
+                        'entity_pagination' => false,
+                    ],
+                ]
+
+            ],
+        ];
     }
 }
