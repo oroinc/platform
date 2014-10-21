@@ -2,7 +2,7 @@ UPGRADE FROM 1.4 to 1.5
 =======================
 
 ####AddressBundle:
-- `PhoneHolderHelper` class has been added to help getting phone number from object.
+- `PhoneProvider` class has been added to help getting phone number(s) from object.
 
 ####EntityExtendBundle:
 - `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated

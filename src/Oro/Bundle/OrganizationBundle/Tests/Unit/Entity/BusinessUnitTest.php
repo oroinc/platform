@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -121,25 +122,5 @@ class BusinessUnitTest extends \PHPUnit_Framework_TestCase
         $entity->setOwner($businessUnit);
 
         $this->assertEquals($businessUnit, $entity->getOwner());
-    }
-
-    public function testGetPhoneNumber()
-    {
-        $businessUnit = new BusinessUnit();
-
-        $this->assertNull($businessUnit->getPhoneNumber());
-
-        $businessUnit->setPhone('123-123');
-        $this->assertEquals('123-123', $businessUnit->getPhoneNumber());
-    }
-
-    public function testGetPhoneNumbers()
-    {
-        $businessUnit = new BusinessUnit();
-
-        $this->assertSame([], $businessUnit->getPhoneNumbers());
-
-        $businessUnit->setPhone('123-123');
-        $this->assertSame(['123-123'], $businessUnit->getPhoneNumbers());
     }
 }
