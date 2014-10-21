@@ -51,14 +51,14 @@ oro:
             name.label:             Name
             key.label:              Key
             target:
-                entity.label:         'Target Entity'
+                entity.label:         'Target entity'
                 choose_entity.value:  'Please choice target entity...'
-                field.label:          'Target Field'
+                field.label:          'Target field'
                 choose_field.value:   'Please choice target field...'
             relation:
-                entity_data_fields:   'Related Entity Data Fields'
-                entity_info_title:    'Related Entity Info Title'
-                entity_detailed:      'Related Entity Detailed'
+                entity_data_fields:   'Related entity data fields'
+                entity_info_title:    'Related entity info title'
+                entity_detailed:      'Related entity detailed'
 
         enum_name:    Option Set Name
         enum_public:  Public
