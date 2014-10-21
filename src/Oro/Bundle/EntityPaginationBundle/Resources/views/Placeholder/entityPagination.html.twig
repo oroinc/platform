@@ -1,17 +1,16 @@
-<li>
-    {% set previous = oro_entity_pagination_previous(entity) %}
-    {% set pager = oro_entity_pagination_pager(entity) %}
-    {% set next = oro_entity_pagination_next(entity) %}
+{% set pager = oro_entity_pagination_pager(entity) %}
+{% if pager %}
+    <li>
+        {% set previous = oro_entity_pagination_previous(entity) %}
+        {% if previous %}
+            <a href="{{ path(previous.route, previous.route_params) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
+        {% endif %}
 
-    {% if previous %}
-        <a href="{{ path(previous.route, previous.route_params) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
-    {% endif %}
-
-    {% if pager %}
         {{ 'oro.entity_pagination.pager_%current%_of_%total%'|trans({'%current%': pager.current, '%total%': pager.total}) }}
-    {% endif %}
 
-    {% if next %}
-        <a href="{{ path(next.route, next.route_params) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
-    {% endif %}
-</li>
+        {% set next = oro_entity_pagination_next(entity) %}
+        {% if next %}
+            <a href="{{ path(next.route, next.route_params) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
+        {% endif %}
+    </li>
+{% endif %}
