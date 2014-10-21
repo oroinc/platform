@@ -1,5 +1,6 @@
 parameters:
     oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
+    oro_integration.change_set.class:                                     Oro\Bundle\IntegrationBundle\Entity\ChangeSet
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
     oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
@@ -10,6 +11,7 @@ parameters:
     oro_integration.form.subscriber.default_user_owner_subscriber.class:  Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
+    oro_integration.manager.change_set.class:                             Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
@@ -33,6 +35,8 @@ parameters:
 
     oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
     oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
+
+    oro_integration.action.save_change_set.class:                         Oro\Bundle\IntegrationBundle\Model\Action\SaveChangeSetAction
 
 services:
     oro_integration.manager.api:
@@ -100,6 +104,12 @@ services:
         class: %oro_integration.manager.types_registry.class%
         arguments:
             - []
+
+    oro_integration.manager.change_set:
+        class: %oro_integration.manager.change_set.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - %oro_integration.change_set.class%
 
     oro_integration.manager.types_registry.link:
         tags:
@@ -208,3 +218,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 
+    oro_integration.action.save_change_set:
+        class: %oro_integration.action.save_change_set.class%
+        arguments:
+            - @oro_workflow.context_accessor
+        calls:
+            - [setChangeSetManager, [@oro_integration.manager.change_set]]
+        tags:
+            - { name: oro_workflow.action, alias: save_change_set }
