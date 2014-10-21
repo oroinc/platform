@@ -69,9 +69,9 @@ oro_ui:
 
 Each placeholder item can have the following properties:
 
- - **template** or **action** - The path to TWIG template or controller action is used to rendering the item
- - **applicable** - The condition indicates whether the item can be rendered or not
- - **acl** - The ACL resource. Can be used to restrict access to the item
+ - **template** or **action** - The path to TWIG template or controller action is used to rendering the item.
+ - **applicable** - The condition indicates whether the item can be rendered or not.
+ - **acl** - The ACL resource(s). Can be a string or array of strings. Can be used to restrict access to the item. If several ACL resources are provided an access is granted only if all of them grant an access.
  - **data** - An additional data to be passed to TWIG template or controller.
 
 Each property can be a constant or some expression supported by [System Aware Resolver Component](../../Component/Config/Resources/doc/system_aware_resolver.md). Examples can be found in existing *placeholders.yml* files.

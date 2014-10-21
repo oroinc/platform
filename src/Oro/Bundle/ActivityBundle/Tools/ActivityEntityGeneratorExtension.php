@@ -32,8 +32,7 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
 
         return
             !empty($groups)
-            && in_array(ActivityScope::GROUP_ACTIVITY, $groups)
-            && parent::supports($schema);
+            && in_array(ActivityScope::GROUP_ACTIVITY, $groups);
     }
 
     /**

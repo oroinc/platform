@@ -8,8 +8,11 @@ use Doctrine\Common\Util\ClassUtils;
  * This provider calls all registered leaf providers in a chain, merges and does grouping of widgets returned
  * by each leaf provider and orders result widgets by priority.
  */
-class GroupingChainWidgetProvider extends ChainWidgetProvider
+class GroupingChainWidgetProvider implements WidgetProviderInterface
 {
+    /** @var array [WidgetProviderInterface, group] */
+    protected $providers = [];
+
     /** @var LabelProviderInterface */
     protected $groupNameProvider;
 
@@ -22,6 +25,25 @@ class GroupingChainWidgetProvider extends ChainWidgetProvider
     }
 
     /**
+     * Registers the given provider in the chain
+     *
+     * @param WidgetProviderInterface $provider
+     * @param string|null             $group
+     */
+    public function addProvider(WidgetProviderInterface $provider, $group = null)
+    {
+        $this->providers[] = [$provider, $group];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($entity)
+    {
+        return !empty($this->providers);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * The format of returning array:
@@ -30,7 +52,7 @@ class GroupingChainWidgetProvider extends ChainWidgetProvider
      */
     public function getWidgets($entity)
     {
-        $widgets = parent::getWidgets($entity);
+        $widgets = $this->getWidgetsOrderedByPriority($entity);
 
         $result = [];
         foreach ($widgets as $widget) {
@@ -55,6 +77,48 @@ class GroupingChainWidgetProvider extends ChainWidgetProvider
             }
 
             $result[$groupName]['widgets'][] = $widget;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns widgets ordered by priority
+     *
+     * @param object $entity The entity object
+     *
+     * @return array
+     */
+    public function getWidgetsOrderedByPriority($entity)
+    {
+        $result = [];
+
+        // collect widgets
+        foreach ($this->providers as $item) {
+            /** @var WidgetProviderInterface $provider */
+            $provider = $item[0];
+            /** @var string|null $group */
+            $group = $item[1];
+
+            if ($provider->supports($entity)) {
+                $widgets = $provider->getWidgets($entity);
+                if (!empty($widgets)) {
+                    foreach ($widgets as $widget) {
+                        if (!empty($group) && !isset($widget['group'])) {
+                            $widget['group'] = $group;
+                        }
+                        $priority = isset($widget['priority']) ? $widget['priority'] : 0;
+                        unset($widget['priority']);
+                        $result[$priority][] = $widget;
+                    }
+                }
+            }
+        }
+
+        // sort by priority and flatten
+        if (!empty($result)) {
+            ksort($result);
+            $result = call_user_func_array('array_merge', $result);
         }
 
         return $result;
