@@ -2,6 +2,7 @@ parameters:
     oro_entity_pagination.datagrid.extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension
     oro_entity_pagination.event_listener.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener
     oro_entity_pagination.storage.class: Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage
+    oro_entity_pagination.twig_extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension
 
 services:
     oro_entity_pagination.datagrid.extension.orm_entity_pagination:
@@ -24,3 +25,13 @@ services:
             - @oro_entity.doctrine_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
+
+    oro_entity_pagination.twig_extension.entity_pagination:
+        class: %oro_entity_pagination.twig_extension.entity_pagination.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity_pagination.storage
+        calls:
+            - [ setRequest, [@?request=] ]
+        tags:
+            - { name: twig.extension }
