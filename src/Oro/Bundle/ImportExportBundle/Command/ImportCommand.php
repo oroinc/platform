@@ -29,24 +29,24 @@ class ImportCommand extends ContainerAwareCommand
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->addOption(
-                self::OPTION_PROCESSOR,
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Name of the processor for the entity data contained in the CSV'
+            ->setDescription('Import data from specified file for specified entity.')
+            ->addArgument(
+                self::ARGUMENT_FILE,
+                InputArgument::REQUIRED,
+                'File name, to import CSV data from'
             )
             ->addOption(
                 self::OPTION_VALIDATION_PROCESSOR,
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Name of the processor for the entity data validation contained in the CSV'
             )
-            ->addArgument(
-                self::ARGUMENT_FILE,
-                InputArgument::REQUIRED,
-                'File name from which to import the CSV data'
-            )
-            ->setDescription('Import data from specified file for specified entity.');
+            ->addOption(
+                self::OPTION_PROCESSOR,
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Name of the processor for the entity data contained in the CSV'
+            );
     }
 
     /**
@@ -55,39 +55,25 @@ class ImportCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $processorAlias = $this->handleProcessorName($input, $output);
-        $validationProcessorAlias = $this->handleProcessorName(
-            $input,
-            $output,
-            self::OPTION_VALIDATION_PROCESSOR,
-            ProcessorRegistry::TYPE_IMPORT_VALIDATION
-        );
+        $sourceFile = $input->getArgument(self::ARGUMENT_FILE);
+        $noInteraction = $input->getOption('no-interaction');
 
-        $srcFile = $input->getArgument(self::ARGUMENT_FILE);
+        $this->getImportHandler()->setImportingFileName($sourceFile);
 
-        $this->getImportHandler()->setImportingFileName($srcFile);
+        if (!$noInteraction) {
+            $validationProcessorAlias = $this->handleProcessorName(
+                $input,
+                $output,
+                self::OPTION_VALIDATION_PROCESSOR,
+                ProcessorRegistry::TYPE_IMPORT_VALIDATION
+            );
 
-        $validationInfo = $this->getImportHandler()->handleImportValidation(
-            JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
-            $validationProcessorAlias
-        );
+            $validationInfo = $this->getImportHandler()->handleImportValidation(
+                JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+                $validationProcessorAlias
+            );
 
-        $rows = [];
-        foreach ($validationInfo['counts'] as $label => $count) {
-            $rows[] = [$label, (int)$count];
-        }
-
-        if ($rows) {
-            $this
-                ->getHelper('table')
-                ->setHeaders(['Results', 'Count'])
-                ->setRows($rows)
-                ->render($output);
-        }
-
-        if ($validationInfo['success']) {
-            if ($input->getOption('no-interaction')) {
-                return self::STATUS_SUCCESS;
-            }
+            $this->renderResult($validationInfo, $output);
 
             $confirmation = $this->getHelper('dialog')->askConfirmation(
                 $output,
@@ -98,18 +84,18 @@ class ImportCommand extends ContainerAwareCommand
             if (!$confirmation) {
                 return self::STATUS_SUCCESS;
             }
-
-            $importInfo = $this->getImportHandler()->handleImport(
-                JobExecutor::JOB_IMPORT_FROM_CSV,
-                $processorAlias
-            );
-
-            $output->writeln('<info>' . $importInfo['message'] . '</info>');
-        } else {
-            foreach ($validationInfo['errors'] as $errorMessage) {
-                $output->writeln('<error>' . $errorMessage . '</error>');
-            }
         }
+
+        $importInfo = $this->getImportHandler()->handleImport(
+            JobExecutor::JOB_IMPORT_FROM_CSV,
+            $processorAlias
+        );
+
+        if ($noInteraction) {
+            $this->renderResult($importInfo, $output);
+        }
+
+        $output->writeln('<info>' . $importInfo['message'] . '</info>');
 
         return self::STATUS_SUCCESS;
     }
@@ -119,8 +105,8 @@ class ImportCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      * @param string          $option
      * @param string          $type
-     *
      * @return string
+     * @throws \InvalidArgumentException
      */
     protected function handleProcessorName(
         InputInterface $input,
@@ -168,5 +154,33 @@ class ImportCommand extends ContainerAwareCommand
     protected function getProcessorRegistry()
     {
         return $this->getContainer()->get('oro_importexport.processor.registry');
+    }
+
+    /**
+     * @param array $result
+     * @param OutputInterface $output
+     */
+    protected function renderResult(array $result, OutputInterface $output)
+    {
+        $rows = [];
+        if (!empty($result['counts'])) {
+            foreach ($result['counts'] as $label => $count) {
+                $rows[] = [$label, (int)$count];
+            }
+        }
+
+        if ($rows) {
+            $this
+                ->getHelper('table')
+                ->setHeaders(['Results', 'Count'])
+                ->setRows($rows)
+                ->render($output);
+        }
+
+        if (!empty($result['errors'])) {
+            foreach ($result['errors'] as $errorMessage) {
+                $output->writeln('<error>' . $errorMessage . '</error>');
+            }
+        }
     }
 }

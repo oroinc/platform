@@ -48,3 +48,6 @@ oro:
     ui:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
+        page_header:
+            button:
+                more: "More"

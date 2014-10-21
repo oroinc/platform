@@ -100,7 +100,7 @@ label, input, button, select, textarea { font-size:13px;}
     label.control-label {
       float:left;
       width:160px;
-      padding-top:5px;
+      padding-top:7px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
@@ -113,6 +113,7 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
+        padding-top:7px;
         width: 100%;
         word-wrap: break-word;
       }
@@ -146,8 +147,11 @@ label, input, button, select, textarea { font-size:13px;}
     }
   }
 }
-
-input[type='checkbox'] + label { margin-bottom:2px; }
+input[type='radio'] + label,
+input[type='checkbox'] + label {
+  margin-bottom:2px;
+  display: inline-block;
+}
 textarea, input, select,
 .uneditable-input,
 body .select2-container {
@@ -940,6 +944,7 @@ footer {
       button {
         color:#666;
         font-size: 14px;
+        vertical-align: baseline;
       }
     }
     .select-filter-widget .caret { margin-top:8px; }
@@ -1194,6 +1199,7 @@ footer {
 }
 .navbar-extra {
   padding: 0;
+  margin-bottom: 5px;
   .customer-info-top-actions a {
     height: 24px;
     line-height: 24px;
@@ -1207,11 +1213,11 @@ footer {
   }
   > .row > .pull-left{
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   > .row > .pull-right{
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 }
 .icons-holder .icons-holder-text [class^="icon-"] {
@@ -1908,7 +1914,7 @@ ul.inline-extra {
 }
 .row-oro {
   width: 100%;
-  margin: 0 0 10px;
+  margin: 0;
 }
 .clearfix-oro {
   width: 100%;
@@ -1926,6 +1932,7 @@ label.required em,
 .form-horizontal label.required em {
   color: #c30b25;
   font-size: 15px;
+  line-height: 1px;
 }
 
 /*.form-horizontal .span6 .controls div.selector {
@@ -1934,7 +1941,7 @@ label.required em,
     width:292px;
   }
 }*/
-.form-horizontal .controls  .removeRow{
+.controls .removeRow{
   position: relative;
   margin: 0 0 0 -24px;
 }
@@ -1978,14 +1985,18 @@ textarea {
 }
 .horizontal .oro-clearfix input[type="checkbox"],
 .horizontal .oro-clearfix input[type="radio"] {
-  float: left;
-  margin: 3px 10px 0 0;
+  margin: -4px 10px 0 0;
 }
 .horizontal .oro-clearfix .label {
   float: left;
 }
-.controls .horizontal {
-  padding-top: 5px;
+.controls {
+  .horizontal {
+    padding-top: 5px;
+  }
+  > input[type=checkbox]:only-child {
+    margin-top: 6px;
+  }
 }
 .dot-menu-empty-message {
   padding: 4px 15px;
@@ -2182,7 +2193,7 @@ select {
 }
 div.selector {
   line-height: 28px;
-  height: 28px;
+  height: 30px;
   position: relative;
   width: 235px;
   font-size: 12px;
@@ -2537,7 +2548,6 @@ div.selector.disabled span {
 
 .row-fluid.row-fluid-divider {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-  .forScreen(@mediumScreen, background, none);
 }
 h5.user-fieldset {
   font-weight:bold;
@@ -2823,7 +2833,43 @@ label.radio.error {
   top: -3px;
 }
 
-#orocrm_contact_form_addresses_collection.oro-item-collection {
+.add-list-item {
+  i.icon-plus{
+    font-size: 12px;
+  }
+}
+.oro-item-collection {
+  &>div {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+  .add-list-item {
+    margin-left: 183px;
+  }
+  .removeRow {
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 5px;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f00d";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+  .row-oro.oro-multiselect-holder {
+    margin: 0 0 5px;
+  }
+}
+
+.oro-address-collection.oro-item-collection {
   &>div {
     position: relative;
     padding: 10px 15px 0 0;
@@ -2844,36 +2890,6 @@ label.radio.error {
     &:after {
       color: #bbb;
     }
-  }
-}
-
-.mobile-version #orocrm_contact_form_addresses_collection.oro-item-collection {
-  &>div {
-    padding: 10px 15px 0;
-  }
-}
-.add-list-item {
-  i.icon-plus{
-    font-size: 12px;
-  }
-}
-.oro-item-collection {
-  &>div {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    border: none;
-  }
-  .add-list-item {
-    margin-left: 183px;
-  }
-  .removeRow {
-    position: absolute;
-    top: 0;
-    right: 10px;
-  }
-  .row-oro.oro-multiselect-holder {
-    margin: 0 0 5px;
   }
 }
 
@@ -2964,7 +2980,9 @@ label.radio.error {
   .box-content {
     padding: 20px 15px;
     background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .forScreen(@smallScreen, background, none);
+    .responsive-small & {
+      background: none;
+    }
   }
   .list-inline {
     margin-left: 0;
@@ -2976,23 +2994,6 @@ label.radio.error {
   float: left;
   .removeRow {
     margin: 0;
-  }
-}
-#orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow{
-  text-indent:-999;
-  font-size:0;
-  line-height:0;
-  margin: 0 0 0 15px;
-  &:after {
-    display:inline-block;
-    font:14px/1em 'FontAwesome';
-    color:#ddd;
-    content: "\f00d";
-    text-indent:0;
-  }
-  &:hover:after {
-    color:#888;
   }
 }
 pre.email-body {
@@ -3227,8 +3228,7 @@ span.validation-failed {
     .nav-tabs{
       & > li{
         & > a{
-          border-top-width: 0;
-          .forScreen(@mediumScreen, border-top-width, 1px);
+          margin-top: -1px;
         }
       }
     }

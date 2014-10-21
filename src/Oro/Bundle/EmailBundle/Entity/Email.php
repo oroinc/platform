@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
@@ -39,12 +40,13 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "activity"={
  *              "route"="oro_email_activity_view",
  *              "acl"="oro_email_view",
- *              "action_widget"="oro_send_email_button"
+ *              "action_button_widget"="oro_send_email_button",
+ *              "action_link_widget"="oro_send_email_link"
  *          }
  *      }
  * )
  */
-class Email extends ExtendEmail
+class Email extends ExtendEmail implements ActivityInterface
 {
     const LOW_IMPORTANCE    = -1;
     const NORMAL_IMPORTANCE = 0;

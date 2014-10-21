@@ -20,6 +20,7 @@ services:
         arguments:
             - %oro_dataaudit.loggable.entity.class%
             - @oro_entity_config.provider.dataaudit
+            - @security.context.link
 
     oro_dataaudit.metadata.metadata_factory:
         class:                                      %oro_dataaudit.metadata.metadata_factory.class%

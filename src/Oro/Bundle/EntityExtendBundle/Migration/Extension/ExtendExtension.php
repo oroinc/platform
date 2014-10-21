@@ -13,7 +13,6 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
@@ -76,7 +75,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $entityName,
         array $options = []
     ) {
-        $className = ExtendConfigDumper::ENTITY . $entityName;
+        $className = ExtendHelper::ENTITY_NAMESPACE . $entityName;
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table     = $schema->createTable($tableName);
         $this->entityMetadataHelper->registerEntityClass($tableName, $className);
@@ -151,7 +150,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $className = ExtendHelper::buildEnumValueClassName($enumCode);
 
-        $options = array_merge(
+        $options = array_replace_recursive(
             [
                 ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_HIDDEN,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,

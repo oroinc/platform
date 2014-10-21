@@ -71,7 +71,7 @@ class PlaceholderProvider
 
         $item = $this->placeholders['items'][$itemName];
         if (isset($item['acl'])) {
-            if ($this->securityFacade->isGranted($item['acl'])) {
+            if ($this->isGranted($item['acl'])) {
                 // remove 'acl' attribute as it is not needed anymore
                 unset($item['acl']);
             } else {
@@ -91,5 +91,29 @@ class PlaceholderProvider
         }
 
         return $this->resolver->resolve($item, $variables);
+    }
+
+    /**
+     * Checks if an access to a resource is granted to the caller
+     *
+     * @param string|array $acl
+     *
+     * @return bool
+     */
+    protected function isGranted($acl)
+    {
+        if (!is_array($acl)) {
+            return $this->securityFacade->isGranted($acl);
+        }
+
+        $result = true;
+        foreach ($acl as $val) {
+            if (!$this->securityFacade->isGranted($val)) {
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
     }
 }

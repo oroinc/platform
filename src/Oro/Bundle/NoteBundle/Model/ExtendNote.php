@@ -16,6 +16,19 @@ class ExtendNote
     }
 
     /**
+     * Checks if this note can be associated with the given target entity type
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
      * Gets the entity this note is associated with
      *
      * The real implementation of this method is auto generated.

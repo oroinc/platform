@@ -11,6 +11,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
@@ -20,7 +21,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 
-class ProcessCollectorListener
+class ProcessCollectorListener implements OptionalListenerInterface
 {
     /**
      * @var ManagerRegistry
@@ -73,6 +74,11 @@ class ProcessCollectorListener
     protected $forceQueued = false;
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param ManagerRegistry     $registry
      * @param DoctrineHelper      $doctrineHelper
      * @param ProcessHandler      $handler
@@ -94,49 +100,19 @@ class ProcessCollectorListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * @param bool $forceQueued
      */
     public function setForceQueued($forceQueued)
     {
         $this->forceQueued = $forceQueued;
-    }
-
-    /**
-     * Cache triggers in the internal storage
-     */
-    protected function initializeTriggers()
-    {
-        if (null === $this->triggers) {
-            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')
-                ->findAllWithDefinitions(true);
-
-            $this->triggers = array();
-            foreach ($triggers as $trigger) {
-                $entityClass = $trigger->getDefinition()->getRelatedEntity();
-                $event = $trigger->getEvent();
-                $field = $trigger->getField();
-
-                if ($event == ProcessTrigger::EVENT_UPDATE) {
-                    if ($field) {
-                        $this->triggers[$entityClass][$event]['field'][$field][] = $trigger;
-                    } else {
-                        $this->triggers[$entityClass][$event]['entity'][] = $trigger;
-                    }
-                } else {
-                    $this->triggers[$entityClass][$event][] = $trigger;
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $event
-     * @return bool
-     */
-    protected function hasTriggers($entityClass, $event)
-    {
-        return $this->triggerCache->hasTrigger($entityClass, $event);
     }
 
     /**
@@ -147,7 +123,27 @@ class ProcessCollectorListener
      */
     protected function getTriggers($entityClass, $event, $field = null)
     {
-        $this->initializeTriggers();
+        if (null === $this->triggers) {
+            $triggers = $this->registry->getRepository('OroWorkflowBundle:ProcessTrigger')
+                ->findAllWithDefinitions(true);
+
+            $this->triggers = array();
+            foreach ($triggers as $trigger) {
+                $triggerEntityClass = $trigger->getDefinition()->getRelatedEntity();
+                $triggerEvent = $trigger->getEvent();
+                $triggerField = $trigger->getField();
+
+                if ($triggerEvent == ProcessTrigger::EVENT_UPDATE) {
+                    if ($triggerField) {
+                        $this->triggers[$triggerEntityClass][$triggerEvent]['field'][$triggerField][] = $trigger;
+                    } else {
+                        $this->triggers[$triggerEntityClass][$triggerEvent]['entity'][] = $trigger;
+                    }
+                } else {
+                    $this->triggers[$triggerEntityClass][$triggerEvent][] = $trigger;
+                }
+            }
+        }
 
         if ($event == ProcessTrigger::EVENT_UPDATE) {
             if ($field) {
@@ -171,11 +167,15 @@ class ProcessCollectorListener
      */
     public function prePersist(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
-        $entityClass = $this->getClass($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $event       = ProcessTrigger::EVENT_CREATE;
 
-        if (!$this->hasTriggers($entityClass, $event)) {
+        if (!$this->triggerCache->hasTrigger($entityClass, $event)) {
             return;
         }
 
@@ -191,11 +191,15 @@ class ProcessCollectorListener
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
-        $entityClass = $this->getClass($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $event       = ProcessTrigger::EVENT_UPDATE;
 
-        if (!$this->hasTriggers($entityClass, $event)) {
+        if (!$this->triggerCache->hasTrigger($entityClass, $event)) {
             return;
         }
 
@@ -223,11 +227,15 @@ class ProcessCollectorListener
      */
     public function preRemove(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity      = $args->getEntity();
-        $entityClass = $this->getClass($entity);
+        $entityClass = ClassUtils::getClass($entity);
         $event       = ProcessTrigger::EVENT_DELETE;
 
-        if (!$this->hasTriggers($entityClass, $event)) {
+        if (!$this->triggerCache->hasTrigger($entityClass, $event)) {
             return;
         }
 
@@ -248,12 +256,9 @@ class ProcessCollectorListener
      */
     public function onClear(OnClearEventArgs $args)
     {
-        $isClears = $args->clearsAllEntities();
-        if ($isClears || $args->getEntityClass() == 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger') {
-            $this->triggers = null;
-        }
+        $this->triggers = null;
 
-        if ($isClears) {
+        if ($args->clearsAllEntities()) {
             $this->scheduledProcesses = array();
         } else {
             unset($this->scheduledProcesses[$args->getEntityClass()]);
@@ -265,11 +270,15 @@ class ProcessCollectorListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entityManager = $args->getEntityManager();
 
         // handle processes
         $hasHandledProcesses = false;
-        foreach ($this->scheduledProcesses as $entityClass => &$entityProcesses) {
+        foreach ($this->scheduledProcesses as &$entityProcesses) {
             while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
                 $trigger = $entityProcess['trigger'];
@@ -365,7 +374,7 @@ class ProcessCollectorListener
      */
     protected function scheduleProcess(ProcessTrigger $trigger, $entity, $old = null, $new = null)
     {
-        $entityClass = $this->getClass($entity);
+        $entityClass = ClassUtils::getClass($entity);
 
         // important to set modified flag to true
         $data = new ProcessData();
@@ -375,14 +384,5 @@ class ProcessCollectorListener
         }
 
         $this->scheduledProcesses[$entityClass][] = array('trigger' => $trigger, 'data' => $data);
-    }
-
-    /**
-     * @param object $entity
-     * @return string
-     */
-    protected function getClass($entity)
-    {
-        return ClassUtils::getClass($entity);
     }
 }

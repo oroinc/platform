@@ -10,10 +10,15 @@ services:
             - @oro_entity_config.provider.importexport
             - @oro_entity_extend.extend.field_type_helper
 
+    oro_importexport.field.field_helper.link:
+        tags:
+            - { name: oro_service_link, service: oro_importexport.field.field_helper }
+
     oro_importexport.field.database_helper:
         class: %oro_importexport.field.database_helper.class%
         arguments:
             - @doctrine
             - @oro_entity.doctrine_helper
+            - @oro_importexport.field.field_helper.link
         tags:
             - { name: doctrine.event_listener, event: onClear }

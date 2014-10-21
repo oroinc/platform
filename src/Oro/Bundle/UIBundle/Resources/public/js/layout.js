@@ -16,6 +16,7 @@ define(function (require) {
     require('jquery-ui');
     require('jquery-ui-timepicker');
     require('jquery.uniform');
+    require('oroui/js/responsive-jquery-widget');
 
     document = window.document;
     console = window.console;
@@ -213,6 +214,16 @@ define(function (require) {
             });
 
             pageRenderedCbPool = [];
+        },
+
+        /**
+         * Update modificators of responsive elements according to their containers size
+         */
+        updateResponsiveLayout: function() {
+            // todo: figure out this magic
+            _.defer(function() {
+                $(document).responsive();
+            });
         }
     };
 
