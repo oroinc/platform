@@ -30,6 +30,8 @@ parameters:
 
     oro_organization.autocomplete.organization_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
 
+    oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
+
 services:
     #
     # Business Unit API
@@ -183,3 +185,8 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_organizations }
         lazy: true
+
+    oro_organization.provider.phone.business_unit:
+        class: %oro_organization.provider.phone.business_unit.class%
+        tags:
+            - { name: oro_address.phone_provider, class: %oro_organization.business_unit.entity.class% }

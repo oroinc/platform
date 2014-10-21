@@ -1,0 +1,39 @@
+{#
+    Renders a link which can be used to open send email dialog
+    Parameters:
+        email      - TO email address
+        entity     - a target entity an email should be associated with
+        parameters - additional parameters, array:
+            [
+                'aCss' - additional css class for 'a' tag
+            ]
+#}
+{% macro sendEmailLink(email, entity, parameters) -%}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{- UI.clientLink({
+        'dataUrl': path(
+            'oro_email_email_create', {
+                to: email,
+                entityClass: oro_class_name(entity, true),
+                entityId: entity.id
+        }),
+        'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+        'label' : email,
+        'widget' : {
+            'type' : 'dialog',
+            'multiple' : true,
+            'reload-grid-name' : 'activity-email-grid',
+            'options' : {
+                'alias': 'email-dialog',
+                'dialogOptions' : {
+                    'title' : 'oro.email.send_email'|trans,
+                    'allowMaximize': true,
+                    'allowMinimize': true,
+                    'dblclick': 'maximize',
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 1000
+                }
+            }
+        }
+    }) -}}
+{% endmacro -%}
