@@ -100,7 +100,7 @@ class WsseAuthProvider extends Provider
                 $userApi->getApiKey(),
                 $this->getSalt($user)
             );
-            if ($isSecretValid && !$userApi->getUser()->getBusinessUnits()->contains($userApi->getOrganization())) {
+            if ($isSecretValid && !$userApi->getUser()->getOrganizations()->contains($userApi->getOrganization())) {
                 throw new BadCredentialsException('Wrong API key.');
             }
             if ($isSecretValid && !$userApi->getOrganization()->isEnabled()) {
