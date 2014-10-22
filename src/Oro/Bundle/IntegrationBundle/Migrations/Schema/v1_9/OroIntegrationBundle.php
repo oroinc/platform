@@ -15,7 +15,7 @@ class OroIntegrationBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-        $this->createOroIntegrationChangeSetTable($schema);
+        $this->createOroIntegrationFieldsChangesTable($schema);
     }
 
     /**
@@ -23,14 +23,13 @@ class OroIntegrationBundle implements Migration
      *
      * @param Schema $schema
      */
-    protected function createOroIntegrationChangeSetTable(Schema $schema)
+    protected function createOroIntegrationFieldsChangesTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_integration_change_set');
+        $table = $schema->createTable('oro_integration_fields_changes');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
         $table->addColumn('entity_id', 'integer', []);
-        $table->addColumn('local_changes', 'array', ['comment' => '(DC2Type:array)']);
-        $table->addColumn('remote_changes', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn('changed_fields', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
     }
 }

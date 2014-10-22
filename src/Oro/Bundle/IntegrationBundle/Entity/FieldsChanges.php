@@ -5,22 +5,16 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="oro_integration_change_set")
+ * @ORM\Table(
+ *      name="oro_integration_fields_changes",
+ *      indexes={
+ *          @ORM\Index(name="oro_integration_fields_changes_idx", columns={"entity_id", "entity_class"})
+ *      }
+ * )
  * @ORM\Entity()
  */
-class ChangeSet
+class FieldsChanges
 {
-    const TYPE_LOCAL = 'localChanges';
-    const TYPE_REMOTE = 'remoteChanges';
-
-    /**
-     * @var array
-     */
-    public static $types = [
-        self::TYPE_LOCAL,
-        self::TYPE_REMOTE
-    ];
-
     /**
      * @var integer
      *
@@ -45,25 +39,16 @@ class ChangeSet
     /**
      * @var array
      *
-     * @ORM\Column(name="local_changes", type="array")
+     * @ORM\Column(name="changed_fields", type="array")
      */
-    protected $localChanges;
+    protected $changedFields;
 
     /**
-     * @var array
-     *
-     * @ORM\Column(name="remote_changes", type="array")
+     * @param array $changedFields
      */
-    protected $remoteChanges = [];
-
-    /**
-     * @param array $localChanges
-     * @param array $remoteChanges
-     */
-    public function __construct(array $localChanges = null, array $remoteChanges = null)
+    public function __construct(array $changedFields = null)
     {
-        $this->localChanges  = $localChanges;
-        $this->remoteChanges = $remoteChanges;
+        $this->changedFields  = $changedFields;
     }
 
     /**
@@ -81,7 +66,7 @@ class ChangeSet
      *
      * @param string $entityClass
      *
-     * @return ChangeSet
+     * @return FieldsChanges
      */
     public function setEntityClass($entityClass)
     {
@@ -105,7 +90,7 @@ class ChangeSet
      *
      * @param integer $entityId
      *
-     * @return ChangeSet
+     * @return FieldsChanges
      */
     public function setEntityId($entityId)
     {
@@ -125,50 +110,26 @@ class ChangeSet
     }
 
     /**
-     * Set localChanges
+     * Set changedFields
      *
-     * @param array $localChanges
+     * @param array $changedFields
      *
-     * @return ChangeSet
+     * @return FieldsChanges
      */
-    public function setLocalChanges(array $localChanges = null)
+    public function setChangedFields(array $changedFields)
     {
-        $this->localChanges = $localChanges;
+        $this->changedFields = $changedFields;
 
         return $this;
     }
 
     /**
-     * Get localChanges
+     * Get changedFields
      *
      * @return array
      */
-    public function getLocalChanges()
+    public function getChangedFields()
     {
-        return $this->localChanges;
-    }
-
-    /**
-     * Set remoteChanges
-     *
-     * @param array $remoteChanges
-     *
-     * @return ChangeSet
-     */
-    public function setRemoteChanges(array $remoteChanges = null)
-    {
-        $this->remoteChanges = $remoteChanges;
-
-        return $this;
-    }
-
-    /**
-     * Get remoteChanges
-     *
-     * @return array
-     */
-    public function getRemoteChanges()
-    {
-        return $this->remoteChanges;
+        return $this->changedFields;
     }
 }
