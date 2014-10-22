@@ -16,7 +16,7 @@ class EntityPaginationExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $pagination = $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH, null);
+        $pagination = $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH);
 
         if ($pagination === null) {
             return false;

@@ -59,18 +59,18 @@ class EntityPaginationStorage
      * The PaginationState must have the following structure:
      * <code>
      * array(
-     *     'state'   => [
-     *          '_pager' = [
-     *              '_page' = 3,
-     *              '_per_page' = 10
+     *     'state' => [
+     *          '_pager' => [
+     *              '_page' => 3,
+     *              '_per_page' => 10
      *          ],
-     *          '_sort_by' = [
-     *              'name' = 'ASC'
+     *          '_sort_by' => [
+     *              'name' => 'ASC'
      *          ],
-     *          '_filter'  = []
-     *      ]
-     *     'current_ids' => [4, 28, 37, 29, 7, 20, 15, 27],
-     *     'total' = 27
+     *          '_filter' => []
+     *      ],
+     *      'current_ids' => [4, 28, 37, 29, 7, 20, 15, 27],
+     *      'total' => 27
      * )
      * </code>
      *
