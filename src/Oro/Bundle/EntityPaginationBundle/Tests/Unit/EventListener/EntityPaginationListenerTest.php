@@ -45,7 +45,7 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider onBuildAfterProvider
      */
-    public function testOnBuildAfter(array$config, $isEnabled = false)
+    public function testOnBuildAfter(array $config, $isEnabled = false)
     {
         $fieldName    = 'id';
         $currentIds   = [45, 78, 25, 8, 32, 40, 64, 84, 67, 4];

@@ -9,6 +9,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EntityPaginationStorage
 {
@@ -37,18 +38,23 @@ class EntityPaginationStorage
     protected $datagridManager;
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var ConfigManager
      */
     protected $configManager;
 
     /**
-     * @param Manager $gridManager
+     * @param Manager $datagridManager
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
      */
-    public function __construct(Manager $gridManager, DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    public function __construct(Manager $datagridManager, DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
-        $this->datagridManager = $gridManager;
+        $this->datagridManager = $datagridManager;
         $this->doctrineHelper  = $doctrineHelper;
         $this->configManager = $configManager;
     }
@@ -88,7 +94,7 @@ class EntityPaginationStorage
      */
     public function addData($entityName, $gridName, array $paginationState)
     {
-        if ($this->request) {
+        if ($this->isEnabled() && $this->request) {
             $storage                            = $this->getStorage();
             $paginationState[self::PREVIOUS_ID] = null;
             $paginationState[self::NEXT_ID]     = null;
@@ -112,7 +118,7 @@ class EntityPaginationStorage
         }
 
         $total = null;
-        $entityName = $this->getName($entity);
+        $entityName = ClassUtils::getClass($entity);
         if ($this->isEntityInStorage($entity)) {
             $total = $this->getStorage()[$entityName][self::PAGINATION_STATE][self::TOTAL];
         }
@@ -232,7 +238,7 @@ class EntityPaginationStorage
     protected function isEntityInStorage($entity)
     {
         $storage = $this->getStorage();
-        $entityName = $this->getName($entity);
+        $entityName = ClassUtils::getClass($entity);
         $identifierValue = $this->getIdentifierValue($entity);
 
         return !empty($storage[$entityName])
@@ -252,30 +258,10 @@ class EntityPaginationStorage
         $storage = $this->getStorage();
         $entityData = [];
         if ($this->isEntityInStorage($entity)) {
-            $entityData = $storage[$this->getName($entity)];
+            $entityData = $storage[ClassUtils::getClass($entity)];
         }
 
         return $entityData;
-    }
-
-    /**
-     * @param object $entity
-     * @return string
-     */
-    protected function getName($entity)
-    {
-        return ClassUtils::getClass($entity);
-    }
-
-    /**
-     * @param object $entity
-     * @param array $data
-     */
-    protected function updateStorageData($entity, array $data)
-    {
-        $storage = $this->getStorage();
-        $storage[$this->getName($entity)]  = $data;
-        $this->setStorage($storage);
     }
 
     /**
@@ -294,7 +280,7 @@ class EntityPaginationStorage
      * @return array
      * @throws \LogicException
      */
-    public function rebuildPaginationState($entity, $entityData, $direction)
+    protected function rebuildPaginationState($entity, $entityData, $direction)
     {
         $paginationState = $entityData[self::PAGINATION_STATE];
         $gridState       = $paginationState[self::GRID_STATE];
@@ -336,6 +322,10 @@ class EntityPaginationStorage
      */
     protected function prepareCurrentState($entity)
     {
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
         $entityData = $this->getEntityStorageData($entity);
         if (!empty($entityData)) {
             $paginationState = $entityData[self::PAGINATION_STATE];
@@ -417,7 +407,9 @@ class EntityPaginationStorage
             }
 
             if ($needUpdate) {
-                $this->updateStorageData($entity, $entityData);
+                $storage = $this->getStorage();
+                $storage[ClassUtils::getClass($entity)] = $entityData;
+                $this->setStorage($storage);
             }
 
             return true;
