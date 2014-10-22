@@ -210,6 +210,7 @@ abstract class AbstractPageEntity extends AbstractPage
         $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
         $this->waitForAjax();
         $this->test->byXpath("//div[@class='pull-right']//a[@title='{$action}']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
 
         return $this;
