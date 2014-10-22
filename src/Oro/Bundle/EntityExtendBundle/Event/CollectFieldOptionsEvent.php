@@ -49,4 +49,4 @@ class CollectFieldOptionsEvent extends Event
     {
         return $this->fieldConfigModel;
     }
-} 
+}
