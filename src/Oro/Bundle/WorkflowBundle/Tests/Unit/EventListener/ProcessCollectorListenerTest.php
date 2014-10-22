@@ -126,7 +126,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entity      = new $entityClass();
         $oldValue    = 1;
         $newValue    = 2;
-        $changeSet   = array(self::FIELD => array($oldValue, $newValue));
+        $changeSet   = [self::FIELD => [$oldValue, $newValue]];
 
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
@@ -135,20 +135,40 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->callPreFunctionByEventName(ProcessTrigger::EVENT_UPDATE, $entity, $this->getEntityManager(), $changeSet);
 
         $expectedTriggers = $this->getExpectedTriggers($triggers);
-        $expectedScheduledProcessed = array(
-            self::ENTITY => array(
-                array(
+        $expectedScheduledProcessed = [
+            self::ENTITY => [
+                [
                     'trigger' => $triggers['updateEntity'],
-                    'data' => $this->createProcessData(array('data' => $entity))
-                ),
-                array(
-                    'trigger' => $triggers['updateField'],
-                    'data' => $this->createProcessData(
-                        array('data' => $entity, 'old' => $oldValue, 'new' => $newValue)
+                    'data'    => $this->createProcessData(
+                        [
+                            'data'      => $entity,
+                            'changeSet' => [
+                                'field' => [
+                                    'old' => $oldValue,
+                                    'new' => $newValue
+                                ]
+                            ]
+                        ]
                     )
-                ),
-            ),
-        );
+                ],
+                [
+                    'trigger' => $triggers['updateField'],
+                    'data'    => $this->createProcessData(
+                        [
+                            'data'      => $entity,
+                            'old'       => $oldValue,
+                            'changeSet' => [
+                                'field' => [
+                                    'old' => $oldValue,
+                                    'new' => $newValue
+                                ]
+                            ],
+                            'new'       => $newValue
+                        ]
+                    )
+                ],
+            ],
+        ];
 
         $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
         $this->assertAttributeEquals($expectedScheduledProcessed, 'scheduledProcesses', $this->listener);

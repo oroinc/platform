@@ -36,6 +36,10 @@ class SaveChangeSetAction extends AbstractChangeSetAction
     protected function executeAction($context)
     {
         $changeSet = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_CHANGESET]);
+        if (!$changeSet) {
+            return;
+        }
+
         $entity    = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_DATA]);
         $type      = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TYPE]);
 

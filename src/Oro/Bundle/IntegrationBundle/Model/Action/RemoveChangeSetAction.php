@@ -9,7 +9,7 @@ namespace Oro\Bundle\IntegrationBundle\Model\Action;
  *         value: Oro\Bundle\IntegrationBundle\Entity\ChangeSet::TYPE_REMOTE
  *    - @remove_change_set:
  *        data: $.data
- *        type: %oro_integration.change_set.class%::TYPE_REMOTE
+ *        type: $.remoteType
  */
 class RemoveChangeSetAction extends AbstractChangeSetAction
 {

@@ -47,7 +47,7 @@ class ChangeSet
      *
      * @ORM\Column(name="local_changes", type="array")
      */
-    protected $localChanges = [];
+    protected $localChanges;
 
     /**
      * @var array
@@ -57,9 +57,19 @@ class ChangeSet
     protected $remoteChanges = [];
 
     /**
+     * @param array $localChanges
+     * @param array $remoteChanges
+     */
+    public function __construct(array $localChanges = [], array $remoteChanges = [])
+    {
+        $this->localChanges  = $localChanges;
+        $this->remoteChanges = $remoteChanges;
+    }
+
+    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -70,6 +80,7 @@ class ChangeSet
      * Set entityClass
      *
      * @param string $entityClass
+     *
      * @return ChangeSet
      */
     public function setEntityClass($entityClass)
@@ -82,7 +93,7 @@ class ChangeSet
     /**
      * Get entityClass
      *
-     * @return string 
+     * @return string
      */
     public function getEntityClass()
     {
@@ -93,6 +104,7 @@ class ChangeSet
      * Set entityId
      *
      * @param integer $entityId
+     *
      * @return ChangeSet
      */
     public function setEntityId($entityId)
@@ -105,7 +117,7 @@ class ChangeSet
     /**
      * Get entityId
      *
-     * @return integer 
+     * @return integer
      */
     public function getEntityId()
     {
@@ -116,6 +128,7 @@ class ChangeSet
      * Set localChanges
      *
      * @param array $localChanges
+     *
      * @return ChangeSet
      */
     public function setLocalChanges(array $localChanges = null)
@@ -128,7 +141,7 @@ class ChangeSet
     /**
      * Get localChanges
      *
-     * @return array 
+     * @return array
      */
     public function getLocalChanges()
     {
@@ -139,6 +152,7 @@ class ChangeSet
      * Set remoteChanges
      *
      * @param array $remoteChanges
+     *
      * @return ChangeSet
      */
     public function setRemoteChanges(array $remoteChanges = null)
@@ -151,7 +165,7 @@ class ChangeSet
     /**
      * Get remoteChanges
      *
-     * @return array 
+     * @return array
      */
     public function getRemoteChanges()
     {

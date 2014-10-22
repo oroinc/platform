@@ -54,6 +54,8 @@ class ChangeSetManager
      * @param object $entity
      * @param string $type
      * @param array  $changes
+     *
+     * @return ChangeSet
      */
     public function setChanges($entity, $type = ChangeSet::TYPE_LOCAL, array $changes)
     {
@@ -62,11 +64,15 @@ class ChangeSetManager
         $changeSet = $this->getChangeSetForEntity($entity);
 
         $this->getPropertyAccessor()->setValue($changeSet, $type, $changes);
+
+        return $changeSet;
     }
 
     /**
      * @param object $entity
      * @param string $type
+     *
+     * @return ChangeSet|null
      */
     public function removeChanges($entity, $type = ChangeSet::TYPE_LOCAL)
     {
@@ -88,12 +94,14 @@ class ChangeSetManager
         if (!$removeEntity) {
             $this->getPropertyAccessor()->setValue($changeSet, $type, null);
 
-            return;
+            return $changeSet;
         }
 
         $this->doctrineHelper
             ->getEntityManager($changeSet)
             ->remove($changeSet);
+
+        return null;
     }
 
     /**
