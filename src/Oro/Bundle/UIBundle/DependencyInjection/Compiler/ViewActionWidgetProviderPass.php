@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\DependencyInjection\Compiler;
 
-class ViewActionWidgetProviderPass extends AbstractWidgetProviderPass
+class ViewActionWidgetProviderPass extends AbstractGroupingWidgetProviderPass
 {
     /**
      * {@inheritdoc}

@@ -56,7 +56,7 @@ class NoteController extends RestController implements ClassResourceInterface
      */
     public function cgetAction($entityClass, $entityId)
     {
-        $entityClass = str_replace('_', '\\', $entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
 
         $page = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);

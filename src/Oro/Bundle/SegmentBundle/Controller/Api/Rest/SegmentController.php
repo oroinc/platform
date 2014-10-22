@@ -46,7 +46,7 @@ class SegmentController extends RestController implements ClassResourceInterface
      */
     public function getItemsAction($entityName)
     {
-        $entityName = str_replace('_', '\\', $entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
         $page = $this->getRequest()->query->get('page', 1);
         $term = $this->getRequest()->query->get('term');
         $currentSegment = $this->getRequest()->query->get('currentSegment', null);
