@@ -10,6 +10,12 @@ oro:
             view_calendar: My Calendar
 
     calendar:
+        my_calendar:         My Calendar
+        add_event:           Add Event
+
+        controller:
+            event.saved.message:  Calendar event saved
+
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
             exclude_calendar:            "Exclude this calendar"
@@ -38,8 +44,6 @@ oro:
         connections.label:   Connection
         owner.label:         Owner
         organization.label:  Organization
-
-        my_calendar:         My Calendar
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent

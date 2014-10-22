@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\CalendarBundle\Model\ExtendCalendarEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
@@ -15,6 +16,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
  * @ORM\Table(name="oro_calendar_event",
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_calendar_view_default",
  *      defaultValues={
@@ -26,6 +28,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *              "group_name"=""
  *          },
+ *          "grouping"={
+ *              "groups"={"activity"}
+ *          },
  *          "reminder"={
  *              "reminder_template_name"="calendar_reminder",
  *              "reminder_flash_template_identifier"="calendar_event_template"
@@ -34,7 +39,10 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *              "immutable"=true
  *          },
  *          "activity"={
- *              "immutable"=true
+ *              "route"="oro_calendar_event_activity_view",
+ *              "acl"="oro_calendar_view",
+ *              "action_button_widget"="oro_add_calendar_event_button",
+ *              "action_link_widget"="oro_add_calendar_event_link"
  *          },
  *          "attachment"={
  *              "immutable"=true
@@ -42,7 +50,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      }
  * )
  */
-class CalendarEvent implements RemindableInterface
+class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 {
     /**
      * @ORM\Id
@@ -97,8 +105,38 @@ class CalendarEvent implements RemindableInterface
      */
     protected $reminders;
 
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $updatedAt;
+
     public function __construct()
     {
+        parent::__construct();
+
         $this->reminders = new ArrayCollection();
     }
 
@@ -263,5 +301,54 @@ class CalendarEvent implements RemindableInterface
         $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

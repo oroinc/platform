@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CalendarEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +19,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider propertiesDataProvider
+     *
      * @param string $property
      * @param mixed  $value
      */
@@ -27,7 +29,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
+        $this->assertSame($value, $accessor->getValue($obj, $property));
     }
 
     public function propertiesDataProvider()
@@ -37,7 +39,31 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             array('title', 'testTitle'),
             array('start', new \DateTime()),
             array('end', new \DateTime()),
-            array('allDay', true)
+            array('allDay', true),
+            array('createdAt', new \DateTime()),
+            array('updatedAt', new \DateTime()),
         );
+    }
+
+    public function testPrePersist()
+    {
+        $obj = new CalendarEvent();
+
+        $this->assertNull($obj->getCreatedAt());
+
+        $obj->prePersist();
+        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
+    }
+
+    public function testPreUpdate()
+    {
+        $obj = new CalendarEvent();
+
+        $this->assertNull($obj->getCreatedAt());
+        $this->assertNull($obj->getUpdatedAt());
+
+        $obj->prePersist();
+        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
+        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
 }

@@ -421,6 +421,162 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
+    public function testReplaceActivityTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $oldTargetEntity = new Target(1);
+        $newTargetEntity = new Target(2);
+
+        $activityEntity->expects($this->exactly(2))
+            ->method('supportActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [get_class($oldTargetEntity), true],
+                        [get_class($newTargetEntity), true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->exactly(2))
+            ->method('hasActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$oldTargetEntity, true],
+                        [$newTargetEntity, false],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->once())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($oldTargetEntity))
+            ->will($this->returnValue($activityEntity));
+        $activityEntity->expects($this->once())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($newTargetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
+        );
+    }
+
+    public function testReplaceActivityTargetNoAssociationWithOldTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $oldTargetEntity = new Target(1);
+        $newTargetEntity = new Target(2);
+
+        $activityEntity->expects($this->exactly(2))
+            ->method('supportActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [get_class($oldTargetEntity), true],
+                        [get_class($newTargetEntity), true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->exactly(2))
+            ->method('hasActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$oldTargetEntity, false],
+                        [$newTargetEntity, false],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget');
+        $activityEntity->expects($this->once())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($newTargetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
+        );
+    }
+
+    public function testReplaceActivityTargetNewTargetAlreadyExist()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $oldTargetEntity = new Target(1);
+        $newTargetEntity = new Target(2);
+
+        $activityEntity->expects($this->exactly(2))
+            ->method('supportActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [get_class($oldTargetEntity), true],
+                        [get_class($newTargetEntity), true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->exactly(2))
+            ->method('hasActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$oldTargetEntity, true],
+                        [$newTargetEntity, true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->once())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($oldTargetEntity))
+            ->will($this->returnValue($activityEntity));
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget');
+
+        $this->assertTrue(
+            $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
+        );
+    }
+
+    public function testReplaceActivityTargetNoChanges()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $oldTargetEntity = new Target(1);
+        $newTargetEntity = new Target(2);
+
+        $activityEntity->expects($this->exactly(2))
+            ->method('supportActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [get_class($oldTargetEntity), true],
+                        [get_class($newTargetEntity), true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->exactly(2))
+            ->method('hasActivityTarget')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$oldTargetEntity, false],
+                        [$newTargetEntity, true],
+                    ]
+                )
+            );
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget');
+
+        $this->assertFalse(
+            $this->manager->replaceActivityTarget($activityEntity, $oldTargetEntity, $newTargetEntity)
+        );
+    }
+
     public function testGetActivityAssociations()
     {
         $targetEntityClass = 'Test\Entity';

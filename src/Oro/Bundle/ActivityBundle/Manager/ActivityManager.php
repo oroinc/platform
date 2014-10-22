@@ -150,6 +150,31 @@ class ActivityManager
     }
 
     /**
+     * Removes an association of the given $oldTargetEntity and associates the given $newTargetEntity
+     * with the activity entity
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $oldTargetEntity
+     * @param object            $newTargetEntity
+     *
+     * @return bool TRUE if an association was removed; otherwise, FALSE
+     */
+    public function replaceActivityTarget(ActivityInterface $activityEntity, $oldTargetEntity, $newTargetEntity)
+    {
+        $hasChanges = false;
+
+        if ($this->removeActivityTarget($activityEntity, $oldTargetEntity)) {
+            $hasChanges = true;
+        }
+        if ($this->addActivityTarget($activityEntity, $newTargetEntity)) {
+            $hasChanges = true;
+        }
+
+        return $hasChanges;
+    }
+
+    /**
      * Returns an array contains info about all activity associations for the given entity type
      *
      * @param string $entityClass
