@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\CalendarBundle\Model;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 
-class ExtendCalendarEvent
+class ExtendCalendarEvent implements ActivityInterface
 {
     use ExtendActivity;
 

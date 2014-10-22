@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\CalendarBundle\Model\ExtendCalendarEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -50,7 +49,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      }
  * )
  */
-class CalendarEvent extends ExtendCalendarEvent implements ActivityInterface, RemindableInterface
+class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 {
     /**
      * @ORM\Id
@@ -108,6 +107,7 @@ class CalendarEvent extends ExtendCalendarEvent implements ActivityInterface, Re
     public function __construct()
     {
         parent::__construct();
+
         $this->reminders = new ArrayCollection();
     }
 
