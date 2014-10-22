@@ -78,6 +78,8 @@ class EntityPaginationStorage
      * @param string $entityName
      * @param string $gridName
      * @param array $paginationState
+     *
+     * @return boolean
      */
     public function addData($entityName, $gridName, array $paginationState)
     {
@@ -91,7 +93,9 @@ class EntityPaginationStorage
             ];
 
             $this->setStorage($storage);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -207,7 +211,9 @@ class EntityPaginationStorage
      */
     protected function getStorage()
     {
-        return $this->request->getSession()->get(self::STORAGE_NAME, []);
+        if ($this->request) {
+            return $this->request->getSession()->get(self::STORAGE_NAME, []);
+        }
     }
 
     /**
@@ -287,7 +293,7 @@ class EntityPaginationStorage
      * @return array
      * @throws \LogicException
      */
-    public function rebuildPaginationState($entity, $entityData, $direction)
+    protected function rebuildPaginationState($entity, $entityData, $direction)
     {
         $paginationState = $entityData[self::PAGINATION_STATE];
         $gridState       = $paginationState[self::GRID_STATE];
