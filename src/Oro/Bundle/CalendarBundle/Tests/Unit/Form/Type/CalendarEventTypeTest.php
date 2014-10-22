@@ -26,11 +26,19 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'title',
-                'textarea',
+                'text',
                 array('required' => true, 'label' => 'oro.calendar.calendarevent.title.label')
             )
             ->will($this->returnSelf());
         $builder->expects($this->at(1))
+            ->method('add')
+            ->with(
+                'description',
+                'textarea',
+                array('required' => true, 'label' => 'oro.calendar.calendarevent.description.label')
+            )
+            ->will($this->returnSelf());
+        $builder->expects($this->at(2))
             ->method('add')
             ->with(
                 'start',
@@ -38,7 +46,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 array('required' => true, 'label' => 'oro.calendar.calendarevent.start.label')
             )
             ->will($this->returnSelf());
-        $builder->expects($this->at(2))
+        $builder->expects($this->at(3))
             ->method('add')
             ->with(
                 'end',
@@ -46,7 +54,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 array('required' => true, 'label' => 'oro.calendar.calendarevent.end.label')
             )
             ->will($this->returnSelf());
-        $builder->expects($this->at(3))
+        $builder->expects($this->at(4))
             ->method('add')
             ->with(
                 'allDay',

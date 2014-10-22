@@ -35,6 +35,14 @@ class CalendarEventApiType extends CalendarEventType
                 )
             )
             ->add(
+                'description',
+                'text',
+                array(
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.description.label'
+                )
+            )
+            ->add(
                 'start',
                 'datetime',
                 array(

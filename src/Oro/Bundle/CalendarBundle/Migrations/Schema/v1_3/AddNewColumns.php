@@ -8,7 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddCreatedAtAndUpdatedAt implements Migration, OrderedMigrationInterface
+class AddNewColumns implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritdoc}
@@ -24,6 +24,7 @@ class AddCreatedAtAndUpdatedAt implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_calendar_event');
+        $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', ['notnull' => false]);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
     }

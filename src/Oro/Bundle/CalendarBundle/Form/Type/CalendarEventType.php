@@ -17,10 +17,18 @@ class CalendarEventType extends AbstractType
         $builder
             ->add(
                 'title',
-                'textarea',
+                'text',
                 [
                     'required' => true,
                     'label'    => 'oro.calendar.calendarevent.title.label'
+                ]
+            )
+            ->add(
+                'description',
+                'textarea',
+                [
+                    'required' => true,
+                    'label'    => 'oro.calendar.calendarevent.description.label'
                 ]
             )
             ->add(
