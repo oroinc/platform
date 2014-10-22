@@ -118,7 +118,7 @@ class ChangeSet
      * @param array $localChanges
      * @return ChangeSet
      */
-    public function setLocalChanges(array $localChanges)
+    public function setLocalChanges(array $localChanges = null)
     {
         $this->localChanges = $localChanges;
 
@@ -141,7 +141,7 @@ class ChangeSet
      * @param array $remoteChanges
      * @return ChangeSet
      */
-    public function setRemoteChanges(array $remoteChanges)
+    public function setRemoteChanges(array $remoteChanges = null)
     {
         $this->remoteChanges = $remoteChanges;
 

@@ -72,10 +72,14 @@ class ChangeSetManager
     {
         $this->ensureType($type);
 
-        $changeSet = $this->getChangeSetForEntity($entity);
+        $changeSet = $this->getChangeSetForEntity($entity, false);
 
         $removeEntity = true;
         foreach (ChangeSet::$types as $changeSetType) {
+            if ($changeSetType === $type) {
+                continue;
+            }
+
             if ($this->getPropertyAccessor()->getValue($changeSet, $changeSetType)) {
                 $removeEntity = false;
             }
