@@ -38,7 +38,7 @@ class CalendarEventApiType extends CalendarEventType
                 'description',
                 'text',
                 array(
-                    'required' => true,
+                    'required' => false,
                     'label'    => 'oro.calendar.calendarevent.description.label'
                 )
             )

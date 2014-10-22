@@ -27,7 +27,7 @@ class CalendarEventType extends AbstractType
                 'description',
                 'textarea',
                 [
-                    'required' => true,
+                    'required' => false,
                     'label'    => 'oro.calendar.calendarevent.description.label'
                 ]
             )

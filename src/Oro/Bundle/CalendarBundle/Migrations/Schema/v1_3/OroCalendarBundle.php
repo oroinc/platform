@@ -103,7 +103,7 @@ class OroCalendarBundle implements
                     $this->platform->getLengthExpression('title')
                 ),
                 ['new_line' => '%\n%'],
-                ['date' => Type::STRING]
+                ['new_line' => Type::STRING]
             )
         );
         // trim title
