@@ -37,6 +37,7 @@ parameters:
     oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
 
     oro_integration.action.save_change_set.class:                         Oro\Bundle\IntegrationBundle\Model\Action\SaveChangeSetAction
+    oro_integration.action.remove_change_set.class:                       Oro\Bundle\IntegrationBundle\Model\Action\RemoveChangeSetAction
 
 services:
     oro_integration.manager.api:
@@ -218,11 +219,21 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 
-    oro_integration.action.save_change_set:
-        class: %oro_integration.action.save_change_set.class%
+    oro_integration.action.abstract_change_set:
+        abstract: true
         arguments:
             - @oro_workflow.context_accessor
         calls:
             - [setChangeSetManager, [@oro_integration.manager.change_set]]
+
+    oro_integration.action.save_change_set:
+        class: %oro_integration.action.save_change_set.class%
+        parent: oro_integration.action.abstract_change_set
         tags:
             - { name: oro_workflow.action, alias: save_change_set }
+
+    oro_integration.action.remove_change_set:
+        class: %oro_integration.action.remove_change_set.class%
+        parent: oro_integration.action.abstract_change_set
+        tags:
+            - { name: oro_workflow.action, alias: remove_change_set }

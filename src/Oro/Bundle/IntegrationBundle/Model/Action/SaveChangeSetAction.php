@@ -2,31 +2,32 @@
 
 namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
-use Oro\Bundle\IntegrationBundle\Entity\ChangeSet;
-use Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager;
-use Oro\Bundle\WorkflowBundle\Model\AbstractStorage;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
-class SaveChangeSetAction extends AbstractAction
+/**
+ * actions:
+ *    - @assign_constant_value:
+ *         attribute: $.localType
+ *         value: Oro\Bundle\IntegrationBundle\Entity\ChangeSet::TYPE_LOCAL
+ *    - @save_change_set:
+ *        data: $.data
+ *        changeSet: $.changeSet
+ *        type: $.localType
+ */
+class SaveChangeSetAction extends AbstractChangeSetAction
 {
-    /**
-     * @var ChangeSetManager
-     */
-    protected $changeSetManager;
-
-    /**
-     * @param ChangeSetManager $changeSetManager
-     */
-    public function setChangeSetManager(ChangeSetManager $changeSetManager)
-    {
-        $this->changeSetManager = $changeSetManager;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function initialize(array $options)
     {
+        if (empty($options[self::OPTION_KEY_CHANGESET])) {
+            throw new InvalidParameterException('ChangeSet parameter is required');
+        }
+
+        parent::initialize($options);
+
+        return $this;
     }
 
     /**
@@ -34,21 +35,10 @@ class SaveChangeSetAction extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if (!$context instanceof AbstractStorage) {
-            return;
-        }
+        $changeSet = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_CHANGESET]);
+        $entity    = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_DATA]);
+        $type      = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TYPE]);
 
-        if (!$context->has('changeSet')) {
-            return;
-        }
-
-        $changeSet = $context->get('changeSet');
-        if (!$changeSet) {
-            return;
-        }
-
-        $fields = array_keys($changeSet);
-        $entity = $context->get('data');
-        $this->changeSetManager->setChanges($entity, ChangeSet::TYPE_LOCAL, $fields);
+        $this->changeSetManager->setChanges($entity, $type, array_keys($changeSet));
     }
 }
