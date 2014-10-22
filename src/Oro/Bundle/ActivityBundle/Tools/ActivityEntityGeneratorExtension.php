@@ -40,7 +40,7 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
     /**
      * {@inheritdoc}
      */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array &$schema, PhpClass $class)
     {
         $class->addInterfaceName('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
