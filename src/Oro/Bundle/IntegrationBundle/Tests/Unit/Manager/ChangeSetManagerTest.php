@@ -88,17 +88,34 @@ class ChangeSetManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array  $changeSet
      * @param string $type
-     * @param array  $expected
+     * @param mixed  $expected
      *
      * @dataProvider getChangesDataProvider
      */
-    public function testGetChanges($changeSet, $type, array $expected)
+    public function testGetChanges($changeSet, $type, $expected)
     {
-        $this->repo
-            ->expects($this->any())
-            ->method('findOneBy')
-            ->with($this->isType('array'))
-            ->will($this->returnValue($changeSet));
+        if ($changeSet) {
+            $this->repo
+                ->expects($this->any())
+                ->method('findOneBy')
+                ->with($this->isType('array'))
+                ->will($this->returnValue($changeSet));
+        } else {
+            $newChangeSet = new ChangeSet();
+            $newChangeSet
+                ->setEntityClass(self::CLASS_NAME)
+                ->setEntityId(1);
+
+            $this->doctrineHelper
+                ->expects($this->once())
+                ->method('createEntityInstance')
+                ->will($this->returnValue($newChangeSet));
+
+            $this->em
+                ->expects($this->once())
+                ->method('persist')
+                ->with($this->equalTo($newChangeSet));
+        }
 
         $this->assertEquals(
             $expected,
@@ -121,6 +138,11 @@ class ChangeSetManagerTest extends \PHPUnit_Framework_TestCase
                 new ChangeSet(['local'], ['remote']),
                 ChangeSet::TYPE_REMOTE,
                 ['remote']
+            ],
+            [
+                null,
+                ChangeSet::TYPE_REMOTE,
+                null
             ]
         ];
     }
@@ -180,11 +202,19 @@ class ChangeSetManagerTest extends \PHPUnit_Framework_TestCase
     public function testRemoveChanges($changeSet, $type, $removed, array $expected)
     {
         $entity = new \stdClass();
-        $this->repo
-            ->expects($this->any())
-            ->method('findOneBy')
-            ->with($this->isType('array'))
-            ->will($this->returnValue($changeSet));
+
+        if ($changeSet) {
+            $this->repo
+                ->expects($this->any())
+                ->method('findOneBy')
+                ->with($this->isType('array'))
+                ->will($this->returnValue($changeSet));
+        } else {
+            $this->setExpectedException(
+                '\InvalidArgumentException',
+                'Entity with id 1 not exists'
+            );
+        }
 
         if ($removed) {
             $this->em
@@ -230,6 +260,12 @@ class ChangeSetManagerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new ChangeSet(['local'], ['remote']),
+                ChangeSet::TYPE_LOCAL,
+                false,
+                [null, ['remote']]
+            ],
+            [
+                null,
                 ChangeSet::TYPE_LOCAL,
                 false,
                 [null, ['remote']]

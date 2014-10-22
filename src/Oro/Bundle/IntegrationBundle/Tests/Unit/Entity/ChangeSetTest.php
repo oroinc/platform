@@ -62,4 +62,30 @@ class ChangeSetTest extends \PHPUnit_Framework_TestCase
             'empty_remoteChanges' => ['remoteChanges', null],
         ];
     }
+
+    /**
+     * @param array $local
+     * @param array $remote
+     *
+     * @dataProvider constructDataProvider
+     */
+    public function testConstruct(array $local = null, array $remote = null)
+    {
+        $changeSet = new ChangeSet($local, $remote);
+        $this->assertEquals($local, $changeSet->getLocalChanges());
+        $this->assertEquals($remote, $changeSet->getRemoteChanges());
+    }
+
+    /**
+     * @return array
+     */
+    public function constructDataProvider()
+    {
+        return [
+            [null, null],
+            [null, ['remote']],
+            [['local'], null],
+            [['local'], ['remote']],
+        ];
+    }
 }

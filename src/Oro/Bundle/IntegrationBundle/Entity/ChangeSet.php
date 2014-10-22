@@ -60,7 +60,7 @@ class ChangeSet
      * @param array $localChanges
      * @param array $remoteChanges
      */
-    public function __construct(array $localChanges = [], array $remoteChanges = [])
+    public function __construct(array $localChanges = null, array $remoteChanges = null)
     {
         $this->localChanges  = $localChanges;
         $this->remoteChanges = $remoteChanges;
