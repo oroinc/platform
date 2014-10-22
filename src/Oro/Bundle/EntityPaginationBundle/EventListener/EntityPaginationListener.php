@@ -3,9 +3,11 @@
 namespace Oro\Bundle\EntityPaginationBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
@@ -46,11 +48,22 @@ class EntityPaginationListener
             $queryBuilder = $dataSource->getQueryBuilder();
 
             $entityName = $queryBuilder->getRootEntities()[0];
-
             $entityName = $this->doctrineHelper->getEntityMetadata($entityName)->getName();
             $gridName   = $dataGrid->getName();
 
-            $paginationState['state'] = $dataGrid->getParameters()->all();
+            $state = $dataGrid->getParameters()->all();
+            if (isset($state[ParameterBag::MINIFIED_PARAMETERS])) {
+                unset($state[ParameterBag::MINIFIED_PARAMETERS]);
+            }
+            if (!isset($state[PagerInterface::PAGER_ROOT_PARAM])) {
+                $perPage = $dataGrid->getMetadata()
+                    ->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
+                $state[PagerInterface::PAGER_ROOT_PARAM] = [
+                    PagerInterface::PAGE_PARAM => 1,
+                    PagerInterface::PER_PAGE_PARAM => $perPage
+                ];
+            }
+            $paginationState['state'] = $state;
 
             $records = $event->getRecords();
             $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);

@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Entity\Manager;
+namespace Oro\Bundle\ActivityBundle\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -62,6 +63,93 @@ class ActivityManager
     }
 
     /**
+     * Indicates whether the given entity type can be associated with the given activity or not
+     *
+     * @param string $entityClass
+     * @param string $activityEntityClass
+     *
+     * @return bool
+     */
+    public function hasActivityAssociation($entityClass, $activityEntityClass)
+    {
+        if (!$this->activityConfigProvider->hasConfig($entityClass)) {
+            return false;
+        }
+
+        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+
+        return !empty($activityClassNames) && in_array($activityEntityClass, $activityClassNames);
+    }
+
+    /**
+     * Associates the given target entity with the activity entity
+     * If the target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $targetEntity
+     *
+     * @return bool TRUE if an association was added; otherwise, FALSE
+     */
+    public function addActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        if ($targetEntity !== null
+            && $activityEntity->supportActivityTarget(get_class($targetEntity))
+            && !$activityEntity->hasActivityTarget($targetEntity)
+        ) {
+            $activityEntity->addActivityTarget($targetEntity);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Associates the given target entities with the activity entity
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object|object[]   $targetEntities
+     *
+     * @return bool TRUE if at least one association was added; otherwise, FALSE
+     */
+    public function addActivityTargets(ActivityInterface $activityEntity, array $targetEntities)
+    {
+        $hasChanges = false;
+
+        foreach ($targetEntities as $targetEntity) {
+            if ($this->addActivityTarget($activityEntity, $targetEntity)) {
+                $hasChanges = true;
+            }
+        }
+
+        return $hasChanges;
+    }
+
+    /**
+     * Removes an association of the given target entity with the activity entity
+     * If the target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $targetEntity
+     *
+     * @return bool TRUE if an association was removed; otherwise, FALSE
+     */
+    public function removeActivityTarget(ActivityInterface $activityEntity, $targetEntity)
+    {
+        if ($targetEntity !== null
+            && $activityEntity->supportActivityTarget(get_class($targetEntity))
+            && $activityEntity->hasActivityTarget($targetEntity)
+        ) {
+            $activityEntity->removeActivityTarget($targetEntity);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns an array contains info about all activity associations for the given entity type
      *
      * @param string $entityClass
@@ -115,19 +203,19 @@ class ActivityManager
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-            $widget         = $activityConfig->get('action_widget');
-            if (!empty($widget)) {
+            $buttonWidget   = $activityConfig->get('action_button_widget');
+            if (!empty($buttonWidget)) {
                 $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
                 $item = [
                     'className'       => $activityClassName,
                     'associationName' => $associationName,
-                    'widget'          => $widget
+                    'button_widget'   => $buttonWidget
                 ];
 
-                $group = $activityConfig->get('action_group');
-                if (!empty($group)) {
-                    $item['group'] = $group;
+                $linkWidget = $activityConfig->get('action_link_widget');
+                if (!empty($linkWidget)) {
+                    $item['link_widget'] = $linkWidget;
                 }
                 $priority = $activityConfig->get('priority');
                 if (!empty($priority)) {
@@ -149,6 +237,7 @@ class ActivityManager
      * @param mixed        $entityId            The target entity id
      * @param string|null  $activityEntityClass This parameter should be specified
      *                                          if the query has more than one root entity
+     *
      * @throws \RuntimeException
      */
     public function addFilterByTargetEntity(

@@ -187,6 +187,22 @@ class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
             $columnName
         );
         $this->addSetOptionsDataItem(
+            'append new (with existing another attr in the same scope)',
+            [
+                $this->getAppendedOption('scope', 'attr', 'test'),
+                [
+                    'scope' => ['another_attr' => 'test'],
+                ],
+                [
+                    'scope'                              => ['attr' => ['test'], 'another_attr' => 'test'],
+                    ExtendOptionsManager::APPEND_SECTION => ['scope' => ['attr']]
+                ]
+            ],
+            $result,
+            $tableName,
+            $columnName
+        );
+        $this->addSetOptionsDataItem(
             'append existing',
             [
                 $this->getAppendedOption('scope', 'attr', 'test2'),

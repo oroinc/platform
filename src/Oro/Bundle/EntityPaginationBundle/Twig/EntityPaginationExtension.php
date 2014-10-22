@@ -62,7 +62,7 @@ class EntityPaginationExtension extends \Twig_Extension
             return null;
         }
 
-        $previousEntityId = $this->storage->getPrevious($entity);
+        $previousEntityId = $this->storage->getPreviousIdentifier($entity);
         if (!$previousEntityId) {
             return null;
         }
@@ -84,7 +84,7 @@ class EntityPaginationExtension extends \Twig_Extension
             return null;
         }
 
-        $nextEntityId = $this->storage->getNext($entity);
+        $nextEntityId = $this->storage->getNextIdentifier($entity);
         if (!$nextEntityId) {
             return null;
         }
@@ -101,12 +101,12 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     public function getPager($entity)
     {
-        $totalCount = $this->storage->getTotal($entity);
+        $totalCount = $this->storage->getTotalCount($entity);
         if (!$totalCount) {
             return null;
         }
 
-        $currentNumber = $this->storage->getCurrent($entity);
+        $currentNumber = $this->storage->getCurrentNumber($entity);
         if (!$currentNumber) {
             return null;
         }
