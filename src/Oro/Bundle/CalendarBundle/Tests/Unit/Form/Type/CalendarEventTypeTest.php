@@ -35,7 +35,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'description',
                 'textarea',
-                array('required' => true, 'label' => 'oro.calendar.calendarevent.description.label')
+                array('required' => false, 'label' => 'oro.calendar.calendarevent.description.label')
             )
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
