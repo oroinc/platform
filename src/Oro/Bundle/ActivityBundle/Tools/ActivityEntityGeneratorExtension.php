@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Tools;
 
+use CG\Generator\PhpClass;
+
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
@@ -33,6 +35,16 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
         return
             !empty($groups)
             && in_array(ActivityScope::GROUP_ACTIVITY, $groups);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(array $schema, PhpClass $class)
+    {
+        $class->addInterfaceName('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        parent::generate($schema, $class);
     }
 
     /**
