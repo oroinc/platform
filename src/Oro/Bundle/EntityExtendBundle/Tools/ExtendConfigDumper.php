@@ -123,11 +123,14 @@ class ExtendConfigDumper
         $this->clear();
     }
 
-    public function dump()
+    /**
+     * @param null|string $className
+     */
+    public function dump($className = null)
     {
         $schemas        = [];
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs(null, true);
+        $extendConfigs  = $extendProvider->getConfigs($className, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();

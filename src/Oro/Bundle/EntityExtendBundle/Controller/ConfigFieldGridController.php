@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
+use Oro\Bundle\EntityExtendBundle\Event\AfterFlushFieldEvent;
+use Oro\Bundle\EntityExtendBundle\Event\BeforePersistFieldEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -192,8 +194,18 @@ class ConfigFieldGridController extends Controller
 
                 $extendEntityConfig->set('upgradeable', true);
 
+                $this->get('event_dispatcher')->dispatch(
+                    BeforePersistFieldEvent::EVENT_NAME,
+                    new BeforePersistFieldEvent($newFieldModel, $extendEntityConfig)
+                );
+
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
+
+                $this->get('event_dispatcher')->dispatch(
+                    AfterFlushFieldEvent::EVENT_NAME,
+                    new AfterFlushFieldEvent($entity->getClassName(), $newFieldModel)
+                );
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $newFieldModel->getId()]],
