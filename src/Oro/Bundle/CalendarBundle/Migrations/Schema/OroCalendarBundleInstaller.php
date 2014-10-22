@@ -83,6 +83,8 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
         $table->addColumn('start_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('end_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('all_day', 'boolean', []);
+        $table->addColumn('createdAt', 'datetime');
+        $table->addColumn('updatedAt', 'datetime', ['notnull' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->setPrimaryKey(['id']);

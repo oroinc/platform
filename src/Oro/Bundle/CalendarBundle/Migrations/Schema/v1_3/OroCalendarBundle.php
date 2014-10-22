@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
@@ -13,11 +14,14 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class OroCalendarBundle implements
     Migration,
+    OrderedMigrationInterface,
     NameGeneratorAwareInterface,
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
@@ -30,6 +34,14 @@ class OroCalendarBundle implements
 
     /** @var ActivityExtension */
     protected $activityExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 2;
+    }
 
     /**
      * {@inheritdoc}
@@ -60,6 +72,16 @@ class OroCalendarBundle implements
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $queries->addPreQuery(
+            new ParametrizedSqlMigrationQuery(
+                'UPDATE oro_calendar_event SET createdAt = :date',
+                ['date' => new \DateTime('now', new \DateTimeZone('UTC'))],
+                ['date' => Type::DATETIME]
+            )
+        );
+        $table = $schema->createTable('oro_calendar_event');
+        $table->getColumn('createdAt')->setOptions(['notnull' => true]);
+
         $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'oro_user');
         $queries->addPostQuery($this->getFillUserActivityQuery());
     }
