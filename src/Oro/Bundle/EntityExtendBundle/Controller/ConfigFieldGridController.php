@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\EntityExtendBundle\Event\AfterFlushFieldEvent;
-use Oro\Bundle\EntityExtendBundle\Event\BeforePersistFieldEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +23,9 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Event\AfterFlushFieldEvent;
+use Oro\Bundle\EntityExtendBundle\Event\BeforePersistFieldEvent;
+use Oro\Bundle\EntityExtendBundle\Event\CollectFieldOptionsEvent;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -146,6 +147,7 @@ class ConfigFieldGridController extends Controller
         $configManager      = $this->get('oro_entity_config.config_manager');
         $extendProvider     = $configManager->getProvider('extend');
         $extendEntityConfig = $extendProvider->getConfig($entity->getClassName());
+        $originalExtendEntityConfig = clone $extendEntityConfig;
 
         $fieldOptions = [
             'extend' => [
@@ -174,34 +176,34 @@ class ConfigFieldGridController extends Controller
         }
 
         $newFieldModel = $configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
-        $this->updateFieldConfigs($configManager, $newFieldModel, $fieldOptions);
+        $event =  new CollectFieldOptionsEvent($fieldOptions, $newFieldModel);
+        $this->get('event_dispatcher')->dispatch(
+            CollectFieldOptionsEvent::EVENT_NAME,
+            $event
+        );
+        $fieldOptions = $event->getOptions();
 
+        $this->updateFieldConfigs($configManager, $newFieldModel, $fieldOptions);
         $form = $this->createForm('oro_entity_config_type', null, ['config_model' => $newFieldModel]);
 
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
-
             if ($form->isValid()) {
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',
                     $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved')
                 );
-
                 if (!$extendEntityConfig->is('state', ExtendScope::STATE_NEW)) {
                     $extendEntityConfig->set('state', ExtendScope::STATE_UPDATE);
                 }
-
                 $extendEntityConfig->set('upgradeable', true);
-
                 $this->get('event_dispatcher')->dispatch(
                     BeforePersistFieldEvent::EVENT_NAME,
-                    new BeforePersistFieldEvent($newFieldModel, $extendEntityConfig)
+                    new BeforePersistFieldEvent($newFieldModel, $extendEntityConfig, $originalExtendEntityConfig)
                 );
-
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
-
                 $this->get('event_dispatcher')->dispatch(
                     AfterFlushFieldEvent::EVENT_NAME,
                     new AfterFlushFieldEvent($entity->getClassName(), $newFieldModel)
@@ -216,7 +218,6 @@ class ConfigFieldGridController extends Controller
 
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-
         $entityConfig = $entityConfigProvider->getConfig($entity->getClassName());
         $fieldConfig  = $entityConfigProvider->getConfig($entity->getClassName(), $newFieldModel->getFieldName());
 

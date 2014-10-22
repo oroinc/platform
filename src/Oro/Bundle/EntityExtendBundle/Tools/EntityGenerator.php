@@ -48,8 +48,9 @@ class EntityGenerator
      * Generates extended entities
      *
      * @param array $schemas
+     * @param bool  $clearAliases
      */
-    public function generate(array $schemas)
+    public function generate(array $schemas, $clearAliases = true)
     {
         $aliases = [];
         foreach ($schemas as $schema) {
@@ -79,11 +80,13 @@ class EntityGenerator
             );
         }
 
-        // write PHP class aliases to the file
-        file_put_contents(
-            ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            serialize($aliases)
-        );
+        if ($clearAliases) {
+            // write PHP class aliases to the file
+            file_put_contents(
+                ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
+                serialize($aliases)
+            );
+        }
     }
 
     /**

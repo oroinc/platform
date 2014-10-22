@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
+use Symfony\Component\EventDispatcher\Event;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Symfony\Component\EventDispatcher\Event;
 
 class AfterFlushFieldEvent extends Event
 {
@@ -16,6 +17,10 @@ class AfterFlushFieldEvent extends Event
     /** @var FieldConfigModel */
     protected $configModel;
 
+    /**
+     * @param string           $className
+     * @param FieldConfigModel $configModel
+     */
     public function __construct($className, FieldConfigModel $configModel)
     {
         $this->className = $className;

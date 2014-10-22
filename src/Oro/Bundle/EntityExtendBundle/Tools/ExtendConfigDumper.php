@@ -125,12 +125,18 @@ class ExtendConfigDumper
 
     /**
      * @param null|string $className
+     * @param bool        $clearAliases
      */
-    public function dump($className = null)
+    public function dump($className = null, $clearAliases = true)
     {
         $schemas        = [];
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs($className, true);
+        if ($className) {
+            $extendConfigs = [$extendProvider->getConfig($className)];
+        } else {
+            $extendConfigs  = $extendProvider->getConfigs($className, true);
+        }
+
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
@@ -141,7 +147,7 @@ class ExtendConfigDumper
             }
         }
 
-        $this->entityGenerator->generate($schemas);
+        $this->entityGenerator->generate($schemas, $clearAliases);
     }
 
     /**

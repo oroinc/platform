@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\EventDispatcher\Event;
 
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 class BeforePersistFieldEvent extends Event
@@ -17,17 +17,27 @@ class BeforePersistFieldEvent extends Event
     protected $entityConfig;
 
     /**
+     * @var ConfigInterface
+     */
+    protected $originalExtendEntityConfig;
+
+    /**
      * @var FieldConfigModel
      */
     protected $fieldConfigModel;
 
     /**
-     * @param ConfigInterface $config
+     * @param FieldConfigModel $fieldConfigModel
+     * @param ConfigInterface  $entityConfig
      */
-    public function __construct(FieldConfigModel $fieldConfigModel, ConfigInterface $entityConfig)
-    {
+    public function __construct(
+        FieldConfigModel $fieldConfigModel,
+        ConfigInterface $entityConfig,
+        ConfigInterface $originalExtendEntityConfig
+    ) {
         $this->entityConfig = $entityConfig;
         $this->fieldConfigModel = $fieldConfigModel;
+        $this->originalExtendEntityConfig = $originalExtendEntityConfig;
     }
 
     /**
@@ -44,5 +54,13 @@ class BeforePersistFieldEvent extends Event
     public function getFieldConfigModel()
     {
         return $this->fieldConfigModel;
+    }
+
+    /**
+     * @return ConfigInterface
+     */
+    public function getOriginalExtendEntityConfig()
+    {
+        return $this->originalExtendEntityConfig;
     }
 }
