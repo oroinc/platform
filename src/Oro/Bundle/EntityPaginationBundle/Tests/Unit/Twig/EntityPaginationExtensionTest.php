@@ -72,7 +72,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->storage->expects($this->any())
-            ->method('getPrevious')
+            ->method('getPreviousIdentifier')
             ->with($entity)
             ->will($this->returnValue($entityId));
 
@@ -100,7 +100,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->storage->expects($this->any())
-            ->method('getNext')
+            ->method('getNextIdentifier')
             ->with($entity)
             ->will($this->returnValue($entityId));
 
@@ -164,11 +164,11 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
 
         $this->storage->expects($this->any())
-            ->method('getTotal')
+            ->method('getTotalCount')
             ->with($entity)
             ->will($this->returnValue($totalCount));
         $this->storage->expects($this->any())
-            ->method('getCurrent')
+            ->method('getCurrentNumber')
             ->with($entity)
             ->will($this->returnValue($currentNumber));
 
