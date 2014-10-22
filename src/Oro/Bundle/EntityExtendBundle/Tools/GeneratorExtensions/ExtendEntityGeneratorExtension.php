@@ -38,7 +38,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         }
 
         $this->generateConstructor($schema, $class);
-        $class->setInterfaceNames(['Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface']);
+        $class->addInterfaceName('Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface');
 
         $this->generateProperties('property', $schema, $class);
         $this->generateProperties('relation', $schema, $class);

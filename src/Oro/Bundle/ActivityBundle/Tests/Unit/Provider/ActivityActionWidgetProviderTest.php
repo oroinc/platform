@@ -17,7 +17,7 @@ class ActivityActionWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->placeholderProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider')
@@ -64,34 +64,38 @@ class ActivityActionWidgetProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'className'       => 'Test\Activity1',
                 'associationName' => 'association1',
-                'widget'          => 'widget1',
+                'button_widget'   => 'button_widget1',
+                'link_widget'     => 'link_widget1',
             ],
             [
                 'className'       => 'Test\Activity2',
                 'associationName' => 'association2',
-                'widget'          => 'widget2',
+                'button_widget'   => 'button_widget2',
+                'link_widget'     => 'link_widget2',
                 'group'           => 'group2',
                 'priority'        => 100,
             ],
             [
                 'className'       => 'Test\Activity3',
                 'associationName' => 'association3',
-                'widget'          => 'widget3',
+                'button_widget'   => 'button_widget3',
+                'link_widget'     => 'link_widget3',
             ],
         ];
 
-        $this->placeholderProvider->expects($this->at(0))
+        $this->placeholderProvider->expects($this->any())
             ->method('getItem')
-            ->with('widget1', ['entity' => $entity])
-            ->will($this->returnValue(['template' => 'template1']));
-        $this->placeholderProvider->expects($this->at(1))
-            ->method('getItem')
-            ->with('widget2', ['entity' => $entity])
-            ->will($this->returnValue(['template' => 'template2']));
-        $this->placeholderProvider->expects($this->at(2))
-            ->method('getItem')
-            ->with('widget3', ['entity' => $entity])
-            ->will($this->returnValue(null));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['button_widget1', ['entity' => $entity], ['template' => 'button_template1']],
+                        ['link_widget1', ['entity' => $entity], ['template' => 'link_template1']],
+                        ['button_widget2', ['entity' => $entity], ['template' => 'button_template2']],
+                        ['link_widget2', ['entity' => $entity], null],
+                        ['button_widget3', ['entity' => $entity], null],
+                    ]
+                )
+            );
         $this->activityManager->expects($this->once())
             ->method('getActivityActions')
             ->with($entityClass)
@@ -100,12 +104,19 @@ class ActivityActionWidgetProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 [
-                    'name'     => 'widget1',
-                    'template' => 'template1',
+                    'name'   => 'button_widget1',
+                    'button' => [
+                        'template' => 'button_template1'
+                    ],
+                    'link'   => [
+                        'template' => 'link_template1'
+                    ],
                 ],
                 [
-                    'name'     => 'widget2',
-                    'template' => 'template2',
+                    'name'     => 'button_widget2',
+                    'button'   => [
+                        'template' => 'button_template2'
+                    ],
                     'group'    => 'group2',
                     'priority' => 100,
                 ],

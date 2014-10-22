@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Tests\Unit\Entity\Manager;
+namespace Oro\Bundle\ActivityBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -129,6 +130,297 @@ class ActivityManagerTest extends OrmTestCase
         );
     }
 
+    public function testHasActivityAssociation()
+    {
+        $activityEntityClass = 'Test\Activity';
+        $targetEntityClass   = 'Test\Entity';
+
+        $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
+        $targetEntityActivityConfig->set('activities', ['Test\OtherActivity', $activityEntityClass]);
+
+        $this->activityConfigProvider->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(true));
+        $this->activityConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue($targetEntityActivityConfig));
+
+        $this->assertTrue(
+            $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
+        );
+        $this->assertFalse(
+            $this->manager->hasActivityAssociation($targetEntityClass, 'Test\UnsupportedActivity')
+        );
+    }
+
+    public function testHasActivityAssociationForNoActivities()
+    {
+        $activityEntityClass = 'Test\Activity';
+        $targetEntityClass   = 'Test\Entity';
+
+        $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
+
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(true));
+        $this->activityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue($targetEntityActivityConfig));
+
+        $this->assertFalse(
+            $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
+        );
+    }
+
+    public function testHasActivityAssociationForNonConfigurableEntity()
+    {
+        $activityEntityClass = 'Test\Activity';
+        $targetEntityClass   = 'Test\Entity';
+
+        $this->activityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($targetEntityClass)
+            ->will($this->returnValue(false));
+
+        $this->assertFalse(
+            $this->manager->hasActivityAssociation($targetEntityClass, $activityEntityClass)
+        );
+    }
+
+    public function testAddActivityTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->once())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->addActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testAddActivityTargetForAlreadyAddedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->addActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testAddActivityTargetForNotSupportedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->addActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testAddActivityTargetForNullTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $activityEntity->expects($this->never())
+            ->method('supportActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget');
+
+        $this->assertFalse(
+            $this->manager->addActivityTarget($activityEntity, null)
+        );
+    }
+
+    public function testAddActivityTargets()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->once())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->addActivityTargets($activityEntity, [$targetEntity])
+        );
+    }
+
+    public function testAddActivityTargetsForAlreadyAddedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->addActivityTargets($activityEntity, [$targetEntity])
+        );
+    }
+
+    public function testAddActivityTargetsForNotSupportedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+        $activityEntity->expects($this->never())
+            ->method('addActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->addActivityTargets($activityEntity, [$targetEntity])
+        );
+    }
+
+    public function testRemoveActivityTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue($activityEntity));
+
+        $this->assertTrue(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNotExistingTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(true));
+        $activityEntity->expects($this->once())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNotSupportedTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $targetEntity   = new Target();
+
+        $activityEntity->expects($this->once())
+            ->method('supportActivityTarget')
+            ->with(get_class($targetEntity))
+            ->will($this->returnValue(false));
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget')
+            ->with($this->identicalTo($targetEntity));
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, $targetEntity)
+        );
+    }
+
+    public function testRemoveActivityTargetForNullTarget()
+    {
+        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        $activityEntity->expects($this->never())
+            ->method('supportActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('hasActivityTarget');
+        $activityEntity->expects($this->never())
+            ->method('removeActivityTarget');
+
+        $this->assertFalse(
+            $this->manager->removeActivityTarget($activityEntity, null)
+        );
+    }
+
     public function testGetActivityAssociations()
     {
         $targetEntityClass = 'Test\Entity';
@@ -205,13 +497,14 @@ class ActivityManagerTest extends OrmTestCase
         $activity1EntityConfig = new Config(new EntityConfigId('entity', $activity1Class));
         $activity1EntityConfig->set('plural_label', 'lbl.activity1');
         $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
-        $activity1ActivityConfig->set('action_widget', 'widget1');
-        $activity1ActivityConfig->set('action_group', 'group1');
+        $activity1ActivityConfig->set('action_button_widget', 'button_widget1');
+        $activity1ActivityConfig->set('action_link_widget', 'link_widget1');
 
         $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
-        $activity2ActivityConfig->set('action_widget', 'widget2');
+        $activity2ActivityConfig->set('action_button_widget', 'button_widget2');
+        $activity2ActivityConfig->set('action_link_widget', 'link_widget2');
         $activity2ActivityConfig->set('priority', 100);
 
         $this->entityConfigProvider->expects($this->any())
@@ -241,13 +534,14 @@ class ActivityManagerTest extends OrmTestCase
                 [
                     'className'       => 'Test\Activity1',
                     'associationName' => 'entity_1f801d4a',
-                    'widget'          => 'widget1',
-                    'group'           => 'group1',
+                    'button_widget'   => 'button_widget1',
+                    'link_widget'     => 'link_widget1',
                 ],
                 [
                     'className'       => 'Test\Activity2',
                     'associationName' => 'entity_1f801d4a',
-                    'widget'          => 'widget2',
+                    'button_widget'   => 'button_widget2',
+                    'link_widget'     => 'link_widget2',
                     'priority'        => 100,
                 ],
             ],
