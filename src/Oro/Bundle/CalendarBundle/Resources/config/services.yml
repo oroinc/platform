@@ -24,6 +24,7 @@ services:
         arguments:
             - @oro_activity.manager
             - @oro_entity.routing_helper
+            - @oro_locale.settings
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-calendar-event-grid, method: onBuildAfter }
 

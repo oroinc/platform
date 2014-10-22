@@ -6,6 +6,7 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class ActivityGridListener
 {
@@ -15,14 +16,22 @@ class ActivityGridListener
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /**
      * @param ActivityManager     $activityManager
      * @param EntityRoutingHelper $entityRoutingHelper
+     * @param LocaleSettings      $localeSettings
      */
-    public function __construct(ActivityManager $activityManager, EntityRoutingHelper $entityRoutingHelper)
-    {
+    public function __construct(
+        ActivityManager $activityManager,
+        EntityRoutingHelper $entityRoutingHelper,
+        LocaleSettings $localeSettings
+    ) {
         $this->activityManager     = $activityManager;
         $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->localeSettings      = $localeSettings;
     }
 
     /**
@@ -43,7 +52,7 @@ class ActivityGridListener
             $this->activityManager->addFilterByTargetEntity($qb, $entityClass, $entityId);
 
             // apply filter by date
-            $start = new \DateTime('now', new \DateTimeZone('UTC'));
+            $start = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
             $start->setTime(0, 0, 0);
             $qb->andWhere('event.start >= :date OR event.end >= :date')
                 ->setParameter('date', $start);
