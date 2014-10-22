@@ -191,4 +191,27 @@ abstract class AbstractPageEntity extends AbstractPage
         $element = $this->test->select($this->test->byXPath($this->organization));
         return trim($element->selectedLabel());
     }
+
+    public function checkActionInGroup($action, $false = true)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        if (!$false) {
+            $this->assertElementNotPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        } else {
+            $this->assertElementPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        }
+
+        return $this;
+    }
+
+    public function runActionInGroup($action)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@class='pull-right']//a[@title='{$action}']")->click();
+        $this->waitForAjax();
+
+        return $this;
+    }
 }
