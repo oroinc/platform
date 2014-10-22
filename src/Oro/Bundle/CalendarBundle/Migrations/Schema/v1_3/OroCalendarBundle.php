@@ -74,13 +74,14 @@ class OroCalendarBundle implements
     {
         $queries->addPreQuery(
             new ParametrizedSqlMigrationQuery(
-                'UPDATE oro_calendar_event SET createdAt = :date',
+                'UPDATE oro_calendar_event SET created_at = :date, updated_at = :date',
                 ['date' => new \DateTime('now', new \DateTimeZone('UTC'))],
                 ['date' => Type::DATETIME]
             )
         );
-        $table = $schema->createTable('oro_calendar_event');
-        $table->getColumn('createdAt')->setOptions(['notnull' => true]);
+        $table = $schema->getTable('oro_calendar_event');
+        $table->getColumn('created_at')->setOptions(['notnull' => true]);
+        $table->getColumn('updated_at')->setOptions(['notnull' => true]);
 
         $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'oro_user');
         $queries->addPostQuery($this->getFillUserActivityQuery());

@@ -108,7 +108,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -122,7 +122,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(name="updated_at", type="datetime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
@@ -340,7 +340,8 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function prePersist()
     {
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
     }
 
     /**
@@ -348,6 +349,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function preUpdate()
     {
-        $this->updatedAt = new \DateTime();
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
