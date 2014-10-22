@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
@@ -27,11 +28,11 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->storage = $this
-            ->getMock('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage');
+        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
