@@ -52,6 +52,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('entity_id', 'integer', []);
         $table->addColumn('changed_fields', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['entity_id', 'entity_class'], 'oro_integration_fields_changes_idx', []);
     }
 
     /**
