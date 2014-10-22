@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
@@ -43,7 +44,6 @@ class EntityPaginationListener
             $queryBuilder = $dataSource->getQueryBuilder();
 
             $entityName = $queryBuilder->getRootEntities()[0];
-
             $entityName = $this->doctrineHelper->getEntityMetadata($entityName)->getName();
             $gridName   = $dataGrid->getName();
 
