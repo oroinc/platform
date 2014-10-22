@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\IntegrationBundle\Entity\ChangeSet;
-use Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager;
-use Oro\Bundle\IntegrationBundle\Model\Action\SaveChangeSetAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class SaveChangeSetActionTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
+use Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
+class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var SaveChangeSetAction
+     * @var SaveFieldsChangesAction
      */
     protected $action;
 
     protected function setUp()
     {
         $contextAccessor = new ContextAccessor();
-        $this->action    = new SaveChangeSetAction($contextAccessor);
+        $this->action    = new SaveFieldsChangesAction($contextAccessor);
     }
 
     /**
@@ -48,18 +48,14 @@ class SaveChangeSetActionTest extends \PHPUnit_Framework_TestCase
         return [
             'empty'     => [
                 [],
-                'ChangeSet parameter is required'
+                'changeSet parameter is required'
             ],
             'changeSet' => [
                 ['changeSet' => ['value']],
-                'Data parameter is required'
-            ],
-            'data'      => [
-                ['changeSet' => ['value'], 'data' => ['value']],
-                'Type parameter is required'
+                'Entity parameter is required'
             ],
             'full'      => [
-                ['changeSet' => ['value'], 'data' => ['value'], 'type' => 'type'],
+                ['changeSet' => ['value'], 'entity' => ['value']],
                 null
             ],
         ];
@@ -73,22 +69,19 @@ class SaveChangeSetActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteAction(array $options, array $context)
     {
-        /** @var ChangeSetManager|\PHPUnit_Framework_MockObject_MockObject $changeSetManager */
-        $changeSetManager = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager')
+        /** @var FieldsChangesManager|\PHPUnit_Framework_MockObject_MockObject $fieldsChangesManager */
+        $fieldsChangesManager = $this
+            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         if (!empty($context['changeSet'])) {
-            $changeSetManager
+            $fieldsChangesManager
                 ->expects($this->once())
                 ->method('setChanges')
                 ->with(
                     $this->equalTo(
-                        empty($context['data']) ? null : $context['data']
-                    ),
-                    $this->equalTo(
-                        empty($context['type']) ? null : $context['type']
+                        empty($context['entity']) ? null : $context['entity']
                     ),
                     $this->equalTo(
                         array_keys($context['changeSet'])
@@ -96,7 +89,7 @@ class SaveChangeSetActionTest extends \PHPUnit_Framework_TestCase
                 );
         }
 
-        $this->action->setChangeSetManager($changeSetManager);
+        $this->action->setFieldsChangesManager($fieldsChangesManager);
         $this->action->initialize($options);
         $this->action->execute(new ProcessData($context));
     }
@@ -109,20 +102,17 @@ class SaveChangeSetActionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'data'      => new PropertyPath('data'),
-                    'type'      => new PropertyPath('type'),
+                    'entity'    => new PropertyPath('entity'),
                     'changeSet' => new PropertyPath('changeSet'),
                 ],
                 [
-                    'data'      => new \stdClass(),
-                    'type'      => ChangeSet::TYPE_LOCAL,
+                    'entity'    => new \stdClass(),
                     'changeSet' => ['field' => ['old' => 1, 'new' => 2]],
                 ]
             ],
             [
                 [
-                    'data'      => new PropertyPath('data'),
-                    'type'      => new PropertyPath('type'),
+                    'entity'    => new PropertyPath('entity'),
                     'changeSet' => new PropertyPath('changeSet'),
                 ],
                 ['changeSet' => []]

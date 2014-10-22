@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 
-use Oro\Bundle\IntegrationBundle\Entity\ChangeSet;
-use Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager;
-use Oro\Bundle\IntegrationBundle\Model\Action\RemoveChangeSetAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RemoveChangeSetActionTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
+use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
+class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var RemoveChangeSetAction
+     * @var RemoveFieldsChangesAction
      */
     protected $action;
 
     protected function setUp()
     {
         $contextAccessor = new ContextAccessor();
-        $this->action    = new RemoveChangeSetAction($contextAccessor);
+        $this->action    = new RemoveFieldsChangesAction($contextAccessor);
     }
 
     /**
@@ -48,14 +48,10 @@ class RemoveChangeSetActionTest extends \PHPUnit_Framework_TestCase
         return [
             'empty' => [
                 [],
-                'Data parameter is required'
-            ],
-            'data'  => [
-                ['data' => ['value']],
-                'Type parameter is required'
+                'Entity parameter is required'
             ],
             'full'  => [
-                ['data' => ['value'], 'type' => 'type'],
+                ['entity' => ['value']],
                 null
             ],
         ];
@@ -69,25 +65,22 @@ class RemoveChangeSetActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteAction(array $options, array $context)
     {
-        /** @var ChangeSetManager|\PHPUnit_Framework_MockObject_MockObject $changeSetManager */
-        $changeSetManager = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\ChangeSetManager')
+        /** @var FieldsChangesManager|\PHPUnit_Framework_MockObject_MockObject $fieldsChangesManager */
+        $fieldsChangesManager = $this
+            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $changeSetManager
+        $fieldsChangesManager
             ->expects($this->once())
             ->method('removeChanges')
             ->with(
                 $this->equalTo(
-                    empty($context['data']) ? null : $context['data']
-                ),
-                $this->equalTo(
-                    empty($context['type']) ? null : $context['type']
+                    empty($context['entity']) ? null : $context['entity']
                 )
             );
 
-        $this->action->setChangeSetManager($changeSetManager);
+        $this->action->setFieldsChangesManager($fieldsChangesManager);
         $this->action->initialize($options);
         $this->action->execute(new ProcessData($context));
     }
@@ -99,20 +92,11 @@ class RemoveChangeSetActionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                [
-                    'data' => new PropertyPath('data'),
-                    'type' => new PropertyPath('type'),
-                ],
-                [
-                    'data' => new \stdClass(),
-                    'type' => ChangeSet::TYPE_LOCAL
-                ]
+                ['entity' => new PropertyPath('entity')],
+                ['entity' => new \stdClass()]
             ],
             [
-                [
-                    'data' => new PropertyPath('data'),
-                    'type' => new PropertyPath('type'),
-                ],
+                ['entity' => new PropertyPath('entity')],
                 []
             ]
         ];

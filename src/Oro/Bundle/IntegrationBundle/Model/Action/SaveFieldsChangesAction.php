@@ -6,15 +6,11 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
 /**
  * actions:
- *    - @assign_constant_value:
- *         attribute: $.localType
- *         value: Oro\Bundle\IntegrationBundle\Entity\ChangeSet::TYPE_LOCAL
- *    - @save_change_set:
- *        data: $.data
+ *    - @save_fields_changes:
+ *        entity: $.data
  *        changeSet: $.changeSet
- *        type: $.localType
  */
-class SaveChangeSetAction extends AbstractChangeSetAction
+class SaveFieldsChangesAction extends AbstractFieldsChangesAction
 {
     /**
      * {@inheritdoc}
@@ -22,7 +18,7 @@ class SaveChangeSetAction extends AbstractChangeSetAction
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_CHANGESET])) {
-            throw new InvalidParameterException('ChangeSet parameter is required');
+            throw new InvalidParameterException('changeSet parameter is required');
         }
 
         parent::initialize($options);
@@ -40,9 +36,8 @@ class SaveChangeSetAction extends AbstractChangeSetAction
             return;
         }
 
-        $entity    = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_DATA]);
-        $type      = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_TYPE]);
+        $entity = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_ENTITY]);
 
-        $this->changeSetManager->setChanges($entity, $type, array_keys($changeSet));
+        $this->fieldsChangesManager->setChanges($entity, array_keys($changeSet));
     }
 }

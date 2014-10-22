@@ -4,18 +4,18 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\IntegrationBundle\Entity\ChangeSet;
+use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
 
-class ChangeSetTest extends \PHPUnit_Framework_TestCase
+class FieldsChangesTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ChangeSet
+     * @var FieldsChanges
      */
     protected $entity;
 
     protected function setUp()
     {
-        $this->entity = new ChangeSet();
+        $this->entity = new FieldsChanges();
     }
 
     protected function tearDown()
@@ -52,28 +52,23 @@ class ChangeSetTest extends \PHPUnit_Framework_TestCase
     public function entityDataProvider()
     {
         return [
-            'entityClass'         => ['entityClass', '\stdClass'],
-            'empty_entityClass'   => ['entityClass', null],
-            'entityId'            => ['entityId', 1],
-            'empty_entityId'      => ['entityId', null],
-            'localChanges'        => ['localChanges', ['field']],
-            'empty_localChanges'  => ['localChanges', null],
-            'remoteChanges'       => ['remoteChanges', ['field']],
-            'empty_remoteChanges' => ['remoteChanges', null],
+            'entityClass'       => ['entityClass', '\stdClass'],
+            'empty_entityClass' => ['entityClass', null],
+            'entityId'          => ['entityId', 1],
+            'empty_entityId'    => ['entityId', null],
+            'changedFields'     => ['changedFields', ['field']],
         ];
     }
 
     /**
-     * @param array $local
-     * @param array $remote
+     * @param array $fields
      *
      * @dataProvider constructDataProvider
      */
-    public function testConstruct(array $local = null, array $remote = null)
+    public function testConstruct(array $fields = null)
     {
-        $changeSet = new ChangeSet($local, $remote);
-        $this->assertEquals($local, $changeSet->getLocalChanges());
-        $this->assertEquals($remote, $changeSet->getRemoteChanges());
+        $fieldsChanges = new FieldsChanges($fields);
+        $this->assertEquals($fields, $fieldsChanges->getChangedFields());
     }
 
     /**
@@ -82,10 +77,8 @@ class ChangeSetTest extends \PHPUnit_Framework_TestCase
     public function constructDataProvider()
     {
         return [
-            [null, null],
-            [null, ['remote']],
-            [['local'], null],
-            [['local'], ['remote']],
+            [null],
+            [['field']],
         ];
     }
 }
