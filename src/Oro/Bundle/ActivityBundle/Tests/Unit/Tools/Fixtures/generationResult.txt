@@ -1,6 +1,6 @@
 namespace Test;
 
-class Entity
+class Entity implements \Oro\Bundle\ActivityBundle\Model\ActivityInterface
 {
     /**
      * Checks if an entity of the given type can be associated with this entity
