@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
-{% oro_title_set({params : {"%title%": form.vars.value.title|default('N/A') } }) %}
+{% oro_title_set({params : {"%%entity.subject%%": form.vars.value.title|default('N/A') } }) %}
 
 {% block head_script %}
     {{ parent() }}
@@ -13,34 +13,34 @@
 {% block content_data %}
     {% set id = 'calendarevent-add' %}
     {% set title = form.vars.value.id
-    ? 'oro.ui.edit_entity'|trans({'%entityName%': 'oro.calendar.calendarevent.entity_label'|trans})
-    : 'oro.calendar.add_event'|trans
+        ? 'oro.ui.edit_entity'|trans({'%entityName%': 'oro.calendar.calendarevent.entity_label'|trans})
+        : 'oro.calendar.add_event'|trans
     %}
 
     {% set formFields = [] %}
     {% set formFields = formFields|merge([
-    form_row(form.title),
-    form_row(form.description),
-    form_row(form.start),
-    form_row(form.end),
-    form_row(form.allDay),
-    form_row(form.reminders)
+        form_row(form.title),
+        form_row(form.description),
+        form_row(form.start),
+        form_row(form.end),
+        form_row(form.allDay),
+        form_row(form.reminders)
     ]) %}
 
     {% set dataBlocks = [{
-    'title': title,
-    'class': 'active',
-    'subblocks': [
-    {
-    'title': title,
-    'data': formFields
-    }
-    ]
+        'title': title,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': title,
+                'data':  formFields
+            }
+        ]
     }] %}
 
     {% set data = {
-    'formErrors': form_errors(form)? form_errors(form) : null,
-    'dataBlocks': dataBlocks
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks
     } %}
     {{ parent() }}
 {% endblock content_data %}
@@ -57,18 +57,18 @@
 {% block pageHeader %}
     {% if form.vars.value.id %}
         {% set breadcrumbs = {
-        'entity':      form.vars.value,
-        'indexPath':   path('oro_calendar_event_index'),
-        'indexLabel': 'oro.calendar.calendarevent.entity_plural_label'|trans,
-        'entityTitle': form.vars.value.subject|default('N/A')
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_calendar_event_index'),
+            'indexLabel':  'oro.calendar.calendarevent.entity_plural_label'|trans,
+            'entityTitle': form.vars.value.subject|default('N/A')
         }
         %}
     {% else %}
         {% set breadcrumbs = {
-        'entity':      form.vars.value,
-        'indexPath':   path('oro_calendar_event_index'),
-        'indexLabel': 'oro.calendar.calendarevent.entity_plural_label'|trans,
-        'entityTitle': 'oro.calendar.add_event'|trans
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_calendar_event_index'),
+            'indexLabel':  'oro.calendar.calendarevent.entity_plural_label'|trans,
+            'entityTitle': 'oro.calendar.add_event'|trans
         }
         %}
     {% endif %}
