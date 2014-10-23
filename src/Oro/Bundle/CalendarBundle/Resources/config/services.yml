@@ -65,3 +65,10 @@ services:
         class: %oro_calendar.owner_assignment_checker.calendar.class%
         tags:
             - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\CalendarBundle\Entity\Calendar }
+
+    oro_calendar.label_provider.action_button:
+        parent: oro_ui.label_provider.action_button.abstract
+        arguments:
+            - # labels
+                '': { label: oro.calendar.add_event }
+                '%oro_user.entity.class%': { label: oro.calendar.assign_event }

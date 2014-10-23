@@ -7,7 +7,7 @@
     'aCss': 'no-hash',
     'iCss': 'icon-time',
     'dataId': entity.id,
-    'label' : 'oro.calendar.add_event'|trans,
+    'label' : data.label,
     'widget' : {
         'type' : 'dialog',
         'multiple' : true,
@@ -15,7 +15,7 @@
         'options' : {
             'alias': 'calendar-event-dialog',
             'dialogOptions' : {
-                'title' : 'oro.calendar.add_event'|trans,
+                'title' : data.widget_title,
                 'allowMaximize': true,
                 'allowMinimize': true,
                 'dblclick': 'maximize',
