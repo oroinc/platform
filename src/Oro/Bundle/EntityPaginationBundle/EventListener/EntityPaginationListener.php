@@ -77,8 +77,8 @@ class EntityPaginationListener
         $state = $this->getDataGridState($dataGrid);
         $entitiesLimit = $this->getEntitiesLimit();
         $parameters = [
-            OrmFilterExtension::FILTER_ROOT_PARAM  => $state['filters'],
-            OrmSorterExtension::SORTERS_ROOT_PARAM => $state['sorters'],
+            OrmFilterExtension::FILTER_ROOT_PARAM  => !empty($state['filters']) ? $state['filters'] : [],
+            OrmSorterExtension::SORTERS_ROOT_PARAM => !empty($state['sorters']) ? $state['sorters'] : [],
             PagerInterface::PAGER_ROOT_PARAM       => [
                 PagerInterface::PAGE_PARAM     => 1,
                 PagerInterface::PER_PAGE_PARAM => $entitiesLimit
@@ -134,8 +134,8 @@ class EntityPaginationListener
     {
         $state = $this->getDataGridState($dataGrid);
         $data = [
-            'filters' => $state['filters'],
-            'sorters' => $state['sorters'],
+            'filters' => !empty($state['filters']) ? $state['filters'] : [],
+            'sorters' => !empty($state['sorters']) ? $state['sorters'] : [],
             'total'   => $totalCount
         ];
 
