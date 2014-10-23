@@ -11,32 +11,27 @@ class BeforePersistFieldEvent extends Event
 {
     const EVENT_NAME = "oro_entity_extend.before_persist_field";
 
-    /**
-     * @var ConfigInterface
-     */
+    /** @var ConfigInterface */
     protected $entityConfig;
 
-    /**
-     * @var ConfigInterface
-     */
+    /** @var ConfigInterface */
     protected $originalExtendEntityConfig;
 
-    /**
-     * @var FieldConfigModel
-     */
+    /** @var FieldConfigModel */
     protected $fieldConfigModel;
 
     /**
      * @param FieldConfigModel $fieldConfigModel
      * @param ConfigInterface  $entityConfig
+     * @param ConfigInterface  $originalExtendEntityConfig
      */
     public function __construct(
         FieldConfigModel $fieldConfigModel,
         ConfigInterface $entityConfig,
         ConfigInterface $originalExtendEntityConfig
     ) {
-        $this->entityConfig = $entityConfig;
-        $this->fieldConfigModel = $fieldConfigModel;
+        $this->entityConfig               = $entityConfig;
+        $this->fieldConfigModel           = $fieldConfigModel;
         $this->originalExtendEntityConfig = $originalExtendEntityConfig;
     }
 

@@ -22,7 +22,7 @@ class CollectFieldOptionsEvent extends Event
      */
     public function __construct($options, FieldConfigModel $fieldConfigModel)
     {
-        $this->options = $options;
+        $this->options          = $options;
         $this->fieldConfigModel = $fieldConfigModel;
     }
 
