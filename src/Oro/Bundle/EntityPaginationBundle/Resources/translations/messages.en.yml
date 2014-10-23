@@ -7,3 +7,5 @@ oro.entity_pagination:
         fields:
             enabled:
                 label: 'Entity Pagination'
+            limit:
+                label: 'Entity Pagination limit'

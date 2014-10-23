@@ -8,6 +8,16 @@ oro_system_configuration:
                 label: oro.entity_pagination.system_configuration.fields.enabled.label
                 tooltip: oro.entity_pagination.system_configuration.fields.enabled.tooltip
                 required: true
+        oro_entity_pagination.limit:
+            data_type: integer
+            type: text
+            priority: 90
+            options:
+                label: oro.entity_pagination.system_configuration.fields.limit.label
+                tooltip: oro.entity_pagination.system_configuration.fields.limit.tooltip
+                constraints:
+                    - NotBlank: ~
+                required: false
 
     tree:
         system_configuration:
@@ -20,6 +30,7 @@ oro_system_configuration:
                                     grid_settings:
                                         children:
                                             - oro_entity_pagination.enabled
+                                            - oro_entity_pagination.limit
 
     api_tree:
         look-and-feel:

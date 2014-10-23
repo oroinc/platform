@@ -432,4 +432,9 @@ class EntityPaginationStorage
     {
         return (bool)$this->configManager->get('oro_entity_pagination.enabled');
     }
+
+    public function getLimit()
+    {
+        return (bool)$this->configManager->get('oro_entity_pagination.limit');
+    }
 }
