@@ -1,4 +1,9 @@
 oro.entity_pagination:
     pager_%current%_of_%total%: '%current% of %total%'
-    previous: '<'
-    next: '>'
+    previous: '< Prev'
+    next: 'Next >'
+
+    system_configuration:
+        fields:
+            enabled:
+                label: 'Entity Pagination'

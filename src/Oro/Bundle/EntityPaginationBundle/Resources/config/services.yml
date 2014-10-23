@@ -15,6 +15,7 @@ services:
         arguments:
             - @oro_datagrid.datagrid.manager
             - @oro_entity.doctrine_helper
+            - @oro_config.global
         calls:
             - [ setRequest, [@?request=] ]
 

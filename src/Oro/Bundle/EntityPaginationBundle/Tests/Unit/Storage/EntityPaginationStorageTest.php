@@ -45,7 +45,15 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper);
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_entity_pagination.enabled')
+            ->will($this->returnValue(true));
+
+        $this->storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
         $this->entity = new \stdClass();
     }
 
@@ -630,5 +638,53 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setSession($session);
         $this->storage->setRequest($request);
+    }
+
+    /**
+     * @param mixed $source
+     * @param bool $expected
+     * @dataProvider isEnabledDataProvider
+     */
+    public function testIsEnabled($source, $expected)
+    {
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_entity_pagination.enabled')
+            ->will($this->returnValue($source));
+
+        $storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
+        $this->assertSame($expected, $storage->isEnabled());
+    }
+
+    /**
+     * @return array
+     */
+    public function isEnabledDataProvider()
+    {
+        return [
+            'string true' => [
+                'source'   => '1',
+                'expected' => true,
+            ],
+            'string false' => [
+                'source'   => '0',
+                'expected' => false,
+            ],
+            'boolean true' => [
+                'source'   => true,
+                'expected' => true,
+            ],
+            'boolean false' => [
+                'source'   => false,
+                'expected' => false,
+            ],
+            'null' => [
+                'source'   => null,
+                'expected' => false,
+            ],
+        ];
     }
 }
