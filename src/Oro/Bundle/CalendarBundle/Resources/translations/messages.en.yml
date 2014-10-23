@@ -61,7 +61,6 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
-            calendar.name.label:  Calendar Name
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php

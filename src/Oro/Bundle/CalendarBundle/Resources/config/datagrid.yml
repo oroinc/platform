@@ -26,7 +26,7 @@ datagrid:
             title:
                 label: oro.calendar.calendarevent.title.label
             name:
-                label: oro.calendar.calendarevent.calendar.name.label
+                label: oro.calendar.calendarevent.calendar.label
             start:
                 label: oro.calendar.calendarevent.start.label
                 frontend_type: datetime
