@@ -31,7 +31,7 @@ class FieldsChangesManager
      * @param object $entity
      * @param bool   $doRemove
      *
-     * @return array|null
+     * @return array
      */
     public function getChanges($entity, $doRemove = false)
     {
@@ -92,14 +92,8 @@ class FieldsChangesManager
                 ]
             );
 
-        if ($fieldChanges) {
+        if ($fieldChanges || (!$fieldChanges && !$allowCreate)) {
             return $fieldChanges;
-        }
-
-        if (!$fieldChanges && !$allowCreate) {
-            throw new \InvalidArgumentException(
-                'Entity not exists and now allowed to create'
-            );
         }
 
         $fieldChanges = $this->doctrineHelper

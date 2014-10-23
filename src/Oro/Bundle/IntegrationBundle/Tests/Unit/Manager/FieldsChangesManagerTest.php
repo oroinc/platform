@@ -60,7 +60,7 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper
             ->expects($this->any())
             ->method('createEntityInstance')
-            ->will($this->returnValue(new FieldsChanges()));
+            ->will($this->returnValue(new FieldsChanges([])));
 
         $this->repo = $this
             ->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -91,7 +91,7 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
                 ->with($this->isType('array'))
                 ->will($this->returnValue($fieldsChanges));
         } else {
-            $newFieldsChanges = new FieldsChanges();
+            $newFieldsChanges = new FieldsChanges([]);
             $newFieldsChanges
                 ->setEntityClass(self::CLASS_NAME)
                 ->setEntityId(1);
@@ -108,17 +108,10 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($doRemove) {
-            if ($fieldsChanges) {
-                $this->em
-                    ->expects($this->once())
-                    ->method('remove')
-                    ->with($this->equalTo($fieldsChanges));
-            } else {
-                $this->setExpectedException(
-                    '\InvalidArgumentException',
-                    'Entity not exists and now allowed to create'
-                );
-            }
+            $this->em
+                ->expects($this->once())
+                ->method('remove')
+                ->with($this->equalTo($fieldsChanges));
         }
 
         $this->assertEquals(
@@ -133,12 +126,12 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
     public function getChangesDataProvider()
     {
         return [
-            [new FieldsChanges(), null, false],
+            [new FieldsChanges([]), [], false],
             [new FieldsChanges(['field']), ['field'], false],
-            [null, null, false],
-            [new FieldsChanges(), null, true],
+            [null, [], false],
+            [new FieldsChanges([]), [], true],
             [new FieldsChanges(['field']), ['field'], true],
-            [null, null, true]
+            [null, [], true]
         ];
     }
 
@@ -172,7 +165,7 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [new FieldsChanges(['field']), ['field']],
-            [new FieldsChanges(), []],
+            [new FieldsChanges([]), []],
             [null, []],
         ];
     }
@@ -180,7 +173,7 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
     public function testRemoveChanges()
     {
         $entity        = new \stdClass();
-        $fieldsChanges = new FieldsChanges();
+        $fieldsChanges = new FieldsChanges([]);
 
         $this->repo
             ->expects($this->any())

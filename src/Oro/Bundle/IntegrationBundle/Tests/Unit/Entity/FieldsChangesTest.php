@@ -15,7 +15,7 @@ class FieldsChangesTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = new FieldsChanges();
+        $this->entity = new FieldsChanges([]);
     }
 
     protected function tearDown()
@@ -65,7 +65,7 @@ class FieldsChangesTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider constructDataProvider
      */
-    public function testConstruct(array $fields = null)
+    public function testConstruct(array $fields)
     {
         $fieldsChanges = new FieldsChanges($fields);
         $this->assertEquals($fields, $fieldsChanges->getChangedFields());
@@ -77,7 +77,7 @@ class FieldsChangesTest extends \PHPUnit_Framework_TestCase
     public function constructDataProvider()
     {
         return [
-            [null],
+            [[]],
             [['field']],
         ];
     }
