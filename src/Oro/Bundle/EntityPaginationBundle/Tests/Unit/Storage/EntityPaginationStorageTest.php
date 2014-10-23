@@ -45,7 +45,15 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper);
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_entity_pagination.enabled')
+            ->will($this->returnValue(true));
+
+        $this->storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
         $this->entity = new \stdClass();
     }
 
@@ -639,14 +647,6 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsEnabled($source, $expected)
     {
-        $datagridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -655,10 +655,10 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->with('oro_entity_pagination.enabled')
             ->will($this->returnValue($source));
 
-        $storage = new EntityPaginationStorage($datagridManager, $doctrineHelper, $configManager);
+        $storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
         $this->assertSame($expected, $storage->isEnabled());
     }
-    
+
     /**
      * @return array
      */
