@@ -34,7 +34,7 @@ oro.locale:
                     fahrenheit: 'Fahrenheit'
                     celsius: 'Celsius'
             wind_speed_unit:
-                label: 'First Quarter Starts on'
+                label: 'Wind Speed Unit'
                 choices:
                     miles_per_hour: 'Miles per hour'
                     kilometers_per_hour: 'Kilometers per hour'
