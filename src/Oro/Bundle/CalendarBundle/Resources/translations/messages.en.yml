@@ -12,6 +12,7 @@ oro:
     calendar:
         my_calendar:         My Calendar
         add_event:           Add Event
+        view_events:         Events
 
         controller:
             event.saved.message:  Calendar event saved
@@ -58,6 +59,7 @@ oro:
             end.label:       End
             calendar.label:  Calendar
             all_day.label:   All day event
+            calendar.name.label:  Calendar Name
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
