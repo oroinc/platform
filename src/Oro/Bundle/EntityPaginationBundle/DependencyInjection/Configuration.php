@@ -9,6 +9,8 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 class Configuration implements ConfigurationInterface
 {
+
+    const DEFAULT_LIMIT = 1000;
     /**
      * {@inheritdoc}
      */
@@ -19,7 +21,10 @@ class Configuration implements ConfigurationInterface
 
         SettingsBuilder::append(
             $rootNode,
-            ['enabled' => ['type' => 'boolean', 'value' => true]]
+            [
+                'enabled' => ['type' => 'boolean', 'value' => true],
+                'limit'   => ['type' => 'integer', 'value' => self::DEFAULT_LIMIT]
+            ]
         );
 
         return $treeBuilder;
