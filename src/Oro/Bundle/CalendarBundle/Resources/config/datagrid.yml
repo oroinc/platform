@@ -17,12 +17,10 @@ datagrid:
                         - { join: event.calendar, alias: calendar }
                         - { join: calendar.owner, alias: owner }
                     left:
-                        - { join: %oro_calendar.calendar_connection.entity.class%, alias: connectedCalendar, conditionType: WITH, condition: "connectedCalendar.connectedCalendar = calendar"  }
+                        - { join: %oro_calendar.calendar_connection.entity.class%, alias: connectCalendar, conditionType: WITH, condition: "connectCalendar.connectedCalendar = calendar"  }
                 where:
-                    and:
-                        - connectedCalendar.calendar = @oro_security.security_facade->getLoggedUserId
-                        - true = @oro_security.security_facade->isGranted('oro_calendar_connection_view')
                     or:
+                        - connectCalendar.calendar = @oro_security.security_facade->getLoggedUserId
                         - calendar.owner = @oro_security.security_facade->getLoggedUserId
         columns:
             title:
