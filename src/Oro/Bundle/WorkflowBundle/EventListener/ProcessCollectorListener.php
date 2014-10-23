@@ -377,8 +377,13 @@ class ProcessCollectorListener implements OptionalListenerInterface
      * @param mixed|null $old
      * @param mixed|null $new
      */
-    protected function scheduleProcess(ProcessTrigger $trigger, $entity, array $changeSet = null, $old = null, $new = null)
-    {
+    protected function scheduleProcess(
+        ProcessTrigger $trigger,
+        $entity,
+        array $changeSet = null,
+        $old = null,
+        $new = null
+    ) {
         $entityClass = ClassUtils::getClass($entity);
 
         // important to set modified flag to true

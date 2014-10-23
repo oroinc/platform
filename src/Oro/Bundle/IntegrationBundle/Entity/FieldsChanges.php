@@ -25,14 +25,14 @@ class FieldsChanges
     protected $id;
 
     /**
-     * @ORM\Column(name="entity_class", type="string", unique=false, length=255, nullable=false)
+     * @ORM\Column(name="entity_class", type="string", length=255)
      */
     protected $entityClass;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="entity_id", type="integer", nullable=false)
+     * @ORM\Column(name="entity_id", type="integer")
      */
     protected $entityId;
 
@@ -41,12 +41,12 @@ class FieldsChanges
      *
      * @ORM\Column(name="changed_fields", type="array")
      */
-    protected $changedFields;
+    protected $changedFields = [];
 
     /**
      * @param array $changedFields
      */
-    public function __construct(array $changedFields = null)
+    public function __construct(array $changedFields)
     {
         $this->changedFields  = $changedFields;
     }
