@@ -13,3 +13,5 @@ oro_menu_config:
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"
     oro_calendar_view: "%%calendarname%% - Calendars - %%username%%"
+    oro_calendar_event_view: 'Calendar Event - %%entity.subject%%'
+    oro_calendar_event_update: 'Calendar Event - %%entity.subject%% - Edit'
