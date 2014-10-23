@@ -61,16 +61,14 @@
             'indexPath':   path('oro_calendar_event_index'),
             'indexLabel':  'oro.calendar.calendarevent.entity_plural_label'|trans,
             'entityTitle': form.vars.value.subject|default('N/A')
-        }
-        %}
+        } %}
     {% else %}
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_calendar_event_index'),
             'indexLabel':  'oro.calendar.calendarevent.entity_plural_label'|trans,
             'entityTitle': 'oro.calendar.add_event'|trans
-        }
-        %}
+        } %}
     {% endif %}
     {{ parent() }}
 {% endblock pageHeader %}
