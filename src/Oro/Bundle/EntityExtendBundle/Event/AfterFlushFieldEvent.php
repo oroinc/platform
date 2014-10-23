@@ -23,7 +23,7 @@ class AfterFlushFieldEvent extends Event
      */
     public function __construct($className, FieldConfigModel $configModel)
     {
-        $this->className = $className;
+        $this->className   = $className;
         $this->configModel = $configModel;
     }
 
