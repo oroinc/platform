@@ -14,6 +14,7 @@ define(['backbone', 'routing'], function (Backbone, routing) {
         defaults: {
             id: null,
             title : null,
+            description : null,
             start: null,
             end: null,
             allDay: false,

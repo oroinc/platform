@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_3;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
@@ -12,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
@@ -22,10 +24,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 class OroCalendarBundle implements
     Migration,
     OrderedMigrationInterface,
+    DatabasePlatformAwareInterface,
     NameGeneratorAwareInterface,
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
+    /** @var AbstractPlatform */
+    protected $platform;
+
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
@@ -41,6 +47,14 @@ class OroCalendarBundle implements
     public function getOrder()
     {
         return 2;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDatabasePlatform(AbstractPlatform $platform)
+    {
+        $this->platform = $platform;
     }
 
     /**
@@ -72,6 +86,7 @@ class OroCalendarBundle implements
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        // fill createdAt and updatedAt
         $queries->addPreQuery(
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_calendar_event SET created_at = :date, updated_at = :date',
@@ -79,7 +94,48 @@ class OroCalendarBundle implements
                 ['date' => Type::DATETIME]
             )
         );
+
+        // copy title to description if needed
+        $queries->addPreQuery(
+            new ParametrizedSqlMigrationQuery(
+                sprintf(
+                    'UPDATE oro_calendar_event SET description = title WHERE %s > 255 OR title LIKE :new_line',
+                    $this->platform->getLengthExpression('title')
+                ),
+                ['new_line' => '%\n%'],
+                ['new_line' => Type::STRING]
+            )
+        );
+        // trim title
+        $locateExpr = $this->platform->getLocateExpression('title', ':lf');
+        $queries->addPreQuery(
+            new ParametrizedSqlMigrationQuery(
+                sprintf(
+                    'UPDATE oro_calendar_event SET title = %s WHERE %s > 0',
+                    $this->platform->getSubstringExpression(
+                        sprintf(
+                            'REPLACE(%s, :cr, :empty)',
+                            $this->platform->getSubstringExpression('title', 1, $locateExpr)
+                        ),
+                        1,
+                        255
+                    ),
+                    $locateExpr
+                ),
+                ['lf' => '\n', 'cr' => '\r', 'empty' => ''],
+                ['lf' => Type::STRING, 'cr' => Type::STRING, 'empty' => Type::STRING]
+            )
+        );
+        $queries->addPreQuery(
+            sprintf(
+                'UPDATE oro_calendar_event SET title = %s WHERE %s > 255',
+                $this->platform->getSubstringExpression('title', 1, 255),
+                $this->platform->getLengthExpression('title')
+            )
+        );
+
         $table = $schema->getTable('oro_calendar_event');
+        $table->getColumn('title')->setType(Type::getType(Type::STRING))->setOptions(['length' => 255]);
         $table->getColumn('created_at')->setOptions(['notnull' => true]);
         $table->getColumn('updated_at')->setOptions(['notnull' => true]);
 

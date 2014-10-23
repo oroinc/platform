@@ -24,6 +24,14 @@ class CalendarEventType extends AbstractType
                 ]
             )
             ->add(
+                'description',
+                'textarea',
+                [
+                    'required' => false,
+                    'label'    => 'oro.calendar.calendarevent.description.label'
+                ]
+            )
+            ->add(
                 'start',
                 'oro_datetime',
                 [

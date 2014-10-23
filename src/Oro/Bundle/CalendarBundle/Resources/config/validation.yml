@@ -2,6 +2,8 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
     properties:
         title:
             - NotBlank:     ~
+            - Length:
+                max: 255
         start:
             - DateTime:     ~
             - NotBlank:     ~
