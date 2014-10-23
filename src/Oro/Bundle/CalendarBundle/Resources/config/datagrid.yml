@@ -25,9 +25,6 @@ datagrid:
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
-                type: twig
-                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/title.html.twig
-                frontend_type: html
             name:
                 label: oro.calendar.calendarevent.calendar.name.label
             start:
