@@ -52,12 +52,13 @@ oro:
             entity_label:         Calendar event
             entity_plural_label:  Calendar events
             entity_description:   Represent calendar event
-            id.label:        Id
-            title.label:     Title
-            start.label:     Start
-            end.label:       End
-            calendar.label:  Calendar
-            all_day.label:   All day event
+            id.label:           Id
+            title.label:        Title
+            description.label:  Description
+            start.label:        Start
+            end.label:          End
+            calendar.label:     Calendar
+            all_day.label:      All day event
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php

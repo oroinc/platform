@@ -9,10 +9,6 @@ use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterfac
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
 class OroCalendarBundleInstaller implements Installation, ActivityExtensionAwareInterface
 {
     /** @var ActivityExtension */
@@ -79,7 +75,8 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
         $table = $schema->createTable('oro_calendar_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('calendar_id', 'integer', []);
-        $table->addColumn('title', 'text', []);
+        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('start_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('end_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('all_day', 'boolean', []);

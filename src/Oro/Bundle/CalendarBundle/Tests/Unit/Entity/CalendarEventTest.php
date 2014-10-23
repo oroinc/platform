@@ -37,6 +37,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         return array(
             array('calendar', new Calendar()),
             array('title', 'testTitle'),
+            array('description', 'testdDescription'),
             array('start', new \DateTime()),
             array('end', new \DateTime()),
             array('allDay', true),
@@ -50,20 +51,20 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $obj = new CalendarEvent();
 
         $this->assertNull($obj->getCreatedAt());
+        $this->assertNull($obj->getUpdatedAt());
 
         $obj->prePersist();
         $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
+        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
 
     public function testPreUpdate()
     {
         $obj = new CalendarEvent();
 
-        $this->assertNull($obj->getCreatedAt());
         $this->assertNull($obj->getUpdatedAt());
 
-        $obj->prePersist();
-        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
+        $obj->preUpdate();
         $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
 }

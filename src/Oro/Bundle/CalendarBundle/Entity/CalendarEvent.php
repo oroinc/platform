@@ -75,9 +75,16 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="text", nullable=false)
+     * @ORM\Column(name="title", type="string", length=255)
      */
     protected $title;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="description", type="text", nullable=true)
+     */
+    protected $description;
 
     /**
      * @var \DateTime
@@ -164,6 +171,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * Sets owning calendar
      *
      * @param Calendar $calendar
+     *
      * @return CalendarEvent
      */
     public function setCalendar(Calendar $calendar)
@@ -174,10 +182,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Gets calendar name.
-     * Usually user's default calendar has no name and this method returns null for it.
+     * Gets calendar event title.
      *
-     * @return string|null
+     * @return string
      */
     public function getTitle()
     {
@@ -187,12 +194,37 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * Sets calendar event title.
      *
-     * @param  string $title
+     * @param string $title
+     *
      * @return CalendarEvent
      */
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Gets calendar event description.
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Sets calendar event description.
+     *
+     * @param  string $description
+     *
+     * @return CalendarEvent
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -211,6 +243,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * Sets date/time an event begins.
      *
      * @param \DateTime $start
+     *
      * @return CalendarEvent
      */
     public function setStart($start)
@@ -241,6 +274,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * Sets date/time an event ends.
      *
      * @param \DateTime $end
+     *
      * @return CalendarEvent
      */
     public function setEnd($end)
@@ -264,6 +298,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * Sets a flag indicates whether an event occurs at a specific time-of-day.
      *
      * @param bool $allDay
+     *
      * @return CalendarEvent
      */
     public function setAllDay($allDay)
