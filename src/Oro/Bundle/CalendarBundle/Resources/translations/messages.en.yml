@@ -61,6 +61,8 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
+            widget.information: Calendar Event Information
+            sections.general:   General Information
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php

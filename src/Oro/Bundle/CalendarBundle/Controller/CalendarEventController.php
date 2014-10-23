@@ -44,7 +44,7 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * @Route("/view/{id}", name="oro_calendar_event_view")
+     * @Route("/view/{id}", name="oro_calendar_event_view", requirements={"id"="\d+"})
      * @Template
      * @AclAncestor("oro_calendar_event_view")
      */
