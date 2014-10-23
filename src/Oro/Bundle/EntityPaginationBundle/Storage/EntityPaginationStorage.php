@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
@@ -17,29 +15,10 @@ class EntityPaginationStorage
     const ENTITY_IDS   = 'entity_ids';
     const HASH         = 'hash';
 
-    // TODO: remove constants
-    const ENTITY_NAME      = 'entity_name';
-    const GRID_NAME        = 'grid_name';
-
-    const PAGINATION_STATE = 'pagination_state';
-    const GRID_STATE       = 'state';
-    const PREVIOUS_ID      = 'previous_id';
-    const NEXT_ID          = 'next_id';
-    const TOTAL            = 'total';
-    const PREVIOUS         = 'previous';
-    const NEXT             = 'next';
-
-    const WITHOUT_LINK     = false;
-
     /**
      * @var Request
      */
     protected $request;
-
-    /**
-     * @var Manager
-     */
-    protected $datagridManager;
 
     /**
      * @var DoctrineHelper
@@ -52,13 +31,11 @@ class EntityPaginationStorage
     protected $configManager;
 
     /**
-     * @param Manager $datagridManager
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
      */
-    public function __construct(Manager $datagridManager, DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
-        $this->datagridManager = $datagridManager;
         $this->doctrineHelper  = $doctrineHelper;
         $this->configManager = $configManager;
     }
@@ -80,20 +57,23 @@ class EntityPaginationStorage
      *      ],
      *      ...
      * ]
-
+     *
      * @param string $entityName
      * @param string $hash
      * @param array $entityIds
+     * @return bool
      */
     public function setData($entityName, $hash, array $entityIds)
     {
-        if (!$this->isEnabled()) {
-            return;
+        if (!($this->isEnabled() && $this->request)) {
+            return false;
         }
 
         $storage = $this->getStorage();
         $storage[$entityName] = [self::HASH => $hash, self::ENTITY_IDS => $entityIds];
         $this->setStorage($storage);
+
+        return true;
     }
 
     /**
@@ -118,14 +98,9 @@ class EntityPaginationStorage
      */
     public function getTotalCount($entity)
     {
-        if (!$this->prepareCurrentState($entity)) {
-            return null;
-        }
-
         $total = null;
-        $entityName = $this->getName($entity);
         if ($this->isEntityInStorage($entity)) {
-            $total = $this->getStorage()[$entityName][self::PAGINATION_STATE][self::TOTAL];
+            $total = count($this->getEntityIds($entity));
         }
 
         return $total;
@@ -137,57 +112,31 @@ class EntityPaginationStorage
      */
     public function getCurrentNumber($entity)
     {
-        if (!$this->prepareCurrentState($entity)) {
-            return null;
+        $currentNumber = null;
+        if ($this->isEntityInStorage($entity)) {
+            $currentNumber = $this->getCurrentPosition($entity) + 1;
         }
 
-        $currentPosition = null;
-        $entityData = $this->getEntityStorageData($entity);
-        if (!empty($entityData)) {
-            $gridState = $entityData[self::PAGINATION_STATE][self::GRID_STATE];
-            $pager = $gridState[PagerInterface::PAGER_ROOT_PARAM];
-            $page = $pager[PagerInterface::PAGE_PARAM];
-
-            $perPage = $pager[PagerInterface::PER_PAGE_PARAM];
-            $positionInStorage = array_search(
-                $this->getIdentifierValue($entity),
-                $entityData[self::PAGINATION_STATE][self::ENTITY_IDS]
-            );
-
-            $currentPosition = (($page - 1) * $perPage + $positionInStorage) + 1;
-        }
-
-        return $currentPosition;
+        return $currentNumber;
     }
 
     /**
-     * @param object $entity
-     * @return mixed|null
+     * @param $entity
+     * @return int|null
      */
     public function getPreviousIdentifier($entity)
     {
-        if (!$this->prepareCurrentState($entity)) {
-            return null;
-        }
-
         $previous = null;
-        $entityData = $this->getEntityStorageData($entity);
-        if (!empty($entityData)) {
-            $paginationState = $entityData[self::PAGINATION_STATE];
-            $identifierValue = $this->getIdentifierValue($entity);
-
-            if (
-                $paginationState[self::PREVIOUS_ID] !== null
-                && $identifierValue == reset($paginationState[self::ENTITY_IDS])
-            ) {
-                $previous = $paginationState[self::PREVIOUS_ID];
-            } else {
-                $currentPositionInStorage = array_search($identifierValue, $paginationState[self::ENTITY_IDS]);
-                $previous = $paginationState[self::ENTITY_IDS][--$currentPositionInStorage];
+        if ($this->isEntityInStorage($entity)) {
+            $entityIds = $this->getEntityIds($entity);
+            $currentId = $this->getIdentifierValue($entity);
+            if ($currentId != reset($entityIds)) {
+                $currentPosition = $this->getCurrentPosition($entity);
+                $previous = $entityIds[--$currentPosition];
             }
         }
 
-        return $previous ?: null;
+        return $previous;
     }
 
     /**
@@ -196,39 +145,74 @@ class EntityPaginationStorage
      */
     public function getNextIdentifier($entity)
     {
-        if (!$this->prepareCurrentState($entity)) {
-            return null;
-        }
-
         $next = null;
-        $entityData = $this->getEntityStorageData($entity);
-        if (!empty($entityData)) {
-            $paginationState = $entityData[self::PAGINATION_STATE];
-            $identifierValue = $this->getIdentifierValue($entity);
-
-            if (
-                $paginationState[self::NEXT_ID] !== null
-                && $identifierValue == end($paginationState[self::ENTITY_IDS])
-            ) {
-                $next = $paginationState[self::NEXT_ID];
-            } else {
-                $currentPositionInStorage = array_search($identifierValue, $paginationState[self::ENTITY_IDS]);
-                $next = $paginationState[self::ENTITY_IDS][++$currentPositionInStorage];
+        if ($this->isEntityInStorage($entity)) {
+            $entityIds = $this->getEntityIds($entity);
+            $currentId = $this->getIdentifierValue($entity);
+            if ($currentId != end($entityIds)) {
+                $currentPosition = $this->getCurrentPosition($entity);
+                $next = $entityIds[++$currentPosition];
             }
         }
 
-        return $next ?: null;
+        return $next;
     }
 
     /**
-     * @return array
+     * @param object $entity
+     * @return mixed|null
+     */
+    public function getFirstIdentifier($entity)
+    {
+        $first = null;
+        if ($this->isEntityInStorage($entity)) {
+            $entityIds = $this->getEntityIds($entity);
+            $first     = reset($entityIds);
+        }
+
+        return $first;
+    }
+
+    /**
+     * @param object $entity
+     * @return mixed|null
+     */
+    public function getLastIdentifier($entity)
+    {
+        $last = null;
+        if ($this->isEntityInStorage($entity)) {
+            $entityIds = $this->getEntityIds($entity);
+            $last      = end($entityIds);
+        }
+
+        return $last;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return (bool)$this->configManager->get('oro_entity_pagination.enabled');
+    }
+
+    /**
+     * @return int
+     */
+    public function getLimit()
+    {
+        return (int)$this->configManager->get('oro_entity_pagination.limit');
+    }
+
+    /**
+     * @return array|boolean
      */
     protected function getStorage()
     {
         if ($this->request) {
             return $this->request->getSession()->get(self::STORAGE_NAME, []);
         } else {
-            return [];
+            return false;
         }
     }
 
@@ -248,33 +232,12 @@ class EntityPaginationStorage
      */
     protected function isEntityInStorage($entity)
     {
-        return false;
-
         $storage = $this->getStorage();
         $entityName = $this->getName($entity);
         $identifierValue = $this->getIdentifierValue($entity);
 
         return !empty($storage[$entityName])
-        && (
-            in_array($identifierValue, $storage[$entityName][self::PAGINATION_STATE][self::ENTITY_IDS])
-            || $storage[$entityName][self::PAGINATION_STATE][self::NEXT_ID] == $identifierValue
-            || $storage[$entityName][self::PAGINATION_STATE][self::PREVIOUS_ID] == $identifierValue
-        );
-    }
-
-    /**
-     * @param object $entity
-     * @return array
-     */
-    protected function getEntityStorageData($entity)
-    {
-        $storage = $this->getStorage();
-        $entityData = [];
-        if ($this->isEntityInStorage($entity)) {
-            $entityData = $storage[$this->getName($entity)];
-        }
-
-        return $entityData;
+            && in_array($identifierValue, $storage[$entityName][self::ENTITY_IDS]);
     }
 
     /**
@@ -288,17 +251,6 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
-     * @param array $data
-     */
-    protected function updateStorageData($entity, array $data)
-    {
-        $storage = $this->getStorage();
-        $storage[$this->getName($entity)]  = $data;
-        $this->setStorage($storage);
-    }
-
-    /**
-     * @param object $entity
      * @return mixed|null
      */
     protected function getIdentifierValue($entity)
@@ -308,156 +260,23 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
-     * @param array $entityData
-     * @param int $direction
      * @return array
-     * @throws \LogicException
      */
-    protected function rebuildPaginationState($entity, $entityData, $direction)
+    protected function getEntityIds($entity)
     {
-        $paginationState = $entityData[self::PAGINATION_STATE];
-        $gridState       = $paginationState[self::GRID_STATE];
-        $pageNumber      = $gridState[PagerInterface::PAGER_ROOT_PARAM][PagerInterface::PAGE_PARAM];
-
-        switch($direction) {
-            case self::PREVIOUS:
-                $pageNumber--;
-                break;
-            case self::NEXT:
-                $pageNumber++;
-                break;
-            default:
-                throw new \LogicException(sprintf('Not supported direction "%s".', $direction));
-        }
-
-        $gridState[PagerInterface::PAGER_ROOT_PARAM][PagerInterface::PAGE_PARAM] = $pageNumber;
-
-        /*
-         * Build grid with new grid state (next page or previous page state).
-         * Get data for this state and return pagination state filled with new current ids.
-         */
-        $dataGrid         = $this->datagridManager->getDataGrid($entityData[self::GRID_NAME], $gridState);
-        $records          = $dataGrid->getData()->toArray();
-        $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
-        $paginationState[self::GRID_STATE] = $dataGrid->getParameters()->all();
-
-        $paginationState[self::ENTITY_IDS] = [];
-        foreach ($records['data'] as $record) {
-            $paginationState[self::ENTITY_IDS][] = $record[$entityIdentifier];
-        }
-
-        return $paginationState;
+        $entityName = $this->getName($entity);
+        return $this->getStorage()[$entityName][self::ENTITY_IDS];
     }
 
     /**
      * @param object $entity
-     * @return bool
-     */
-    protected function prepareCurrentState($entity)
-    {
-        $entityData = $this->getEntityStorageData($entity);
-        if (!empty($entityData)) {
-            $paginationState = $entityData[self::PAGINATION_STATE];
-            $identifierValue = $this->getIdentifierValue($entity);
-            $gridState       = $entityData[self::PAGINATION_STATE][self::GRID_STATE];
-            $gridPage        = $gridState[PagerInterface::PAGER_ROOT_PARAM][PagerInterface::PAGE_PARAM];
-            $gridPerPage     = $gridState[PagerInterface::PAGER_ROOT_PARAM][PagerInterface::PER_PAGE_PARAM];
-            $needUpdate      = false;
-
-            if ($identifierValue == $paginationState[self::NEXT_ID]) {
-                /*
-                 * If entity identifier value is equal $paginationState['next_id'] value, it means that entity
-                 * is not in $paginationState['ENTITY_IDS'] kit, and should to generate pagination state for next page.
-                 * The last element of current ids kit will be $nextPaginationState['previous_id'],
-                 * and storage data for current entity name updated by the next page pagination state.
-                */
-                $nextPaginationState = $this->rebuildPaginationState($entity, $entityData, self::NEXT);
-                $nextPaginationState[self::PREVIOUS_ID] = end($paginationState[self::ENTITY_IDS]);
-                $nextPaginationState[self::NEXT_ID]     = null;
-                $entityData[self::PAGINATION_STATE]     = $nextPaginationState;
-                $needUpdate                             = true;
-            } elseif ($identifierValue == $paginationState[self::PREVIOUS_ID]) {
-                /*
-                 * If entity identifier value is equal $paginationState['previous_id'] value, it means that entity
-                 * is not in $paginationState['ENTITY_IDS'] kit, and should to generate pagination state for
-                 * previous page. The first element of current ids kit will be $previousPaginationState['next_id'],
-                 * and storage data for current entity name updated by the previous page pagination state.
-                */
-                $previousPaginationState = $this->rebuildPaginationState($entity, $entityData, self::PREVIOUS);
-                $previousPaginationState[self::NEXT_ID]     = reset($paginationState[self::ENTITY_IDS]);
-                $previousPaginationState[self::PREVIOUS_ID] = null;
-                $entityData[self::PAGINATION_STATE]         = $previousPaginationState;
-                $needUpdate                                 = true;
-            } else {
-                /*
-                 * If entity identifier value is at the beginning of the list current $paginationState['ENTITY_IDS'],
-                 * and current $paginationState['previous_id'] is not defined yet should to define
-                 * $paginationState['previous_id'].  In this case need to set $paginationState['previous_id'].
-                 * Previous id will be FALSE when current entity is a first element on the first page,
-                 * otherwise it will be the last element of generated $previousPaginationState['ENTITY_IDS'].
-                 * Storage data for current entity name updated by $paginationState['previous_id'] value.
-                 */
-                if (
-                    $identifierValue == reset($paginationState[self::ENTITY_IDS])
-                    && null === $paginationState[self::PREVIOUS_ID]
-                ) {
-                    if ($gridPage == 1) {
-                        $paginationState[self::PREVIOUS_ID] = self::WITHOUT_LINK;
-                    } else {
-                        $previousPaginationState = $this->rebuildPaginationState($entity, $entityData, self::PREVIOUS);
-                        $paginationState[self::PREVIOUS_ID] = end($previousPaginationState[self::ENTITY_IDS]);
-                    }
-                    $entityData[self::PAGINATION_STATE] = $paginationState;
-                    $needUpdate                         = true;
-                }
-
-                /*
-                 * If entity identifier value is at the end of the list current $paginationState['ENTITY_IDS'],
-                 * and current $paginationState['next_id'] is not defined yet should to define
-                 * $paginationState['next_id']. In this case need to set $paginationState['next_id'].
-                 * Next id will be FALSE when current entity is a last element on the last page,
-                 * otherwise it will be the first element of generated $nextPaginationState['ENTITY_IDS'].
-                 * Storage data for current entity name updated by $paginationState['next_id'] value.
-                 */
-                if (
-                    $identifierValue == end($paginationState[self::ENTITY_IDS])
-                    && null === $paginationState[self::NEXT_ID]
-                ) {
-                    $lastPage = ceil($paginationState[self::TOTAL] / $gridPerPage);
-                    if ($gridPage == $lastPage) {
-                        $paginationState[self::NEXT_ID] = self::WITHOUT_LINK;
-                    } else {
-                        $nextPaginationState = $this->rebuildPaginationState($entity, $entityData, self::NEXT);
-                        $paginationState[self::NEXT_ID] = reset($nextPaginationState[self::ENTITY_IDS]);
-                    }
-                    $entityData[self::PAGINATION_STATE] = $paginationState;
-                    $needUpdate                         = true;
-                }
-            }
-
-            if ($needUpdate) {
-                $this->updateStorageData($entity, $entityData);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEnabled()
-    {
-        return (bool)$this->configManager->get('oro_entity_pagination.enabled');
-    }
-
-    /**
      * @return int
      */
-    public function getLimit()
+    protected function getCurrentPosition($entity)
     {
-        return (int)$this->configManager->get('oro_entity_pagination.limit');
+        return array_search(
+            $this->getIdentifierValue($entity),
+            $this->getEntityIds($entity)
+        );
     }
 }

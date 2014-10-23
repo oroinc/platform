@@ -6,25 +6,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
 class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_NAME = 'stdClass';
-    const GRID_NAME   = 'test_grid';
     const FIELD_NAME  = 'id';
+    const HASH        = '9b59e3bbc14e88a044c112a5b5e914a4';
 
-    public static $previousIds = [1, 2, 3, 4, 5];
-    public static $currentIds  = [6, 7, 8, 9, 10];
-    public static $nextIds     = [11, 12, 13, 14];
+    public static $entityIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $datagridManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $session;
@@ -37,13 +30,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestIncomplete('Should be fixed in scope of BAP-5722');
-
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->datagridManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Manager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -55,18 +42,18 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->with('oro_entity_pagination.enabled')
             ->will($this->returnValue(true));
 
-        $this->storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
+        $this->storage = new EntityPaginationStorage($this->doctrineHelper, $configManager);
         $this->entity = new \stdClass();
     }
 
     /**
      * @param bool $request
-     * @param array $paginationState
+     * @param array $source
      * @param bool $expected
      *
      * @dataProvider addDataDataProvider
      */
-    public function testAddData($request, array $paginationState, $expected)
+    public function testAddData($request, array $source, $expected)
     {
         if (true === $request) {
             $session = new Session(new MockArraySessionStorage());
@@ -75,7 +62,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             $this->storage->setRequest($request);
         }
 
-        $result = $this->storage->setData(self::ENTITY_NAME, self::GRID_NAME, $paginationState);
+        $result = $this->storage->setData(self::ENTITY_NAME, $source['hash'], $source['entity_ids']);
         $this->assertEquals($expected, $result);
     }
 
@@ -86,38 +73,18 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'is set request' => [
-                'request' => true,
-                'pagination_state' => [
-                    'state'   => [
-                        '_pager' => [
-                            '_page' => 2,
-                            '_per_page' => 5
-                        ],
-                        '_sort_by' => [
-                            'name' => 'ASC'
-                        ],
-                        '_filter'  => []
-                    ],
-                    'current_ids' => self::$currentIds,
-                    'total' => 14,
+                'request'  => true,
+                'source'   => [
+                    'hash'       => self::HASH,
+                    'entity_ids' => self::$entityIds
                 ],
                 'expected' => true
             ],
             'is not set request' => [
-                'request' => false,
-                'pagination_state' => [
-                    'state'   => [
-                        '_pager' => [
-                            '_page' => 2,
-                            '_per_page' => 5
-                        ],
-                        '_sort_by' => [
-                            'name' => 'ASC'
-                        ],
-                        '_filter'  => []
-                    ],
-                    'current_ids' => self::$currentIds,
-                    'total' => 14,
+                'request'  => false,
+                'source'   => [
+                    'hash'       => self::HASH,
+                    'entity_ids' => self::$entityIds
                 ],
                 'expected' => false
             ]
@@ -125,341 +92,17 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
+     * @param $source
+     * @param $expected
+     *
+     * @dataProvider getCurrentNumberDataProvider
      */
-    public function getNextDataProvider()
+    public function testGetCurrentNumber($source, $expected)
     {
-        return [
-            'in current ids' => [
-                'entityId' => 8,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 9,
-            ],
-            'not in storage' => [
-                'entityId' => 40,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => null,
-            ],
-            'last in current ids with empty next id' => [
-                'entityId' => 10,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 11,
-                'rebuild' => [
-                    'page' => 3,
-                    'current_ids' => self::$nextIds,
-                ]
+        $this->assertStoragePrepare($source);
+        $result = $this->storage->getCurrentNumber($this->entity);
 
-            ],
-            'last in current ids' => [
-                'entityId' => 10,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => 11,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 11
-            ],
-            'with next and previous' => [
-                'entityId' => 7,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => 11,
-                        'previous_id' => 5
-                    ]
-                ],
-                'expected' => 8
-            ],
-            'last on last page' => [
-                'entityId' => 14,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 3,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$nextIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => null
-            ],
-        ];
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
-     */
-    public function getPreviousDataProvider()
-    {
-        return [
-            'in current ids' => [
-                'entityId' => 8,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 7,
-            ],
-            'not in storage' => [
-                'entityId' => 40,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => null,
-            ],
-            'first in current ids' => [
-                'entityId' => 6,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => 5
-                    ]
-                ],
-                'expected' => 5
-            ],
-            'first in current ids with empty previous id' => [
-                'entityId' => 6,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 5,
-                'rebuild' => [
-                    'page' => 1,
-                    'current_ids' => self::$previousIds,
-                ]
-
-            ],
-            'with next and previous' => [
-                'entityId' => 7,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => 11,
-                        'previous_id' => 5
-                    ]
-                ],
-                'expected' => 6
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function totalCountDataProvider()
-    {
-        return [
-            'in current ids' => [
-                'entityId' => 8,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => 14,
-            ],
-            'not in storage' => [
-                'entityId' => 40,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
-                    ]
-                ],
-                'expected' => null,
-            ],
-        ];
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -468,178 +111,218 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     public function getCurrentNumberDataProvider()
     {
         return [
-            'in current ids' => [
-                'entityId' => 8,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
+            'in set' => [
+                'source'   => [
+                    'entity_id'    => 8,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
                     ]
                 ],
-                'expected' => 8,
+                'expected' => 8
             ],
-            'not in storage' => [
-                'entityId' => 40,
-                'source' => [
-                    'grid_name' => self::GRID_NAME,
-                    'pagination_state' => [
-                        'state'   => [
-                            '_pager' => [
-                                '_page' => 2,
-                                '_per_page' => 5
-                            ],
-                            '_sort_by' => [
-                                'name' => 'ASC'
-                            ],
-                            '_filter'  => []
-                        ],
-                        'current_ids' => self::$currentIds,
-                        'total' => 14,
-                        'next_id' => null,
-                        'previous_id' => null
+            'not in set' => [
+                'source'   => [
+                    'entity_id'    => 25,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
                     ]
                 ],
-                'expected' => null,
-            ],
+                'expected' => null
+            ]
         ];
     }
 
     /**
-     * @param object $entityId
-     * @param array $source
-     * @param int $expected
-     * @param array|null $rebuild
+     * @param $source
+     * @param $expected
      *
-     * @dataProvider totalCountDataProvider
+     * @dataProvider getFirstIdentifierDataProvider
      */
-    public function testGetTotalCount($entityId, array $source, $expected, array $rebuild = null)
+    public function testGetFirstIdentifier($source, $expected)
     {
-        $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
-        $result = $this->storage->getTotalCount($this->entity);
+        $this->assertStoragePrepare($source);
+        $result = $this->storage->getFirstIdentifier($this->entity);
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @param object $entityId
-     * @param array $source
-     * @param int $expected
-     * @param array|null $rebuild
-     *
-     * @dataProvider getCurrentNumberDataProvider
+     * @return array
      */
-    public function testGetCurrentNumber($entityId, array $source, $expected, array $rebuild = null)
+    public function getFirstIdentifierDataProvider()
     {
-        $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
-        $result = $this->storage->getCurrentNumber($this->entity);
+        return [
+            'in set' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => 1
+            ],
+            'not in set' => [
+                'source'   => [
+                    'entity_id'    => 25,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ]
+        ];
+    }
+
+    /**
+     * @param $source
+     * @param $expected
+     *
+     * @dataProvider getLastIdentifierDataProvider
+     */
+    public function testGetLastIdentifier($source, $expected)
+    {
+        $this->assertStoragePrepare($source);
+        $result = $this->storage->getLastIdentifier($this->entity);
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @param object $entityId
-     * @param array $source
-     * @param int $expected
-     * @param array|null $rebuild
-     *
-     * @dataProvider getPreviousDataProvider
+     * @return array
      */
-    public function testGetPreviousIdentifier($entityId, array $source, $expected, array $rebuild = null)
+    public function getLastIdentifierDataProvider()
     {
-        $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
+        return [
+            'in set' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => 10
+            ],
+            'not in set' => [
+                'source'   => [
+                    'entity_id'    => 25,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ]
+        ];
+    }
+
+    /**
+     * @param $source
+     * @param $expected
+     *
+     * @dataProvider getPreviousIdentifierDataProvider
+     */
+    public function testGetPreviousIdentifier($source, $expected)
+    {
+        $this->assertStoragePrepare($source);
         $result = $this->storage->getPreviousIdentifier($this->entity);
 
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @param object $entityId
-     * @param array $source
-     * @param int $expected
-     * @param array|null $rebuild
-     *
-     * @dataProvider getNextDataProvider
+     * @return array
      */
-    public function testGetNextIdentifier($entityId, array $source, $expected, array $rebuild = null)
+    public function getPreviousIdentifierDataProvider()
     {
-        $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
+        return [
+            'first in set' => [
+                'source'   => [
+                    'entity_id'    => 1,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ],
+            'in set' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => 4
+            ],
+            'not in set' => [
+                'source'   => [
+                    'entity_id'    => 25,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ]
+        ];
+    }
+    /**
+     * @param $source
+     * @param $expected
+     *
+     * @dataProvider getNextIdentifierDataProvider
+     */
+    public function testGetNextIdentifier($source, $expected)
+    {
+        $this->assertStoragePrepare($source);
         $result = $this->storage->getNextIdentifier($this->entity);
 
-        $this->assertSame($expected, $result);
+        $this->assertEquals($expected, $result);
     }
 
     /**
-     * @param object $entity
-     * @param int $entityId
-     * @param array $source
-     * @param array|null $rebuild
+     * @return array
      */
-    protected function assertPrepareCurrentState($entity, $entityId, array $source, array $rebuild = null)
+    public function getNextIdentifierDataProvider()
     {
-        $this->setStorage($source);
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($entity)
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with($entity)
-            ->will($this->returnValue(self::FIELD_NAME));
-
-        if (null !== $rebuild) {
-            $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-
-            $source['pagination_state']['state']['_pager']['_page'] = $rebuild['page'];
-            $source['pagination_state']['current_ids']     = $rebuild['current_ids'];
-
-            $this->datagridManager->expects($this->once())
-                ->method('getDataGrid')
-                ->with($source[EntityPaginationStorage::GRID_NAME], $source['pagination_state']['state'])
-                ->will($this->returnValue($dataGrid));
-
-            $data = [];
-            foreach ($rebuild['current_ids'] as $id) {
-                $data[] = [self::FIELD_NAME => $id];
-            }
-
-            $dataGrid->expects($this->once())
-                ->method('getData')
-                ->will($this->returnValue(ResultsObject::create(['data' => $data])));
-
-            $dataGrid->expects($this->once())
-                ->method('getParameters')
-                ->will($this->returnValue(new ParameterBag($source['pagination_state']['state'])));
-        } else {
-            $this->datagridManager->expects($this->never())
-                ->method('getDataGrid');
-        }
-    }
-
-    /**
-     * @param array $source
-     */
-    protected function setStorage(array $source)
-    {
-        $session = new Session(new MockArraySessionStorage());
-        $session->set(EntityPaginationStorage::STORAGE_NAME, [self::ENTITY_NAME => $source]);
-        $request = new Request();
-        $request->setSession($session);
-        $this->storage->setRequest($request);
+        return [
+            'last in set' => [
+                'source'   => [
+                    'entity_id'    => 10,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ],
+            'in set' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => 6
+            ],
+            'not in set' => [
+                'source'   => [
+                    'entity_id'    => 25,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => self::$entityIds,
+                    ]
+                ],
+                'expected' => null
+            ]
+        ];
     }
 
     /**
@@ -657,7 +340,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->with('oro_entity_pagination.enabled')
             ->will($this->returnValue($source));
 
-        $storage = new EntityPaginationStorage($this->datagridManager, $this->doctrineHelper, $configManager);
+        $storage = new EntityPaginationStorage($this->doctrineHelper, $configManager);
         $this->assertSame($expected, $storage->isEnabled());
     }
 
@@ -688,5 +371,38 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                 'expected' => false,
             ],
         ];
+    }
+
+    /**
+     * @param array $source
+     */
+    protected function assertStoragePrepare(array $source)
+    {
+        $this->setStorage($source['storage_data']);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($this->entity)
+            ->will($this->returnValue($source['entity_id']));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with($this->entity)
+            ->will($this->returnValue(self::FIELD_NAME));
+    }
+
+    /**
+     * @param array $storageData
+     */
+    protected function setStorage(array $storageData)
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $session->set(
+            EntityPaginationStorage::STORAGE_NAME,
+            [self::ENTITY_NAME => $storageData]
+        );
+        $request = new Request();
+        $request->setSession($session);
+        $this->storage->setRequest($request);
     }
 }
