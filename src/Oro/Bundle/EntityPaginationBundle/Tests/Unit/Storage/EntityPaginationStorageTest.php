@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
+
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
 class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,9 +16,9 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     const GRID_NAME   = 'test_grid';
     const FIELD_NAME  = 'id';
 
-    public static $previous_ids = [1, 2, 3, 4, 5];
-    public static $current_ids  = [6, 7, 8, 9, 10];
-    public static $next_ids     = [11, 12, 13, 14];
+    public static $previousIds = [1, 2, 3, 4, 5];
+    public static $currentIds  = [6, 7, 8, 9, 10];
+    public static $nextIds     = [11, 12, 13, 14];
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -31,7 +32,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     /** @var EntityPaginationStorage */
     protected $storage;
 
-    /** @var stdClass */
+    /** @var \stdClass */
     protected $entity;
 
     protected function setUp()
@@ -49,13 +50,13 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $request
-     * @param $paginationState
-     * @param $expected
+     * @param bool $request
+     * @param array $paginationState
+     * @param bool $expected
      *
      * @dataProvider addDataDataProvider
      */
-    public function testAddData($request, $paginationState, $expected)
+    public function testAddData($request, array $paginationState, $expected)
     {
         if (true === $request) {
             $session = new Session(new MockArraySessionStorage());
@@ -87,7 +88,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                         ],
                         '_filter'  => []
                     ],
-                    'current_ids' => self::$current_ids,
+                    'current_ids' => self::$currentIds,
                     'total' => 14,
                 ],
                 'expected' => true
@@ -105,7 +106,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                         ],
                         '_filter'  => []
                     ],
-                    'current_ids' => self::$current_ids,
+                    'current_ids' => self::$currentIds,
                     'total' => 14,
                 ],
                 'expected' => false
@@ -135,7 +136,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -158,7 +159,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -181,7 +182,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -190,7 +191,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                 'expected' => 11,
                 'rebuild' => [
                     'page' => 3,
-                    'current_ids' => self::$next_ids,
+                    'current_ids' => self::$nextIds,
                 ]
 
             ],
@@ -209,7 +210,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => 11,
                         'previous_id' => null
@@ -232,7 +233,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => 11,
                         'previous_id' => 5
@@ -255,7 +256,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$next_ids,
+                        'current_ids' => self::$nextIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -288,7 +289,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -311,7 +312,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -334,7 +335,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => 5
@@ -357,7 +358,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -366,7 +367,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                 'expected' => 5,
                 'rebuild' => [
                     'page' => 1,
-                    'current_ids' => self::$previous_ids,
+                    'current_ids' => self::$previousIds,
                 ]
 
             ],
@@ -385,7 +386,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => 11,
                         'previous_id' => 5
@@ -396,6 +397,9 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function totalCountDataProvider()
     {
         return [
@@ -414,7 +418,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -437,7 +441,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -448,6 +452,9 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getCurrentNumberDataProvider()
     {
         return [
@@ -466,7 +473,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -489,7 +496,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                             ],
                             '_filter'  => []
                         ],
-                        'current_ids' => self::$current_ids,
+                        'current_ids' => self::$currentIds,
                         'total' => 14,
                         'next_id' => null,
                         'previous_id' => null
@@ -501,31 +508,30 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $entityId
-     * @param $source
-     * @param $expected
-     * @param null $rebuild
+     * @param object $entityId
+     * @param array $source
+     * @param int $expected
+     * @param array|null $rebuild
      *
      * @dataProvider totalCountDataProvider
      */
-    public function testGetTotalCount($entityId, $source, $expected, $rebuild = null)
+    public function testGetTotalCount($entityId, array $source, $expected, array $rebuild = null)
     {
         $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
         $result = $this->storage->getTotalCount($this->entity);
 
         $this->assertEquals($expected, $result);
-
     }
 
     /**
-     * @param $entityId
-     * @param $source
-     * @param $expected
-     * @param $rebuild
+     * @param object $entityId
+     * @param array $source
+     * @param int $expected
+     * @param array|null $rebuild
      *
      * @dataProvider getCurrentNumberDataProvider
      */
-    public function testGetCurrentNumber($entityId, $source, $expected, $rebuild = null)
+    public function testGetCurrentNumber($entityId, array $source, $expected, array $rebuild = null)
     {
         $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
         $result = $this->storage->getCurrentNumber($this->entity);
@@ -534,14 +540,14 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $entityId
-     * @param $source
-     * @param $expected
-     * @param $rebuild
+     * @param object $entityId
+     * @param array $source
+     * @param int $expected
+     * @param array|null $rebuild
      *
      * @dataProvider getPreviousDataProvider
      */
-    public function testGetPreviousIdentifier($entityId, $source, $expected, $rebuild = null)
+    public function testGetPreviousIdentifier($entityId, array $source, $expected, array $rebuild = null)
     {
         $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
         $result = $this->storage->getPreviousIdentifier($this->entity);
@@ -549,16 +555,15 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-
     /**
-     * @param $entityId
-     * @param $source
-     * @param $expected
-     * @param $rebuild
+     * @param object $entityId
+     * @param array $source
+     * @param int $expected
+     * @param array|null $rebuild
      *
      * @dataProvider getNextDataProvider
      */
-    public function testGetNextIdentifier($entityId, $source, $expected, $rebuild = null)
+    public function testGetNextIdentifier($entityId, array $source, $expected, array $rebuild = null)
     {
         $this->assertPrepareCurrentState($this->entity, $entityId, $source, $rebuild);
         $result = $this->storage->getNextIdentifier($this->entity);
@@ -567,12 +572,12 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $entity
-     * @param $entityId
-     * @param $source
-     * @param $rebuild
+     * @param object $entity
+     * @param int $entityId
+     * @param array $source
+     * @param array|null $rebuild
      */
-    protected function assertPrepareCurrentState($entity, $entityId, $source, $rebuild)
+    protected function assertPrepareCurrentState($entity, $entityId, array $source, array $rebuild = null)
     {
         $this->setStorage($source);
 
@@ -615,7 +620,10 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function setStorage($source)
+    /**
+     * @param array $source
+     */
+    protected function setStorage(array $source)
     {
         $session = new Session(new MockArraySessionStorage());
         $session->set(EntityPaginationStorage::STORAGE_NAME, [self::ENTITY_NAME => $source]);

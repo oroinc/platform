@@ -214,6 +214,7 @@ class EntityPaginationStorage
         if ($this->request) {
             return $this->request->getSession()->get(self::STORAGE_NAME, []);
         }
+        return [];
     }
 
     /**
