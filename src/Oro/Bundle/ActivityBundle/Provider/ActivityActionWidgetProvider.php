@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
@@ -47,9 +47,18 @@ class ActivityActionWidgetProvider implements WidgetProviderInterface
 
         $items = $this->activityManager->getActivityActions($entityClass);
         foreach ($items as $item) {
-            $widget = $this->placeholderProvider->getItem($item['widget'], ['entity' => $entity]);
-            if ($widget) {
-                $widget['name'] = $item['widget'];
+            $buttonWidget = $this->placeholderProvider->getItem($item['button_widget'], ['entity' => $entity]);
+            if ($buttonWidget) {
+                $widget = [
+                    'name'   => $item['button_widget'],
+                    'button' => $buttonWidget
+                ];
+                if (!empty($item['link_widget'])) {
+                    $linkWidget = $this->placeholderProvider->getItem($item['link_widget'], ['entity' => $entity]);
+                    if ($linkWidget) {
+                        $widget['link'] = $linkWidget;
+                    }
+                }
                 if (isset($item['group'])) {
                     $widget['group'] = $item['group'];
                 }

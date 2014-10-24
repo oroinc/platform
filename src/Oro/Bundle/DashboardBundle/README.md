@@ -123,20 +123,14 @@ datagrid:
             query:
                 select:
                     - call.id
-                    - CONCAT(contact.firstName, CONCAT(' ', contact.lastName)) as contactName
-                    - contact.id as contactId
-                    - account.name as accountName
                     - call.subject
-                    - CONCAT(CASE WHEN call.phoneNumber IS NOT NULL THEN call.phoneNumber ELSE contactPhone.phone END, '') as phone
+                    - call.phoneNumber as phone
                     - call.callDateTime as dateTime
                     - directionType.name as callDirection
                 from:
                     - { table: %orocrm_call.call.entity.class%, alias: call }
                 join:
                     left:
-                        - { join: call.relatedContact, alias: contact }
-                        - { join: call.contactPhoneNumber, alias: contactPhone }
-                        - { join: call.relatedAccount, alias: account }
                         - { join: call.direction, alias: directionType }
                     inner:
                         - { join: call.owner, alias: ownerUser }
@@ -152,11 +146,6 @@ datagrid:
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
-            contactName:
-                type: twig
-                label: orocrm.call.datagrid.contact_name
-                frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/contactName.html.twig
             subject:
                 type: twig
                 label: orocrm.call.subject.label

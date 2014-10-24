@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * This class provides an algorithm to load prioritized widget providers different kind of widgets
+ * This class provides an algorithm to load prioritized widget providers for different kind of widgets
  */
 abstract class AbstractWidgetProviderPass implements CompilerPassInterface
 {

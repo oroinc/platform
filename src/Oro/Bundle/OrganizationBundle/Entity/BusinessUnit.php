@@ -38,7 +38,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      }
  * )
  */
-class BusinessUnit implements NotificationEmailInterface
+class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface
 {
     /**
      * @var integer

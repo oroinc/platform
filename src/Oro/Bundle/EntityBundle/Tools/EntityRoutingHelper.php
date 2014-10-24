@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The helper class intended to use in controllers that works with entities
@@ -52,7 +54,13 @@ class EntityRoutingHelper
      */
     public function decodeClassName($className)
     {
-        return str_replace('_', '\\', $className);
+        $result = str_replace('_', '\\', $className);
+        if (strpos($result, ExtendHelper::ENTITY_NAMESPACE) === 0) {
+            // a custom entity can contain _ in class name
+            $result = ExtendHelper::ENTITY_NAMESPACE . substr($className, strlen(ExtendHelper::ENTITY_NAMESPACE));
+        }
+
+        return $result;
     }
 
     /**
@@ -62,6 +70,7 @@ class EntityRoutingHelper
      * @param string $entityClass
      * @param mixed  $entityId
      * @param array  $additionalParameters
+     *
      * @return string
      */
     public function generateUrl($routeName, $entityClass, $entityId, $additionalParameters = [])
@@ -69,6 +78,30 @@ class EntityRoutingHelper
         $parameters = $this->getRouteParameters($entityClass, $entityId);
         if (!empty($additionalParameters)) {
             $parameters = array_merge($parameters, $additionalParameters);
+        }
+
+        return $this->urlGenerator->generate($routeName, $parameters);
+    }
+
+    /**
+     * Generates a URL for a specific route based on the given parameters
+     *
+     * @param string  $routeName
+     * @param Request $request
+     * @param array   $additionalParameters
+     *
+     * @return string
+     */
+    public function generateUrlByRequest($routeName, Request $request, $additionalParameters = [])
+    {
+        $entityClass = $request->get('entityClass');
+        if ($entityClass) {
+            $parameters = $this->getRouteParameters($entityClass, $request->get('entityId'));
+            if (!empty($additionalParameters)) {
+                $parameters = array_merge($parameters, $additionalParameters);
+            }
+        } else {
+            $parameters = $additionalParameters;
         }
 
         return $this->urlGenerator->generate($routeName, $parameters);
