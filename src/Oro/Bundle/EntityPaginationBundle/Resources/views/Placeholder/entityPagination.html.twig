@@ -1,6 +1,11 @@
 {% set pager = oro_entity_pagination_pager(entity) %}
 {% if pager %}
     <li>
+        {% set first = oro_entity_pagination_first(entity) %}
+        {% if first %}
+            <a href="{{ path(first.route, first.route_params) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
+        {% endif %}
+
         {% set previous = oro_entity_pagination_previous(entity) %}
         {% if previous %}
             <a href="{{ path(previous.route, previous.route_params) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
@@ -11,6 +16,11 @@
         {% set next = oro_entity_pagination_next(entity) %}
         {% if next %}
             <a href="{{ path(next.route, next.route_params) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
+        {% endif %}
+
+        {% set last = oro_entity_pagination_last(entity) %}
+        {% if last %}
+            <a href="{{ path(last.route, last.route_params) }}">{{ 'oro.entity_pagination.last'|trans }}</a>
         {% endif %}
     </li>
 {% endif %}
