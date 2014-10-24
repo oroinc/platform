@@ -143,7 +143,7 @@ class EntityPaginationListener
     }
 
     /**
-     * @return bool
+     * @return int
      */
     protected function getEntitiesLimit()
     {
