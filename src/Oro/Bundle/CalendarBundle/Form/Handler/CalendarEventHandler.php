@@ -4,7 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
