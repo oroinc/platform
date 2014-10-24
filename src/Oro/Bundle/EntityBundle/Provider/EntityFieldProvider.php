@@ -309,11 +309,6 @@ class EntityFieldProvider
         if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
             return true;
         }
-        // skip a field if it was deleted
-       // $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $fieldName);
-       // if ($fieldConfig->is('is_deleted')) {
-       //     return true;
-       // }
 
         return false;
     }
