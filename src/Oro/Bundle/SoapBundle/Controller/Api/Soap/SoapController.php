@@ -133,19 +133,7 @@ abstract class SoapController extends SoapGetController implements
      */
     protected function fixFormData(array &$data, $entity)
     {
-        $changed = false;
-
-        foreach ($data as $key => $property) {
-            if (is_array($property) && isset($property['date'], $property['timezone'])) {
-                $date = str_replace(' ', 'T', $property['date']);
-                $timezone = str_replace(':', '', $property['timezone']);
-                $data[$key] = $date . $timezone;
-
-                $changed = true;
-            }
-        }
-
-        return $changed;
+        return false;
     }
 
     /**
@@ -167,16 +155,16 @@ abstract class SoapController extends SoapGetController implements
     protected function convertValueToArray($value)
     {
         // special case for ordered arrays
-        if ($value instanceof \stdClass && isset($value->item) && is_array($value->item)) {
-            $value = (array) $value->item;
-        }
-
-        if ($value instanceof Collection) {
-            $value = $value->toArray();
-        }
-
         if (is_object($value)) {
-            $value = (array) $value;
+            if ($value instanceof \stdClass && isset($value->item) && is_array($value->item)) {
+                $value = $value->item;
+            } elseif ($value instanceof \DateTime) {
+                $value = $value->format(\DateTime::ISO8601);
+            } elseif ($value instanceof Collection) {
+                $value = $value->toArray();
+            } else {
+                $value = (array)$value;
+            }
         }
 
         if (is_array($value)) {
