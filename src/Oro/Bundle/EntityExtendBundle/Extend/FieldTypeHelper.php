@@ -32,4 +32,14 @@ class FieldTypeHelper
 
         return $this->underlyingTypesMap[$type];
     }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isRelation($type)
+    {
+        return in_array($type, ['ref-one', 'ref-many', 'oneToMany', 'manyToOne', 'manyToMany', 'optionSet']);
+    }
 }
