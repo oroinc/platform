@@ -1,0 +1,200 @@
+<?php
+
+namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
+
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\Guess;
+use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
+
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+
+class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
+{
+    /**
+     * @var ConfigProvider
+     */
+    protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $formConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
+
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @var array
+     */
+    protected $typeMap = [
+        'string'     => 'text',
+        'integer'    => 'integer',
+        'smallint'   => 'integer',
+        'bigint'     => 'integer',
+        'boolean'    => 'choice',
+        'decimal'    => 'number',
+        'money'      => 'oro_money',
+        'percent'    => 'oro_percent',
+        'date'       => 'oro_date',
+        'datetime'   => 'oro_datetime',
+        'text'       => 'textarea',
+        'float'      => 'number',
+        'file'       => 'oro_file',
+        'image'      => 'oro_image',
+        'manyToOne'  => 'oro_entity_select',
+        'oneToMany'  => 'oro_multiple_entity',
+        'manyToMany' => 'oro_multiple_entity',
+        'optionSet'  => 'oro_option_select',
+        'enum'       => 'oro_enum_select',
+        'multiEnum'  => 'oro_enum_choice',
+    ];
+
+    /**
+     * @param ManagerRegistry         $managerRegistry
+     * @param ConfigManager           $configManager
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $formConfigProvider
+     * @param ConfigProvider $extendConfigProvider
+     */
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        ConfigManager $configManager,
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $formConfigProvider,
+        ConfigProvider $extendConfigProvider
+    ) {
+        $this->formConfigProvider = $formConfigProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
+        $this->managerRegistry = $managerRegistry;
+        $this->configManager = $configManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessType($className, $property)
+    {
+        $formConfig = $this->formConfigProvider->getConfig($className, $property);
+        if (!$formConfig->is('is_enabled')) {
+            return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+        }
+
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $formConfig->getId();
+        $fieldName = $fieldConfigId->getFieldName();
+
+        $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
+        if (!$this->isApplicableField($extendConfig)) {
+            return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+        }
+
+        $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
+
+        $options = [
+            'label'    => $entityConfig->get('label'),
+            'required' => false,
+            'block'    => 'general',
+        ];
+
+        switch ($fieldConfigId->getFieldType()) {
+            case 'boolean':
+                $options['empty_value'] = false;
+                $options['choices'] = ['No', 'Yes'];
+                break;
+            case 'optionSet':
+                $options['entityClassName'] = $className;
+                $options['entityFieldName'] = $fieldName;
+                break;
+            case 'enum':
+                $options['enum_code'] = $this->configManager->getProvider('enum')
+                    ->getConfig($className, $fieldName)
+                    ->get('enum_code');
+                break;
+            case 'multiEnum':
+                $options['expanded'] = true;
+                $options['enum_code'] = $this->configManager->getProvider('enum')
+                    ->getConfig($className, $fieldName)
+                    ->get('enum_code');
+                break;
+            case 'manyToOne':
+                $options['entity_class'] = $extendConfig->get('target_entity');
+                $options['configs'] = [
+                    'placeholder'   => 'oro.form.choose_value',
+                    'extra_config'  => 'relation',
+                    'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
+                    'target_field'  => $extendConfig->get('target_field'),
+                    'properties'    => [$extendConfig->get('target_field')],
+                ];
+                break;
+        }
+
+
+        return new TypeGuess(
+            $this->typeMap[$fieldConfigId->getFieldType()],
+            $options,
+            TypeGuess::VERY_HIGH_CONFIDENCE
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessRequired($class, $property)
+    {
+        return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessMaxLength($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessPattern($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * @param ConfigInterface         $extendConfig
+     *
+     * @return bool
+     */
+    protected function isApplicableField(ConfigInterface $extendConfig)
+    {
+        return
+            !$extendConfig->is('is_deleted')
+            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
+            && !in_array($extendConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
+            && (
+                !$extendConfig->has('target_entity')
+                || !$this->extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+            );
+    }
+}
