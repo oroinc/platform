@@ -56,9 +56,8 @@ services:
             - { name: oro_migration.extension, extension_name: note }
 
     oro_note.widget_provider.actions:
-        class: %oro_ui.widget_provider.action_button.class%
+        parent: oro_ui.widget_provider.action_button.abstract
         arguments:
-            - @oro_ui.placeholder.provider
             - oro_add_note_button
             - oro_add_note_link
         tags:
