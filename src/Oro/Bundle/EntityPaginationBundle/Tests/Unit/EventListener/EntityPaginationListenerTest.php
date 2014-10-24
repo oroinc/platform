@@ -8,8 +8,10 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
 class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -161,6 +163,9 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
 
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $dataGrid->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(self::GRID_NAME));
+        $dataGrid->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($configObject));
         $dataGrid->expects($this->any())
@@ -174,5 +179,65 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($acceptor));
 
         return $dataGrid;
+    }
+
+    public function testOnResultAfterSetData()
+    {
+        $limit = 100;
+        $total = 50;
+
+        $state = ['filters' => ['a' => 'b'], 'sorters' => ['c' => 'd']];
+        $stateHash = md5(json_encode(array_merge($state, ['total' => $total])));
+        $parameters = [
+            OrmFilterExtension::FILTER_ROOT_PARAM  => $state['filters'],
+            OrmSorterExtension::SORTERS_ROOT_PARAM => $state['sorters'],
+            PagerInterface::PAGER_ROOT_PARAM       => [
+                PagerInterface::PAGE_PARAM     => 1,
+                PagerInterface::PER_PAGE_PARAM => $limit
+            ],
+        ];
+
+        $fieldName = 'id';
+        $entityIds = [1, 2, 3, 4, 5];
+        $entityResult = [];
+        foreach ($entityIds as $id) {
+            $entityResult[] = [$fieldName => $id];
+        }
+
+        $this->storage->expects($this->any())
+            ->method('isEnabled')
+            ->will($this->returnValue(true));
+        $this->storage->expects($this->any())
+            ->method('getLimit')
+            ->will($this->returnValue($limit));
+        $this->storage->expects($this->once())
+            ->method('hasData')
+            ->with(self::ENTITY_NAME, $this->isType('string'))
+            ->will($this->returnValue(false));
+        $this->storage->expects($this->at(3))
+            ->method('setData')
+            ->with(self::ENTITY_NAME, $stateHash, []);
+        $this->storage->expects($this->at(5))
+            ->method('setData')
+            ->with(self::ENTITY_NAME, $stateHash, $entityIds);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(self::ENTITY_NAME)
+            ->will($this->returnValue($fieldName));
+
+        $fullDataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $fullDataGrid->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue(ResultsObject::create(['data' => $entityResult])));
+
+        $this->datagridManager->expects($this->once())
+            ->method('getDataGrid')
+            ->with(self::GRID_NAME, $parameters)
+            ->will($this->returnValue($fullDataGrid));
+
+        $dataGrid = $this->createGridMock(true, $state, $total);
+
+        $this->listener->onResultAfter(new OrmResultAfter($dataGrid));
     }
 }

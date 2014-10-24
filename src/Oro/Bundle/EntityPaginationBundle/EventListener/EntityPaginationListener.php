@@ -88,8 +88,8 @@ class EntityPaginationListener
         $entityName = $this->getEntityName($dataGrid);
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
 
-        $dataGrid = $this->dataGridManager->getDataGrid($dataGrid->getName(), $parameters);
-        $records = $dataGrid->getData()->toArray();
+        $fullDataGrid = $this->dataGridManager->getDataGrid($dataGrid->getName(), $parameters);
+        $records = $fullDataGrid->getData()->toArray();
 
         $entityIds = [];
         foreach ($records['data'] as $record) {
