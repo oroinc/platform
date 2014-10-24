@@ -31,6 +31,8 @@ parameters:
     oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
     oro_entity_extend.type.enum_filter.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType
 
+    oro_entity_extend.form.guesser.extend_field.class:          Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser
+
 services:
     oro_entity_extend.type.entity:
         class:                                                  %oro_entity_extend.type.entity.class%
@@ -227,3 +229,14 @@ services:
             - @doctrine
         tags:
             - { name: form.type, alias: oro_enum_filter }
+
+    oro_entity_extend.form.guesser.extend_field:
+        class: %oro_entity_extend.form.guesser.extend_field.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.config_manager
+            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.form
+            - @oro_entity_config.provider.extend
+        tags:
+            - { name: form.type_guesser, priority: 20 }
