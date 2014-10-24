@@ -409,6 +409,17 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => null
             ],
+            'without entity ids' => [
+                'enabled'  => true,
+                'source'   => [
+                    'entity_id'    => 5,
+                    'storage_data' => [
+                        'hash'       => self::HASH,
+                        'entity_ids' => [],
+                    ]
+                ],
+                'expected' => null
+            ]
         ];
     }
 

@@ -303,11 +303,12 @@ class EntityPaginationStorage
     {
         $entityName = $this->getName($entity);
         $storage = $this->getStorage();
+        $entityIds = [];
         if ($storage && !empty($storage[$entityName][self::ENTITY_IDS])) {
-            return $storage[$entityName][self::ENTITY_IDS];
-        } else {
-            return [];
+            $entityIds = $storage[$entityName][self::ENTITY_IDS];
         }
+
+        return $entityIds;
     }
 
     /**
