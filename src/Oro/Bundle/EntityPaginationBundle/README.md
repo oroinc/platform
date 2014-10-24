@@ -66,5 +66,11 @@ class UserController extends Controller
 System Configuration
 --------------------
 
+Entity pagination has two system configuration options to handle pagination process. These options are accessible
+in section "System configuration" > "General setup" > "Display settings" > "Data Grid settings".
 
-
+* **Entity Pagination**, default is **true**, key _oro\_entity\_pagination.enabled_ - used to enable or disable
+entity pagination allover the system
+* **Entity Pagination limit**, default is **1000**, key _oro\_entity\_pagination.limit_ - allows to set maximum number
+of entities in grid for entity pagination (i.e. if number of entities in grid more than limit then entity pagination
+will not be available)
