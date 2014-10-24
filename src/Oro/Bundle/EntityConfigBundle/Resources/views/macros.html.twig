@@ -7,18 +7,28 @@
             {% set itemValue = item.value %}
             {% if itemValue is iterable %}
                 {% set data = '' %}
-                {% for value in itemValue.values %}
-                    {% if value.link is defined and value.link != false  %}
+                {% if itemValue.values is defined %}
+                    {% for value in itemValue.values %}
+                        {% if value.link is defined and value.link != false  %}
+                            {% set hasLink = true %}
+                            {% set data = data ~ ui.renderUrl(value.link, value.title) %}
+                        {% else %}
+                            {% set data = data ~ value.title|escape %}
+                        {% endif %}
+                        {% if not loop.last %}
+                            {% set data = data ~ ', ' %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% set itemValue = data %}
+                {% else %}
+                    {% if itemValue.link is defined and itemValue.link != false  %}
                         {% set hasLink = true %}
-                        {% set data = data ~ ui.renderUrl(value.link, value.title) %}
+                        {% set itemValue = ui.renderUrl(itemValue.link, itemValue.title) %}
                     {% else %}
-                        {% set data = data ~ value.title|escape %}
+                        {% set itemValue = itemValue.title|escape %}
                     {% endif %}
-                    {% if not loop.last %}
-                        {% set data = data ~ ', ' %}
-                    {% endif %}
-                {% endfor %}
-                {% set itemValue = data %}
+                {% endif %}
             {% endif %}
 
             {% if item.type == 'text' %}
