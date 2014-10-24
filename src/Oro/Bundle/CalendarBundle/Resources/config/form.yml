@@ -40,6 +40,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
             - @oro_entity.routing_helper
+            - @oro_security.security_facade
 
     oro_calendar.calendar_event.form.handler.api:
         class: %oro_calendar.calendar_event.form.handler.api.class%

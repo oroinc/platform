@@ -108,12 +108,6 @@ datagrid:
                     - event.end
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
-                join:
-                    inner:
-                        - { join: event.calendar, alias: calendar }
-                where:
-                    and:
-                      - calendar.owner = @oro_security.security_facade->getLoggedUserId
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
