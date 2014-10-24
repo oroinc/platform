@@ -216,12 +216,10 @@ class EntityFieldProvider
             $fieldConfigId = $fieldConfig->getId();
             $fieldName = $fieldConfigId->getFieldName();
 
-            if ($this->fieldTypeHelper->isRelation(
-                    $this->fieldTypeHelper->getUnderlyingType(
-                        $fieldConfigId->getFieldType()
-                    )
-                )
-            ) {
+            $fieldType = $this->fieldTypeHelper->getUnderlyingType(
+                $fieldConfigId->getFieldType()
+            );
+            if ($this->fieldTypeHelper->isRelation($fieldType)) {
                 // skip because this field is relation
                 continue;
             }
@@ -230,16 +228,20 @@ class EntityFieldProvider
                 // skip because a field with this name is already added, it could be a virtual field
                 continue;
             }
+
             if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $fieldName)) {
                 // skip non configurable field
                 continue;
             }
+
             if ($this->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
+
             if ($fieldConfig->is('is_deleted')) {
                 continue;
             }
+
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
