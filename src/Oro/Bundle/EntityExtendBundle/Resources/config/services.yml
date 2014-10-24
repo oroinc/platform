@@ -235,6 +235,17 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }
 
+    oro_entity_extend.twig.extension.dynamic_fields:
+        class: %oro_entity_extend.twig.extension.dynamic_fields.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
+            - @oro_locale.formatter.date_time
+            - @router
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: twig.extension }
+
     oro_entity_extend.twig.extension.enum:
         class: %oro_entity_extend.twig.extension.enum.class%
         arguments:
