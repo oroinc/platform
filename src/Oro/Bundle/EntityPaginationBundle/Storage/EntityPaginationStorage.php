@@ -15,6 +15,11 @@ class EntityPaginationStorage
     const ENTITY_IDS   = 'entity_ids';
     const HASH         = 'hash';
 
+    const FIRST    = 'first';
+    const PREVIOUS = 'previous';
+    const NEXT     = 'next';
+    const LAST     = 'last';
+
     /**
      * @var Request
      */
@@ -126,17 +131,7 @@ class EntityPaginationStorage
      */
     public function getPreviousIdentifier($entity)
     {
-        $previous = null;
-        if ($this->isEntityInStorage($entity)) {
-            $entityIds = $this->getEntityIds($entity);
-            $currentId = $this->getIdentifierValue($entity);
-            if ($currentId != reset($entityIds)) {
-                $currentPosition = $this->getCurrentPosition($entity);
-                $previous = $entityIds[--$currentPosition];
-            }
-        }
-
-        return $previous;
+        return $this->getIdentifier($entity, self::PREVIOUS);
     }
 
     /**
@@ -145,17 +140,7 @@ class EntityPaginationStorage
      */
     public function getNextIdentifier($entity)
     {
-        $next = null;
-        if ($this->isEntityInStorage($entity)) {
-            $entityIds = $this->getEntityIds($entity);
-            $currentId = $this->getIdentifierValue($entity);
-            if ($currentId != end($entityIds)) {
-                $currentPosition = $this->getCurrentPosition($entity);
-                $next = $entityIds[++$currentPosition];
-            }
-        }
-
-        return $next;
+        return $this->getIdentifier($entity, self::NEXT);
     }
 
     /**
@@ -164,13 +149,7 @@ class EntityPaginationStorage
      */
     public function getFirstIdentifier($entity)
     {
-        $first = null;
-        if ($this->isEntityInStorage($entity)) {
-            $entityIds = $this->getEntityIds($entity);
-            $first     = reset($entityIds);
-        }
-
-        return $first;
+        return $this->getIdentifier($entity, self::FIRST);
     }
 
     /**
@@ -179,13 +158,50 @@ class EntityPaginationStorage
      */
     public function getLastIdentifier($entity)
     {
-        $last = null;
+        return $this->getIdentifier($entity, self::LAST);
+    }
+
+    /**
+     * @param object $entity
+     * @param string $navigation
+     * @return mixed|null
+     */
+    protected function getIdentifier($entity, $navigation)
+    {
+        $identifier = null;
         if ($this->isEntityInStorage($entity)) {
             $entityIds = $this->getEntityIds($entity);
-            $last      = end($entityIds);
+            $currentId = $this->getIdentifierValue($entity);
+            switch ($navigation) {
+                case self::FIRST:
+                    if ($currentId != reset($entityIds)) {
+                        $identifier = reset($entityIds);
+                    }
+                    break;
+                case self::PREVIOUS:
+                    if ($currentId != reset($entityIds)) {
+                        $currentPosition = $this->getCurrentPosition($entity);
+                        $identifier = $entityIds[--$currentPosition];
+                    }
+                    break;
+                case self::NEXT:
+                    if ($currentId != end($entityIds)) {
+                        $currentPosition = $this->getCurrentPosition($entity);
+                        $identifier = $entityIds[++$currentPosition];
+                    }
+                    break;
+                case self::LAST:
+                    if ($currentId != end($entityIds)) {
+                        $identifier = end($entityIds);
+                    }
+                    break;
+                default:
+                    throw new \LogicException(sprintf('Not supported navigation "%s".', $navigation));
+            }
         }
 
-        return $last;
+        return $identifier;
+
     }
 
     /**
