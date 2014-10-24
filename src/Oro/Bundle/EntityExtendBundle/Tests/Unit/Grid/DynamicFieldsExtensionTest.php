@@ -105,7 +105,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetPriority()
     {
         $this->assertEquals(
-            250,
+            300,
             $this->extension->getPriority()
         );
     }

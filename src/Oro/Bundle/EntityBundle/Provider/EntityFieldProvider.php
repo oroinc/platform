@@ -211,8 +211,21 @@ class EntityFieldProvider
             $this->addVirtualFields($result, $metadata, $applyExclusions, $translate);
         }
         // add regular fields
-        $fieldNames = $metadata->getFieldNames();
-        foreach ($fieldNames as $fieldName) {
+        $configs = $this->extendConfigProvider->getConfigs($metadata->getName());
+        foreach ($configs as $fieldConfig) {
+            $fieldConfigId = $fieldConfig->getId();
+            $fieldName = $fieldConfigId->getFieldName();
+
+            if ($this->fieldTypeHelper->isRelation(
+                    $this->fieldTypeHelper->getUnderlyingType(
+                        $fieldConfigId->getFieldType()
+                    )
+                )
+            ) {
+                // skip because this field is relation
+                continue;
+            }
+
             if (isset($result[$fieldName])) {
                 // skip because a field with this name is already added, it could be a virtual field
                 continue;
@@ -224,6 +237,9 @@ class EntityFieldProvider
             if ($this->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
+            if ($fieldConfig->is('is_deleted')) {
+                continue;
+            }
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
@@ -231,7 +247,7 @@ class EntityFieldProvider
             $this->addField(
                 $result,
                 $fieldName,
-                $metadata->getTypeOfField($fieldName),
+                $fieldConfigId->getFieldType(),
                 $this->getFieldLabel($className, $fieldName),
                 $metadata->isIdentifier($fieldName),
                 $translate
@@ -294,10 +310,10 @@ class EntityFieldProvider
             return true;
         }
         // skip a field if it was deleted
-        $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $fieldName);
-        if ($fieldConfig->is('is_deleted')) {
-            return true;
-        }
+       // $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $fieldName);
+       // if ($fieldConfig->is('is_deleted')) {
+       //     return true;
+       // }
 
         return false;
     }
