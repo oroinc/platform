@@ -12,6 +12,7 @@ oro:
     calendar:
         my_calendar:         My Calendar
         add_event:           Add Event
+        assign_event:        Assign Event
         view_events:         Events
 
         controller:
