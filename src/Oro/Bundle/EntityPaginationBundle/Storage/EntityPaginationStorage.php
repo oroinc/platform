@@ -70,11 +70,15 @@ class EntityPaginationStorage
      */
     public function setData($entityName, $hash, array $entityIds)
     {
-        if (!($this->isEnabled() && $this->request)) {
+        if (!$this->isEnabled()) {
             return false;
         }
 
         $storage = $this->getStorage();
+        if (null === $storage) {
+            return false;
+        }
+
         $storage[$entityName] = [self::HASH => $hash, self::ENTITY_IDS => $entityIds];
         $this->setStorage($storage);
 
@@ -93,8 +97,11 @@ class EntityPaginationStorage
         }
 
         $storage = $this->getStorage();
+        if (null === $storage) {
+            return false;
+        }
 
-        return isset($storage[$entityName]['hash']) && $storage[$entityName]['hash'] == $hash;
+        return isset($storage[$entityName][self::HASH]) && $storage[$entityName][self::HASH] == $hash;
     }
 
     /**
@@ -103,6 +110,10 @@ class EntityPaginationStorage
      */
     public function getTotalCount($entity)
     {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
         $total = null;
         if ($this->isEntityInStorage($entity)) {
             $total = count($this->getEntityIds($entity));
@@ -117,6 +128,10 @@ class EntityPaginationStorage
      */
     public function getCurrentNumber($entity)
     {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
         $currentNumber = null;
         if ($this->isEntityInStorage($entity)) {
             $currentNumber = $this->getCurrentPosition($entity) + 1;
@@ -168,6 +183,10 @@ class EntityPaginationStorage
      */
     protected function getIdentifier($entity, $navigation)
     {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
         $identifier = null;
         if ($this->isEntityInStorage($entity)) {
             $entityIds = $this->getEntityIds($entity);
@@ -195,8 +214,6 @@ class EntityPaginationStorage
                         $identifier = end($entityIds);
                     }
                     break;
-                default:
-                    throw new \LogicException(sprintf('Not supported navigation "%s".', $navigation));
             }
         }
 
@@ -221,14 +238,14 @@ class EntityPaginationStorage
     }
 
     /**
-     * @return array|boolean
+     * @return array|null
      */
     protected function getStorage()
     {
         if ($this->request) {
             return $this->request->getSession()->get(self::STORAGE_NAME, []);
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -249,10 +266,14 @@ class EntityPaginationStorage
     protected function isEntityInStorage($entity)
     {
         $storage = $this->getStorage();
+        if (null === $storage) {
+            return false;
+        }
+
         $entityName = $this->getName($entity);
         $identifierValue = $this->getIdentifierValue($entity);
 
-        return !empty($storage[$entityName])
+        return !empty($storage[$entityName][self::ENTITY_IDS])
             && in_array($identifierValue, $storage[$entityName][self::ENTITY_IDS]);
     }
 
@@ -281,7 +302,12 @@ class EntityPaginationStorage
     protected function getEntityIds($entity)
     {
         $entityName = $this->getName($entity);
-        return $this->getStorage()[$entityName][self::ENTITY_IDS];
+        $storage = $this->getStorage();
+        if ($storage && !empty($storage[$entityName][self::ENTITY_IDS])) {
+            return $storage[$entityName][self::ENTITY_IDS];
+        } else {
+            return [];
+        }
     }
 
     /**
