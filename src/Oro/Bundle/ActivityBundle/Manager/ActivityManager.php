@@ -26,22 +26,28 @@ class ActivityManager
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
-        ConfigProvider $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
+        $this->extendConfigProvider   = $extendConfigProvider;
     }
 
     /**
@@ -187,6 +193,10 @@ class ActivityManager
 
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
+            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+                continue;
+            }
+
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
 
@@ -227,6 +237,10 @@ class ActivityManager
 
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
+            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+                continue;
+            }
+
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
             $buttonWidget   = $activityConfig->get('action_button_widget');
             if (!empty($buttonWidget)) {
@@ -327,5 +341,25 @@ class ActivityManager
                 )
             )
             ->setParameter('targetEntityId', $entityId);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $activityClassName
+     *
+     * @return bool
+     */
+    protected function isActivityAssociationEnabled($entityClass, $activityClassName)
+    {
+        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
+        $relations    = $extendConfig->get('relation', false, []);
+        $relationKey  = ExtendHelper::buildRelationKey(
+            $activityClassName,
+            ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND),
+            'manyToMany',
+            $entityClass
+        );
+
+        return isset($relations[$relationKey]);
     }
 }
