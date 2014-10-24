@@ -22,8 +22,9 @@ services:
     oro_entity_pagination.event_listener.entity_pagination:
         class: %oro_entity_pagination.event_listener.entity_pagination.class%
         arguments:
-            - @oro_entity_pagination.storage
+            - @oro_datagrid.datagrid.manager
             - @oro_entity.doctrine_helper
+            - @oro_entity_pagination.storage
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
 
