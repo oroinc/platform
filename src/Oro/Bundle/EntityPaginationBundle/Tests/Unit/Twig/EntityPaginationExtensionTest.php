@@ -19,6 +19,11 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     protected $storage;
 
     /**
+     * @var \stdClass
+     */
+    protected $entity;
+
+    /**
      * @var EntityPaginationExtension
      */
     protected $extension;
@@ -33,14 +38,18 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entity = new \stdClass();
+
         $this->extension = new EntityPaginationExtension($this->doctrineHelper, $this->storage);
     }
 
     public function testGetFunctions()
     {
         $expectedFunctions = [
+            'oro_entity_pagination_first'    => [$this->extension, 'getFirst'],
             'oro_entity_pagination_previous' => [$this->extension, 'getPrevious'],
             'oro_entity_pagination_next'     => [$this->extension, 'getNext'],
+            'oro_entity_pagination_last'     => [$this->extension, 'getLast'],
             'oro_entity_pagination_pager'    => [$this->extension, 'getPager'],
         ];
 
@@ -61,27 +70,25 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $attributes
      * @param int|null $entityId
      * @param string|null $fieldName
-     * @dataProvider getPreviousNextDataProvider
+     * @dataProvider getNavigationDataProvider
      */
-    public function testGetPrevious($expected, array $attributes = null, $entityId = null, $fieldName = null)
+    public function testGetFirst($expected, array $attributes = null, $entityId = null, $fieldName = null)
     {
-        $entity = new \stdClass();
-
         if (null !== $attributes) {
             $this->extension->setRequest(new Request([], [], $attributes));
         }
 
         $this->storage->expects($this->any())
-            ->method('getPreviousIdentifier')
-            ->with($entity)
+            ->method('getFirstIdentifier')
+            ->with($this->entity)
             ->will($this->returnValue($entityId));
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifierFieldName')
-            ->with($entity)
+            ->with($this->entity)
             ->will($this->returnValue($fieldName));
 
-        $this->assertSame($expected, $this->extension->getPrevious($entity));
+        $this->assertSame($expected, $this->extension->getFirst($this->entity));
     }
 
     /**
@@ -89,33 +96,83 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $attributes
      * @param int|null $entityId
      * @param string|null $fieldName
-     * @dataProvider getPreviousNextDataProvider
+     * @dataProvider getNavigationDataProvider
+     */
+    public function testGetLast($expected, array $attributes = null, $entityId = null, $fieldName = null)
+    {
+        if (null !== $attributes) {
+            $this->extension->setRequest(new Request([], [], $attributes));
+        }
+
+        $this->storage->expects($this->any())
+            ->method('getLastIdentifier')
+            ->with($this->entity)
+            ->will($this->returnValue($entityId));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with($this->entity)
+            ->will($this->returnValue($fieldName));
+
+        $this->assertSame($expected, $this->extension->getLast($this->entity));
+    }
+
+    /**
+     * @param mixed $expected
+     * @param array $attributes
+     * @param int|null $entityId
+     * @param string|null $fieldName
+     * @dataProvider getNavigationDataProvider
+     */
+    public function testGetPrevious($expected, array $attributes = null, $entityId = null, $fieldName = null)
+    {
+        if (null !== $attributes) {
+            $this->extension->setRequest(new Request([], [], $attributes));
+        }
+
+        $this->storage->expects($this->any())
+            ->method('getPreviousIdentifier')
+            ->with($this->entity)
+            ->will($this->returnValue($entityId));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with($this->entity)
+            ->will($this->returnValue($fieldName));
+
+        $this->assertSame($expected, $this->extension->getPrevious($this->entity));
+    }
+
+    /**
+     * @param mixed $expected
+     * @param array $attributes
+     * @param int|null $entityId
+     * @param string|null $fieldName
+     * @dataProvider getNavigationDataProvider
      */
     public function testGetNext($expected, array $attributes = null, $entityId = null, $fieldName = null)
     {
-        $entity = new \stdClass();
-
         if (null !== $attributes) {
             $this->extension->setRequest(new Request([], [], $attributes));
         }
 
         $this->storage->expects($this->any())
             ->method('getNextIdentifier')
-            ->with($entity)
+            ->with($this->entity)
             ->will($this->returnValue($entityId));
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifierFieldName')
-            ->with($entity)
+            ->with($this->entity)
             ->will($this->returnValue($fieldName));
 
-        $this->assertSame($expected, $this->extension->getNext($entity));
+        $this->assertSame($expected, $this->extension->getNext($this->entity));
     }
 
     /**
      * @return array
      */
-    public function getPreviousNextDataProvider()
+    public function getNavigationDataProvider()
     {
         return [
             'no request' => [
@@ -161,18 +218,16 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPager($expected, $totalCount = null, $currentNumber = null)
     {
-        $entity = new \stdClass();
-
         $this->storage->expects($this->any())
             ->method('getTotalCount')
-            ->with($entity)
+            ->with($this->entity)
             ->will($this->returnValue($totalCount));
         $this->storage->expects($this->any())
             ->method('getCurrentNumber')
-            ->with($entity)
+            ->with($this->entity)
             ->will($this->returnValue($currentNumber));
 
-        $this->assertSame($expected, $this->extension->getPager($entity));
+        $this->assertSame($expected, $this->extension->getPager($this->entity));
     }
 
     /**
