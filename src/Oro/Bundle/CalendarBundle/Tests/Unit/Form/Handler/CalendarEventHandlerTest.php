@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +26,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityRoutingHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
     /** @var CalendarEventHandler */
     protected $handler;
@@ -47,6 +51,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entity  = new CalendarEvent();
         $this->handler = new CalendarEventHandler(
@@ -54,7 +61,8 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->request,
             $this->om,
             $this->activityManager,
-            $this->entityRoutingHelper
+            $this->entityRoutingHelper,
+            $this->securityFacade
         );
     }
 
@@ -128,6 +136,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $targetEntity = new User();
         ReflectionUtil::setId($targetEntity, 123);
+        $organization = new Organization();
+        ReflectionUtil::setId($organization, 1);
+        $targetEntity->setOrganization($organization);
 
         $this->request->query->set('entityClass', get_class($targetEntity));
         $this->request->query->set('entityId', $targetEntity->getId());
@@ -152,6 +163,27 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->activityManager->expects($this->at(0))
             ->method('addActivityTarget')
             ->with($this->identicalTo($this->entity), $this->identicalTo($targetEntity));
+
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUserId')
+            ->will($this->returnValue(100));
+
+        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->disableOriginalConstructor()
+            ->setMethods(array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'findDefaultCalendar'))
+            ->getMock();
+
+        $calendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository ->expects($this->once())
+            ->method('findDefaultCalendar')
+            ->will($this->returnValue($calendar));
+
+        $this->om->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
 
         $this->om->expects($this->once())
             ->method('persist')
