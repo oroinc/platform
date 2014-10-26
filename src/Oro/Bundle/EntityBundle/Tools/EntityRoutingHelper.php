@@ -17,6 +17,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class EntityRoutingHelper
 {
+    const PARAM_ACTION = '_action';
+    const PARAM_ENTITY_CLASS = 'entityClass';
+    const PARAM_ENTITY_ID = 'entityId';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -64,6 +68,49 @@ class EntityRoutingHelper
     }
 
     /**
+     * Gets an entity action form a query string.
+     *
+     * @param Request $request
+     *
+     * @return mixed
+     */
+    public function getAction(Request $request)
+    {
+        return $request->query->get(self::PARAM_ACTION);
+    }
+
+    /**
+     * Gets an entity class name form a query string.
+     *
+     * @param Request $request
+     * @param string  $paramName
+     *
+     * @return string|null
+     */
+    public function getEntityClassName(Request $request, $paramName = self::PARAM_ENTITY_CLASS)
+    {
+        $className = $request->query->get($paramName);
+        if ($className) {
+            $className = $this->decodeClassName($className);
+        }
+
+        return $className;
+    }
+
+    /**
+     * Gets an entity id form a query string.
+     *
+     * @param Request $request
+     * @param string  $paramName
+     *
+     * @return mixed
+     */
+    public function getEntityId(Request $request, $paramName = self::PARAM_ENTITY_ID)
+    {
+        return $request->query->get($paramName);
+    }
+
+    /**
      * Generates a URL for a specific route based on the given parameters
      *
      * @param string $routeName
@@ -94,33 +141,32 @@ class EntityRoutingHelper
      */
     public function generateUrlByRequest($routeName, Request $request, $additionalParameters = [])
     {
-        $entityClass = $request->get('entityClass');
-        if ($entityClass) {
-            $parameters = $this->getRouteParameters($entityClass, $request->get('entityId'));
-            if (!empty($additionalParameters)) {
-                $parameters = array_merge($parameters, $additionalParameters);
-            }
-        } else {
-            $parameters = $additionalParameters;
-        }
-
-        return $this->urlGenerator->generate($routeName, $parameters);
+        return $this->urlGenerator->generate(
+            $routeName,
+            array_merge($request->query->all(), $additionalParameters)
+        );
     }
 
     /**
-     * Returns an array that can be used as the route parameters and which contains the entity class name and id
+     * Returns an array that can be used as the route parameters for entity related actions
      *
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * @param string      $entityClass
+     * @param mixed       $entityId
+     * @param string|null $action
      *
      * @return array
      */
-    public function getRouteParameters($entityClass, $entityId)
+    public function getRouteParameters($entityClass, $entityId, $action = null)
     {
-        return [
-            'entityClass' => $this->encodeClassName($entityClass),
-            'entityId'    => (string)$entityId
+        $params = [
+            self::PARAM_ENTITY_CLASS => $this->encodeClassName($entityClass),
+            self::PARAM_ENTITY_ID    => (string)$entityId
         ];
+        if ($action) {
+            $params[self::PARAM_ACTION] = $action;
+        }
+
+        return $params;
     }
 
     /**
@@ -145,7 +191,9 @@ class EntityRoutingHelper
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
         if (!$entity) {
-            throw new NotFoundHttpException('Not Found');
+            throw new NotFoundHttpException(
+                sprintf('The entity "%s" with ID "%s" was not found.', $entityClass, $entityId)
+            );
         }
 
         return $entity;

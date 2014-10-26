@@ -15,7 +15,7 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-    oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
+    oro_entity.twig.extension.entity.class:                        Oro\Bundle\EntityBundle\Twig\EntityExtension
     oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
     oro_entity.extension.unique_entity_extension.class:            Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
 
@@ -151,8 +151,11 @@ services:
             - @oro_entity.entity_field_provider
             - @oro_entity.entity_provider
 
-    oro_entity.twig.extension.class_name:
-        class: %oro_entity.twig.extension.class_name.class%
+    oro_entity.twig.extension.entity:
+        class: %oro_entity.twig.extension.entity.class%
+        arguments:
+            - @oro_entity.entity_identifier_accessor
+            - @oro_entity.routing_helper
         tags:
             - { name: twig.extension }
 
