@@ -5,7 +5,19 @@ oro_menu_config:
             route: 'oro_calendar_view_default'
             extras:
                 position: 20
+        calendar_event_list:
+            label: 'oro.calendar.calendarevent.entity_plural_label'
+            route: 'oro_calendar_event_index'
+            extras:
+                position: 50
+                routes: ['oro_calendar_event_*']
+
     tree:
+        application_menu:
+            children:
+                activities_tab:
+                    children:
+                        calendar_event_list: ~
         usermenu:
             children:
                 oro_calendar_view_default: ~
@@ -13,3 +25,6 @@ oro_menu_config:
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"
     oro_calendar_view: "%%calendarname%% - Calendars - %%username%%"
+    oro_calendar_event_index: ~
+    oro_calendar_event_view: 'Calendar Event - %%entity.subject%%'
+    oro_calendar_event_update: 'Calendar Event - %%entity.subject%% - Edit'
