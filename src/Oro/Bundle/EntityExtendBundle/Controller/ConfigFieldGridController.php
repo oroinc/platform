@@ -23,6 +23,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Event\AfterFlushFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Event\BeforePersistFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Event\CollectFieldOptionsEvent;
+use Oro\Bundle\EntityExtendBundle\Event\BeforeDeletePersistFieldEvent;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -262,11 +263,18 @@ class ConfigFieldGridController extends Controller
         );
 
         $entityConfig = $extendConfigProvider->getConfig($className);
+        $originalEntityConfig = clone $entityConfig;
         if (!count($fields)) {
             $entityConfig->set('upgradeable', false);
         } else {
             $entityConfig->set('upgradeable', true);
         }
+
+        $this->get('event_dispatcher')->dispatch(
+            BeforeDeletePersistFieldEvent::EVENT_NAME,
+            new BeforeDeletePersistFieldEvent($fieldConfig, $entityConfig, $originalEntityConfig)
+        );
+
         $configManager->persist($entityConfig);
 
         $configManager->flush();
