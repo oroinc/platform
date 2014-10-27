@@ -11,7 +11,7 @@
         'options' : {
             'alias': 'calendar-event-dialog',
             'dialogOptions' : {
-                'title' : 'oro.calendar.assign_event'|trans,
+                'title' : 'oro.calendar.assign_event.widget_title'|trans({'%username%': entity|oro_format_name}),
                 'allowMaximize': true,
                 'allowMinimize': true,
                 'dblclick': 'maximize',
