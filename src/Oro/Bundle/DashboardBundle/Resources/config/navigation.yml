@@ -4,7 +4,7 @@ oro_menu_config:
             label: 'oro.dashboard.menu.dashboards_tab.label'
             uri: '#'
             extras:
-                position: 10
+                position: 0
                 icon: icon-bar-chart
             attributes:
                 class: 'only-icon'
