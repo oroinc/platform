@@ -33,6 +33,7 @@ parameters:
     oro_entity_extend.twig.extension.dynamic_fields.class:    Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
+    oro_entity_extend.datagrid.action.type.ajaxdelete.class:  Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -279,3 +280,9 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.column_options_guesser }
+
+    oro_entity_extend.datagrid.action.type.ajaxdelete:
+        class: %oro_entity_extend.datagrid.action.type.ajaxdelete.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
