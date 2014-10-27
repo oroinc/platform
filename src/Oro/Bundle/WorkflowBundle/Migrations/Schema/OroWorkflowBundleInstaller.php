@@ -13,7 +13,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -203,6 +203,11 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('enabled', 'boolean', []);
         $table->addColumn('related_entity', 'string', ['length' => 255]);
         $table->addColumn('execution_order', 'smallint', []);
+        $table->addColumn(
+            'exclude_definitions',
+            'simple_array',
+            ['notnull' => false, 'comment' => '(DC2Type:simple_array)']
+        );
         $table->addColumn('actions_configuration', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
