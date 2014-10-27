@@ -9,8 +9,8 @@ use Oro\Bundle\UIBundle\Twig\TabExtension;
  */
 class TabMenuWidgetProvider implements WidgetProviderInterface
 {
-    /** @var ObjectIdentityAccessorInterface */
-    protected $entityIdentifierAccessor;
+    /** @var ObjectIdAccessorInterface */
+    protected $objectIdAccessor;
 
     /** @var TabExtension */
     protected $widgetProvider;
@@ -19,46 +19,46 @@ class TabMenuWidgetProvider implements WidgetProviderInterface
     protected $menuName;
 
     /** @var string */
-    protected $entityClass;
+    protected $objectClass;
 
     /**
-     * @param ObjectIdentityAccessorInterface $entityIdentifierAccessor The entity accessor
-     * @param TabExtension                    $widgetProvider           The tab widgets provider
-     * @param string                          $menuName                 The name of the navigation menu contains
-     *                                                                  declarations of widgets
-     * @param string|null                     $entityClass              The full class name of the entity
-     *                                                                  for which this provider is applicable
+     * @param ObjectIdAccessorInterface $objectIdAccessor The object id accessor
+     * @param TabExtension              $widgetProvider   The tab widgets provider
+     * @param string                    $menuName         The name of the navigation menu contains
+     *                                                    declarations of widgets
+     * @param string|null               $objectClass      The full class name of the object
+     *                                                    for which this provider is applicable
      */
     public function __construct(
-        ObjectIdentityAccessorInterface $entityIdentifierAccessor,
+        ObjectIdAccessorInterface $objectIdAccessor,
         TabExtension $widgetProvider,
         $menuName,
-        $entityClass = null
+        $objectClass = null
     ) {
-        $this->entityIdentifierAccessor = $entityIdentifierAccessor;
-        $this->widgetProvider           = $widgetProvider;
-        $this->menuName                 = $menuName;
-        $this->entityClass              = $entityClass;
+        $this->objectIdAccessor = $objectIdAccessor;
+        $this->widgetProvider   = $widgetProvider;
+        $this->menuName         = $menuName;
+        $this->objectClass      = $objectClass;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($entity)
+    public function supports($object)
     {
-        return $this->entityClass
-            ? is_a($entity, $this->entityClass)
+        return $this->objectClass
+            ? is_a($object, $this->objectClass)
             : true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWidgets($entity)
+    public function getWidgets($object)
     {
         return $this->widgetProvider->getTabs(
             $this->menuName,
-            ['id' => $this->entityIdentifierAccessor->getIdentifier($entity)]
+            ['id' => $this->objectIdAccessor->getIdentifier($object)]
         );
     }
 }
