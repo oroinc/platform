@@ -4,21 +4,12 @@ namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
-use Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider;
-
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @Route("/event")
@@ -94,14 +85,6 @@ class CalendarEventController extends Controller
     public function createAction()
     {
         $entity = new CalendarEvent();
-
-        /** @var SecurityFacade $securityFacade */
-        $securityFacade = $this->get('oro_security.security_facade');
-
-        $defaultCalendar = $this->getDoctrine()->getManager()
-            ->getRepository('OroCalendarBundle:Calendar')
-            ->findDefaultCalendar($this->getUser()->getId(), $securityFacade->getOrganization()->getId());
-        $entity->setCalendar($defaultCalendar);
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity->setStart($startTime);

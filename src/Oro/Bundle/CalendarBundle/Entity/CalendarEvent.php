@@ -23,6 +23,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          "entity"={
  *              "icon"="icon-time"
  *          },
+ *          "dataaudit"={
+ *              "auditable"=true
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "permissions"="VIEW;CREATE;EDIT;DELETE",
@@ -65,9 +68,11 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @ORM\ManyToOne(targetEntity="Calendar", inversedBy="events")
      * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
      * )
      */
     protected $calendar;
@@ -76,6 +81,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $title;
 
@@ -83,6 +95,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var string
      *
      * @ORM\Column(name="description", type="text", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $description;
 
@@ -90,6 +109,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var \DateTime
      *
      * @ORM\Column(name="start_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $start;
 
@@ -97,6 +123,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var \DateTime
      *
      * @ORM\Column(name="end_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $end;
 
@@ -104,6 +137,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var bool
      *
      * @ORM\Column(name="all_day", type="boolean")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $allDay;
 

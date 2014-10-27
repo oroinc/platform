@@ -14,8 +14,6 @@ parameters:
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
-        arguments:
-            - @oro_activity.manager
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
@@ -66,9 +64,10 @@ services:
         tags:
             - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\CalendarBundle\Entity\Calendar }
 
-    oro_calendar.label_provider.action_button:
-        parent: oro_ui.label_provider.action_button.abstract
+    oro_calendar.widget_provider.actions.assign_calendar_event:
+        parent: oro_ui.widget_provider.action_button.abstract
         arguments:
-            - # labels
-                '': { label: oro.calendar.add_event }
-                '%oro_user.entity.class%': { label: oro.calendar.assign_event }
+            - oro_assign_calendar_event_button
+            - oro_assign_calendar_event_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity }

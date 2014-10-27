@@ -72,23 +72,48 @@ class CalendarEventHandler
      * Process form
      *
      * @param  CalendarEvent $entity
+     * @throws \LogicException
      *
      * @return bool  True on successful processing, false otherwise
      */
     public function process(CalendarEvent $entity)
     {
+        if (!$entity->getCalendar()) {
+            if ($this->securityFacade->getLoggedUser() && $this->securityFacade->getOrganization()) {
+                /** @var Calendar $defaultCalendar */
+                $defaultCalendar = $this->manager
+                    ->getRepository('OroCalendarBundle:Calendar')
+                    ->findDefaultCalendar(
+                        $this->securityFacade->getLoggedUser()->getId(),
+                        $this->securityFacade->getOrganization()->getId()
+                    );
+                $entity->setCalendar($defaultCalendar);
+            } else {
+                throw new \LogicException('Current user did not define');
+            }
+        }
+
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $targetEntityClass = $this->request->get('entityClass');
+                $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
+
                 if ($targetEntityClass) {
-                    $targetEntityId = $this->request->get('entityId');
+                    $targetEntityId    = $this->entityRoutingHelper->getEntityId($this->request);
                     $targetEntity = $this->entityRoutingHelper->getEntityReference($targetEntityClass, $targetEntityId);
-                    $this->activityManager->addActivityTarget($entity, $targetEntity);
-                    if ($targetEntity instanceof User && $targetEntityId != $this->securityFacade->getLoggedUserId()) {
+                    $action = $this->entityRoutingHelper->getAction($this->request);
+
+                    if ($action === 'activity') {
+                        $this->activityManager->addActivityTarget($entity, $targetEntity);
+                    }
+
+                    if ($action === 'assign'
+                        && $targetEntity instanceof User
+                        && $targetEntityId !== $this->securityFacade->getLoggedUserId()
+                    ) {
                         /** @var Calendar $defaultCalendar */
                         $defaultCalendar = $this->manager
                             ->getRepository('OroCalendarBundle:Calendar')

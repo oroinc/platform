@@ -4,30 +4,24 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
-use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class OroCalendarBundle implements
     Migration,
     OrderedMigrationInterface,
-    DatabasePlatformAwareInterface,
-    NameGeneratorAwareInterface,
-    ExtendExtensionAwareInterface,
-    ActivityExtensionAwareInterface
+    DatabasePlatformAwareInterface
 {
     /** @var AbstractPlatform */
     protected $platform;
@@ -55,30 +49,6 @@ class OroCalendarBundle implements
     public function setDatabasePlatform(AbstractPlatform $platform)
     {
         $this->platform = $platform;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
-    {
-        $this->nameGenerator = $nameGenerator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExtendExtension(ExtendExtension $extendExtension)
-    {
-        $this->extendExtension = $extendExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
     }
 
     /**
@@ -138,43 +108,54 @@ class OroCalendarBundle implements
         $table->getColumn('title')->setType(Type::getType(Type::STRING))->setOptions(['length' => 255]);
         $table->getColumn('created_at')->setOptions(['notnull' => true]);
         $table->getColumn('updated_at')->setOptions(['notnull' => true]);
-
-        $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'oro_user');
-        $queries->addPostQuery($this->getFillUserActivityQuery());
+        $this->enableDataAudit($table);
     }
 
     /**
-     * @return string
+     * @param Table $taskTable
      */
-    protected function getFillUserActivityQuery()
+    protected function enableDataAudit(Table $taskTable)
     {
-        $sql = 'INSERT INTO %s (calendarevent_id, user_id)'
-            . ' SELECT ce.id, c.user_owner_id'
-            . ' FROM oro_calendar_event ce INNER JOIN oro_calendar c ON c.id = ce.calendar_id'
-            . ' WHERE c.user_owner_id IS NOT NULL';
-
-        return sprintf($sql, $this->getAssociationTableName('oro_user'));
-    }
-
-    /**
-     * @param string $targetTableName
-     *
-     * @return string
-     */
-    protected function getAssociationTableName($targetTableName)
-    {
-        $sourceClassName = $this->extendExtension->getEntityClassByTableName('oro_calendar_event');
-        $targetClassName = $this->extendExtension->getEntityClassByTableName($targetTableName);
-
-        $associationName = ExtendHelper::buildAssociationName(
-            $targetClassName,
-            ActivityScope::ASSOCIATION_KIND
-        );
-
-        return $this->nameGenerator->generateManyToManyJoinTableName(
-            $sourceClassName,
-            $associationName,
-            $targetClassName
-        );
+        $taskTable->addOption(OroOptions::KEY, ['dataaudit' => ['auditable' => true]]);
+        $taskTable->getColumn('title')
+            ->setOptions([OroOptions::KEY => ['dataaudit' => ['auditable' => true]]]);
+        $taskTable->getColumn('description')
+            ->setOptions([OroOptions::KEY => ['dataaudit' => ['auditable' => true]]]);
+        $taskTable->getColumn('start_at')
+            ->setOptions(
+                [
+                    OroOptions::KEY => [
+                        ExtendOptionsManager::FIELD_NAME_OPTION => 'start',
+                        'dataaudit'                             => ['auditable' => true]
+                    ]
+                ]
+            );
+        $taskTable->getColumn('end_at')
+            ->setOptions(
+                [
+                    OroOptions::KEY => [
+                        ExtendOptionsManager::FIELD_NAME_OPTION => 'end',
+                        'dataaudit'                             => ['auditable' => true]
+                    ]
+                ]
+            );
+        $taskTable->getColumn('calendar_id')
+            ->setOptions(
+                [
+                    OroOptions::KEY => [
+                        ExtendOptionsManager::FIELD_NAME_OPTION => 'calendar',
+                        'dataaudit'                             => ['auditable' => true]
+                    ]
+                ]
+            );
+        $taskTable->getColumn('all_day')
+            ->setOptions(
+                [
+                    OroOptions::KEY => [
+                        ExtendOptionsManager::FIELD_NAME_OPTION => 'allDay',
+                        'dataaudit'                             => ['auditable' => true]
+                    ]
+                ]
+            );
     }
 }

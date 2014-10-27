@@ -10,10 +10,13 @@ oro:
             view_calendar: My Calendar
 
     calendar:
-        my_calendar:         My Calendar
-        add_event:           Add Event
-        assign_event:        Assign Event
-        view_events:         Events
+        my_calendar:                My Calendar
+        add_event:                  Add Event
+        add_event.title:            Add an event to this record
+        assign_event:               Assign Event
+        assign_event.title:         Assign an event to this user
+        assign_event.widget_title:  Assign Event to %username%
+        view_events:                Events
 
         controller:
             event.saved.message:  Calendar event saved

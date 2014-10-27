@@ -44,8 +44,6 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
         $this->addOroCalendarForeignKeys($schema);
         $this->addOroCalendarEventForeignKeys($schema);
         $this->addOroCalendarConnectionForeignKeys($schema);
-
-        $this->activityExtension->addActivityAssociation($schema, 'oro_calendar_event', 'oro_user');
     }
 
     /**
