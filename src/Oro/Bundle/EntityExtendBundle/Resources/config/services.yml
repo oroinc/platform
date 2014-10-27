@@ -285,3 +285,4 @@ services:
         class: %oro_entity_extend.datagrid.action.type.ajaxdelete.class%
         scope: prototype
         tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
