@@ -35,7 +35,7 @@ define([
         _onAjaxSuccess: function (data) {
             mediator.execute('refreshPage');
 
-            AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, arguments);
+            AjaxdeletefieldAction.__super__._onAjaxSuccess.apply(this, arguments);
         }
     });
 
