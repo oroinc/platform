@@ -4,6 +4,7 @@ definitions:
         enabled: true
         entity: Oro\Bundle\UserBundle\Entity\User
         order: 20
+        exclude_definitions: [another_definition]
         actions_configuration:
             - @assign_value: [$entity.field, 'value']
 

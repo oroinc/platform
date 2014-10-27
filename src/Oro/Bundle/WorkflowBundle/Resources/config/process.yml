@@ -1,0 +1,27 @@
+definitions:                                                 # list of definitions
+    contact_definition:                                      # name of process definition
+        label: 'Contact Definition'                          # label of the process definition
+        enabled: true                                        # this definition is enabled (activated)
+        entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
+        order: 20                                            # processing order
+        exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
+        actions_configuration:                               # list of actions to perform
+            - @find_entity:                                  # find existing entity
+                conditions:                                  # action conditions
+                    @empty: $assignedTo                      # if field $assignedTo is empty
+                parameters:                                  # action parameters
+                    class: Oro\Bundle\UserBundle\Entity\User # $assignedTo entity full class name
+                    attribute: $assignedTo                   # name of attribute that will store entity
+                    where:                                   # where conditions
+                        username: 'admin'                    # username is 'admin'
+triggers:                                                    # list of triggers
+    contact_definition:                                      # name of trigger
+        -
+            event: create                                    # event on which the trigger performed
+        -
+            event: update                                    # event on which the trigger performed
+            field: assignedTo                                # field name to listen
+            priority: 10                                     # priority of the job queue
+        -
+            event: update                                    # event on which the trigger performed
+            priority: 10                                     # priority of the job queue
