@@ -31,11 +31,9 @@ define([
             error: 'Not removed.',
             empty_selection: 'Please, select item to remove.'
         },
-
         _onAjaxSuccess: function (data) {
+            AjaxdeletefieldAction.__super__._showAjaxSuccessMessage.apply(this, arguments);
             mediator.execute('refreshPage');
-
-            AjaxdeletefieldAction.__super__._onAjaxSuccess.apply(this, arguments);
         }
     });
 
