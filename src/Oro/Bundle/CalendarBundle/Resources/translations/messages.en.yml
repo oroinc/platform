@@ -12,7 +12,9 @@ oro:
     calendar:
         my_calendar:         My Calendar
         add_event:           Add Event
+        add_event.title:     Add an event related to this entity
         assign_event:        Assign Event
+        assign_event.title:  Create an event related to this entity
         view_events:         Events
 
         controller:
