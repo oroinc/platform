@@ -33,7 +33,7 @@ class ActionButtonWidgetProvider implements WidgetProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($entity)
+    public function supports($object)
     {
         return true;
     }
@@ -41,16 +41,16 @@ class ActionButtonWidgetProvider implements WidgetProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getWidgets($entity)
+    public function getWidgets($object)
     {
         $result = [];
 
-        $buttonWidget = $this->placeholderProvider->getItem($this->buttonWidgetName, ['entity' => $entity]);
+        $buttonWidget = $this->placeholderProvider->getItem($this->buttonWidgetName, ['entity' => $object]);
         if ($buttonWidget) {
             $widget['name']   = $this->buttonWidgetName;
             $widget['button'] = $buttonWidget;
             if (!empty($this->linkWidgetName)) {
-                $linkWidget = $this->placeholderProvider->getItem($this->linkWidgetName, ['entity' => $entity]);
+                $linkWidget = $this->placeholderProvider->getItem($this->linkWidgetName, ['entity' => $object]);
                 if ($linkWidget) {
                     $widget['link'] = $linkWidget;
                 }

@@ -19,7 +19,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdentifierAccessor;
+    protected $entityIdAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityRoutingHelper;
@@ -33,7 +33,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator          = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->entityIdentifierAccessor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor')
+        $this->entityIdAccessor    = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
@@ -44,7 +44,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->securityFacade,
             $this->translator,
-            $this->entityIdentifierAccessor,
+            $this->entityIdAccessor,
             $this->entityRoutingHelper
         );
     }
@@ -103,7 +103,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->entityIdentifierAccessor->expects($this->once())
+        $this->entityIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue($entityId));

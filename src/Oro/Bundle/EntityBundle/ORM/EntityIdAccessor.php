@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Oro\Bundle\UIBundle\Provider\ObjectIdentityAccessorInterface;
+use Oro\Bundle\UIBundle\Provider\ObjectIdAccessorInterface;
 
-class EntityIdentifierAccessor implements ObjectIdentityAccessorInterface
+class EntityIdAccessor implements ObjectIdAccessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -20,8 +20,8 @@ class EntityIdentifierAccessor implements ObjectIdentityAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getIdentifier($entity)
+    public function getIdentifier($object)
     {
-        return $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        return $this->doctrineHelper->getSingleEntityIdentifier($object);
     }
 }
