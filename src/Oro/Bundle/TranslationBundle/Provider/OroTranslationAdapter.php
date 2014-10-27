@@ -80,7 +80,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
 
             return $result;
         } else {
-            $this->logger->critical('Service unavailable. Status received: ' . $responseCode);
+            $this->logger->critical('Service unavailable. Status received: ' . $response->getStatusCode());
             throw new \RuntimeException('Service unavailable');
         }
     }
