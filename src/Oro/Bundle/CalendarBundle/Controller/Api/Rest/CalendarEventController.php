@@ -235,6 +235,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
     {
         parent::fixFormData($data, $entity);
 
+        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
+            $data['allDay'] = false;
+        }
+
         // remove auxiliary attributes if any
         unset($data['editable']);
         unset($data['removable']);
