@@ -279,7 +279,12 @@ class ConfigFieldGridController extends Controller
 
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was removed.', 'successful' => true), Codes::HTTP_OK);
+        $this->get('session')->getFlashBag()->add(
+            'success',
+            $this->get('translator')->trans('Item deleted')
+        );
+
+        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
     }
 
     /**
