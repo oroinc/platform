@@ -13,7 +13,7 @@ define([
      * and on success - refresh current page
      *
      * @export  oro/datagrid/action/ajaxdeletefield-action
-     * @class   oro.datagrid.action.AjaxdeleteAction
+     * @class   oro.datagrid.action.AjaxdeletefieldAction
      * @extends oro.datagrid.action.AjaxdeleteAction
      */
     AjaxdeletefieldAction = AjaxdeleteAction.extend({
