@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yurio
- * Date: 27.10.14
- * Time: 14:57
- */
 
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 class BeforeDeletePersistFieldEvent extends Event
@@ -65,4 +58,4 @@ class BeforeDeletePersistFieldEvent extends Event
     {
         return $this->originalExtendEntityConfig;
     }
-} 
+}
