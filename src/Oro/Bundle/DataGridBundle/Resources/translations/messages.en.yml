@@ -1,3 +1,4 @@
+"Item deleted": "Item deleted"
 oro_datagrid:
     no_data_hint %entityHint%: "No %entityHint% exists."
     not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
