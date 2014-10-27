@@ -254,6 +254,40 @@ class ActivityList
     }
 
     /**
+     * Get creation date
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Get modification date
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set modification date
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return self
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
      * Get owning organization
      *
      * @return Organization
@@ -283,5 +317,26 @@ class ActivityList
     public function __toString()
     {
         return (string)$this->subject;
+    }
+
+    /**
+     * Pre persist event handler
+     *
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
