@@ -1,0 +1,287 @@
+<?php
+
+namespace Oro\Bundle\ActivityListBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
+/**
+ * @ORM\Table(name="oro_activity_list", indexes={
+ *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
+ *     @ORM\Index(name="oro_activity_list_related_idx", columns={"related_entity_class", "related_entity_id"})
+ * })
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @Config(
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-align-justify"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
+ */
+class ActivityList
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="verb", type="string", length=32)
+     */
+    protected $verb;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="subject", type="string", length=255)
+     */
+    protected $subject;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="data", type="array", nullable=true)
+     */
+    protected $data;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="related_entity_class", type="string", length=255)
+     */
+    protected $relatedEntityClass;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="related_entity_id", type="integer", nullable=true)
+     */
+    protected $relatedEntityId;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $updatedAt;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get a verb indicates last state of activity list item.
+     * For example:
+     *  create - indicates that the actor has created the object
+     *  update - indicates that the actor has modified the object
+     *  delete - indicates that the actor has deleted the object
+     *
+     * @return string
+     */
+    public function getVerb()
+    {
+        return $this->verb;
+    }
+
+    /**
+     * Set a verb indicates last state of activity list item.
+     * For example:
+     *  create - indicates that the actor has created the object
+     *  update - indicates that the actor has modified the object
+     *  delete - indicates that the actor has deleted the object
+     *
+     * @param string $verb
+     *
+     * @return self
+     */
+    public function setVerb($verb)
+    {
+        $this->verb = $verb;
+
+        return $this;
+    }
+
+    /**
+     * Get a subject of the related record
+     *
+     * @return string
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * Set a subject of the related record
+     *
+     * @param string $subject
+     *
+     * @return self
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Get an additional data of the related record
+     *
+     * @return array|null
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Set an additional data of the related record
+     *
+     * @param array|null $data
+     *
+     * @return self
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get related entity class name
+     *
+     * @return string
+     */
+    public function getRelatedEntityClass()
+    {
+        return $this->relatedEntityClass;
+    }
+
+    /**
+     * Set related entity class name
+     *
+     * @param string $relatedEntityClass
+     *
+     * @return self
+     */
+    public function setRelatedEntityClass($relatedEntityClass)
+    {
+        $this->relatedEntityClass = $relatedEntityClass;
+
+        return $this;
+    }
+
+    /**
+     * Get related entity id
+     *
+     * @return integer
+     */
+    public function getRelatedEntityId()
+    {
+        return $this->relatedEntityId;
+    }
+
+    /**
+     * Set related entity id
+     *
+     * @param integer|null $relatedEntityId
+     *
+     * @return self
+     */
+    public function setRelatedEntityId($relatedEntityId)
+    {
+        $this->relatedEntityId = $relatedEntityId;
+
+        return $this;
+    }
+
+    /**
+     * Get owning organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * Set owning organization
+     *
+     * @param Organization $organization
+     *
+     * @return self
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->subject;
+    }
+}
