@@ -1,12 +1,13 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
-{% oro_title_set({params : {"%entity.subject%": entity.title|default('N/A') }}) %}
+{% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
 
 {% block navButtons %}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
-            'path' :        path('oro_calendar_event_update', { id: entity.id }),
+            'path' : path('oro_calendar_event_update', { id: entity.id }),
             'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
         })  }}
     {% endif %}
@@ -32,25 +33,33 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% set calendarEventInformationWidget %}
-    {{ oro_widget_render({
-        'widgetType':   'block',
-        'title':        'oro.calendar.calendarevent.widget.information'|trans,
-        'url':          path('oro_calendar_event_widget_info', {id: entity.id})
-    }) }}
-    {% endset %}
+    {%- set calendarEventInformation -%}
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.calendar.calendarevent.title.label'|trans, entity.title) }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description|escape|nl2br) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
+            </div>
+            <div class="responsive-block">
+                {{ entityConfig.renderDynamicFields(entity) }}
+            </div>
+        </div>
+    {%- endset -%}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.calendar.calendarevent.sections.general'|trans,
+            'title': 'General Information'|trans,
             'class': 'active',
             'subblocks': [
-                {'data' : [calendarEventInformationWidget]}
+                {'data' : [calendarEventInformation]}
             ]
         }
     ] %}
 
     {% set id = 'calendarEventView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}
+
     {{ parent() }}
 {% endblock content_data %}
