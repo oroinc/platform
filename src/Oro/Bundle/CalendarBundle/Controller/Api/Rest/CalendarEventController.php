@@ -48,6 +48,18 @@ class CalendarEventController extends RestController implements ClassResourceInt
      * @QueryParam(
      *      name="subordinate", requirements="(true)|(false)", nullable=true, strict=true, default="false",
      *      description="Determine whether events from connected calendars should be included or not.")
+     * @QueryParam(
+     *     name="createdAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
+     * )
+     * @QueryParam(
+     *     name="updatedAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
+     * )
      * @ApiDoc(
      *      description="Get calendar events",
      *      resource=true
@@ -63,6 +75,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $start       = new \DateTime($this->getRequest()->get('start'));
         $end         = new \DateTime($this->getRequest()->get('end'));
         $subordinate = (true == $this->getRequest()->get('subordinate'));
+        $createdAt   = $this->getRequest()->get('createdAt');
+        $updatedAt   = $this->getRequest()->get('updatedAt');
 
         /** @var SecurityFacade $securityFacade */
         $securityFacade = $this->get('oro_security.security_facade');
@@ -73,7 +87,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $manager = $this->getManager();
         /** @var CalendarEventRepository $repo */
         $repo = $manager->getRepository();
-        $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate);
+        $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate, $createdAt, $updatedAt);
 
         $result = array();
 
