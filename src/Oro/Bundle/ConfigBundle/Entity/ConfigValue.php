@@ -77,14 +77,14 @@ class ConfigValue
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="updated_at", type="datetime")
      */
     protected $updatedAt;
 
@@ -235,18 +235,6 @@ class ConfigValue
     }
 
     /**
-     * @param \DateTime
-     *
-     * @return Config
-     */
-    public function setCreatedAt($created)
-    {
-        $this->createdAt = $created;
-
-        return $this;
-    }
-
-    /**
      * Get last update date/time
      *
      * @return \DateTime
@@ -261,9 +249,9 @@ class ConfigValue
      *
      * @return Config
      */
-    public function setUpdatedAt($updated)
+    public function setUpdatedAt($updatedAt)
     {
-        $this->updatedAt = $updated;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -276,7 +264,7 @@ class ConfigValue
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
     }
 
     /**
