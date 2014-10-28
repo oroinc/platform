@@ -3,6 +3,7 @@ datagrid:
         options:
             entityHint: processes
             export:     false
+            entity_pagination: true
 
         source:
             type:         orm
@@ -107,6 +108,7 @@ datagrid:
         options:
             entityHint: workflowssss
             export:     false
+            entity_pagination: true
         source:
             type: orm
             acl_resource: oro_workflow_definition_view

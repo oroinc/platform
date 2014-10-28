@@ -6,6 +6,7 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 100
+            entity_pagination: true
         source:
             acl_resource: oro_entityconfig_manage
             type: orm
