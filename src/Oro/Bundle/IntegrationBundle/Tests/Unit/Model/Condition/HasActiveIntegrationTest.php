@@ -34,8 +34,9 @@ class HasActiveIntegrationTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider failingOptionsDataProvider
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ConditionException
+     * @param array $options
      */
-    public function testInitializeException($options)
+    public function testInitializeException(array $options)
     {
         $this->condition->initialize($options);
     }
