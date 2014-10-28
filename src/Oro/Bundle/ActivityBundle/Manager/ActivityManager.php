@@ -26,22 +26,28 @@ class ActivityManager
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider      $activityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $activityConfigProvider,
-        ConfigProvider $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
         $this->activityConfigProvider = $activityConfigProvider;
         $this->entityConfigProvider   = $entityConfigProvider;
+        $this->extendConfigProvider   = $extendConfigProvider;
     }
 
     /**
@@ -150,6 +156,31 @@ class ActivityManager
     }
 
     /**
+     * Removes an association of the given $oldTargetEntity and associates the given $newTargetEntity
+     * with the activity entity
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object            $oldTargetEntity
+     * @param object            $newTargetEntity
+     *
+     * @return bool TRUE if an association was removed; otherwise, FALSE
+     */
+    public function replaceActivityTarget(ActivityInterface $activityEntity, $oldTargetEntity, $newTargetEntity)
+    {
+        $hasChanges = false;
+
+        if ($this->removeActivityTarget($activityEntity, $oldTargetEntity)) {
+            $hasChanges = true;
+        }
+        if ($this->addActivityTarget($activityEntity, $newTargetEntity)) {
+            $hasChanges = true;
+        }
+
+        return $hasChanges;
+    }
+
+    /**
      * Returns an array contains info about all activity associations for the given entity type
      *
      * @param string $entityClass
@@ -162,6 +193,10 @@ class ActivityManager
 
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
+            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+                continue;
+            }
+
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
 
@@ -202,6 +237,10 @@ class ActivityManager
 
         $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
         foreach ($activityClassNames as $activityClassName) {
+            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+                continue;
+            }
+
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
             $buttonWidget   = $activityConfig->get('action_button_widget');
             if (!empty($buttonWidget)) {
@@ -302,5 +341,25 @@ class ActivityManager
                 )
             )
             ->setParameter('targetEntityId', $entityId);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $activityClassName
+     *
+     * @return bool
+     */
+    protected function isActivityAssociationEnabled($entityClass, $activityClassName)
+    {
+        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
+        $relations    = $extendConfig->get('relation', false, []);
+        $relationKey  = ExtendHelper::buildRelationKey(
+            $activityClassName,
+            ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND),
+            'manyToMany',
+            $entityClass
+        );
+
+        return isset($relations[$relationKey]);
     }
 }

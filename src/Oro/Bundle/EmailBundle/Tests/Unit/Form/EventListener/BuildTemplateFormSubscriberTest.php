@@ -127,7 +127,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $formMock->expects($this->once())
             ->method('add');
 
-        $fieldMock->expects($this->exactly(2))
+        $fieldMock->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($configMock));
 
@@ -175,7 +175,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $fieldMock->expects($this->exactly(2))->method('getConfig')
+        $fieldMock->expects($this->once())->method('getConfig')
             ->will($this->returnValue($configMock));
 
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
