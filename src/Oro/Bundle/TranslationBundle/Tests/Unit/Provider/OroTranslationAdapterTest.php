@@ -50,7 +50,7 @@ class OroTranslationAdapterTest extends \PHPUnit_Framework_TestCase
         $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->once())
+        $this->request->expects($this->any())
             ->method('getQuery')
             ->will($this->returnValue($this->query));
         $this->response->expects($this->once())
@@ -82,7 +82,7 @@ class OroTranslationAdapterTest extends \PHPUnit_Framework_TestCase
         $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->once())
+        $this->request->expects($this->any())
             ->method('getQuery')
             ->will($this->returnValue($this->query));
         $this->response->expects($this->once())

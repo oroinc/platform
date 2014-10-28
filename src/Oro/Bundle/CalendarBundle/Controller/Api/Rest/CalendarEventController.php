@@ -52,13 +52,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      description="Get calendar events",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_view",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="VIEW",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_view")
      *
      * @return Response
      * @throws \InvalidArgumentException
@@ -142,13 +136,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      description="Update calendar event",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_update",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="EDIT",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_update")
      *
      * @return Response
      */
@@ -165,13 +153,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      description="Create new calendar event",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_create",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="CREATE",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_create")
      *
      * @return Response
      */
@@ -234,6 +216,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
     protected function fixFormData(array &$data, $entity)
     {
         parent::fixFormData($data, $entity);
+
+        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
+            $data['allDay'] = false;
+        }
 
         // remove auxiliary attributes if any
         unset($data['editable']);
