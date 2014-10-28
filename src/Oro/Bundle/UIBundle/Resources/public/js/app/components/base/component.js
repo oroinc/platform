@@ -11,7 +11,12 @@ define([
 
     componentOptions = ['model', 'collection'];
 
-    // base component's constructor
+    /**
+     * Base component's constructor
+     *
+     * @export oroui/js/app/components/base/component
+     * @class oroui.app.components.base.Component
+     */
     BaseComponent = function (options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
@@ -45,10 +50,16 @@ define([
         extend: Backbone.Model.extend
     });
 
-    // defines prototype properties and  methods
-    _.extend(BaseComponent.prototype, Backbone.Events, Chaplin.EventBroker,
-        // copy useful methods Chaplin.View
+    _.extend(
+        BaseComponent.prototype,
+
+        // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
+        /** @lends {Backbone.Events} */ Backbone.Events,
+        /** @lends {Chaplin.EventBroker} */ Chaplin.EventBroker,
+        // lends useful methods Chaplin.View
         _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener']), {
+
+        // defines own properties and methods
         /**
          * Defer object, helps to notify environment that component is initialized
          * in case it work in asynchronous way

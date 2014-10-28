@@ -10,7 +10,6 @@ define(function (require) {
         bootstrap = require('bootstrap'),
         __ = require('orotranslation/js/translator'),
         scrollspy = require('oroui/js/scrollspy'),
-        widgetControlInitializer = require('oroui/js/app/components/widget-component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
@@ -33,7 +32,6 @@ define(function (require) {
             container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover(container.find('form label'));
-            widgetControlInitializer.init(container);
 
             promise = this.initPageComponents(container);
             return promise;
