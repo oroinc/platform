@@ -97,11 +97,12 @@ class ExtendEntityExtension extends AbstractTypeExtension
         $extendConfigProvider = $this->configManager->getProvider('extend');
 
         $formConfigs = $formConfigProvider->getConfigs($className);
+        $formType = null;
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
             }
-
+            $formType = null;
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $formConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
@@ -119,36 +120,7 @@ class ExtendEntityExtension extends AbstractTypeExtension
                 'block'    => 'general',
             ];
 
-            switch ($fieldConfigId->getFieldType()) {
-                case 'boolean':
-                    $options['empty_value'] = false;
-                    $options['choices']     = ['No', 'Yes'];
-                    break;
-                case 'optionSet':
-                    $options['entityClassName'] = $className;
-                    $options['entityFieldName'] = $fieldName;
-                    break;
-                case 'enum':
-                    $options['enum_code'] = $this->configManager->getProvider('enum')
-                        ->getConfig($className, $fieldName)
-                        ->get('enum_code');
-                    break;
-                case 'multiEnum':
-                    $options['expanded']  = true;
-                    $options['enum_code'] = $this->configManager->getProvider('enum')
-                        ->getConfig($className, $fieldName)
-                        ->get('enum_code');
-                    break;
-                case 'manyToOne':
-                    $options['entity_class'] = $extendConfig->get('target_entity');
-                    $options['configs']      = [
-                        'placeholder'   => 'oro.form.choose_value',
-                        'extra_config'  => 'relation',
-                        'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
-                        'target_field'  => $extendConfig->get('target_field'),
-                        'properties'    => [$extendConfig->get('target_field')],
-                    ];
-                    break;
+            /*switch ($fieldConfigId->getFieldType()) {
                 case 'oneToMany':
                 case 'manyToMany':
                     $classArray          = explode('\\', $extendConfig->get('target_entity'));
@@ -189,11 +161,14 @@ class ExtendEntityExtension extends AbstractTypeExtension
                         );
                         $options['default_element'] = $defaultFieldName;
                     }
-
+                    $formType = true;
                     break;
             }
-
-            $builder->add($fieldName, $this->typeMap[$fieldConfigId->getFieldType()], $options);
+            if ($formType) {
+                $builder->add($fieldName, $this->typeMap[$fieldConfigId->getFieldType()], $options);
+            } else {
+            }*/
+            $builder->add($fieldName, null, array());
         }
     }
 
