@@ -8,7 +8,7 @@ define([
 ], function (_, Backbone, mediator, tools) {
     'use strict';
 
-    var contentManager, stateShortKeys;
+    var contentManager, stateShortKeys, executeAction;
 
     /**
      * Object declares state keys that will be involved in URL-state saving with their shorthands
@@ -22,6 +22,8 @@ define([
         filters: 'f',
         gridView: 'v'
     };
+
+    executeAction = false;
 
     /**
      * Encode state object to string
@@ -69,6 +71,24 @@ define([
         mediator.execute('pageCache:state:save', key, collection.clone(), hash);
     }
 
+    function addHashToUrl(grid, action)
+    {
+        // only links after execute event must be modified
+        action.on('preExecute', function () {
+            executeAction = true;
+        });
+        action.on('getLink', function (action, linkData) {
+            if (executeAction) {
+                linkData.link = action.addUrlParameter(
+                    linkData.link,
+                    gridNameKey(grid.name),
+                    encodeStateData(grid.collection.state)
+                );
+                executeAction = false;
+            }
+        });
+    }
+
     contentManager = {
         get: function (gridName) {
             var key, collection, hash, isActual;
@@ -88,6 +108,22 @@ define([
             contentManager.listenTo(collection, 'beforeReset', updateState);
             mediator.once('page:beforeChange', function () {
                 contentManager.stopListening(collection);
+            });
+        },
+
+        process: function (grid) {
+            if (grid.rowClickAction) {
+                addHashToUrl(grid, grid.rowClickAction.prototype);
+            }
+
+            _.each(grid.body.rows, function (row) {
+                _.each(row.cells, function (cell) {
+                    if (cell.actions) {
+                        _.each(cell.actions, function (action) {
+                            addHashToUrl(grid, action);
+                        });
+                    }
+                });
             });
         }
     };

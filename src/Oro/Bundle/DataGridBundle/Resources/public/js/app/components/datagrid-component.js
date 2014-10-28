@@ -152,6 +152,8 @@ define(function (require) {
             this.$el.append(grid.render().$el);
             mediator.trigger('datagrid:rendered');
 
+            gridContentManager.process(grid);
+
             if (options.routerEnabled !== false) {
                 // trace collection changes
                 gridContentManager.trace(collection);

@@ -62,7 +62,7 @@ define([
          * @throws {TypeError} If route is undefined
          */
         getLink: function () {
-            var result, backUrl;
+            var result, backUrl, linkData;
             if (!this.link) {
                 throw new TypeError("'link' is required");
             }
@@ -79,7 +79,10 @@ define([
                 result = this.addUrlParameter(result, this.backUrlParameter, backUrl);
             }
 
-            return result;
+            linkData = { link: result };
+            this.trigger('getLink', this, linkData);
+
+            return linkData.link;
         },
 
         /**
@@ -126,7 +129,7 @@ define([
             if (newQueryString !== "" && newQueryString !== '?') {
                 newQueryString += "&";
             }
-            newQueryString += parameterName + "=" + (parameterValue || '');
+            newQueryString += parameterName + "=" + encodeURIComponent(parameterValue || '');
             return urlParts[0] + newQueryString + urlHash;
         }
     });
