@@ -15,9 +15,9 @@ oro_system_configuration:
             options:
                 label: oro.entity_pagination.system_configuration.fields.limit.label
                 tooltip: oro.entity_pagination.system_configuration.fields.limit.tooltip
+                required: true
                 constraints:
                     - NotBlank: ~
-                required: false
 
     tree:
         system_configuration:
