@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Doctrine\Common\Util\ClassUtils;
 
 class EntityPaginationExtension extends \Twig_Extension
 {
@@ -41,99 +42,15 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return [
-            new \Twig_SimpleFunction('oro_entity_pagination_first', [$this, 'getFirst']),
-            new \Twig_SimpleFunction('oro_entity_pagination_last', [$this, 'getLast']),
-            new \Twig_SimpleFunction('oro_entity_pagination_previous', [$this, 'getPrevious']),
-            new \Twig_SimpleFunction('oro_entity_pagination_next', [$this, 'getNext']),
+        return array(
             new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
-        ];
-    }
-
-    /**
-     * Null - first entity is not accessible
-     * Array('route' => <string>, 'route_params' => <array>)
-     *
-     * @param object $entity
-     * @return null|array
-     */
-    public function getFirst($entity)
-    {
-        return $this->getLink($entity, EntityPaginationStorage::FIRST);
-    }
-
-    /**
-     * Null - previous entity is not accessible
-     * Array('route' => <string>, 'route_params' => <array>)
-     *
-     * @param object $entity
-     * @return null|array
-     */
-    public function getPrevious($entity)
-    {
-        return $this->getLink($entity, EntityPaginationStorage::PREVIOUS);
-    }
-
-    /**
-     * Null - next entity is not accessible
-     * Array('route' => <string>, 'route_params' => <array>)
-     *
-     * @param object $entity
-     * @return null|string
-     */
-    public function getNext($entity)
-    {
-        return $this->getLink($entity, EntityPaginationStorage::NEXT);
-    }
-
-    /**
-     * Null - last entity is not accessible
-     * Array('route' => <string>, 'route_params' => <array>)
-     *
-     * @param object $entity
-     * @return null|array
-     */
-    public function getLast($entity)
-    {
-        return $this->getLink($entity, EntityPaginationStorage::LAST);
-    }
-
-    /**
-     * Null - entity is not accessible
-     * Array('route' => <string>, 'route_params' => <array>)
-     *
-     * @param object $entity
-     * @param string $navigation
-     * @return array|null
-     */
-    protected function getLink($entity, $navigation)
-    {
-        $routeAndParameters = $this->getRouteAndParameters();
-        if (!$routeAndParameters) {
-            return null;
-        }
-
-        $entityId = 0;
-        switch ($navigation) {
-            case EntityPaginationStorage::FIRST:
-                $entityId = $this->storage->getFirstIdentifier($entity);
-                break;
-            case EntityPaginationStorage::PREVIOUS:
-                $entityId = $this->storage->getPreviousIdentifier($entity);
-                break;
-            case EntityPaginationStorage::NEXT:
-                $entityId = $this->storage->getNextIdentifier($entity);
-                break;
-            case EntityPaginationStorage::LAST:
-                $entityId = $this->storage->getLastIdentifier($entity);
-                break;
-        }
-
-        if (!$entityId) {
-            return null;
-        }
-
-        return $this->addEntityIdParameter($routeAndParameters, $entity, $entityId);
+            new \Twig_SimpleFunction(
+                'oro_entity_pagination_name',
+                function ($entity) {
+                    return ClassUtils::getClass($entity);
+                }
+            ),
+        );
     }
 
     /**

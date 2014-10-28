@@ -15,6 +15,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_config.global
+            - @oro_security.security_facade
         calls:
             - [ setRequest, [@?request=] ]
 

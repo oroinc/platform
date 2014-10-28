@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Common\Util\ClassUtils;
@@ -11,6 +12,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EntityPaginationStorage
 {
+    const VIEW_SCOPE   = 'view';
+    const EDIT_SCOPE   = 'edit';
     const STORAGE_NAME = 'entity_pagination_storage';
     const ENTITY_IDS   = 'entity_ids';
     const HASH         = 'hash';
@@ -35,14 +38,22 @@ class EntityPaginationStorage
      */
     protected $configManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
+        SecurityFacade $securityFacade
+    ) {
         $this->doctrineHelper  = $doctrineHelper;
         $this->configManager = $configManager;
+        $this->securityFasade = $securityFacade;
     }
 
     /**
@@ -66,9 +77,10 @@ class EntityPaginationStorage
      * @param string $entityName
      * @param string $hash
      * @param array $entityIds
+     * @param string $scope
      * @return bool
      */
-    public function setData($entityName, $hash, array $entityIds)
+    public function setData($entityName, $hash, array $entityIds, $scope = self::VIEW_SCOPE)
     {
         if (!$this->isEnabled()) {
             return false;
@@ -79,7 +91,7 @@ class EntityPaginationStorage
             return false;
         }
 
-        $storage[$entityName] = [self::HASH => $hash, self::ENTITY_IDS => $entityIds];
+        $storage[$entityName][$scope] = [self::HASH => $hash, self::ENTITY_IDS => $entityIds];
         $this->setStorage($storage);
 
         return true;
@@ -88,9 +100,10 @@ class EntityPaginationStorage
     /**
      * @param string $entityName
      * @param string $hash
+     * @param string $scope
      * @return bool
      */
-    public function hasData($entityName, $hash)
+    public function hasData($entityName, $hash, $scope = self::VIEW_SCOPE)
     {
         if (!$this->isEnabled()) {
             return false;
@@ -101,22 +114,23 @@ class EntityPaginationStorage
             return false;
         }
 
-        return isset($storage[$entityName][self::HASH]) && $storage[$entityName][self::HASH] == $hash;
+        return isset($storage[$entityName][$scope][self::HASH]) && $storage[$entityName][$scope][self::HASH] == $hash;
     }
 
     /**
      * @param object $entity
+     * @param string $scope
      * @return int|null
      */
-    public function getTotalCount($entity)
+    public function getTotalCount($entity, $scope = self::VIEW_SCOPE)
     {
         if (!$this->isEnabled()) {
             return null;
         }
 
         $total = null;
-        if ($this->isEntityInStorage($entity)) {
-            $total = count($this->getEntityIds($entity));
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $total = count($this->getEntityIds($entity, $scope));
         }
 
         return $total;
@@ -124,17 +138,18 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
+     * @param string $scope
      * @return mixed|null
      */
-    public function getCurrentNumber($entity)
+    public function getCurrentNumber($entity, $scope = self::VIEW_SCOPE)
     {
         if (!$this->isEnabled()) {
             return null;
         }
 
         $currentNumber = null;
-        if ($this->isEntityInStorage($entity)) {
-            $currentNumber = $this->getCurrentPosition($entity) + 1;
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $currentNumber = $this->getCurrentPosition($entity, $scope) + 1;
         }
 
         return $currentNumber;
@@ -142,83 +157,178 @@ class EntityPaginationStorage
 
     /**
      * @param $entity
-     * @return int|null
+     * @param string $scope
+     * @return EntityPaginationStorageResult
      */
-    public function getPreviousIdentifier($entity)
-    {
-        return $this->getIdentifier($entity, self::PREVIOUS);
-    }
-
-    /**
-     * @param object $entity
-     * @return mixed|null
-     */
-    public function getNextIdentifier($entity)
-    {
-        return $this->getIdentifier($entity, self::NEXT);
-    }
-
-    /**
-     * @param object $entity
-     * @return mixed|null
-     */
-    public function getFirstIdentifier($entity)
-    {
-        return $this->getIdentifier($entity, self::FIRST);
-    }
-
-    /**
-     * @param object $entity
-     * @return mixed|null
-     */
-    public function getLastIdentifier($entity)
-    {
-        return $this->getIdentifier($entity, self::LAST);
-    }
-
-    /**
-     * @param object $entity
-     * @param string $navigation
-     * @return mixed|null
-     */
-    protected function getIdentifier($entity, $navigation)
+    public function getPreviousIdentifier($entity, $scope = self::VIEW_SCOPE)
     {
         if (!$this->isEnabled()) {
             return null;
         }
 
         $identifier = null;
-        if ($this->isEntityInStorage($entity)) {
-            $entityIds = $this->getEntityIds($entity);
+        $result = new EntityPaginationStorageResult();
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $entityIds = $this->getEntityIds($entity, $scope);
             $currentId = $this->getIdentifierValue($entity);
-            switch ($navigation) {
-                case self::FIRST:
-                    if ($currentId != reset($entityIds)) {
-                        $identifier = reset($entityIds);
+            $entityName = $this->getName($entity);
+
+            if ($currentId != reset($entityIds)) {
+                do {
+                    $currentPosition = $this->getCurrentPosition($entity, $scope);
+                    if (!isset($entityIds[$currentPosition - 1])) {
+                        break;
                     }
-                    break;
-                case self::PREVIOUS:
-                    if ($currentId != reset($entityIds)) {
-                        $currentPosition = $this->getCurrentPosition($entity);
-                        $identifier = $entityIds[--$currentPosition];
+                    $identifier = $entityIds[$currentPosition - 1];
+                    $navigationEntity = $this->doctrineHelper->getEntity($entityName, $identifier);
+                    if (!$navigationEntity) {
+                        $this->unsetIdentifier($identifier, $entity, $scope);
+                        $result->setAvailable(false);
+                    } elseif (
+                    !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                    ) {
+                        $result->setAccessible(false);
                     }
-                    break;
-                case self::NEXT:
-                    if ($currentId != end($entityIds)) {
-                        $currentPosition = $this->getCurrentPosition($entity);
-                        $identifier = $entityIds[++$currentPosition];
-                    }
-                    break;
-                case self::LAST:
-                    if ($currentId != end($entityIds)) {
-                        $identifier = end($entityIds);
-                    }
-                    break;
+                } while (
+                    !$navigationEntity
+                    || !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                );
+
+                $result->setId($identifier);
             }
         }
 
-        return $identifier;
+        return $result;
+    }
 
+    /**
+     * @param object $entity
+     * @param string $scope
+     * @return EntityPaginationStorageResult
+     */
+    public function getNextIdentifier($entity, $scope = self::VIEW_SCOPE)
+    {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
+        $identifier = null;
+        $result = new EntityPaginationStorageResult();
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $entityIds = $this->getEntityIds($entity, $scope);
+            $currentId = $this->getIdentifierValue($entity);
+            $entityName = $this->getName($entity);
+
+            if ($currentId != end($entityIds)) {
+                do {
+                    $currentPosition = $this->getCurrentPosition($entity, $scope);
+                    if (!isset($entityIds[$currentPosition + 1])) {
+                        break;
+                    }
+                    $identifier = $entityIds[$currentPosition + 1];
+                    $navigationEntity = $this->doctrineHelper->getEntity($entityName, $identifier);
+                    if (!$navigationEntity) {
+                        $this->unsetIdentifier($identifier, $entity, $scope);
+                        $result->setAvailable(false);
+                    } elseif (
+                    !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                    ) {
+                        $result->setAccessible(false);
+                    }
+                } while (
+                    !$navigationEntity
+                    || !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                );
+
+                $result->setId($identifier);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object $entity
+     * @param string $scope
+     * @return EntityPaginationStorageResult
+     */
+    public function getFirstIdentifier($entity, $scope = self::VIEW_SCOPE)
+    {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
+        $identifier = null;
+        $result = new EntityPaginationStorageResult();
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $entityIds = $this->getEntityIds($entity, $scope);
+            $currentId = $this->getIdentifierValue($entity);
+            $entityName = $this->getName($entity);
+
+            if ($currentId != reset($entityIds)) {
+                do {
+                    $identifier = reset($entityIds);
+                    $navigationEntity = $this->doctrineHelper->getEntity($entityName, $identifier);
+                    if (!$navigationEntity) {
+                        $this->unsetIdentifier($identifier, $entity, $scope);
+                        $result->setAvailable(false);
+                    } elseif (
+                    !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                    ) {
+                        $result->setAccessible(false);
+                    }
+                } while (
+                    !$navigationEntity
+                    || !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                );
+
+                $result->setId($identifier);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object $entity
+     * @param string $scope
+     * @return EntityPaginationStorageResult
+     */
+    public function getLastIdentifier($entity, $scope = self::VIEW_SCOPE)
+    {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
+        $identifier = null;
+        $result = new EntityPaginationStorageResult();
+        if ($this->isEntityInStorage($entity, $scope)) {
+            $entityIds = $this->getEntityIds($entity, $scope);
+            $currentId = $this->getIdentifierValue($entity);
+            $entityName = $this->getName($entity);
+
+            if ($currentId != end($entityIds)) {
+                do {
+                    $identifier = end($entityIds);
+                    $navigationEntity = $this->doctrineHelper->getEntity($entityName, $identifier);
+                    if (!$navigationEntity) {
+                        $this->unsetIdentifier($identifier, $entity, $scope);
+                        $result->setAvailable(false);
+                    } elseif (
+                    !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                    ) {
+                        $result->setAccessible(false);
+                    }
+                } while (
+                    !$navigationEntity
+                    || !$this->securityFasade->isGranted(self::getAttribute($scope), $navigationEntity)
+                );
+
+                $result->setId($identifier);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -261,9 +371,10 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
+     * @param string $scope
      * @return bool
      */
-    protected function isEntityInStorage($entity)
+    protected function isEntityInStorage($entity, $scope = self::VIEW_SCOPE)
     {
         $storage = $this->getStorage();
         if (null === $storage) {
@@ -273,8 +384,8 @@ class EntityPaginationStorage
         $entityName = $this->getName($entity);
         $identifierValue = $this->getIdentifierValue($entity);
 
-        return !empty($storage[$entityName][self::ENTITY_IDS])
-            && in_array($identifierValue, $storage[$entityName][self::ENTITY_IDS]);
+        return !empty($storage[$entityName][$scope][self::ENTITY_IDS])
+            && in_array($identifierValue, $storage[$entityName][$scope][self::ENTITY_IDS]);
     }
 
     /**
@@ -297,15 +408,16 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
+     * @param string $scope
      * @return array
      */
-    protected function getEntityIds($entity)
+    protected function getEntityIds($entity, $scope = self::VIEW_SCOPE)
     {
         $entityName = $this->getName($entity);
         $storage = $this->getStorage();
         $entityIds = [];
-        if ($storage && !empty($storage[$entityName][self::ENTITY_IDS])) {
-            $entityIds = $storage[$entityName][self::ENTITY_IDS];
+        if ($storage && !empty($storage[$entityName][$scope][self::ENTITY_IDS])) {
+            $entityIds = $storage[$entityName][$scope][self::ENTITY_IDS];
         }
 
         return $entityIds;
@@ -313,13 +425,55 @@ class EntityPaginationStorage
 
     /**
      * @param object $entity
+     * @param string $scope
      * @return int
      */
-    protected function getCurrentPosition($entity)
+    protected function getCurrentPosition($entity, $scope = self::VIEW_SCOPE)
     {
         return array_search(
-            $this->getIdentifierValue($entity),
-            $this->getEntityIds($entity)
+            $this->getIdentifierValue($entity, $scope),
+            $this->getEntityIds($entity, $scope)
         );
+    }
+
+    /**
+     * @param string $scope
+     * @return string
+     */
+    public static function getAttribute($scope)
+    {
+        switch ($scope) {
+            case self::VIEW_SCOPE:
+                $attribute = 'VIEW';
+                break;
+            case self::EDIT_SCOPE:
+                $attribute = 'EDIT';
+                break;
+            default:
+                throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
+        }
+
+        return $attribute;
+    }
+
+    /**
+     * @param object $entity
+     * @param string $scope
+     * @param array $entityIds
+     */
+    protected function updateStorageData($entity, $scope, array $entityIds)
+    {
+        $storage = $this->getStorage();
+        $storage[$this->getName($entity)][$scope][self::ENTITY_IDS] = $entityIds;
+        $this->setStorage($storage);
+    }
+
+    protected function unsetIdentifier($identifier, $entity, $scope)
+    {
+        $entityIds = $this->getEntityIds($entity, $scope);
+        $entityKey = array_search($identifier, $entityIds);
+        unset($entityIds[$entityKey]);
+        $entityIds = array_values($entityIds);
+        $this->updateStorageData($entity, $scope, $entityIds);
     }
 }
