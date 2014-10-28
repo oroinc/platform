@@ -14,7 +14,7 @@ class AddProcessExcludeDefinitions implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $table = $schema->getTable('oro_process_trigger');
+        $table = $schema->getTable('oro_process_definition');
         $table->addColumn(
             'exclude_definitions',
             'simple_array',

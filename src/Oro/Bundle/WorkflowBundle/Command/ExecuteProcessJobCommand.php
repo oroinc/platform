@@ -90,27 +90,18 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             $entityManager->beginTransaction();
             try {
                 $processHandler->handleJob($processJob);
-                $this->finishJob($entityManager, $processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+                $processHandler->finishJob($processJob);
+                $entityManager->commit();
 
                 $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
             } catch (\Exception $e) {
+                $processHandler->finishJob($processJob);
                 $entityManager->rollback();
 
                 $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
             }
         }
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     * @param ProcessJob $processJob
-     */
-    protected function finishJob(EntityManager $entityManager, ProcessJob $processJob)
-    {
-        $entityManager->remove($processJob);
-        $entityManager->flush();
-        $entityManager->commit();
-
-        $this->getProcessHandler()->finishJob($processJob);
     }
 }
