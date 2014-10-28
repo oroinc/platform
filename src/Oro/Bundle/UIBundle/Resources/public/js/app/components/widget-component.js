@@ -4,7 +4,7 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'oroui/js/mediator'],
         'use strict';
 
         /**
-         * @export oroui/js/widget-control-initializer
+         * @export oroui/js/app/components/widget-component
          * @class oroui.widgetControlInitializer
          */
         return {
