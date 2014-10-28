@@ -100,9 +100,8 @@ services:
             - { name: oro_datagrid.extension.action.type, type: dialog }
 
     oro_attachment.widget_provider.actions:
-        class: %oro_ui.widget_provider.action_button.class%
+        parent: oro_ui.widget_provider.action_button.abstract
         arguments:
-            - @oro_ui.placeholder.provider
             - oro_add_attachment_button
             - oro_add_attachment_link
         tags:

@@ -25,7 +25,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     /**
      * {@inheritdoc}
      */
-    public function generate(array &$schema, PhpClass $class)
+    public function generate(array $schema, PhpClass $class)
     {
         if (!empty($schema['inherit'])) {
             $class->setParentClassName($schema['inherit']);
@@ -38,7 +38,7 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
         }
 
         $this->generateConstructor($schema, $class);
-        $class->setInterfaceNames(['Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface']);
+        $class->addInterfaceName('Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface');
 
         $this->generateProperties('property', $schema, $class);
         $this->generateProperties('relation', $schema, $class);

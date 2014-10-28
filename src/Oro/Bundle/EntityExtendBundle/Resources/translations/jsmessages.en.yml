@@ -7,3 +7,4 @@ oro:
     entity_extend:
         schema_updated: Schema updated
         schema_update_failed: Schema update failed
+        delete_field.confirm_content: Are you sure you want to delete this field?

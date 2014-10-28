@@ -20,14 +20,14 @@ class CalendarRepository extends EntityRepository
     }
 
     /**
-     * Gets user's calendar in scope of organization
+     * Gets user's default calendar in scope of organization
      *
      * @param $userId
      * @param $organizationId
      *
      * @return null|object
      */
-    public function findByUserAndOrganization($userId, $organizationId)
+    public function findDefaultCalendar($userId, $organizationId)
     {
         return $this->findOneBy(
             array(
