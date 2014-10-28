@@ -19,8 +19,7 @@ class AddNewColumns implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {

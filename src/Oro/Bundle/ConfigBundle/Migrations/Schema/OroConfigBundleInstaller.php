@@ -25,9 +25,14 @@ class OroConfigBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroConfigTable($schema);
         $this->createOroConfigValueTable($schema);
+
+        /** Foreign keys generation **/
+        $this->addOroConfigValueForeignKeys($schema);
     }
 
     /**
+     * Create oro_config table
+     *
      * @param Schema $schema
      */
     protected function createOroConfigTable(Schema $schema)
@@ -41,6 +46,8 @@ class OroConfigBundleInstaller implements Installation
     }
 
     /**
+     * Create oro_config_value table
+     *
      * @param Schema $schema
      */
     protected function createOroConfigValueTable(Schema $schema)
@@ -59,11 +66,21 @@ class OroConfigBundleInstaller implements Installation
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name', 'section', 'config_id'], 'CONFIG_VALUE_UQ_ENTITY');
         $table->addIndex(['config_id'], 'IDX_DAF6DF5524DB0683', []);
+    }
 
-        /** Generate foreign keys for table oro_config_value **/
+    /**
+     * Add oro_config_value foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroConfigValueForeignKeys(Schema $schema)
+    {
         $table = $schema->getTable('oro_config_value');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_config'), ['config_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]
+            $schema->getTable('oro_config'),
+            ['config_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
         );
     }
 }

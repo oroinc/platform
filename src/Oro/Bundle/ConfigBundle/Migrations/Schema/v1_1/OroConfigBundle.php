@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroConfigBundle implements  Migration,  OrderedMigrationInterface
+class OroConfigBundle implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritdoc}
