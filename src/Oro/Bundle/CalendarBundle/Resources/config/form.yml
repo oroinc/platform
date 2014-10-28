@@ -2,6 +2,7 @@ parameters:
     oro_calendar.calendar_event.form.type.class:              Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType
     oro_calendar.calendar_event.form.type.api.class:          Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType
     oro_calendar.calendar_event.form.handler.class:           Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler
+    oro_calendar.calendar_event.form.handler.api.class:       Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
 
 services:
     oro_calendar.calendar_event.form.type:
@@ -37,9 +38,12 @@ services:
             - @oro_calendar.calendar_event.form
             - @request
             - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @oro_entity.routing_helper
+            - @oro_security.security_facade
 
     oro_calendar.calendar_event.form.handler.api:
-        class: %oro_calendar.calendar_event.form.handler.class%
+        class: %oro_calendar.calendar_event.form.handler.api.class%
         scope: request
         arguments:
             - @oro_calendar.calendar_event.form.api

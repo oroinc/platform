@@ -122,7 +122,7 @@ class CalendarConnectionController extends FOSRestController implements
 
         $connectedCalendar = !empty($calendarId)
             ? $calendarRepo->find($id)
-            : $calendarRepo->findByUserAndOrganization($ownerId, $organization->getId());
+            : $calendarRepo->findDefaultCalendar($ownerId, $organization->getId());
         if (!$connectedCalendar) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }

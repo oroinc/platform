@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
         $calendar    = $this->getDoctrine()->getManager()
             ->getRepository('OroCalendarBundle:Calendar')
-            ->findByUserAndOrganization($this->getUser()->getId(), $securityFacade->getOrganization()->getId());
+            ->findDefaultCalendar($this->getUser()->getId(), $securityFacade->getOrganization()->getId());
         $currentDate = new \DateTime('now', new \DateTimeZone($localeSettings->getTimeZone()));
         $startDate   = clone $currentDate;
         $startDate->setTime(0, 0, 0);

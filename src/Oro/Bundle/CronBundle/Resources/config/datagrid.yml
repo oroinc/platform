@@ -93,4 +93,3 @@ datagrid:
                 rowAction:    true
         options:
             entityHint: job
-            entity_pagination: true

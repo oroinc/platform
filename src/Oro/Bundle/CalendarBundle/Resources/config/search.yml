@@ -12,6 +12,10 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
             target_type:            text
             target_fields:          [title]
         -
+            name:                   description
+            target_type:            text
+            target_fields:          [description]
+        -
             name:                   start
             target_type:            datetime
             target_fields:          [start]

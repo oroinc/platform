@@ -62,7 +62,7 @@ define([
          * @throws {TypeError} If route is undefined
          */
         getLink: function () {
-            var result, backUrl, linkData;
+            var result, backUrl;
             if (!this.link) {
                 throw new TypeError("'link' is required");
             }
@@ -79,10 +79,7 @@ define([
                 result = this.addUrlParameter(result, this.backUrlParameter, backUrl);
             }
 
-            linkData = { link: result };
-            this.trigger('getLink', this, linkData);
-
-            return linkData.link;
+            return result;
         },
 
         /**
