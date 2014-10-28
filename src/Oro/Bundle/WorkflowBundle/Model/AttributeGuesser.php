@@ -10,6 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -98,6 +99,7 @@ class AttributeGuesser
      * @param string $rootClass
      * @param string|PropertyPath $propertyPath
      * @return array|null
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function guessMetadataAndField($rootClass, $propertyPath)
     {
@@ -116,10 +118,14 @@ class AttributeGuesser
         $field = null;
         for ($i = 1; $i < $elementsCount; $i++) {
             $field = $pathElements[$i];
-            $hasAssociation = $metadata->hasAssociation($field);
-
+            $hasAssociation = $metadata->hasAssociation($field)
+                || $this->entityConfigProvider->hasConfig($rootClass, $field);
             if ($hasAssociation && $i < $elementsCount - 1) {
-                $metadata = $this->getMetadataForClass($metadata->getAssociationTargetClass($field));
+                $metadata = $this->getMetadataForClass(
+                    $metadata->hasAssociation($field)
+                        ? $metadata->getAssociationTargetClass($field)
+                        : $this->entityConfigProvider->getConfig($rootClass, $field)->getId()->getClassName()
+                );
             } elseif (!$hasAssociation && !$metadata->hasField($field)) {
                 return null;
             }
@@ -158,6 +164,17 @@ class AttributeGuesser
                 $this->doctrineTypeMapping[$doctrineType]['type'],
                 $this->doctrineTypeMapping[$doctrineType]['options']
             );
+        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)){
+            $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
+            $fieldType = $entityConfig->getId()->getFieldType();
+            if (!FieldTypeHelper::isRelation($fieldType)) {
+
+                return $this->formatResult(
+                    $entityConfig->get('label'),
+                    $this->doctrineTypeMapping[$fieldType]['type'],
+                    $this->doctrineTypeMapping[$fieldType]['options']
+                );
+            }
         }
 
         if ($metadata->hasAssociation($field)) {
