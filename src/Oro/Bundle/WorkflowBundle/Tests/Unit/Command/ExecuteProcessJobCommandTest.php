@@ -84,24 +84,16 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
         $processJobs = $this->populateProcessJobs($ids);
 
         $index = 0;
-        if ($successful) {
-            foreach ($processJobs as $processJob) {
-                $this->processHandler->expects($this->at($index++))
-                    ->method('handleJob')
-                    ->with($processJob);
-                $this->processHandler->expects($this->at($index++))
-                    ->method('finishJob')
-                    ->with($processJob);
-            }
-        } else {
-            foreach ($processJobs as $processJob) {
-                $this->processHandler->expects($this->at($index))
-                    ->method('handleJob')
-                    ->with($processJob)
-                    ->will($this->throwException($exceptions[$index++]));
-            }
-            $this->processHandler->expects($this->never())
-                ->method('finishJob');
+
+        foreach ($processJobs as $processJob) {
+            $stub = $successful ? $this->returnSelf() : $this->throwException($exceptions[round($index / 2)]);
+            $this->processHandler->expects($this->at($index++))
+                ->method('handleJob')
+                ->with($processJob)
+                ->will($stub);
+            $this->processHandler->expects($this->at($index++))
+                ->method('finishJob')
+                ->with($processJob);
         }
 
         $this->expectProcessJobRepositoryFindByIds($ids, $processJobs);
