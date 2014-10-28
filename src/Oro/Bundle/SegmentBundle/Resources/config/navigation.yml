@@ -4,6 +4,7 @@ oro_menu_config:
             label: 'oro.segment.menu.reports_tab.label'
             uri: '#'
             extras:
+                position: 50
                 icon: icon-folder-open
 
         segments_divider:
