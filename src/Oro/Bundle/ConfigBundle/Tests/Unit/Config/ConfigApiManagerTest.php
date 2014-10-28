@@ -87,12 +87,41 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->configManager->expects($this->any())
+            ->method('getInfo')
+            ->will(
+                $this->returnValue(
+                    [
+                        'createdAt' => $datetime,
+                        'updatedAt' => $datetime,
+                    ]
+                )
+            );
 
         $this->assertSame(
             [
-                ['key' => 'acme.item1', 'type' => 'string', 'value' => 'val1'],
-                ['key' => 'acme.item2', 'type' => 'integer', 'value' => 123],
-                ['key' => 'acme.item3', 'type' => 'array', 'value' => ['val1' => 1, 'val2' => true]],
+                [
+                    'key' => 'acme.item1',
+                    'type' => 'string',
+                    'value' => 'val1',
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item2',
+                    'type' => 'integer',
+                    'value' => 123,
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item3',
+                    'type' => 'array',
+                    'value' => ['val1' => 1, 'val2' => true],
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
             ],
             $this->manager->getData($path)
         );

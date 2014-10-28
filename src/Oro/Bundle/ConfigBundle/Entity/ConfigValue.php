@@ -75,6 +75,20 @@ class ConfigValue
     protected $type = self::FIELD_SCALAR_TYPE;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $updatedAt;
+
+    /**
      * Get id
      *
      * @return integer
@@ -208,6 +222,71 @@ class ConfigValue
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Get created date/time
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime
+     *
+     * @return Config
+     */
+    public function setCreatedAt($created)
+    {
+        $this->createdAt = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get last update date/time
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime
+     *
+     * @return Config
+     */
+    public function setUpdatedAt($updated)
+    {
+        $this->updatedAt = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function doPreUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
