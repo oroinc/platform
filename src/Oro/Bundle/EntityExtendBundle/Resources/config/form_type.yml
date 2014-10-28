@@ -18,6 +18,7 @@ parameters:
     oro_entity_extend.type.association.text.class:              Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
     oro_entity_extend.type.association.textarea.class:          Oro\Bundle\EntityExtendBundle\Form\Type\TextareaAssociationPropertyType
     oro_entity_extend.type.association.choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType
+    oro_entity_extend.type.multiple_entity.class:               Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType
 
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
 
@@ -240,3 +241,10 @@ services:
             - @oro_entity_config.provider.extend
         tags:
             - { name: form.type_guesser, priority: 20 }
+
+    oro_entity_extend.type.multiple_entity:
+        class: %oro_entity_extend.type.multiple_entity.class%
+        arguments:
+            - @router
+        tags:
+            - { name: form.type, alias: oro_entity_extend_multiple_entity }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
+use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -61,8 +63,8 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
         'file'       => 'oro_file',
         'image'      => 'oro_image',
         'manyToOne'  => 'oro_entity_select',
-        'oneToMany'  => 'oro_multiple_entity',
-        'manyToMany' => 'oro_multiple_entity',
+        'oneToMany'  => MultipleEntityType::TYPE,
+        'manyToMany' => MultipleEntityType::TYPE,
         'optionSet'  => 'oro_option_select',
         'enum'       => 'oro_enum_select',
         'multiEnum'  => 'oro_enum_choice',
@@ -138,7 +140,7 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
                 break;
             case 'manyToOne':
                 $options['entity_class'] = $extendConfig->get('target_entity');
-                $options['configs'] = [
+                $options['configs']      = [
                     'placeholder'   => 'oro.form.choose_value',
                     'extra_config'  => 'relation',
                     'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
@@ -146,11 +148,32 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
                     'properties'    => [$extendConfig->get('target_field')],
                 ];
                 break;
-        }
+            case 'oneToMany':
+            case 'manyToMany':
+                $classArray = explode('\\', $extendConfig->get('target_entity'));
+                $blockName = array_pop($classArray);
+                $selectorWindowTitle = 'Select ' . $blockName;
 
+                $options['block'] = $blockName;
+                $options['block_config'] = [
+                    $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
+                ];
+                $options['class'] = $extendConfig->get('target_entity');
+                $options['selector_window_title'] = $selectorWindowTitle;
+                $options['initial_elements'] = null;
+                $options['mapped'] = false;
+                $options['extend'] = true;
+                if (!$extendConfig->is('without_default')) {
+                    $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $property;
+                }
+                break;
+            default:
+                return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+        }
+        $type = $this->typeMap[$fieldConfigId->getFieldType()];
 
         return new TypeGuess(
-            $this->typeMap[$fieldConfigId->getFieldType()],
+            $type,
             $options,
             TypeGuess::VERY_HIGH_CONFIDENCE
         );
