@@ -33,6 +33,18 @@ class CalendarEventController extends RestController implements ClassResourceInt
      * Get calendar events.
      *
      * @QueryParam(
+     *      name="page",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Page number, starting from 1. Defaults to 1."
+     * )
+     * @QueryParam(
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of items per page. defaults to 10."
+     * )
+     * @QueryParam(
      *      name="calendar", requirements="\d+", nullable=false, strict=true,
      *      description="Calendar id.")
      * @QueryParam(
@@ -75,6 +87,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $start       = new \DateTime($this->getRequest()->get('start'));
         $end         = new \DateTime($this->getRequest()->get('end'));
         $subordinate = (true == $this->getRequest()->get('subordinate'));
+        $page        = (int) $this->getRequest()->get('page', 1);
+        $limit       = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         /** @var SecurityFacade $securityFacade */
         $securityFacade = $this->get('oro_security.security_facade');
@@ -105,6 +119,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
         $criteria = $this->getFilterCriteria(array('createdAt', 'updatedAt'), $filterParameters);
         $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate, $criteria);
+        $qb->setMaxResults($limit)
+            ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
         $result = array();
 
