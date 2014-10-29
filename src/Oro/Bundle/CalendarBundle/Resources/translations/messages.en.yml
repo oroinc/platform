@@ -30,6 +30,9 @@ oro:
         menu:
             view_default: My Calendar
 
+        context:
+            hide: Hide this calenadr
+
         control:
             all_day: ""
             today:   today
