@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionListConfiguration;
 
@@ -51,6 +49,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'enabled' => false,
                         'entity' => 'My\Entity',
                         'order' => 10,
+                        'exclude_definitions'   => array('minimum_definition'),
                         'actions_configuration' => array('key' => 'value'),
                     ),
                 ),
@@ -60,6 +59,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'entity' => 'My\Entity',
                         'enabled' => true,
                         'order' => 0,
+                        'exclude_definitions'   => array(),
                         'actions_configuration' => array(),
                     ),
                     'maximum_definition' => array(
@@ -67,6 +67,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'enabled' => false,
                         'entity' => 'My\Entity',
                         'order' => 10,
+                        'exclude_definitions'   => array('minimum_definition'),
                         'actions_configuration' => array('key' => 'value'),
                     )
                 ),
