@@ -77,6 +77,13 @@ class ProcessDefinition implements DomainObjectInterface
     /**
      * @var array
      *
+     * @ORM\Column(name="exclude_definitions", type="simple_array", nullable=true)
+     */
+    protected $excludeDefinitions;
+
+    /**
+     * @var array
+     *
      * @ORM\Column(name="actions_configuration", type="array")
      */
     protected $actionsConfiguration;
@@ -202,6 +209,25 @@ class ProcessDefinition implements DomainObjectInterface
     public function getExecutionOrder()
     {
         return $this->executionOrder;
+    }
+
+    /**
+     * @param array $excludeDefinitions
+     * @return ProcessDefinition
+     */
+    public function setExcludeDefinitions(array $excludeDefinitions)
+    {
+        $this->excludeDefinitions = $excludeDefinitions;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludeDefinitions()
+    {
+        return (array)$this->excludeDefinitions;
     }
 
     /**
