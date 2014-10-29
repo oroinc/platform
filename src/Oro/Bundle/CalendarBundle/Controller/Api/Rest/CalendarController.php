@@ -10,7 +10,6 @@ use FOS\Rest\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -53,7 +52,6 @@ class CalendarController extends FOSRestController
 
         $result = array(
             'calendar'      => $calendar->getId(),
-            'organization'  => $calendar->getOrganization()->getId(),
             'owner'         => $calendar->getOwner()->getId(),
             'calendarName'  => $calendar->getName(),
         );
