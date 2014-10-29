@@ -12,16 +12,15 @@ class TabMenuWidgetProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdentifierAccessor;
+    protected $objectIdAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $widgetProvider;
 
     protected function setUp()
     {
-        $this->entityIdentifierAccessor =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\ObjectIdentityAccessorInterface');
-        $this->widgetProvider = $this->getMockBuilder('Oro\Bundle\UIBundle\Twig\TabExtension')
+        $this->objectIdAccessor = $this->getMock('Oro\Bundle\UIBundle\Provider\ObjectIdAccessorInterface');
+        $this->widgetProvider   = $this->getMockBuilder('Oro\Bundle\UIBundle\Twig\TabExtension')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -29,7 +28,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit_Framework_TestCase
     public function testSupportsWithoutEntityClass()
     {
         $this->provider = new TabMenuWidgetProvider(
-            $this->entityIdentifierAccessor,
+            $this->objectIdAccessor,
             $this->widgetProvider,
             'test_menu'
         );
@@ -41,7 +40,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit_Framework_TestCase
     public function testSupports()
     {
         $this->provider = new TabMenuWidgetProvider(
-            $this->entityIdentifierAccessor,
+            $this->objectIdAccessor,
             $this->widgetProvider,
             'test_menu',
             'Oro\Bundle\UIBundle\Tests\Unit\Fixture\TestBaseClass'
@@ -55,7 +54,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgets()
     {
         $this->provider = new TabMenuWidgetProvider(
-            $this->entityIdentifierAccessor,
+            $this->objectIdAccessor,
             $this->widgetProvider,
             'test_menu'
         );
@@ -68,7 +67,7 @@ class TabMenuWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ['name' => 'widget2'],
         ];
 
-        $this->entityIdentifierAccessor->expects($this->once())
+        $this->objectIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue($entityId));

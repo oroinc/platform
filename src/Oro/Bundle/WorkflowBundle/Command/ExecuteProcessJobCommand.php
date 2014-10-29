@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
 class ExecuteProcessJobCommand extends ContainerAwareCommand
 {
@@ -22,6 +23,11 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     protected $registry;
 
     /**
+     * @var ProcessHandler
+     */
+    protected $processHandler;
+
+    /**
      * @return ManagerRegistry
      */
     protected function getRegistry()
@@ -31,6 +37,18 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
         }
 
         return $this->registry;
+    }
+
+    /**
+     * @return ProcessHandler
+     */
+    protected function getProcessHandler()
+    {
+        if (!$this->processHandler) {
+            $this->processHandler = $this->getContainer()->get('oro_workflow.process.process_handler');
+        }
+
+        return $this->processHandler;
     }
 
     /**
@@ -64,7 +82,7 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
 
         /** @var EntityManager $entityManager */
         $entityManager  = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
-        $processHandler = $this->getContainer()->get('oro_workflow.process.process_handler');
+        $processHandler = $this->getProcessHandler();
 
         /** @var ProcessJob $processJob */
         foreach ($processJobs as $processJob) {
@@ -72,25 +90,18 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             $entityManager->beginTransaction();
             try {
                 $processHandler->handleJob($processJob);
-                $this->finishJob($entityManager, $processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+                $processHandler->finishJob($processJob);
+                $entityManager->commit();
 
                 $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
             } catch (\Exception $e) {
+                $processHandler->finishJob($processJob);
                 $entityManager->rollback();
 
                 $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
             }
         }
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     * @param ProcessJob $processJob
-     */
-    protected function finishJob(EntityManager $entityManager, ProcessJob $processJob)
-    {
-        $entityManager->remove($processJob);
-        $entityManager->flush();
-        $entityManager->commit();
     }
 }

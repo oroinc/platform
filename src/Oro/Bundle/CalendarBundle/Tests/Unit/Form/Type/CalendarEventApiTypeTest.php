@@ -79,12 +79,13 @@ class CalendarEventApiTypeTest extends TypeTestCase
     public function testSubmitValidData()
     {
         $formData = array(
-            'calendar'  => 1,
-            'title'     => 'testTitle',
-            'start'     => '2013-10-05T13:00:00Z',
-            'end'       => '2013-10-05T13:30:00+00:00',
-            'allDay'    => true,
-            'reminders' => new ArrayCollection()
+            'calendar'    => 1,
+            'title'       => 'testTitle',
+            'description' => 'testDescription',
+            'start'       => '2013-10-05T13:00:00Z',
+            'end'         => '2013-10-05T13:30:00+00:00',
+            'allDay'      => true,
+            'reminders'   => new ArrayCollection()
         );
 
         $type = new CalendarEventApiType(array());
@@ -100,6 +101,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
         ReflectionUtil::setId($calendar, 1);
         $this->assertEquals($calendar, $result->getCalendar());
         $this->assertEquals('testTitle', $result->getTitle());
+        $this->assertEquals('testDescription', $result->getDescription());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:00:00Z'), $result->getStart());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:30:00Z'), $result->getEnd());
         $this->assertTrue($result->getAllDay());

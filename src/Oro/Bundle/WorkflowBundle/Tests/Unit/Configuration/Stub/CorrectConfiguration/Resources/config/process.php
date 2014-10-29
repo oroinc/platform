@@ -12,6 +12,7 @@ return array(
             'enabled' => true,
             'entity'  => 'Oro\Bundle\UserBundle\Entity\User',
             'order'   => 20,
+            'exclude_definitions'   => array('another_definition'),
             'actions_configuration' => array(
                 array('@assign_value' => array('$entity.field', 'value'))
             )
@@ -22,6 +23,7 @@ return array(
             'actions_configuration' => array(),
             'enabled'               => true,
             'order'                 => 0,
+            'exclude_definitions'   => array(),
         ),
     ),
     ProcessConfigurationProvider::NODE_TRIGGERS => array(

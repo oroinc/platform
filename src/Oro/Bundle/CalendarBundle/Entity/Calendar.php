@@ -102,7 +102,9 @@ class Calendar
      */
     public function __toString()
     {
-        return empty($this->name) ? '[default]' : $this->name;
+        return empty($this->name)
+            ? ($this->owner ? (string)$this->owner : '[default]')
+            : $this->name;
     }
 
     /**

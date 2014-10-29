@@ -1,0 +1,24 @@
+{{ UI.clientButton({
+    'dataUrl': path('oro_calendar_event_create', oro_action_params(entity, 'assign')),
+    'aCss': 'no-hash',
+    'iCss': 'icon-time',
+    'dataId': entity.id,
+    'label' : 'oro.calendar.assign_event'|trans,
+    'title' : 'oro.calendar.assign_event.title'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : true,
+        'options' : {
+            'alias': 'calendar-event-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.calendar.assign_event.widget_title'|trans({'%username%': entity|oro_format_name}),
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'autoResize': true,
+                'width': 475
+            }
+        }
+    }
+}) }}
