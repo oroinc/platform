@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -462,6 +463,11 @@ class ConfigManager
 
         // @todo: need investigation if we can call this flush only if !empty($models)
         $this->getEntityManager()->flush();
+
+        $this->eventDispatcher->dispatch(
+            Events::POST_FLUSH_CONFIG,
+            new FlushConfigEvent($models, $this)
+        );
 
         if ($this->cache && !empty($models)) {
             $this->cache->removeAllConfigurable();
