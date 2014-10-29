@@ -63,7 +63,7 @@ class CreateObject extends AbstractAction
     {
         $objectClassName = $this->getObjectClassName();
 
-        $arguments = $this->getConstructorArguments();
+        $arguments = $this->getConstructorArguments($context);
         if ($arguments) {
             $reflection = new \ReflectionClass($objectClassName);
             $object = $reflection->newInstanceArgs($arguments);
@@ -105,14 +105,36 @@ class CreateObject extends AbstractAction
      */
     protected function getObjectData()
     {
-        return $this->getOption($this->options, self::OPTION_KEY_DATA, array());
+        return $this->getOption($this->options, self::OPTION_KEY_DATA, []);
     }
 
     /**
+     * @param mixed $context
      * @return array
      */
-    protected function getConstructorArguments()
+    protected function getConstructorArguments($context)
     {
-        return $this->getOption($this->options, self::OPTION_KEY_ARGUMENTS, array());
+        $arguments = $this->getOption($this->options, self::OPTION_KEY_ARGUMENTS, []);
+        $arguments = $this->resolveArguments($context, $arguments);
+
+        return $arguments;
+    }
+
+    /**
+     * @param mixed $context
+     * @param array $arguments
+     * @return array
+     */
+    protected function resolveArguments($context, array $arguments)
+    {
+        foreach ($arguments as &$argument) {
+            if (is_array($argument)) {
+                $argument = $this->resolveArguments($context, $argument);
+            } else {
+                $argument = $this->contextAccessor->getValue($context, $argument);
+            }
+        }
+
+        return $arguments;
     }
 }
