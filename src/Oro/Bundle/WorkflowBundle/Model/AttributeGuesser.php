@@ -99,7 +99,6 @@ class AttributeGuesser
      * @param string $rootClass
      * @param string|PropertyPath $propertyPath
      * @return array|null
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function guessMetadataAndField($rootClass, $propertyPath)
     {
@@ -153,28 +152,9 @@ class AttributeGuesser
         $metadata = $metadataParameters['metadata'];
         $field = $metadataParameters['field'];
 
-        if ($metadata->hasField($field)) {
-            $doctrineType = $metadata->getTypeOfField($field);
-            if (!isset($this->doctrineTypeMapping[$doctrineType])) {
-                return null;
-            }
-
-            return $this->formatResult(
-                $this->getLabel($metadata->getName(), $field),
-                $this->doctrineTypeMapping[$doctrineType]['type'],
-                $this->doctrineTypeMapping[$doctrineType]['options']
-            );
-        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)){
-            $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
-            $fieldType = $entityConfig->getId()->getFieldType();
-            if (!FieldTypeHelper::isRelation($fieldType)) {
-
-                return $this->formatResult(
-                    $entityConfig->get('label'),
-                    $this->doctrineTypeMapping[$fieldType]['type'],
-                    $this->doctrineTypeMapping[$fieldType]['options']
-                );
-            }
+        $scalarParameters = $this->guessAttributeParametersScalarField($metadata, $field);
+        if ($scalarParameters !== false) {
+            return $scalarParameters;
         }
 
         if ($metadata->hasAssociation($field)) {
@@ -325,5 +305,39 @@ class AttributeGuesser
         }
 
         return $this->formTypeGuesser;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @param $field
+     * @return array|bool
+     */
+    protected function guessAttributeParametersScalarField(ClassMetadata $metadata, $field)
+    {
+        if ($metadata->hasField($field)) {
+            $doctrineType = $metadata->getTypeOfField($field);
+            if (!isset($this->doctrineTypeMapping[$doctrineType])) {
+                return null;
+            }
+
+            return $this->formatResult(
+                $this->getLabel($metadata->getName(), $field),
+                $this->doctrineTypeMapping[$doctrineType]['type'],
+                $this->doctrineTypeMapping[$doctrineType]['options']
+            );
+        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)){
+            $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
+            $fieldType = $entityConfig->getId()->getFieldType();
+            if (!FieldTypeHelper::isRelation($fieldType)) {
+
+                return $this->formatResult(
+                    $entityConfig->get('label'),
+                    $this->doctrineTypeMapping[$fieldType]['type'],
+                    $this->doctrineTypeMapping[$fieldType]['options']
+                );
+            }
+        }
+
+        return false;
     }
 }
