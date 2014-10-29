@@ -54,6 +54,7 @@ class ConfigApiManager
         foreach ($variables as $variable) {
             $var          = $variable->toArray();
             $var['value'] = $this->configManager->get($variable->getKey());
+            $var          = array_merge($var, $this->configManager->getInfo($variable->getKey()));
             $result[]     = $var;
         }
 

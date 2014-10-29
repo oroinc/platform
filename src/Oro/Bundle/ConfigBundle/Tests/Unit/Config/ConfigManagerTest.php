@@ -111,6 +111,44 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test get info from loaded settings
+     */
+    public function testGetInfoLoaded()
+    {
+        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $loadedSettings = array(
+            'oro_user' => array(
+                'level'    => array(
+                    'value' => 2000,
+                    'type'  => 'scalar',
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                )
+            ),
+        );
+
+        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('loadSettings')
+            ->with('app', 0)
+            ->will($this->returnValue($loadedSettings));
+
+        $this->om
+            ->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $object = $this->object;
+        $info = $object->getInfo('oro_user.level');
+
+        $this->assertEquals($loadedSettings['oro_user']['level']['createdAt'], $info['createdAt']);
+        $this->assertEquals($loadedSettings['oro_user']['level']['updatedAt'], $info['updatedAt']);
+    }
+
+    /**
      * Test default settings condition
      */
     public function testGetDefaultSettings()

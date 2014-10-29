@@ -14,8 +14,13 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
- * @ORM\Table(name="oro_calendar_event",
- *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
+ * @ORM\Table(
+ *      name="oro_calendar_event",
+ *      indexes={
+ *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
+ *          @ORM\Index(name="oro_calendar_event_updated_at_idx", columns={"updated_at"})
+ *      }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_calendar_view_default",
