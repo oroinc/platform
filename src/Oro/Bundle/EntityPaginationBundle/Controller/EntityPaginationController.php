@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorageResult;
+use Oro\Bundle\EntityPaginationBundle\Storage\NavigationResult;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -121,7 +121,7 @@ class EntityPaginationController extends Controller
                 break;
         }
 
-        if ($result instanceof EntityPaginationStorageResult) {
+        if ($result instanceof NavigationResult) {
             $entityId = $result->getId();
             if ($entityId) {
                 $params[$identifier] = $entityId;
