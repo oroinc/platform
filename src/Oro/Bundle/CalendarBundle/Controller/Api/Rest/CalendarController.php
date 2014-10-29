@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\Rest\Util\Codes;
 
@@ -12,7 +12,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\User;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,12 +27,8 @@ class CalendarController extends FOSRestController
     /**
      * Get Default Calendar of User
      *
-     * @QueryParam(
-     *      name="user", requirements="\d+", nullable=false, strict=true,
-     *      description="User id.")
-     * @QueryParam(
-     *      name="organization", requirements="\d+", nullable=false, strict=true,
-     *      description="Organization id.")
+     * @Get("/calendars/default", name="oro_api_get_calendar_default")
+     *
      * @ApiDoc(
      *      description="Get default calendar of user",
      *      resource=true
@@ -41,18 +39,17 @@ class CalendarController extends FOSRestController
      */
     public function getDefaultAction()
     {
-        $user = (int)$this->getRequest()->get('user');
-        $organization = (int)$this->getRequest()->get('organization');
+        /** @var User $user */
+        $user = $this->getUser();
+
+        /** @var Organization $organization */
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
 
         $em = $this->getDoctrine()->getManager();
         /** @var CalendarRepository $repo */
         $repo = $em->getRepository('OroCalendarBundle:Calendar');
-        /** @var Calendar $calendar */
-        $calendar = $repo->findDefaultCalendar($user, $organization);
 
-        if (!$calendar) {
-            return new Response('', Codes::HTTP_NOT_FOUND);
-        }
+        $calendar = $repo->findDefaultCalendar($user->getId(), $organization->getId());
 
         $result = array(
             'calendar'      => $calendar->getId(),

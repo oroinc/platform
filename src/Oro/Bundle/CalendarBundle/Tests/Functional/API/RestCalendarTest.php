@@ -32,14 +32,5 @@ class RestCalendarTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), Codes::HTTP_OK);
 
         $this->assertNotEmpty($result);
-
-        $request = array(
-            "user"          => 0,
-            "organization"  => 1,
-        );
-
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendar_default', $request));
-
-        $this->assertResponseStatusCodeEquals($this->client->getResponse(), Codes::HTTP_NOT_FOUND);
     }
 }
