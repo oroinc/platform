@@ -131,7 +131,7 @@ class ConfigFieldGridController extends Controller
             'extend' => [
                 'is_extend' => true,
                 'owner'     => ExtendScope::OWNER_CUSTOM,
-                'state'     => ExtendScope::STATE_NEW,
+                'state'     => ExtendScope::STATE_NEW
             ]
         ];
 
@@ -243,28 +243,21 @@ class ConfigFieldGridController extends Controller
         );
 
         $entityConfig = $extendConfigProvider->getConfig($className);
-//        $originalEntityConfig = clone $entityConfig;
         if (!count($fields)) {
             $entityConfig->set('upgradeable', false);
         } else {
             $entityConfig->set('upgradeable', true);
         }
-//
-//        $this->get('event_dispatcher')->dispatch(
-//            BeforeDeletePersistFieldEvent::EVENT_NAME,
-//            new BeforeDeletePersistFieldEvent($fieldConfig, $entityConfig, $originalEntityConfig)
-//        );
-//
         $configManager->persist($entityConfig);
 
         $configManager->flush();
 
         $this->get('session')->getFlashBag()->add(
             'success',
-            $this->get('translator')->trans('Item deleted')
+            $this->get('translator')->trans('Field successfully deleted')
         );
 
-        return new JsonResponse(['message' => 'Item deleted', 'successful' => true], Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Field successfully deleted', 'successful' => true], Codes::HTTP_OK);
     }
 
     /**
@@ -319,7 +312,7 @@ class ConfigFieldGridController extends Controller
 
         $configManager->flush();
 
-        return new JsonResponse(['message' => 'Item was restored', 'successful' => true], Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Field was restored', 'successful' => true], Codes::HTTP_OK);
     }
 
     /**
