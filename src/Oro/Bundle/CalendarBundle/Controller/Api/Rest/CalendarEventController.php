@@ -3,8 +3,10 @@
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\QueryBuilder;
+
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -23,7 +25,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @RouteResource("calendarevent")
