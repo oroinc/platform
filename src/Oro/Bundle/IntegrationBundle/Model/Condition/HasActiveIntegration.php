@@ -48,14 +48,14 @@ class HasActiveIntegration extends AbstractCondition
     {
         $type = $this->contextAccessor->getValue($context, $this->type);
 
-        return (bool)$this->getActiveMailChimpIntegration($type);
+        return (bool)$this->getActiveIntegration($type);
     }
 
     /**
      * @param string $type
      * @return array
      */
-    protected function getActiveMailChimpIntegration($type)
+    protected function getActiveIntegration($type)
     {
         return $this->registry->getRepository('OroIntegrationBundle:Channel')
             ->getConfiguredChannelsForSync($type, true);
