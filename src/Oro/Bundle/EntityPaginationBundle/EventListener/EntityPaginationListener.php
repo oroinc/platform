@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
@@ -29,15 +30,18 @@ class EntityPaginationListener
      * @param DataGridManager $dataGridManager
      * @param DoctrineHelper $doctrineHelper
      * @param EntityPaginationStorage $storage
+     * @param EntityPaginationManager $paginationManager
      */
     public function __construct(
         DataGridManager $dataGridManager,
         DoctrineHelper $doctrineHelper,
-        EntityPaginationStorage $storage
+        EntityPaginationStorage $storage,
+        EntityPaginationManager $paginationManager
     ) {
-        $this->dataGridManager = $dataGridManager;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->storage         = $storage;
+        $this->dataGridManager   = $dataGridManager;
+        $this->doctrineHelper    = $doctrineHelper;
+        $this->storage           = $storage;
+        $this->paginationManager = $paginationManager;
     }
 
     /**
@@ -45,7 +49,7 @@ class EntityPaginationListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
-        if (!$this->storage->isEnabled()) {
+        if (!$this->paginationManager->isEnabled()) {
             return;
         }
         
@@ -147,7 +151,7 @@ class EntityPaginationListener
      */
     protected function getEntitiesLimit()
     {
-        return $this->storage->getLimit();
+        return $this->paginationManager->getLimit();
     }
 
     /**

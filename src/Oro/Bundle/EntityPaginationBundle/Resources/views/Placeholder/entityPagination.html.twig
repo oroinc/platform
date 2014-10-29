@@ -8,7 +8,7 @@
     {% set currentRoute = app.request.attributes.get('_route') %}
     {% set currentParams = app.request.attributes.get('_route_params') %}
     {% set queryParams = app.request.query.all %}
-    {% set scope = constant('Oro\\Bundle\\EntityPaginationBundle\\Storage\\EntityPaginationStorage::VIEW_SCOPE') %}
+    {% set scope = constant('Oro\\Bundle\\EntityPaginationBundle\\Manager\\EntityPaginationManager::VIEW_SCOPE') %}
     {% set allParams = {'entityName': oro_entity_pagination_name(entity), 'scope': scope, 'routeName': currentRoute} %}
     {% set allParams = allParams|merge(currentParams) %}
     {% set allParams = allParams|merge(queryParams) %}

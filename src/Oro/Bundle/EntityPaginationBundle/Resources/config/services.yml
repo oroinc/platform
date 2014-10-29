@@ -39,6 +39,7 @@ services:
             - @oro_datagrid.datagrid.manager
             - @oro_entity.doctrine_helper
             - @oro_entity_pagination.storage
+            - @oro_entity_pagination.manager
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
 
@@ -46,7 +47,7 @@ services:
         class: %oro_entity_pagination.twig_extension.entity_pagination.class%
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_entity_pagination.storage
+            - @oro_entity_pagination.navigation
         calls:
             - [ setRequest, [@?request=] ]
         tags:

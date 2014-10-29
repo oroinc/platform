@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Twig;
 
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -18,9 +19,9 @@ class EntityPaginationExtension extends \Twig_Extension
     protected $doctrineHelper;
 
     /**
-     * @var EntityPaginationStorage
+     * @var EntityPaginationNavigation
      */
-    protected $storage;
+    protected $paginationNavigation;
 
     /**
      * @var Request
@@ -29,12 +30,12 @@ class EntityPaginationExtension extends \Twig_Extension
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param EntityPaginationStorage $storage
+     * @param EntityPaginationNavigation $paginationNavigation
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityPaginationStorage $storage)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityPaginationNavigation $paginationNavigation)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->storage = $storage;
+        $this->paginationNavigation = $paginationNavigation;
     }
 
     /**
@@ -62,12 +63,12 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     public function getPager($entity)
     {
-        $totalCount = $this->storage->getTotalCount($entity);
+        $totalCount = $this->paginationNavigation->getTotalCount($entity);
         if (!$totalCount) {
             return null;
         }
 
-        $currentNumber = $this->storage->getCurrentNumber($entity);
+        $currentNumber = $this->paginationNavigation->getCurrentNumber($entity);
         if (!$currentNumber) {
             return null;
         }
