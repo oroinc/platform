@@ -308,6 +308,9 @@ class AttributeGuesser
     }
 
     /**
+     * Return false if can't find config for field, null if field type in unknown and array with config data
+     * for given field
+     *
      * @param ClassMetadata $metadata
      * @param $field
      * @return array|bool
