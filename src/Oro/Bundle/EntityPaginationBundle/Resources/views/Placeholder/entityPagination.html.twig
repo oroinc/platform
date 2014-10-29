@@ -1,20 +1,16 @@
 {% if entity is defined and entity %}
-    {% for flashMessage in app.session.flashbag.get('notice') %}
-        <div class="flash-notice">
-            {{ flashMessage }}
-        </div>
-    {% endfor %}
-
-    {% set currentRoute = app.request.attributes.get('_route') %}
-    {% set currentParams = app.request.attributes.get('_route_params') %}
-    {% set queryParams = app.request.query.all %}
     {% set scope = constant('Oro\\Bundle\\EntityPaginationBundle\\Manager\\EntityPaginationManager::VIEW_SCOPE') %}
-    {% set allParams = {'entityName': oro_entity_pagination_name(entity), 'scope': scope, 'routeName': currentRoute} %}
-    {% set allParams = allParams|merge(currentParams) %}
-    {% set allParams = allParams|merge(queryParams) %}
-
+    {% set isDataCollected = oro_entity_pagination_collect_data(app.request, scope) %}
     {% set pager = oro_entity_pagination_pager(entity) %}
-    {% if pager %}
+
+    {% if isDataCollected and pager %}
+        {% set currentRoute = app.request.attributes.get('_route') %}
+        {% set currentParams = app.request.attributes.get('_route_params') %}
+        {% set queryParams = app.request.query.all %}
+        {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
+        {% set allParams = allParams|merge(currentParams) %}
+        {% set allParams = allParams|merge(queryParams) %}
+
         <li>
             {% if pager.current != 1 %}
                 <a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a>

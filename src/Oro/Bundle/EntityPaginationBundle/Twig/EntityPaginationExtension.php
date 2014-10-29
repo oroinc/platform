@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Twig;
 
-use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
-use Doctrine\Common\Util\ClassUtils;
 
 class EntityPaginationExtension extends \Twig_Extension
 {
@@ -24,6 +23,11 @@ class EntityPaginationExtension extends \Twig_Extension
     protected $paginationNavigation;
 
     /**
+     * @var StorageDataCollector
+     */
+    protected $dataCollector;
+
+    /**
      * @var Request
      */
     protected $request;
@@ -31,11 +35,16 @@ class EntityPaginationExtension extends \Twig_Extension
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityPaginationNavigation $paginationNavigation
+     * @param StorageDataCollector $dataCollector
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityPaginationNavigation $paginationNavigation)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityPaginationNavigation $paginationNavigation,
+        StorageDataCollector $dataCollector
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->paginationNavigation = $paginationNavigation;
+        $this->dataCollector = $dataCollector;
     }
 
     /**
@@ -45,12 +54,7 @@ class EntityPaginationExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
-            new \Twig_SimpleFunction(
-                'oro_entity_pagination_name',
-                function ($entity) {
-                    return ClassUtils::getClass($entity);
-                }
-            ),
+            new \Twig_SimpleFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
         );
     }
 
@@ -74,6 +78,16 @@ class EntityPaginationExtension extends \Twig_Extension
         }
 
         return ['total' => $totalCount, 'current' => $currentNumber];
+    }
+
+    /**
+     * @param Request $request
+     * @param string $scope
+     * @return bool
+     */
+    public function collectData(Request $request, $scope)
+    {
+        return $this->dataCollector->collect($request, $scope);
     }
 
     /**

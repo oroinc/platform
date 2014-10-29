@@ -36,6 +36,7 @@ class EntityPaginationManager
     /**
      * @param string $scope
      * @return string
+     * @throws \LogicException
      */
     public static function getPermission($scope)
     {

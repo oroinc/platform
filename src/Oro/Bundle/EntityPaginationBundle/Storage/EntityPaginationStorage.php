@@ -59,14 +59,13 @@ class EntityPaginationStorage
      * @param string $scope
      * @return bool
      */
-    public function setData($entityName, $hash, array $entityIds, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function setData($entityName, $hash, array $entityIds, $scope)
     {
         if (!$this->isEnvironmentValid()) {
             return false;
         }
 
         $storage = $this->getStorage();
-
         $storage[$entityName][$scope] = [self::HASH => $hash, self::ENTITY_IDS => $entityIds];
         $this->setStorage($storage);
 
@@ -79,7 +78,7 @@ class EntityPaginationStorage
      * @param string $scope
      * @return bool
      */
-    public function hasData($entityName, $hash, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function hasData($entityName, $hash, $scope)
     {
         if (!$this->isEnvironmentValid()) {
             return false;
@@ -95,7 +94,7 @@ class EntityPaginationStorage
      * @param string $scope
      * @return bool
      */
-    public function clearData($entityName, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function clearData($entityName, $scope = null)
     {
         if (!$this->isEnvironmentValid()) {
             return false;
@@ -103,8 +102,14 @@ class EntityPaginationStorage
 
         $storage = $this->getStorage();
 
-        if (!empty($storage[$entityName][$scope])) {
+        if ($scope !== null && isset($storage[$entityName][$scope])) {
+            // clear only specified scope
             unset($storage[$entityName][$scope]);
+            $this->setStorage($storage);
+            return true;
+        } elseif ($scope === null && isset($storage[$entityName])) {
+            // clear all scopes
+            unset($storage[$entityName]);
             $this->setStorage($storage);
             return true;
         }
@@ -139,7 +144,7 @@ class EntityPaginationStorage
      * @param string $scope
      * @return bool
      */
-    public function isEntityInStorage($entity, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function isEntityInStorage($entity, $scope)
     {
         $storage = $this->getStorage();
         $entityName = ClassUtils::getClass($entity);
@@ -154,7 +159,7 @@ class EntityPaginationStorage
      * @param string $scope
      * @return array
      */
-    public function getEntityIds($entity, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function getEntityIds($entity, $scope)
     {
         $entityName = ClassUtils::getClass($entity);
         $storage = $this->getStorage();
@@ -171,7 +176,7 @@ class EntityPaginationStorage
      * @param string $scope
      * @return int
      */
-    public function getCurrentPosition($entity, $scope = EntityPaginationManager::VIEW_SCOPE)
+    public function getCurrentPosition($entity, $scope)
     {
         return array_search(
             $this->doctrineHelper->getSingleEntityIdentifier($entity),
