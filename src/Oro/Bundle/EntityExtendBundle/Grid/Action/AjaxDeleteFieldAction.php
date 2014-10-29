@@ -15,10 +15,6 @@ class AjaxDeleteFieldAction extends AjaxAction
 
         $options['frontend_type'] = 'ajaxdeletefield';
 
-        if (empty($options['frontend_handle'])) {
-            $options['frontend_handle'] = 'ajaxdeletefield';
-        }
-
         return $options;
     }
 }
