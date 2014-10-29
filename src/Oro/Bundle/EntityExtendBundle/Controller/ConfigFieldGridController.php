@@ -20,10 +20,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Event\AfterFlushFieldEvent;
-use Oro\Bundle\EntityExtendBundle\Event\BeforePersistFieldEvent;
-use Oro\Bundle\EntityExtendBundle\Event\CollectFieldOptionsEvent;
-use Oro\Bundle\EntityExtendBundle\Event\BeforeDeletePersistFieldEvent;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -101,11 +97,11 @@ class ConfigFieldGridController extends Controller
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
-        return array(
+        return [
             'form'          => $form->createView(),
             'entity_id'     => $entity->getId(),
             'entity_config' => $entityConfigProvider->getConfig($entity->getClassName()),
-        );
+        ];
     }
 
     /**
@@ -127,10 +123,9 @@ class ConfigFieldGridController extends Controller
         }
 
         /** @var ConfigManager $configManager */
-        $configManager              = $this->get('oro_entity_config.config_manager');
-        $extendProvider             = $configManager->getProvider('extend');
-        $extendEntityConfig         = $extendProvider->getConfig($entity->getClassName());
-        $originalExtendEntityConfig = clone $extendEntityConfig;
+        $configManager      = $this->get('oro_entity_config.config_manager');
+        $extendProvider     = $configManager->getProvider('extend');
+        $extendEntityConfig = $extendProvider->getConfig($entity->getClassName());
 
         $fieldOptions = [
             'extend' => [
@@ -159,14 +154,8 @@ class ConfigFieldGridController extends Controller
         }
 
         $newFieldModel = $configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
-        $event         = new CollectFieldOptionsEvent($fieldOptions, $newFieldModel);
-        $this->get('event_dispatcher')->dispatch(
-            CollectFieldOptionsEvent::EVENT_NAME,
-            $event
-        );
-        $fieldOptions = $event->getOptions();
-
         $this->updateFieldConfigs($configManager, $newFieldModel, $fieldOptions);
+
         $form = $this->createForm('oro_entity_config_type', null, ['config_model' => $newFieldModel]);
 
         if ($request->getMethod() == 'POST') {
@@ -177,20 +166,11 @@ class ConfigFieldGridController extends Controller
                     'success',
                     $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved')
                 );
-                if (!$extendEntityConfig->is('state', ExtendScope::STATE_NEW)) {
-                    $extendEntityConfig->set('state', ExtendScope::STATE_UPDATE);
-                }
+
                 $extendEntityConfig->set('upgradeable', true);
-                $this->get('event_dispatcher')->dispatch(
-                    BeforePersistFieldEvent::EVENT_NAME,
-                    new BeforePersistFieldEvent($newFieldModel, $extendEntityConfig, $originalExtendEntityConfig)
-                );
+
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
-                $this->get('event_dispatcher')->dispatch(
-                    AfterFlushFieldEvent::EVENT_NAME,
-                    new AfterFlushFieldEvent($entity->getClassName(), $newFieldModel)
-                );
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $newFieldModel->getId()]],
@@ -201,6 +181,7 @@ class ConfigFieldGridController extends Controller
 
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+
         $entityConfig = $entityConfigProvider->getConfig($entity->getClassName());
         $fieldConfig  = $entityConfigProvider->getConfig($entity->getClassName(), $newFieldModel->getFieldName());
 
@@ -211,7 +192,7 @@ class ConfigFieldGridController extends Controller
                 'field_config'  => $fieldConfig,
                 'field'         => $newFieldModel,
                 'form'          => $form->createView(),
-                'formAction'    => $this->generateUrl('oro_entityextend_field_update', array('id' => $entity->getId())),
+                'formAction'    => $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()]),
                 'require_js'    => $configManager->getProvider('extend')->getPropertyConfig()->getRequireJsModules()
             ]
         );
@@ -244,7 +225,6 @@ class ConfigFieldGridController extends Controller
         $extendConfigProvider = $configManager->getProvider('extend');
 
         $fieldConfig = $extendConfigProvider->getConfig($className, $field->getFieldName());
-
         if (!$fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
@@ -256,35 +236,28 @@ class ConfigFieldGridController extends Controller
             function (ConfigInterface $config) {
                 return in_array(
                     $config->get('state'),
-                    array(ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE)
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                 );
             },
             $className
         );
 
         $entityConfig = $extendConfigProvider->getConfig($className);
-        $originalEntityConfig = clone $entityConfig;
         if (!count($fields)) {
             $entityConfig->set('upgradeable', false);
         } else {
             $entityConfig->set('upgradeable', true);
         }
-
-        $this->get('event_dispatcher')->dispatch(
-            BeforeDeletePersistFieldEvent::EVENT_NAME,
-            new BeforeDeletePersistFieldEvent($fieldConfig, $entityConfig, $originalEntityConfig)
-        );
-
         $configManager->persist($entityConfig);
 
         $configManager->flush();
 
         $this->get('session')->getFlashBag()->add(
             'success',
-            $this->get('translator')->trans('Item deleted')
+            $this->get('translator')->trans('Field successfully deleted')
         );
 
-        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Field successfully deleted', 'successful' => true], Codes::HTTP_OK);
     }
 
     /**
@@ -339,7 +312,7 @@ class ConfigFieldGridController extends Controller
 
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was restored', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Field was restored', 'successful' => true], Codes::HTTP_OK);
     }
 
     /**
