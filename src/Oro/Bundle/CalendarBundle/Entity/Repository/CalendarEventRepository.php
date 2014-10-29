@@ -15,8 +15,7 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime $startDate                   Start date
      * @param \DateTime $endDate                     End date
      * @param bool      $includingConnectedCalendars If true events from connected calendars will be returned as well
-     * @param string    $createdAt                   Created date
-     * @param string    $updatedAt                   Updated date
+     * @param array     $criteria                    Additional criteria
      * @return QueryBuilder
      */
     public function getEventListQueryBuilder(
@@ -24,8 +23,7 @@ class CalendarEventRepository extends EntityRepository
         $startDate,
         $endDate,
         $includingConnectedCalendars = false,
-        $createdAt = null,
-        $updatedAt = null
+        $criteria = array()
     ) {
         /** @var QueryBuilder $qb */
         $qb = $this->createQueryBuilder('e')
@@ -39,20 +37,17 @@ class CalendarEventRepository extends EntityRepository
             ->orderBy('c.id, e.start')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
-        $criteria = Criteria::create();
-        if ($createdAt) {
-            $createdAt   = new \DateTime($createdAt);
-            $exprBuilder = Criteria::expr();
-            $expr = $exprBuilder->eq('createdAt', $createdAt);
-            $criteria->andWhere($expr);
+        if (is_array($criteria)) {
+            $newCriteria = new Criteria();
+            foreach ($criteria as $fieldName => $value) {
+                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+            }
+
+            $criteria = $newCriteria;
         }
-        if ($updatedAt) {
-            $updatedAt  = new \DateTime($updatedAt);
-            $exprBuilder = Criteria::expr();
-            $expr = $exprBuilder->eq('updatedAt', $updatedAt);
-            $criteria->andWhere($expr);
+        if ($criteria) {
+            $qb->addCriteria($criteria);
         }
-        $qb->addCriteria($criteria);
         if ($includingConnectedCalendars) {
             $calendarRepo = $this->getEntityManager()->getRepository('OroCalendarBundle:Calendar');
             $qbAC         = $calendarRepo->createQueryBuilder('c1')

@@ -82,7 +82,6 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
-        $table->addIndex(['created_at'], 'oro_calendar_event_created_at_idx', []);
         $table->addIndex(['updated_at'], 'oro_calendar_event_updated_at_idx', []);
         $table->setPrimaryKey(['id']);
     }

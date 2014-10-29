@@ -18,7 +18,6 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      name="oro_calendar_event",
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_calendar_event_created_at_idx", columns={"created_at"}),
  *          @ORM\Index(name="oro_calendar_event_updated_at_idx", columns={"updated_at"})
  *      }
  * )

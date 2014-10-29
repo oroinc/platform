@@ -106,4 +106,33 @@ class RestCalendarEventTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result[0]['id']);
     }
+
+    /**
+     * @depends testPut
+     */
+    public function testCgetFiltering()
+    {
+        $request = array(
+            'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+            'start'       => date(DATE_RFC3339, strtotime('-1 day')),
+            'end'         => date(DATE_RFC3339, strtotime('+1 day')),
+            'subordinate' => false
+        );
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2014-03-04T20:00:00+0000'
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(1, $result);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2050-03-04T20:00:00+0000'
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEmpty($result);
+    }
 }

@@ -75,8 +75,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $start       = new \DateTime($this->getRequest()->get('start'));
         $end         = new \DateTime($this->getRequest()->get('end'));
         $subordinate = (true == $this->getRequest()->get('subordinate'));
-        $createdAt   = $this->getRequest()->get('createdAt');
-        $updatedAt   = $this->getRequest()->get('updatedAt');
 
         /** @var SecurityFacade $securityFacade */
         $securityFacade = $this->get('oro_security.security_facade');
@@ -87,7 +85,26 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $manager = $this->getManager();
         /** @var CalendarEventRepository $repo */
         $repo = $manager->getRepository();
-        $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate, $createdAt, $updatedAt);
+        $dateClosure = function ($value) {
+            // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,
+            // so it becomes space on symfony side due to parse_str php function in HttpFoundation\Request
+            $value = str_replace(' ', '+', $value);
+
+            // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
+            return new \DateTime($value, new \DateTimeZone('UTC'));
+        };
+
+        $filterParameters = [
+            'createdAt' => [
+                'closure' => $dateClosure,
+            ],
+            'updatedAt' => [
+                'closure' => $dateClosure,
+            ],
+        ];
+
+        $criteria = $this->getFilterCriteria(array('createdAt', 'updatedAt'), $filterParameters);
+        $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate, $criteria);
 
         $result = array();
 
