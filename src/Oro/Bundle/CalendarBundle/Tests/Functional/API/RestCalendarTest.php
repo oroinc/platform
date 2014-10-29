@@ -22,12 +22,7 @@ class RestCalendarTest extends WebTestCase
      */
     public function testGetDefaultCalendarAction()
     {
-        $request = array(
-            "user"          => 1,
-            "organization"  => 1,
-        );
-
-        $this->client->request('GET', $this->getUrl('oro_api_get_calendar_default', $request));
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendar_default'));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), Codes::HTTP_OK);
 
