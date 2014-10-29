@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityPaginationBundle\Storage;
+namespace Oro\Bundle\EntityPaginationBundle\Navigation;
 
-class EntityPaginationStorageResult
+class NavigationResult
 {
     /** @var int|null  */
     protected $id = null;

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorageResult;
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -25,7 +25,7 @@ class EntityPaginationController extends Controller
      */
     public function firstAction($entityName, $scope, $routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationStorage::FIRST);
+        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::FIRST);
     }
 
     /**
@@ -41,7 +41,7 @@ class EntityPaginationController extends Controller
      */
     public function previousAction($entityName, $scope, $routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationStorage::PREVIOUS);
+        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::PREVIOUS);
     }
 
     /**
@@ -57,7 +57,7 @@ class EntityPaginationController extends Controller
      */
     public function nextAction($entityName, $scope, $routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationStorage::NEXT);
+        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::NEXT);
     }
 
     /**
@@ -73,7 +73,7 @@ class EntityPaginationController extends Controller
      */
     public function lastAction($entityName, $scope, $routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationStorage::LAST);
+        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::LAST);
     }
 
     /**
@@ -85,11 +85,11 @@ class EntityPaginationController extends Controller
     }
 
     /**
-     * @return EntityPaginationStorage
+     * @return EntityPaginationNavigation
      */
-    protected function getStorage()
+    protected function getNavigation()
     {
-        return $this->get('oro_entity_pagination.storage');
+        return $this->get('oro_entity_pagination.navigation');
     }
 
     /**
@@ -107,21 +107,22 @@ class EntityPaginationController extends Controller
         $entity          = $this->getDoctrineHelper()->getEntityReference($entityName, $identifierValue);
 
         switch ($navigation) {
-            case EntityPaginationStorage::FIRST:
-                $result = $this->getStorage()->getFirstIdentifier($entity, $scope);
+            case EntityPaginationNavigation::FIRST:
+                $result = $this->getNavigation()->getFirstIdentifier($entity, $scope);
                 break;
-            case EntityPaginationStorage::PREVIOUS:
-                $result = $this->getStorage()->getPreviousIdentifier($entity, $scope);
+            case EntityPaginationNavigation::PREVIOUS:
+                $result = $this->getNavigation()->getPreviousIdentifier($entity, $scope);
                 break;
-            case EntityPaginationStorage::NEXT:
-                $result = $this->getStorage()->getNextIdentifier($entity, $scope);
+            case EntityPaginationNavigation::NEXT:
+                $result = $this->getNavigation()->getNextIdentifier($entity, $scope);
                 break;
-            case EntityPaginationStorage::LAST:
-                $result = $this->getStorage()->getLastIdentifier($entity, $scope);
+            case EntityPaginationNavigation::LAST:
+                $result = $this->getNavigation()->getLastIdentifier($entity, $scope);
                 break;
         }
 
-        if ($result instanceof EntityPaginationStorageResult) {
+        /** @var NavigationResult $result */
+        if ($result instanceof NavigationResult) {
             $entityId = $result->getId();
             if ($entityId) {
                 $params[$identifier] = $entityId;
@@ -138,10 +139,10 @@ class EntityPaginationController extends Controller
                     'Entity is not accessible!'
                 );
             }
-
-            return $this->redirect(
-                $this->generateUrl($routeName, $params)
-            );
         }
+
+        return $this->redirect(
+            $this->generateUrl($routeName, $params)
+        );
     }
 }
