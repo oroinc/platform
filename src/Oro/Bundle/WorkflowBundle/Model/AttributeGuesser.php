@@ -10,6 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -116,10 +117,14 @@ class AttributeGuesser
         $field = null;
         for ($i = 1; $i < $elementsCount; $i++) {
             $field = $pathElements[$i];
-            $hasAssociation = $metadata->hasAssociation($field);
-
+            $hasAssociation = $metadata->hasAssociation($field)
+                || $this->entityConfigProvider->hasConfig($rootClass, $field);
             if ($hasAssociation && $i < $elementsCount - 1) {
-                $metadata = $this->getMetadataForClass($metadata->getAssociationTargetClass($field));
+                $metadata = $this->getMetadataForClass(
+                    $metadata->hasAssociation($field)
+                        ? $metadata->getAssociationTargetClass($field)
+                        : $this->entityConfigProvider->getConfig($rootClass, $field)->getId()->getClassName()
+                );
             } elseif (!$hasAssociation && !$metadata->hasField($field)) {
                 return null;
             }
@@ -147,17 +152,9 @@ class AttributeGuesser
         $metadata = $metadataParameters['metadata'];
         $field = $metadataParameters['field'];
 
-        if ($metadata->hasField($field)) {
-            $doctrineType = $metadata->getTypeOfField($field);
-            if (!isset($this->doctrineTypeMapping[$doctrineType])) {
-                return null;
-            }
-
-            return $this->formatResult(
-                $this->getLabel($metadata->getName(), $field),
-                $this->doctrineTypeMapping[$doctrineType]['type'],
-                $this->doctrineTypeMapping[$doctrineType]['options']
-            );
+        $scalarParameters = $this->guessAttributeParametersScalarField($metadata, $field);
+        if ($scalarParameters !== false) {
+            return $scalarParameters;
         }
 
         if ($metadata->hasAssociation($field)) {
@@ -308,5 +305,42 @@ class AttributeGuesser
         }
 
         return $this->formTypeGuesser;
+    }
+
+    /**
+     * Return "false" if can't find config for field, "null" if field type is unknown for given field
+     * or array with config data for given field
+     *
+     * @param ClassMetadata $metadata
+     * @param $field
+     * @return array|bool
+     */
+    protected function guessAttributeParametersScalarField(ClassMetadata $metadata, $field)
+    {
+        if ($metadata->hasField($field)) {
+            $doctrineType = $metadata->getTypeOfField($field);
+            if (!isset($this->doctrineTypeMapping[$doctrineType])) {
+                return null;
+            }
+
+            return $this->formatResult(
+                $this->getLabel($metadata->getName(), $field),
+                $this->doctrineTypeMapping[$doctrineType]['type'],
+                $this->doctrineTypeMapping[$doctrineType]['options']
+            );
+        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)){
+            $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
+            $fieldType = $entityConfig->getId()->getFieldType();
+            if (!FieldTypeHelper::isRelation($fieldType)) {
+
+                return $this->formatResult(
+                    $entityConfig->get('label'),
+                    $this->doctrineTypeMapping[$fieldType]['type'],
+                    $this->doctrineTypeMapping[$fieldType]['options']
+                );
+            }
+        }
+
+        return false;
     }
 }
