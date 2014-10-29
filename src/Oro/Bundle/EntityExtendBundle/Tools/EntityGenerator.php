@@ -48,45 +48,52 @@ class EntityGenerator
      * Generates extended entities
      *
      * @param array $schemas
-     * @param bool  $clearAliases
      */
-    public function generate(array $schemas, $clearAliases = true)
+    public function generate(array $schemas)
     {
         $aliases = [];
         foreach ($schemas as $schema) {
-            // generate PHP code
-            $class = PhpClass::create($schema['entity']);
-            foreach ($this->getExtensions() as $extension) {
-                if ($extension->supports($schema)) {
-                    $extension->generate($schema, $class);
-                }
-            }
-
-            $className = ExtendHelper::getShortClassName($schema['entity']);
+            $this->generateSchemaFiles($schema);
             if ($schema['type'] == 'Extend') {
                 $aliases[$schema['entity']] = $schema['parent'];
             }
-
-            // write PHP class to the file
-            $strategy = new DefaultGeneratorStrategy();
-            file_put_contents(
-                $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php',
-                "<?php\n\n" . $strategy->generate($class)
-            );
-            // write doctrine metadata in separate yaml file
-            file_put_contents(
-                $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
-                Yaml::dump($schema['doctrine'], 5)
-            );
         }
 
-        if ($clearAliases) {
-            // write PHP class aliases to the file
-            file_put_contents(
-                ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-                serialize($aliases)
-            );
+        // write PHP class aliases to the file
+        file_put_contents(
+            ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
+            serialize($aliases)
+        );
+    }
+
+    /**
+     * Generate php and yml files for schema
+     *
+     * @param array $schema
+     */
+    public function generateSchemaFiles(array $schema)
+    {
+        // generate PHP code
+        $class = PhpClass::create($schema['entity']);
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->supports($schema)) {
+                $extension->generate($schema, $class);
+            }
         }
+
+        $className = ExtendHelper::getShortClassName($schema['entity']);
+
+        // write PHP class to the file
+        $strategy = new DefaultGeneratorStrategy();
+        file_put_contents(
+            $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php',
+            "<?php\n\n" . $strategy->generate($class)
+        );
+        // write doctrine metadata in separate yaml file
+        file_put_contents(
+            $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
+            Yaml::dump($schema['doctrine'], 5)
+        );
     }
 
     /**

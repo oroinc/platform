@@ -97,6 +97,41 @@ class ConfigManager
     }
 
     /**
+     * Get Additional Info of Config Value
+     *
+     * @param $name
+     * @return array
+     */
+    public function getInfo($name)
+    {
+        $entity   = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        $this->loadStoredSettings($entity, $entityId);
+        $name    = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $section = $name[0];
+        $key     = $name[1];
+
+        $createdAt = null;
+        $updatedAt = null;
+        if (!empty($this->storedSettings[$entity][$entityId][$section][$key])) {
+            $setting = $this->storedSettings[$entity][$entityId][$section][$key];
+            if (is_array($setting)) {
+                if (array_key_exists('createdAt', $setting)) {
+                    $createdAt = $setting['createdAt'];
+                }
+                if (array_key_exists('updatedAt', $setting)) {
+                    $updatedAt = $setting['updatedAt'];
+                }
+            }
+        }
+
+        return array(
+            'createdAt' => $createdAt,
+            'updatedAt' => $updatedAt,
+        );
+    }
+
+    /**
      * Set setting value. To save changes in a database you need to call flush method
      *
      * @param string $name  Setting name, for example "oro_user.level"
