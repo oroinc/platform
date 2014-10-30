@@ -4,30 +4,17 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
-use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCalendarBundleInstaller implements Installation, ActivityExtensionAwareInterface
+class OroCalendarBundleInstaller implements Installation
 {
-    /** @var ActivityExtension */
-    protected $activityExtension;
-
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setActivityExtension(ActivityExtension $activityExtension)
-    {
-        $this->activityExtension = $activityExtension;
+        return 'v1_5';
     }
 
     /**
@@ -39,11 +26,13 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
         $this->createOroCalendarTable($schema);
         $this->createOroCalendarEventTable($schema);
         $this->createOroCalendarConnectionTable($schema);
+        $this->createOroCalendarPropertyTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroCalendarForeignKeys($schema);
         $this->addOroCalendarEventForeignKeys($schema);
         $this->addOroCalendarConnectionForeignKeys($schema);
+        $this->addOroCalendarPropertyForeignKeys($schema);
     }
 
     /**
@@ -163,6 +152,40 @@ class OroCalendarBundleInstaller implements Installation, ActivityExtensionAware
             ['connected_calendar_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Create oro_calendar_property table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroCalendarPropertyTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_calendar_property');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('calendar_alias', 'string', ['notnull' => true, 'length' => 32]);
+        $table->addColumn('calendar_id', 'integer', ['notnull' => true]);
+        $table->addColumn('user_id', 'integer', ['notnull' => true]);
+        $table->addColumn('visible', 'boolean', ['notnull' => true, 'default' => true]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['user_id'], 'IDX_8BE57819A76ED395', []);
+        $table->addUniqueIndex(['calendar_alias', 'calendar_id', 'user_id'], 'oro_calendar_prop_uq');
+    }
+
+    /**
+     * Add oro_calendar_property foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroCalendarPropertyForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_calendar');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 }
