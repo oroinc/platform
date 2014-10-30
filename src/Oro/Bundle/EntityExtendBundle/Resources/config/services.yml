@@ -263,7 +263,6 @@ services:
             - @oro_entity_extend.extend.field_type_helper
             - @oro_locale.formatter.date_time
             - @router
-            - @doctrine.orm.entity_manager
         tags:
             - { name: twig.extension }
 
