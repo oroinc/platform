@@ -26,13 +26,13 @@ class OroCalendarBundleInstaller implements Installation
         $this->createOroCalendarTable($schema);
         $this->createOroCalendarEventTable($schema);
         $this->createOroCalendarConnectionTable($schema);
-        $this->createOroCalendarConnectionPropertyTable($schema);
+        $this->createOroCalendarPropertyTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroCalendarForeignKeys($schema);
         $this->addOroCalendarEventForeignKeys($schema);
         $this->addOroCalendarConnectionForeignKeys($schema);
-        $this->addOroCalendarConnectionPropertyForeignKeys($schema);
+        $this->addOroCalendarPropertyForeignKeys($schema);
     }
 
     /**
@@ -160,18 +160,17 @@ class OroCalendarBundleInstaller implements Installation
      *
      * @param Schema $schema
      */
-    protected function createOroCalendarConnectionPropertyTable(Schema $schema)
+    protected function createOroCalendarPropertyTable(Schema $schema)
     {
-        /** Generate table oro_calendar **/
         $table = $schema->createTable('oro_calendar_property');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('calendar_uid', 'string', ['notnull' => true, 'length' => 32]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => true]);
-        $table->addColumn('visible', 'boolean', ['default' => false]);
+        $table->addColumn('calendar_alias', 'string', ['notnull' => true, 'length' => 32]);
+        $table->addColumn('calendar_id', 'integer', ['notnull' => true]);
+        $table->addColumn('user_id', 'integer', ['notnull' => true]);
+        $table->addColumn('visible', 'boolean', ['notnull' => true, 'default' => true]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['user_owner_id'], 'IDX_660946D19EB185F9', []);
-        $table->addUniqueIndex(['calendar_uid', 'user_owner_id'], 'oro_calendar_property_uq');
-        /** End of generate table oro_calendar **/
+        $table->addIndex(['user_id'], 'IDX_8BE57819A76ED395', []);
+        $table->addUniqueIndex(['calendar_alias', 'calendar_id', 'user_id'], 'oro_calendar_prop_uq');
     }
 
     /**
@@ -179,15 +178,14 @@ class OroCalendarBundleInstaller implements Installation
      *
      * @param Schema $schema
      */
-    protected function addOroCalendarConnectionPropertyForeignKeys(Schema $schema)
+    protected function addOroCalendarPropertyForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_calendar');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['user_owner_id'],
+            ['user_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL'],
-            'FK_660946D19EB185F9'
+            ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
     }
 }

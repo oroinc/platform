@@ -37,6 +37,9 @@ oro:
             week:    week
             day:     day
 
+        reminder_template:
+            due_message: is starting at
+
         #
         # Oro/Bundle/CalendarBundle/Entity/Calendar
         #
@@ -57,7 +60,6 @@ oro:
             entity_label:         Calendar event
             entity_plural_label:  Calendar events
             entity_description:   Represent calendar event
-
             id.label:             Id
             title.label:          Title
             description.label:    Description
@@ -79,5 +81,15 @@ oro:
             calendar.label:           Calendar
             background_color.label:   Background
 
-        reminder_template:
-            due_message: is starting at
+        #
+        # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
+        #
+        calendarproperty:
+            entity_label:         Calendar Property
+            entity_plural_label:  Calendar Properties
+            entity_description:   Represent different kind of user's properties for a calendar
+            id.label:             Id
+            user.label:           User
+            calendar_alias.label: Calendar Alias
+            calendar_id.label:    Calendar Id
+            visible.label:        Visible
