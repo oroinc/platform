@@ -191,3 +191,16 @@
 .connection-container .media > .pull-right {
     margin-top: -3px;
 }
+
+.calendar-connections .context-menu {
+    display: inline;
+    top: inherit;
+    z-index: 999;
+    left: 100%;
+    margin: 0 0 0 -20px;
+}
+
+.connection-item {
+    overflow: visible;
+    position: relative;
+}

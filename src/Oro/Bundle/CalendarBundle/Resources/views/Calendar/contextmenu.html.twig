@@ -1,8 +1,8 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block linkElement %}
-    {% if item.extras is defined and item.extras.function is defined %}
-        {% set itemAttributes = itemAttributes|merge({'data-function': item.extras.function })%}
+    {% if item.extras is defined and item.extras.module is defined %}
+        {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
     {% endif %}
-    <a href="{{ item.uri }}"{{ oro_menu.attributes(itemAttributes) }}>{{ block('label') }}</a>
+    <a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>{{ block('label') }}</a>
 {% endblock %}

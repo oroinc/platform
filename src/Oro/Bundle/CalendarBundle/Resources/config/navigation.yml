@@ -2,6 +2,7 @@ oro_menu_config:
     templates:
         calendar_menu:
             template: 'OroCalendarBundle:Calendar:contextmenu.html.twig'
+            rootClass: 'dropdown-menu context-menu'
     items:
         oro_calendar_view_default:
             label: 'oro.calendar.menu.view_default'
@@ -13,7 +14,7 @@ oro_menu_config:
             uri: '#'
             extras:
                 position: 10
-                function: 'hideCalendar'
+                module: 'orocalendar/js/calendar/menu/hide-calendar-action'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
