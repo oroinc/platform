@@ -180,7 +180,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     protected function addOroCalendarPropertyForeignKeys(Schema $schema)
     {
-        $table = $schema->getTable('oro_calendar');
+        $table = $schema->getTable('oro_calendar_property');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
