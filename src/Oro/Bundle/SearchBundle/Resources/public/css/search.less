@@ -1,54 +1,81 @@
 .search-entity-types-column {
-    width: 200px;
-    vertical-align: top;
-    border: 1px solid #cccccc;
-    background-color: #f8f8f8;
-}
-
-.search-entity-types-column .entity-type {
+  width: 200px;
+  vertical-align: top;
+  border: 1px solid #cccccc;
+  background-color: #f8f8f8;
+  .entity-type {
     border-bottom: 1px solid #e6e6e6;
     width: 200px;
     height: 30px;
     font-size: 13px;
     padding: 5px 0 5px 10px;
-}
-
-.search-entity-types-column .entity-type.selected {
+    > img {
+      position: relative;
+      top: -2px;
+    }
+  }
+  .entity-type.selected {
     font-weight: bold;
     background-color: #e8e8e8;
-}
-
-.search-entity-types-column .entity-type.selected .arrow {
+  }
+  .entity-type.selected .arrow {
     float: right;
     padding-right: 5px;
+  }
+}
+
+.search-header{
+  &.container-fluid {
+    background-color: #f8f8f8;
+  }
+  h2 {
+    font-size: 22px;
+    float: left;
+    width: 160px;
+  }
+  .search-form {
+    float: left;
+    margin: 16px 0 0;
+    input[type="text"] {
+      width: 300px;
+    }
+  }
 }
 
 .search-form {
-    display:inline;
-    padding-left: 20px;
+  display:inline;
+  padding-left: 20px;
 }
 
 .search-results-column {
-    vertical-align: top;
-    border: 1px solid #cccccc;
-    padding: 10px;
-    background-color: #ffffff;
+  vertical-align: top;
+  border: 1px solid #cccccc;
+  padding: 10px;
+  background-color: #ffffff;
+  .customer-info {
+    padding: 0 0 5px 60px;
+    margin-top: -10px;
+    .sub-title {
+      font-size: 13px;
+      line-height: 1em;
+    }
+    .user-name {
+      margin: 2px 0 3px;
+    }
+  }
 }
 
 .search-no-results {
-    margin:10px auto;
-    width: 98%;
-    padding: 10px 0;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 16px;
-    border-top: 1px solid #cccccc;
-    border-bottom: 1px solid #cccccc;
+  margin:10px auto;
+  width: 98%;
+  padding: 10px 0;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 16px;
+  border-top: 1px solid #cccccc;
+  border-bottom: 1px solid #cccccc;
 }
 
-.container-fluid.search-header {
-    background-color: #f8f8f8;
-}
 .search-grid thead {
-    display: none;
+  display: none;
 }
