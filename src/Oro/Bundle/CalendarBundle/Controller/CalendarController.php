@@ -39,7 +39,7 @@ class CalendarController extends Controller
         /** @var CalendarRepository $repo */
         $repo     = $em->getRepository('OroCalendarBundle:Calendar');
 
-        $calendar = $repo->findByUserAndOrganization($user->getId(), $organization->getId());
+        $calendar = $repo->findDefaultCalendar($user->getId(), $organization->getId());
 
         return $this->forward(
             'OroCalendarBundle:Calendar:view',
