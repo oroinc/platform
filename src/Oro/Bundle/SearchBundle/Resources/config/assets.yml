@@ -1,3 +1,3 @@
 css:
   'orosearch':
-      - 'bundles/orosearch/css/search.css'
+      - 'bundles/orosearch/css/search.less'

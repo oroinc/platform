@@ -2,8 +2,11 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
 "Yes, Proceed": "Yes, Proceed"
+"Field successfully deleted": "Field successfully deleted"
+"Field was restored": "Field was restored"
 
 oro:
     entity_extend:
         schema_updated: Schema updated
         schema_update_failed: Schema update failed
+        delete_field.confirm_content: Are you sure you want to delete this field?
