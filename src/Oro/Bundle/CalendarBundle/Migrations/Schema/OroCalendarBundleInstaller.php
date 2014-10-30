@@ -185,7 +185,7 @@ class OroCalendarBundleInstaller implements Installation
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => 'SET NULL']
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 }
