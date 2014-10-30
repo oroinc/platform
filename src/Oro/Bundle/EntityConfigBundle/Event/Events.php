@@ -13,4 +13,5 @@ final class Events
     const UPDATE_FIELD_CONFIG  = 'entity_config.update.field.config';
     const PRE_PERSIST_CONFIG   = 'entity_config.persist.config';
     const RENAME_FIELD         = 'entity_config.rename.field';
+    const POST_FLUSH_CONFIG    = 'entity_config.flush.config';
 }

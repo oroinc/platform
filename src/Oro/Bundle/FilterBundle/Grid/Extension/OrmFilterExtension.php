@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
@@ -205,14 +206,21 @@ class OrmFilterExtension extends AbstractExtension
         $filters       = [];
         $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
 
-        foreach ($filtersConfig as $column => $filter) {
+        foreach ($filtersConfig as $name => $definition) {
+            if (isset($definition[PropertyInterface::DISABLED_KEY])
+                && $definition[PropertyInterface::DISABLED_KEY]
+            ) {
+                // skip disabled filter
+                continue;
+            }
+
             // if label not set, try to suggest it from column with the same name
-            if (!isset($filter['label'])) {
-                $filter['label'] = $config->offsetGetByPath(
-                    sprintf('[%s][%s][label]', FormatterConfiguration::COLUMNS_KEY, $column)
+            if (!isset($definition['label'])) {
+                $definition['label'] = $config->offsetGetByPath(
+                    sprintf('[%s][%s][label]', FormatterConfiguration::COLUMNS_KEY, $name)
                 );
             }
-            $filters[] = $this->getFilterObject($column, $filter);
+            $filters[] = $this->getFilterObject($name, $definition);
         }
 
         return $filters;
