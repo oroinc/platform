@@ -1,6 +1,6 @@
 {% if entity is defined and entity %}
     {% set scope = constant('Oro\\Bundle\\EntityPaginationBundle\\Manager\\EntityPaginationManager::VIEW_SCOPE') %}
-    {% set isDataCollected = oro_entity_pagination_collect_data(app.request, scope) %}
+    {% set isDataCollected = oro_entity_pagination_collect_data(scope) %}
     {% set pager = oro_entity_pagination_pager(entity) %}
 
     {% if isDataCollected and pager %}

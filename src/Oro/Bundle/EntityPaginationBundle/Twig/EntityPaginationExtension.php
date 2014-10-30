@@ -6,16 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityPaginationExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_pagination';
-
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
 
     /**
      * @var EntityPaginationNavigation
@@ -33,16 +27,13 @@ class EntityPaginationExtension extends \Twig_Extension
     protected $request;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
      * @param EntityPaginationNavigation $paginationNavigation
      * @param StorageDataCollector $dataCollector
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
         EntityPaginationNavigation $paginationNavigation,
         StorageDataCollector $dataCollector
     ) {
-        $this->doctrineHelper = $doctrineHelper;
         $this->paginationNavigation = $paginationNavigation;
         $this->dataCollector = $dataCollector;
     }
@@ -81,59 +72,12 @@ class EntityPaginationExtension extends \Twig_Extension
     }
 
     /**
-     * @param Request $request
      * @param string $scope
      * @return bool
      */
-    public function collectData(Request $request, $scope)
+    public function collectData($scope)
     {
-        return $this->dataCollector->collect($request, $scope);
-    }
-
-    /**
-     * @return null|array
-     */
-    protected function getRouteAndParameters()
-    {
-        if (!$this->request) {
-            return null;
-        }
-
-        $route = $this->request->attributes->get('_route');
-        if (!$route) {
-            return null;
-        }
-
-        $routeParameters = $this->request->attributes->get('_route_params');
-        // at least entity identifier parameter must be specified
-        if (!$routeParameters) {
-            return null;
-        }
-
-        return ['route' => $route, 'route_params' => $routeParameters];
-    }
-
-    /**
-     * @param array $routeAndParameters
-     * @param object $entity
-     * @param int|string $entityId
-     * @return null|array
-     */
-    protected function addEntityIdParameter(array $routeAndParameters, $entity, $entityId)
-    {
-        $fieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
-        if (!$fieldName) {
-            return null;
-        }
-
-        // no entity identifier parameter
-        if (!isset($routeAndParameters['route_params'][$fieldName])) {
-            return null;
-        }
-
-        $routeAndParameters['route_params'][$fieldName] = $entityId;
-
-        return $routeAndParameters;
+        return $this->dataCollector->collect($this->request, $scope);
     }
 
     /**

@@ -56,7 +56,6 @@ services:
     oro_entity_pagination.twig_extension.entity_pagination:
         class: %oro_entity_pagination.twig_extension.entity_pagination.class%
         arguments:
-            - @oro_entity.doctrine_helper
             - @oro_entity_pagination.navigation
             - @oro_entity_pagination.storage.data_collector
         calls:

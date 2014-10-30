@@ -139,7 +139,7 @@ class StorageDataCollector
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults($this->getEntitiesLimit());
 
-        $query = $this->aclHelper->apply($dataSource->getQueryBuilder(), $permission);
+        $query = $this->aclHelper->apply($queryBuilder, $permission);
         $results = $query->execute();
 
         $entityIds = [];
