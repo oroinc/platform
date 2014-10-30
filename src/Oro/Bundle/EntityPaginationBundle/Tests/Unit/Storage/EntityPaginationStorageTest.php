@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -20,7 +21,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    protected $paginationManager;
 
     /** @var EntityPaginationStorage */
     protected $storage;
@@ -34,11 +35,13 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->paginationManager = $this->getMockBuilder(
+            'Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->storage = new EntityPaginationStorage($this->doctrineHelper, $this->configManager);
+        $this->storage = new EntityPaginationStorage($this->doctrineHelper, $this->paginationManager);
         $this->entity = new \stdClass();
     }
 
@@ -58,7 +61,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             $this->setRequest();
         }
 
-        $result = $this->storage->setData(self::ENTITY_NAME, $source['hash'], $source['entity_ids']);
+        $result = $this->storage->setData(self::ENTITY_NAME, $source['hash'], $source['entity_ids'], 'VIEW');
         $this->assertSame($expected, $result);
     }
 
@@ -115,8 +118,8 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             $this->setRequest();
         }
 
-        $this->storage->setData(self::ENTITY_NAME, self::HASH, []);
-        $result = $this->storage->hasData($entityName, $hash);
+        $this->storage->setData(self::ENTITY_NAME, self::HASH, [], 'VIEW');
+        $result = $this->storage->hasData($entityName, $hash, 'VIEW');
 
         $this->assertSame($expected, $result);
     }
@@ -166,464 +169,12 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $enabled
-     * @param bool $request
-     * @param array $entityIds
-     * @param mixed $identifier
-     * @param mixed $expected
-     *
-     * @dataProvider getTotalCountDataProvider
-     */
-    public function testGetTotalCount($enabled, $request, array $entityIds, $identifier, $expected)
-    {
-        $this->setEnabled($enabled);
-
-        if (true === $request) {
-            $this->setRequest();
-        }
-
-        $this->storage->setData(self::ENTITY_NAME, self::HASH, $entityIds);
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($this->entity)
-            ->will($this->returnValue($identifier));
-
-        $result = $this->storage->getTotalCount($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getTotalCountDataProvider()
-    {
-        return [
-            'not enabled' => [
-                'enabled' => false,
-                'request' => true,
-                'entityIds' => [1, 2, 3],
-                'identifier' => 1,
-                'expected' => null,
-            ],
-            'no request' => [
-                'enabled' => true,
-                'request' => false,
-                'entityIds' => [1, 2, 3],
-                'identifier' => 1,
-                'expected' => null,
-            ],
-            'empty storage' => [
-                'enabled' => true,
-                'request' => true,
-                'entityIds' => [],
-                'identifier' => 4,
-                'expected' => null,
-            ],
-            'not in storage' => [
-                'enabled' => true,
-                'request' => true,
-                'entityIds' => [1, 2, 3],
-                'identifier' => 4,
-                'expected' => null,
-            ],
-            'in storage' => [
-                'enabled' => true,
-                'request' => true,
-                'entityIds' => [1, 2, 3],
-                'identifier' => 2,
-                'expected' => 3,
-            ],
-        ];
-    }
-
-    /**
-     * @param bool $enabled
      * @param array $source
-     * @param mixed $expected
+     * @param int $expected
      *
-     * @dataProvider getCurrentNumberDataProvider
+     * @dataProvider getCurrentPositionDataProvider
      */
-    public function testGetCurrentNumber($enabled, array $source, $expected)
-    {
-        $this->setEnabled($enabled);
-        $this->assertStoragePrepare($source);
-        $result = $this->storage->getCurrentNumber($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getCurrentNumberDataProvider()
-    {
-        return [
-            'in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 8,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => 8
-            ],
-            'not in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 25,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'not enabled' => [
-                'enabled'  => false,
-                'source'   => [
-                    'entity_id'    => 8,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ]
-        ];
-    }
-
-    /**
-     * @param bool $enabled
-     * @param array $source
-     * @param mixed $expected
-     *
-     * @dataProvider getFirstIdentifierDataProvider
-     */
-    public function testGetFirstIdentifier($enabled, array $source, $expected)
-    {
-        $this->setEnabled($enabled);
-        $this->assertStoragePrepare($source);
-        $result = $this->storage->getFirstIdentifier($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getFirstIdentifierDataProvider()
-    {
-        return [
-            'in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => 1
-            ],
-            'not in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 25,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'not enabled' => [
-                'enabled'  => false,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-        ];
-    }
-
-    /**
-     * @param bool $enabled
-     * @param array $source
-     * @param mixed $expected
-     *
-     * @dataProvider getLastIdentifierDataProvider
-     */
-    public function testGetLastIdentifier($enabled, array $source, $expected)
-    {
-        $this->setEnabled($enabled);
-        $this->assertStoragePrepare($source);
-        $result = $this->storage->getLastIdentifier($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getLastIdentifierDataProvider()
-    {
-        return [
-            'in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => 10
-            ],
-            'not in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 25,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'enabled' => [
-                'enabled'  => false,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'without entity ids' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => [],
-                    ]
-                ],
-                'expected' => null
-            ]
-        ];
-    }
-
-    /**
-     * @param bool $enabled
-     * @param array $source
-     * @param mixed $expected
-     *
-     * @dataProvider getPreviousIdentifierDataProvider
-     */
-    public function testGetPreviousIdentifier($enabled, array $source, $expected)
-    {
-        $this->setEnabled($enabled);
-        $this->assertStoragePrepare($source);
-        $result = $this->storage->getPreviousIdentifier($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getPreviousIdentifierDataProvider()
-    {
-        return [
-            'first in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 1,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => 4
-            ],
-            'not in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 25,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'not enabled' => [
-                'enabled'  => false,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-        ];
-    }
-    /**
-     * @param bool $enabled
-     * @param array $source
-     * @param mixed $expected
-     *
-     * @dataProvider getNextIdentifierDataProvider
-     */
-    public function testGetNextIdentifier($enabled, array $source, $expected)
-    {
-        $this->setEnabled($enabled);
-        $this->assertStoragePrepare($source);
-        $result = $this->storage->getNextIdentifier($this->entity);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getNextIdentifierDataProvider()
-    {
-        return [
-            'last in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 10,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => 6
-            ],
-            'not in set' => [
-                'enabled'  => true,
-                'source'   => [
-                    'entity_id'    => 25,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-            'not enabled' => [
-                'enabled'  => false,
-                'source'   => [
-                    'entity_id'    => 5,
-                    'storage_data' => [
-                        'hash'       => self::HASH,
-                        'entity_ids' => self::$entityIds,
-                    ]
-                ],
-                'expected' => null
-            ],
-        ];
-    }
-
-    /**
-     * @param mixed $source
-     * @param bool $expected
-     * @dataProvider isEnabledDataProvider
-     */
-    public function testIsEnabled($source, $expected)
-    {
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
-            ->method('get')
-            ->with('oro_entity_pagination.enabled')
-            ->will($this->returnValue($source));
-
-        $storage = new EntityPaginationStorage($this->doctrineHelper, $configManager);
-        $this->assertSame($expected, $storage->isEnabled());
-    }
-
-    /**
-     * @return array
-     */
-    public function isEnabledDataProvider()
-    {
-        return [
-            'string true' => [
-                'source'   => '1',
-                'expected' => true,
-            ],
-            'string false' => [
-                'source'   => '0',
-                'expected' => false,
-            ],
-            'boolean true' => [
-                'source'   => true,
-                'expected' => true,
-            ],
-            'boolean false' => [
-                'source'   => false,
-                'expected' => false,
-            ],
-            'null' => [
-                'source'   => null,
-                'expected' => false,
-            ],
-        ];
-    }
-
-    public function testGetLimit()
-    {
-        $limit = 200;
-
-        $this->configManager->expects($this->once())
-            ->method('get')
-            ->with('oro_entity_pagination.limit')
-            ->will($this->returnValue($limit));
-
-        $this->assertEquals($limit, $this->storage->getLimit());
-    }
-
-    /**
-     * @param array $source
-     */
-    protected function assertStoragePrepare(array $source)
+    public function testGetCurrentPosition(array $source, $expected)
     {
         $this->setStorage($source['storage_data']);
 
@@ -632,10 +183,302 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
             ->with($this->entity)
             ->will($this->returnValue($source['entity_id']));
 
+        $result = $this->storage->getCurrentPosition($this->entity, $source['scope']);
+
+        $this->assertSame($expected, $result);
+
+    }
+
+    /**
+     * @return array
+     */
+    public function getCurrentPositionDataProvider()
+    {
+        return [
+            'valid case view' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => 4
+            ],
+            'valid case edit' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'scope'        => EntityPaginationManager::EDIT_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => 4
+            ],
+            'not in ids' => [
+                'source'   => [
+                    'entity_id'    => 100,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => false
+            ],
+        ];
+    }
+
+    /**
+     * @param array $source
+     * @param boolean $expected
+     *
+     * @dataProvider isEntityInStorageDataProvider
+     */
+    public function testIsEntityInStorage($source, $expected)
+    {
+        $this->setStorage($source['storage_data']);
+
         $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
+            ->method('getSingleEntityIdentifier')
             ->with($this->entity)
-            ->will($this->returnValue(self::FIELD_NAME));
+            ->will($this->returnValue($source['entity_id']));
+
+        $result = $this->storage->isEntityInStorage($this->entity, $source['scope']);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function isEntityInStorageDataProvider()
+    {
+        return [
+            'valid case view' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => true
+            ],
+            'valid case edit' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'scope'        => EntityPaginationManager::EDIT_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => true
+            ],
+            'empty ids' => [
+                'source'   => [
+                    'entity_id'    => 5,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => []
+                        ]
+                    ]
+                ],
+                'expected' => false
+            ],
+            'not in ids' => [
+                'source'   => [
+                    'entity_id'    => 100,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => self::$entityIds
+                        ]
+                    ]
+                ],
+                'expected' => false
+            ],
+        ];
+    }
+
+    /**
+     * @param array $source
+     * @param array $expected
+     *
+     * @dataProvider unsetIdentifierDataProvider
+     */
+    public function testUnsetIdentifier(array $source, array $expected)
+    {
+        $this->setStorage($source['storage_data']);
+        $this->storage->unsetIdentifier($source['identifier'], $this->entity, $source['scope']);
+        $result = $this->storage->getEntityIds($this->entity, $source['scope']);
+
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function unsetIdentifierDataProvider()
+    {
+        return [
+            'valid case view' => [
+                'source'   => [
+                    'identifier'   => 3,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3, 4, 5]
+                        ]
+                    ]
+                ],
+                'expected' => [1, 2, 4, 5]
+            ],
+        ];
+    }
+
+    /**
+     * @param boolean $enabled
+     * @param boolean $request
+     * @param array $source
+     * @param boolean $expected
+     *
+     * @dataProvider clearDataDataProvider
+     */
+    public function testClearData($enabled, $request, $source, $expected)
+    {
+        $this->setEnabled($enabled);
+
+        if (true === $request) {
+            $this->setRequest();
+        }
+
+        $this->setStorage($source['storage_data']);
+        $result = $this->storage->clearData(self::ENTITY_NAME, $source['scope']);
+        $viewScopesIds = $this->storage->getEntityIds($this->entity, EntityPaginationManager::VIEW_SCOPE);
+        $editScopesIds = $this->storage->getEntityIds($this->entity, EntityPaginationManager::EDIT_SCOPE);
+
+        $this->assertEquals($expected['result'], $result);
+        if ($expected['result'] === true) {
+            $this->assertEquals($expected['view_scope_ids'], $viewScopesIds);
+            $this->assertEquals($expected['edit_scope_ids'], $editScopesIds);
+        }
+    }
+
+    public function clearDataDataProvider()
+    {
+        return [
+            'not valid environment' => [
+                'enabled' => false,
+                'request' => true,
+                'source'   => [
+                    'identifier'   => 3,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3, 4, 5]
+                        ],
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3]
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'result' => false,
+                    'view_scope_ids' => [],
+                    'edit_scope_ids' => [1, 2, 3],
+                ]
+            ],
+            'clear view scope' => [
+                'enabled' => true,
+                'request' => true,
+                'source'   => [
+                    'identifier'   => 3,
+                    'scope'        => EntityPaginationManager::VIEW_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3, 4, 5]
+                        ],
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3]
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'result' => true,
+                    'view_scope_ids' => [],
+                    'edit_scope_ids' => [1, 2, 3],
+                ]
+            ],
+            'clear edit scope' => [
+                'enabled' => true,
+                'request' => true,
+                'source'   => [
+                    'identifier'   => 3,
+                    'scope'        => EntityPaginationManager::EDIT_SCOPE,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3, 4, 5]
+                        ],
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3]
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'result' => true,
+                    'view_scope_ids' => [1, 2, 3, 4, 5],
+                    'edit_scope_ids' => [],
+                ]
+            ],
+            'clear both scopes' => [
+                'enabled' => true,
+                'request' => true,
+                'source'   => [
+                    'identifier'   => 3,
+                    'scope'        => null,
+                    'storage_data' => [
+                        EntityPaginationManager::VIEW_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3, 4, 5]
+                        ],
+                        EntityPaginationManager::EDIT_SCOPE => [
+                            'hash'       => self::HASH,
+                            'entity_ids' => [1, 2, 3]
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'result' => true,
+                    'view_scope_ids' => [],
+                    'edit_scope_ids' => [],
+                ]
+            ]
+        ];
     }
 
     /**
@@ -654,13 +497,12 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $isEnabled
+     * @param boolean $isEnabled
      */
     protected function setEnabled($isEnabled)
     {
-        $this->configManager->expects($this->any())
-            ->method('get')
-            ->with('oro_entity_pagination.enabled')
+        $this->paginationManager->expects($this->any())
+            ->method('isEnabled')
             ->will($this->returnValue($isEnabled));
     }
 

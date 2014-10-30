@@ -131,12 +131,12 @@ class EntityPaginationController extends Controller
             if (!$result->isAvailable()) {
                 $this->get('session')->getFlashBag()->add(
                     'alert',
-                    'Entity is not available!'
+                    $this->get('translator')->trans('oro.entity_pagination.not_available')
                 );
             } elseif (!$result->isAccessible()) {
                 $this->get('session')->getFlashBag()->add(
                     'alert',
-                    'Entity is not accessible!'
+                    $this->get('translator')->trans('oro.entity_pagination.not_accessible')
                 );
             }
         }

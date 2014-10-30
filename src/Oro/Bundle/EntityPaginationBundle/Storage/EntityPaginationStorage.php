@@ -102,19 +102,20 @@ class EntityPaginationStorage
 
         $storage = $this->getStorage();
 
+        $clear = false;
         if ($scope !== null && isset($storage[$entityName][$scope])) {
             // clear only specified scope
             unset($storage[$entityName][$scope]);
             $this->setStorage($storage);
-            return true;
+            $clear = true;
         } elseif ($scope === null && isset($storage[$entityName])) {
             // clear all scopes
             unset($storage[$entityName]);
             $this->setStorage($storage);
-            return true;
+            $clear = true;
         }
 
-        return false;
+        return $clear;
     }
 
     /**
