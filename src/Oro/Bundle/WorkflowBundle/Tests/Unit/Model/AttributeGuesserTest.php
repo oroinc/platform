@@ -480,9 +480,16 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
      * @param bool $multiple
      * @param bool $hasConfig
      * @param string|null $label
+     * @param string|null $fieldType
      */
-    protected function setEntityConfigProvider($class, $field, $multiple = false, $hasConfig = true, $label = null, $fieldType = null)
-    {
+    protected function setEntityConfigProvider(
+        $class,
+        $field,
+        $multiple = false,
+        $hasConfig = true,
+        $label = null,
+        $fieldType = null
+    ) {
         $labelOption = $multiple ? 'plural_label' : 'label';
 
         $entityConfig = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');

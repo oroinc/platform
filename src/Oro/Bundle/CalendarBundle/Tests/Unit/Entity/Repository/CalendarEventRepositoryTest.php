@@ -83,7 +83,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
     }
 
-    public function testGetEventListByTimeIntervalQueryBuilderWithAdditionalFilters()
+    public function testGetEventListByTimeIntervalQueryBuilderWithAdditionalFiltersAsCriteria()
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
@@ -94,6 +94,35 @@ class CalendarEventRepositoryTest extends OrmTestCase
             new \DateTime(),
             false,
             new Criteria(Criteria::expr()->eq('allDay', true))
+        );
+
+        $this->assertEquals(
+            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            . ' INNER JOIN e.calendar c'
+            . ' WHERE e.allDay = :allDay AND c.id = :id'
+            . ' AND ('
+            . '(e.start < :start AND e.end >= :start) OR '
+            . '(e.start <= :end AND e.end > :end) OR'
+            . '(e.start >= :start AND e.end < :end))'
+            . ' ORDER BY c.id, e.start ASC',
+            $qb->getQuery()->getDQL()
+        );
+
+        $this->assertTrue($qb->getQuery()->getParameter('allDay')->getValue());
+    }
+
+    public function testGetEventListByTimeIntervalQueryBuilderWithAdditionalFiltersAsArray()
+    {
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
+
+        $qb = $repo->getEventListByTimeIntervalQueryBuilder(
+            1,
+            new \DateTime(),
+            new \DateTime(),
+            false,
+            ['allDay' => true]
         );
 
         $this->assertEquals(

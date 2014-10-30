@@ -264,6 +264,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
      * @param bool $subordinate
      *
      * @return QueryBuilder
+     *
+     * @throws BadRequestHttpException
      */
     protected function getEventListQueryBuilder($calendarId, $subordinate)
     {
