@@ -7,7 +7,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
@@ -23,6 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
 class DynamicFieldsExtension extends \Twig_Extension
 {
@@ -74,23 +74,16 @@ class DynamicFieldsExtension extends \Twig_Extension
     protected $entityViewRoute = 'oro_entity_view';
 
     /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @param ConfigManager         $configManager
-     * @param FieldTypeHelper       $fieldTypeHelper
-     * @param DateTimeFormatter     $dateTimeFormatter
+     * @param ConfigManager $configManager
+     * @param FieldTypeHelper $fieldTypeHelper
+     * @param DateTimeFormatter $dateTimeFormatter
      * @param UrlGeneratorInterface $router
-     * @param EntityManager         $entityManager
      */
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
         DateTimeFormatter $dateTimeFormatter,
-        UrlGeneratorInterface $router,
-        EntityManager $entityManager
+        UrlGeneratorInterface $router
     ) {
         $this->configManager = $configManager;
         $this->fieldTypeHelper = $fieldTypeHelper;
@@ -101,7 +94,6 @@ class DynamicFieldsExtension extends \Twig_Extension
         $this->entityProvider = $configManager->getProvider('entity');
         $this->viewProvider = $configManager->getProvider('view');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->entityManager = $entityManager;
     }
 
     /**
@@ -143,7 +135,10 @@ class DynamicFieldsExtension extends \Twig_Extension
             }
 
             if ($value && $underlyingFieldType == 'manyToOne') {
-                $value = $this->getValueForManyToOne($value, $field);
+                $value = $this->propertyAccessor->getValue(
+                    FieldAccessor::getValue($entity, $fieldName),
+                    $field->get('target_field')
+                );
             }
 
             /** Prepare Relation field type */
@@ -256,17 +251,31 @@ class DynamicFieldsExtension extends \Twig_Extension
      */
     protected function getEntityRouteOptions($entityClassName)
     {
+        $route       = false;
+        $routeParams = false;
         if (class_exists($entityClassName)) {
-            $relationExtendConfig = $this->extendProvider->getConfig($entityClassName);
+            /** @var EntityMetadata $metadata */
+            $metadata = $this->configManager->getEntityMetadata($entityClassName);
+            if ($metadata && $metadata->routeView) {
+                $route       = $metadata->routeView;
+                $routeParams = [
+                    'id' => null
+                ];
+            }
 
-            return $relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? $this->getCustomEntityViewRouteOptions($entityClassName)
-                : $this->getClassViewRouteOptions($entityClassName);
+            $relationExtendConfig = $this->extendProvider->getConfig($entityClassName);
+            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
+                $route       = $this->entityViewRoute;
+                $routeParams = [
+                    'entityName' => str_replace('\\', '_', $entityClassName),
+                    'id'        => null
+                ];
+            }
         }
 
         return [
-            'route'        => false,
-            'route_params' => false
+            'route'        => $route,
+            'route_params' => $routeParams
         ];
     }
 
@@ -310,81 +319,5 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function getName()
     {
         return self::NAME;
-    }
-
-    /**
-     * Return view link options or simple text
-     *
-     * @param object $targetEntity
-     * @param ConfigInterface $field
-     * @return array|mixed
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     */
-    protected function getValueForManyToOne($targetEntity, ConfigInterface $field)
-    {
-        $targetFieldName = $field->get('target_field');
-        $targetClassName = $field->get('target_entity');
-
-        $title = $this->propertyAccessor->getValue(
-            $targetEntity,
-            $targetFieldName
-        );
-
-        $targetMetadata = $this->entityManager->getClassMetadata($targetClassName);
-        $id = $this->propertyAccessor->getValue(
-            $targetEntity,
-            $targetMetadata->getSingleIdentifierFieldName()
-        );
-
-        if (class_exists($targetClassName)) {
-            $relationExtendConfig = $this->extendProvider->getConfig($targetClassName);
-            $routeOptions = $relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? $this->getCustomEntityViewRouteOptions($targetClassName, $id)
-                : $this->getClassViewRouteOptions($targetClassName, $id);
-            if ($routeOptions['route']) {
-                return [
-                    'link'  => $this->router->generate($routeOptions['route'], $routeOptions['route_params']),
-                    'title' => $title
-                ];
-            }
-        }
-
-        return $title;
-    }
-
-    /**
-     * @param string $entityClassName
-     * @param mixed  $id
-     * @return array
-     */
-    protected function getClassViewRouteOptions($entityClassName, $id = null)
-    {
-        $routeOptions = array('route' => false, 'route_params' => false);
-        /** @var EntityMetadata $metadata */
-        $metadata = $this->configManager->getEntityMetadata($entityClassName);
-        if ($metadata && $metadata->routeView) {
-            $routeOptions['route'] = $metadata->routeView;
-            $routeOptions['route_params'] = [
-                'id' => $id
-            ];
-            return $routeOptions;
-        }
-        return $routeOptions;
-    }
-
-    /**
-     * @param string   $entityClassName
-     * @param mixed    $id
-     * @return array
-     */
-    protected function getCustomEntityViewRouteOptions($entityClassName, $id = null)
-    {
-        return [
-            'route'        => $this->entityViewRoute,
-            'route_params' => [
-                'entityName' => str_replace('\\', '_', $entityClassName),
-                'id'         => $id
-            ]
-        ];
     }
 }
