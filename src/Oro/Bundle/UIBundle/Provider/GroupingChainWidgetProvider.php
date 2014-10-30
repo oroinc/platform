@@ -38,7 +38,7 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($entity)
+    public function supports($object)
     {
         return !empty($this->providers);
     }
@@ -50,9 +50,9 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
      *      [group name] =>
      *          'widgets' => array
      */
-    public function getWidgets($entity)
+    public function getWidgets($object)
     {
-        $widgets = $this->getWidgetsOrderedByPriority($entity);
+        $widgets = $this->getWidgetsOrderedByPriority($object);
 
         $result = [];
         foreach ($widgets as $widget) {
@@ -70,7 +70,7 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
                     $result[$groupName]['label'] = $this->groupNameProvider->getLabel(
                         [
                             'groupName'   => $groupName,
-                            'entityClass' => ClassUtils::getClass($entity)
+                            'entityClass' => ClassUtils::getClass($object)
                         ]
                     );
                 }
@@ -85,11 +85,11 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     /**
      * Returns widgets ordered by priority
      *
-     * @param object $entity The entity object
+     * @param object $object The object
      *
      * @return array
      */
-    public function getWidgetsOrderedByPriority($entity)
+    public function getWidgetsOrderedByPriority($object)
     {
         $result = [];
 
@@ -100,8 +100,8 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
             /** @var string|null $group */
             $group = $item[1];
 
-            if ($provider->supports($entity)) {
-                $widgets = $provider->getWidgets($entity);
+            if ($provider->supports($object)) {
+                $widgets = $provider->getWidgets($object);
                 if (!empty($widgets)) {
                     foreach ($widgets as $widget) {
                         if (!empty($group) && !isset($widget['group'])) {

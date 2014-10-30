@@ -3,21 +3,31 @@
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- */
-class OroCalendarBundleInstaller implements Installation
+class OroCalendarBundleInstaller implements Installation, ActivityExtensionAwareInterface
 {
+    /** @var ActivityExtension */
+    protected $activityExtension;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_4';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension)
+    {
+        $this->activityExtension = $activityExtension;
     }
 
     /**
@@ -63,12 +73,16 @@ class OroCalendarBundleInstaller implements Installation
         $table = $schema->createTable('oro_calendar_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('calendar_id', 'integer', []);
-        $table->addColumn('title', 'text', []);
+        $table->addColumn('title', 'string', ['length' => 255]);
+        $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('start_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('end_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('all_day', 'boolean', []);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
+        $table->addIndex(['updated_at'], 'oro_calendar_event_updated_at_idx', []);
         $table->setPrimaryKey(['id']);
     }
 

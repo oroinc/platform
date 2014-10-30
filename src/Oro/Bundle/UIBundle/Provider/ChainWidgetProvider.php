@@ -26,7 +26,7 @@ class ChainWidgetProvider implements WidgetProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($entity)
+    public function supports($object)
     {
         return !empty($this->providers);
     }
@@ -34,14 +34,14 @@ class ChainWidgetProvider implements WidgetProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getWidgets($entity)
+    public function getWidgets($object)
     {
         $result = [];
 
         // collect widgets
         foreach ($this->providers as $provider) {
-            if ($provider->supports($entity)) {
-                $widgets = $provider->getWidgets($entity);
+            if ($provider->supports($object)) {
+                $widgets = $provider->getWidgets($object);
                 if (!empty($widgets)) {
                     foreach ($widgets as $widget) {
                         $priority = isset($widget['priority']) ? $widget['priority'] : 0;

@@ -81,64 +81,70 @@ class ConfigScopeType extends AbstractType
                     $options['disabled'] = true;
                     $this->appendClassAttr($options, 'disabled-' . $config['form']['type']);
                 }
-
+                $propertyOnForm = false;
+                $properties = [];
                 if (isset($config['options']['required_property'])) {
-                    $property = $config['options']['required_property'];
+                    $properties[] = $config['options']['required_property'];
+                }
+                if (isset($config['options']['required_properties'])) {
+                    $properties = array_merge($properties, $config['options']['required_properties']);
+                }
 
-                    $propertyOnForm = false;
+                if (!empty($properties)) {
+                    foreach ($properties as $property) {
+                        if (isset($property['config_id'])) {
+                            $configId = $property['config_id'];
 
-                    if (isset($property['config_id'])) {
-                        $configId = $property['config_id'];
+                            $fieldName = array_key_exists('field_name', $configId) ? $configId['field_name'] : false;
+                            if ($fieldName === false && $this->config->getId() instanceof FieldConfigId) {
+                                $fieldName = $this->config->getId()->getFieldName();
+                            }
 
-                        $fieldName = array_key_exists('field_name', $configId) ? $configId['field_name'] : false;
-                        if ($fieldName === false && $this->config->getId() instanceof FieldConfigId) {
-                            $fieldName = $this->config->getId()->getFieldName();
-                        }
+                            $className = isset($configId['class_name'])
+                                ? $configId['class_name']
+                                : $this->config->getId()->getClassName();
 
-                        $className = isset($configId['class_name'])
-                            ? $configId['class_name']
-                            : $this->config->getId()->getClassName();
+                            $scope = isset($configId['scope'])
+                                ? $configId['scope']
+                                : $this->config->getId()->getScope();
 
-                        $scope = isset($configId['scope'])
-                            ? $configId['scope']
-                            : $this->config->getId()->getScope();
-
-                        if ($fieldName) {
-                            $configId = new FieldConfigId(
-                                $scope,
-                                $className,
-                                $fieldName,
-                                $this->config->getId()->getFieldType()
-                            );
-                        } else {
-                            $configId = new EntityConfigId($scope, $className);
-                        }
-
-                        //check if requirement property isset in this form
-                        if ($className == $this->config->getId()->getClassName()) {
                             if ($fieldName) {
-                                if ($this->config->getId() instanceof FieldConfigId
-                                    && $this->config->getId()->getFieldName() == $fieldName
-                                ) {
+                                $configId = new FieldConfigId(
+                                    $scope,
+                                    $className,
+                                    $fieldName,
+                                    $this->config->getId()->getFieldType()
+                                );
+                            } else {
+                                $configId = new EntityConfigId($scope, $className);
+                            }
+
+                            //check if requirement property is set in this form
+                            if ($className == $this->config->getId()->getClassName()) {
+                                if ($fieldName) {
+                                    if ($this->config->getId() instanceof FieldConfigId
+                                        && $this->config->getId()->getFieldName() == $fieldName
+                                    ) {
+                                        $propertyOnForm = true;
+                                    }
+                                } else {
                                     $propertyOnForm = true;
                                 }
-                            } else {
-                                $propertyOnForm = true;
                             }
-                        }
-                    } else {
-                        $propertyOnForm = true;
-
-                        $configId = $this->config->getId();
-                    }
-
-                    $requireConfig = $this->configManager->getConfig($configId);
-
-                    if ($requireConfig->get($property['code']) != $property['value']) {
-                        if ($propertyOnForm) {
-                            $this->appendClassAttr($options, 'hide');
                         } else {
-                            continue;
+                            $propertyOnForm = true;
+
+                            $configId = $this->config->getId();
+                        }
+
+                        $requireConfig = $this->configManager->getConfig($configId);
+
+                        if ($requireConfig->get($property['code']) != $property['value']) {
+                            if ($propertyOnForm) {
+                                $this->appendClassAttr($options, 'hide');
+                            } else {
+                                continue;
+                            }
                         }
                     }
 

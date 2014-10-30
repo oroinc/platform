@@ -2,5 +2,8 @@ oro:
     activity:
         activities:           Activities
 
+        menu:
+            activities_tab.label: Activities
+
         sections:
-            activities:       Activities
+            activities:       Record Activities
