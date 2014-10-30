@@ -319,7 +319,6 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
      * @param array $source
      * @param array $expected
      *
-     * @expectedException \LogicException
      * @dataProvider getPreviousIdentifierDataProvider
      */
     public function testGetPreviousIdentifier($source, $expected)
