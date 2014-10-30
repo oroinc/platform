@@ -10,4 +10,4 @@ oro.entity_pagination:
             enabled:
                 label: 'Entity Pagination'
             limit:
-                label: 'Entity Pagination limit'
+                label: 'Entity Pagination Limit'

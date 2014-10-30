@@ -140,6 +140,9 @@ class EntityPaginationNavigation
             if ($this->isIdentifierMatched($entity, $resultType, $scope)) {
                 do {
                     $identifier = $this->getProcessedIdentifier($entity, $resultType, $scope);
+                    if (!$identifier) {
+                        break;
+                    }
                     $navigationEntity = $this->doctrineHelper->getEntity($entityName, $identifier);
                     $permission = EntityPaginationManager::getPermission($scope);
                     if (!$navigationEntity) {
