@@ -1,10 +1,19 @@
 oro_menu_config:
+    templates:
+        calendar_menu:
+            template: 'OroCalendarBundle:Calendar:contextmenu.html.twig'
     items:
         oro_calendar_view_default:
             label: 'oro.calendar.menu.view_default'
             route: 'oro_calendar_view_default'
             extras:
                 position: 20
+        oro_calendar_hide_action:
+            label: 'oro.calendar.context.hide'
+            uri: '#'
+            extras:
+                position: 10
+                function: 'hideCalendar'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
@@ -21,6 +30,11 @@ oro_menu_config:
         usermenu:
             children:
                 oro_calendar_view_default: ~
+
+        calendar_menu:
+            type: calendar_menu
+            children:
+                oro_calendar_hide_action: ~
 
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"
