@@ -186,7 +186,6 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         $result = $this->storage->getCurrentPosition($this->entity, $source['scope']);
 
         $this->assertSame($expected, $result);
-
     }
 
     /**
