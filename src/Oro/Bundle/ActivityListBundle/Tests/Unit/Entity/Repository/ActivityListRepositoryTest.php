@@ -4,12 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY_NAME = 'ActivityListEntityName';
-
     /**
      * @var ActivityListRepository
      */
@@ -37,7 +36,6 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         unset($this->entityManager, $this->repository);
     }
-
 
     /**
      * @dataProvider paramsProvider
