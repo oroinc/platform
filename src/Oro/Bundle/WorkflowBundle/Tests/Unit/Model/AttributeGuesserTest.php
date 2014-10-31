@@ -138,7 +138,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $associationEntity = 'AssociationEntity';
 
         $entityMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-        $entityMetadata->expects($this->once())->method('hasAssociation')->with('association')
+        $entityMetadata->expects($this->any())->method('hasAssociation')->with('association')
             ->will($this->returnValue(true));
         $entityMetadata->expects($this->once())->method('getAssociationTargetClass')->with('association')
             ->will($this->returnValue($associationEntity));
@@ -228,13 +228,42 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($associationClass));
 
         $this->setEntityMetadata(array($rootClass => $metadata));
-        $this->setEntityConfigProvider($rootClass, 'association', false, true);
+        $this->setEntityConfigProvider($rootClass, 'association', false, true, null, 'ref-one');
 
+        $result = $this->guesser->guessAttributeParameters($rootClass, $propertyPath);
         $this->assertAttributeOptions(
-            $this->guesser->guessAttributeParameters($rootClass, $propertyPath),
+            $result,
             null,
             'entity',
             array('class' => $associationClass)
+        );
+    }
+
+    public function testGuessAttributeParametersFieldFromEntityConfig()
+    {
+        $propertyPath = 'entity.field';
+        $rootClass = 'RootClass';
+        $fieldLabel = 'Field Label';
+
+        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata->expects($this->any())->method('getName')
+            ->will($this->returnValue($rootClass));
+
+        $metadata->expects($this->any())->method('hasAssociation')->with('field')
+            ->will($this->returnValue(false));
+        $metadata->expects($this->any())->method('hasField')->with('field')
+            ->will($this->returnValue(false));
+
+        $this->setEntityMetadata(array($rootClass => $metadata));
+        $this->setEntityConfigProvider($rootClass, 'field', false, true, $fieldLabel, 'date');
+
+        $this->guesser->addDoctrineTypeMapping('date', 'object', array('class' => 'DateTime'));
+
+        $this->assertAttributeOptions(
+            $this->guesser->guessAttributeParameters($rootClass, $propertyPath),
+            $fieldLabel,
+            'object',
+            array('class' => 'DateTime')
         );
     }
 
@@ -451,9 +480,16 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
      * @param bool $multiple
      * @param bool $hasConfig
      * @param string|null $label
+     * @param string|null $fieldType
      */
-    protected function setEntityConfigProvider($class, $field, $multiple = false, $hasConfig = true, $label = null)
-    {
+    protected function setEntityConfigProvider(
+        $class,
+        $field,
+        $multiple = false,
+        $hasConfig = true,
+        $label = null,
+        $fieldType = null
+    ) {
         $labelOption = $multiple ? 'plural_label' : 'label';
 
         $entityConfig = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
@@ -466,5 +502,15 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($hasConfig));
         $this->entityConfigProvider->expects($this->any())->method('getConfig')->with($class, $field)
             ->will($this->returnValue($entityConfig));
+
+        if ($fieldType) {
+            $configId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $entityConfig->expects($this->any())->method('getId')
+                ->will($this->returnValue($configId));
+            $configId->expects($this->any())->method('getFieldType')
+                ->will($this->returnValue($fieldType));
+        }
     }
 }

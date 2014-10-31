@@ -39,4 +39,28 @@ class FieldTypeHelperTest extends \PHPUnit_Framework_TestCase
             ['enum', 'manyToOne']
         ];
     }
+
+    /**
+     * @dataProvider relationCHeckTestProvider
+     */
+    public function testIsRelation($fieldType, $expected)
+    {
+        $this->assertSame($expected, FieldTypeHelper::isRelation($fieldType));
+    }
+
+    public function relationCHeckTestProvider()
+    {
+        return [
+            ['ref-one', true],
+            ['ref-many', true],
+            ['oneToMany', true],
+            ['manyToOne', true],
+            ['manyToMany', true],
+            ['optionSet', true],
+            ['string', false],
+            ['integer', false],
+            ['text', false],
+            ['array', false],
+        ];
+    }
 }
