@@ -5,5 +5,3 @@ oro.sidebar:
         fields:
             sidebar_left_active.label: 'Enable left sidebar'
             sidebar_right_active.label: 'Enable right sidebar'
-    widget:
-        add: 'Add widget'
