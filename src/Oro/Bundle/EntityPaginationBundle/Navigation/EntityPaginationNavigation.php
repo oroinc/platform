@@ -38,7 +38,6 @@ class EntityPaginationNavigation
         SecurityFacade $securityFacade,
         EntityPaginationStorage $storage
     ) {
-
         $this->doctrineHelper = $doctrineHelper;
         $this->securityFacade = $securityFacade;
         $this->storage = $storage;

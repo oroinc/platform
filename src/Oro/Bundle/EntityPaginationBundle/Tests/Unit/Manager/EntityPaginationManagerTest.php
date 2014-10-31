@@ -95,7 +95,7 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPermission($scope, $expected)
     {
-        $result = $this->entityPaginationManager->getPermission($scope);
+        $result = EntityPaginationManager::getPermission($scope);
         $this->assertSame($expected, $result);
     }
 
@@ -121,6 +121,6 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPermissionException()
     {
-        $this->entityPaginationManager->getPermission(self::WRONG_SCOPE);
+        EntityPaginationManager::getPermission(self::WRONG_SCOPE);
     }
 }
