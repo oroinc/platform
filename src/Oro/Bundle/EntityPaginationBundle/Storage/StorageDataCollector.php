@@ -87,16 +87,11 @@ class StorageDataCollector
         foreach ($gridNames as $gridName) {
             // datagrid manager automatically extracts all required parameters from request
             $dataGrid = $this->datagridManager->getDatagridByRequestParams($gridName);
-
-            if ($dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH) !== true) {
+            if (!$this->paginationManager->isDatagridApplicable($dataGrid)) {
                 continue;
             }
 
             $dataSource = $dataGrid->getDatasource();
-            if (!$dataSource instanceof OrmDatasource) {
-                continue;
-            }
-
             $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
             $entityName = $this->getEntityName($dataSource);
@@ -139,7 +134,7 @@ class StorageDataCollector
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults($this->getEntitiesLimit());
 
-        $query = $this->aclHelper->apply($dataSource->getQueryBuilder(), $permission);
+        $query = $this->aclHelper->apply($queryBuilder, $permission);
         $results = $query->execute();
 
         $entityIds = [];

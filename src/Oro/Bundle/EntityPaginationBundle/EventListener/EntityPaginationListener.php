@@ -46,7 +46,7 @@ class EntityPaginationListener
         }
         
         $dataGrid = $event->getDatagrid();
-        if ($dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH) !== true) {
+        if (!$this->paginationManager->isDatagridApplicable($dataGrid)) {
             return;
         }
 

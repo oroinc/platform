@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Navigation;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
@@ -122,5 +123,64 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetPermissionException()
     {
         EntityPaginationManager::getPermission(self::WRONG_SCOPE);
+    }
+
+    /**
+     * @param bool $expected
+     * @param bool $isOrmDatasource
+     * @param bool|null $entityPagination
+     * @dataProvider isDatagridApplicableDataProvider
+     */
+    public function testIsDatagridApplicable($expected, $isOrmDatasource, $entityPagination)
+    {
+        if ($isOrmDatasource) {
+            $dataSource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+                ->disableOriginalConstructor()
+                ->getMock();
+        } else {
+            $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        }
+
+        $config = ['options' => ['entity_pagination' => $entityPagination]];
+        $configObject = DatagridConfiguration::create($config);
+
+        $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid->expects($this->any())
+            ->method('getDatasource')
+            ->will($this->returnValue($dataSource));
+        $dataGrid->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($configObject));
+
+        $this->assertSame($expected, $this->entityPaginationManager->isDatagridApplicable($dataGrid));
+    }
+
+    /**
+     * @return array
+     */
+    public function isDatagridApplicableDataProvider()
+    {
+        return [
+            'not orm datasource' => [
+                'expected' => false,
+                'isOrmDatasource' => false,
+                'entityPagination' => true,
+            ],
+            'pagination not specified' => [
+                'expected' => false,
+                'isOrmDatasource' => true,
+                'entityPagination' => null,
+            ],
+            'pagination disabled' => [
+                'expected' => false,
+                'isOrmDatasource' => true,
+                'entityPagination' => false,
+            ],
+            'pagination enabled' => [
+                'expected' => true,
+                'isOrmDatasource' => true,
+                'entityPagination' => true,
+            ],
+        ];
     }
 }

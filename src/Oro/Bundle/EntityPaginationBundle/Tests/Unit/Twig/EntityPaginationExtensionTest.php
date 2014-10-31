@@ -11,17 +11,12 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $doctrineHelper;
+    protected $navigation;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $storage;
-
-    /**
-     * @var \stdClass
-     */
-    protected $entity;
+    protected $dataCollector;
 
     /**
      * @var EntityPaginationExtension
@@ -30,27 +25,23 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->navigation =
+            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->dataCollector = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entity = new \stdClass();
-
-        $this->extension = new EntityPaginationExtension($this->doctrineHelper, $this->storage);
+        $this->extension = new EntityPaginationExtension($this->navigation, $this->dataCollector);
     }
 
     public function testGetFunctions()
     {
         $expectedFunctions = [
-            'oro_entity_pagination_first'    => [$this->extension, 'getFirst'],
-            'oro_entity_pagination_previous' => [$this->extension, 'getPrevious'],
-            'oro_entity_pagination_next'     => [$this->extension, 'getNext'],
-            'oro_entity_pagination_last'     => [$this->extension, 'getLast'],
-            'oro_entity_pagination_pager'    => [$this->extension, 'getPager'],
+            'oro_entity_pagination_pager' => [$this->extension, 'getPager'],
+            'oro_entity_pagination_collect_data' => [$this->extension, 'collectData'],
         ];
 
         $functions = $this->extension->getFunctions();
@@ -67,167 +58,40 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $expected
-     * @param array $attributes
-     * @param int|null $entityId
-     * @param string|null $fieldName
-     * @dataProvider getNavigationDataProvider
-     */
-    public function testGetFirst($expected, array $attributes = null, $entityId = null, $fieldName = null)
-    {
-        if (null !== $attributes) {
-            $this->extension->setRequest(new Request([], [], $attributes));
-        }
-
-        $this->storage->expects($this->any())
-            ->method('getFirstIdentifier')
-            ->with($this->entity)
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with($this->entity)
-            ->will($this->returnValue($fieldName));
-
-        $this->assertSame($expected, $this->extension->getFirst($this->entity));
-    }
-
-    /**
-     * @param mixed $expected
-     * @param array $attributes
-     * @param int|null $entityId
-     * @param string|null $fieldName
-     * @dataProvider getNavigationDataProvider
-     */
-    public function testGetLast($expected, array $attributes = null, $entityId = null, $fieldName = null)
-    {
-        if (null !== $attributes) {
-            $this->extension->setRequest(new Request([], [], $attributes));
-        }
-
-        $this->storage->expects($this->any())
-            ->method('getLastIdentifier')
-            ->with($this->entity)
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with($this->entity)
-            ->will($this->returnValue($fieldName));
-
-        $this->assertSame($expected, $this->extension->getLast($this->entity));
-    }
-
-    /**
-     * @param mixed $expected
-     * @param array $attributes
-     * @param int|null $entityId
-     * @param string|null $fieldName
-     * @dataProvider getNavigationDataProvider
-     */
-    public function testGetPrevious($expected, array $attributes = null, $entityId = null, $fieldName = null)
-    {
-        if (null !== $attributes) {
-            $this->extension->setRequest(new Request([], [], $attributes));
-        }
-
-        $this->storage->expects($this->any())
-            ->method('getPreviousIdentifier')
-            ->with($this->entity)
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with($this->entity)
-            ->will($this->returnValue($fieldName));
-
-        $this->assertSame($expected, $this->extension->getPrevious($this->entity));
-    }
-
-    /**
-     * @param mixed $expected
-     * @param array $attributes
-     * @param int|null $entityId
-     * @param string|null $fieldName
-     * @dataProvider getNavigationDataProvider
-     */
-    public function testGetNext($expected, array $attributes = null, $entityId = null, $fieldName = null)
-    {
-        if (null !== $attributes) {
-            $this->extension->setRequest(new Request([], [], $attributes));
-        }
-
-        $this->storage->expects($this->any())
-            ->method('getNextIdentifier')
-            ->with($this->entity)
-            ->will($this->returnValue($entityId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifierFieldName')
-            ->with($this->entity)
-            ->will($this->returnValue($fieldName));
-
-        $this->assertSame($expected, $this->extension->getNext($this->entity));
-    }
-
-    /**
-     * @return array
-     */
-    public function getNavigationDataProvider()
-    {
-        return [
-            'no request' => [
-                'expected' => null,
-            ],
-            'no route' => [
-                'expected' => null,
-                'attributes' => [],
-            ],
-            'no route parameters' => [
-                'expected' => null,
-                'attributes' => ['_route' => 'test_route'],
-            ],
-            'no previous entity' => [
-                'expected' => null,
-                'attributes' => ['_route' => 'test_route', '_route_params' => ['test_id' => 2]],
-            ],
-            'no field name' => [
-                'expected' => null,
-                'attributes' => ['_route' => 'test_route', '_route_params' => ['test_id' => 2]],
-                'entityId' => 1,
-            ],
-            'no identifier parameter' => [
-                'expected' => null,
-                'attributes' => ['_route' => 'test_route', '_route_params' => ['test_id' => 2]],
-                'entityId' => 1,
-                'fieldName' => 'id'
-            ],
-            'valid data' => [
-                'expected' => ['route' => 'test_route', 'route_params' => ['id' => 1]],
-                'attributes' => ['_route' => 'test_route', '_route_params' => ['id' => 2]],
-                'entityId' => 1,
-                'fieldName' => 'id'
-            ],
-        ];
-    }
-
-    /**
-     * @param mixed $expected
      * @param int|null $totalCount
      * @param int|null $currentNumber
      * @dataProvider getPagerDataProvider
      */
     public function testGetPager($expected, $totalCount = null, $currentNumber = null)
     {
-        $this->storage->expects($this->any())
+        $entity = new \stdClass();
+
+        $this->navigation->expects($this->any())
             ->method('getTotalCount')
-            ->with($this->entity)
+            ->with($entity)
             ->will($this->returnValue($totalCount));
-        $this->storage->expects($this->any())
+        $this->navigation->expects($this->any())
             ->method('getCurrentNumber')
-            ->with($this->entity)
+            ->with($entity)
             ->will($this->returnValue($currentNumber));
 
-        $this->assertSame($expected, $this->extension->getPager($this->entity));
+        $this->assertSame($expected, $this->extension->getPager($entity));
+    }
+
+    public function testCollectData()
+    {
+        $request = new Request();
+        $scope = 'test';
+        $result = true;
+
+        $this->dataCollector->expects($this->once())
+            ->method('collect')
+            ->with($request, $scope)
+            ->will($this->returnValue($result));
+
+        $this->extension->setRequest($request);
+
+        $this->assertSame($result, $this->extension->collectData($scope));
     }
 
     /**

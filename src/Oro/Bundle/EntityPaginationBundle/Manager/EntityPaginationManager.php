@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityPaginationBundle\Manager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
 class EntityPaginationManager
 {
@@ -31,6 +34,19 @@ class EntityPaginationManager
     public function getLimit()
     {
         return (int)$this->configManager->get('oro_entity_pagination.limit');
+    }
+
+    /**
+     * @param DatagridInterface $dataGrid
+     * @return bool
+     */
+    public function isDatagridApplicable(DatagridInterface $dataGrid)
+    {
+        if (!$dataGrid->getDatasource() instanceof OrmDatasource) {
+            return false;
+        }
+
+        return $dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_PATH) === true;
     }
 
     /**
