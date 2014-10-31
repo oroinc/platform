@@ -88,9 +88,10 @@ config:
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
-        'oroui/js/app/modules/layout': 'bundles/oroui/js/app/modules/layout.js'
-        'oroui/js/app/modules/views': 'bundles/oroui/js/app/modules/views.js'
-        'oroui/js/app/modules/messenger': 'bundles/oroui/js/app/modules/messenger.js'
+        'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
+        'oroui/js/app/modules/messenger-module': 'bundles/oroui/js/app/modules/messenger-module.js'
+        'oroui/js/app/modules/views-module': 'bundles/oroui/js/app/modules/views-module.js'
+        'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -113,7 +114,7 @@ config:
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
-        'oroui/js/widget-control-initializer': 'bundles/oroui/js/widget-control-initializer.js'
+        'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget-manager.js'
         'oroui/js/widget/abstract': 'bundles/oroui/js/widget/abstract.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block.js'
@@ -132,9 +133,10 @@ config:
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
-        - oroui/js/app/modules/layout
-        - oroui/js/app/modules/views
-        - oroui/js/app/modules/messenger
+        - oroui/js/app/modules/layout-module
+        - oroui/js/app/modules/messenger-module
+        - oroui/js/app/modules/views-module
+        - oroui/js/app/modules/widgets-module
 
 build:
     paths:

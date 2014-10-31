@@ -524,6 +524,7 @@ define(function (require) {
              * @event grid_render:complete
              */
             mediator.trigger('grid_render:complete', this.$el);
+            mediator.execute('layout:init', this.$el);
 
             return this;
         },
@@ -596,6 +597,7 @@ define(function (require) {
                  * @event grid_load:complete
                  */
                 mediator.trigger("grid_load:complete", this.collection, this.$el);
+                mediator.execute('layout:init', this.$el);
             }
         },
 
