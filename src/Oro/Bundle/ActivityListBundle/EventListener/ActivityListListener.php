@@ -6,6 +6,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListInterface;
@@ -25,16 +26,16 @@ class ActivityListListener
     protected $deletedEntities = [];
 
     /**
-     * @var DoctrineHelper
+     * @var ActivityListChainProvider
      */
-    protected $doctrineHelper;
+    protected $chainProvider;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param ActivityListChainProvider $chainProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(ActivityListChainProvider $chainProvider)
     {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->chainProvider = $chainProvider;
     }
 
     /**
@@ -141,12 +142,10 @@ class ActivityListListener
     {
         if (!empty($this->insertedEntities)) {
             foreach ($this->insertedEntities as $entity) {
-                $activityList = new ActivityList();
-                $activityList->setVerb(self::STATE_CREATE);
-                $activityList->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
-                $activityList->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-                $activityList->setSubject($entity->getActivityListSubject());
-                $entityManager->persist($activityList);
+                $activityList = $this->chainProvider->getActivityListByActivityEntity($entity);
+                if ($activityList) {
+                    $entityManager->persist($activityList);
+                }
             }
             $this->insertedEntities = [];
             $entityManager->flush();

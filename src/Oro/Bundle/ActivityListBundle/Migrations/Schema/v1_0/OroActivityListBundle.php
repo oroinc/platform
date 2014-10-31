@@ -37,8 +37,8 @@ class OroActivityListBundle implements Migration
         $table->addColumn('data', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('related_entity_class', 'string', ['length' => 255]);
         $table->addColumn('related_entity_id', 'integer', ['notnull' => false]);
-        $table->addColumn('related_entity_class', 'string', ['length' => 255]);
-        $table->addColumn('related_entity_id', 'integer', []);
+        $table->addColumn('related_activity_class', 'string', ['length' => 255]);
+        $table->addColumn('related_activity_id', 'integer', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

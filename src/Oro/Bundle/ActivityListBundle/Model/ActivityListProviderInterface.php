@@ -33,6 +33,8 @@ interface ActivityListProviderInterface
 
     public function getFullTemplate();
 
+    public function getActivityId($entity);
+
     /**
      * Check if provider supports given entity
      *

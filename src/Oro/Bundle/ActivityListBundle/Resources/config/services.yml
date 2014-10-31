@@ -1,11 +1,18 @@
 parameters:
   oro.activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
+  oro.activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
 
 services:
   oro.activity_list.event_listener.actitity_list_listener:
       class:  %oro.activity_list.event_listener.actitity_list_listener.class%
       arguments:
-          - @oro_entity.doctrine_helper
+          - @oro.activity_list.provider.chain
       tags:
           - { name: doctrine.event_listener, event: onFlush }
           - { name: doctrine.event_listener, event: postFlush }
+
+  oro.activity_list.provider.chain:
+      class: %oro.activity_list.provider.chain.class%
+      arguments:
+         - @oro_security.security_facade.link
+         - @oro_entity.doctrine_helper
