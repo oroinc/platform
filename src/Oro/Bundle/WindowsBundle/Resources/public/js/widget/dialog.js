@@ -1,16 +1,25 @@
 /*global define*/
-define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
-        'oroui/js/widget/abstract', 'orowindows/js/dialog/state/model', 'oroui/js/messenger', 'oroui/js/layout',
-        'orotranslation/js/translator', 'jquery.dialog.extended'
-    ], function ($, _, tools, error, AbstractWidget, StateModel, messenger, layout, __) {
+define(function (require) {
     'use strict';
+
+    var DialogWidget,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        __= require('orotranslation/js/translator'),
+        tools = require('oroui/js/tools'),
+        error = require('oroui/js/error'),
+        layout = require('oroui/js/layout'),
+        messenger = require('oroui/js/messenger'),
+        AbstractWidget = require('oroui/js/widget/abstract'),
+        StateModel = require('orowindows/js/dialog/state/model');
+    require('jquery.dialog.extended');
 
     /**
      * @export  oro/dialog-widget
      * @class   oro.DialogWidget
      * @extends oro.AbstractWidget
      */
-    var DialogWidget = AbstractWidget.extend({
+    DialogWidget = AbstractWidget.extend({
         options: _.extend({}, AbstractWidget.prototype.options, {
             type: 'dialog',
             dialogOptions: null,
@@ -28,43 +37,35 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
         openedWindows: 0,
         contentTop: null,
 
+        listen: {
+            'adoptedFormResetClick': 'remove',
+            'widgetRender': '_initAdjustHeight',
+            'page:request mediator': 'onPageChange'
+        },
+
         /**
          * Initialize dialog
          */
         initialize: function(options) {
+            var dialogOptions;
             options = options || {};
             this.options = _.defaults(options, this.options);
 
-            this.on('adoptedFormResetClick', _.bind(this.remove, this));
+            dialogOptions = options.dialogOptions = options.dialogOptions || {};
+            _.defaults(dialogOptions, {
+                title: options.title,
+                limitTo: '#container',
+                minWidth: 375,
+                minHeight: 150
+            });
 
-            this.options.dialogOptions = this.options.dialogOptions || {};
-            this.options.dialogOptions.title = this.options.dialogOptions.title || this.options.title;
-            this.options.dialogOptions.limitTo = this.options.dialogOptions.limitTo || '#container';
-            this.options.dialogOptions.minWidth = this.options.dialogOptions.minWidth || 375;
-            this.options.dialogOptions.minHeight = this.options.dialogOptions.minHeight || 150;
-
-            if (this.options.stateEnabled) {
+            // it's possible to track state only for not modal dialogs
+            options.stateEnabled = options.stateEnabled && !dialogOptions.modal;
+            if (options.stateEnabled) {
                 this._initModel(this.options);
             }
 
-            var runner = function(handlers) {
-                return function() {
-                    for (var i = 0; i < handlers.length; i++) {
-                        if (_.isFunction(handlers[i])) {
-                            handlers[i]();
-                        }
-                    }
-                };
-            };
-
-            var closeHandlers = [_.bind(this.closeHandler, this)];
-            if (this.options.dialogOptions.close !== undefined) {
-                closeHandlers.push(this.options.dialogOptions.close);
-            }
-
-            this.options.dialogOptions.close = runner(closeHandlers);
-
-            this.on('widgetRender', _.bind(this._initAdjustHeight, this));
+            dialogOptions.close = _.bind(this.closeHandler, this, dialogOptions.close);
 
             this.initializeWidget(options);
         },
@@ -96,9 +97,26 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
         },
 
         /**
-         * Handle dialog close
+         * Handles dialog close action
+         *  - executes external close handler
+         *  - disposes dialog widget
+         *
+         * @param {Function|undefined} onClose External onClose handler
          */
-        closeHandler: function() {
+        closeHandler: function (onClose) {
+            if (_.isFunction(onClose)) {
+                onClose();
+            }
+            this.dispose();
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
             if (this.model) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
@@ -112,8 +130,13 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             this._hideLoading();
             if (this.widget) {
                 this.widget.remove();
+                delete this.widget;
             }
-            AbstractWidget.prototype.remove.call(this);
+
+            // add flag: this is disposing process
+            // (to prevent recursion from remove method)
+            this.disposing = true;
+            DialogWidget.__super__.dispose.call(this);
         },
 
         /**
@@ -124,15 +147,9 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             this.options.stateEnabled = false;
             if (jqxhr.status == 403) {
                 messenger.notificationFlashMessage('error', __('oro.ui.forbidden_error'));
-
-                if (this.widget) {
-                    this.widget.dialog("close");
-                } else {
-                    // for case if error triggered before widget rendering
-                    this.closeHandler();
-                }
+                this.remove();
             } else {
-                AbstractWidget.prototype._onContentLoadFail.apply(this, arguments);
+                DialogWidget.__super__._onContentLoadFail.apply(this, arguments);
             }
         },
 
@@ -164,9 +181,33 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
             }
         },
 
+        /**
+         * Handles page change
+         *  - closes dialogs with not tracked state (eg. modal dialogs)
+         */
+        onPageChange: function () {
+            if (!this.options.stateEnabled) {
+                this.remove();
+            }
+        },
+
+        /**
+         * Removes dialog widget
+         */
         remove: function() {
-            // Close will trigger call of closeHandler where Backbone.View.remove will be called
-            this.widget.dialog('close');
+            if (this.widget) {
+                // There's widget, close it before remove.
+                // Close handler will invoke dispose method,
+                // where remove method will be called again
+                this.widget.dialog('close');
+
+            } else if (!this.disposing) {
+                // If remove method was called directly -- execute dispose first
+                this.dispose();
+
+            } else {
+                DialogWidget.__super__.remove.call(this);
+            }
         },
 
         getWidget: function() {
@@ -189,7 +230,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
         },
 
         _renderActions: function() {
-            AbstractWidget.prototype._renderActions.apply(this);
+            DialogWidget.__super__._renderActions.apply(this);
             this.widget.dialog('showActionsContainer');
         },
 
@@ -207,7 +248,7 @@ define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/error',
                 this.widget.html(this.$el);
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
-            AbstractWidget.prototype.show.apply(this);
+            DialogWidget.__super__.show.apply(this);
             this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
