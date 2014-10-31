@@ -98,6 +98,20 @@ class ActivityList
     protected $relatedEntityId;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="related_activity_class", type="string", length=255)
+     */
+    protected $relatedActivityClass;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="related_activity_id", type="integer", nullable=false)
+     */
+    protected $relatedActivityId;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -376,5 +390,45 @@ class ActivityList
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelatedActivityClass()
+    {
+        return $this->relatedActivityClass;
+    }
+
+    /**
+     * @param $relatedActivityClass
+     *
+     * @return $this
+     */
+    public function setRelatedActivityClass($relatedActivityClass)
+    {
+        $this->relatedActivityClass = $relatedActivityClass;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelatedActivityId()
+    {
+        return $this->relatedActivityId;
+    }
+
+    /**
+     * @param $relatedActivityId
+     *
+     * @return $this
+     */
+    public function setRelatedActivityId($relatedActivityId)
+    {
+        $this->relatedActivityId = $relatedActivityId;
+
+        return $this;
     }
 }

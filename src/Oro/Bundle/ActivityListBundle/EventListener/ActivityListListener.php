@@ -96,8 +96,8 @@ class ActivityListListener
             foreach ($this->deletedEntities as $entity) {
                 $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list')
                     ->delete()
-                    ->where('list.relatedEntityClass = :relatedEntityClass')
-                    ->andWhere('list.relatedEntityId = :relatedEntityId')
+                    ->where('list.relatedActivityClass = :relatedActivityClass')
+                    ->andWhere('list.relatedActivityId = :relatedActivityId')
                     ->setParameter('relatedEntityClass', $entity['class'])
                     ->setParameter('relatedEntityId', $entity['id'])
                     ->getQuery()
@@ -121,10 +121,10 @@ class ActivityListListener
                     ->set('list.verb', $qb->expr()->literal(self::STATE_UPDATE))
                     ->set('list.subject', $qb->expr()->literal($entity->getActivityListSubject()))
                     ->set('list.updatedAt', $qb->expr()->literal(new \DateTime('now', new \DateTimeZone('UTC'))))
-                    ->where('list.relatedEntityClass = :relatedEntityClass')
-                    ->andWhere('list.relatedEntityId = :relatedEntityId')
-                    ->setParameter('relatedEntityClass', $this->doctrineHelper->getEntityClass($entity))
-                    ->setParameter('relatedEntityId', $this->doctrineHelper->getSingleEntityIdentifier($entity))
+                    ->where('list.relatedActivityClass = :relatedActivityClass')
+                    ->andWhere('list.relatedActivityId = :relatedActivityId')
+                    ->setParameter('relatedActivityClass', $this->doctrineHelper->getEntityClass($entity))
+                    ->setParameter('relatedActivityId', $this->doctrineHelper->getSingleEntityIdentifier($entity))
                     ->getQuery()
                     ->execute();
             }
@@ -143,8 +143,8 @@ class ActivityListListener
             foreach ($this->insertedEntities as $entity) {
                 $activityList = new ActivityList();
                 $activityList->setVerb(self::STATE_CREATE);
-                $activityList->setRelatedEntityClass($this->doctrineHelper->getEntityClass($entity));
-                $activityList->setRelatedEntityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
+                $activityList->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
+                $activityList->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
                 $activityList->setSubject($entity->getActivityListSubject());
                 $entityManager->persist($activityList);
             }
