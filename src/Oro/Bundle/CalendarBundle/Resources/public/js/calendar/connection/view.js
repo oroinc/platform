@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             lastItem:      '.connection-item:last',
             findItemByCalendar: function (calendarId) { return '.connection-item[data-calendar="' + calendarId + '"]'; },
             findItemByOwner: function (ownerId) { return '.connection-item[data-owner="' + ownerId + '"]'; },
-            removeButton:  '.remove-connection-button',
+            contextMenuButton: '.context-menu-button',
             newOwnerSelector: '#new_calendar_owner',
             contextMenuTemplate: '#template-calendar-menu'
         },
@@ -77,7 +77,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             });
             // subscribe to disconnect calendar event
             //TODO: Add new button and update selector
-            el.on('click', this.selectors.removeButton, _.bind(function (e) {
+            el.on('click', this.selectors.contextMenuButton, _.bind(function (e) {
                 this.contextMenu($(e.currentTarget), model.get('calendar'));
             }, this));
 
@@ -101,9 +101,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     var moduleConstructor = arguments[0],
                         actionModule = new moduleConstructor(options);
                     el.on('click', "a[data-module='" + actionModule.getName() + "']", _.bind(function (e) {
+                        el.remove();
                         actionModule.execute(calendarId);
                     }, this));
                 }
+                parent.find('.context-menu-button').css('display', 'block !important');
+                el.on('blur', function() {
+                    el.remove();
+                });
                 parent.closest(itemSelector).append(el);
             });
         },

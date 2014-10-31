@@ -74,17 +74,15 @@
                 >
                     <%- calendarName %>
                 </div>
-                <% if (removable) { %>
-                    <div class="pull-right icons-holder">
-                        <a
-                            href="javascript: void(0);"
-                            class="icons-holder-text no-hash remove-connection-button"
-                            title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
-                        >
-                                <i class="icon-remove hide-text"></i>
-                        </a>
-                    </div>
-                <% } %>
+                <div class="pull-right icons-holder">
+                    <a
+                        href="javascript: void(0);"
+                        class="icons-holder-text no-hash context-menu-button"
+                        title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
+                    >
+                        <i class="icon-caret-down"></i>
+                    </a>
+                </div>
             </div>
         </li>
     </script>

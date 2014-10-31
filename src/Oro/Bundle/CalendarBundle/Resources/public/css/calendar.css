@@ -200,7 +200,21 @@
     margin: 0 0 0 -20px;
 }
 
+.calendar-connections .context-menu a {
+    color: #444 !important;
+    font-weight: normal;
+    line-height: 20px;
+}
+
 .connection-item {
     overflow: visible;
     position: relative;
+}
+
+.calendar-connections .context-menu-button {
+    display: none;
+}
+
+.calendar-connections .connection-item:hover .context-menu-button {
+    display: block;
 }
