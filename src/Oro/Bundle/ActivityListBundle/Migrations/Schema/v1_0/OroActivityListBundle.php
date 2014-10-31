@@ -1,22 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Migrations\Schema;
+namespace Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroActivityListBundleInstaller implements Installation
+class OroActivityListBundle implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
-    {
-        return 'v1_0';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -75,4 +67,4 @@ class OroActivityListBundleInstaller implements Installation
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
-}
+} 
