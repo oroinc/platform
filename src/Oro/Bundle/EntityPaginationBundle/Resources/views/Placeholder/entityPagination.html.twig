@@ -1,27 +1,26 @@
 {% if entity is defined and entity %}
-    {% set pager = oro_entity_pagination_pager(entity) %}
-    {% if pager %}
-        <li>
-            {% set first = oro_entity_pagination_first(entity) %}
-            {% if first %}
-                <a href="{{ path(first.route, first.route_params) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
-            {% endif %}
+    {% set isDataCollected = oro_entity_pagination_collect_data(scope) %}
+    {% set pager = oro_entity_pagination_pager(entity, scope) %}
 
-            {% set previous = oro_entity_pagination_previous(entity) %}
-            {% if previous %}
-                <a href="{{ path(previous.route, previous.route_params) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
+    {% if isDataCollected and pager %}
+        {% set currentRoute = app.request.attributes.get('_route') %}
+        {% set currentParams = app.request.attributes.get('_route_params') %}
+        {% set queryParams = app.request.query.all %}
+        {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
+        {% set allParams = allParams|merge(currentParams) %}
+        {% set allParams = allParams|merge(queryParams) %}
+
+        <li>
+            {% if pager.current != 1 %}
+                <a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
+                <a href="{{ path('oro_entity_pagination_previous', allParams) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
             {% endif %}
 
             {{ 'oro.entity_pagination.pager_%current%_of_%total%'|trans({'%current%': pager.current, '%total%': pager.total}) }}
 
-            {% set next = oro_entity_pagination_next(entity) %}
-            {% if next %}
-                <a href="{{ path(next.route, next.route_params) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
-            {% endif %}
-
-            {% set last = oro_entity_pagination_last(entity) %}
-            {% if last %}
-                <a href="{{ path(last.route, last.route_params) }}">{{ 'oro.entity_pagination.last'|trans }}</a>
+            {% if pager.current != pager.total %}
+                <a href="{{ path('oro_entity_pagination_next', allParams) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
+                <a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a>
             {% endif %}
         </li>
     {% endif %}
