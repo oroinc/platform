@@ -54,16 +54,17 @@ class EntityPaginationExtension extends \Twig_Extension
      * Array('total' => <int>, 'current' => <int>) - used to generate string "<current> of <total>"
      *
      * @param object $entity
+     * @param string $scope
      * @return null|array
      */
-    public function getPager($entity)
+    public function getPager($entity, $scope)
     {
-        $totalCount = $this->paginationNavigation->getTotalCount($entity);
+        $totalCount = $this->paginationNavigation->getTotalCount($entity, $scope);
         if (!$totalCount) {
             return null;
         }
 
-        $currentNumber = $this->paginationNavigation->getCurrentNumber($entity);
+        $currentNumber = $this->paginationNavigation->getCurrentNumber($entity, $scope);
         if (!$currentNumber) {
             return null;
         }
