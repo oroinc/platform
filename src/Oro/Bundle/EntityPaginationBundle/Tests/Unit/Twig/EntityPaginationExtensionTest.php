@@ -65,17 +65,18 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetPager($expected, $totalCount = null, $currentNumber = null)
     {
         $entity = new \stdClass();
+        $scope = 'test';
 
         $this->navigation->expects($this->any())
             ->method('getTotalCount')
-            ->with($entity)
+            ->with($entity, $scope)
             ->will($this->returnValue($totalCount));
         $this->navigation->expects($this->any())
             ->method('getCurrentNumber')
-            ->with($entity)
+            ->with($entity, $scope)
             ->will($this->returnValue($currentNumber));
 
-        $this->assertSame($expected, $this->extension->getPager($entity));
+        $this->assertSame($expected, $this->extension->getPager($entity, $scope));
     }
 
     public function testCollectData()
