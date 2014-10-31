@@ -202,7 +202,7 @@ define(function (require) {
                 if (form.length > 0) {
                     this.form = form;
                     var formAction = this.form.attr('action');
-                    if (formAction.length > 0 && formAction[0] !== '#') {
+                    if (!this.options.url && formAction.length > 0 && formAction[0] !== '#') {
                         this.options.url = formAction;
                     }
                 }
@@ -534,8 +534,8 @@ define(function (require) {
         /**
          * Load content
          *
-         * @param {Object|null} data
-         * @param {String|null} method
+         * @param {Object=} data
+         * @param {String=} method
          */
         loadContent: function(data, method) {
             this.loading = true;
