@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityPaginationStorage
@@ -102,19 +102,20 @@ class EntityPaginationStorage
 
         $storage = $this->getStorage();
 
+        $clear = false;
         if ($scope !== null && isset($storage[$entityName][$scope])) {
             // clear only specified scope
             unset($storage[$entityName][$scope]);
             $this->setStorage($storage);
-            return true;
+            $clear = true;
         } elseif ($scope === null && isset($storage[$entityName])) {
             // clear all scopes
             unset($storage[$entityName]);
             $this->setStorage($storage);
-            return true;
+            $clear = true;
         }
 
-        return false;
+        return $clear;
     }
 
     /**
@@ -146,8 +147,8 @@ class EntityPaginationStorage
      */
     public function isEntityInStorage($entity, $scope)
     {
-        $storage = $this->getStorage();
         $entityName = ClassUtils::getClass($entity);
+        $storage = $this->getStorage();
         $identifierValue = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
         return !empty($storage[$entityName][$scope][self::ENTITY_IDS])
@@ -196,8 +197,9 @@ class EntityPaginationStorage
         unset($entityIds[$entityKey]);
         $entityIds = array_values($entityIds);
 
+        $entityName = ClassUtils::getClass($entity);
         $storage = $this->getStorage();
-        $storage[ClassUtils::getClass($entity)][$scope][self::ENTITY_IDS] = $entityIds;
+        $storage[$entityName][$scope][self::ENTITY_IDS] = $entityIds;
         $this->setStorage($storage);
     }
 

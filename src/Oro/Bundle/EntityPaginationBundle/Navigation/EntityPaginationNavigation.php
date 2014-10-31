@@ -55,7 +55,7 @@ class EntityPaginationNavigation
     public function getTotalCount($entity, $scope = EntityPaginationManager::VIEW_SCOPE)
     {
         if (!$this->storage->isEnvironmentValid()) {
-            return false;
+            return null;
         }
 
         $total = null;
@@ -74,7 +74,7 @@ class EntityPaginationNavigation
     public function getCurrentNumber($entity, $scope = EntityPaginationManager::VIEW_SCOPE)
     {
         if (!$this->storage->isEnvironmentValid()) {
-            return false;
+            return null;
         }
 
         $currentNumber = null;
@@ -172,16 +172,19 @@ class EntityPaginationNavigation
         $entityIds = $this->storage->getEntityIds($entity, $scope);
         $currentId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
+        $matched = false;
         switch ($resultType) {
             case self::FIRST:
             case self::PREVIOUS:
-                return $currentId != reset($entityIds);
+                $matched = $currentId != reset($entityIds);
+                break;
             case self::LAST:
             case self::NEXT:
-                return $currentId != end($entityIds);
+                $matched = $currentId != end($entityIds);
+                break;
         }
 
-        return false;
+        return $matched;
     }
 
     /**
@@ -194,25 +197,28 @@ class EntityPaginationNavigation
     {
         $entityIds = $this->storage->getEntityIds($entity, $scope);
 
+        $entityId = null;
         switch ($resultType) {
             case self::LAST:
-                return end($entityIds);
+                $entityId = end($entityIds);
+                break;
             case self::FIRST:
-                return reset($entityIds);
+                $entityId = reset($entityIds);
+                break;
             case self::PREVIOUS:
                 $currentPosition = $this->storage->getCurrentPosition($entity, $scope);
-                if (!isset($entityIds[$currentPosition - 1])) {
-                    break;
+                if (isset($entityIds[$currentPosition - 1])) {
+                    $entityId = $entityIds[$currentPosition - 1];
                 }
-                return $entityIds[$currentPosition - 1];
+                break;
             case self::NEXT:
                 $currentPosition = $this->storage->getCurrentPosition($entity, $scope);
-                if (!isset($entityIds[$currentPosition + 1])) {
-                    break;
+                if (isset($entityIds[$currentPosition + 1])) {
+                    $entityId = $entityIds[$currentPosition + 1];
                 }
-                return $entityIds[$currentPosition + 1];
+                break;
         }
 
-        return null;
+        return $entityId;
     }
 }
