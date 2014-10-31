@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
-use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 
 class EntityPaginationController extends Controller
 {
     /**
-     * @Route(
-     *    "/first/{entityName}/{scope}/{routeName}",
-     *    name="oro_entity_pagination_first"
-     * )
+     * @Route("/first/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_first")
      *
      * @param $entityName
      * @param $scope
@@ -29,10 +27,7 @@ class EntityPaginationController extends Controller
     }
 
     /**
-     * @Route(
-     *    "/previous/{entityName}/{scope}/{routeName}",
-     *    name="oro_entity_pagination_previous"
-     * )
+     * @Route("/previous/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_previous")
      *
      * @param $entityName
      * @param $scope
@@ -45,10 +40,7 @@ class EntityPaginationController extends Controller
     }
 
     /**
-     * @Route(
-     *    "/next/{entityName}/{scope}/{routeName}",
-     *    name="oro_entity_pagination_next"
-     * )
+     * @Route("/next/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_next")
      *
      * @param $entityName
      * @param $scope
@@ -61,10 +53,7 @@ class EntityPaginationController extends Controller
     }
 
     /**
-     * @Route(
-     *    "/last/{entityName}/{scope}/{routeName}",
-     *    name="oro_entity_pagination_last"
-     * )
+     * @Route("/last/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_last")
      *
      * @param $entityName
      * @param $scope
@@ -77,22 +66,6 @@ class EntityPaginationController extends Controller
     }
 
     /**
-     * @return DoctrineHelper
-     */
-    protected function getDoctrineHelper()
-    {
-        return $this->get('oro_entity.doctrine_helper');
-    }
-
-    /**
-     * @return EntityPaginationNavigation
-     */
-    protected function getNavigation()
-    {
-        return $this->get('oro_entity_pagination.navigation');
-    }
-
-    /**
      * @param string $entityName
      * @param string $scope
      * @param string $routeName
@@ -101,23 +74,26 @@ class EntityPaginationController extends Controller
      */
     protected function getLink($entityName, $scope, $routeName, $navigation)
     {
+        $doctrineHelper    = $this->get('oro_entity.doctrine_helper');
+        $navigationService = $this->get('oro_entity_pagination.navigation');
+
         $params          = $this->getRequest()->query->all();
-        $identifier      = $this->getDoctrineHelper()->getSingleEntityIdentifierFieldName($entityName);
+        $identifier      = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
         $identifierValue = $params[$identifier];
-        $entity          = $this->getDoctrineHelper()->getEntityReference($entityName, $identifierValue);
+        $entity          = $doctrineHelper->getEntityReference($entityName, $identifierValue);
 
         switch ($navigation) {
             case EntityPaginationNavigation::FIRST:
-                $result = $this->getNavigation()->getFirstIdentifier($entity, $scope);
+                $result = $navigationService->getFirstIdentifier($entity, $scope);
                 break;
             case EntityPaginationNavigation::PREVIOUS:
-                $result = $this->getNavigation()->getPreviousIdentifier($entity, $scope);
+                $result = $navigationService->getPreviousIdentifier($entity, $scope);
                 break;
             case EntityPaginationNavigation::NEXT:
-                $result = $this->getNavigation()->getNextIdentifier($entity, $scope);
+                $result = $navigationService->getNextIdentifier($entity, $scope);
                 break;
             case EntityPaginationNavigation::LAST:
-                $result = $this->getNavigation()->getLastIdentifier($entity, $scope);
+                $result = $navigationService->getLastIdentifier($entity, $scope);
                 break;
         }
 
@@ -128,21 +104,17 @@ class EntityPaginationController extends Controller
                 $params[$identifier] = $entityId;
             }
 
+            /** @var FlashBagInterface $flashBag */
+            $flashBag   = $this->get('session')->getFlashBag();
+            $translator = $this->get('translator');
+
             if (!$result->isAvailable()) {
-                $this->get('session')->getFlashBag()->add(
-                    'alert',
-                    $this->get('translator')->trans('oro.entity_pagination.not_available')
-                );
+                $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_available'));
             } elseif (!$result->isAccessible()) {
-                $this->get('session')->getFlashBag()->add(
-                    'alert',
-                    $this->get('translator')->trans('oro.entity_pagination.not_accessible')
-                );
+                $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_accessible'));
             }
         }
 
-        return $this->redirect(
-            $this->generateUrl($routeName, $params)
-        );
+        return $this->redirect($this->generateUrl($routeName, $params));
     }
 }

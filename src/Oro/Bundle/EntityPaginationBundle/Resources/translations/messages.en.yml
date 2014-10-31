@@ -4,8 +4,10 @@ oro.entity_pagination:
     next: 'Next >'
     first: '<< First'
     last: 'Last >>'
-    not_available: Entity is not available!
-    not_accessible: Entity is not accessible!
+
+    message:
+        not_available: 'Requested entity is not available'
+        not_accessible: 'Requested entity is not accessible'
 
     system_configuration:
         fields:
