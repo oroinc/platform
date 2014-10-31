@@ -32,19 +32,15 @@ class EntityPaginationNavigation
      * @param DoctrineHelper $doctrineHelper
      * @param SecurityFacade $securityFacade
      * @param EntityPaginationStorage $storage
-     * @param EntityPaginationManager $paginationManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade,
-        EntityPaginationStorage $storage,
-        EntityPaginationManager $paginationManager
+        EntityPaginationStorage $storage
     ) {
-
         $this->doctrineHelper = $doctrineHelper;
         $this->securityFacade = $securityFacade;
         $this->storage = $storage;
-        $this->paginationManager = $paginationManager;
     }
 
     /**
@@ -134,7 +130,7 @@ class EntityPaginationNavigation
     protected function getResult($entity, $resultType, $scope = EntityPaginationManager::VIEW_SCOPE)
     {
         $result = new NavigationResult();
-        if ($this->paginationManager->isEnabled() && $this->storage->isEntityInStorage($entity, $scope)) {
+        if ($this->storage->isEnvironmentValid() && $this->storage->isEntityInStorage($entity, $scope)) {
             $entityName = ClassUtils::getClass($entity);
 
             if ($this->isIdentifierMatched($entity, $resultType, $scope)) {

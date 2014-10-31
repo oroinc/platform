@@ -43,17 +43,10 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->paginationManager = $this->getMockBuilder(
-            'Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->navigation = new EntityPaginationNavigation(
             $this->doctrineHelper,
             $this->securityFacade,
-            $this->storage,
-            $this->paginationManager
+            $this->storage
         );
         $this->entity = new \stdClass();
     }
@@ -183,7 +176,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     public function testGetFirstIdentifier(array $source, array $expected)
     {
         $this->assertPrepareResult(
-            $source['isEnabled'],
+            $source['isValid'],
             $source['inStorage'],
             $source['isGranted'],
             $source['entityIds']
@@ -205,7 +198,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
         return [
             'valid case' => [
                 'source' => [
-                    'isEnabled'  => true,
+                    'isValid'  => true,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -218,7 +211,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not enabled' => [
                 'source' => [
-                    'isEnabled'  => false,
+                    'isValid'  => false,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -231,7 +224,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not in storage' => [
                 'source' => [
-                    'isEnabled'  => true,
+                    'isValid'  => true,
                     'inStorage'  => false,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -254,7 +247,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     public function testGetLastIdentifier(array $source, array $expected)
     {
         $this->assertPrepareResult(
-            $source['isEnabled'],
+            $source['isValid'],
             $source['inStorage'],
             $source['isGranted'],
             $source['entityIds']
@@ -275,7 +268,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
         return [
             'valid case' => [
                 'source' => [
-                    'isEnabled'  => true,
+                    'isValid'  => true,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -288,7 +281,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not enabled' => [
                 'source' => [
-                    'isEnabled'  => false,
+                    'isValid'  => false,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -301,7 +294,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not in storage' => [
                 'source' => [
-                    'isEnabled'  => true,
+                    'isValid'  => true,
                     'inStorage'  => false,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3]
@@ -324,7 +317,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     public function testGetPreviousIdentifier($source, $expected)
     {
         $this->assertPrepareResult(
-            $source['isEnabled'],
+            $source['isValid'],
             $source['inStorage'],
             $source['isGranted'],
             $source['entityIds']
@@ -350,7 +343,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
         return [
             'valid case view scope' => [
                 'source' => [
-                    'isEnabled'       => true,
+                    'isValid'       => true,
                     'inStorage'       => true,
                     'isGranted'       => true,
                     'entityIds'       => [1, 2, 3, 4, 5],
@@ -365,7 +358,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'valid case edit scope' => [
                 'source' => [
-                    'isEnabled'       => true,
+                    'isValid'       => true,
                     'inStorage'       => true,
                     'isGranted'       => true,
                     'entityIds'       => [1, 2, 3, 4, 5],
@@ -380,7 +373,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not enabled' => [
                 'source' => [
-                    'isEnabled'  => false,
+                    'isValid'  => false,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3],
@@ -395,7 +388,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not in storage' => [
                 'source' => [
-                    'isEnabled'       => true,
+                    'isValid'       => true,
                     'inStorage'       => false,
                     'isGranted'       => true,
                     'entityIds'       => [1, 2, 3],
@@ -419,7 +412,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     public function testGetNextIdentifier($source, $expected)
     {
         $this->assertPrepareResult(
-            $source['isEnabled'],
+            $source['isValid'],
             $source['inStorage'],
             $source['isGranted'],
             $source['entityIds']
@@ -445,7 +438,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
         return [
             'valid case' => [
                 'source' => [
-                    'isEnabled'       => true,
+                    'isValid'       => true,
                     'inStorage'       => true,
                     'isGranted'       => true,
                     'entityIds'       => [1, 2, 3, 4, 5],
@@ -459,7 +452,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not enabled' => [
                 'source' => [
-                    'isEnabled'  => false,
+                    'isValid'  => false,
                     'inStorage'  => true,
                     'isGranted'  => true,
                     'entityIds'  => [1, 2, 3],
@@ -473,7 +466,7 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
             ],
             'not in storage' => [
                 'source' => [
-                    'isEnabled'       => true,
+                    'isValid'       => true,
                     'inStorage'       => false,
                     'isGranted'       => true,
                     'entityIds'       => [1, 2, 3],
@@ -489,17 +482,17 @@ class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param boolean $isEnabled
+     * @param boolean $isValid
      * @param boolean $inStorage
      * @param boolean $isGranted
      * @param array $entityIds
      * @param int|null $noEntityId
      */
-    protected function assertPrepareResult($isEnabled, $inStorage, $isGranted, array $entityIds, $noEntityId = null)
+    protected function assertPrepareResult($isValid, $inStorage, $isGranted, array $entityIds, $noEntityId = null)
     {
-        $this->paginationManager->expects($this->any())
-            ->method('isEnabled')
-            ->will($this->returnValue($isEnabled));
+        $this->storage->expects($this->any())
+            ->method('isEnvironmentValid')
+            ->will($this->returnValue($isValid));
 
         $this->storage->expects($this->any())
             ->method('isEntityInStorage')
