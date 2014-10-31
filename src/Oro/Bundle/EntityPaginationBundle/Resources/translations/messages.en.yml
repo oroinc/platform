@@ -5,6 +5,10 @@ oro.entity_pagination:
     first: '<< First'
     last: 'Last >>'
 
+    message:
+        not_available: 'Requested entity is not available'
+        not_accessible: 'Requested entity is not accessible'
+
     system_configuration:
         fields:
             enabled:
