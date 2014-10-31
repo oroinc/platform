@@ -1,13 +1,10 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'underscore',
     'orotranslation/js/translator',
-    'oroui/js/messenger',
-    'oroui/js/mediator',
     'oro/datagrid/action/model-action',
-    'oro/dialog-widget'
-], function (_, __, messenger, mediator, ModelAction, DialogWidget) {
+    'oroui/js/app/components/widget-component'
+], function (__, ModelAction, WidgetComponent) {
     'use strict';
 
     var DialogAction;
@@ -21,7 +18,9 @@ define([
      */
     DialogAction = ModelAction.extend({
         useDirectLauncherLink: false,
-        widgetDefault: {
+        widgetOptions: null,
+        widgetComponent: null,
+        widgetDefaultOptions: {
             type: 'dialog',
             multiple: false,
             'reload-grid-name': '',
@@ -30,12 +29,14 @@ define([
                     title: __('Update item'),
                     allowMaximize: false,
                     allowMinimize: false,
+                    modal: true,
+                    resizable: false,
                     maximizedHeightDecreaseBy: 'minimize-bar',
                     width: 550
                 }
             }
         },
-        messagesDefault: {
+        defaultMessages: {
             saved: __('Item updated successfully')
         },
 
@@ -43,49 +44,41 @@ define([
          * Initialize view
          *
          * @param {Object} options
-         * @param {Backbone.Model} options.model Optional parameter
          * @throws {TypeError} If model is undefined
          */
         initialize: function (options) {
-            var widget, messages;
-
             DialogAction.__super__.initialize.apply(this, arguments);
 
-            widget = this.widget
-                ? _.extend(this.widgetDefault, this.widget)
-                : this.widgetDefault;
-
-            messages = this.messages
-                ? _.extend(this.messagesDefault, this.messages)
-                : this.messagesDefault;
-
-            this.launcherOptions = _.extend(this.launcherOptions, {
-                link: this.getLink(),
-                widget: widget,
-                messages: messages
+            // make own widgetOptions property from prototype
+            this.widgetOptions = $.extend(true, {}, this.widgetDefaultOptions, this.widgetOptions, {
+                options: {
+                    url: this.getLink()
+                }
             });
         },
 
-        run: function () {
-            if (!this.itemEditDialog) {
-                this.itemEditDialog = new DialogWidget({
-                    url: this.getLink(),
-                    title: this.launcherOptions.widget.options.dialogOptions.title,
-                    regionEnabled: false,
-                    incrementalPosition: false,
-                    dialogOptions: {
-                        modal: true,
-                        resizable: false,
-                        width: this.launcherOptions.widget.options.dialogOptions.width,
-                        close: _.bind(function () {
-                            delete this.itemEditDialog;
-                        }, this)
-                    }
-                });
-                this.subviews.push(this.itemEditDialog);
-
-                this.itemEditDialog.render();
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (!this.disposed) {
+                return;
             }
+            if (this.widgetComponent) {
+                this.widgetComponent.dispose();
+            }
+            delete this.widgetComponent;
+            DialogAction.__super__.dispose.call(this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        run: function () {
+            if (!this.widgetComponent) {
+                this.widgetComponent = new WidgetComponent(this.widgetOptions);
+            }
+            this.widgetComponent.openWidget();
         }
     });
 

@@ -51,7 +51,7 @@ datagrid:
                 label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
-                widget:
+                widgetOptions:
                     reload-grid-name: attachment-grid
                     options:
                         dialogOptions:

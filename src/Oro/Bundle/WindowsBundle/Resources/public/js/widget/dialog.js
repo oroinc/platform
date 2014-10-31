@@ -62,7 +62,7 @@ define(function (require) {
             // it's possible to track state only for not modal dialogs
             options.stateEnabled = options.stateEnabled && !dialogOptions.modal;
             if (options.stateEnabled) {
-                this._initModel(this.options);
+                this._initModel();
             }
 
             dialogOptions.close = _.bind(this.closeHandler, this, dialogOptions.close);
@@ -74,15 +74,11 @@ define(function (require) {
             this.widget.dialog("option", "title", title);
         },
 
-        _initModel: function(options) {
+        _initModel: function() {
             if (this.model) {
                 this.restoreMode = true;
                 var attributes = this.model.get('data');
-                _.extend(options, attributes);
-                if (_.isObject(attributes.dialogOptions)) {
-                    options.dialogOptions = _.extend(options.dialogOptions, attributes.dialogOptions);
-                }
-                this.options = options;
+                $.extend(true, this.options, attributes);
                 if (this.options.el) {
                     this.setElement(this.options.el);
                 } else if (this.model.get('id')) {
@@ -133,9 +129,6 @@ define(function (require) {
                 delete this.widget;
             }
 
-            // add flag: this is disposing process
-            // (to prevent recursion from remove method)
-            this.disposing = true;
             DialogWidget.__super__.dispose.call(this);
         },
 
@@ -200,11 +193,6 @@ define(function (require) {
                 // Close handler will invoke dispose method,
                 // where remove method will be called again
                 this.widget.dialog('close');
-
-            } else if (!this.disposing) {
-                // If remove method was called directly -- execute dispose first
-                this.dispose();
-
             } else {
                 DialogWidget.__super__.remove.call(this);
             }
