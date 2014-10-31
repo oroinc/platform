@@ -18,6 +18,8 @@ oro_system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                    - Range:
+                        min: 1
 
     tree:
         system_configuration:
