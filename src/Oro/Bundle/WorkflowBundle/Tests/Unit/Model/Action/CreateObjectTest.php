@@ -38,7 +38,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeExceptionNoClassName()
     {
-        $this->action->initialize(array('some' => 1, 'attribute' => $this->getPropertyPath()));
+        $this->action->initialize(['some' => 1, 'attribute' => $this->getPropertyPath()]);
     }
 
     /**
@@ -47,7 +47,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeExceptionNoAttribute()
     {
-        $this->action->initialize(array('class' => 'stdClass'));
+        $this->action->initialize(['class' => 'stdClass']);
     }
 
     /**
@@ -56,7 +56,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeExceptionInvalidAttribute()
     {
-        $this->action->initialize(array('class' => 'stdClass', 'attribute' => 'string'));
+        $this->action->initialize(['class' => 'stdClass', 'attribute' => 'string']);
     }
 
     /**
@@ -66,7 +66,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     public function testInitializeExceptionInvalidData()
     {
         $this->action->initialize(
-            array('class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'data' => 'string_value')
+            ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'data' => 'string_value']
         );
     }
 
@@ -77,24 +77,26 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     public function testInitializeExceptionInvalidArguments()
     {
         $this->action->initialize(
-            array('class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'arguments' => 'string_value')
+            ['class' => 'stdClass', 'attribute' => $this->getPropertyPath(), 'arguments' => 'string_value']
         );
     }
 
     public function testInitialize()
     {
-        $options = array('class' => 'stdClass', 'attribute' => $this->getPropertyPath());
+        $options = ['class' => 'stdClass', 'attribute' => $this->getPropertyPath()];
         $this->assertEquals($this->action, $this->action->initialize($options));
         $this->assertAttributeEquals($options, 'options', $this->action);
     }
 
     /**
      * @param array $options
+     * @param array $expectedData
+     * @param null|array $contextData
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options)
+    public function testExecute(array $options, array $contextData = [], array $expectedData = null)
     {
-        $context = new ItemStub(array());
+        $context = new ItemStub($contextData);
         $attributeName = (string)$options['attribute'];
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -104,7 +106,9 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
         if ($context->$attributeName instanceof ItemStub) {
             /** @var ItemStub $entity */
             $entity = $context->$attributeName;
-            $expectedData = !empty($options['data']) ? $options['data'] : array();
+            if (!$expectedData) {
+                $expectedData = !empty($options['data']) ? $options['data'] : [];
+            }
             $this->assertInstanceOf($options['class'], $entity);
             $this->assertEquals($expectedData, $entity->getData());
         }
@@ -115,28 +119,39 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function executeDataProvider()
     {
-        return array(
-            'without data' => array(
-                'options' => array(
+        return [
+            'without data' => [
+                'options' => [
                     'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
-                )
-            ),
-            'with data' => array(
-                'options' => array(
+                ]
+            ],
+            'with data' => [
+                'options' => [
                     'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                     'attribute' => new PropertyPath('test_attribute'),
-                    'data'      => array('key1' => 'value1', 'key2' => 'value2'),
-                )
-            ),
-            'with arguments' => array(
-                'options' => array(
+                    'data'      => ['key1' => new PropertyPath('test_attribute'), 'key2' => 'value2'],
+                ],
+                ['test_attribute' => 'test_value'],
+                ['key1' => 'test_value', 'key2' => 'value2']
+            ],
+            'with arguments' => [
+                'options' => [
                     'class'     => '\DateTime',
                     'attribute' => new PropertyPath('test_attribute'),
-                    'arguments' => array('now'),
-                )
-            )
-        );
+                    'arguments' => ['now'],
+                ]
+            ],
+            'with complex arguments' => [
+                'options' => [
+                    'class'     => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                    'attribute' => new PropertyPath('test_attribute'),
+                    'arguments' => [['test', new PropertyPath('test_attribute')]],
+                ],
+                ['test_attribute' => 'test_value'],
+                ['test', 'test_value']
+            ]
+        ];
     }
 
     protected function getPropertyPath()
