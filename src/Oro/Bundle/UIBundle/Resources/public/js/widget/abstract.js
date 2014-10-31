@@ -534,8 +534,8 @@ define(function (require) {
         /**
          * Load content
          *
-         * @param {Object|null} data
-         * @param {String|null} method
+         * @param {Object=} data
+         * @param {String=} method
          */
         loadContent: function(data, method) {
             this.loading = true;

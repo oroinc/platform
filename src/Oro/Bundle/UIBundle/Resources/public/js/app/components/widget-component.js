@@ -5,7 +5,6 @@ define(function (require) {
     var WidgetComponent,
         $ = require('jquery'),
         BaseComponent = require('oroui/js/app/components/base/component'),
-        widgetManager = require('oroui/js/widget-manager'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
         mapWidgetModuleName = require('oroui/js/map-widget-module-name');
@@ -16,6 +15,17 @@ define(function (require) {
      * @class oroui.app.components.WidgetComponent
      */
     WidgetComponent = BaseComponent.extend({
+        /**
+         * @type {oro.AbstractWidget}
+         * @constructor
+         */
+        widget: null,
+
+        /**
+         * @type {boolean}
+         */
+        opened: false,
+
         defaults: {
             options: {}
         },
@@ -86,10 +96,7 @@ define(function (require) {
         _openWidget: function () {
             var widget,
                 Widget = this.widget,
-                options = $.extend(true, {}, this.options.options),
-                reloadEvent = this.options['reload-event'],
-                reloadGridName = this.options['reload-grid-name'],
-                reloadWidgetAlias = this.options['reload-widget-alias'];
+                options = $.extend(true, {}, this.options.options);
 
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
@@ -103,24 +110,44 @@ define(function (require) {
             // Create and open widget
             widget = new Widget(options);
 
-            reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
-            widget.listenTo(mediator, reloadEvent, function () {
-                widgetManager.getWidgetInstanceByAlias(reloadWidgetAlias, function (widget) {
-                    widget.loadContent();
-                });
-                if (reloadGridName) {
-                    mediator.trigger('datagrid:doRefresh:' + reloadGridName);
-                }
-            });
+            this._bindEnvironmentEvent(widget);
 
             if (!this.options.multiple) {
                 this.opened = true;
-                widget.on('widgetRemove', _.bind(function () {
+                this.listenTo(widget, 'widgetRemove', _.bind(function () {
                     this.opened = false;
                 }, this));
             }
 
             widget.render();
+        },
+
+        /**
+         * Binds widget instance to environment events
+         *
+         * @param {oro.AbstractWidget} widget
+         * @protected
+         */
+        _bindEnvironmentEvent: function (widget) {
+            var reloadEvent = this.options['reload-event'],
+                reloadGridName = this.options['reload-grid-name'],
+                reloadWidgetAlias = this.options['reload-widget-alias'];
+
+            reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
+
+            if (reloadWidgetAlias) {
+                widget.listenTo(mediator, reloadEvent, function () {
+                    mediator.execute('widgets:getByAliasAsync', reloadWidgetAlias, function (widget) {
+                        widget.loadContent();
+                    });
+                });
+            }
+
+            if (reloadGridName) {
+                widget.listenTo(mediator, reloadEvent, function () {
+                    mediator.trigger('datagrid:doRefresh:' + reloadGridName);
+                });
+            }
         }
     });
 

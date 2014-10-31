@@ -133,8 +133,9 @@ config:
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
         - oroui/js/app/modules/layout
-        - oroui/js/app/modules/views
         - oroui/js/app/modules/messenger
+        - oroui/js/app/modules/views
+        - oroui/js/app/modules/widgets
 
 build:
     paths:

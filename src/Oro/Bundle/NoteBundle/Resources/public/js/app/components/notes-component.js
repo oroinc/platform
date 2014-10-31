@@ -10,7 +10,6 @@ define(function (require) {
         routing = require('routing'),
         tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
-        widgetManager = require('oroui/js/widget-manager'),
         NoteView = require('../views/note-view'),
         NotesView = require('../views/notes-view'),
         NoteModel = require('../models/note-model'),
@@ -93,7 +92,7 @@ define(function (require) {
 
         registerWidget: function (options) {
             var list = this.list;
-            widgetManager.getWidgetInstance(options.widgetId, function (widget) {
+            mediator.execute('widgets:getByIdAsync', options.widgetId, function (widget) {
                 widget.getAction('collapse_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });
