@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
@@ -97,20 +96,10 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->collector->collect($this->getGridRequest(), 'test'));
     }
 
-    public function testCollectGridWithoutPagination()
+    public function testCollectGridNotApplicable()
     {
         $this->setPaginationEnabled(true);
         $this->buildDataGrid();
-        $this->storage->expects($this->never())
-            ->method('hasData');
-
-        $this->assertFalse($this->collector->collect($this->getGridRequest(), 'test'));
-    }
-
-    public function testCollectNotOrmGrid()
-    {
-        $this->setPaginationEnabled(true);
-        $this->buildDataGrid(true);
         $this->storage->expects($this->never())
             ->method('hasData');
 
@@ -122,7 +111,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
         $scope = EntityPaginationManager::VIEW_SCOPE;
 
         $this->setPaginationEnabled(true);
-        $this->buildDataGrid(true, true);
+        $this->buildDataGrid(true);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $this->isType('string'), $scope)
@@ -143,14 +132,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->setPaginationEnabled(true);
         $this->setPaginationLimit($paginationLimit);
-        $this->buildDataGrid(
-            true,
-            true,
-            array_merge($state, ['pager' => []]),
-            $scope,
-            $entityIds,
-            $paginationLimit
-        );
+        $this->buildDataGrid(true, array_merge($state, ['pager' => []]), $scope, $entityIds, $paginationLimit);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $hash, $scope)
@@ -172,7 +154,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->setPaginationEnabled(true);
         $this->setPaginationLimit($paginationLimit);
-        $this->buildDataGrid(true, true, $state, $scope, $entityIds, $paginationLimit);
+        $this->buildDataGrid(true, $state, $scope, $entityIds, $paginationLimit);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $hash, $scope)
@@ -185,8 +167,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $isPaginationEnabled
-     * @param bool $isDataSource
+     * @param bool $isApplicable
      * @param array $state
      * @param string $scope
      * @param array $entityIds
@@ -194,20 +175,21 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function buildDataGrid(
-        $isPaginationEnabled = false,
-        $isDataSource = false,
+        $isApplicable = false,
         array $state = [],
         $scope = EntityPaginationManager::VIEW_SCOPE,
         array $entityIds = [],
         $entitiesLimit = 0
     ) {
-        $config = ['options' => ['entity_pagination' => $isPaginationEnabled]];
-        $configObject = DatagridConfiguration::create($config);
         $metadata = ['state' => $state];
         $metadataObject = MetadataObject::create($metadata);
 
         $permission = EntityPaginationManager::getPermission($scope);
         $identifierField = 'id';
+
+        $this->paginationManager->expects($this->any())
+            ->method('isDatagridApplicable')
+            ->will($this->returnValue($isApplicable));
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -256,25 +238,22 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryBuilder));
 
         $acceptor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
+        if ($isApplicable) {
+            $acceptor->expects($this->once())
+                ->method('acceptDatasource')
+                ->with($dataSource);
+        }
 
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $dataGrid->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($configObject));
         $dataGrid->expects($this->any())
             ->method('getMetadata')
             ->will($this->returnValue($metadataObject));
         $dataGrid->expects($this->any())
             ->method('getAcceptor')
             ->will($this->returnValue($acceptor));
-        if ($isDataSource) {
-            $dataGrid->expects($this->any())
-                ->method('getDatasource')
-                ->will($this->returnValue($dataSource));
-            $acceptor->expects($this->once())
-                ->method('acceptDatasource')
-                ->with($dataSource);
-        }
+        $dataGrid->expects($this->any())
+            ->method('getDatasource')
+            ->will($this->returnValue($dataSource));
 
         $this->pager->expects($this->any())
             ->method('setQueryBuilder')
