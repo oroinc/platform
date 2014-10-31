@@ -49,6 +49,7 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
             'actionsConfiguration' => array('actionsConfiguration', array('my' => 'configuration')),
             'relatedEntity' => array('relatedEntity', 'My\Entity'),
             'executionOrder' => array('executionOrder', 42, 0),
+            'excludeDefinitions' => array('excludeDefinitions', array('test'), array()),
             'createdAt' => array('createdAt', new \DateTime()),
             'updatedAt' => array('updatedAt', new \DateTime()),
         );

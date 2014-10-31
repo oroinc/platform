@@ -193,7 +193,7 @@ class ConfigEntityGridController extends Controller
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was removed', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
     }
 
     /**

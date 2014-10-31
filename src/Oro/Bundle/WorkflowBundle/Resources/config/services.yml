@@ -7,6 +7,7 @@ parameters:
     oro_workflow.process_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
     oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
     oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
+    oro_workflow.process.schedule_policy.exclude_definitions.class: Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy
     oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
@@ -79,6 +80,16 @@ services:
         arguments:
             - @oro_workflow.process.process_factory
             - @oro_workflow.process.logger
+            - @event_dispatcher
+
+    oro_workflow.process.schedule_policy.exclude_definitions:
+        class: %oro_workflow.process.schedule_policy.exclude_definitions.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_workflow.process.handle_before, method: onProcessHandleBefore }
+            - { name: kernel.event_listener, event: oro_workflow.process.handle_after_flush, method: onProcessHandleAfterFlush }
+
+    oro_workflow.process.schedule_policy:
+        alias: oro_workflow.process.schedule_policy.exclude_definitions
 
     oro_workflow.process.logger:
         class: %oro_workflow.process.logger.class%

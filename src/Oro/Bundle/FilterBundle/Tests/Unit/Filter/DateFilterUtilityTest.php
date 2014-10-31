@@ -19,7 +19,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('Europe/Moscow'));
+            ->will($this->returnValue('Asia/Tbilisi'));
 
         $this->utility = new DateFilterUtility($localeSettings);
     }

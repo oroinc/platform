@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -15,11 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListener
 {
-    /** @var ClassMetadata */
-    protected $calendarMetadata;
-
-    /** @var ClassMetadata */
-    protected $calendarConnectionMetadata;
+    /** @var ClassMetadata[] */
+    protected $metadataLocalCache = [];
 
     /**
      * @param OnFlushEventArgs $event
@@ -31,23 +29,28 @@ class EntityListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof User) {
-                $assignedOrganizations = $entity->getOrganizations();
-                foreach ($assignedOrganizations as $organization) {
-                    if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        $this->createCalendar($em, $uow, $entity, $organization);
-                    }
-                }
+                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
             }
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             if ($entity instanceof User) {
-                $assignedOrganizations = $entity->getOrganizations();
-                foreach ($assignedOrganizations as $organization) {
-                    if (!$this->isCalendarExists($em, $entity, $organization)) {
-                        $this->createCalendar($em, $uow, $entity, $organization);
-                    }
-                }
+                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
+            }
+        }
+    }
+
+    /**
+     * @param User          $entity
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
+     */
+    protected function ensureDefaultUserCalendarExist(User $entity, EntityManager $em, UnitOfWork $uow)
+    {
+        $assignedOrganizations = $entity->getOrganizations();
+        foreach ($assignedOrganizations as $organization) {
+            if (!$this->isCalendarExists($em, $entity, $organization)) {
+                $this->createCalendar($em, $uow, $entity, $organization);
             }
         }
     }
@@ -70,9 +73,9 @@ class EntityListener
 
         $em->persist($calendar);
         $em->persist($calendarConnection);
-        // can't inject entity manager through constructor because of circular dependency
-        $uow->computeChangeSet($this->getCalendarMetadata($em), $calendar);
-        $uow->computeChangeSet($this->getCalendarConnectionMetadata($em), $calendarConnection);
+
+        $uow->computeChangeSet($this->getClassMetadata($calendar, $em), $calendar);
+        $uow->computeChangeSet($this->getClassMetadata($calendarConnection, $em), $calendarConnection);
     }
 
     /**
@@ -86,35 +89,22 @@ class EntityListener
     {
         $calendarRepository = $em->getRepository('OroCalendarBundle:Calendar');
 
-        return (bool)$calendarRepository->findByUserAndOrganization($user->getId(), $organization->getId());
+        return (bool)$calendarRepository->findDefaultCalendar($user->getId(), $organization->getId());
     }
 
     /**
-     * @param EntityManager $entityManager
+     * @param object        $entity
+     * @param EntityManager $em
      *
      * @return ClassMetadata
      */
-    protected function getCalendarMetadata(EntityManager $entityManager)
+    protected function getClassMetadata($entity, EntityManager $em)
     {
-        if (!$this->calendarMetadata) {
-            $this->calendarMetadata = $entityManager->getClassMetadata('OroCalendarBundle:Calendar');
+        $className = ClassUtils::getClass($entity);
+        if (!isset($this->metadataLocalCache[$className])) {
+            $this->metadataLocalCache[$className] = $em->getClassMetadata($className);
         }
 
-        return $this->calendarMetadata;
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     *
-     * @return ClassMetadata
-     */
-    protected function getCalendarConnectionMetadata(EntityManager $entityManager)
-    {
-        if (!$this->calendarConnectionMetadata) {
-            $this->calendarConnectionMetadata
-                = $entityManager->getClassMetadata('OroCalendarBundle:CalendarConnection');
-        }
-
-        return $this->calendarConnectionMetadata;
+        return $this->metadataLocalCache[$className];
     }
 }
