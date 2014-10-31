@@ -1,24 +1,23 @@
 /* jshint devel:true*/
 /*global define, require*/
-define([
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/loading-mask',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'jquery.form'
-], function (_, Backbone, mediator, LoadingMask, __, tools) {
+define(function (require) {
     'use strict';
 
-    var $ = Backbone.$;
+    var AbstractWidget,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        mediator = require('oroui/js/mediator'),
+        LoadingMask = require('oroui/js/loading-mask'),
+        __ = require('orotranslation/js/translator');
+    require('jquery.form');
 
     /**
      * @export  oroui/js/widget/abstract
      * @class   oro.AbstractWidget
-     * @extends Backbone.View
+     * @extends oroui.app.views.BaseView
      */
-    return Backbone.View.extend({
+    AbstractWidget = BaseView.extend({
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
@@ -641,4 +640,6 @@ define([
             el.attr('data-wid', this.getWid());
         }
     });
+
+    return AbstractWidget;
 });
