@@ -55,23 +55,24 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
             ->will($this->returnValue(false));
+        $this->paginationManager->expects($this->never())
+            ->method('isDatagridApplicable');
 
-        $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $dataGrid->expects($this->never())
-            ->method('getConfig');
-
-        $this->listener->onResultAfter(new OrmResultAfter($dataGrid));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
     }
 
-    public function testOnResultAfterGridPaginationDisabled()
+    public function testOnResultAfterGridNotApplicable()
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
             ->will($this->returnValue(true));
+        $this->paginationManager->expects($this->once())
+            ->method('isDatagridApplicable')
+            ->will($this->returnValue(false));
         $this->storage->expects($this->never())
             ->method('clearData');
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock(false)));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
     }
 
     public function testOnResultClearData()
@@ -79,22 +80,21 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
             ->will($this->returnValue(true));
+        $this->paginationManager->expects($this->once())
+            ->method('isDatagridApplicable')
+            ->will($this->returnValue(true));
         $this->storage->expects($this->once())
             ->method('clearData')
             ->with(self::ENTITY_NAME);
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock(true)));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
     }
 
     /**
-     * @param bool $isPaginationEnabled
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createGridMock($isPaginationEnabled)
+    protected function createGridMock()
     {
-        $config = ['options' => ['entity_pagination' => $isPaginationEnabled]];
-        $configObject = DatagridConfiguration::create($config);
-
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,9 +115,6 @@ class EntityPaginationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryBuilder));
 
         $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $dataGrid->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($configObject));
         $dataGrid->expects($this->any())
             ->method('getDatasource')
             ->will($this->returnValue($dataSource));
