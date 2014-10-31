@@ -25,8 +25,7 @@ class ActivityListRepository extends EntityRepository
     /**
      * @param string    $entityClass
      * @param integer   $entityId
-     * @param null      $activityClass
-     * @param null      $activityId
+     * @param array     $activityClasses
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      *
@@ -35,27 +34,20 @@ class ActivityListRepository extends EntityRepository
     public function getActivityListQueryBuilder(
         $entityClass,
         $entityId,
-        $activityClass = null,
-        $activityId = null,
+        $activityClasses = array(),
         \DateTime $dateFrom = null,
         \DateTime $dateTo = null
     ) {
         $qb = $this->createQueryBuilder('activity')
-            ->select('activity')
             ->where('activity.relatedEntityClass = :class')
             ->andWhere('activity.relatedEntityId = :entityId')
             ->setParameter('class', $entityClass)
             ->setParameter('entityId', $entityId)
             ->orderBy('activity.id', 'DESC');
 
-        if ($activityClass) {
-            $qb->andWhere('activity.relatedActivityClass = :activityClass')
-                ->setParameter('activityClass', $activityClass);
-
-            if ($activityId) {
-                $qb->andWhere('activity.relatedActivityId = :activityId')
-                    ->setParameter('activityId', $activityId);
-            }
+        if ($activityClasses) {
+            $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))
+                ->setParameter('activityClasses', $activityClasses);
         }
 
         if ($dateFrom) {
@@ -67,6 +59,7 @@ class ActivityListRepository extends EntityRepository
             }
             $qb->setParameter('dateFrom', $dateFrom);
         }
+
         return $qb;
     }
 }
