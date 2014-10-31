@@ -90,7 +90,7 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
 
         $object = $this->serializer->deserialize(
             $item,
-            $this->context->getOption('entityName'),
+            $this->getEntityName(),
             null,
             $this->context->getConfiguration()
         );
@@ -100,6 +100,18 @@ class ImportProcessor implements ContextAwareProcessor, SerializerAwareInterface
         }
 
         return $object ?: null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getEntityName()
+    {
+        if ($this->entityName) {
+            return $this->entityName;
+        } else {
+            return $this->context->getOption('entityName');
+        }
     }
 
     /**
