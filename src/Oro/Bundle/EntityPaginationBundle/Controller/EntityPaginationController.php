@@ -74,44 +74,47 @@ class EntityPaginationController extends Controller
      */
     protected function getLink($entityName, $scope, $routeName, $navigation)
     {
-        $doctrineHelper    = $this->get('oro_entity.doctrine_helper');
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         $navigationService = $this->get('oro_entity_pagination.navigation');
 
-        $params          = $this->getRequest()->query->all();
-        $identifier      = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
-        $identifierValue = $params[$identifier];
-        $entity          = $doctrineHelper->getEntityReference($entityName, $identifierValue);
+        $params = $this->getRequest()->query->all();
+        $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
 
-        switch ($navigation) {
-            case EntityPaginationNavigation::FIRST:
-                $result = $navigationService->getFirstIdentifier($entity, $scope);
-                break;
-            case EntityPaginationNavigation::PREVIOUS:
-                $result = $navigationService->getPreviousIdentifier($entity, $scope);
-                break;
-            case EntityPaginationNavigation::NEXT:
-                $result = $navigationService->getNextIdentifier($entity, $scope);
-                break;
-            case EntityPaginationNavigation::LAST:
-                $result = $navigationService->getLastIdentifier($entity, $scope);
-                break;
-        }
+        if (!empty($params[$identifier])) {
+            $identifierValue = $params[$identifier];
+            $entity = $doctrineHelper->getEntityReference($entityName, $identifierValue);
 
-        /** @var NavigationResult $result */
-        if ($result instanceof NavigationResult) {
-            $entityId = $result->getId();
-            if ($entityId) {
-                $params[$identifier] = $entityId;
+            switch ($navigation) {
+                case EntityPaginationNavigation::FIRST:
+                    $result = $navigationService->getFirstIdentifier($entity, $scope);
+                    break;
+                case EntityPaginationNavigation::PREVIOUS:
+                    $result = $navigationService->getPreviousIdentifier($entity, $scope);
+                    break;
+                case EntityPaginationNavigation::NEXT:
+                    $result = $navigationService->getNextIdentifier($entity, $scope);
+                    break;
+                case EntityPaginationNavigation::LAST:
+                    $result = $navigationService->getLastIdentifier($entity, $scope);
+                    break;
             }
 
-            /** @var FlashBagInterface $flashBag */
-            $flashBag   = $this->get('session')->getFlashBag();
-            $translator = $this->get('translator');
+            /** @var NavigationResult $result */
+            if ($result instanceof NavigationResult) {
+                $entityId = $result->getId();
+                if ($entityId) {
+                    $params[$identifier] = $entityId;
+                }
 
-            if (!$result->isAvailable()) {
-                $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_available'));
-            } elseif (!$result->isAccessible()) {
-                $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_accessible'));
+                /** @var FlashBagInterface $flashBag */
+                $flashBag = $this->get('session')->getFlashBag();
+                $translator = $this->get('translator');
+
+                if (!$result->isAvailable()) {
+                    $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_available'));
+                } elseif (!$result->isAccessible()) {
+                    $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_accessible'));
+                }
             }
         }
 

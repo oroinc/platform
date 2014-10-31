@@ -6,6 +6,8 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
 {
+    const WRONG_SCOPE = 'wrong_scope';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
@@ -86,10 +88,39 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $scope
+     * @param $expected
+     *
+     * @dataProvider getPermissionProvider
+     */
+    public function testGetPermission($scope, $expected)
+    {
+        $result = $this->entityPaginationManager->getPermission($scope);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissionProvider()
+    {
+        return [
+            'view scope' => [
+                'scope'    => EntityPaginationManager::VIEW_SCOPE,
+                'expected' => 'VIEW'
+            ],
+            'edit scope' => [
+                'scope'    => EntityPaginationManager::EDIT_SCOPE,
+                'expected' => 'EDIT'
+            ],
+        ];
+    }
+
+    /**
      * @expectedException \LogicException
      */
     public function testGetPermissionException()
     {
-        $this->entityPaginationManager->getPermission('wrong_scope_name');
+        $this->entityPaginationManager->getPermission(self::WRONG_SCOPE);
     }
 }
