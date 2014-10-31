@@ -37,8 +37,8 @@ define([
             var Component, result;
             Component = this;
             result = new Component(options);
-            if (result.defer) {
-                result = result.defer.promise();
+            if (result.deferredInit) {
+                result = result.deferredInit.promise();
             }
             return result;
         },
@@ -64,7 +64,7 @@ define([
          * Defer object, helps to notify environment that component is initialized
          * in case it work in asynchronous way
          */
-        defer: null,
+        deferredInit: null,
 
         /**
          * Flag shows if the component is disposed or not
@@ -106,6 +106,26 @@ define([
             }, this);
             this.disposed = true;
             return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+        },
+
+        /**
+         * Create flag of deferred initialization
+         *
+         * @protected
+         */
+        _deferredInit: function () {
+            this.deferredInit = $.Deferred();
+        },
+
+        /**
+         * Resolves deferred initialization
+         *
+         * @protected
+         */
+        _resolveDeferredInit: function () {
+            if (this.deferredInit) {
+                this.deferredInit.resolve(this);
+            }
         }
     });
 

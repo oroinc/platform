@@ -35,11 +35,11 @@ define(function (require) {
             this.processOptions(options);
 
             if (!_.isEmpty(options.modules)) {
-                this.defer = $.Deferred();
+                this._deferredInit();
                 tools.loadModules(options.modules, function (modules) {
                     _.extend(options.notesOptions, modules);
                     this.initView(options);
-                    this.defer.resolve(this);
+                    this._resolveDeferredInit();
                 }, this);
             } else {
                 this.initView(options);
