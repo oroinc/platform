@@ -1,0 +1,109 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
+
+<div class="widget-content activity-list {{ containerExtraClass }}">
+    {% block widget_content %}
+        {% block widget_actions %}
+        <div class="actions">
+            <div class="pull-right">
+                {#{{ UI.clientLink({#}
+                    {#'aCss': 'collapse-all-button btn-mini',#}
+                    {#'label' : 'Collapse All'|trans,#}
+                    {#'dataAttributes': {'action-name': 'collapse_all'}#}
+                {#}) }}#}
+
+                {% set html %}
+                    <li>
+                        <a href="javascript: void(0);">
+                            <label for="activity-test-0">
+                                <input type="checkbox" id="activity-test-0" style="margin: 0 -2px 0 0" />
+                                <i class="icon-list hide-text"></i>
+                                Tasks
+                            </label>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript: void(0);">
+                            <label for="activity-test-1">
+                                <input type="checkbox" id="activity-test-1" style="margin: 0 -2px 0 0"/>
+                                <i class="icon-comment-alt hide-text"></i>
+                                Notes
+                            </label>
+                        </a>
+                    </li>
+
+                {% endset %}
+                {{ UI.dropdownButton({
+                    'label': 'View filter'|trans,
+                    'iCss': 'icon- icon-cog-',
+                    'aCss': 'pull-right--',
+                    'html': html
+                }) }}
+                {{ UI.clientLink({
+                    'aCss': 'btn apply-button icons-holder-text',
+                    'iCss': 'icon-play',
+                    'title' : 'Apply filter'|trans,
+                    'dataAttributes': {'action-name': 'apply'}
+                }) }}
+                {{ UI.clientLink({
+                    'aCss': 'btn refresh-button icons-holder-text',
+                    'iCss': 'icon-refresh',
+                    'title' : 'Refresh'|trans,
+                    'dataAttributes': {'action-name': 'refresh'}
+                }) }}
+            </div>
+        </div>
+        {% endblock %}
+
+        {% block items_container %}
+            <div class="clearfix" style="border:1px solid red;">
+                ACTIVITIES HERE
+            </div>
+
+            {% set options = {
+                widgetId: app.request.get('_wid'),
+                activitiesData: render(path(
+                    'oro_note_notes',
+                    {
+                        entityClass: oro_class_name(entity, true),
+                        entityId: entity.id
+                    }
+                ))
+            } %}
+
+                {#notesOptions: {#}
+                    {#template: '#template-note-list',#}
+                    {#itemTemplate: '#template-note-item',#}
+                    {#urls: {#}
+                        {#list: path('oro_note_notes', {#}
+                            {#'entityClass': oro_class_name(entity, true), 'entityId': entity.id#}
+                        {#}),#}
+                        {#createItem: path('oro_note_create', {#}
+                            {#'entityClass': oro_class_name(entity, true), 'entityId': entity.id#}
+                        {#}),#}
+                    {#},#}
+                    {#routes: {#}
+                        {#update: 'oro_note_update',#}
+                        {#delete: 'oro_api_delete_note'#}
+                    {#}#}
+                {#},#}
+                {#notesData: render(path('oro_note_notes', {#}
+                    {#entityClass: oro_class_name(entity, true), entityId: entity.id#}
+                {#}))#}
+            {#} %}#}
+
+            <div class="container-fluid accordion" style="border: 1px solid yellow"
+                data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
+                data-page-component-options="{{ options|json_encode }}"
+            >
+                l;asjkfasl;fjkasl;dfjk
+                asdfkl;afhl;asdkf
+                ass;adhfl;asdfh
+            </div>
+
+            {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
+            {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
+        {% endblock %}
+    {% endblock %}
+</div>

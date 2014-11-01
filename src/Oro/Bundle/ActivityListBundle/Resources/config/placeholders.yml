@@ -1,0 +1,11 @@
+placeholders:
+    view_content_data_activities: #.items.oro_activities: ~
+        items:
+            oro_activity_list: ~
+
+items:
+    oro_activity_list:
+        action: OroActivityListBundle:ActivityList:activities
+        applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$)
+        #template: OroNoteBundle:Note:notes.html.twig
+        #acl: oro_activity_list_view

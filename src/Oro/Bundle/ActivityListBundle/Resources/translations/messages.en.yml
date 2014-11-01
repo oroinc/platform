@@ -1,2 +1,15 @@
 oro:
-    activity_list:
+    activitylist:
+        entity_label:         Activity list
+        entity_plural_label:  Activity list
+        entity_description:   Represent activities list
+
+        id.label:             Id
+        verb.label:           Verb
+        subject.label:        Subject
+        data.label:           Data
+        organization.label:   Organization
+        related_entity_class.label: Related entity class
+        related_entity_id.label:    Related entity id
+        created_at.label: Created at
+        updated_at.label: Updated at
