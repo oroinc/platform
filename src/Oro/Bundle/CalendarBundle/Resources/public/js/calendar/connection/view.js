@@ -76,9 +76,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 el.attr(value, viewModel[key]);
             });
             // subscribe to disconnect calendar event
-            //TODO: Add new button and update selector
             el.on('click', this.selectors.contextMenuButton, _.bind(function (e) {
-                this.contextMenu($(e.currentTarget), model.get('calendar'));
+                this.contextMenu($(e.currentTarget), model);
             }, this));
 
             this.$el.find(this.selectors.itemContainer).append(el);
@@ -86,31 +85,45 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.trigger('connectionAdd', model);
         },
 
-        contextMenu: function (parent, calendarId) {
-            var el = $(this.menu()),
+        contextMenu: function (parent, model) {
+            var itemSelector = this.selectors.item,
+                viewModel = model.toJSON();;
+            if (parent.closest(itemSelector).find('.context-menu').length > 0) {
+                parent.closest(itemSelector).find('.context-menu').remove();
+                return true;
+            }
+            var el = $(this.menu(viewModel)),
                 i,
                 modules = [],
-                aModules = el.find("a[data-module]");
+                aModules = el.find("a[data-module]"),
+                options = this.options;
             for (i=0; i < aModules.length; i++) {
-                modules.push($(aModules[i]).attr('data-module'));
-            }
-            var options = this.options,
-                itemSelector = this.selectors.item;
-            require(modules, function () {
-                for (i=0; i < arguments.length; i++) {
-                    var moduleConstructor = arguments[0],
-                        actionModule = new moduleConstructor(options);
-                    el.on('click', "a[data-module='" + actionModule.getName() + "']", _.bind(function (e) {
-                        el.remove();
-                        actionModule.execute(calendarId);
-                    }, this));
+                if ($.inArray($(aModules[i]).attr('data-module'), modules) === -1) {
+                    modules.push($(aModules[i]).attr('data-module'));
                 }
-                parent.find('.context-menu-button').css('display', 'block !important');
-                el.on('blur', function() {
-                    el.remove();
+            }
+            if (modules.length > 0) {
+                require(modules, function () {
+                    for (i=0; i < arguments.length; i++) {
+                        var moduleConstructor = arguments[0],
+                            actionModule = new moduleConstructor(options);
+                        el.on('click', "a[data-module='" + actionModule.getName() + "']", _.bind(function (e) {
+                            el.remove();
+                            var dataOptions = $(this).attr('data-options');
+                            dataOptions = dataOptions ? dataOptions : {};
+                            actionModule.execute(model.get('calendar'), dataOptions);
+                        }, this));
+                    }
+                    parent.closest(itemSelector).find('.context-menu-button').css('display', 'block');
+                    parent.closest(itemSelector).append(el);
+                    $(document).on('click', function(event) {
+                        if (!$(event.target).hasClass('context-menu')) {
+                            $('.context-menu-button').css('display', '');
+                            el.remove();
+                        }
+                    });
                 });
-                parent.closest(itemSelector).append(el);
-            });
+            }
         },
 
         onModelChanged: function (model) {

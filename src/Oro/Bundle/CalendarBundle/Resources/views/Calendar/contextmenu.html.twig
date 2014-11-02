@@ -1,8 +1,15 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block linkElement %}
-    {% if item.extras is defined and item.extras.module is defined %}
-        {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
+    {% set label %}
+        {{ block('label') }}
+    {% endset %}
+    {% if item.extras is defined and item.extras.template is defined %}
+        {{ include(item.extras.template, {'label': label}, ignore_missing = true) }}
+    {% else %}
+        {% if item.extras is defined and item.extras.module is defined %}
+            {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
+        {% endif %}
+        <a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>{{ label }}</a>
     {% endif %}
-    <a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>{{ block('label') }}</a>
 {% endblock %}

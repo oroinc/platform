@@ -29,6 +29,7 @@ oro:
 
         menu:
             view_default: My Calendar
+            context: Context menu
 
         context:
             hide: Hide this calenadr
