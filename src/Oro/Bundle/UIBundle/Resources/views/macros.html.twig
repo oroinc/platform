@@ -309,6 +309,10 @@
         'title': title,
         'label': label
     }) %}
+
+    {# Add URL parameters to button path #}
+    {% set parameters = parameters|merge({ 'path' : oro_url_add_query(parameters['path']) }) %}
+
     {{ _self.button(parameters) }}
 {% endmacro %}
 
