@@ -24,7 +24,7 @@ class UrlExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_url_add_query', array($this, 'addQuery')),
+            new \Twig_SimpleFunction('oro_url_add_query', [$this, 'addQuery']),
         ];
     }
 
@@ -47,11 +47,18 @@ class UrlExtension extends \Twig_Extension
         $requestQueryParts = $this->request->query->all();
         if ($requestQueryParts && $requestQueryParts != $urlQueryParts) {
             $mergedQueryParts = array_merge($requestQueryParts, $urlQueryParts);
+
             $basicUrlPart = $parts['path'];
+            $updatedUrlPart = $parts['path'] . '?' . http_build_query($mergedQueryParts);
+
+            if (!empty($parts['host'])) {
+                $basicUrlPart = $parts['host'] . $basicUrlPart;
+                $updatedUrlPart = $parts['host'] . $updatedUrlPart;
+            }
             if (!empty($parts['query'])) {
                 $basicUrlPart .= '?' . $parts['query'];
             }
-            $updatedUrlPart = $parts['path'] . '?' . http_build_query($mergedQueryParts);
+
             $link = str_replace($basicUrlPart, $updatedUrlPart, $link);
         }
 
@@ -63,6 +70,6 @@ class UrlExtension extends \Twig_Extension
      */
     public function setRequest(Request $request = null)
     {
-        $this->request = $request;
+        $this->request = $request->getSession();
     }
 }
