@@ -37,6 +37,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());
             this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+            this.cid = 'outsideEvent';
 
             // render connected calendars
             this.getCollection().each(_.bind(function (model) {
@@ -106,16 +107,18 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         var  actionModule = new moduleConstructor(options);
                         el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {//actionModule.getName()
                             el.remove();
+                            $(document).off('.' + options.connectionsView.cid);
                             var dataOptions = $(this).attr('data-options') || {};
                             actionModule.execute(model.get('calendar'), dataOptions);
                         }, this));
                     });
                     parent.closest(itemSelector).find('.context-menu-button').css('display', 'block');
                     parent.closest(itemSelector).append(el);
-                    $(document).on('click', function(event) {
+                    $(document).on('click.' + options.connectionsView.cid, function(event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
                             el.remove();
+                            $(document).off('.' + options.connectionsView.cid);
                         }
                     });
                 });
@@ -166,6 +169,17 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $(document).off('.' + this.cid);
+            Backbone.View.prototype.dispose.call(this);
         }
     });
 });
