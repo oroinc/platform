@@ -50,6 +50,10 @@
         <div class="span10 calendar-events scrollable-container"></div>
     </div>
 
+    <script type="text/html" id="template-calendar-menu">
+        {{ oro_menu_render('calendar_menu') }}
+    </script>
+
     <script type="text/html" id="template-calendar-connections">
         <ul class="media-list connection-container">
         </ul>
@@ -68,17 +72,15 @@
                 >
                     <%- calendarName %>
                 </div>
-                <% if (removable) { %>
-                    <div class="pull-right icons-holder">
-                        <a
-                            href="javascript: void(0);"
-                            class="icons-holder-text no-hash remove-connection-button"
-                            title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
-                        >
-                                <i class="icon-remove hide-text"></i>
-                        </a>
-                    </div>
-                <% } %>
+                <div class="pull-right icons-holder">
+                    <a
+                        href="javascript: void(0);"
+                        class="icons-holder-text no-hash context-menu-button"
+                        title="{{ 'oro.calendar.menu.context'|trans }}"
+                    >
+                        <i class="icon-collapse"></i>
+                    </a>
+                </div>
             </div>
         </li>
     </script>
