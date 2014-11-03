@@ -87,7 +87,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         contextMenu: function (parent, model) {
             var itemSelector = this.selectors.item,
-                viewModel = model.toJSON();;
+                viewModel = model.toJSON();
             if (parent.closest(itemSelector).find('.context-menu').length > 0) {
                 parent.closest(itemSelector).find('.context-menu').remove();
                 return true;
@@ -105,7 +105,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 tools.loadModules(modules, function (modules) {
                     _.each(modules, function (moduleConstructor, moduleName) {
                         var  actionModule = new moduleConstructor(options);
-                        el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {//actionModule.getName()
+                        el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
                             el.remove();
                             $(document).off('.' + options.connectionsView.cid);
                             var dataOptions = $(this).attr('data-options') || {};
