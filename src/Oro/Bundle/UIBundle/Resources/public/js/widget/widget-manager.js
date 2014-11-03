@@ -1,13 +1,18 @@
 /* global define */
-define(['oroui/js/mediator'],
-function(mediator) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/mediator'
+], function($, _, mediator) {
     'use strict';
+
+    var widgetManager;
 
     /**
      * @export oroui/js/widget-manager
      * @name   oro.widgetManager
      */
-    var widgetManager = {
+    widgetManager = {
         widgets: {},
         aliases: {},
 
@@ -15,14 +20,18 @@ function(mediator) {
          * Reset manager to initial state.
          */
         resetWidgets: function() {
-            this.widgets = {};
-            this.aliases = {};
+            _.each(this.widgets, function (widget) {
+                // if widget is detached from DOM, remove this widget
+                if (!$.contains(document.documentElement, widget.el)) {
+                    widget.remove();
+                }
+            });
         },
 
         /**
          * Add widget instance to registry.
          *
-         * @param {oro.AbstractWidget} widget
+         * @param {oroui.widget.AbstractWidget} widget
          */
         addWidgetInstance: function(widget) {
             this.widgets[widget.getWid()] = widget;
@@ -37,7 +46,7 @@ function(mediator) {
          * Get widget instance by widget identifier and pass it to callback when became available.
          *
          * @param {string} wid unique widget identifier
-         * @param {function} callback widget instance handler
+         * @param {Function} callback widget instance handler
          */
         getWidgetInstance: function(wid, callback) {
             if (this.widgets.hasOwnProperty(wid)) {
@@ -51,7 +60,7 @@ function(mediator) {
          * Get widget instance by alias and pass it to callback when became available.
          *
          * @param {string} alias widget alias
-         * @param {function} callback widget instance handler
+         * @param {Function} callback widget instance handler
          */
         getWidgetInstanceByAlias: function(alias, callback) {
             if (this.aliases.hasOwnProperty(alias)) {
@@ -67,17 +76,13 @@ function(mediator) {
          * @param {string} wid unique widget identifier
          */
         removeWidget: function(wid) {
+            var widget = this.widgets[wid];
+            if (widget) {
+                delete this.aliases[widget.getAlias()];
+            }
             delete this.widgets[wid];
         }
     };
-
-    mediator.on('widget_initialize', function(widget) {
-        widgetManager.addWidgetInstance(widget);
-    });
-
-    mediator.on('widget_remove', function(wid) {
-        widgetManager.removeWidget(wid);
-    });
 
     return widgetManager;
 });

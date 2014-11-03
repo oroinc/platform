@@ -1,7 +1,7 @@
 Mediator Handlers
 =================
 
-OroUIBundle declares some mediator handlers.
+OroUIBundle declares some mediator handlers. It's preferable to use indirect method execution with `mediator.execute()` in all components which follows Chaplin architecture. 
 
 ##Application
 
@@ -36,6 +36,15 @@ Handler Name | Method
 `showErrorMessage` | `messenger.showErrorMessage`
 
 See [`oroui/js/messenger`](../../public/js/messenger.js) module for details
+
+##Widgets (Widget Manager)
+
+Handler Name | Method | Description
+------------ | ------ | -----------
+`widgets:getByIdAsync` | `widgetManager.getWidgetInstance` | asynchronously fetches widget instance by widget id
+`widgets:getByAliasAsync` | `widgetManager.getWidgetInstanceByAlias` | asynchronously fetches widget instance its alias
+
+See [`oroui/js/widget-manager`](../../public/js/widget-manager.js) module for details
 
 ##PageLoadingMaskView
 
