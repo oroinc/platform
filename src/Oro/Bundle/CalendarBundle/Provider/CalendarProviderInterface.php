@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
+
 interface CalendarProviderInterface
 {
     /**
@@ -12,6 +14,13 @@ interface CalendarProviderInterface
      * @return array
      */
     public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds);
+
+    /**
+     * @param CalendarProperty $connection
+     *
+     * @return string
+     */
+    public function getCalendarName(CalendarProperty $connection);
 
     /**
      * @param int       $calendarId

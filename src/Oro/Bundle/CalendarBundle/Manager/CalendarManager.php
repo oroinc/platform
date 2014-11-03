@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Manager;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -81,6 +82,20 @@ class CalendarManager
         $this->normalizeCalendarData($result);
 
         return $result;
+    }
+
+    /**
+     * @param CalendarProperty $connection
+     *
+     * @return array
+     */
+    public function getCalendarInfo(CalendarProperty $connection)
+    {
+        $provider = $this->providers[$connection->getCalendarAlias()];
+
+        return [
+            'calendarName' => $provider->getCalendarName($connection)
+        ];
     }
 
     /**

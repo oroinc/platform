@@ -15,12 +15,11 @@ use FOS\Rest\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
 /**
  * @NamePrefix("oro_api_")
@@ -44,7 +43,7 @@ class CalendarConnectionController extends RestController implements ClassResour
      */
     public function cgetAction($id)
     {
-        $items = $this->get('oro_calendar.calendar_manager')
+        $items = $this->getManager()->getCalendarManager()
             ->getCalendars($this->getUser()->getId(), $id);
 
         return new Response(json_encode($items), Codes::HTTP_OK);
@@ -106,7 +105,7 @@ class CalendarConnectionController extends RestController implements ClassResour
     }
 
     /**
-     * @return ApiEntityManager
+     * @return CalendarPropertyApiEntityManager
      */
     public function getManager()
     {
@@ -151,13 +150,10 @@ class CalendarConnectionController extends RestController implements ClassResour
     {
         $data = parent::createResponseData($entity);
 
-        $calendar = $this->getDoctrine()->getRepository('OroCalendarBundle:Calendar')
-            ->find($entity->getCalendar());
-        $name     = $calendar->getName();
-        if (empty($name)) {
-            $name = $this->get('oro_locale.formatter.name')->format($calendar->getOwner());
-        }
-        $data['calendarName'] = $name;
+        $data = array_merge(
+            $data,
+            $this->getManager()->getCalendarManager()->getCalendarInfo($entity)
+        );
 
         return $data;
     }

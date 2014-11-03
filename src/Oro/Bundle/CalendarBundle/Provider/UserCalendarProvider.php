@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -49,12 +50,8 @@ class UserCalendarProvider implements CalendarProviderInterface
         /** @var Calendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
         foreach ($calendars as $calendar) {
-            $name = $calendar->getName();
-            if (empty($name)) {
-                $name = $this->nameFormatter->format($calendar->getOwner());
-            }
             $resultItem = [
-                'calendarName' => $name
+                'calendarName' => $this->buildCalendarName($calendar)
             ];
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
@@ -69,6 +66,18 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getCalendarName(CalendarProperty $connection)
+    {
+        /** @var Calendar $calendar */
+        $calendar = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
+            ->find($connection->getCalendar());
+
+        return $this->buildCalendarName($calendar);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCalendarEvents($calendarId, $start, $end, $subordinate)
     {
         /** @var CalendarEventRepository $repo */
@@ -76,5 +85,20 @@ class UserCalendarProvider implements CalendarProviderInterface
         $qb   = $repo->getEventListByTimeIntervalQueryBuilder($calendarId, $start, $end, $subordinate);
 
         return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb);
+    }
+
+    /**
+     * @param Calendar $calendar
+     *
+     * @return string
+     */
+    protected function buildCalendarName(Calendar $calendar)
+    {
+        $name = $calendar->getName();
+        if (empty($name)) {
+            $name = $this->nameFormatter->format($calendar->getOwner());
+        }
+
+        return $name;
     }
 }
