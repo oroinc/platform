@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -25,6 +26,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
  * Autocomplete search handler for users with ACL access level protection
  *
  * Class UserAclHandler
+ *
  * @package Oro\Bundle\UserBundle\Autocomplete
  */
 class UserAclHandler implements SearchHandlerInterface
@@ -39,7 +41,7 @@ class UserAclHandler implements SearchHandlerInterface
     protected $className;
 
     /** @var array */
-    protected $fields;
+    protected $fields = [];
 
     /** @var NameFormatter */
     protected $nameFormatter;
@@ -60,7 +62,6 @@ class UserAclHandler implements SearchHandlerInterface
      * @param EntityManager     $em
      * @param AttachmentManager $attachmentManager
      * @param string            $className
-     * @param array             $fields
      * @param ServiceLink       $securityContextLink
      * @param OwnerTreeProvider $treeProvider
      * @param AclVoter          $aclVoter
@@ -69,7 +70,6 @@ class UserAclHandler implements SearchHandlerInterface
         EntityManager $em,
         AttachmentManager $attachmentManager,
         $className,
-        $fields,
         ServiceLink $securityContextLink,
         OwnerTreeProvider $treeProvider,
         AclVoter $aclVoter = null
@@ -77,7 +77,6 @@ class UserAclHandler implements SearchHandlerInterface
         $this->em                  = $em;
         $this->attachmentManager   = $attachmentManager;
         $this->className           = $className;
-        $this->fields              = $fields;
         $this->aclVoter            = $aclVoter;
         $this->securityContextLink = $securityContextLink;
         $this->treeProvider        = $treeProvider;
@@ -85,35 +84,43 @@ class UserAclHandler implements SearchHandlerInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
         list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
-        $entityClass = str_replace('_', '\\', $entityClass);
+        $entityClass = $this->decodeClassName($entityClass);
 
-        if ($entityId) {
-            $object = $this->em->getRepository($entityClass)->find((int)$entityId);
-        } else {
-            $object = 'entity:' . $entityClass;
-        }
-
+        $hasMore  = false;
+        $object   = $entityId
+            ? $this->em->getRepository($entityClass)->find((int)$entityId)
+            : 'entity:' . $entityClass;
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permission, $object);
-
-        if ($isGranted) {
+        if ($this->getSecurityContext()->isGranted($permission, $object)) {
             $results = [];
             if ($searchById) {
                 $results[] = $this->em->getRepository('OroUserBundle:User')->find((int)$query);
             } else {
-                $user = $this->getSecurityContext()->getToken()->getUser();
+                $page        = (int)$page > 0 ? (int)$page : 1;
+                $perPage     = (int)$perPage > 0 ? (int)$perPage : 10;
+                $firstResult = ($page - 1) * $perPage;
+                $perPage += 1;
+
+                $user         = $this->getSecurityContext()->getToken()->getUser();
                 $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
                 $queryBuilder = $this->getSearchQueryBuilder($search);
-                if ((boolean) $excludeCurrentUser) {
+                if ((boolean)$excludeCurrentUser) {
                     $this->excludeUser($queryBuilder, $user);
                 }
+                $queryBuilder
+                    ->setFirstResult($firstResult)
+                    ->setMaxResults($perPage);
                 $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user, $organization);
                 $results = $queryBuilder->getQuery()->getResult();
+
+                $hasMore = count($results) == $perPage;
             }
 
             $resultsData = [];
@@ -126,7 +133,7 @@ class UserAclHandler implements SearchHandlerInterface
 
         return [
             'results' => $resultsData,
-            'more'    => false
+            'more'    => $hasMore
         ];
     }
 
@@ -147,6 +154,14 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
+     * @param string[] $properties
+     */
+    public function setProperties(array $properties)
+    {
+        $this->fields = $properties;
+    }
+
+    /**
      * @param NameFormatter $nameFormatter
      */
     public function setNameFormatter(NameFormatter $nameFormatter)
@@ -163,15 +178,8 @@ class UserAclHandler implements SearchHandlerInterface
         foreach ($this->fields as $field) {
             $result[$field] = $this->getPropertyValue($field, $user);
         }
-        $result['avatar'] = null;
 
-        $avatar = $this->getPropertyValue('avatar', $user);
-        if ($avatar) {
-            $result['avatar'] = $this->attachmentManager->getFilteredImageUrl(
-                $avatar,
-                UserSearchHandler::IMAGINE_AVATAR_FILTER
-            );
-        }
+        $result['avatar'] = $this->getUserAvatar($user);
 
         if (!$this->nameFormatter) {
             throw new \RuntimeException('Name formatter must be configured');
@@ -182,8 +190,27 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
+     * @param $user
+     *
+     * @return string|null
+     */
+    protected function getUserAvatar($user)
+    {
+        $avatar = $this->getPropertyValue('avatar', $user);
+        if (!$avatar) {
+            return null;
+        }
+
+        return $this->attachmentManager->getFilteredImageUrl(
+            $avatar,
+            UserSearchHandler::IMAGINE_AVATAR_FILTER
+        );
+    }
+
+    /**
      * @param string       $name
      * @param object|array $item
+     *
      * @return mixed
      */
     protected function getPropertyValue($name, $item)
@@ -208,6 +235,7 @@ class UserAclHandler implements SearchHandlerInterface
      * Get search users query builder
      *
      * @param $search
+     *
      * @return QueryBuilder
      */
     protected function getSearchQueryBuilder($search)
@@ -244,6 +272,7 @@ class UserAclHandler implements SearchHandlerInterface
                 )
             )
             ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
+
         return $queryBuilder;
     }
 
@@ -297,5 +326,23 @@ class UserAclHandler implements SearchHandlerInterface
     {
         $queryBuilder->andWhere('users.id != :userId');
         $queryBuilder->setParameter('userId', $user->getId());
+    }
+
+    /**
+     * Decodes the given string into the class name
+     *
+     * @param string $className The encoded class name
+     *
+     * @return string The class name
+     */
+    public function decodeClassName($className)
+    {
+        $result = str_replace('_', '\\', $className);
+        if (strpos($result, ExtendHelper::ENTITY_NAMESPACE) === 0) {
+            // a custom entity can contain _ in class name
+            $result = ExtendHelper::ENTITY_NAMESPACE . substr($className, strlen(ExtendHelper::ENTITY_NAMESPACE));
+        }
+
+        return $result;
     }
 }

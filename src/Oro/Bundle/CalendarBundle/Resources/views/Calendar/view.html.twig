@@ -42,11 +42,9 @@
         <div class="span2">
             <div class="calendars">
                 <div class="calendar-connections"></div>
-                {% if resource_granted('oro_calendar_connection_view') %}
-                    <form action="#">
-                        {{ form_row(user_select_form) }}
-                    </form>
-                {% endif %}
+                <form action="#">
+                    {{ form_row(user_select_form) }}
+                </form>
             </div>
         </div>
         <div class="span10 calendar-events scrollable-container"></div>

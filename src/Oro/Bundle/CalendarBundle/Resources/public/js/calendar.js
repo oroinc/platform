@@ -1,4 +1,5 @@
-/* jshint devel:true*/
+/*jslint nomen:true*/
+/*jshint devel:true*/
 /*global define, console*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
@@ -51,7 +52,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         /**
          * this property is used to prevent loading of events from a server when the calendar object is created
-         *  @property {bool}
+         * @property {bool}
          */
         enableEventLoading: false,
         fullCalendar: null,
@@ -254,7 +255,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
          */
         prepareViewModel: function (fcEvent, applyTZCorrection) {
             // set an event text and background colors the same as the owning calendar
-            var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
+            var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
             if (applyTZCorrection !== false) {
@@ -371,7 +372,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 self.setTimeline();
             };
 
-            options.eventAfterRender = function(event, element) {
+            options.eventAfterRender = function (event, element) {
                 var reminders = self.getCollection().get(event.id).get('reminders');
                 if (reminders && _.keys(reminders).length) {
                     element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
@@ -417,7 +418,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;
                 });
-                this.colorManager.setCalendarColors(obj.calendar, obj.color, obj.backgroundColor);
+                this.colorManager.setCalendarColors(obj.calendarUid, obj.color, obj.backgroundColor);
                 lastBackgroundColor = obj.backgroundColor;
             }, this));
         },

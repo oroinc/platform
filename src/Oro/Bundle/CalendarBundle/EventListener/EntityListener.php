@@ -3,14 +3,15 @@
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -18,6 +19,9 @@ class EntityListener
 {
     /** @var ClassMetadata[] */
     protected $metadataLocalCache = [];
+
+    /** @var Calendar[] */
+    protected $insertedCalendars = [];
 
     /**
      * @param OnFlushEventArgs $event
@@ -37,6 +41,27 @@ class EntityListener
             if ($entity instanceof User) {
                 $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
             }
+        }
+    }
+
+    /**
+     * @param PostFlushEventArgs $event
+     */
+    public function postFlush(PostFlushEventArgs $event)
+    {
+        if (!empty($this->insertedCalendars)) {
+            $em  = $event->getEntityManager();
+            foreach ($this->insertedCalendars as $calendar) {
+                // connect the calendar to itself
+                $calendarProperty = new CalendarProperty();
+                $calendarProperty
+                    ->setTargetCalendar($calendar)
+                    ->setCalendarAlias('user')
+                    ->setCalendar($calendar->getId());
+                $em->persist($calendarProperty);
+            }
+            $this->insertedCalendars = [];
+            $em->flush();
         }
     }
 
@@ -63,19 +88,14 @@ class EntityListener
      */
     protected function createCalendar($em, $uow, $entity, $organization)
     {
-        // create a default calendar for assigned organization
+        // create default user's calendar
         $calendar = new Calendar();
         $calendar->setOwner($entity);
         $calendar->setOrganization($organization);
-        // connect the calendar to itself
-        $calendarConnection = new CalendarConnection($calendar);
-        $calendar->addConnection($calendarConnection);
-
         $em->persist($calendar);
-        $em->persist($calendarConnection);
-
         $uow->computeChangeSet($this->getClassMetadata($calendar, $em), $calendar);
-        $uow->computeChangeSet($this->getClassMetadata($calendarConnection, $em), $calendarConnection);
+
+        $this->insertedCalendars[] = $calendar;
     }
 
     /**
