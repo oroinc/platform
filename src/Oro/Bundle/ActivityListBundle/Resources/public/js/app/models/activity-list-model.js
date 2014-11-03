@@ -12,33 +12,32 @@ define([
             verb: '',
             subject: '',
             data: '',
-
             briefTemplate: '',
             briefData: '',
             fullTemplate: '',
             fullData: '',
-
             relatedEntity_class: '',
             relatedEntity_id: '',
             activityEntity_class: '',
             activityEntity_id: '',
-
-            hasUpdate: false,
-            editable: false,
-            removable: false,
-
-            createdBy: null,
-            createdBy_id: null,
-            createdBy_viewable: false,
-            createdBy_avatar: null,
-
-            updatedBy: null,
-            updatedBy_id: null,
-            updatedBy_viewable: false,
-            updatedBy_avatar: null,
-
             createdAt: '',
             updatedAt: ''
+
+            //hasUpdate: false,
+            //editable: false,
+            //removable: false,
+        },
+
+        initialize: function (options) {
+            debugger;
+
+            //this.options = _.defaults(options || {}, this.options);
+            //this.collapsed = false;
+            //
+            //if (!this.options.template) {
+            //    debugger;
+            //    this.template = _.template($(this.options.template).html());
+            //}
         }
     });
 

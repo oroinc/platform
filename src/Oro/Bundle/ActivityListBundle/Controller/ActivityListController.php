@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +33,13 @@ class ActivityListController extends Controller
     {
         $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
 
+        /** @var ActivityListChainProvider $activitiesProvider */
+        $activitiesProvider = $this->get('oro.activity_list.provider.chain');
+
         return [
-            'entity' => $entity
+            'entity'         => $entity,
+            'briefTemplates' => $activitiesProvider->getBriefTemplates(),
+            'fullTemplates'  => $activitiesProvider->getFullTemplates()
         ];
     }
 
@@ -50,16 +56,6 @@ class ActivityListController extends Controller
      */
     public function activitiesAction($entity)
     {
-//        $widgetProvider = $this->get('oro_activity.widget_provider.activities');
-//        $widgets = $widgetProvider->supports($entity)
-//            ? $widgetProvider->getWidgets($entity)
-//            : [];
-//
-//        if (empty($widgets)) {
-//            // return empty response to prevent rendering 'Activities' placeholder
-//            return new Response();
-//        }
-
         return $this->render(
             'OroActivityListBundle:ActivityList:activities.html.twig',
             [

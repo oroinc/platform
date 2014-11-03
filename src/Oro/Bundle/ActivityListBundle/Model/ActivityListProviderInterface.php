@@ -21,6 +21,7 @@ interface ActivityListProviderInterface
 
     /**
      * @param object $entity
+     *
      * @return string
      */
     public function getSubject($entity);
@@ -38,7 +39,8 @@ interface ActivityListProviderInterface
     /**
      * Check if provider supports given entity
      *
-     * @param $entity
+     * @param object|string $entity
+     *
      * @return bool
      */
     public function isApplicable($entity);

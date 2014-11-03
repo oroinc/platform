@@ -11,10 +11,11 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\Get;
 
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
@@ -59,7 +60,7 @@ class ActivityListController extends RestController
      *          200="Returned when successful",
      *      }
      * )
-     * @Acl(
+     * @ Acl(
      *      id="oro_activity_list_get",
      *      type="entity",
      *      permission="VIEW",
@@ -130,7 +131,7 @@ class ActivityListController extends RestController
             );
         }
 
-        return new Response(json_encode($items));
+        return new JsonResponse($items);
     }
 
 

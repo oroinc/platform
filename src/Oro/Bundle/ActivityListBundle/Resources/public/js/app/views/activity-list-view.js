@@ -17,9 +17,10 @@ define([
 
     ActivityListView = BaseCollectionView.extend({
         options: {
-            template: null,
-            itemTemplate: null,
+            briefTemplates: {},
+            fullTemplates: {},
 
+            itemTemplate: null,
             //itemAddEvent: 'note:add',
             itemViewIdPrefix: 'activity-',
             listSelector: '.items.list-box',
@@ -28,20 +29,19 @@ define([
             collection: null,
             urls: {
                 //createItem: null,
-                updateItem: null,
-                deleteItem: null
+                //updateItem: null,
+                //deleteItem: null
             },
             messages: {}
         },
-
         listen: {
-            'toEdit collection': '_editItem',
-            'toDelete collection': '_deleteItem'
+            //'toEdit collection': '_editItem',
+            //'toDelete collection': '_deleteItem'
         },
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-
+            /*
             _.defaults(this.options.messages, {
                 addDialogTitle: __('oro.note.add_note_title'),
                 editDialogTitle: __('oro.note.edit_note_title'),
@@ -52,19 +52,20 @@ define([
                 deleteItemError: __('oro.note.delete_note_error'),
                 forbiddenError: __('oro.note.forbidden_error')
             });
+            */
 
-            this.template = _.template($(this.options.template).html());
+            //this.itemTemplate = _.template($(this.options.template).html());
 
             // create communication in scope of active controller
-            mediator.on(this.options.itemAddEvent, this._addItem, this);
+            //mediator.on(this.options.itemAddEvent, this._addItem, this);
 
-            NotesView.__super__.initialize.call(this, options);
+            ActivityListView.__super__.initialize.call(this, options);
         },
 
         render: function () {
-            //NotesView.__super__.render.apply(this, arguments);
-            //this.$loadingMaskContainer = this.$('.loading-mask');
-            //return this;
+            ActivityListView.__super__.render.apply(this, arguments);
+            this.$loadingMaskContainer = this.$('.loading-mask');
+            return this;
         },
 
         expandAll: function () {
@@ -96,30 +97,32 @@ define([
         },
 
         _reload: function (sorting) {
-            //var state = {};
-            //if (!_.isUndefined(sorting)) {
-            //    this.collection.setSorting(sorting);
-            //}
-            //this._showLoading();
-            //try {
-            //    _.each(this.subviews, function (itemView) {
-            //        state[itemView.model.get('id')] = itemView.isCollapsed();
-            //    });
-            //    this.collection.fetch({
-            //        reset: true,
-            //        success: _.bind(function () {
-            //            _.each(this.subviews, function (itemView) {
-            //                itemView.toggle(state[itemView.model.get('id')]);
-            //            });
-            //            this._hideLoading();
-            //        }, this),
-            //        error: _.bind(function (collection, response) {
-            //            this._showLoadItemsError(response.responseJSON || {});
-            //        }, this)
-            //    });
-            //} catch (err) {
-            //    this._showLoadItemsError(err);
-            //}
+            alert('reload');
+
+            var state = {};
+            if (!_.isUndefined(sorting)) {
+                this.collection.setSorting(sorting);
+            }
+            this._showLoading();
+            try {
+                _.each(this.subviews, function (itemView) {
+                    state[itemView.model.get('id')] = itemView.isCollapsed();
+                });
+                this.collection.fetch({
+                    reset: true,
+                    success: _.bind(function () {
+                        _.each(this.subviews, function (itemView) {
+                            itemView.toggle(state[itemView.model.get('id')]);
+                        });
+                        this._hideLoading();
+                    }, this),
+                    error: _.bind(function (collection, response) {
+                        this._showLoadItemsError(response.responseJSON || {});
+                    }, this)
+                });
+            } catch (err) {
+                this._showLoadItemsError(err);
+            }
         },
 
         _addItem: function () {
@@ -222,6 +225,7 @@ define([
         },
 
         _showLoading: function () {
+            alert('showLoading');
             if (!this.$loadingMaskContainer.data('loading-mask-visible')) {
                 this.loadingMask = new LoadingMask();
                 this.$loadingMaskContainer.data('loading-mask-visible', true);
@@ -231,6 +235,7 @@ define([
         },
 
         _hideLoading: function () {
+            alert('hideLoading');
             if (this.loadingMask) {
                 this.$loadingMaskContainer.data('loading-mask-visible', false);
                 this.loadingMask.remove();

@@ -3,28 +3,21 @@
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityListChainProvider
 {
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityFacadeLink;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var ActivityListProviderInterface[]
-     */
+    /** @var ActivityListProviderInterface[] */
     protected $providers;
 
     /**
@@ -34,7 +27,7 @@ class ActivityListChainProvider
     public function __construct(ServiceLink $securityFacadeLink, DoctrineHelper $doctrineHelper)
     {
         $this->securityFacadeLink = $securityFacadeLink;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineHelper     = $doctrineHelper;
     }
 
     public function addProvider(ActivityListProviderInterface $provider)
@@ -67,4 +60,24 @@ class ActivityListChainProvider
 
         return false;
     }
-} 
+
+    public function getBriefTemplates()
+    {
+        $templates = [];
+        foreach ($this->providers as $provider) {
+            $templates[$provider->getActivityClass()] = $provider->getBriefTemplate();
+        }
+
+        return $templates;
+    }
+
+    public function getFullTemplates()
+    {
+        $templates = [];
+        foreach ($this->providers as $provider) {
+            $templates[$provider->getActivityClass()] = $provider->getFullTemplate();
+        }
+
+        return $templates;
+    }
+}
