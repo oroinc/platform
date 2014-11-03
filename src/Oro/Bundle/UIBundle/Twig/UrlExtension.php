@@ -70,6 +70,6 @@ class UrlExtension extends \Twig_Extension
      */
     public function setRequest(Request $request = null)
     {
-        $this->request = $request->getSession();
+        $this->request = $request;
     }
 }
