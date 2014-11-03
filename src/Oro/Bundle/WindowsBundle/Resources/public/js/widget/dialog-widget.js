@@ -10,14 +10,14 @@ define(function (require) {
         error = require('oroui/js/error'),
         layout = require('oroui/js/layout'),
         messenger = require('oroui/js/messenger'),
-        AbstractWidget = require('oroui/js/widget/abstract'),
+        AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
     require('jquery.dialog.extended');
 
     /**
      * @export  oro/dialog-widget
      * @class   oro.DialogWidget
-     * @extends oro.AbstractWidget
+     * @extends oroui.widget.AbstractWidget
      */
     DialogWidget = AbstractWidget.extend({
         options: _.extend({}, AbstractWidget.prototype.options, {

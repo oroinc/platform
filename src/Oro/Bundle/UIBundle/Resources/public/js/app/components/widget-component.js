@@ -7,7 +7,7 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
-        mapWidgetModuleName = require('oroui/js/map-widget-module-name');
+        mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
      * @export oroui/js/app/components/widget-component
@@ -16,7 +16,7 @@ define(function (require) {
      */
     WidgetComponent = BaseComponent.extend({
         /**
-         * @property {oro.AbstractWidget}
+         * @property {oroui.widget.AbstractWidget}
          * @constructor
          */
         widget: null,
@@ -127,7 +127,7 @@ define(function (require) {
         /**
          * Binds widget instance to environment events
          *
-         * @param {oro.AbstractWidget} widget
+         * @param {oroui.widget.AbstractWidget} widget
          * @protected
          */
         _bindEnvironmentEvent: function (widget) {

@@ -13,8 +13,8 @@ define(function (require) {
     require('jquery.form');
 
     /**
-     * @export  oroui/js/widget/abstract
-     * @class   oro.AbstractWidget
+     * @export  oroui/js/widget/abstract-widget
+     * @class   oroui.widget.AbstractWidget
      * @extends oroui.app.views.BaseView
      */
     AbstractWidget = BaseView.extend({
