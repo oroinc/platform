@@ -43,7 +43,7 @@ class ActivityListRepository extends EntityRepository
             ->andWhere('activity.relatedEntityId = :entityId')
             ->setParameter('class', $entityClass)
             ->setParameter('entityId', $entityId)
-            ->orderBy('activity.id', 'DESC');
+            ->orderBy('activity.updatedAt', 'DESC');
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))

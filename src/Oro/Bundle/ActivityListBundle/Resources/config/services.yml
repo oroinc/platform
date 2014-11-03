@@ -1,3 +1,15 @@
 parameters:
+    # entity
+    oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
+
+    # manager
+    oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
 services:
+    # Activity List API
+    oro_activity_list.manager.api:
+        class: %oro_activity_list.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_activity_list.entity.class%
+            - @doctrine.orm.entity_manager
