@@ -85,11 +85,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.trigger('connectionAdd', model);
         },
 
-        contextMenu: function (parent, model) {
+        contextMenu: function (parentEl, model) {
             var itemSelector = this.selectors.item,
                 viewModel = model.toJSON();
-            if (parent.closest(itemSelector).find('.context-menu').length > 0) {
-                parent.closest(itemSelector).find('.context-menu').remove();
+            if (parentEl.closest(itemSelector).find('.context-menu').length > 0) {
+                parentEl.closest(itemSelector).find('.context-menu').remove();
                 return true;
             }
             var el = $(this.menu(viewModel)),
@@ -112,8 +112,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                             actionModule.execute(model.get('calendar'), dataOptions);
                         }, this));
                     });
-                    parent.closest(itemSelector).find('.context-menu-button').css('display', 'block');
-                    parent.closest(itemSelector).append(el);
+                    parentEl.closest(itemSelector).find('.context-menu-button').css('display', 'block');
+                    parentEl.closest(itemSelector).append(el);
                     $(document).on('click.' + options.connectionsView.cid, function(event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
