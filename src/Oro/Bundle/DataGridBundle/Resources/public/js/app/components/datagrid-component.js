@@ -47,7 +47,7 @@ define(function (require) {
             var promises, self;
 
             self = this;
-            this.defer = $.Deferred();
+            this._deferredInit();
             this.built = $.Deferred();
 
             options = options || {};
@@ -66,7 +66,7 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
-                self.defer.resolve(self);
+                self._resolveDeferredInit();
             });
         },
 
