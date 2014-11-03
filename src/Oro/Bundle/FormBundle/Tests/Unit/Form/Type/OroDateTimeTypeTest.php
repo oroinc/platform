@@ -5,9 +5,9 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Test\TypeTestCase;
 
-class OroDateTimeTypeTest extends FormIntegrationTestCase
+class OroDateTimeTypeTest extends TypeTestCase
 {
     /**
      * @var OroDateTimeType
@@ -86,6 +86,36 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
                 'placeholder',
                 'some.placeholder',
             ),
+        );
+    }
+
+    /**
+     * @dataProvider valuesDataProvider
+     * @param string  $value
+     * @param \DateTime $expectedValue
+     */
+    public function testSubmitValidData($value, $expectedValue)
+    {
+        $form = $this->factory->create($this->type);
+        $form->submit($value);
+        $this->assertDateTimeEquals($expectedValue, $form->getData());
+    }
+
+    public function valuesDataProvider()
+    {
+        return array(
+            array(
+                '2002-10-02T15:00:00+00:00',
+                new \DateTime('2002-10-02T15:00:00+00:00')
+            ),
+            array(
+                '2002-10-02T15:00:00Z',
+                new \DateTime('2002-10-02T15:00:00Z')
+            ),
+            array(
+                '2002-10-02T15:00:00.05Z',
+                new \DateTime('2002-10-02T15:00:00.05Z')
+            )
         );
     }
 }
