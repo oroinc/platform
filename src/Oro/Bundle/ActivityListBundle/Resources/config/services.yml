@@ -1,4 +1,10 @@
 parameters:
+    # entity
+    oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
+
+    # manager
+    oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+
     oro.activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro.activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
 
@@ -23,3 +29,11 @@ services:
         class: %oro_activity_list.placeholder.filter.class%
         arguments: ~
 
+
+    # Activity List API
+    oro_activity_list.manager.api:
+        class: %oro_activity_list.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_activity_list.entity.class%
+            - @doctrine.orm.entity_manager
