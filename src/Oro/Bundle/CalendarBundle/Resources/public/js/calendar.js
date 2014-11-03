@@ -85,6 +85,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
+            this.connectionsView.dispose.call(this);
             Backbone.View.prototype.dispose.call(this);
         },
 

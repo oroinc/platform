@@ -1,7 +1,7 @@
 /*global define, console*/
 define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model'
-    ], function ($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel) {
+    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model', 'oroui/js/tools'
+    ], function ($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel, tools) {
     'use strict';
 
     /**
@@ -26,8 +26,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             lastItem:      '.connection-item:last',
             findItemByCalendar: function (calendarId) { return '.connection-item[data-calendar="' + calendarId + '"]'; },
             findItemByOwner: function (ownerId) { return '.connection-item[data-owner="' + ownerId + '"]'; },
-            removeButton:  '.remove-connection-button',
-            newOwnerSelector: '#new_calendar_owner'
+            contextMenuButton: '.context-menu-button',
+            newOwnerSelector: '#new_calendar_owner',
+            contextMenuTemplate: '#template-calendar-menu'
         },
 
         initialize: function (options) {
@@ -35,6 +36,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());
+            this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+            this.cid = 'outsideEvent';
 
             // render connected calendars
             this.getCollection().each(_.bind(function (model) {
@@ -44,7 +47,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             // subscribe to connection collection events
             this.listenTo(this.getCollection(), 'add', this.onModelAdded);
             this.listenTo(this.getCollection(), 'change', this.onModelChanged);
-            this.listenTo(this.getCollection(), 'destroy', this.onModelDeleted);
 
             // subscribe to connect new calendar event
             var container = this.$el.closest(this.selectors.container);
@@ -74,8 +76,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 el.attr(value, viewModel[key]);
             });
             // subscribe to disconnect calendar event
-            el.on('click', this.selectors.removeButton, _.bind(function (e) {
-                this.deleteModel($(e.currentTarget).closest(this.selectors.item).attr(this.attrs.calendar));
+            el.on('click', this.selectors.contextMenuButton, _.bind(function (e) {
+                this.contextMenu($(e.currentTarget), model);
             }, this));
 
             this.$el.find(this.selectors.itemContainer).append(el);
@@ -83,15 +85,49 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.trigger('connectionAdd', model);
         },
 
+        contextMenu: function (parentEl, model) {
+            var itemSelector = this.selectors.item,
+                viewModel = model.toJSON();
+            if (parentEl.closest(itemSelector).find('.context-menu').length > 0) {
+                parentEl.closest(itemSelector).find('.context-menu').remove();
+                return true;
+            }
+            var el = $(this.menu(viewModel)),
+                i,
+                options = this.options;
+                options.connectionsView = this;
+
+            var modules = _.uniq(el.find("a[data-module]").map(function () {
+                return $(this).attr('data-module');
+            }).get());
+            if (modules.length > 0) {
+                modules = _.object(modules, modules);
+                tools.loadModules(modules, function (modules) {
+                    _.each(modules, function (moduleConstructor, moduleName) {
+                        var  actionModule = new moduleConstructor(options);
+                        el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
+                            el.remove();
+                            $(document).off('.' + options.connectionsView.cid);
+                            var dataOptions = $(this).attr('data-options') || {};
+                            actionModule.execute(model.get('calendar'), dataOptions);
+                        }, this));
+                    });
+                    parentEl.closest(itemSelector).find('.context-menu-button').css('display', 'block');
+                    parentEl.closest(itemSelector).append(el);
+                    $(document).on('click.' + options.connectionsView.cid, function(event) {
+                        if (!$(event.target).hasClass('context-menu')) {
+                            $('.context-menu-button').css('display', '');
+                            el.remove();
+                            $(document).off('.' + options.connectionsView.cid);
+                        }
+                    });
+                });
+            }
+        },
+
         onModelChanged: function (model) {
             this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
-        },
-
-        onModelDeleted: function (model) {
-            this.options.colorManager.removeCalendarColors(model.get('calendar'));
-            this.$el.find(this.selectors.findItemByCalendar(model.get('calendar'))).remove();
-            this.trigger('connectionRemove', model);
         },
 
         addModel: function (ownerId) {
@@ -123,34 +159,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        deleteModel: function (calendarId) {
-            var model,
-                deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
-            try {
-                model = this.getCollection().get(calendarId);
-                model.destroy({
-                    wait: true,
-                    success: _.bind(function () {
-                        deletingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was excluded.'));
-                    }, this),
-                    error: _.bind(function (model, response) {
-                        deletingMsg.close();
-                        this.showDeleteError(response.responseJSON || {});
-                    }, this)
-                });
-            } catch (err) {
-                deletingMsg.close();
-                this.showMiscError(err);
-            }
-        },
-
         showAddError: function (err) {
             this._showError(__('Sorry, the calendar adding was failed'), err);
-        },
-
-        showDeleteError: function (err) {
-            this._showError(__('Sorry, the calendar excluding was failed'), err);
         },
 
         showMiscError: function (err) {
@@ -159,6 +169,17 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $(document).off('.' + this.cid);
+            Backbone.View.prototype.dispose.call(this);
         }
     });
 });
