@@ -1,45 +1,43 @@
 /*global define, console*/
-define(['module', 'jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
+define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
     'orocalendar/js/calendar/connection/collection'
-], function (module, $, _, Backbone, __, messenger, ConnectionCollection) {
+], function ($, _, BaseView, __, messenger, ConnectionCollection) {
     'use strict';
 
     /**
      * @export  orocalendar/js/calendar/menu/hide-calendar-action
      * @class   orocalendar.calendar.menu.HideCalendarAction
-     * @extends Backbone.View
+     * @extends oroui/js/app/views/base/view
      */
-    return Backbone.View.extend({
+    return BaseView.extend({
+        /** @property {Object} */
+        listen: {
+            'destroy collection': 'onModelDeleted'
+        },
+
         /** @property {Object} */
         selectors: {
             findItemByCalendar: function (calendarId) { return '.connection-item[data-calendar="' + calendarId + '"]'; }
         },
 
         initialize: function (options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.options.collection = this.options.collection || new ConnectionCollection();
-            this.options.collection.setCalendar(this.options.calendar);
-            this.template = _.template($(this.options.itemTemplateSelector).html());
-
-            // subscribe to connection collection events
-            this.listenTo(this.getCollection(), 'destroy', this.onModelDeleted);
-        },
-
-        getCollection: function () {
-            return this.options.collection;
+            this.collection = options.collection || new ConnectionCollection();
+            this.collection.setCalendar(options.calendar);
+            this.colorManager = options.colorManager;
+            this.connectionsView = options.connectionsView;
         },
 
         onModelDeleted: function (model) {
-            this.options.colorManager.removeCalendarColors(model.get('calendar'));
+            this.colorManager.removeCalendarColors(model.get('calendar'));
             this.$el.find(this.selectors.findItemByCalendar(model.get('calendar'))).remove();
-            this.trigger('connectionRemove', model);
+            this.connectionsView.trigger('connectionRemove', model);
         },
 
         execute: function (calendarId, options) {
             var model,
                 deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
             try {
-                model = this.getCollection().get(calendarId);
+                model = this.collection.get(calendarId);
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {
@@ -68,9 +66,5 @@ define(['module', 'jquery', 'underscore', 'backbone', 'orotranslation/js/transla
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
         },
-
-        getName: function() {
-            return 'orocalendar/js/calendar/menu/hide-calendar-action';
-        }
     });
 });

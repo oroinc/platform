@@ -1,7 +1,7 @@
 /*global define, console*/
 define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model'
-    ], function ($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel) {
+    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model', 'oroui/js/tools'
+    ], function ($, _, Backbone, __, messenger, ConnectionCollection, ConnectionModel, tools) {
     'use strict';
 
     /**
@@ -46,7 +46,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             // subscribe to connection collection events
             this.listenTo(this.getCollection(), 'add', this.onModelAdded);
             this.listenTo(this.getCollection(), 'change', this.onModelChanged);
-            this.listenTo(this.getCollection(), 'destroy', this.onModelDeleted);
 
             // subscribe to connect new calendar event
             var container = this.$el.closest(this.selectors.container);
@@ -94,26 +93,23 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
             var el = $(this.menu(viewModel)),
                 i,
-                modules = [],
-                aModules = el.find("a[data-module]"),
                 options = this.options;
-            for (i=0; i < aModules.length; i++) {
-                if ($.inArray($(aModules[i]).attr('data-module'), modules) === -1) {
-                    modules.push($(aModules[i]).attr('data-module'));
-                }
-            }
+                options.connectionsView = this;
+
+            var modules = _.uniq(el.find("a[data-module]").map(function () {
+                return $(this).attr('data-module');
+            }).get());
             if (modules.length > 0) {
-                require(modules, function () {
-                    for (i=0; i < arguments.length; i++) {
-                        var moduleConstructor = arguments[0],
-                            actionModule = new moduleConstructor(options);
-                        el.on('click', "a[data-module='" + actionModule.getName() + "']", _.bind(function (e) {
+                modules = _.object(modules, modules);
+                tools.loadModules(modules, function (modules) {
+                    _.each(modules, function (moduleConstructor, moduleName) {
+                        var  actionModule = new moduleConstructor(options);
+                        el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {//actionModule.getName()
                             el.remove();
-                            var dataOptions = $(this).attr('data-options');
-                            dataOptions = dataOptions ? dataOptions : {};
+                            var dataOptions = $(this).attr('data-options') || {};
                             actionModule.execute(model.get('calendar'), dataOptions);
                         }, this));
-                    }
+                    });
                     parent.closest(itemSelector).find('.context-menu-button').css('display', 'block');
                     parent.closest(itemSelector).append(el);
                     $(document).on('click', function(event) {
