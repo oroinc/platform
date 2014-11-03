@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,6 +16,7 @@ use FOS\Rest\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
