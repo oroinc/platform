@@ -67,6 +67,12 @@ define([
         reloadData: true,
 
         /** @property {Object} */
+        messages: null,
+
+        /** @property {Object} */
+        launcherOptions: null,
+
+        /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
             confirm_content: 'Are you sure you want to do this?',
@@ -89,8 +95,10 @@ define([
             }
             this.subviews = [];
             this.datagrid = options.datagrid;
-            this.messages = _.extend({}, this.defaultMessages, options.messages);
-            this.launcherOptions = _.extend({}, this.launcherOptions, options.launcherOptions, {
+            // make own messages property from prototype
+            this.messages = _.extend({}, this.defaultMessages, this.messages);
+            // make own launcherOptions property from prototype
+            this.launcherOptions = $.extend(true, {}, this.launcherOptions, options.launcherOptions, {
                 action: this
             });
 
