@@ -34,28 +34,6 @@ class ExtendEntityExtension extends AbstractTypeExtension
 
     // TODO: Replace manual mapping with form type guessing,
     // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3351
-    protected $typeMap = [
-        'string'     => 'text',
-        'integer'    => 'integer',
-        'smallint'   => 'integer',
-        'bigint'     => 'integer',
-        'boolean'    => 'choice',
-        'decimal'    => 'number',
-        'money'      => 'oro_money',
-        'percent'    => 'oro_percent',
-        'date'       => 'oro_date',
-        'datetime'   => 'oro_datetime',
-        'text'       => 'textarea',
-        'float'      => 'number',
-        'file'       => 'oro_file',
-        'image'      => 'oro_image',
-        'manyToOne'  => 'oro_entity_select',
-        'oneToMany'  => 'oro_multiple_entity',
-        'manyToMany' => 'oro_multiple_entity',
-        'optionSet'  => 'oro_option_select',
-        'enum'       => 'oro_enum_select',
-        'multiEnum'  => 'oro_enum_choice',
-    ];
 
     /**
      * @param ConfigManager       $configManager
@@ -70,106 +48,6 @@ class ExtendEntityExtension extends AbstractTypeExtension
         $this->configManager = $configManager;
         $this->router        = $router;
         $this->translator    = $translator;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
-            return;
-        }
-
-        $className = $options['data_class'];
-        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
-            return;
-        }
-
-        $data = $builder->getData();
-
-        $formConfigProvider   = $this->configManager->getProvider('form');
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-
-        $formConfigs = $formConfigProvider->getConfigs($className);
-        $formType = null;
-        foreach ($formConfigs as $formConfig) {
-            if (!$formConfig->is('is_enabled')) {
-                continue;
-            }
-            $formType = null;
-            /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId = $formConfig->getId();
-            $fieldName     = $fieldConfigId->getFieldName();
-
-            $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
-            if (!$this->isApplicableField($extendConfig, $extendConfigProvider)) {
-                continue;
-            }
-
-            $entityConfig = $entityConfigProvider->getConfig($className, $fieldName);
-
-            $options = [
-                'label'    => $entityConfig->get('label'),
-                'required' => false,
-                'block'    => 'general',
-            ];
-
-            /*switch ($fieldConfigId->getFieldType()) {
-                case 'oneToMany':
-                case 'manyToMany':
-                    $classArray          = explode('\\', $extendConfig->get('target_entity'));
-                    $blockName           = array_pop($classArray);
-                    $selectorWindowTitle = 'Select ' . $blockName;
-
-                    $options = [
-                        'label'                 => $entityConfig->get('label'),
-                        'required'              => false,
-                        'block'                 => $blockName,
-                        'block_config'          => [
-                            $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
-                        ],
-                        'class'                 => $extendConfig->get('target_entity'),
-                        'grid_url'              => $this->router->generate(
-                            'oro_entity_relation',
-                            [
-                                'id'         => (($data && $data->getId()) ? $data->getId() : 0),
-                                'entityName' => str_replace('\\', '_', $className),
-                                'fieldName'  => $fieldName
-                            ]
-                        ),
-                        'selector_window_title' => $selectorWindowTitle,
-                        'initial_elements'      => null,
-                        'mapped'                => false,
-                        'extend'                => true,
-                    ];
-
-                    if (!$extendConfig->is('without_default')) {
-                        $defaultFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-                        $builder->add(
-                            $defaultFieldName,
-                            'oro_entity_identifier',
-                            [
-                                'class'    => $extendConfig->get('target_entity'),
-                                'multiple' => false
-                            ]
-                        );
-                        $options['default_element'] = $defaultFieldName;
-                    }
-                    $formType = true;
-                    break;
-            }
-            if ($formType) {
-                $builder->add($fieldName, $this->typeMap[$fieldConfigId->getFieldType()], $options);
-            } else {
-            }*/
-            $builder->add($fieldName, null, array());
-        }
     }
 
     /**
