@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Exception;
@@ -142,6 +143,22 @@ class DoctrineHelper
         }
 
         return $entityManager;
+    }
+
+    /**
+     * @param string|object $entityOrClass
+     * @return EntityRepository
+     * @throws Exception\NotManageableEntityException
+     */
+    public function getEntityRepository($entityOrClass)
+    {
+        $entityClass   = $this->getEntityClass($entityOrClass);
+        $entityManager = $this->registry->getManagerForClass($entityClass);
+        if (!$entityManager) {
+            throw new Exception\NotManageableEntityException($entityClass);
+        }
+
+        return $entityManager->getRepository($entityClass);
     }
 
     /**

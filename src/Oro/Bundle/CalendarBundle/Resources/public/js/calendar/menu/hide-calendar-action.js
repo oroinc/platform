@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define, console*/
 define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
     'orocalendar/js/calendar/connection/collection'
@@ -15,11 +16,6 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             'destroy collection': 'onModelDeleted'
         },
 
-        /** @property {Object} */
-        selectors: {
-            findItemByCalendar: function (calendarId) { return '.connection-item[data-calendar="' + calendarId + '"]'; }
-        },
-
         initialize: function (options) {
             this.collection = options.collection || new ConnectionCollection();
             this.collection.setCalendar(options.calendar);
@@ -28,16 +24,16 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
         },
 
         onModelDeleted: function (model) {
-            this.colorManager.removeCalendarColors(model.get('calendar'));
-            this.$el.find(this.selectors.findItemByCalendar(model.get('calendar'))).remove();
+            this.colorManager.removeCalendarColors(model.get('calendarUid'));
+            this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).remove();
             this.connectionsView.trigger('connectionRemove', model);
         },
 
-        execute: function (calendarId, options) {
+        execute: function (calendarUid, options) {
             var model,
                 deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
             try {
-                model = this.collection.get(calendarId);
+                model = this.collection.findWhere({calendarUid: calendarUid});
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {
@@ -65,6 +61,6 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
 
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
-        },
+        }
     });
 });

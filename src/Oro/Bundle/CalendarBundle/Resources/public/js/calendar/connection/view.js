@@ -1,3 +1,4 @@
+/*jslint nomen:true*/
 /*global define, console*/
 define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model', 'oroui/js/tools'
@@ -12,8 +13,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
     return Backbone.View.extend({
         /** @property {Object} */
         attrs: {
-            calendar:        'data-calendar',
-            owner:           'data-owner',
+            calendarUid:     'data-calendar-uid',
             color:           'data-color',
             backgroundColor: 'data-bg-color'
         },
@@ -24,10 +24,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             itemContainer: '.connection-container',
             item:          '.connection-item',
             lastItem:      '.connection-item:last',
-            findItemByCalendar: function (calendarId) { return '.connection-item[data-calendar="' + calendarId + '"]'; },
-            findItemByOwner: function (ownerId) { return '.connection-item[data-owner="' + ownerId + '"]'; },
+            findItemByCalendar: function (calendarUid) { return '.connection-item[data-calendar-uid="' + calendarUid + '"]'; },
             contextMenuButton: '.context-menu-button',
-            newOwnerSelector: '#new_calendar_owner',
+            newCalendarSelector: '#new_calendar',
             contextMenuTemplate: '#template-calendar-menu'
         },
 
@@ -35,6 +34,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options = _.defaults(options || {}, this.options);
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
+            this.options.connectionsView = this;
             this.template = _.template($(this.options.itemTemplateSelector).html());
             this.menu = _.template($(this.selectors.contextMenuTemplate).html());
             this.cid = 'outsideEvent';
@@ -50,7 +50,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
             // subscribe to connect new calendar event
             var container = this.$el.closest(this.selectors.container);
-            container.find(this.selectors.newOwnerSelector).on('change', _.bind(function (e) {
+            container.find(this.selectors.newCalendarSelector).on('change', _.bind(function (e) {
                 this.addModel(e.val);
                 // clear autocomplete
                 $(e.target).select2('val', '');
@@ -68,7 +68,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
                 return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
             }, this));
-            this.options.colorManager.setCalendarColors(viewModel.calendar, viewModel.color, viewModel.backgroundColor);
+            this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.color, viewModel.backgroundColor);
 
             el = $(this.template(viewModel));
             // set 'data-' attributes
@@ -77,7 +77,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             });
             // subscribe to disconnect calendar event
             el.on('click', this.selectors.contextMenuButton, _.bind(function (e) {
-                this.contextMenu($(e.currentTarget), model);
+                var $parent = $(e.currentTarget);
+                if ($parent.closest(this.selectors.item).find('.context-menu').length > 0) {
+                    $parent.closest(this.selectors.item).find('.context-menu').remove();
+                } else {
+                    this.contextMenu($parent, model);
+                }
             }, this));
 
             this.$el.find(this.selectors.itemContainer).append(el);
@@ -85,21 +90,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.trigger('connectionAdd', model);
         },
 
-        contextMenu: function (parentEl, model) {
-            var itemSelector = this.selectors.item,
-                viewModel = model.toJSON();
-            if (parentEl.closest(itemSelector).find('.context-menu').length > 0) {
-                parentEl.closest(itemSelector).find('.context-menu').remove();
-                return true;
-            }
-            var el = $(this.menu(viewModel)),
-                i,
-                options = this.options;
-                options.connectionsView = this;
+        contextMenu: function ($parent, model) {
+            var viewModel = model.toJSON(),
+                el = $(this.menu(viewModel)),
+                options = this.options,
+                modules = _.uniq(el.find("a[data-module]").map(function () {
+                    return $(this).attr('data-module');
+                }).get());
 
-            var modules = _.uniq(el.find("a[data-module]").map(function () {
-                return $(this).attr('data-module');
-            }).get());
             if (modules.length > 0) {
                 modules = _.object(modules, modules);
                 tools.loadModules(modules, function (modules) {
@@ -109,12 +107,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                             el.remove();
                             $(document).off('.' + options.connectionsView.cid);
                             var dataOptions = $(this).attr('data-options') || {};
-                            actionModule.execute(model.get('calendar'), dataOptions);
+                            actionModule.execute(model.get('calendarUid'), dataOptions);
                         }, this));
                     });
-                    parentEl.closest(itemSelector).find('.context-menu-button').css('display', 'block');
-                    parentEl.closest(itemSelector).append(el);
-                    $(document).on('click.' + options.connectionsView.cid, function(event) {
+                    $parent.closest(options.connectionsView.selectors.item).find('.context-menu-button').css('display', 'block');
+                    $parent.closest(options.connectionsView.selectors.item).append(el);
+                    $(document).on('click.' + options.connectionsView.cid, function (event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
                             el.remove();
@@ -126,21 +124,25 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onModelChanged: function (model) {
-            this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
+            this.options.colorManager.setCalendarColors(model.get('calendarUid'), model.get('color'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
         },
 
-        addModel: function (ownerId) {
+        addModel: function (calendarId) {
             var savingMsg, model,
-                el = this.$el.find(this.selectors.findItemByOwner(ownerId));
+                calendarAlias = 'user',
+                calendarUid = calendarAlias + '_' + calendarId,
+                el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
             if (el.length > 0) {
                 messenger.notificationFlashMessage('warning', __('This calendar already exists.'));
             } else {
                 savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
                 try {
                     model = new ConnectionModel();
-                    model.set('owner', ownerId);
-                    model.urlRoot = this.getCollection().url;
+                    model.set('targetCalendar', this.options.calendar);
+                    model.set('calendarAlias', calendarAlias);
+                    model.set('calendar', calendarId);
+                    model.set('calendarUid', calendarUid);
                     this.getCollection().create(model, {
                         wait: true,
                         success: _.bind(function () {
