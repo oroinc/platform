@@ -3,8 +3,6 @@ datagrid:
         options:
             entityHint: processes
             export:     false
-            entity_pagination: true
-
         source:
             type:         orm
             acl_resource: oro_process_definition_view
@@ -19,7 +17,6 @@ datagrid:
                     - process.name as processDefinition
                 from:
                     - { table: %oro_workflow.process_definition.entity.class%, alias: process }
-
         columns:
             label:
                 label: oro.workflow.processdefinition.label.label
@@ -37,7 +34,6 @@ datagrid:
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
-
         properties:
             name:              ~
             processDefinition: ~
@@ -53,7 +49,6 @@ datagrid:
                 type:   url
                 route:  oro_workflow_api_rest_process_deactivate
                 params: [ processDefinition ]
-
         sorters:
             columns:
                 executionOrder:
@@ -64,7 +59,6 @@ datagrid:
                     data_name: process.createdAt
             default:
                 label: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-
         actions:
             view:
                 type:         navigate
@@ -85,9 +79,7 @@ datagrid:
                 label:        oro.workflow.action.process.deactivate
                 icon:         remove
                 link:         deactivate_link
-
         action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getProcessDefinitionPermissions"]
-
         filters:
             columns:
                 label:
@@ -108,7 +100,6 @@ datagrid:
         options:
             entityHint: workflowssss
             export:     false
-            entity_pagination: true
         source:
             type: orm
             acl_resource: oro_workflow_definition_view
