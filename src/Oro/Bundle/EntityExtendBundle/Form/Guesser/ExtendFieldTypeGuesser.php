@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -11,6 +9,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -19,64 +18,24 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $formConfigProvider;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var array
-     */
-    protected $typeMap = [
-        'string'     => 'text',
-        'integer'    => 'integer',
-        'smallint'   => 'integer',
-        'bigint'     => 'integer',
-        'boolean'    => 'choice',
-        'decimal'    => 'number',
-        'money'      => 'oro_money',
-        'percent'    => 'oro_percent',
-        'date'       => 'oro_date',
-        'datetime'   => 'oro_datetime',
-        'text'       => 'textarea',
-        'float'      => 'number',
-        'file'       => 'oro_file',
-        'image'      => 'oro_image',
-        'manyToOne'  => 'oro_entity_select',
-        'oneToMany'  => MultipleEntityType::TYPE,
-        'manyToMany' => MultipleEntityType::TYPE,
-        'optionSet'  => 'oro_option_select',
-        'enum'       => 'oro_enum_select',
-        'multiEnum'  => 'oro_enum_choice',
-    ];
+    /** @var array */
+    protected $typeMap = [];
 
-    /**
-     * @param ManagerRegistry         $managerRegistry
-     * @param ConfigManager           $configManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $formConfigProvider
-     * @param ConfigProvider $extendConfigProvider
-     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ConfigManager $configManager,
@@ -84,11 +43,21 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
         ConfigProvider $formConfigProvider,
         ConfigProvider $extendConfigProvider
     ) {
-        $this->formConfigProvider = $formConfigProvider;
+        $this->formConfigProvider   = $formConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
-        $this->managerRegistry = $managerRegistry;
-        $this->configManager = $configManager;
+        $this->managerRegistry      = $managerRegistry;
+        $this->configManager        = $configManager;
+    }
+
+    /**
+     * @param string $extendType
+     * @param string $formType
+     * @param array  $formOptions
+     */
+    public function addExtendTypeMapping($extendType, $formType, array $formOptions = [])
+    {
+        $this->typeMap[$extendType] = ['type' => $formType, 'options' => $formOptions];
     }
 
     /**
@@ -152,17 +121,16 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
             case 'manyToMany':
                 $classArray = explode('\\', $extendConfig->get('target_entity'));
                 $blockName = array_pop($classArray);
-                $selectorWindowTitle = 'Select ' . $blockName;
 
-                $options['block'] = $blockName;
-                $options['block_config'] = [
+                $options['block']                 = $blockName;
+                $options['block_config']          = [
                     $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
                 ];
-                $options['class'] = $extendConfig->get('target_entity');
-                $options['selector_window_title'] = $selectorWindowTitle;
-                $options['initial_elements'] = null;
-                $options['mapped'] = false;
-                $options['extend'] = true;
+                $options['class']                 = $extendConfig->get('target_entity');
+                $options['selector_window_title'] = 'Select ' . $blockName;
+                $options['initial_elements']      = null;
+                $options['mapped']                = false;
+                $options['extend']                = true;
                 if (!$extendConfig->is('without_default')) {
                     $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $property;
                 }
