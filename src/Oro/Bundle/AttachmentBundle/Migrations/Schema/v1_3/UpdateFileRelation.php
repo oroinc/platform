@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Types\Type;
+
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
