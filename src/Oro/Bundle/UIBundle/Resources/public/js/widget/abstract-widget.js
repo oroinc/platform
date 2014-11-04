@@ -13,8 +13,8 @@ define(function (require) {
     require('jquery.form');
 
     /**
-     * @export  oroui/js/widget/abstract
-     * @class   oro.AbstractWidget
+     * @export  oroui/js/widget/abstract-widget
+     * @class   oroui.widget.AbstractWidget
      * @extends oroui.app.views.BaseView
      */
     AbstractWidget = BaseView.extend({
@@ -65,14 +65,35 @@ define(function (require) {
         /**
          * Remove widget
          */
-        remove: function() {
+        remove: function () {
+            if (!this.disposing) {
+                // If remove method was called directly -- execute dispose first
+                this.dispose();
+            } else {
+                AbstractWidget.__super__.remove.call(this);
+            }
+        },
+
+        /**
+         *
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            // add flag: this is disposing process
+            // (to prevent recursion from remove method)
+            this.disposing = true;
+
+            // trigger all events before handlers got undelegated
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
             if (this.getAlias()) {
                 mediator.trigger('widget_remove:' + this.getAlias());
             }
-            Backbone.View.prototype.remove.call(this);
             this.trigger('widgetRemoved');
+
+            AbstractWidget.__super__.dispose.call(this);
         },
 
         /**
