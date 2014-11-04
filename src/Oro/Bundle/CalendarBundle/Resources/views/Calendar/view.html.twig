@@ -6,6 +6,9 @@
 
 {% block head_script %}
     {{ parent() }}
+    {% oro_css %}
+        <link rel="stylesheet" media="print" href="{{ '/bundles/orocalendar/lib/fullcalendar/print.css' }}" />
+    {% endoro_css %}
 {% endblock %}
 
 {% block navButtons %}
