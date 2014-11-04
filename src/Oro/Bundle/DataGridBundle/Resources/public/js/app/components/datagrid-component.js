@@ -226,7 +226,8 @@ define(function (require) {
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
-                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions)
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
+                metadata: this.metadata
             };
         }
     });
