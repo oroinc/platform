@@ -153,6 +153,27 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
+     * Deletes all ACL including class data for a given object identity.
+     *
+     * @param ObjectIdentityInterface $oid
+     * @throws \Exception
+     */
+    public function deleteAclClass(ObjectIdentityInterface $oid)
+    {
+        $this->connection->beginTransaction();
+        try {
+            $this->deleteAcl($oid);
+            $this->connection->executeQuery($this->getDeleteClassIdSql($oid->getType()));
+
+            $this->connection->commit();
+        } catch (\Exception $failed) {
+            $this->connection->rollBack();
+
+            throw $failed;
+        }
+    }
+
+    /**
      * Constructs the SQL for updating a security identity.
      *
      * @param SecurityIdentityInterface $sid
@@ -201,6 +222,20 @@ class MutableAclProvider extends BaseMutableAclProvider
     protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
         $select = $this->getSelectSecurityIdentityIdSql($sid);
+        $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        return $delete;
+    }
+
+    /**
+     * Constructs the SQL to delete an ACL class.
+     *
+     * @param string $classType
+     * @return string
+     */
+    protected function getDeleteClassIdSql($classType)
+    {
+        $select = $this->getSelectClassIdSql($classType);
         $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
 
         return $delete;
