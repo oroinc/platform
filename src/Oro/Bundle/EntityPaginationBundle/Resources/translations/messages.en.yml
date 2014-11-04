@@ -6,8 +6,11 @@ oro.entity_pagination:
     last: 'Last >>'
 
     message:
-        not_available: 'Requested entity is not available'
-        not_accessible: 'Requested entity is not accessible'
+        stats_number_view_%count%: 'You are now viewing %count% number of records.'
+        stats_number_edit_%count%: 'You are now editing %count% number of records.'
+        not_available: 'Some of the records are no longer availbale.'
+        not_accessible: 'You do not have sufficient permissions to access records.'
+        stats_changed_view_to_edit: 'You do not have sufficient permissions to edit all selected records.'
 
     system_configuration:
         fields:
