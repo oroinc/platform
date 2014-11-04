@@ -79,14 +79,6 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
             return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
         }
 
-        $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
-
-        $options = [
-            'label'    => $entityConfig->get('label'),
-            'required' => false,
-            'block'    => 'general',
-        ];
-
         switch ($fieldConfigId->getFieldType()) {
             case 'boolean':
                 $options['empty_value'] = false;
@@ -138,13 +130,20 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
             default:
                 return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
         }
-        $type = $this->typeMap[$fieldConfigId->getFieldType()];
 
-        return new TypeGuess(
-            $type,
+        $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
+        $type    = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+        $options = array_replace_recursive(
+            [
+                'label'    => $entityConfig->get('label'),
+                'required' => false,
+                'block'    => 'general',
+            ],
             $options,
-            TypeGuess::VERY_HIGH_CONFIDENCE
+            $this->typeMap[$fieldConfigId->getFieldType()]['options']
         );
+
+        return new TypeGuess($type, $options, TypeGuess::HIGH_CONFIDENCE);
     }
 
     /**
