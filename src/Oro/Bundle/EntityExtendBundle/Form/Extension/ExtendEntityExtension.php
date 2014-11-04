@@ -32,9 +32,6 @@ class ExtendEntityExtension extends AbstractTypeExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    // TODO: Replace manual mapping with form type guessing,
-    // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3351
-
     /**
      * @param ConfigManager       $configManager
      * @param RouterInterface     $router
@@ -48,6 +45,41 @@ class ExtendEntityExtension extends AbstractTypeExtension
         $this->configManager = $configManager;
         $this->router        = $router;
         $this->translator    = $translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+            return;
+        }
+
+        $className = $options['data_class'];
+        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
+            return;
+        }
+
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $formConfigs          = $this->configManager->getProvider('form')->getConfigs($className);
+
+        foreach ($formConfigs as $formConfig) {
+            if (!$formConfig->is('is_enabled')) {
+                continue;
+            }
+
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $formConfig->getId();
+            $fieldName     = $fieldConfigId->getFieldName();
+            $extendConfig  = $extendConfigProvider->getConfig($className, $fieldName);
+
+            if (!$this->isApplicableField($extendConfig, $extendConfigProvider)) {
+                continue;
+            }
+
+            $builder->add($fieldName);
+        }
     }
 
     /**
