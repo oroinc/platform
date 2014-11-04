@@ -44,7 +44,7 @@ class OroDateTimeType extends AbstractType
             array(
                 'model_timezone'   => 'UTC',
                 'view_timezone'    => 'UTC',
-                'format'           => "yyyy-MM-dd'T'HH:mm:ssZ",
+                'format'           => DateTimeType::HTML5_FORMAT,
                 'widget'           => 'single_text',
                 'placeholder'      => 'oro.form.click_here_to_select',
             )
