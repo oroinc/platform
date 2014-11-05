@@ -140,8 +140,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                             messenger.notificationFlashMessage('success', __('The calendar was updated.'));
                             $target.removeClass('un-color');
                             var style = {
-                                backgroundColor: "#4986E7",
-                                borderColor: "#4986E7"
+                                backgroundColor: "#" + model.get('backgroundColor'),
+                                borderColor: "#" + model.get('backgroundColor')
                             };
                             $target.css(style);
                             this.trigger('connectionAdd', model);
