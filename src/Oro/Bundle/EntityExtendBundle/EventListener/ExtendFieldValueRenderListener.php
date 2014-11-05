@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -50,14 +51,27 @@ class ExtendFieldValueRenderListener
      */
     protected $fieldTypeHelper;
 
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @param ConfigManager         $configManager
+     * @param UrlGeneratorInterface $router
+     * @param FieldTypeHelper       $fieldTypeHelper
+     * @param EntityManager         $entityManager
+     */
     public function __construct(
         ConfigManager $configManager,
         UrlGeneratorInterface $router,
-        FieldTypeHelper $fieldTypeHelper
+        FieldTypeHelper $fieldTypeHelper,
+        EntityManager $entityManager
     ) {
         $this->configManager = $configManager;
         $this->router = $router;
         $this->fieldTypeHelper = $fieldTypeHelper;
+        $this->entityManager = $entityManager;
 
         $this->extendProvider = $configManager->getProvider('extend');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -70,14 +84,9 @@ class ExtendFieldValueRenderListener
     {
         $value = $event->getFieldValue();
 
-        if (!$value) {
-            return;
-        }
-
         $type = $event->getFieldConfigId()->getFieldType();
-
         /** Prepare Relation field type */
-        if ($value instanceof Collection) {
+        if ($value && $value instanceof Collection) {
             $viewData = $this->getValueForCollection($value, $event->getFieldConfigId());
             $event->setFieldViewValue($viewData);
 
@@ -86,18 +95,17 @@ class ExtendFieldValueRenderListener
 
         /** Prepare OptionSet field type */
         if ($type == 'optionSet') {
-            $viewData = $this->getValueForOptionSet($event->getFieldValue(), $event->getFieldConfigId());
+            $viewData = $this->getValueForOptionSet($event->getEntity(), $event->getFieldConfigId());
             $event->setFieldViewValue($viewData);
 
             return;
         }
 
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
-        if ($underlyingFieldType == 'manyToOne') {
-            $viewData = $this->propertyAccessor->getValue(
+        if ($value && $underlyingFieldType == 'manyToOne') {
+            $viewData = $this->getValueForManyToOne(
                 $value,
                 $this->extendProvider->getConfigById($event->getFieldConfigId())
-                    ->get('target_field')
             );
 
             $event->setFieldViewValue($viewData);
@@ -155,31 +163,17 @@ class ExtendFieldValueRenderListener
      */
     protected function getEntityRouteOptions($entityClassName)
     {
-        $route       = false;
-        $routeParams = false;
         if (class_exists($entityClassName)) {
-            /** @var EntityMetadata $metadata */
-            $metadata = $this->configManager->getEntityMetadata($entityClassName);
-            if ($metadata && $metadata->routeView) {
-                $route       = $metadata->routeView;
-                $routeParams = [
-                    'id' => null
-                ];
-            }
-
             $relationExtendConfig = $this->extendProvider->getConfig($entityClassName);
-            if ($relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
-                $route       = self::ENTITY_VIEW_ROUTE;
-                $routeParams = [
-                    'entityName' => str_replace('\\', '_', $entityClassName),
-                    'id'        => null
-                ];
-            }
+
+            return $relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                ? $this->getCustomEntityViewRouteOptions($entityClassName)
+                : $this->getClassViewRouteOptions($entityClassName);
         }
 
         return [
-            'route'        => $route,
-            'route_params' => $routeParams
+            'route'        => false,
+            'route_params' => false
         ];
     }
 
@@ -211,5 +205,87 @@ class ExtendFieldValueRenderListener
         $value['values'] = $value;
 
         return $value;
+    }
+
+    /**
+     * Return view link options or simple text
+     *
+     * @param object          $targetEntity
+     * @param ConfigInterface $field
+     *
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @return array|string
+     */
+    protected function getValueForManyToOne($targetEntity, ConfigInterface $field)
+    {
+        $targetFieldName = $field->get('target_field');
+        $targetClassName = $field->get('target_entity');
+
+        if (!class_exists($targetClassName)) {
+            return '';
+        }
+
+        $title = (string)$this->propertyAccessor->getValue(
+            $targetEntity,
+            $targetFieldName
+        );
+
+        $targetMetadata = $this->entityManager->getClassMetadata($targetClassName);
+        $id = $this->propertyAccessor->getValue(
+            $targetEntity,
+            $targetMetadata->getSingleIdentifierFieldName()
+        );
+
+
+        $relationExtendConfig = $this->extendProvider->getConfig($targetClassName);
+        $routeOptions = $relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            ? $this->getCustomEntityViewRouteOptions($targetClassName, $id)
+            : $this->getClassViewRouteOptions($targetClassName, $id);
+        if ($routeOptions['route']) {
+            return [
+                'link'  => $this->router->generate($routeOptions['route'], $routeOptions['route_params']),
+                'title' => $title
+            ];
+        }
+
+        return $title;
+    }
+
+    /**
+     * @param string $entityClassName
+     * @param mixed  $id
+     *
+     * @return array
+     */
+    protected function getClassViewRouteOptions($entityClassName, $id = null)
+    {
+        $routeOptions = ['route' => false, 'route_params' => false];
+        /** @var EntityMetadata $metadata */
+        $metadata = $this->configManager->getEntityMetadata($entityClassName);
+        if ($metadata && $metadata->routeView) {
+            $routeOptions['route'] = $metadata->routeView;
+            $routeOptions['route_params'] = [
+                'id' => $id
+            ];
+            return $routeOptions;
+        }
+        return $routeOptions;
+    }
+
+    /**
+     * @param string   $entityClassName
+     * @param mixed    $id
+     *
+     * @return array
+     */
+    protected function getCustomEntityViewRouteOptions($entityClassName, $id = null)
+    {
+        return [
+            'route'        => self::ENTITY_VIEW_ROUTE,
+            'route_params' => [
+                'entityName' => str_replace('\\', '_', $entityClassName),
+                'id'         => $id
+            ]
+        ];
     }
 }

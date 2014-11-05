@@ -137,7 +137,7 @@ class FileExtension extends \Twig_Extension
         /**
          * @todo: should be refactored in BAP-5637
          */
-        if (is_int($attachment)) {
+        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
             $attachment = $this->getFileById($attachment);
         }
         if ($attachment && $attachment->getFilename()) {
@@ -173,9 +173,10 @@ class FileExtension extends \Twig_Extension
         /**
          * @todo: should be refactored in BAP-5637
          */
-        if (is_int($attachment)) {
+        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
             $attachment = $this->getFileById($attachment);
         }
+
         if ($attachment && $attachment->getFilename()) {
             $width  = self::DEFAULT_THUMB_SIZE;
             $height = self::DEFAULT_THUMB_SIZE;
