@@ -9,6 +9,11 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 class ValueRenderEvent extends Event
 {
     /**
+     * @var object
+     */
+    protected $entity;
+
+    /**
      * @var mixed
      */
     protected $fieldValue;
@@ -27,9 +32,11 @@ class ValueRenderEvent extends Event
      * @param mixed         $fieldValue
      * @param FieldConfigId $fieldConfigId
      */
-    public function __construct($fieldValue, FieldConfigId $fieldConfigId)
+    public function __construct($entity, $fieldValue, FieldConfigId $fieldConfigId)
     {
+        $this->entity = $entity;
         $this->fieldValue = $fieldValue;
+        $this->fieldViewValue = $fieldValue;
         $this->fieldConfigId = $fieldConfigId;
     }
 
@@ -67,5 +74,13 @@ class ValueRenderEvent extends Event
         $this->fieldViewValue = $fieldViewValue;
 
         return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 }

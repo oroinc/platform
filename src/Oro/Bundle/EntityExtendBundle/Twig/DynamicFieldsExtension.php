@@ -23,11 +23,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     const NAME = 'oro_entity_config_fields';
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
      * @var FieldTypeHelper
      */
     protected $fieldTypeHelper;
@@ -65,10 +60,8 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
-        UrlGeneratorInterface $router,
         EventDispatcher $dispatcher
     ) {
-        $this->configManager = $configManager;
         $this->fieldTypeHelper = $fieldTypeHelper;
         $this->eventDispatcher = $dispatcher;
 
@@ -111,9 +104,10 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
+            $event = new ValueRenderEvent($entity, $value, $fieldConfigId);
             $this->eventDispatcher->dispatch(
                 EntityExtendEvents::BEFORE_VALUE_RENDER,
-                new ValueRenderEvent($value, $fieldConfigId)
+                $event
             );
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
@@ -124,7 +118,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             $dynamicRow[$fieldName] = array(
                 'type'  => $fieldType,
                 'label' => $label,
-                'value' => $value,
+                'value' => $event->getFieldViewValue(),
             );
         }
 

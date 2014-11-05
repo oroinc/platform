@@ -290,7 +290,7 @@ services:
     oro_entity_extend.listener.extend_field_value_render:
         class: %oro_entity_extend.listener.extend_field_value_render.class%
         arguments:
-            - @oro_entity_config.provider.extend
+            - @oro_entity_config.config_manager
             - @router
             - @oro_entity_extend.extend.field_type_helper
         tags:

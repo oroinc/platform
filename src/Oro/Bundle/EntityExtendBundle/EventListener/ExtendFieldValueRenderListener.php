@@ -51,14 +51,15 @@ class ExtendFieldValueRenderListener
     protected $fieldTypeHelper;
 
     public function __construct(
-        ConfigProviderInterface $extendProvider,
+        ConfigManager $configManager,
         UrlGeneratorInterface $router,
         FieldTypeHelper $fieldTypeHelper
     ) {
-        $this->extendProvider = $extendProvider;
+        $this->configManager = $configManager;
         $this->router = $router;
         $this->fieldTypeHelper = $fieldTypeHelper;
 
+        $this->extendProvider = $configManager->getProvider('extend');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -73,6 +74,8 @@ class ExtendFieldValueRenderListener
             return;
         }
 
+        $type = $event->getFieldConfigId()->getFieldType();
+
         /** Prepare Relation field type */
         if ($value instanceof Collection) {
             $event->setFieldViewValue($this->getValueForCollection($value, $event->getFieldConfigId()));
@@ -81,18 +84,14 @@ class ExtendFieldValueRenderListener
         }
 
         /** Prepare OptionSet field type */
-        if ($event->getType() == 'optionSet') {
+        if ($type == 'optionSet') {
             $value = $this->getValueForOptionSet($event->getFieldValue(), $event->getFieldConfigId());
         }
 
-        $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($event->getType());
+        $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($underlyingFieldType == 'manyToOne') {
             $viewData = $this->propertyAccessor->getValue(
-                FieldAccessor::getValue(
-                    $value,
-                    $event->getFieldConfigId()
-                        ->getFieldName()
-                ),
+                $value,
                 $this->extendProvider->getConfigById($event->getFieldConfigId())
                     ->get('target_field')
             );
