@@ -78,14 +78,18 @@ class ExtendFieldValueRenderListener
 
         /** Prepare Relation field type */
         if ($value instanceof Collection) {
-            $event->setFieldViewValue($this->getValueForCollection($value, $event->getFieldConfigId()));
+            $viewData = $this->getValueForCollection($value, $event->getFieldConfigId());
+            $event->setFieldViewValue($viewData);
 
             return;
         }
 
         /** Prepare OptionSet field type */
         if ($type == 'optionSet') {
-            $value = $this->getValueForOptionSet($event->getFieldValue(), $event->getFieldConfigId());
+            $viewData = $this->getValueForOptionSet($event->getFieldValue(), $event->getFieldConfigId());
+            $event->setFieldViewValue($viewData);
+
+            return;
         }
 
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
