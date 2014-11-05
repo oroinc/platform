@@ -10,13 +10,13 @@
         {% set allParams = allParams|merge(currentParams) %}
         {% set allParams = allParams|merge(queryParams) %}
 
-        <li>
+        <li class="entity-pagination">
             {% if pager.current != 1 %}
                 <a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
                 <a href="{{ path('oro_entity_pagination_previous', allParams) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
             {% endif %}
 
-            {{ 'oro.entity_pagination.pager_%current%_of_%total%'|trans({'%current%': pager.current, '%total%': pager.total}) }}
+            <span>{{ 'oro.entity_pagination.pager_%current%_of_%total%'|trans({'%current%': pager.current, '%total%': pager.total}) }}</span>
 
             {% if pager.current != pager.total %}
                 <a href="{{ path('oro_entity_pagination_next', allParams) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
