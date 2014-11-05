@@ -20,37 +20,42 @@ define([
             'class': 'list-item'
         },
         events: {
-            //'click .item-edit-button':   'onEdit',
-            //'click .item-remove-button': 'onDelete',
-            //'click .accordion-toggle':   'onToggle'
+            'click .item-edit-button':   'onEdit',
+            'click .item-remove-button': 'onDelete',
+            'click .accordion-toggle':   'onToggle'
         },
         listen: {
-            //'change model': '_onModelChanged'
+            'change model': '_onModelChanged'
         },
 
         initialize: function (options) {
-            /*
-            debugger;
             this.options = _.defaults(options || {}, this.options);
-            this.collapsed = false;
-            if (!this.options.template) {
+            this.collapsed = true;
+            if (this.options.template) {
                 this.template = _.template($(this.options.template).html());
             }
-            */
+            if (this.model.attributes.relatedActivityClass) {
+                var templateName = '#template-activity-item-' + this.model.attributes.relatedActivityClass;
+                templateName = templateName.replace(/\\/g, '_');
+                this.template = _.template($(templateName).html());
+            }
         },
 
         getTemplateData: function () {
             var data = ActivityView.__super__.getTemplateData.call(this);
 
-            //data.collapsed = this.collapsed;
+            data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
-            //data.template  = this.
+            data.relatedEntityClass = _.escape(data.relatedEntityClass);
+            data.relatedActivityClass = _.escape(data.relatedActivityClass);
+
             //data.message = _.escape(data.message);
             //data.brief_message = data.message.replace(new RegExp('\r?\n', 'g'), ' ');
             //data.message = data.message.replace(new RegExp('\r?\n', 'g'), '<br />');
             //data.message = autolinker.link(data.message, {className: 'no-hash'});
             //data.brief_message = autolinker.link(data.brief_message, {className: 'no-hash'});
+
 
             return data;
         },
@@ -66,7 +71,6 @@ define([
         },
 
         onToggle: function (e) {
-            alert('onToggle');
             e.preventDefault();
             this.toggle();
         },

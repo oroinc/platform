@@ -1,18 +1,10 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
-
-<div class="widget-content activity-list {{ containerExtraClass }}">
+<div class="widget-content notes activity-list {{ containerExtraClass }}">
     {% block widget_content %}
         {% block widget_actions %}
-        <div class="actions">
-            <div class="pull-right">
-                {#{{ UI.clientLink({#}
-                    {#'aCss': 'collapse-all-button btn-mini',#}
-                    {#'label' : 'Collapse All'|trans,#}
-                    {#'dataAttributes': {'action-name': 'collapse_all'}#}
-                {#}) }}#}
-
+        <div class="widget-actions">
                 {% set html %}
                     <li>
                         <a href="javascript: void(0);">
@@ -32,13 +24,29 @@
                             </label>
                         </a>
                     </li>
-
                 {% endset %}
+
+
+            {#<div class="btn-group">#}
+                {#<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">#}
+                    {#<i class="icon icon-cog"></i>#}
+                    {#Tools#}
+                    {#<span class="caret"></span>#}
+                {#</a>#}
+                {#<ul class="dropdown-menu pull-right">#}
+                    {#<li><a href="/crm-enterprise/web/app_dev.php/dashboard/update/1" class=" " title="Edit current dashboard"><i class="icon-edit hide-text">Edit</i>Edit</a></li>#}
+                    {#<li><a href="/crm-enterprise/web/app_dev.php/dashboard/create" class=" " title="Create new dashboard"><i class="icon-plus hide-text">Create</i>Create</a></li>#}
+                    {#<li><a href="javascript:void(0);" data-message="Are you sure you want to delete this Dashboard?" data-success-message="Dashboard deleted" data-url="/crm-enterprise/web/app_dev.php/api/rest/latest/dashboards/1" data-id="1" data-redirect="/crm-enterprise/web/app_dev.php/dashboard" class=" no-hash remove-button" title="Delete Dashboard"><i class="icon-trash hide-text">Delete</i>Delete</a></li>#}
+                {#</ul>#}
+            {#</div>#}
+
+
                 {{ UI.dropdownButton({
                     'label': 'View filter'|trans,
                     'iCss': 'icon- icon-cog-',
-                    'aCss': 'pull-right--',
-                    'html': html
+                    'aCss': 'btn btn-',
+                    'html': html,
+                    'dataAttribute': {'action-name': 'filter'}
                 }) }}
                 {{ UI.clientLink({
                     'aCss': 'btn apply-button icons-holder-text',
@@ -52,15 +60,10 @@
                     'title' : 'Refresh'|trans,
                     'dataAttributes': {'action-name': 'refresh'}
                 }) }}
-            </div>
         </div>
         {% endblock %}
 
         {% block items_container %}
-            <div class="clearfix" style="border:1px solid red;">
-                ACTIVITIES HERE
-            </div>
-
             {% set options = {
                 widgetId: app.request.get('_wid'),
                 activityListData: render(path(
@@ -71,31 +74,27 @@
                         entityId: entity.id
                     }
                 )),
-                briefTemplates: briefTemplates,
-                fullTemplates: fullTemplates,
-
-                template:     '#template-activity-list',
-                itemTemplate: '#template-activity-item',
+                activityListOptions: {
+                    briefTemplates: briefTemplates,
+                    fullTemplates: fullTemplates,
+                    template: '#template-activity-list',
+                    itemTemplate: '#template-activity-item',
+                    urls: {},
+                    routes: {}
+                }
             } %}
 
-            {{ dump(options) }}
-
-            {#urls: {#}
-                {#list: path('oro_note_notes', {#}
-                    {#'entityClass': oro_class_name(entity, true), 'entityId': entity.id#}
-                {#}),#}
-            {#},#}
-            {#routes: {#}
-                {#update: 'oro_note_update',#}
-                {#delete: 'oro_api_delete_note'#}
-            {#}#}
-
-            <div class="container-fluid accordion" style="border: 1px solid yellow"
+            <div class="container-fluid accordion"
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
+            {{ dump(briefTemplates) }}
+            {% for activityClass, activityOptions in briefTemplates %}
+                {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
+            {% endfor %}
+
         {% endblock %}
     {% endblock %}
 </div>

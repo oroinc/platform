@@ -1,45 +1,62 @@
+///*jslint nomen:true*/
+///*global define*/
+//define([
+//    'jquery',
+//    'underscore',
+//    'orotranslation/js/translator',
+//    'oroui/js/app/views/base/collection-view',
+//    'oroui/js/mediator',
+//    'oroui/js/loading-mask',
+//    'oro/dialog-widget',
+//    'oroui/js/delete-confirmation'
+//], function ($, _, __, BaseCollectionView, mediator,
+//    LoadingMask, DialogWidget, DeleteConfirmation) {
+//    'use strict';
+//
+//    var ActivityListView;
+
+
+
 /*jslint nomen:true*/
 /*global define*/
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/app/views/base/collection-view',
-    'oroui/js/mediator',
-    'oroui/js/loading-mask',
-    'oro/dialog-widget',
-    'oroui/js/delete-confirmation'
-], function ($, _, __, BaseCollectionView, mediator,
-    LoadingMask, DialogWidget, DeleteConfirmation) {
+define(function (require) {
     'use strict';
 
-    var ActivityListView;
+    var ActivityListView,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
+        LoadingMask = require('oroui/js/loading-mask'),
+        DialogWidget = require('oro/dialog-widget'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation'),
+        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     ActivityListView = BaseCollectionView.extend({
         options: {
             briefTemplates: {},
             fullTemplates: {},
-
+            template: null,
             itemTemplate: null,
-            //itemAddEvent: 'note:add',
+            itemAddEvent: 'activity:add',
             itemViewIdPrefix: 'activity-',
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
             loadingSelector: '.loading-mask',
             collection: null,
             urls: {
-                //createItem: null,
-                //updateItem: null,
-                //deleteItem: null
+                updateItem: null,
+                deleteItem: null
             },
             messages: {}
         },
         listen: {
-            //'toEdit collection': '_editItem',
-            //'toDelete collection': '_deleteItem'
+            'toEdit collection': '_editItem',
+            'toDelete collection': '_deleteItem'
         },
 
         initialize: function (options) {
+            console.log(options);
             this.options = _.defaults(options || {}, this.options);
             /*
             _.defaults(this.options.messages, {
@@ -54,13 +71,26 @@ define([
             });
             */
 
-            //this.itemTemplate = _.template($(this.options.template).html());
+            this.template = _.template($(this.options.template).html());
 
             // create communication in scope of active controller
-            //mediator.on(this.options.itemAddEvent, this._addItem, this);
+            mediator.on(this.options.itemAddEvent, this._addItem, this);
 
             ActivityListView.__super__.initialize.call(this, options);
         },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.itemEditDialog;
+            delete this.$loadingMaskContainer;
+            ActivityListView.__super__.dispose.call(this);
+        },
+
 
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
@@ -69,12 +99,14 @@ define([
         },
 
         expandAll: function () {
+            alert('expand all');
             //_.each(this.subviews, function (itemView) {
             //    itemView.toggle(false);
             //});
         },
 
         collapseAll: function () {
+            alert('collapse all');
             //_.each(this.subviews, function (itemView) {
             //    itemView.toggle(true);
             //});
@@ -82,6 +114,10 @@ define([
 
         refresh: function () {
             this._reload();
+        },
+
+        filter: function () {
+            this._filter();
         },
 
         toggleSorting: function (e) {
@@ -97,14 +133,13 @@ define([
         },
 
         _reload: function (sorting) {
-            alert('reload');
-
             var state = {};
             if (!_.isUndefined(sorting)) {
                 this.collection.setSorting(sorting);
             }
             this._showLoading();
             try {
+                debugger;
                 _.each(this.subviews, function (itemView) {
                     state[itemView.model.get('id')] = itemView.isCollapsed();
                 });
@@ -123,6 +158,13 @@ define([
             } catch (err) {
                 this._showLoadItemsError(err);
             }
+        },
+
+        _filter: function (filter) {
+
+            console.log(filter);
+            alert('filter');
+
         },
 
         _addItem: function () {
@@ -144,8 +186,8 @@ define([
         },
 
         _onItemDelete: function (model) {
-            //this._showLoading();
-            //try {
+            this._showLoading();
+            try {
             //    model.destroy({
             //        wait: true,
             //        url: this._getUrl('deleteItem', model),
@@ -161,9 +203,9 @@ define([
             //            }
             //        }, this)
             //    });
-            //} catch (err) {
-            //    this._showDeleteItemError(err);
-            //}
+            } catch (err) {
+                this._showDeleteItemError(err);
+            }
         },
 
         /**
@@ -182,11 +224,11 @@ define([
         },
 
         _getMessage: function (labelKey) {
-            //return this.options.messages[labelKey];
+            return this.options.messages[labelKey];
         },
 
         _openItemEditForm: function (title, url) {
-            //if (!this.itemEditDialog) {
+            if (!this.itemEditDialog) {
             //    this.itemEditDialog = new DialogWidget({
             //        'url': url,
             //        'title': title,
@@ -221,11 +263,10 @@ define([
             //            this.collection.add(response, {at: insertPosition});
             //        }
             //    }, this));
-            //}
+            }
         },
 
         _showLoading: function () {
-            alert('showLoading');
             if (!this.$loadingMaskContainer.data('loading-mask-visible')) {
                 this.loadingMask = new LoadingMask();
                 this.$loadingMaskContainer.data('loading-mask-visible', true);
@@ -235,7 +276,6 @@ define([
         },
 
         _hideLoading: function () {
-            alert('hideLoading');
             if (this.loadingMask) {
                 this.$loadingMaskContainer.data('loading-mask-visible', false);
                 this.loadingMask.remove();

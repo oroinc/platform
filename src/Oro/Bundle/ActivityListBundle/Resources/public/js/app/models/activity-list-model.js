@@ -16,28 +16,16 @@ define([
             briefData: '',
             fullTemplate: '',
             fullData: '',
-            relatedEntity_class: '',
-            relatedEntity_id: '',
-            activityEntity_class: '',
-            activityEntity_id: '',
+            relatedEntityClass: '',
+            relatedEntityId: '',
+            activityEntityClass: '',
+            activityEntityId: '',
             createdAt: '',
-            updatedAt: ''
+            updatedAt: '',
 
-            //hasUpdate: false,
-            //editable: false,
-            //removable: false,
-        },
-
-        initialize: function (options) {
-            debugger;
-
-            //this.options = _.defaults(options || {}, this.options);
-            //this.collapsed = false;
-            //
-            //if (!this.options.template) {
-            //    debugger;
-            //    this.template = _.template($(this.options.template).html());
-            //}
+            hasUpdate: false,
+            editable: true,
+            removable: true
         }
     });
 

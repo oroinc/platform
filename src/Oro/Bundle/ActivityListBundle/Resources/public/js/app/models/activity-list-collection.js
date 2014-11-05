@@ -17,9 +17,6 @@ define([
         toDate:   '',
         filter:   '',
 
-        briefTemplates: {},
-        fullTemplates: {},
-
         url: function () {
             return this.baseUrl + '?sorting=' + this.sorting;
         },
@@ -48,12 +45,6 @@ define([
         },
 
         setFilter: function () {
-        },
-
-        getBriefTemplate: function () {
-        },
-
-        setBriefTemplate: function () {
         }
     });
 

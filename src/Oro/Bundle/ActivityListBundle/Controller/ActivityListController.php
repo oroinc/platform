@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 /**
  * @Route("/activity-list")
@@ -41,27 +41,6 @@ class ActivityListController extends Controller
             'briefTemplates' => $activitiesProvider->getBriefTemplates(),
             'fullTemplates'  => $activitiesProvider->getFullTemplates()
         ];
-    }
-
-
-    /**
-     * @Route(
-     *      "/view/{entity}",
-     *      name="oro_activity_view_activities"
-     * )
-     *
-     * @param object $entity The entity object which activities should be rendered
-     *
-     * @return Response
-     */
-    public function activitiesAction($entity)
-    {
-        return $this->render(
-            'OroActivityListBundle:ActivityList:activities.html.twig',
-            [
-                'entity' => $entity
-            ]
-        );
     }
 
     /**

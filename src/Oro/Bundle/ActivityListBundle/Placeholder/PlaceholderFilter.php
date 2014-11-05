@@ -24,6 +24,11 @@ class PlaceholderFilter
          * TODO:
          *  validation should be checked by interface class or by provider
          */
-        return in_array($className, ['OroCRM\Bundle\ContactBundle\Entity\Contact']);
+        return in_array(
+            $className,
+            [
+                'OroCRM\Bundle\ContactBundle\Entity\Contact',
+            ]
+        );
     }
 }
