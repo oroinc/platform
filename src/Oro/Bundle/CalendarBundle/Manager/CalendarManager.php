@@ -3,33 +3,24 @@
 namespace Oro\Bundle\CalendarBundle\Manager;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
+use Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider;
 use Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class CalendarManager
 {
-    const CALENDAR_PROPERTY_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarProperty';
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var CalendarPropertyProvider */
+    protected $calendarPropertyProvider;
 
     /** @var CalendarProviderInterface[] */
     protected $providers = [];
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager  $configManager
+     * @param CalendarPropertyProvider $calendarPropertyProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    public function __construct(CalendarPropertyProvider $calendarPropertyProvider)
     {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->configManager  = $configManager;
+        $this->calendarPropertyProvider = $calendarPropertyProvider;
     }
 
     /**
@@ -44,18 +35,20 @@ class CalendarManager
     }
 
     /**
-     * @param int $userId
-     * @param int $calendarId
+     * Gets calendars connected to the given calendar
+     *
+     * @param int $userId     The id of an user requested this information
+     * @param int $calendarId The target calendar id
      *
      * @return array
      */
     public function getCalendars($userId, $calendarId)
     {
-        // make sure input parameters have proper type
+        // make sure input parameters have proper types
         $userId     = (int)$userId;
         $calendarId = (int)$calendarId;
 
-        $result = $this->getCalendarProperties($calendarId);
+        $result = $this->calendarPropertyProvider->getItems($calendarId);
 
         $existing = [];
         foreach ($result as $key => $item) {
@@ -65,16 +58,17 @@ class CalendarManager
         foreach ($this->providers as $alias => $provider) {
             $calendarIds           = isset($existing[$alias]) ? array_keys($existing[$alias]) : [];
             $calendarDefaultValues = $provider->getCalendarDefaultValues($userId, $calendarId, $calendarIds);
-            foreach ($calendarDefaultValues as $calendarId => $values) {
-                if (isset($existing[$alias][$calendarId])) {
-                    $key      = $existing[$alias][$calendarId];
+            foreach ($calendarDefaultValues as $id => $values) {
+                if (isset($existing[$alias][$id])) {
+                    $key      = $existing[$alias][$id];
                     $calendar = $result[$key];
                     $this->applyCalendarDefaultValues($calendar, $values);
                     $result[$key] = $calendar;
                 } else {
-                    $values['calendarAlias'] = $alias;
-                    $values['calendar']      = $calendarId;
-                    $result[]                = $values;
+                    $values['targetCalendar'] = $calendarId;
+                    $values['calendarAlias']  = $alias;
+                    $values['calendar']       = $id;
+                    $result[]                 = $values;
                 }
             }
         }
@@ -85,6 +79,8 @@ class CalendarManager
     }
 
     /**
+     * Gets additional computed properties of a calendar is represented by the given connection
+     *
      * @param CalendarProperty $connection
      *
      * @return array
@@ -99,6 +95,8 @@ class CalendarManager
     }
 
     /**
+     * Gets the list of calendar events
+     *
      * @param int       $calendarId
      * @param \DateTime $start
      * @param \DateTime $end
@@ -108,8 +106,9 @@ class CalendarManager
      */
     public function getCalendarEvents($calendarId, $start, $end, $subordinate)
     {
-        // make sure input parameters have proper type
-        $calendarId = (int)$calendarId;
+        // make sure input parameters have proper types
+        $calendarId  = (int)$calendarId;
+        $subordinate = (bool)$subordinate;
 
         $result = [];
 
@@ -124,22 +123,6 @@ class CalendarManager
         }
 
         return $result;
-    }
-
-    /**
-     * @param int $calendarId
-     *
-     * @return array
-     */
-    protected function getCalendarProperties($calendarId)
-    {
-        $repo = $this->doctrineHelper->getEntityRepository(self::CALENDAR_PROPERTY_CLASS);
-        $qb   = $repo->createQueryBuilder('o')
-            ->where('o.targetCalendar = :calendar_id')
-            ->setParameter('calendar_id', $calendarId)
-            ->orderBy('o.id');
-
-        return $qb->getQuery()->getArrayResult();
     }
 
     /**
@@ -163,9 +146,11 @@ class CalendarManager
      */
     protected function applyCalendarDefaultValues(array &$calendar, array $defaultValues)
     {
-        foreach ($defaultValues as $key => $val) {
-            if (!isset($calendar[$key]) && !array_key_exists($key, $calendar)) {
-                $calendar[$key] = $val;
+        foreach ($defaultValues as $fieldName => $val) {
+            if (!isset($calendar[$fieldName]) && !array_key_exists($fieldName, $calendar)) {
+                $calendar[$fieldName] = is_callable($val)
+                    ? call_user_func($val, $fieldName)
+                    : $val;
             }
         }
     }
@@ -176,9 +161,9 @@ class CalendarManager
      */
     protected function removeCalendarRedundantProperties(array &$calendar, array $defaultValues)
     {
-        foreach (array_keys($calendar) as $key) {
-            if (!isset($defaultValues[$key]) && !array_key_exists($key, $defaultValues)) {
-                unset($calendar[$key]);
+        foreach (array_keys($calendar) as $fieldName) {
+            if (!isset($defaultValues[$fieldName]) && !array_key_exists($fieldName, $defaultValues)) {
+                unset($calendar[$fieldName]);
             }
         }
     }
@@ -188,20 +173,7 @@ class CalendarManager
      */
     protected function getCalendarDefaultValues()
     {
-        $metadata = $this->doctrineHelper->getEntityMetadata(self::CALENDAR_PROPERTY_CLASS);
-        /** @var FieldConfigId[] $fieldIds */
-        $fieldIds = $this->configManager->getIds('extend', self::CALENDAR_PROPERTY_CLASS);
-
-        $result = [];
-        foreach ($fieldIds as $fieldId) {
-            $fieldName    = $fieldId->getFieldName();
-            $defaultValue = null;
-            if ($metadata->hasField($fieldName)) {
-                $mapping      = $metadata->getFieldMapping($fieldName);
-                $defaultValue = isset($mapping['options']['default']) ? $mapping['options']['default'] : null;
-            }
-            $result[$fieldName] = $defaultValue;
-        }
+        $result = $this->calendarPropertyProvider->getDefaultValues();
 
         $result['calendarName'] = null;
         $result['removable']    = true;
