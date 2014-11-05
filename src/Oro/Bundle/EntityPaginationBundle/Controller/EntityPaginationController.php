@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationController extends Controller
 {
@@ -106,14 +107,26 @@ class EntityPaginationController extends Controller
                     $params[$identifier] = $entityId;
                 }
 
-                /** @var FlashBagInterface $flashBag */
-                $flashBag = $this->get('session')->getFlashBag();
-                $translator = $this->get('translator');
+                if (!$result->isAvailable() || !$result->isAccessible()) {
+                    /** @var FlashBagInterface $flashBag */
+                    $flashBag = $this->get('session')->getFlashBag();
+                    $translator = $this->get('translator');
+                    $statsMessage = EntityPaginationManager::getStatsMessage($scope);
+                    $count = $navigationService->getTotalCount($entity, $scope);
 
-                if (!$result->isAvailable()) {
-                    $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_available'));
-                } elseif (!$result->isAccessible()) {
-                    $flashBag->add('alert', $translator->trans('oro.entity_pagination.message.not_accessible'));
+                    if (!$result->isAvailable()) {
+                        $flashBag->add(
+                            'alert',
+                            $translator->trans('oro.entity_pagination.message.not_available') . ' ' .
+                            $translator->trans($statsMessage, ['%count%' => $count])
+                        );
+                    } elseif (!$result->isAccessible()) {
+                        $flashBag->add(
+                            'alert',
+                            $translator->trans('oro.entity_pagination.message.not_accessible') . ' ' .
+                            $translator->trans($statsMessage, ['%count%' => $count])
+                        );
+                    }
                 }
             }
         }
