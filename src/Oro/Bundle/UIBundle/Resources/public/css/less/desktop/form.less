@@ -29,6 +29,28 @@
     }
   }
 }
+.select2-container {
+  .select2-choice {
+    .select2-arrow {
+      top: 6px;
+    }
+    .select2-search-choice-close {
+      width: 15px;
+      height: 15px;
+      &:before{
+        content: "\f00d";
+        font: normal 11px FontAwesome;
+        right: 3px;
+        top: 2px;
+        color: #444;
+        line-height: 1em;
+      }
+      &:hover:before{
+        color: #666;
+      }
+    }
+  }
+}
 .oro-item-collection.not-removable {
   input[type="email"], input[type="text"] {
     width: 280px;

@@ -31,7 +31,7 @@ define([
         /**
          * Add widget instance to registry.
          *
-         * @param {oro.AbstractWidget} widget
+         * @param {oroui.widget.AbstractWidget} widget
          */
         addWidgetInstance: function(widget) {
             this.widgets[widget.getWid()] = widget;
