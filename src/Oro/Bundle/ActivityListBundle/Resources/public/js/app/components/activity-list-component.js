@@ -21,9 +21,7 @@ define(function (require) {
             activityListOptions: {
                 briefTemplates: {},
                 fullTemplates: {},
-                urls: {
-
-                },
+                urls: {},
                 routes: {},
                 itemView: ActivityView,
                 itemModel: ActivityModel
@@ -62,7 +60,6 @@ define(function (require) {
                 };
             });
             delete options.activityListOptions.routes;
-
             options.activityListData = JSON.parse(options.activityListData);
             options.activityListOptions.el = options._sourceElement;
 
@@ -82,7 +79,8 @@ define(function (require) {
             collection = new ActivityCollection(options.activityListData, {
                 model: activityOptions.itemModel
             });
-            //collection.baseUrl = activityOptions.urls.list;
+            collection.baseUrl = activityOptions.urls.list;
+
             activityOptions.collection = collection;
 
             // bind template for item view
@@ -101,13 +99,14 @@ define(function (require) {
                     action.on('click', _.bind(list.refresh, list));
                 });
                 widget.getAction('filter', 'adopted', function(action) {
-                    action.on('change', _.bind(list.filter, list));
+                    action.on('click', _.bind(list.filter, list));
                 });
-                /*
                 widget.getAction('collapse_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });
-                */
+                widget.getAction('expand_all', 'adopted', function (action) {
+                    action.on('click', _.bind(list.expandAll, list));
+                });
                 /*
                 widget.getAction('toggle_sorting', 'adopted', function (action) {
                     action.on('click', _.bind(list.toggleSorting, list));

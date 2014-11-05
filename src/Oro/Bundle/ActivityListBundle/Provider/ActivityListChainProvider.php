@@ -60,6 +60,7 @@ class ActivityListChainProvider
                 $list->setSubject($provider->getSubject($entity));
                 $list->setOwner($entity->getOwner());
                 $list->setOrganization($entity->getOrganization());
+                $list->setData($provider->getData($entity));
                 $list->setRelatedEntityClass($this->doctrineHelper->getEntityClass($entity));
                 $list->setRelatedEntityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
 

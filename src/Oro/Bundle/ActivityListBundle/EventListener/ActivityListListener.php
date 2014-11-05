@@ -7,7 +7,6 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListInterface;
 
@@ -25,9 +24,7 @@ class ActivityListListener
     /**  @var array */
     protected $deletedEntities = [];
 
-    /**
-     * @var ActivityListChainProvider
-     */
+    /** @var ActivityListChainProvider */
     protected $chainProvider;
 
     /**

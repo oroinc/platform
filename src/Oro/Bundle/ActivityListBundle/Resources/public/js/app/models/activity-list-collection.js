@@ -10,7 +10,6 @@ define([
 
     ActivityCollection = BaseCollection.extend({
         model:    ActivityModel,
-
         baseUrl:  '',
         sorting:  'DESC',
         fromDate: '',
@@ -24,28 +23,18 @@ define([
         getSorting: function () {
             return this.sorting;
         },
-
         setSorting: function (mode) {
             this.sorting = mode;
         },
 
-        getFromDate: function () {
-        },
+        getFromDate: function () {},
+        setFromDate: function () {},
 
-        setFromDate: function () {
-        },
+        getToDate: function () {},
+        setToDate: function () {},
 
-        getToDate: function () {
-        },
-
-        setToDate: function () {
-        },
-
-        getFilter: function () {
-        },
-
-        setFilter: function () {
-        }
+        getFilter: function () {},
+        setFilter: function () {}
     });
 
     return ActivityCollection;

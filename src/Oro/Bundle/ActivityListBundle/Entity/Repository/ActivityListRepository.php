@@ -12,10 +12,11 @@ class ActivityListRepository extends EntityRepository
 
         $perPage = 5;
         $pager   = $this->get('oro_datagrid.extension.pager.orm.pager');
-        $qb = $this->getDoctrine()->getManager()->getRepository('OroActivityListBundle:ActivityList')->getActivityListQueryBuilder(
-            $request->get('class_name'),
-            $request->get('entity_id')
-        );
+        $qb = $this->getDoctrine()->getManager()->getRepository('OroActivityListBundle:ActivityList')
+            ->getActivityListQueryBuilder(
+                $request->get('class_name'),
+                $request->get('entity_id')
+            );
         $pager->setQueryBuilder($qb);
         $pager->setPage($request->get('page', 1));
         $pager->setMaxPerPage($perPage);

@@ -26,14 +26,28 @@ interface ActivityListProviderInterface
      */
     public function getSubject($entity);
 
-    public function getBriefData($entity);
-
+    /**
+     * @param object $entity
+     *
+     * @return array
+     */
     public function getData($entity);
 
+    /**
+     * @return string
+     */
     public function getBriefTemplate();
 
+    /**
+     * @return string
+     */
     public function getFullTemplate();
 
+    /**
+     * @param $entity
+     *
+     * @return integer
+     */
     public function getActivityId($entity);
 
     /**

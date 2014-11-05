@@ -1,22 +1,3 @@
-///*jslint nomen:true*/
-///*global define*/
-//define([
-//    'jquery',
-//    'underscore',
-//    'orotranslation/js/translator',
-//    'oroui/js/app/views/base/collection-view',
-//    'oroui/js/mediator',
-//    'oroui/js/loading-mask',
-//    'oro/dialog-widget',
-//    'oroui/js/delete-confirmation'
-//], function ($, _, __, BaseCollectionView, mediator,
-//    LoadingMask, DialogWidget, DeleteConfirmation) {
-//    'use strict';
-//
-//    var ActivityListView;
-
-
-
 /*jslint nomen:true*/
 /*global define*/
 define(function (require) {
@@ -56,20 +37,19 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            console.log(options);
             this.options = _.defaults(options || {}, this.options);
-            /*
+
             _.defaults(this.options.messages, {
-                addDialogTitle: __('oro.note.add_note_title'),
-                editDialogTitle: __('oro.note.edit_note_title'),
-                itemSaved: __('oro.note.note_saved'),
-                itemRemoved: __('oro.note.note_removed'),
-                deleteConfirmation: __('oro.note.note_delete_confirmation'),
-                loadItemsError: __('oro.note.load_notes_error'),
-                deleteItemError: __('oro.note.delete_note_error'),
-                forbiddenError: __('oro.note.forbidden_error')
+                editDialogTitle: __('oro.activitylist.edit_title'),
+                itemSaved: __('oro.activitylist.item_saved'),
+                itemRemoved: __('oro.activitylist.item_removed'),
+
+                deleteConfirmation: __('oro.activitylist.delete_confirmation'),
+                deleteItemError: __('oro.activitylist.delete_error'),
+
+                loadItemsError: __('oro.activitylist.load_error'),
+                forbiddenError: __('oro.activitylist.forbidden_error')
             });
-            */
 
             this.template = _.template($(this.options.template).html());
 
@@ -91,7 +71,6 @@ define(function (require) {
             ActivityListView.__super__.dispose.call(this);
         },
 
-
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
@@ -99,17 +78,15 @@ define(function (require) {
         },
 
         expandAll: function () {
-            alert('expand all');
-            //_.each(this.subviews, function (itemView) {
-            //    itemView.toggle(false);
-            //});
+            _.each(this.subviews, function (itemView) {
+                itemView.toggle(false);
+            });
         },
 
         collapseAll: function () {
-            alert('collapse all');
-            //_.each(this.subviews, function (itemView) {
-            //    itemView.toggle(true);
-            //});
+            _.each(this.subviews, function (itemView) {
+                itemView.toggle(true);
+            });
         },
 
         refresh: function () {
@@ -139,7 +116,6 @@ define(function (require) {
             }
             this._showLoading();
             try {
-                debugger;
                 _.each(this.subviews, function (itemView) {
                     state[itemView.model.get('id')] = itemView.isCollapsed();
                 });
@@ -161,10 +137,7 @@ define(function (require) {
         },
 
         _filter: function (filter) {
-
-            console.log(filter);
             alert('filter');
-
         },
 
         _addItem: function () {
@@ -176,13 +149,13 @@ define(function (require) {
         },
 
         _deleteItem: function (model) {
-            //var confirm = new DeleteConfirmation({
-            //    content: this._getMessage('deleteConfirmation')
-            //});
-            //confirm.on('ok', _.bind(function () {
-            //    this._onItemDelete(model);
-            //}, this));
-            //confirm.open();
+            var confirm = new DeleteConfirmation({
+                content: this._getMessage('deleteConfirmation')
+            });
+            confirm.on('ok', _.bind(function () {
+                this._onItemDelete(model);
+            }, this));
+            confirm.open();
         },
 
         _onItemDelete: function (model) {

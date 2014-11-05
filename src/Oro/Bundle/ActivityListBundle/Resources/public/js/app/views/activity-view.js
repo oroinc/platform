@@ -56,18 +56,15 @@ define([
             //data.message = autolinker.link(data.message, {className: 'no-hash'});
             //data.brief_message = autolinker.link(data.brief_message, {className: 'no-hash'});
 
-
             return data;
         },
 
         onEdit: function () {
-            alert('onEdit');
-            //this.model.collection.trigger('toEdit', this.model);
+            this.model.collection.trigger('toEdit', this.model);
         },
 
         onDelete: function () {
-            alert('onDelete');
-            //this.model.collection.trigger('toDelete', this.model);
+            this.model.collection.trigger('toDelete', this.model);
         },
 
         onToggle: function (e) {
