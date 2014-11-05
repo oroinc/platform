@@ -35,6 +35,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             loadingMaskContent: '.loading-content'
         },
 
+        /** @property {Object} */
         options: {
             eventsOptions: {
                 editable: true,
@@ -48,6 +49,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 collection: null,
                 containerTemplateSelector: null
             }
+        },
+
+        /** @property {Object} */
+        defaults: {
+            calendarAlias: 'user'
         },
 
         /**
@@ -86,7 +92,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
-            this.connectionsView.dispose.call(this);
+            if (this.connectionsView) {
+                this.connectionsView.dispose.call(this);
+            }
             Backbone.View.prototype.dispose.call(this);
         },
 
@@ -134,14 +142,65 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         handleEventViewAdd: function (eventModel) {
+            eventModel.set('calendarAlias', this.defaults.calendarAlias);
             this.getCollection().add(eventModel);
         },
 
-        onEventAdded: function (eventModel) {
+        visibleDefaultCalendar: function (eventModel) {
+            //check calendar visible
+            var model = this.options.connectionsOptions.collection.findWhere({
+                calendarAlias: eventModel.get('calendarAlias'),
+                calendar: eventModel.get('calendar')
+            });
+            if (!model.get('visible')) {
+                //render calendar
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+                try {
+                    model.save('visible', true, {
+                        wait: true,
+                        success: _.bind(function () {
+                            savingMsg.close();
+                            // init text/background colors
+                            this.colorManager.setCalendarColors(
+                                model.get('calendarUid'),
+                                model.get('color'),
+                                model.get('backgroundColor')
+                            );
+                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                            var $target = this.connectionsView.$el.find(
+                                this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
+                            ).find('span.calendar-color');
+                            $target.removeClass('un-color');
+                            var style = {
+                                backgroundColor: "#4986E7",
+                                borderColor: "#4986E7"
+                            };
+                            $target.css(style);
+                            this.onConnectionAddedOrDeleted();
+                        }, this),
+                        error: _.bind(function (model, response) {
+                            savingMsg.close();
+                            this.showAddError(response.responseJSON || {});
+                        })
+                    });
+                } catch (err) {
+                    savingMsg.close();
+                    this.showMiscError(err);
+                }
+            } else {
+                this.renderEventAfterAdd(eventModel);
+            }
+        },
+
+        renderEventAfterAdd: function (eventModel) {
             var fcEvent = eventModel.toJSON();
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+        },
+
+        onEventAdded: function (eventModel) {
+            this.visibleDefaultCalendar(eventModel);
         },
 
         onEventChanged: function (eventModel) {
@@ -304,6 +363,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         showMiscError: function (err) {
             this._showError(__('Sorry, unexpected error was occurred'), err);
+        },
+
+        showUpdateError: function (err) {
+            this._showError(__('Sorry, the calendar updating was failed'), err);
         },
 
         _showError: function (message, err) {

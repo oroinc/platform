@@ -61,9 +61,16 @@
 
     <script type="text/html" id="template-calendar-connection-item">
         <li class="media connection-item" >
-                <span class="calendar-color" <% if (!_.isEmpty(backgroundColor)) { %>
-                style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
-            <% } %> ></span>
+                <span
+                    <% if (visible) { %>
+                    class="calendar-color"
+                        <% if (!_.isEmpty(backgroundColor)) { %>
+                        style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+                        <% } %>
+                    <% } else { %>
+                        class="calendar-color un-color"
+                    <% } %>
+                ></span>
             <div class="media-body">
                 <div
                     <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>

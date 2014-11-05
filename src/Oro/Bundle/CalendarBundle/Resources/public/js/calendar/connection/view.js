@@ -15,7 +15,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         attrs: {
             calendarUid:     'data-calendar-uid',
             color:           'data-color',
-            backgroundColor: 'data-bg-color'
+            backgroundColor: 'data-bg-color',
+            visible:         'data-visible'
         },
 
         /** @property {Object} */
@@ -27,7 +28,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             findItemByCalendar: function (calendarUid) { return '.connection-item[data-calendar-uid="' + calendarUid + '"]'; },
             contextMenuButton: '.context-menu-button',
             newCalendarSelector: '#new_calendar',
-            contextMenuTemplate: '#template-calendar-menu'
+            contextMenuTemplate: '#template-calendar-menu',
+            visibleButton: '.calendar-color'
         },
 
         initialize: function (options) {
@@ -37,7 +39,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.connectionsView = this;
             this.template = _.template($(this.options.itemTemplateSelector).html());
             this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-            this.cid = 'outsideEvent';
 
             // render connected calendars
             this.getCollection().each(_.bind(function (model) {
@@ -68,7 +69,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
                 return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
             }, this));
-            this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.color, viewModel.backgroundColor);
+            model.set('color', viewModel.color);
+            model.set('backgroundColor', viewModel.backgroundColor);
 
             el = $(this.template(viewModel));
             // set 'data-' attributes
@@ -85,9 +87,75 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 }
             }, this));
 
+            el.on('click', this.selectors.visibleButton, _.bind(function (e) {
+                this.visibleCalendar($(e.currentTarget), model);
+            }, this));
+
             this.$el.find(this.selectors.itemContainer).append(el);
 
-            this.trigger('connectionAdd', model);
+            if (model.get('visible')) {
+                this.options.colorManager.setCalendarColors(
+                    viewModel.calendarUid,
+                    viewModel.color,
+                    viewModel.backgroundColor
+                );
+                this.trigger('connectionAdd', model);
+            }
+        },
+
+        visibleCalendar: function ($target, model) {
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+            try {
+                if (model.get('visible')) {
+                    model.save('visible', false, {
+                        wait: true,
+                        success: _.bind(function () {
+                            savingMsg.close();
+                            this.options.colorManager.removeCalendarColors(model.get('calendarUid'));
+                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                            var style = {
+                                backgroundColor: "",
+                                borderColor: ""
+                            };
+                            $target.css(style);
+                            $target.addClass('un-color');
+                            this.trigger('connectionRemove', model);
+                        }, this),
+                        error: _.bind(function (model, response) {
+                            savingMsg.close();
+                            this.showUpdateError(response.responseJSON || {});
+                        })
+                    });
+                } else {
+                    model.save('visible', true, {
+                        wait: true,
+                        success: _.bind(function () {
+                            savingMsg.close();
+                            // init text/background colors
+                            this.options.colorManager.setCalendarColors(
+                                model.get('calendarUid'),
+                                model.get('color'),
+                                model.get('backgroundColor')
+                            );
+                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                            $target.removeClass('un-color');
+                            var style = {
+                                backgroundColor: "#4986E7",
+                                borderColor: "#4986E7"
+                            };
+                            $target.css(style);
+                            this.trigger('connectionAdd', model);
+                        }, this),
+                        error: _.bind(function (model, response) {
+                            savingMsg.close();
+                            this.showUpdateError(response.responseJSON || {});
+                        })
+                    });
+                }
+            } catch (err) {
+                savingMsg.close();
+                this.showMiscError(err);
+            }
         },
 
         contextMenu: function ($parent, model) {
@@ -112,11 +180,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     });
                     $parent.closest(options.connectionsView.selectors.item).find('.context-menu-button').css('display', 'block');
                     $parent.closest(options.connectionsView.selectors.item).append(el);
-                    $(document).on('click.' + options.connectionsView.cid, function (event) {
+                    $(document).one('click.' + options.connectionsView.cid, function (event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
                             el.remove();
-                            $(document).off('.' + options.connectionsView.cid);
                         }
                     });
                 });
@@ -124,7 +191,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onModelChanged: function (model) {
-            this.options.colorManager.setCalendarColors(model.get('calendarUid'), model.get('color'), model.get('backgroundColor'));
+            this.options.colorManager.setCalendarColors(
+                model.get('calendarUid'),
+                model.get('color'),
+                model.get('backgroundColor')
+            );
             this.trigger('connectionChange', model);
         },
 
@@ -163,6 +234,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         showAddError: function (err) {
             this._showError(__('Sorry, the calendar adding was failed'), err);
+        },
+
+        showUpdateError: function (err) {
+            this._showError(__('Sorry, the calendar updating was failed'), err);
         },
 
         showMiscError: function (err) {
