@@ -69,4 +69,25 @@ class EntityPaginationManager
 
         return $permission;
     }
+
+    /**
+     * @param string $scope
+     * @return string
+     * @throws \LogicException
+     */
+    public static function getStatsMessage($scope)
+    {
+        switch ($scope) {
+            case self::VIEW_SCOPE:
+                $message = 'oro.entity_pagination.message.stats_number_view_%count%';
+                break;
+            case self::EDIT_SCOPE:
+                $message = 'oro.entity_pagination.message.stats_number_edit_%count%';
+                break;
+            default:
+                throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
+        }
+
+        return $message;
+    }
 }
