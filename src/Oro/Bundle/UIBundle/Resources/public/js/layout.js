@@ -10,7 +10,6 @@ define(function (require) {
         bootstrap = require('bootstrap'),
         __ = require('orotranslation/js/translator'),
         scrollspy = require('oroui/js/scrollspy'),
-        widgetControlInitializer = require('oroui/js/widget-control-initializer'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
@@ -33,7 +32,6 @@ define(function (require) {
             container.find('[data-toggle="tooltip"]').tooltip();
 
             this.initPopover(container.find('form label'));
-            widgetControlInitializer.init(container);
 
             promise = this.initPageComponents(container);
             return promise;
@@ -217,20 +215,11 @@ define(function (require) {
          * Update modificators of responsive elements according to their containers size
          */
         updateResponsiveLayout: function() {
-            // todo: figure out this magic
             _.defer(function() {
                 $(document).responsive();
             });
         }
     };
-
-    mediator.on('grid_load:complete', function (collection, element) {
-        widgetControlInitializer.init(element);
-    });
-
-    mediator.on('grid_render:complete', function (element) {
-        widgetControlInitializer.init(element);
-    });
 
     return layout;
 });

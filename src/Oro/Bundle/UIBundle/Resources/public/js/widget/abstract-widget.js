@@ -1,24 +1,23 @@
 /* jshint devel:true*/
 /*global define, require*/
-define([
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/loading-mask',
-    'orotranslation/js/translator',
-    'oroui/js/tools',
-    'jquery.form'
-], function (_, Backbone, mediator, LoadingMask, __, tools) {
+define(function (require) {
     'use strict';
 
-    var $ = Backbone.$;
+    var AbstractWidget,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        BaseView = require('oroui/js/app/views/base/view'),
+        mediator = require('oroui/js/mediator'),
+        LoadingMask = require('oroui/js/loading-mask'),
+        __ = require('orotranslation/js/translator');
+    require('jquery.form');
 
     /**
-     * @export  oroui/js/widget/abstract
-     * @class   oro.AbstractWidget
-     * @extends Backbone.View
+     * @export  oroui/js/widget/abstract-widget
+     * @class   oroui.widget.AbstractWidget
+     * @extends oroui.app.views.BaseView
      */
-    return Backbone.View.extend({
+    AbstractWidget = BaseView.extend({
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
@@ -66,14 +65,35 @@ define([
         /**
          * Remove widget
          */
-        remove: function() {
+        remove: function () {
+            if (!this.disposing) {
+                // If remove method was called directly -- execute dispose first
+                this.dispose();
+            } else {
+                AbstractWidget.__super__.remove.call(this);
+            }
+        },
+
+        /**
+         *
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            // add flag: this is disposing process
+            // (to prevent recursion from remove method)
+            this.disposing = true;
+
+            // trigger all events before handlers got undelegated
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
             if (this.getAlias()) {
                 mediator.trigger('widget_remove:' + this.getAlias());
             }
-            Backbone.View.prototype.remove.call(this);
             this.trigger('widgetRemoved');
+
+            AbstractWidget.__super__.dispose.call(this);
         },
 
         /**
@@ -203,7 +223,7 @@ define([
                 if (form.length > 0) {
                     this.form = form;
                     var formAction = this.form.attr('action');
-                    if (formAction.length > 0 && formAction[0] !== '#') {
+                    if (!this.options.url && formAction.length > 0 && formAction[0] !== '#') {
                         this.options.url = formAction;
                     }
                 }
@@ -535,8 +555,8 @@ define([
         /**
          * Load content
          *
-         * @param {Object|null} data
-         * @param {String|null} method
+         * @param {Object=} data
+         * @param {String=} method
          */
         loadContent: function(data, method) {
             this.loading = true;
@@ -641,4 +661,6 @@ define([
             el.attr('data-wid', this.getWid());
         }
     });
+
+    return AbstractWidget;
 });

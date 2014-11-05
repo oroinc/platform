@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
@@ -17,10 +18,16 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $obj->getId());
     }
 
+    public function testPositionDefault()
+    {
+        $obj = new CalendarProperty();
+        $this->assertSame(0, $obj->getPosition());
+    }
+
     public function testVisibleDefault()
     {
         $obj = new CalendarProperty();
-        $this->assertEquals(true, $obj->getVisible());
+        $this->assertTrue($obj->getVisible());
     }
 
     public function testCalendarUid()
@@ -33,7 +40,7 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
         $obj->setCalendarAlias('other');
         $this->assertEquals('other:123', $obj->getCalendarUid());
 
-        $obj->setCalendarId(345);
+        $obj->setCalendar(345);
         $this->assertEquals('other:345', $obj->getCalendarUid());
     }
 
@@ -55,10 +62,13 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return array(
+            array('targetCalendar', new Calendar()),
             array('calendarAlias', 'testAlias'),
-            array('calendarId', 123),
-            array('user', new User()),
+            array('calendar', 123),
+            array('position', 100),
             array('visible', false),
+            array('color', 'FFFFFF'),
+            array('backgroundColor', 'FFFFFF'),
         );
     }
 }

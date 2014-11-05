@@ -89,6 +89,8 @@ class AclConfigurationPass implements CompilerPassInterface
         }
         if ($container->hasDefinition(self::DEFAULT_ACL_PROVIDER)) {
             $providerDef = $container->getDefinition(self::DEFAULT_ACL_PROVIDER);
+            // make ACL DBAL provider public because it can be used as standalone service, for example in migrations
+            $providerDef->setPublic(true);
             // substitute the ACL Permission Granting Strategy
             if ($container->hasDefinition(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY)) {
                 $providerDef->replaceArgument(1, new Reference(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY));

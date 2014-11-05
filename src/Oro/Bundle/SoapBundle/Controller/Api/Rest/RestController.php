@@ -53,9 +53,7 @@ abstract class RestController extends RestGetController implements
         $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
-            $entityClass = ClassUtils::getRealClass($entity);
-            $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
-            $view = $this->view($classMetadata->getIdentifierValues($entity), Codes::HTTP_CREATED);
+            $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
         } else {
             $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
         }
@@ -140,6 +138,20 @@ abstract class RestController extends RestGetController implements
                 $request->request->set($this->getForm()->getName(), $data);
             }
         }
+    }
+
+    /**
+     * Creates data returned if an entity has been successfully created
+     *
+     * @param mixed $entity
+     * @return array
+     */
+    protected function createResponseData($entity)
+    {
+        $entityClass = ClassUtils::getRealClass($entity);
+        $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
+
+        return $classMetadata->getIdentifierValues($entity);
     }
 
     /**

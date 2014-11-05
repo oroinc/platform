@@ -6,17 +6,19 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\CalendarBundle\Model\ExtendCalendarProperty;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * This entity is used to store different kind of user's properties for a calendar.
- * The combination of calendarAlias and calendarId is unique identifier of a calendar.
+ * The combination of calendarAlias and calendar is unique identifier of a calendar.
  *
  * @ORM\Entity
  * @ORM\Table(
  *      name="oro_calendar_property",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(name="oro_calendar_prop_uq", columns={"calendar_alias", "calendar_id", "user_id"})
+ *          @ORM\UniqueConstraint(
+ *              name="oro_calendar_prop_uq",
+ *              columns={"calendar_alias", "calendar_id", "target_calendar_id"}
+ *          )
  *      }
  * )
  * @Config(
@@ -48,12 +50,12 @@ class CalendarProperty extends ExtendCalendarProperty
     protected $id;
 
     /**
-     * @var User
+     * @var Calendar
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="Calendar")
+     * @ORM\JoinColumn(name="target_calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
-    protected $user;
+    protected $targetCalendar;
 
     /**
      * @var string
@@ -67,7 +69,14 @@ class CalendarProperty extends ExtendCalendarProperty
      *
      * @ORM\Column(name="calendar_id", type="integer")
      */
-    protected $calendarId;
+    protected $calendar;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="position", type="integer", options={"default"=0})
+     */
+    protected $position = 0;
 
     /**
      * @var boolean
@@ -75,6 +84,20 @@ class CalendarProperty extends ExtendCalendarProperty
      * @ORM\Column(name="visible", type="boolean", options={"default"=true})
      */
     protected $visible = true;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="color", type="string", length=6, nullable=true)
+     */
+    protected $color;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="background_color", type="string", length=6, nullable=true)
+     */
+    protected $backgroundColor;
 
     /**
      * Gets id of this set of calendar properties.
@@ -87,30 +110,54 @@ class CalendarProperty extends ExtendCalendarProperty
     }
 
     /**
+     * Gets user's calendar this set of calendar properties belong to
+     *
+     * @return Calendar
+     */
+    public function getTargetCalendar()
+    {
+        return $this->targetCalendar;
+    }
+
+    /**
+     * Sets user's calendar this set of calendar properties belong to
+     *
+     * @param Calendar $targetCalendar
+     *
+     * @return self
+     */
+    public function setTargetCalendar($targetCalendar)
+    {
+        $this->targetCalendar = $targetCalendar;
+
+        return $this;
+    }
+
+    /**
      * Gets unique id of a calendar.
      *
      * @return string
      */
     public function getCalendarUid()
     {
-        return sprintf('%s:%d', $this->calendarAlias, $this->calendarId);
+        return sprintf('%s:%d', $this->calendarAlias, $this->calendar);
     }
 
     /**
      * Sets unique id of a calendar.
      *
-     * @param string $calendarAlias
-     * @param int    $calendarId
+     * @param string $calendarAlias An alias of the connected calendar
+     * @param int    $calendar      An id of the connected calendar
      *
      * @return self
      */
-    public function setCalendarUid($calendarAlias, $calendarId)
+    public function setCalendarUid($calendarAlias, $calendar)
     {
-        return $this->setCalendarAlias($calendarAlias)->setCalendarId($calendarId);
+        return $this->setCalendarAlias($calendarAlias)->setCalendar($calendar);
     }
 
     /**
-     * Gets a calendar alias.
+     * Gets an alias of the connected calendar
      *
      * @return string
      */
@@ -120,7 +167,7 @@ class CalendarProperty extends ExtendCalendarProperty
     }
 
     /**
-     * Sets a calendar alias
+     * Sets an alias of the connected calendar
      *
      * @param string $calendarAlias
      *
@@ -134,55 +181,55 @@ class CalendarProperty extends ExtendCalendarProperty
     }
 
     /**
-     * Gets a calendar id.
+     * Gets an id of the connected calendar
      *
      * @return int
      */
-    public function getCalendarId()
+    public function getCalendar()
     {
-        return $this->calendarId;
+        return $this->calendar;
     }
 
     /**
-     * Sets a calendar id
+     * Sets an id of the connected calendar
      *
-     * @param int $calendarId
+     * @param int $calendar
      *
      * @return self
      */
-    public function setCalendarId($calendarId)
+    public function setCalendar($calendar)
     {
-        $this->calendarId = $calendarId;
+        $this->calendar = $calendar;
 
         return $this;
     }
 
     /**
-     * Gets a user this set of calendar properties belong to
+     * Gets a number indicates where the connected calendar should be displayed
      *
-     * @return User
+     * @return int
      */
-    public function getUser()
+    public function getPosition()
     {
-        return $this->user;
+        return $this->position;
     }
 
     /**
-     * Sets a user this set of calendar properties belong to
+     * Sets a number indicates where the connected calendar should be displayed
      *
-     * @param User $user
+     * @param int $position
      *
      * @return self
      */
-    public function setUser($user)
+    public function setPosition($position)
     {
-        $this->user = $user;
+        $this->position = $position;
 
         return $this;
     }
 
     /**
-     * Gets a property indicates whether events of connected calendar should be displayed or not
+     * Gets a property indicates whether events of the connected calendar should be displayed or not
      *
      * @return boolean
      */
@@ -192,7 +239,7 @@ class CalendarProperty extends ExtendCalendarProperty
     }
 
     /**
-     * Sets a property indicates whether events of connected calendar should be displayed or not
+     * Sets a property indicates whether events of the connected calendar should be displayed or not
      *
      * @param bool $visible
      *
@@ -201,6 +248,58 @@ class CalendarProperty extends ExtendCalendarProperty
     public function setVisible($visible)
     {
         $this->visible = (bool)$visible;
+
+        return $this;
+    }
+
+    /**
+     * Gets a text color of the connected calendar events.
+     * If this method returns null the text color should be calculated automatically on UI.
+     *
+     * @return string|null The color in hex format, for example F00 or FF0000 for a red color.
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    /**
+     * Sets a text color of the connected calendar events.
+     *
+     * @param string|null $color The color in hex format, for example F00 or FF0000 for a red color.
+     *                           Set it to null to allow UI to calculate the text color automatically.
+     *
+     * @return self
+     */
+    public function setColor($color)
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    /**
+     * Gets a background color of the connected calendar events.
+     * If this method returns null the background color should be calculated automatically on UI.
+     *
+     * @return string|null The color in hex format, for example F00 or FF0000 for a red color.
+     */
+    public function getBackgroundColor()
+    {
+        return $this->backgroundColor;
+    }
+
+    /**
+     * Sets a background color of the connected calendar events.
+     *
+     * @param string|null $backgroundColor The color in hex format, for example F00 or FF0000 for a red color.
+     *                                     Set it to null to allow UI to calculate the background color automatically.
+     *
+     * @return self
+     */
+    public function setBackgroundColor($backgroundColor)
+    {
+        $this->backgroundColor = $backgroundColor;
 
         return $this;
     }

@@ -6,7 +6,6 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 use Oro\Bundle\CalendarBundle\EventListener\EntityListener;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -53,10 +52,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $newCalendar = new Calendar();
         $newCalendar->setOwner($user);
         $newCalendar->setOrganization($org);
-        $newConnection = new CalendarConnection($newCalendar);
-        $newCalendar->addConnection($newConnection);
         $calendarMetadata   = new ClassMetadata(get_class($newCalendar));
-        $connectionMetadata = new ClassMetadata(get_class($newConnection));
 
         $this->em->expects($this->any())
             ->method('getClassMetadata')
@@ -64,7 +60,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['Oro\Bundle\CalendarBundle\Entity\Calendar', $calendarMetadata],
-                        ['Oro\Bundle\CalendarBundle\Entity\CalendarConnection', $connectionMetadata],
                     ]
                 )
             );
@@ -95,16 +90,10 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->at(2))
             ->method('persist')
             ->with($this->equalTo($newCalendar));
-        $this->em->expects($this->at(3))
-            ->method('persist')
-            ->with($this->equalTo($newConnection));
 
         $this->uow->expects($this->at(1))
             ->method('computeChangeSet')
             ->with($calendarMetadata, $newCalendar);
-        $this->uow->expects($this->at(2))
-            ->method('computeChangeSet')
-            ->with($connectionMetadata, $newConnection);
 
         $this->listener->onFlush($args);
     }
@@ -125,10 +114,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $newCalendar = new Calendar();
         $newCalendar->setOwner($user);
         $newCalendar->setOrganization($org);
-        $newConnection = new CalendarConnection($newCalendar);
-        $newCalendar->addConnection($newConnection);
         $calendarMetadata   = new ClassMetadata(get_class($newCalendar));
-        $connectionMetadata = new ClassMetadata(get_class($newConnection));
 
         $this->em->expects($this->any())
             ->method('getClassMetadata')
@@ -136,7 +122,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['Oro\Bundle\CalendarBundle\Entity\Calendar', $calendarMetadata],
-                        ['Oro\Bundle\CalendarBundle\Entity\CalendarConnection', $connectionMetadata],
                     ]
                 )
             );
@@ -167,16 +152,10 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->at(2))
             ->method('persist')
             ->with($this->equalTo($newCalendar));
-        $this->em->expects($this->at(3))
-            ->method('persist')
-            ->with($this->equalTo($newConnection));
 
         $this->uow->expects($this->at(2))
             ->method('computeChangeSet')
             ->with($calendarMetadata, $newCalendar);
-        $this->uow->expects($this->at(3))
-            ->method('computeChangeSet')
-            ->with($connectionMetadata, $newConnection);
 
         $this->listener->onFlush($args);
     }

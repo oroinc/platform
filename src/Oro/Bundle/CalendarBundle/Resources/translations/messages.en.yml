@@ -29,6 +29,10 @@ oro:
 
         menu:
             view_default: My Calendar
+            context: Context menu
+
+        context:
+            hide: Hide this calenadr
 
         control:
             all_day: ""
@@ -69,27 +73,17 @@ oro:
             all_day.label:        All day event
 
         #
-        # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
-        #
-        calendarconnection:
-            entity_label:             Calendar of other users
-            entity_plural_label:      Calendars of other users
-            entity_description:       Represent calendar connection
-            id.label:                 Id
-            connected_calendar.label: Connected calendar
-            color.label:              Color
-            calendar.label:           Calendar
-            background_color.label:   Background
-
-        #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
         #
         calendarproperty:
-            entity_label:         Calendar Property
-            entity_plural_label:  Calendar Properties
-            entity_description:   Represent different kind of user's properties for a calendar
-            id.label:             Id
-            user.label:           User
-            calendar_alias.label: Calendar Alias
-            calendar_id.label:    Calendar Id
-            visible.label:        Visible
+            entity_label:           Calendar property
+            entity_plural_label:    Calendar properties
+            entity_description:     Represent different kind of user's properties for a calendar
+            id.label:               Id
+            target_calendar.label:  Target Calendar
+            calendar_alias.label:   Calendar Alias
+            calendar.label:         Calendar Id
+            position.label:         Position
+            visible.label:          Visible
+            color.label:            Color
+            background_color.label: Background

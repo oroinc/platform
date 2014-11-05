@@ -51,7 +51,7 @@ datagrid:
                 label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
-                widget:
+                widgetOptions:
                     reload-grid-name: attachment-grid
                     options:
                         dialogOptions:
@@ -59,6 +59,7 @@ datagrid:
                             width: 550
                             allowMaximize: false
                             allowMinimize: false
+                            modal: true
                             maximizedHeightDecreaseBy: minimize-bar
                 messages:
                     saved: oro.attachment.action.saved
