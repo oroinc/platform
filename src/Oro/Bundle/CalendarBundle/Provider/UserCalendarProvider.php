@@ -4,8 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class UserCalendarProvider implements CalendarProviderInterface

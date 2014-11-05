@@ -15,7 +15,7 @@ interface CalendarProviderInterface
      *
      * @return array Each item of this array can contains any properties of a calendar you need to set as default.
      *               There are properties you must return:
-     *                  calendarName - The name of a calendar
+     *                  calendarName - a name of a calendar
      *               Also there are several additional properties you can return:
      *                  removable - indicated whether a calendar can be disconnected from the target calendar
      */
