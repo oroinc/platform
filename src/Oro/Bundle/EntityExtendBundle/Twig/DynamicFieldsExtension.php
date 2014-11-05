@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
@@ -48,19 +47,19 @@ class DynamicFieldsExtension extends \Twig_Extension
     protected $propertyAccessor;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
     /**
      * @param ConfigManager $configManager
      * @param FieldTypeHelper $fieldTypeHelper
-     * @param UrlGeneratorInterface $router
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
-        EventDispatcher $dispatcher
+        EventDispatcherInterface $dispatcher
     ) {
         $this->fieldTypeHelper = $fieldTypeHelper;
         $this->eventDispatcher = $dispatcher;
