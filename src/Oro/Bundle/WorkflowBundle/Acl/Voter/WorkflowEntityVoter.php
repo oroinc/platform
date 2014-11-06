@@ -11,7 +11,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
     /**
      * @var array
      */
-    protected $supportedAttributes = array('EDIT', 'DELETE');
+    protected $supportedAttributes = ['EDIT', 'DELETE'];
 
     /**
      * array(
@@ -72,6 +72,10 @@ class WorkflowEntityVoter extends AbstractEntityVoter
         }
     }
 
+    /**
+     * @param string $class
+     * @param mixed $identifier
+     */
     protected function loadEntityPermissions($class, $identifier)
     {
         if (array_key_exists($identifier, $this->entityAcls[$class]['entities'])) {
@@ -79,13 +83,13 @@ class WorkflowEntityVoter extends AbstractEntityVoter
         }
 
         // default permissions
-        $this->entityAcls[$class]['entities'][$identifier] = array(
+        $this->entityAcls[$class]['entities'][$identifier] = [
             'update' => true,
             'delete' => true,
-        );
+        ];
 
         /** @var WorkflowEntityAclIdentityRepository $repository */
-        $repository = $this->registry->getRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
+        $repository = $this->doctrineHelper->getRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
         $identities = $repository->findByClassAndIdentifier($class, $identifier);
 
         foreach ($identities as $identity) {
@@ -115,17 +119,19 @@ class WorkflowEntityVoter extends AbstractEntityVoter
         }
 
         /** @var WorkflowEntityAcl[] $entityAcls */
-        $entityAcls = $this->registry->getRepository('OroWorkflowBundle:WorkflowEntityAcl')->findAll();
+        $entityAcls = $this->doctrineHelper
+            ->getRepository('OroWorkflowBundle:WorkflowEntityAcl')
+            ->findAll();
 
-        $this->entityAcls = array();
+        $this->entityAcls = [];
         foreach ($entityAcls as $entityAcl) {
             $entityClass = $entityAcl->getEntityClass();
 
             if (!array_key_exists($entityClass, $this->entityAcls)) {
-                $this->entityAcls[$entityClass] = array(
-                    'acls' => array(),
-                    'entities' => array(),
-                );
+                $this->entityAcls[$entityClass] = [
+                    'acls' => [],
+                    'entities' => [],
+                ];
             }
 
             $this->entityAcls[$entityClass]['acls'][$entityAcl->getId()] = $entityAcl;
