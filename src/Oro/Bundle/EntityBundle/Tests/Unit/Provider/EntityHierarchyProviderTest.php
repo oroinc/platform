@@ -16,22 +16,104 @@ class EntityHierarchyProviderTest extends OrmTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\Hierarchy';
 
-    /**
-     * @var EntityHierarchyProvider
-     */
-    protected $provider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $extendConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emMock;
 
     protected function setUp()
     {
-        $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
-            $reader,
+            new AnnotationReader(),
             self::ENTITY_NAMESPACE
         );
 
-        $em = $this->getTestEntityManager();
-        $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
+        $this->emMock = $this->getTestEntityManager();
+        $this->emMock->getConfiguration()->setMetadataDriverImpl($metadataDriver);
 
+        $this->extendConfigProvider = $this->getExtendConfigMock();
+    }
+
+    public function testGetHierarchy()
+    {
+        $this->assertEquals(
+            [
+                self::ENTITY_NAMESPACE . '\TestEntity1' => [
+                    self::ENTITY_NAMESPACE . '\BaseEntity'
+                ],
+                self::ENTITY_NAMESPACE . '\TestEntity2' => [
+                    self::ENTITY_NAMESPACE . '\BaseEntity'
+                ],
+            ],
+            $this->getProvider()->getHierarchy()
+        );
+    }
+
+    /**
+     * @dataProvider getHierarchyForClassNameProvider
+     */
+    public function testGetHierarchyForClassName($className, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->getProvider()->getHierarchyForClassName($className)
+        );
+    }
+
+    public function getHierarchyForClassNameProvider()
+    {
+        return [
+            [self::ENTITY_NAMESPACE . '\TestEntity1', [self::ENTITY_NAMESPACE . '\BaseEntity']],
+            [self::ENTITY_NAMESPACE . '\TestEntity2', [self::ENTITY_NAMESPACE . '\BaseEntity']],
+            [self::ENTITY_NAMESPACE . '\TestEntity3', []],
+            [self::ENTITY_NAMESPACE . '\BaseEntity', []],
+        ];
+    }
+
+    /**
+     * @dataProvider getNoManagerForClassNameProvider
+     */
+    public function testGetNoManagerForClassName($className, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->getProvider(false)->getHierarchyForClassName($className)
+        );
+    }
+
+    public function getNoManagerForClassNameProvider()
+    {
+        return [
+            [self::ENTITY_NAMESPACE . '\TestEntity1', []],
+            [self::ENTITY_NAMESPACE . '\TestEntity2', []],
+            [self::ENTITY_NAMESPACE . '\TestEntity3', []],
+            [self::ENTITY_NAMESPACE . '\BaseEntity', []],
+        ];
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $emMock
+     * @param boolean                                       $isReturnManager
+     */
+    protected function getDoctrineMock($emMock = null, $isReturnManager = true)
+    {
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($isReturnManager ? $emMock : null));
+
+        return $doctrine;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getExtendConfigMock()
+    {
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -69,49 +151,19 @@ class EntityHierarchyProviderTest extends OrmTestCase
             ->method('getConfigs')
             ->will($this->returnValue($entityConfigs));
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($em));
-
-        $this->provider = new EntityHierarchyProvider($extendConfigProvider, $doctrine);
-    }
-
-    public function testGetHierarchy()
-    {
-        $this->assertEquals(
-            [
-                self::ENTITY_NAMESPACE . '\TestEntity1' => [
-                    self::ENTITY_NAMESPACE . '\BaseEntity'
-                ],
-                self::ENTITY_NAMESPACE . '\TestEntity2' => [
-                    self::ENTITY_NAMESPACE . '\BaseEntity'
-                ],
-            ],
-            $this->provider->getHierarchy()
-        );
+        return $extendConfigProvider;
     }
 
     /**
-     * @dataProvider getHierarchyForClassNameProvider
+     * @param bool $isReturnManager return doctrine manager or not (null)
+     *
+     * @return EntityHierarchyProvider
      */
-    public function testGetHierarchyForClassName($className, $expected)
+    protected function getProvider($isReturnManager = true)
     {
-        $this->assertEquals(
-            $expected,
-            $this->provider->getHierarchyForClassName($className)
+        return new EntityHierarchyProvider(
+            $this->extendConfigProvider,
+            $this->getDoctrineMock($this->emMock, $isReturnManager)
         );
-    }
-
-    public function getHierarchyForClassNameProvider()
-    {
-        return [
-            [self::ENTITY_NAMESPACE . '\TestEntity1', [self::ENTITY_NAMESPACE . '\BaseEntity']],
-            [self::ENTITY_NAMESPACE . '\TestEntity2', [self::ENTITY_NAMESPACE . '\BaseEntity']],
-            [self::ENTITY_NAMESPACE . '\TestEntity3', []],
-            [self::ENTITY_NAMESPACE . '\BaseEntity', []],
-        ];
     }
 }
