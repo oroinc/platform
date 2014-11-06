@@ -26,6 +26,7 @@ oro:
             exclude_calendar:            "Exclude this calendar"
 
         my_calendar_widget_descriptions: This widget displays a calendar for today.
+        print: Print
 
         menu:
             view_default: My Calendar

@@ -30,8 +30,10 @@ class CalendarEventNormalizer
     }
 
     /**
-     * @param int          $calendarId
-     * @param QueryBuilder $qb
+     * Converts calendar events returned by the given query to form that can be used in API
+     *
+     * @param int          $calendarId The target calendar id
+     * @param QueryBuilder $qb         The query builder that should be used to get events
      *
      * @return array
      */
