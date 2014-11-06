@@ -42,6 +42,25 @@
     max-width: 100%;
   }
 }
+.select2-container.select2-allowclear{
+  .select2-arrow{
+    right: 36px;
+  }
+  .select2-search-choice-close{
+    border-left: 1px solid #CCC;
+    height: 28px;
+    width: 28px;
+    top: 0px;
+    right: 0px;
+    color: #666;
+    &:before{
+      content: "\f00d";
+      font: normal 12px FontAwesome;
+      top: 8px;
+      right: 8px;
+    }
+  }
+}
 .select2-container-multi .select2-choices li {
   float: none;
 }
@@ -55,4 +74,13 @@
   &>div {
     padding: 10px 15px 0;
   }
+}
+h5.user-fieldset {
+  margin: 7px 0;
+}
+.well {
+  margin-bottom: 7px;
+}
+.tags-overlay .well {
+  margin-bottom: 0;
 }

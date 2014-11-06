@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Entity;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 
