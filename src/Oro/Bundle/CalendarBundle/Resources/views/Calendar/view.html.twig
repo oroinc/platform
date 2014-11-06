@@ -4,10 +4,6 @@
 {% set name = entity.owner|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
 
-{% block head_script %}
-    {{ parent() }}
-{% endblock %}
-
 {% block navButtons %}
     {% if resource_granted('oro_calendar_event_view') %}
         <div class="btn-group">
@@ -16,6 +12,51 @@
                 'label': 'oro.calendar.view_events'|trans,
                 'title': 'oro.calendar.view_events'|trans
             }) }}
+        </div>
+        {# TODO: The Print button is a temporary solution untill we switch to latest version FullCalendar component #}
+        {# should be removed in https://magecore.atlassian.net/browse/BAP-3826 #}
+        <div class="btn-group">
+            {{ UI.clientButton({
+                'id': 'add-entity-note-button',
+                'aCss': 'no-hash',
+                'iCss': 'icon-print  hide-text',
+                'label' : 'oro.calendar.print'|trans
+            }) }}
+            <script type="text/javascript">
+                require(['jquery'],
+                function($){
+                    $('#add-entity-note-button').on('click', function(e) {
+                        e.preventDefault();
+                        var calendar = $('#calendar').data('calendar'),
+                            $el = calendar.getCalendarElement(),
+                            $agendaEl = $el.find('.fc-agenda-slots').parent().parent(),
+                            contentElOverflowX,
+                            contentElOverflowY,
+                            contentElHeight;
+                        $el.width('960px');
+                        $el.fullCalendar('render');
+                        if ($agendaEl.length) {
+                            contentElOverflowX = $agendaEl.css('overflow-x');
+                            contentElOverflowY = $agendaEl.css('overflow-y');
+                            contentElHeight = $agendaEl.css('height');
+                            $agendaEl.css('overflow-x', 'visible');
+                            $agendaEl.css('overflow-y', 'visible');
+                            $agendaEl.css('height', 'auto');
+                            //debugger;
+                            $el.fullCalendar('option', 'contentHeight', 3000);
+                        }
+                        window.print();
+                        if ($agendaEl.length) {
+                            $agendaEl.css('overflow-x', contentElOverflowX);
+                            $agendaEl.css('overflow-y', contentElOverflowY);
+                            $agendaEl.css('height', contentElHeight);
+                            $el.fullCalendar('option', 'contentHeight', null);
+                        }
+                        $el.css('width', '');
+                        $el.fullCalendar('render');
+                    });
+                });
+            </script>
         </div>
     {% endif %}
 {% endblock navButtons %}
