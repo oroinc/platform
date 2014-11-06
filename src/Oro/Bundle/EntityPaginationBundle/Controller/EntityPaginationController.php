@@ -4,13 +4,11 @@ namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationController extends Controller
 {
@@ -107,26 +105,18 @@ class EntityPaginationController extends Controller
                     $params[$identifier] = $entityId;
                 }
 
-                if (!$result->isAvailable() || !$result->isAccessible()) {
-                    /** @var FlashBagInterface $flashBag */
-                    $flashBag = $this->get('session')->getFlashBag();
-                    $translator = $this->get('translator');
-                    $statsMessage = EntityPaginationManager::getStatsMessage($scope);
-                    $count = $navigationService->getTotalCount($entity, $scope);
+                $messageManager = $this->get('oro_entity_pagination.message_manager');
 
-                    if (!$result->isAvailable()) {
-                        $flashBag->add(
-                            'alert',
-                            $translator->trans('oro.entity_pagination.message.not_available') . ' ' .
-                            $translator->trans($statsMessage, ['%count%' => $count])
-                        );
-                    } elseif (!$result->isAccessible()) {
-                        $flashBag->add(
-                            'alert',
-                            $translator->trans('oro.entity_pagination.message.not_accessible') . ' ' .
-                            $translator->trans($statsMessage, ['%count%' => $count])
-                        );
-                    }
+                if (!$result->isAvailable()) {
+                    $messageManager->addFlashMessage(
+                        'warning',
+                        $messageManager->getNotAvailableMessage($entity, $scope)
+                    );
+                } elseif (!$result->isAccessible()) {
+                    $messageManager->addFlashMessage(
+                        'warning',
+                        $messageManager->getNotAccessibleMessage($entity, $scope)
+                    );
                 }
             }
         }

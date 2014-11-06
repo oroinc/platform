@@ -4,6 +4,7 @@ parameters:
     oro_entity_pagination.storage.class: Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage
     oro_entity_pagination.storage.data_collector.class: Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector
     oro_entity_pagination.manager.class: Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager
+    oro_entity_pagination.message_manager.class: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager
     oro_entity_pagination.navigation.class: Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation
     oro_entity_pagination.twig_extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension
 
@@ -36,6 +37,14 @@ services:
         arguments:
             - @oro_config.global
 
+    oro_entity_pagination.message_manager:
+        class: %oro_entity_pagination.message_manager.class%
+        arguments:
+            - @session
+            - @translator
+            - @oro_entity_pagination.navigation
+            - @oro_entity_pagination.storage
+
     oro_entity_pagination.navigation:
         class: %oro_entity_pagination.navigation.class%
         arguments:
@@ -57,6 +66,7 @@ services:
         arguments:
             - @oro_entity_pagination.navigation
             - @oro_entity_pagination.storage.data_collector
+            - @oro_entity_pagination.message_manager
         calls:
             - [ setRequest, [@?request=] ]
         tags:

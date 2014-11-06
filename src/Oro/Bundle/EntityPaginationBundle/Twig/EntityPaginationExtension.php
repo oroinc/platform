@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
+use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 
 class EntityPaginationExtension extends \Twig_Extension
 {
@@ -22,6 +23,11 @@ class EntityPaginationExtension extends \Twig_Extension
     protected $dataCollector;
 
     /**
+     * @var MessageManager
+     */
+    protected $messageManager;
+
+    /**
      * @var Request
      */
     protected $request;
@@ -29,13 +35,16 @@ class EntityPaginationExtension extends \Twig_Extension
     /**
      * @param EntityPaginationNavigation $paginationNavigation
      * @param StorageDataCollector $dataCollector
+     * @param MessageManager $messageManager
      */
     public function __construct(
         EntityPaginationNavigation $paginationNavigation,
-        StorageDataCollector $dataCollector
+        StorageDataCollector $dataCollector,
+        MessageManager $messageManager
     ) {
         $this->paginationNavigation = $paginationNavigation;
         $this->dataCollector = $dataCollector;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -46,6 +55,7 @@ class EntityPaginationExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
             new \Twig_SimpleFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
+            new \Twig_SimpleFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
         );
     }
 
@@ -79,6 +89,18 @@ class EntityPaginationExtension extends \Twig_Extension
     public function collectData($scope)
     {
         return $this->dataCollector->collect($this->request, $scope);
+    }
+
+    /**
+     * @param object $entity
+     * @param string $scope
+     */
+    public function showInfoMessage($entity, $scope)
+    {
+        $message = $this->messageManager->getInfoMessage($entity, $scope);
+        if ($message) {
+            $this->messageManager->addFlashMessage('info', $message);
+        }
     }
 
     /**
