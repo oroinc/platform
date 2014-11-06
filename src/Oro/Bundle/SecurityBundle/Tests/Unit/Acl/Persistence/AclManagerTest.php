@@ -954,11 +954,6 @@ class AclManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->flush();
     }
 
-    public function testGetAclProvider()
-    {
-        $this->assertSame($this->aclProvider, $this->manager->getAclProvider());
-    }
-
     /**
      * @return BatchItem[]
      */
