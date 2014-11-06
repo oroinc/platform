@@ -15,4 +15,4 @@ oro:
         updated_at.label: Updated at
 
         widget.filter.date_picker.title: Date Range
-        widget.filter.activity.title: Task Type
+        widget.filter.activity.title: Activity Type
