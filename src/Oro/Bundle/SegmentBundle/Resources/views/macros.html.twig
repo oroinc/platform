@@ -168,7 +168,7 @@
                 itemTemplate:  '#oro_report-grouping-item-row'
             }
         }) %}
-    {% elseif type == 'oro_segment' %}
+    {% else %}
         {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
 
