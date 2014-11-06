@@ -22,7 +22,7 @@ define(function (require) {
              * Array of rule objects or strings that will be used for entries filtering
              * examples:
              *      ['relation_type'] - will exclude all entries that has 'relation_type' key (means relational fields)
-             *      [{name: 'id"}]    - will exclude all entries that has property "name" equals to "id"
+             *      [{name: 'id'}]    - will exclude all entries that has property "name" equals to "id"
              */
             exclude: [],
             fieldsLoaderSelector: ''
