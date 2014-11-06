@@ -103,7 +103,7 @@ class MessageManager
         $entityName = ClassUtils::getClass($entity);
 
         // info message should be shown only once for each scope
-        if ($this->storage->isInfoMessageShown($entityName, $scope)) {
+        if (false !== $this->storage->isInfoMessageShown($entityName, $scope)) {
             return null;
         }
 

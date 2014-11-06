@@ -4,13 +4,11 @@ namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
 class EntityPaginationController extends Controller
 {

@@ -93,12 +93,12 @@ class EntityPaginationStorage
     /**
      * @param string $entityName
      * @param string $scope
-     * @return bool
+     * @return bool|null
      */
     public function isInfoMessageShown($entityName, $scope)
     {
         if (!$this->isEnvironmentValid()) {
-            return false;
+            return null;
         }
 
         $storage = $this->getStorage();

@@ -507,7 +507,7 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'invalid environment' => [
-                'expected' => false,
+                'expected' => null,
             ],
             'message not shown' => [
                 'expected' => false,
@@ -555,6 +555,8 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
         return [
             'invalid environment' => [
                 'expected' => false,
+                'enabled' => false,
+                'shown' => null,
             ],
             'message not shown' => [
                 'expected' => true,
