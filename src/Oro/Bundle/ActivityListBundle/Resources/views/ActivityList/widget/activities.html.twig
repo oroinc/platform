@@ -69,7 +69,7 @@
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
-            <div class="container-fluid actions-bottom">
+            <div data-section="bottom" class="container-fluid actions-bottom">
                 {{ UI.button({
                     'path': '#',
                     'label': 'Load 25 more'|trans,
@@ -81,6 +81,9 @@
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
+            {% for activityClass, activityOptions in briefTemplates %}
+                {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
+            {% endfor %}
 
         <script type="text/javascript">
             require([
@@ -113,10 +116,6 @@
                 dateFilter.render().$el.appendTo($('#filter2'));
             });
         </script>
-
-            {% for activityClass, activityOptions in briefTemplates %}
-                {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
-            {% endfor %}
         {% endblock %}
     {% endblock %}
 </div>

@@ -54,12 +54,15 @@ define(function (require) {
             _.defaults(options.activityListOptions, defaults.activityListOptions);
 
             // map item routes to action url function
+            /*
             _.each(options.activityListOptions.routes, function (route, name) {
                 options.activityListOptions.urls[name + 'Item'] = function (model) {
                     return routing.generate(route, {'id': model.get('id')});
                 };
             });
             delete options.activityListOptions.routes;
+            */
+
             options.activityListData = JSON.parse(options.activityListData);
             options.activityListOptions.el = options._sourceElement;
 
@@ -95,7 +98,6 @@ define(function (require) {
         registerWidget: function (options) {
             var list = this.list;
             mediator.execute('widgets:getByIdAsync', options.widgetId, function (widget) {
-                debugger;
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
@@ -108,7 +110,8 @@ define(function (require) {
                 widget.getAction('expand_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.expandAll, list));
                 });
-                widget.getAction('more', null, function (action) {
+
+                widget.getAction('more', 'bottom', function (action) {
                     action.on('click', _.bind(list.more, list));
                 });
                 /*

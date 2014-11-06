@@ -30,7 +30,6 @@ services:
         class: %oro_activity_list.placeholder.filter.class%
         arguments: ~
 
-
     # Activity List API
     oro_activity_list.manager.api:
         class: %oro_activity_list.manager.api.class%

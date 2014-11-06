@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityListChainProvider
 {
@@ -77,9 +77,10 @@ class ActivityListChainProvider
         foreach ($this->providers as $provider) {
             $entityConfig = $this->entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$provider->getActivityClass()] = [
-                'icon' => $entityConfig->get('icon'),
-                'label' => $entityConfig->get('label'),
-                'template' => $provider->getBriefTemplate()
+                'icon'     => $entityConfig->get('icon'),
+                'label'    => $entityConfig->get('label'),
+                'template' => $provider->getBriefTemplate(),
+                'routes'   => $provider->getRoutes(),
             ];
         }
 

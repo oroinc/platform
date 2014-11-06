@@ -7,6 +7,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
+        routing = require('routing'),
         mediator = require('oroui/js/mediator'),
         LoadingMask = require('oroui/js/loading-mask'),
         DialogWidget = require('oro/dialog-widget'),
@@ -26,12 +27,14 @@ define(function (require) {
             loadingSelector: '.loading-mask',
             collection: null,
             urls: {
+                viewItem: null,
                 updateItem: null,
                 deleteItem: null
             },
             messages: {}
         },
         listen: {
+            'toView collection': '_viewItem',
             'toEdit collection': '_editItem',
             'toDelete collection': '_deleteItem'
         },
@@ -54,7 +57,7 @@ define(function (require) {
             this.template = _.template($(this.options.template).html());
 
             // create communication in scope of active controller
-            mediator.on(this.options.itemAddEvent, this._addItem, this);
+            //mediator.on(this.options.itemAddEvent, this._addItem, this);
 
             ActivityListView.__super__.initialize.call(this, options);
         },
@@ -67,6 +70,7 @@ define(function (require) {
                 return;
             }
             delete this.itemEditDialog;
+            delete this.itemViewDialog;
             delete this.$loadingMaskContainer;
             ActivityListView.__super__.dispose.call(this);
         },
@@ -128,7 +132,7 @@ define(function (require) {
             }
         },
 
-        _filter: function (filter) {
+        _filter: function () {
             alert('filter');
         },
 
@@ -136,8 +140,64 @@ define(function (require) {
             alert('more');
         },
 
+        _viewItem: function (model) {
+            this.itemViewDialog = new DialogWidget({
+                'url': this._getUrl('itemView', model),
+                'title': model.get('subject'),
+                'regionEnabled': false,
+                'incrementalPosition': false,
+                'dialogOptions': {
+                    'modal': true,
+                    'resizable': false,
+                    'width': 675,
+                    'autoResize': true,
+                    'close': _.bind(function () {
+                        delete this.itemEditDialog;
+                    }, this)
+                }
+            });
+            this.itemViewDialog.render();
+        },
+
         _editItem: function (model) {
-            //this._openItemEditForm(this._getMessage('editDialogTitle'), this._getUrl('updateItem', model));
+            if (!this.itemEditDialog) {
+                this.itemEditDialog = new DialogWidget({
+                    'url': this._getUrl('itemEdit', model),
+                    'title': model.get('subject'),
+                    'regionEnabled': false,
+                    'incrementalPosition': false,
+                    'dialogOptions': {
+                        'modal': true,
+                        'resizable': false,
+                        'width': 675,
+                        'autoResize': true,
+                        'close': _.bind(function () {
+                            delete this.itemEditDialog;
+                        }, this)
+                    }
+                });
+                this.itemEditDialog.render();
+
+                mediator.once('page:request', _.bind(function () {
+                    if (this.itemEditDialog) {
+                        this.itemEditDialog.remove();
+                    }
+                }, this));
+
+                this.itemEditDialog.on('formSave', _.bind(function (response) {
+                    var model, insertPosition;
+                    this.itemEditDialog.remove();
+                    delete this.itemEditDialog;
+                    mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
+                    model = this.collection.get(response.id);
+                    if (model) {
+                        model.set(response);
+                    } else {
+                        insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
+                        this.collection.add(response, {at: insertPosition});
+                    }
+                }, this));
+            }
         },
 
         _deleteItem: function (model) {
@@ -151,26 +211,23 @@ define(function (require) {
         },
 
         _onItemDelete: function (model) {
-            console.log(model);
-            console.log(this._getUrl('deleteItem', model));
-
             this._showLoading();
             try {
-            //    model.destroy({
-            //        wait: true,
-            //        url: this._getUrl('deleteItem', model),
-            //        success: _.bind(function () {
-            //            this._hideLoading();
-            //            mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
-            //        }, this),
-            //        error: _.bind(function (model, response) {
-            //            if (!_.isUndefined(response.status) && response.status === 403) {
-            //                this._showForbiddenError(response.responseJSON || {});
-            //            } else {
-            //                this._showDeleteItemError(response.responseJSON || {});
-            //            }
-            //        }, this)
-            //    });
+                model.destroy({
+                    wait: true,
+                    url: this._getUrl('itemDelete', model),
+                    success: _.bind(function () {
+                        this._hideLoading();
+                        mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                    }, this),
+                    error: _.bind(function (model, response) {
+                        if (!_.isUndefined(response.status) && response.status === 403) {
+                            this._showForbiddenError(response.responseJSON || {});
+                        } else {
+                            this._showDeleteItemError(response.responseJSON || {});
+                        }
+                    }, this)
+                });
 
                 this._hideLoading();
                 mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
@@ -188,53 +245,12 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            if (_.isFunction(this.options.urls[actionKey])) {
-                return this.options.urls[actionKey](model);
-            }
-            return this.options.urls[actionKey];
+            var route = this.options.briefTemplates[model.get('relatedActivityClass')].routes[actionKey];
+            return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
 
         _getMessage: function (labelKey) {
             return this.options.messages[labelKey];
-        },
-
-        _openItemEditForm: function (title, url) {
-            if (!this.itemEditDialog) {
-            //    this.itemEditDialog = new DialogWidget({
-            //        'url': url,
-            //        'title': title,
-            //        'regionEnabled': false,
-            //        'incrementalPosition': false,
-            //        'dialogOptions': {
-            //            'modal': true,
-            //            'resizable': false,
-            //            'width': 675,
-            //            'autoResize': true,
-            //            'close': _.bind(function () {
-            //                delete this.itemEditDialog;
-            //            }, this)
-            //        }
-            //    });
-            //    this.itemEditDialog.render();
-            //    mediator.once('page:request', _.bind(function () {
-            //        if (this.itemEditDialog) {
-            //            this.itemEditDialog.remove();
-            //        }
-            //    }, this));
-            //    this.itemEditDialog.on('formSave', _.bind(function (response) {
-            //        var model, insertPosition;
-            //        this.itemEditDialog.remove();
-            //        delete this.itemEditDialog;
-            //        mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-            //        model = this.collection.get(response.id);
-            //        if (model) {
-            //            model.set(response);
-            //        } else {
-            //            insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
-            //            this.collection.add(response, {at: insertPosition});
-            //        }
-            //    }, this));
-            }
         },
 
         _showLoading: function () {

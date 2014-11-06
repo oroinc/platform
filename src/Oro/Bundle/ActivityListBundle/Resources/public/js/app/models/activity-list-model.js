@@ -13,13 +13,13 @@ define([
             subject: '',
             data: '',
             briefTemplate: '',
-            briefData: '',
-            fullTemplate: '',
-            fullData: '',
+
             relatedEntityClass: '',
             relatedEntityId: '',
+
             activityEntityClass: '',
             activityEntityId: '',
+
             createdAt: '',
             updatedAt: '',
 

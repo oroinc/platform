@@ -14,15 +14,21 @@ define([
         options: {
             template: null,
             briefTemplates: {},
-            fullTemplates: {}
+            fullTemplates: {},
+            urls: {
+                viewItem: null,
+                updateItem: null,
+                deleteItem: null
+            }
         },
         attributes: {
             'class': 'list-item'
         },
         events: {
-            'click .item-edit-button':   'onEdit',
+            'click .item-view-button': 'onView',
+            'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
-            'click .accordion-toggle':   'onToggle'
+            'click .accordion-toggle': 'onToggle'
         },
         listen: {
             'change model': '_onModelChanged'
@@ -50,13 +56,11 @@ define([
             data.relatedEntityClass = _.escape(data.relatedEntityClass);
             data.relatedActivityClass = _.escape(data.relatedActivityClass);
 
-            //data.message = _.escape(data.message);
-            //data.brief_message = data.message.replace(new RegExp('\r?\n', 'g'), ' ');
-            //data.message = data.message.replace(new RegExp('\r?\n', 'g'), '<br />');
-            //data.message = autolinker.link(data.message, {className: 'no-hash'});
-            //data.brief_message = autolinker.link(data.brief_message, {className: 'no-hash'});
-
             return data;
+        },
+
+        onView: function () {
+            this.model.collection.trigger('toView', this.model);
         },
 
         onEdit: function () {

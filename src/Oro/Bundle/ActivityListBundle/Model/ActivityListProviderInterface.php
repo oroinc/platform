@@ -44,6 +44,18 @@ interface ActivityListProviderInterface
     public function getFullTemplate();
 
     /**
+     * Should return array of route names as key => value
+     * e.g. [
+     *      'itemView'  => 'item_view_route',
+     *      'itemEdit'  => 'item_edit_route',
+     *      'itemDelete => 'item_delete_route'
+     * ]
+     *
+     * @return array
+     */
+    public function getRoutes();
+
+    /**
      * @param $entity
      *
      * @return integer
