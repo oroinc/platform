@@ -81,7 +81,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
                 ->method('setChanges')
                 ->with(
                     $this->equalTo(
-                        empty($context['entity']) ? null : $context['entity']
+                        empty($context['data']) ? null : $context['data']
                     ),
                     $this->equalTo(
                         array_keys($context['changeSet'])
@@ -106,7 +106,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
                     'changeSet' => new PropertyPath('changeSet'),
                 ],
                 [
-                    'entity'    => new \stdClass(),
+                    'data'      => new \stdClass(),
                     'changeSet' => ['field' => ['old' => 1, 'new' => 2]],
                 ]
             ],

@@ -71,14 +71,12 @@ class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fieldsChangesManager
-            ->expects($this->once())
-            ->method('removeChanges')
-            ->with(
-                $this->equalTo(
-                    empty($context['entity']) ? null : $context['entity']
-                )
-            );
+        if (!empty($context['entity'])) {
+            $fieldsChangesManager
+                ->expects($this->once())
+                ->method('removeChanges')
+                ->with($this->equalTo($context['entity']));
+        }
 
         $this->action->setFieldsChangesManager($fieldsChangesManager);
         $this->action->initialize($options);
@@ -93,7 +91,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 ['entity' => new PropertyPath('entity')],
-                ['entity' => new \stdClass()]
+                ['data' => new \stdClass()]
             ],
             [
                 ['entity' => new PropertyPath('entity')],
