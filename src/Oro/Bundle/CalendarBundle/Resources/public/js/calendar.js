@@ -183,6 +183,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         eventClick: function (fcEvent) {
+            if (fcEvent.calendarAlias == 'task') {
+                return;
+            }
+
             if (!this.eventView) {
                 try {
                     var eventModel = this.getCollection().get(fcEvent.id);

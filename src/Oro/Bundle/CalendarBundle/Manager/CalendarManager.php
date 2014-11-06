@@ -106,7 +106,7 @@ class CalendarManager
      *
      * @return array
      */
-    public function getCalendarEvents($calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
         // make sure input parameters have proper type
         $calendarId = (int)$calendarId;
@@ -114,7 +114,7 @@ class CalendarManager
         $result = [];
 
         foreach ($this->providers as $alias => $provider) {
-            $events = $provider->getCalendarEvents($calendarId, $start, $end, $subordinate);
+            $events = $provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
             if (!empty($events)) {
                 foreach ($events as &$event) {
                     $event['calendarAlias'] = $alias;

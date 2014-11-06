@@ -23,6 +23,7 @@ interface CalendarProviderInterface
     public function getCalendarName(CalendarProperty $connection);
 
     /**
+     * @param int       $userId
      * @param int       $calendarId
      * @param \DateTime $start
      * @param \DateTime $end
@@ -30,5 +31,5 @@ interface CalendarProviderInterface
      *
      * @return array
      */
-    public function getCalendarEvents($calendarId, $start, $end, $subordinate);
+    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
 }
