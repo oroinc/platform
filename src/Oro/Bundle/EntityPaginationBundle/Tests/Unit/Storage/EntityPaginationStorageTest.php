@@ -481,6 +481,95 @@ class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param bool $expected
+     * @param bool $enabled
+     * @param array $storage
+     * @dataProvider isInfoMessageShownDataProvider
+     */
+    public function testIsInfoMessageShown($expected, $enabled = false, array $storage = null)
+    {
+        $this->setEnabled($enabled);
+
+        if (null !== $storage) {
+            $this->setStorage($storage);
+        }
+
+        $this->assertSame(
+            $expected,
+            $this->storage->isInfoMessageShown(self::ENTITY_NAME, EntityPaginationManager::VIEW_SCOPE)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function isInfoMessageShownDataProvider()
+    {
+        return [
+            'invalid environment' => [
+                'expected' => false,
+            ],
+            'message not shown' => [
+                'expected' => false,
+                'enabled' => true,
+                'storage' => [],
+            ],
+            'message shown' => [
+                'expected' => true,
+                'enabled' => true,
+                'storage' => [
+                    EntityPaginationManager::VIEW_SCOPE => [
+                        EntityPaginationStorage::INFO_MESSAGE => true,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param bool $expected
+     * @param bool $enabled
+     * @param bool $shown
+     * @dataProvider setInfoMessageShownDataProvider
+     */
+    public function testSetInfoMessageShown($expected, $enabled = false, $shown = false)
+    {
+        $this->setEnabled($enabled);
+
+        if ($enabled) {
+            $this->setRequest();
+        }
+
+        $this->assertSame(
+            $expected,
+            $this->storage->setInfoMessageShown(self::ENTITY_NAME, EntityPaginationManager::VIEW_SCOPE, $shown)
+        );
+        $this->assertSame(
+            $shown,
+            $this->storage->isInfoMessageShown(self::ENTITY_NAME, EntityPaginationManager::VIEW_SCOPE)
+        );
+    }
+
+    public function setInfoMessageShownDataProvider()
+    {
+        return [
+            'invalid environment' => [
+                'expected' => false,
+            ],
+            'message not shown' => [
+                'expected' => true,
+                'enabled' => true,
+                'shown' => false,
+            ],
+            'message shown' => [
+                'expected' => true,
+                'enabled' => true,
+                'shown' => true,
+            ],
+        ];
+    }
+
+    /**
      * @param array $storageData
      */
     protected function setStorage(array $storageData)

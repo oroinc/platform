@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Navigation;
+namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
@@ -124,44 +124,6 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetPermissionException()
     {
         EntityPaginationManager::getPermission(self::WRONG_SCOPE);
-    }
-
-    /**
-     * @param $scope
-     * @param $expected
-     *
-     * @dataProvider getStatsMessageProvider
-     */
-    public function testGetStatsMessage($scope, $expected)
-    {
-        $result = EntityPaginationManager::getStatsMessage($scope);
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @return array
-     */
-    public function getStatsMessageProvider()
-    {
-        return [
-            'view scope' => [
-                'scope'    => EntityPaginationManager::VIEW_SCOPE,
-                'expected' => 'oro.entity_pagination.message.stats_number_view_%count%'
-            ],
-            'edit scope' => [
-                'scope'    => EntityPaginationManager::EDIT_SCOPE,
-                'expected' => 'oro.entity_pagination.message.stats_number_edit_%count%'
-            ],
-        ];
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Scope "wrong_scope" is not available.
-     */
-    public function testGetStatsMessageException()
-    {
-        EntityPaginationManager::getStatsMessage(self::WRONG_SCOPE);
     }
 
     /**

@@ -3,6 +3,7 @@
     {% set pager = oro_entity_pagination_pager(entity, scope) %}
 
     {% if isDataCollected and pager %}
+        {% set infoMessageShown = oro_entity_pagination_show_info_message(entity, scope) %}
         {% set currentRoute = app.request.attributes.get('_route') %}
         {% set currentParams = app.request.attributes.get('_route_params') %}
         {% set queryParams = app.request.query.all %}

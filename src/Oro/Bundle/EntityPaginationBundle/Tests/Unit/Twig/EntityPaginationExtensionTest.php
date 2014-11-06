@@ -19,6 +19,11 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
     protected $dataCollector;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $messageManager;
+
+    /**
      * @var EntityPaginationExtension
      */
     protected $extension;
@@ -34,7 +39,15 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new EntityPaginationExtension($this->navigation, $this->dataCollector);
+        $this->messageManager = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Manager\MessageManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new EntityPaginationExtension(
+            $this->navigation,
+            $this->dataCollector,
+            $this->messageManager
+        );
     }
 
     public function testGetFunctions()
@@ -42,6 +55,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedFunctions = [
             'oro_entity_pagination_pager' => [$this->extension, 'getPager'],
             'oro_entity_pagination_collect_data' => [$this->extension, 'collectData'],
+            'oro_entity_pagination_show_info_message' => [$this->extension, 'showInfoMessage'],
         ];
 
         $functions = $this->extension->getFunctions();
@@ -113,6 +127,41 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 'totalCount' => 100,
                 'currentNumber' => 25,
             ],
+        ];
+    }
+
+    /**
+     * @param bool $hasMessage
+     * @dataProvider showInfoMessageDataProvider
+     */
+    public function testShowInfoMessage($hasMessage)
+    {
+        $entity = new \stdClass();
+        $scope = 'test';
+        $message = $hasMessage ? 'Test message' : null;
+
+        $this->messageManager->expects($this->once())
+            ->method('getInfoMessage')
+            ->with($entity, $scope)
+            ->will($this->returnValue($message));
+
+        if ($hasMessage) {
+            $this->messageManager->expects($this->once())
+                ->method('addFlashMessage')
+                ->with('info', $message);
+        } else {
+            $this->messageManager->expects($this->never())
+                ->method('addFlashMessage');
+        }
+
+        $this->extension->showInfoMessage($entity, $scope);
+    }
+
+    public function showInfoMessageDataProvider()
+    {
+        return [
+            'has message' => [true],
+            'no message'  => [false],
         ];
     }
 

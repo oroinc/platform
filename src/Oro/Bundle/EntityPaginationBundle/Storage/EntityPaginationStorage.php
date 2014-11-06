@@ -14,6 +14,7 @@ class EntityPaginationStorage
     const STORAGE_NAME = 'entity_pagination_storage';
     const ENTITY_IDS   = 'entity_ids';
     const HASH         = 'hash';
+    const INFO_MESSAGE = 'info_message';
 
     /**
      * @var Request
@@ -87,6 +88,41 @@ class EntityPaginationStorage
         $storage = $this->getStorage();
 
         return isset($storage[$entityName][$scope][self::HASH]) && $storage[$entityName][$scope][self::HASH] == $hash;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $scope
+     * @return bool
+     */
+    public function isInfoMessageShown($entityName, $scope)
+    {
+        if (!$this->isEnvironmentValid()) {
+            return false;
+        }
+
+        $storage = $this->getStorage();
+
+        return !empty($storage[$entityName][$scope][self::INFO_MESSAGE]);
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $scope
+     * @param bool $shown
+     * @return bool
+     */
+    public function setInfoMessageShown($entityName, $scope, $shown = true)
+    {
+        if (!$this->isEnvironmentValid()) {
+            return false;
+        }
+
+        $storage = $this->getStorage();
+        $storage[$entityName][$scope][self::INFO_MESSAGE] = $shown;
+        $this->setStorage($storage);
+
+        return true;
     }
 
     /**
