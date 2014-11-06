@@ -350,14 +350,23 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         type: 'DELETE',
                         success: function (data) {
                             el.trigger('removesuccess');
-                            mediator.execute('addMessage', 'success', el.data('success-message'));
-                            if (el.data('redirect')) {
-                                mediator.execute('redirectTo', {url: el.data('redirect')});
+                            var redirectTo = el.data('redirect');
+                            if (redirectTo) {
+                                mediator.execute('addMessage', 'success', el.data('success-message'));
+
+                                // In case when redirectTo is current page just refresh it, otherwise redirect.
+                                if (mediator.execute('compareUrl', redirectTo)) {
+                                    mediator.execute('refreshPage');
+                                } else {
+                                    mediator.execute('redirectTo', {url: redirectTo});
+                                }
                             } else {
                                 mediator.execute('hideLoading');
+                                mediator.execute('showFlashMessage', 'success', el.data('success-message'));
                             }
                         },
                         error: function () {
+                            console.log(5);
                             var message;
                             message = el.data('error-message') ||
                                 __('Unexpected error occurred. Please contact system administrator.');
