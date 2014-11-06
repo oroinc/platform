@@ -204,6 +204,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarEvents()
     {
+        $userId      = 123;
         $calendarId  = 1;
         $start       = new \DateTime();
         $end         = new \DateTime();
@@ -211,7 +212,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->provider1->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $start, $end, $subordinate)
+            ->with($userId, $calendarId, $start, $end, $subordinate)
             ->will(
                 $this->returnValue(
                     [
@@ -228,7 +229,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
             );
         $this->provider2->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $start, $end, $subordinate)
+            ->with($userId, $calendarId, $start, $end, $subordinate)
             ->will(
                 $this->returnValue(
                     [
@@ -244,7 +245,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $result = $this->manager->getCalendarEvents($calendarId, $start, $end, $subordinate);
+        $result = $this->manager->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
         $this->assertEquals(
             [
                 [

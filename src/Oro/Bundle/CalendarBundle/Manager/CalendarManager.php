@@ -97,6 +97,7 @@ class CalendarManager
     /**
      * Gets the list of calendar events
      *
+     * @param int       $userId
      * @param int       $calendarId
      * @param \DateTime $start
      * @param \DateTime $end
