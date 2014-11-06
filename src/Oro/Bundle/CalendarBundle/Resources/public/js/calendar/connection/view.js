@@ -87,11 +87,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 }
             }, this));
 
-            el.on('click', this.selectors.visibleButton, _.bind(function (e) {
-                this.visibleCalendar($(e.currentTarget), model);
-            }, this));
-
             this.$el.find(this.selectors.itemContainer).append(el);
+
+            this.addVisibleEventListener(model);
 
             if (model.get('visible')) {
                 this.options.colorManager.setCalendarColors(
@@ -103,58 +101,96 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        visibleCalendar: function ($target, model) {
-            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+        addVisibleEventListener: function (model) {
+            var $itemConnection = this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
+            $itemConnection.one('click', this.selectors.visibleButton, _.bind(function (e) {
+                this.visibleCalendar($(e.currentTarget), model);
+            }, this));
+        },
+
+        setDisplayVisibleItem: function (model, $target) {
+            $target.removeClass('un-color');
+            var style = {
+                backgroundColor: "#" + model.get('backgroundColor'),
+                borderColor: "#" + model.get('backgroundColor')
+            };
+            $target.css(style);
+        },
+
+        setDisplayNoneItem: function (model, $target) {
+            var style = {
+                backgroundColor: "",
+                borderColor: ""
+            };
+            $target.css(style);
+            $target.addClass('un-color');
+        },
+
+        showCalendar: function (model, $target, savingMsg) {
+            this.setDisplayVisibleItem(model, $target);
             try {
-                if (model.get('visible')) {
-                    model.save('visible', false, {
-                        wait: true,
-                        success: _.bind(function () {
-                            savingMsg.close();
-                            this.options.colorManager.removeCalendarColors(model.get('calendarUid'));
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                            var style = {
-                                backgroundColor: "",
-                                borderColor: ""
-                            };
-                            $target.css(style);
-                            $target.addClass('un-color');
-                            this.trigger('connectionRemove', model);
-                        }, this),
-                        error: _.bind(function (model, response) {
-                            savingMsg.close();
-                            this.showUpdateError(response.responseJSON || {});
-                        })
-                    });
-                } else {
-                    model.save('visible', true, {
-                        wait: true,
-                        success: _.bind(function () {
-                            savingMsg.close();
-                            // init text/background colors
-                            this.options.colorManager.setCalendarColors(
-                                model.get('calendarUid'),
-                                model.get('color'),
-                                model.get('backgroundColor')
-                            );
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                            $target.removeClass('un-color');
-                            var style = {
-                                backgroundColor: "#" + model.get('backgroundColor'),
-                                borderColor: "#" + model.get('backgroundColor')
-                            };
-                            $target.css(style);
-                            this.trigger('connectionAdd', model);
-                        }, this),
-                        error: _.bind(function (model, response) {
-                            savingMsg.close();
-                            this.showUpdateError(response.responseJSON || {});
-                        })
-                    });
-                }
-            } catch (err) {
+                model.save('visible', true, {
+                    wait: true,
+                    success: _.bind(function () {
+                        savingMsg.close();
+                        // init text/background colors
+                        this.options.colorManager.setCalendarColors(
+                            model.get('calendarUid'),
+                            model.get('color'),
+                            model.get('backgroundColor')
+                        );
+                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                        this.trigger('connectionAdd', model);
+                        this.addVisibleEventListener(model);
+                    }, this),
+                    error: _.bind(function (model, response) {
+                        savingMsg.close();
+                        this.showUpdateError(response.responseJSON || {});
+                        this.addVisibleEventListener(model);
+                        this.setDisplayNoneItem(model, $target);
+                    })
+                });
+            }  catch (err) {
                 savingMsg.close();
                 this.showMiscError(err);
+                this.addVisibleEventListener(model);
+                this.setDisplayNoneItem(model, $target);
+            }
+        },
+
+        hideCalendar: function (model, $target, savingMsg) {
+            this.setDisplayNoneItem(model, $target);
+            try {
+                model.save('visible', false, {
+                    wait: true,
+                    success: _.bind(function () {
+                        savingMsg.close();
+                        this.options.colorManager.removeCalendarColors(model.get('calendarUid'));
+                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                        this.trigger('connectionRemove', model);
+                        this.addVisibleEventListener(model);
+                    }, this),
+                    error: _.bind(function (model, response) {
+                        savingMsg.close();
+                        this.showUpdateError(response.responseJSON || {});
+                        this.addVisibleEventListener(model);
+                        this.setDisplayVisibleItem(model, $target);
+                    })
+                });
+            }  catch (err) {
+                savingMsg.close();
+                this.showMiscError(err);
+                this.addVisibleEventListener(model);
+                this.setDisplayVisibleItem(model, $target);
+            }
+        },
+
+        visibleCalendar: function ($target, model) {
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+            if (model.get('visible')) {
+                this.hideCalendar(model, $target, savingMsg);
+            } else {
+                this.showCalendar(model, $target, savingMsg);
             }
         },
 

@@ -147,49 +147,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         visibleDefaultCalendar: function (eventModel) {
-            //check calendar visible
-            var model = this.options.connectionsOptions.collection.findWhere({
-                calendarAlias: eventModel.get('calendarAlias'),
-                calendar: eventModel.get('calendar')
-            });
-            if (!model.get('visible')) {
-                //render calendar
-                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
-                try {
-                    model.save('visible', true, {
-                        wait: true,
-                        success: _.bind(function () {
-                            savingMsg.close();
-                            // init text/background colors
-                            this.colorManager.setCalendarColors(
-                                model.get('calendarUid'),
-                                model.get('color'),
-                                model.get('backgroundColor')
-                            );
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                            var $target = this.connectionsView.$el.find(
-                                this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
-                            ).find('span.calendar-color');
-                            $target.removeClass('un-color');
-                            var style = {
-                                backgroundColor: "#4986E7",
-                                borderColor: "#4986E7"
-                            };
-                            $target.css(style);
-                            this.onConnectionAddedOrDeleted();
-                        }, this),
-                        error: _.bind(function (model, response) {
-                            savingMsg.close();
-                            this.showAddError(response.responseJSON || {});
-                        })
-                    });
-                } catch (err) {
-                    savingMsg.close();
-                    this.showMiscError(err);
-                }
-            } else {
-                this.renderEventAfterAdd(eventModel);
-            }
+
         },
 
         renderEventAfterAdd: function (eventModel) {
@@ -200,7 +158,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         onEventAdded: function (eventModel) {
-            this.visibleDefaultCalendar(eventModel);
+            //check that the calendar of new event is visible
+            var model = this.options.connectionsOptions.collection.findWhere({
+                calendarAlias: eventModel.get('calendarAlias'),
+                calendar: eventModel.get('calendar')
+            });
+            if (!model.get('visible')) {
+                //if the calendar is none visible show the calendar visible automatically
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+                var $itemConnection = this.connectionsView.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid')));
+                this.connectionsView.showCalendar(model, $itemConnection.find(this.connectionsView.selectors.visibleButton),savingMsg);
+            } else {
+                //if the calendar is visible render only new event
+                this.renderEventAfterAdd(eventModel);
+            }
         },
 
         onEventChanged: function (eventModel) {

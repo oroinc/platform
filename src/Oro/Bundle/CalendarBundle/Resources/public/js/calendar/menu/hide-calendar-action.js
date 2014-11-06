@@ -34,6 +34,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
             try {
                 model = this.collection.findWhere({calendarUid: calendarUid});
+                this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).hide();
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {
@@ -43,11 +44,13 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     error: _.bind(function (model, response) {
                         deletingMsg.close();
                         this.showDeleteError(response.responseJSON || {});
+                        this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
                     }, this)
                 });
             } catch (err) {
                 deletingMsg.close();
                 this.showMiscError(err);
+                this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
             }
         },
 
