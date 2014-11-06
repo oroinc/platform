@@ -2,6 +2,10 @@
 
 .activity-list-widget {
   border: 1px solid #ddd;
+  .actions-bottom{
+    border-top: 1px solid #ddd;
+    padding:10px;
+  }
   .title {
     border-bottom: 1px solid #ddd;
   }
@@ -30,6 +34,7 @@
           font-size: smaller;
         }
         .title-item {
+          float: left;
           white-space: nowrap;
           .details {
             padding-left: 7px;
@@ -37,15 +42,14 @@
         }
         .actions {
           white-space: nowrap;
-          float: none;
+          float: right;
           margin: 0;
         }
         .message-item {
           width: 100%;
-          padding-left: 21px;
+          padding-left: 23px;
+          float: left;
           .message {
-            padding-left: 10px;
-            border-left: 1px solid #e6e6e6;
           }
         }
       }
@@ -54,9 +58,9 @@
       }
     }
     .accordion {
-      //margin-top: 10px;
       padding: 0;
       .accordion-group {
+        overflow: hidden;
         border: 0;
         margin: 0;
         .accordion-heading {
@@ -95,7 +99,6 @@
         .accordion-body {
           .message {
             display: none;
-            //padding-top: 10px;
             overflow-x: auto;
           }
           .details {

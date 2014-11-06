@@ -88,6 +88,16 @@
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
+            <div class="container-fluid actions-bottom">
+                {{ UI.button({
+                    'path': '#',
+                    'label': 'Load 25 more'|trans,
+                    'title': 'Load 25 more'|trans,
+                    'aCss': 'no-hash',
+                    'dataAttributes': {'action-name': 'more'}
+                }) }}
+            </div>
+
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in briefTemplates %}

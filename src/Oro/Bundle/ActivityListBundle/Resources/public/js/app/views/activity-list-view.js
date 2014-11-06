@@ -97,16 +97,8 @@ define(function (require) {
             this._filter();
         },
 
-        toggleSorting: function (e) {
-            //var $el = $(e.currentTarget),
-            //    titleAlt = $el.data('title-alt'),
-            //    iconAlt = $el.data('icon-alt');
-            //$el.data('title-alt', $el.attr('title'));
-            //$el.attr('title', titleAlt);
-            //$el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
-            //$el.find('i').attr('class', iconAlt + ' hide-text');
-            //
-            //this._reload(this.collection.getSorting() === 'DESC' ? 'ASC' : 'DESC');
+        more: function () {
+            this._more();
         },
 
         _reload: function (sorting) {
@@ -140,8 +132,8 @@ define(function (require) {
             alert('filter');
         },
 
-        _addItem: function () {
-            //this._openItemEditForm(this._getMessage('addDialogTitle'), this._getUrl('createItem'));
+        _more: function () {
+            alert('more');
         },
 
         _editItem: function (model) {
@@ -159,6 +151,9 @@ define(function (require) {
         },
 
         _onItemDelete: function (model) {
+            console.log(model);
+            console.log(this._getUrl('deleteItem', model));
+
             this._showLoading();
             try {
             //    model.destroy({
@@ -176,6 +171,9 @@ define(function (require) {
             //            }
             //        }, this)
             //    });
+
+                this._hideLoading();
+                mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
             } catch (err) {
                 this._showDeleteItemError(err);
             }
@@ -190,10 +188,10 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            //if (_.isFunction(this.options.urls[actionKey])) {
-            //    return this.options.urls[actionKey](model);
-            //}
-            //return this.options.urls[actionKey];
+            if (_.isFunction(this.options.urls[actionKey])) {
+                return this.options.urls[actionKey](model);
+            }
+            return this.options.urls[actionKey];
         },
 
         _getMessage: function (labelKey) {

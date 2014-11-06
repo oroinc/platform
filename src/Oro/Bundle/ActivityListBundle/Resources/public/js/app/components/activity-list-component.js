@@ -95,17 +95,21 @@ define(function (require) {
         registerWidget: function (options) {
             var list = this.list;
             mediator.execute('widgets:getByIdAsync', options.widgetId, function (widget) {
+                debugger;
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
-                widget.getAction('filter', 'adopted', function(action) {
+                /*widget.getAction('filter', 'adopted', function(action) {
                     action.on('click', _.bind(list.filter, list));
-                });
+                });*/
                 widget.getAction('collapse_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });
                 widget.getAction('expand_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.expandAll, list));
+                });
+                widget.getAction('more', null, function (action) {
+                    action.on('click', _.bind(list.more, list));
                 });
                 /*
                 widget.getAction('toggle_sorting', 'adopted', function (action) {
