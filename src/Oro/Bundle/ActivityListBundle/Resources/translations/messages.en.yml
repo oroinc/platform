@@ -13,3 +13,6 @@ oro:
         related_entity_id.label:    Related entity id
         created_at.label: Created at
         updated_at.label: Updated at
+
+        widget.filter.date_picker.title: Date Range
+        widget.filter.activity.title: Task Type
