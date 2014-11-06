@@ -169,6 +169,14 @@ class AclManager extends AbstractAclManager
     }
 
     /**
+     * @return MutableAclProvider
+     */
+    public function getAclProvider()
+    {
+        return $this->aclProvider;
+    }
+
+    /**
      * Flushes all changes to ACLs that have been queued up to now to the database.
      * This synchronizes the in-memory state of managed ACLs with the database.
      */
