@@ -472,7 +472,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                     '--disabled-listeners' => 'oro_search.index_listener',
                 )
             );
-            $commandExecutor->runCommand('oro:search:reindex');
+            $commandExecutor->runCommand(
+                'oro:search:reindex',
+                array(
+                    '--process-isolation' => true,
+                )
+            );
         }
 
         $output->writeln('');
