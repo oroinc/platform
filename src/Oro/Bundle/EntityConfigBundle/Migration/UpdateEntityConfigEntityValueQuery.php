@@ -81,7 +81,7 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
                 field_id IS NULL AND
                 scope = ? AND
                 code = ?
-            LIMIT 1";
+            ";
         $parameters = [$this->value, $this->entityName, $this->scope, $this->code];
         $statement = $this->connection->prepare($sql);
         $statement->execute($parameters);
@@ -99,7 +99,7 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $data[$this->scope][$this->code] = $this->value;
         $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 
-        $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ? LIMIT 1';
+        $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
         $parameters = [$data, $this->entityName];
         $statement = $this->connection->prepare($sql);
         $statement->execute($parameters);
