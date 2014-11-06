@@ -112,10 +112,10 @@ class EntityHierarchyProvider
         if ($parentClass) {
             $parentClassName = $parentClass->getName();
             $em              = $this->doctrine->getManagerForClass($className);
-            if (!$em->getMetadataFactory()->isTransient($parentClassName)) {
+            if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
                 $result[] = $parentClassName;
             }
-            $this->loadParents($result, $parentClassName, $em);
+            $this->loadParents($result, $parentClassName);
         }
     }
 }
