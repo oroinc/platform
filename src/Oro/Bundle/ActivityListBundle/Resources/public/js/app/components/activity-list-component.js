@@ -19,8 +19,7 @@ define(function (require) {
     ActivityListComponent = BaseComponent.extend({
         defaults: {
             activityListOptions: {
-                briefTemplates: {},
-                fullTemplates: {},
+                configuration: {},
                 urls: {},
                 routes: {},
                 itemView: ActivityView,
@@ -52,16 +51,6 @@ define(function (require) {
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(options, defaults);
             _.defaults(options.activityListOptions, defaults.activityListOptions);
-
-            // map item routes to action url function
-            /*
-            _.each(options.activityListOptions.routes, function (route, name) {
-                options.activityListOptions.urls[name + 'Item'] = function (model) {
-                    return routing.generate(route, {'id': model.get('id')});
-                };
-            });
-            delete options.activityListOptions.routes;
-            */
 
             options.activityListData = JSON.parse(options.activityListData);
             options.activityListOptions.el = options._sourceElement;

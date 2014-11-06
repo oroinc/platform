@@ -16,8 +16,7 @@ define(function (require) {
 
     ActivityListView = BaseCollectionView.extend({
         options: {
-            briefTemplates: {},
-            fullTemplates: {},
+            configuration: {},
             template: null,
             itemTemplate: null,
             itemAddEvent: 'activity:add',
@@ -245,7 +244,7 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var route = this.options.briefTemplates[model.get('relatedActivityClass')].routes[actionKey];
+            var route = this.options.configuration[model.get('relatedActivityClass')].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
 

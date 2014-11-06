@@ -12,9 +12,8 @@ define([
     var ActivityView;
     ActivityView = BaseView.extend({
         options: {
+            configuration: {},
             template: null,
-            briefTemplates: {},
-            fullTemplates: {},
             urls: {
                 viewItem: null,
                 updateItem: null,

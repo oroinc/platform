@@ -12,7 +12,7 @@ define([
             verb: '',
             subject: '',
             data: '',
-            briefTemplate: '',
+            configuration: '',
 
             relatedEntityClass: '',
             relatedEntityId: '',

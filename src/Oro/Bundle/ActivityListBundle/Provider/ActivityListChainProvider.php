@@ -55,12 +55,15 @@ class ActivityListChainProvider
             if ($provider->isApplicable($entity)) {
                 $list = new ActivityList();
                 $list->setVerb(ActivityListListener::STATE_CREATE);
+
                 $list->setRelatedActivityClass($provider->getActivityClass());
                 $list->setRelatedActivityId($provider->getActivityId($entity));
+
                 $list->setSubject($provider->getSubject($entity));
                 $list->setOwner($entity->getOwner());
                 $list->setOrganization($entity->getOrganization());
                 $list->setData($provider->getData($entity));
+
                 $list->setRelatedEntityClass($this->doctrineHelper->getEntityClass($entity));
                 $list->setRelatedEntityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
 
@@ -71,7 +74,10 @@ class ActivityListChainProvider
         return false;
     }
 
-    public function getBriefTemplates()
+    /**
+     * @return array
+     */
+    public function getActivityListOption()
     {
         $templates = [];
         foreach ($this->providers as $provider) {
@@ -79,7 +85,7 @@ class ActivityListChainProvider
             $templates[$provider->getActivityClass()] = [
                 'icon'     => $entityConfig->get('icon'),
                 'label'    => $entityConfig->get('label'),
-                'template' => $provider->getBriefTemplate(),
+                'template' => $provider->getTemplate(),
                 'routes'   => $provider->getRoutes(),
             ];
         }
@@ -87,13 +93,19 @@ class ActivityListChainProvider
         return $templates;
     }
 
-    public function getFullTemplates()
+    /**
+     * @param object $entity
+     *
+     * @return string|null
+     */
+    public function getSubject($entity)
     {
-        $templates = [];
         foreach ($this->providers as $provider) {
-            $templates[$provider->getActivityClass()] = $provider->getFullTemplate();
+            if ($provider->isApplicable($entity)) {
+                return $provider->getSubject($entity);
+            }
         }
 
-        return $templates;
+        return null;
     }
 }

@@ -36,12 +36,7 @@ interface ActivityListProviderInterface
     /**
      * @return string
      */
-    public function getBriefTemplate();
-
-    /**
-     * @return string
-     */
-    public function getFullTemplate();
+    public function getTemplate();
 
     /**
      * Should return array of route names as key => value

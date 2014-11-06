@@ -72,7 +72,7 @@ class ActivityListListener
     protected function collectDeletedEntities($entities)
     {
         if (!empty($entities)) {
-            foreach ($entities as $hash=> $entity) {
+            foreach ($entities as $hash => $entity) {
                 if ($entity instanceof ActivityListInterface && empty($this->deletedEntities[$hash])) {
                     $this->deletedEntities[$hash] = [
                         'class' => $this->doctrineHelper->getEntityClass($entity),
