@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
+use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -36,10 +37,14 @@ class ActivityListController extends Controller
         /** @var ActivityListChainProvider $activitiesProvider */
         $activitiesProvider = $this->get('oro.activity_list.provider.chain');
 
+        /** @var DateTimeRangeFilter $dateRangeFilter */
+        $dateRangeFilter = $this->get('oro_filter.datetime_range_filter');
+
         return [
-            'entity'         => $entity,
-            'briefTemplates' => $activitiesProvider->getBriefTemplates(),
-            'fullTemplates'  => $activitiesProvider->getFullTemplates()
+            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
+            'entity'                  => $entity,
+            'briefTemplates'          => $activitiesProvider->getBriefTemplates(),
+            'fullTemplates'           => $activitiesProvider->getFullTemplates()
         ];
     }
 

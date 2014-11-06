@@ -3,35 +3,16 @@
 <div class="widget-content activity-list {{ containerExtraClass }}">
     {% block widget_content %}
         {% block widget_actions %}
-        <div class="widget-actions">
-                {% set html %}
-                    {#<li>#}
-                        {#<a href="javascript: void(0);">#}
-                            {#<label for="activity-test-0">#}
-                                {#<input type="checkbox" id="activity-test-0" style="margin: 0 -2px 0 0" />#}
-                                {#<i class="icon-list hide-text"></i>#}
-                                {#Tasks#}
-                            {#</label>#}
-                        {#</a>#}
-                    {#</li>#}
-                    {#<li>#}
-                        {#<a href="javascript: void(0);">#}
-                            {#<label for="activity-test-1">#}
-                                {#<input type="checkbox" id="activity-test-1" style="margin: 0 -2px 0 0"/>#}
-                                {#<i class="icon-comment-alt hide-text"></i>#}
-                                {#Notes#}
-                            {#</label>#}
-                        {#</a>#}
-                    {#</li>#}
-                {% endset %}
 
-                {{ UI.dropdownButton({
-                    'label': 'View filter'|trans,
-                    'iCss': 'icon- icon-cog-',
-                    'aCss': 'btn btn-',
-                    'html': html,
-                    'dataAttribute': {'action-name': 'filter'}
-                }) }}
+        <div class="filter-box oro-clearfix-width">
+            <div class="filter-container">
+                <div id="filter1" class="filter-item oro-drop"></div>
+                <div id="filter2" class="filter-item oro-drop"></div>
+            </div>
+        </div>
+
+        <div class="widget-actions">
+
                 {#{{ UI.clientLink({#}
                     {#'aCss': 'btn apply-button icons-holder-text',#}
                     {#'iCss': 'icon-play',#}
@@ -100,6 +81,39 @@
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
+
+        <script type="text/javascript">
+            require([
+                'jquery',
+                'oro/filter/multiselect-filter',
+                'oro/filter/datetime-filter',
+                'orofilter/js/datafilter-wrapper',
+            ], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {
+                var choices = {};
+                var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};
+                var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';
+                var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';
+
+                {% for activityClass, activityOptions in briefTemplates %}
+                    choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';
+                {% endfor %}
+
+                var filter = new MultiSelectFilter({
+                    'label':   multiSelectLabel,
+                    'choices': choices
+                });
+
+                var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);
+                dateFilter = new Filter({
+                    'label': datePickerLabel
+                });
+                _.extend(dateFilter, dataFilterWrapper);
+
+                filter.render().$el.appendTo($('#filter1'));
+                dateFilter.render().$el.appendTo($('#filter2'));
+            });
+        </script>
+
             {% for activityClass, activityOptions in briefTemplates %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
             {% endfor %}
