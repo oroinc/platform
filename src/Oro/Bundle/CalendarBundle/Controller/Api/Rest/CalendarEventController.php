@@ -99,6 +99,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $qb = null;
         if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
             $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
+                $this->getUser()->getId(),
                 $calendarId,
                 new \DateTime($this->getRequest()->get('start')),
                 new \DateTime($this->getRequest()->get('end')),
