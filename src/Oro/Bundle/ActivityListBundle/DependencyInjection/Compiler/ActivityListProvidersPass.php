@@ -33,11 +33,12 @@ class ActivityListProvidersPass implements CompilerPassInterface
 
         // sort by priority and flatten
         ksort($providers);
+        $providers = call_user_func_array('array_merge', $providers);
 
         // register
         $serviceDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
         foreach ($providers as $provider) {
-            $serviceDef->addMethodCall('addProvider', $provider);
+            $serviceDef->addMethodCall('addProvider', [$provider]);
         }
     }
 }

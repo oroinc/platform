@@ -10,7 +10,14 @@ interface ActivityListProviderInterface
      *
      * @return array
      */
-    public function getTargets();
+    public function getTargets($entity);
+
+    /**
+     * returns an array of supported target entity classes for activity
+     *
+     * @return string[]
+     */
+    public function getTargetEntityClasses();
 
     /**
      * returns a class name of entity for which we monitor changes

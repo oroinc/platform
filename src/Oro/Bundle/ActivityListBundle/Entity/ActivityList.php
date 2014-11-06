@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -43,7 +44,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class ActivityList
+class ActivityList extends ExtendActivityList
 {
     /**
      * @var integer
