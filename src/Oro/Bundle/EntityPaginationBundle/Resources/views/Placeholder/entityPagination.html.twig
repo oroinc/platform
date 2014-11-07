@@ -16,7 +16,7 @@
                 <ul class="icons-holder">
                     <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a></li>
                     <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_previous', allParams) }}"><i class="icon-chevron-left hide-text"></i></a></li>
-                    <li><div class="pagination-current"> {{ pager.current }} </div></li>
+                    <li><div class="pagination-current">{{ pager.current }}</div></li>
                     <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_next', allParams) }}"><i class="icon-chevron-right hide-text"></i></a></li>
                     <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a></li>
                 </ul>
