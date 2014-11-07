@@ -1,6 +1,6 @@
 <?php
-namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
+namespace Oro\Bundle\OrganizationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -41,7 +40,6 @@ class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwa
         $organization->setName($applicationTitle);
         $manager->flush();
     }
-
 
     /**
      * {@inheritdoc}
