@@ -29,6 +29,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             contextMenuButton: '.context-menu-button',
             newCalendarSelector: '#new_calendar',
             contextMenuTemplate: '#template-calendar-menu',
+            contextMenuSpinnerTemplate: '#template-calendar-menu-spinner',
             visibleButton: '.calendar-color'
         },
 
@@ -103,9 +104,24 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         addVisibleEventListener: function (model) {
             var $itemConnection = this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
-            $itemConnection.one('click', this.selectors.visibleButton, _.bind(function (e) {
+            $itemConnection.one('click.' + this.cid, this.selectors.visibleButton, _.bind(function (e) {
+                this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
+                this.options.defferedActionEnd = $.Deferred();
+                this.options.defferedActionEnd.then(
+                    _.bind(function (){
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this),
+                    _.bind(function (){
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this)
+                );
                 this.visibleCalendar($(e.currentTarget), model);
             }, this));
+        },
+
+        offVisibleEventListener: function (model) {
+            var $itemConnection = this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
+            $itemConnection.off('.' + this.cid);
         },
 
         setDisplayVisibleItem: function (model, $target) {
@@ -127,6 +143,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         showCalendar: function (model, $target, savingMsg) {
+            this.offVisibleEventListener(model);
             this.setDisplayVisibleItem(model, $target);
             try {
                 model.save('visible', true, {
@@ -142,12 +159,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         messenger.notificationFlashMessage('success', __('The calendar was updated.'));
                         this.trigger('connectionAdd', model);
                         this.addVisibleEventListener(model);
+                        this.options.defferedActionEnd.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         savingMsg.close();
                         this.showUpdateError(response.responseJSON || {});
                         this.addVisibleEventListener(model);
                         this.setDisplayNoneItem(model, $target);
+                        this.options.defferedActionEnd.resolve();
                     })
                 });
             }  catch (err) {
@@ -155,10 +174,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 this.showMiscError(err);
                 this.addVisibleEventListener(model);
                 this.setDisplayNoneItem(model, $target);
+                this.options.defferedActionEnd.resolve();
             }
         },
 
         hideCalendar: function (model, $target, savingMsg) {
+            this.offVisibleEventListener(model);
             this.setDisplayNoneItem(model, $target);
             try {
                 model.save('visible', false, {
@@ -169,12 +190,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         messenger.notificationFlashMessage('success', __('The calendar was updated.'));
                         this.trigger('connectionRemove', model);
                         this.addVisibleEventListener(model);
+                        this.options.defferedActionEnd.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         savingMsg.close();
                         this.showUpdateError(response.responseJSON || {});
                         this.addVisibleEventListener(model);
                         this.setDisplayVisibleItem(model, $target);
+                        this.options.defferedActionEnd.resolve();
                     })
                 });
             }  catch (err) {
@@ -182,6 +205,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 this.showMiscError(err);
                 this.addVisibleEventListener(model);
                 this.setDisplayVisibleItem(model, $target);
+                this.options.defferedActionEnd.resolve();
             }
         },
 
@@ -203,26 +227,36 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 }).get());
 
             if (modules.length > 0) {
+                this.options.defferedActionEnd = $.Deferred();
+                this.options.defferedActionEnd.then(
+                    _.bind(function (){
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this),
+                    _.bind(function (){
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this)
+                );
                 modules = _.object(modules, modules);
-                tools.loadModules(modules, function (modules) {
-                    _.each(modules, function (moduleConstructor, moduleName) {
+                tools.loadModules(modules, _.bind(function (modules) {
+                    _.each(modules, _.bind(function (moduleConstructor, moduleName) {
                         var  actionModule = new moduleConstructor(options);
                         el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
+                            this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
+                            var dataOptions = $(e.target).attr('data-options') || {};
                             el.remove();
-                            $(document).off('.' + options.connectionsView.cid);
-                            var dataOptions = $(this).attr('data-options') || {};
+                            $(document).off('.' + this.cid);
                             actionModule.execute(model.get('calendarUid'), dataOptions);
                         }, this));
-                    });
-                    $parent.closest(options.connectionsView.selectors.item).find('.context-menu-button').css('display', 'block');
-                    $parent.closest(options.connectionsView.selectors.item).append(el);
-                    $(document).one('click.' + options.connectionsView.cid, function (event) {
+                    }, this));
+                    $parent.closest(this.selectors.item).find('.context-menu-button').css('display', 'block');
+                    $parent.closest(this.selectors.item).append(el);
+                    $(document).one('click.' + this.cid, function (event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
                             el.remove();
                         }
                     });
-                });
+                }, this));
             }
         },
 

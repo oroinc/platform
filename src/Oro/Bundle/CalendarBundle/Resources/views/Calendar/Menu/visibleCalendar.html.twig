@@ -1,0 +1,10 @@
+{% if item.extras is defined and item.extras.module is defined %}
+    {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
+{% endif %}
+<a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>
+<% if (visible) { %>
+    {{ 'oro.calendar.context.hide'|trans }}
+<% } else { %>
+    {{ 'oro.calendar.context.show'|trans }}
+<% } %>
+</a>

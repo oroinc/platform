@@ -31,7 +31,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
 
         execute: function (calendarUid, options) {
             var model,
-                deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
+                deletingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...'));
             try {
                 model = this.collection.findWhere({calendarUid: calendarUid});
                 this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).hide();
@@ -39,23 +39,26 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     wait: true,
                     success: _.bind(function () {
                         deletingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was excluded.'));
+                        messenger.notificationFlashMessage('success', __('The calendar was removed.'));
+                        options.defferedActionEnd.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         deletingMsg.close();
                         this.showDeleteError(response.responseJSON || {});
+                        options.defferedActionEnd.resolve();
                         this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
                     }, this)
                 });
             } catch (err) {
                 deletingMsg.close();
                 this.showMiscError(err);
+                options.defferedActionEnd.resolve();
                 this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
             }
         },
 
         showDeleteError: function (err) {
-            this._showError(__('Sorry, the calendar excluding was failed'), err);
+            this._showError(__('Sorry, the calendar removing was failed'), err);
         },
 
         showMiscError: function (err) {
