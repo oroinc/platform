@@ -1,0 +1,48 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
+<script type="text/html" id="{{ id|e('html_attr')|raw }}">
+    <div class="accordion-group">
+        <div class="accordion-heading collapse<% if (!collapsed) { %> in<% } %>">
+            <div class="title-item">
+                <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+                <span class="visual">
+                    <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
+                    <span>{{ oro_entity_config_value(entityClass, 'label')|trans }}</span>
+                    <span>logged by "ADMIN" on <i class="date"><%= updatedAt %></i></span>
+                </span>
+            </div>
+            <div class="actions">
+                <button class="btn item-view-button"
+                        title="{{ 'View email log'|trans|e('html_attr')|raw }}">
+                    <i class="icon-eye-open hide-text">{{ 'View email log'|trans|e('html')|raw }}</i>
+                </button>
+                <button class="btn item-remove-button<% if (!removable) { %> disabled<% } %>" <% if (!removable) { %> disabled="disabled"<% } %>
+                title="{{ 'Delete email log'|trans|e('html_attr')|raw }}">
+                <i class="icon-trash hide-text">{{ 'Delete email log'|trans|e('html')|raw }}</i>
+                </button>
+            </div>
+            <div class="message-item">
+                <div class="message"><%= subject %></div>
+            </div>
+        </div>
+        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
+            <div class="message">
+                <%= subject %>
+                <% if (data != null) { %>
+                    <div class="control-group">
+                        <label class="control-label">{{ 'From'|trans|raw }}</label>
+                        <div class="controls">
+                            <div class="control-label"><%= data['oro.email.from_name.label'] %></div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">{{ 'To'|trans|raw }}</label>
+                        <div class="controls">
+                            <div class="control-label"><%= data['oro.email.to_name.label'] %></div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</script>
