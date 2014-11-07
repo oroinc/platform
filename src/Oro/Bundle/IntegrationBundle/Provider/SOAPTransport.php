@@ -64,7 +64,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
         try {
-            $this->client->__soapCall($action, $params);
+            $result = $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
             if ($this->isAttemptNecessary()) {
                 $result = $this->makeNewAttempt($action, $params);
