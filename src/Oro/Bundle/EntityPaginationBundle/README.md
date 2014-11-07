@@ -1,18 +1,18 @@
 OroEntityPaginationBundle
 =========================
 
-This bundle provides ability to navigate over grid entities from an entity view page.
+This bundle provides ability to navigate over grid entities from an entity view and entity edit pages.
 
 
 How to enable pagination
 ------------------------
 
 To enable entity pagination you have to add option ``entity_pagination`` to a datagrid options. If this option
-is enabled then session collects identifiers of entities from specified grid, and these identifiers are used on
-a view page of a root datagrid entity to generate links to a previous and next entities.
+is enabled then session collects identifiers of entities at the first visit view or edit page of any entity from
+specified grid, and these identifiers are used to generate links to a previous and next entities on this page.
 
-Also datagrid must have column with the name same to entity identifier field that is used to collect identifiers,
-and view page route must have parameter with the same name.
+Also datagrid must have column with the name same to entity identifier field that is used to collect identifiers. 
+View and edit pages routes must have parameter with the same name.
 
 **Example**
 
@@ -79,9 +79,21 @@ will not be available)
 Backend processing
 ------------------
 
-When user works with grid each request triggers listener that handles grid results. If entity pagination enabled both
-in system configuration and in the grid, and number of entities in grid less than specified limit, then listener gets
-IDs of all entities from grid. Then all these entities saved in user session for main grid entity.
+When user comes from grid with enabled entity pagination to view or edit page, grid parameters (filters, sorters etc.)
+transmitted as url parameters in the browser address bar. Then entity pagination storage data collector send a query for
+get all records with this grid parameters considering ACL permissions (for example edit ACL permissions are more strict
+than view). There are two different scopes in storage for collect data. One scope for collect view  pagination entities
+identifiers and other scope for collect edit pagination entities identifiers.
+Then collector fill view or edit scope depending on which page user visit. If limit of records count is more than
+**Entity Pagination limit** collector set empty array for this scope. Next time, if storage has data for current scope
+for current grid parameters, collector will not be send request for get records. 
+When switching back to datagrid both storage's scopes will be cleared.
+There are ``EntityPaginationController`` actions for entity pagination navigation. Each action check is pagination
+identifier is available and accessible. If in time when storage has data for current scope, other user delete some
+entities which are in current scope. When user go by navigation to this entity the message ``not_available`` will
+be show and user see next available entity. If was changed ACL permissions for entities which are in current scope
+and user go by navigation to this entity the message ``not_accessible`` will be show. Not available or not accessible
+entity delete from storage, change entities identifier count and message ``stats_number_view_%count% `` will be show.
 
 Default entity view has placeholder used to add entity pagination section. When user came to entity view page this
 section shows pagination details (<M> of <N> entities, links to first, previous, next and last entities)
