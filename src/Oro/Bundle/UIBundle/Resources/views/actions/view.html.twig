@@ -2,6 +2,10 @@
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
+{% block before_content_addition %}
+    {% placeholder view_before_content_addition with {entity: entity} %}
+{% endblock before_content_addition %}
+
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">

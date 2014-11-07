@@ -3,14 +3,14 @@
     {% set pager = oro_entity_pagination_pager(entity, scope) %}
 
     {% if isDataCollected and pager %}
-        {% set currentRoute = app.request.attributes.get('_route') %}
-        {% set currentParams = app.request.attributes.get('_route_params') %}
-        {% set queryParams = app.request.query.all %}
-        {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
-        {% set allParams = allParams|merge(currentParams) %}
-        {% set allParams = allParams|merge(queryParams) %}
+        <div id="entity-pagination" class="clearfix">
+            {% set currentRoute = app.request.attributes.get('_route') %}
+            {% set currentParams = app.request.attributes.get('_route_params') %}
+            {% set queryParams = app.request.query.all %}
+            {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
+            {% set allParams = allParams|merge(currentParams) %}
+            {% set allParams = allParams|merge(queryParams) %}
 
-        <li class="entity-pagination">
             {% if pager.current != 1 %}
                 <a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
                 <a href="{{ path('oro_entity_pagination_previous', allParams) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
@@ -22,6 +22,6 @@
                 <a href="{{ path('oro_entity_pagination_next', allParams) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
                 <a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a>
             {% endif %}
-        </li>
+        </div>
     {% endif %}
 {% endif %}

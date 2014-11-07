@@ -6,6 +6,10 @@
 
 {% set entity = entity is defined ? entity : null %}
 
+{% block before_content_addition %}
+    {% placeholder update_before_content_addition with {entity: entity} %}
+{% endblock before_content_addition %}
+
 {% block content %}
     {% if isWidgetContext and savedId is defined and savedId %}
         <script type="text/javascript">

@@ -1,9 +1,9 @@
 placeholders:
-    view_pageActions_after:
+    view_before_content_addition:
         items:
             entity_pagination_view:
                 order: 100
-    update_pageActions_after:
+    update_before_content_addition:
         items:
             entity_pagination_edit:
                 order: 100
