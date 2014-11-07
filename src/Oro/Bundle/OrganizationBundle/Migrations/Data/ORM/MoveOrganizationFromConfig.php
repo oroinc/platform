@@ -22,10 +22,10 @@ class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwa
      */
     public function load(ObjectManager $manager)
     {
-        $configManager = $this->container->get('oro_config.global');
-        $applicationTitle = $configManager->get('oro_ui.application_title');
+        $configManager   = $this->container->get('oro_config.global');
+        $applicationName = $configManager->get('oro_ui.application_name');
 
-        if (!$applicationTitle) {
+        if (!$applicationName) {
             return;
         }
 
@@ -37,7 +37,7 @@ class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwa
             return;
         }
 
-        $organization->setName($applicationTitle);
+        $organization->setName($applicationName);
         $manager->flush();
     }
 
