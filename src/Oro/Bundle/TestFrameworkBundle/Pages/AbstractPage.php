@@ -191,11 +191,17 @@ abstract class AbstractPage
             ),
             'Flash message is missing'
         );
-        $actualResult = $this->test->byXPath(
-            "//div[@id = 'flash-messages']//div[@class = 'message']"
-        )->attribute('innerHTML');
 
-        PHPUnit_Framework_Assert::assertEquals($messageText, trim($actualResult), $message);
+        $messageCssSelector = $this->test->using('css selector')->value('div#flash-messages div.message');
+
+        $renderedMessages = array();
+        /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $messageElement */
+        foreach ($this->test->elements($messageCssSelector) as $messageElement) {
+            $renderedMessages[] = trim($messageElement->attribute('innerHTML'));
+        }
+
+        PHPUnit_Framework_Assert::assertContains($messageText, $renderedMessages, $message);
+
         return $this;
     }
 
