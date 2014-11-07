@@ -1,5 +1,5 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
-{% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
+{% set entityClass = 'Oro\\Bundle\\NoteBundle\\Entity\\Note' %}
 {% set entityName  = oro_entity_config_value(entityClass, 'label')|trans %}
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="accordion-group">
@@ -9,17 +9,17 @@
                 <span class="visual">
                     <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
                     <span>{{ entityName }}</span>
-                    <span>{{ 'oro.activitylist.widget.logged_by'|trans({'{{ user }}': 'UserName'})|raw }} <i class="date"><%= updatedAt %></i></span>
+                    <span>{{ 'oro.activitylist.widget.logged_by'|trans({'{{ user }}': 'User'})|raw }} <i class="date"><%= updatedAt %></i></span>
                 </span>
             </div>
             <div class="actions">
-                <button class="btn item-view-button"
-                        title="{{ 'oro.activitylist.widget.view'|trans({'{{ entity }}': entityName})|trans|e('html_attr')|raw }}">
-                    <i class="icon-eye-open hide-text">{{ 'oro.activitylist.widget.view'|trans({'{{ entity }}': entityName})|trans|e('html')|raw }}</i>
+                <button class="btn item-edit-button<% if (!editable) { %> disabled<% } %>" <% if (!editable) { %> disabled="disabled"<% } %>
+                title="{{ 'oro.activitylist.widget.update'|trans({'{{ entity }}': entityName})|trans|e('html_attr')|raw }}">
+                <i class="icon-edit hide-text">{{ 'oro.activitylist.widget.update'|trans({'{{ entity }}': entityName})|e('html')|raw }}</i>
                 </button>
                 <button class="btn item-remove-button<% if (!removable) { %> disabled<% } %>" <% if (!removable) { %> disabled="disabled"<% } %>
                 title="{{ 'oro.activitylist.widget.delete'|trans|e('html_attr')|raw }}">
-                <i class="icon-trash hide-text">{{ 'oro.activitylist.widget.delete'|trans|e('html_attr')|raw }}</i>
+                <i class="icon-trash hide-text">{{ 'oro.activitylist.widget.delete'|trans|e('html')|raw }}</i>
                 </button>
             </div>
             <div class="message-item">
@@ -31,16 +31,7 @@
                 <%= subject %>
                 <% if (data != null) { %>
                     <div class="control-group">
-                        <label class="control-label">{{ 'From'|trans|raw }}</label>
-                        <div class="controls">
-                            <div class="control-label"><%= data['oro.email.from_name.label'] %></div>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">{{ 'To'|trans|raw }}</label>
-                        <div class="controls">
-                            <div class="control-label"><%= data['oro.email.to_name.label'] %></div>
-                        </div>
+                        <%= data['message'] %>
                     </div>
                 <% } %>
             </div>
