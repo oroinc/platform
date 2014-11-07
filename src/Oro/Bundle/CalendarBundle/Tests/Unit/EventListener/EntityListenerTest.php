@@ -18,6 +18,9 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $uow;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $coll;
+
     /** @var EntityListener */
     protected $listener;
 
@@ -32,6 +35,9 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
+        $this->coll = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Tests\Unit\FakePersistentCollection')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->listener = new EntityListener($this->activityManager);
     }
@@ -79,7 +85,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([$user]));
         $this->uow->expects($this->once())
-            ->method('getScheduledEntityUpdates')
+            ->method('getScheduledCollectionUpdates')
             ->will($this->returnValue([]));
 
         $this->em->expects($this->any())
@@ -87,7 +93,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->with('OroCalendarBundle:Calendar')
             ->will($this->returnValue($calendarRepo));
 
-        $this->em->expects($this->at(2))
+        $this->em->expects($this->at(1))
             ->method('persist')
             ->with($this->equalTo($newCalendar));
 
@@ -109,6 +115,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $org->setId(1);
         $org->setName('test');
 
+        $user->setId(1);
         $user->addOrganization($org);
 
         $newCalendar = new Calendar();
@@ -141,8 +148,15 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([]));
         $this->uow->expects($this->once())
-            ->method('getScheduledEntityUpdates')
-            ->will($this->returnValue([$user]));
+            ->method('getScheduledCollectionUpdates')
+            ->will($this->returnValue([$this->coll]));
+
+        $this->coll->expects($this->any())
+            ->method('getOwner')
+            ->will($this->returnValue($user));
+        $this->coll->expects($this->once())
+            ->method('getInsertDiff')
+            ->will($this->returnValue([$org]));
 
         $this->em->expects($this->any())
             ->method('getRepository')

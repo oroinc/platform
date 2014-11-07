@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
@@ -33,13 +34,22 @@ class EntityListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof User) {
-                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
+                $assignedOrganizations = $entity->getOrganizations();
+                foreach ($assignedOrganizations as $organization) {
+                    $this->createCalendar($em, $uow, $entity, $organization);
+                }
             }
         }
-
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if ($entity instanceof User) {
-                $this->ensureDefaultUserCalendarExist($entity, $em, $uow);
+        /** @var PersistentCollection $coll */
+        foreach ($uow->getScheduledCollectionUpdates() as $coll) {
+            if ($coll->getOwner() instanceof User && $coll->getOwner()->getId()) {
+                foreach ($coll->getInsertDiff() as $entity) {
+                    if ($entity instanceof Organization) {
+                        if (!$this->isCalendarExists($em, $coll->getOwner(), $entity)) {
+                            $this->createCalendar($em, $uow, $coll->getOwner(), $entity);
+                        }
+                    }
+                }
             }
         }
     }
@@ -62,21 +72,6 @@ class EntityListener
             }
             $this->insertedCalendars = [];
             $em->flush();
-        }
-    }
-
-    /**
-     * @param User          $entity
-     * @param EntityManager $em
-     * @param UnitOfWork    $uow
-     */
-    protected function ensureDefaultUserCalendarExist(User $entity, EntityManager $em, UnitOfWork $uow)
-    {
-        $assignedOrganizations = $entity->getOrganizations();
-        foreach ($assignedOrganizations as $organization) {
-            if (!$this->isCalendarExists($em, $entity, $organization)) {
-                $this->createCalendar($em, $uow, $entity, $organization);
-            }
         }
     }
 
