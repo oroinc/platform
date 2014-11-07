@@ -21,8 +21,6 @@ use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
  */
 abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
-    const ATTEMPTS = 7;
-
     use LoggerAwareTrait;
 
     /** @var ParameterBag */
@@ -46,7 +44,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     public function init(Transport $transportEntity)
     {
         $this->resetAttemptCount();
-        $this->setSleepBetweenAttempts([5, 10, 20, 40, 80, 160, 320, 640]);
+        $this->setSleepBetweenAttempts([5, 10, 20, 40]);
         $this->settings = $transportEntity->getSettingsBag();
         $wsdlUrl        = $this->settings->get('wsdl_url');
 
@@ -66,13 +64,10 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
         try {
-            $result = $this->client->__soapCall($action, $params);
+            $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
             if ($this->isAttemptNecessary()) {
-                $this->logAttempt();
-                sleep($this->getSleepBetweenAttempt());
-                $this->attempt();
-                $result = $this->call($action, $params);
+                $result = $this->makeNewAttempt($action, $params);
             } else {
                 $this->resetAttemptCount();
 
@@ -171,11 +166,15 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * Increment count attempt on one
+     * Make new attempt
      */
-    protected function attempt()
+    protected function makeNewAttempt($action, $params)
     {
+        $this->logAttempt();
+        sleep($this->getSleepBetweenAttempt());
         ++$this->attempted;
+
+        return $this->call($action, $params);
     }
 
     /**
@@ -183,7 +182,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      */
     protected function shouldAttempt()
     {
-        return $this->multipleAttemptsEnabled && ($this->attempted < self::ATTEMPTS);
+        return $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
     }
 
     /**
@@ -235,7 +234,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
                 if (in_array($statusCode, $this->getHttpStatusesForAttempt())) {
                     return true;
                 }
-            } elseif (!empty($headers) && $this->isResultOk($headers) && strpos('<?xml', $response) !== 0) {
+            } elseif (!empty($headers) && $this->isResultOk($headers) && strpos($response, '<?xml') !== 0) {
                 return true;
             } elseif (empty($headers)) {
                 return true;
