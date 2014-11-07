@@ -19,7 +19,14 @@
                     <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_next', allParams) }}"><i class="icon-chevron-right hide-text"></i></a></li>
                     <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a></li>
                 </ul>
-                <div class="dib pagination-total">of {{ pager.total }} Records</div>
+
+                <div class="dib pagination-total">
+                    {% if pager.total > 1 %}
+                        {{ 'oro.entity_pagination.pager_of_%total%_records'|trans({'%total%' : pager.total}) }}
+                    {% else %}
+                        {{ 'oro.entity_pagination.pager_of_%total%_record'|trans({'%total%' : pager.total}) }}
+                    {% endif %}
+                </div>
             </div>
         </div>
     {% endif %}

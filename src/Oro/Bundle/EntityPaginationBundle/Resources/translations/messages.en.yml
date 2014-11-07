@@ -1,6 +1,6 @@
 oro.entity_pagination:
-    current:
-    pager_%current%_of_%total%: '%current% of %total%'
+    pager_of_%total%_record: 'of %total% Record'
+    pager_of_%total%_records: 'of %total% Records'
     first: 'First'
     last: 'Last'
 
