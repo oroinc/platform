@@ -1,9 +1,8 @@
 oro.entity_pagination:
-    pager_%current%_of_%total%: '%current% of %total%'
-    previous: '< Prev'
-    next: 'Next >'
-    first: '<< First'
-    last: 'Last >>'
+    pager_of_%total%_record: 'of %total% Record'
+    pager_of_%total%_records: 'of %total% Records'
+    first: 'First'
+    last: 'Last'
 
     message:
         stats_number_view_%count%: 'You are now viewing %count% number of records.'
