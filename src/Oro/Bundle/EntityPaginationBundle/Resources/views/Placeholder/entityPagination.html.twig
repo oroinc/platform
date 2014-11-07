@@ -3,14 +3,15 @@
     {% set pager = oro_entity_pagination_pager(entity, scope) %}
 
     {% if isDataCollected and pager %}
+        {% set infoMessageShown = oro_entity_pagination_show_info_message(entity, scope) %}
+        {% set currentRoute = app.request.attributes.get('_route') %}
+        {% set currentParams = app.request.attributes.get('_route_params') %}
+        {% set queryParams = app.request.query.all %}
+        {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
+        {% set allParams = allParams|merge(currentParams) %}
+        {% set allParams = allParams|merge(queryParams) %}
+        
         <div id="entity-pagination">
-            {% set currentRoute = app.request.attributes.get('_route') %}
-            {% set currentParams = app.request.attributes.get('_route_params') %}
-            {% set queryParams = app.request.query.all %}
-            {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
-            {% set allParams = allParams|merge(currentParams) %}
-            {% set allParams = allParams|merge(queryParams) %}
-
             <div class="pagination">
                 <ul class="icons-holder">
                     <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a></li>
