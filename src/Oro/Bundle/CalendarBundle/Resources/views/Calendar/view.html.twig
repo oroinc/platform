@@ -95,6 +95,9 @@
         {{ oro_menu_render('calendar_menu') }}
     </script>
 
+    <script type="text/html" id="template-calendar-menu-spinner">
+    </script>
+
     <script type="text/html" id="template-calendar-connections">
         <ul class="media-list connection-container">
         </ul>
@@ -102,9 +105,16 @@
 
     <script type="text/html" id="template-calendar-connection-item">
         <li class="media connection-item" >
-                <span class="calendar-color" <% if (!_.isEmpty(backgroundColor)) { %>
-                style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
-            <% } %> ></span>
+                <span
+                    <% if (visible) { %>
+                    class="calendar-color"
+                        <% if (!_.isEmpty(backgroundColor)) { %>
+                        style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+                        <% } %>
+                    <% } else { %>
+                        class="calendar-color un-color"
+                    <% } %>
+                ></span>
             <div class="media-body">
                 <div
                     <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
@@ -119,7 +129,7 @@
                         class="icons-holder-text no-hash context-menu-button"
                         title="{{ 'oro.calendar.menu.context'|trans }}"
                     >
-                        <i class="icon-collapse"></i>
+                        <i class="icon-ellipsis-horizontal"></i>
                     </a>
                 </div>
             </div>
