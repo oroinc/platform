@@ -21,6 +21,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             this.collection.setCalendar(options.calendar);
             this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
+            this.defferedActionEnd = options.defferedActionEnd;
         },
 
         onModelDeleted: function (model) {
@@ -40,19 +41,19 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     success: _.bind(function () {
                         deletingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was removed.'));
-                        options.defferedActionEnd.resolve();
+                        this.defferedActionEnd.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         deletingMsg.close();
                         this.showDeleteError(response.responseJSON || {});
-                        options.defferedActionEnd.resolve();
+                        this.defferedActionEnd.resolve();
                         this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
                     }, this)
                 });
             } catch (err) {
                 deletingMsg.close();
                 this.showMiscError(err);
-                options.defferedActionEnd.resolve();
+                this.defferedActionEnd.resolve();
                 this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
             }
         },
