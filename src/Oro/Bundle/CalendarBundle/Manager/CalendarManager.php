@@ -97,8 +97,8 @@ class CalendarManager
     /**
      * Gets the list of calendar events
      *
-     * @param int       $userId
-     * @param int       $calendarId
+     * @param int       $userId     The id of an user requested this information
+     * @param int       $calendarId The target calendar id
      * @param \DateTime $start
      * @param \DateTime $end
      * @param bool      $subordinate
@@ -118,6 +118,12 @@ class CalendarManager
             if (!empty($events)) {
                 foreach ($events as &$event) {
                     $event['calendarAlias'] = $alias;
+                    if (!isset($event['editable'])) {
+                        $event['editable'] = true;
+                    }
+                    if (!isset($event['removable'])) {
+                        $event['removable'] = true;
+                    }
                 }
                 $result = array_merge($result, $events);
             }
@@ -135,7 +141,6 @@ class CalendarManager
         $defaultValues = $this->getCalendarDefaultValues();
         foreach ($calendars as &$calendar) {
             $this->applyCalendarDefaultValues($calendar, $defaultValues);
-            $this->removeCalendarRedundantProperties($calendar, $defaultValues);
         }
 
         ArrayUtils::sortBy($calendars, false, 'position');
@@ -152,19 +157,6 @@ class CalendarManager
                 $calendar[$fieldName] = is_callable($val)
                     ? call_user_func($val, $fieldName)
                     : $val;
-            }
-        }
-    }
-
-    /**
-     * @param array $calendar
-     * @param array $defaultValues
-     */
-    protected function removeCalendarRedundantProperties(array &$calendar, array $defaultValues)
-    {
-        foreach (array_keys($calendar) as $fieldName) {
-            if (!isset($defaultValues[$fieldName]) && !array_key_exists($fieldName, $defaultValues)) {
-                unset($calendar[$fieldName]);
             }
         }
     }

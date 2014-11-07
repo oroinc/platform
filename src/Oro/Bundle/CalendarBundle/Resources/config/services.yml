@@ -105,6 +105,7 @@ services:
         arguments:
             - @doctrine
             - @oro_security.security_facade
+            - @oro_reminder.entity.manager
 
     oro_calendar.autocomplete.user_calendar_handler:
         parent: oro_user.autocomplete.user.search_acl_handler.abstract

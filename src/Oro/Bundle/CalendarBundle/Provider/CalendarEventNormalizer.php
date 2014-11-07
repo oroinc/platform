@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CalendarEventNormalizer
@@ -17,16 +17,22 @@ class CalendarEventNormalizer
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var ReminderManager */
+    protected $reminderManager;
+
     /**
      * @param ManagerRegistry $doctrine
      * @param SecurityFacade  $securityFacade
+     * @param ReminderManager $reminderManager
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        ReminderManager $reminderManager
     ) {
-        $this->doctrine       = $doctrine;
-        $this->securityFacade = $securityFacade;
+        $this->doctrine        = $doctrine;
+        $this->securityFacade  = $securityFacade;
+        $this->reminderManager = $reminderManager;
     }
 
     /**
@@ -41,16 +47,7 @@ class CalendarEventNormalizer
     {
         $result = [];
 
-        $items     = $qb->getQuery()->getArrayResult();
-        $itemIds   = array_map(
-            function ($item) {
-                return $item['id'];
-            },
-            $items
-        );
-        $reminders = $this->doctrine->getRepository('OroReminderBundle:Reminder')
-            ->findRemindersByEntities($itemIds, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-
+        $items = $qb->getQuery()->getArrayResult();
         foreach ($items as $item) {
             $resultItem = array();
             foreach ($item as $field => $value) {
@@ -63,28 +60,11 @@ class CalendarEventNormalizer
             $resultItem['removable'] =
                 ($resultItem['calendar'] === $calendarId)
                 && $this->securityFacade->isGranted('oro_calendar_event_delete');
-            $resultReminders         = array_filter(
-                $reminders,
-                function ($reminder) use ($resultItem) {
-                    /* @var Reminder $reminder */
-                    return $reminder->getRelatedEntityId() == $resultItem['id'];
-                }
-            );
-
-            $resultItem['reminders'] = [];
-            foreach ($resultReminders as $resultReminder) {
-                /* @var Reminder $resultReminder */
-                $resultItem['reminders'][] = [
-                    'method'   => $resultReminder->getMethod(),
-                    'interval' => [
-                        'number' => $resultReminder->getInterval()->getNumber(),
-                        'unit'   => $resultReminder->getInterval()->getUnit()
-                    ]
-                ];
-            }
 
             $result[] = $resultItem;
         }
+
+        $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
         return $result;
     }

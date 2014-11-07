@@ -221,8 +221,9 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                             'title' => 'event1',
                         ],
                         [
-                            'id'    => 2,
-                            'title' => 'event2',
+                            'id'        => 2,
+                            'title'     => 'event2',
+                            'removable' => false
                         ],
                     ]
                 )
@@ -238,8 +239,10 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                             'title' => 'event3',
                         ],
                         [
-                            'id'    => 3,
-                            'title' => 'event4',
+                            'id'        => 3,
+                            'title'     => 'event4',
+                            'editable'  => false,
+                            'removable' => false
                         ],
                     ]
                 )
@@ -251,22 +254,30 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     'id'            => 1,
                     'title'         => 'event1',
-                    'calendarAlias' => 'provider1'
+                    'calendarAlias' => 'provider1',
+                    'editable'      => true,
+                    'removable'     => true
                 ],
                 [
                     'id'            => 2,
                     'title'         => 'event2',
-                    'calendarAlias' => 'provider1'
+                    'calendarAlias' => 'provider1',
+                    'editable'      => true,
+                    'removable'     => false
                 ],
                 [
                     'id'            => 1,
                     'title'         => 'event3',
-                    'calendarAlias' => 'provider2'
+                    'calendarAlias' => 'provider2',
+                    'editable'      => true,
+                    'removable'     => true
                 ],
                 [
                     'id'            => 3,
                     'title'         => 'event4',
-                    'calendarAlias' => 'provider2'
+                    'calendarAlias' => 'provider2',
+                    'editable'      => false,
+                    'removable'     => false
                 ],
             ],
             $result

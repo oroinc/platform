@@ -134,29 +134,6 @@ class CalendarProperty extends ExtendCalendarProperty
     }
 
     /**
-     * Gets unique id of a calendar.
-     *
-     * @return string
-     */
-    public function getCalendarUid()
-    {
-        return sprintf('%s:%d', $this->calendarAlias, $this->calendar);
-    }
-
-    /**
-     * Sets unique id of a calendar.
-     *
-     * @param string $calendarAlias An alias of the connected calendar
-     * @param int    $calendar      An id of the connected calendar
-     *
-     * @return self
-     */
-    public function setCalendarUid($calendarAlias, $calendar)
-    {
-        return $this->setCalendarAlias($calendarAlias)->setCalendar($calendar);
-    }
-
-    /**
      * Gets an alias of the connected calendar
      *
      * @return string
