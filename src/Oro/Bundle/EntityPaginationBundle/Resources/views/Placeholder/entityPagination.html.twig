@@ -3,7 +3,7 @@
     {% set pager = oro_entity_pagination_pager(entity, scope) %}
 
     {% if isDataCollected and pager %}
-        <div id="entity-pagination" class="clearfix">
+        <div id="entity-pagination">
             {% set currentRoute = app.request.attributes.get('_route') %}
             {% set currentParams = app.request.attributes.get('_route_params') %}
             {% set queryParams = app.request.query.all %}
@@ -11,17 +11,16 @@
             {% set allParams = allParams|merge(currentParams) %}
             {% set allParams = allParams|merge(queryParams) %}
 
-            {% if pager.current != 1 %}
-                <a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a>
-                <a href="{{ path('oro_entity_pagination_previous', allParams) }}">{{ 'oro.entity_pagination.previous'|trans }}</a>
-            {% endif %}
-
-            <span>{{ 'oro.entity_pagination.pager_%current%_of_%total%'|trans({'%current%': pager.current, '%total%': pager.total}) }}</span>
-
-            {% if pager.current != pager.total %}
-                <a href="{{ path('oro_entity_pagination_next', allParams) }}">{{ 'oro.entity_pagination.next'|trans }}</a>
-                <a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a>
-            {% endif %}
+            <div class="pagination">
+                <ul class="icons-holder">
+                    <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a></li>
+                    <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_previous', allParams) }}"><i class="icon-chevron-left hide-text"></i></a></li>
+                    <li><div class="pagination-current"> {{ pager.current }} </div></li>
+                    <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_next', allParams) }}"><i class="icon-chevron-right hide-text"></i></a></li>
+                    <li {% if pager.current == pager.total %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_last', allParams) }}">{{ 'oro.entity_pagination.last'|trans }}</a></li>
+                </ul>
+                <div class="dib pagination-total">of {{ pager.total }} Records</div>
+            </div>
         </div>
     {% endif %}
 {% endif %}

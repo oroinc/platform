@@ -1,3 +1,65 @@
 #entity-pagination {
     float: right;
 }
+
+#entity-pagination .pagination a {
+    color: #666;
+    font-weight: bold;
+    background-color: #f7f7f7;
+    background-image: linear-gradient(to bottom, #fdfdfd, #efefef);
+    background-repeat: repeat-x;
+}
+
+#entity-pagination .pagination {
+    margin: 4px 0 0;
+    line-height: 0;
+}
+
+#entity-pagination .pagination ul li input {
+    display: inline;
+    float: left;
+    width: 40px;
+    text-align: center;
+    margin: 0;
+    border-left: none;
+    border-color: #dddddd;
+    border-radius: 0;
+}
+
+#entity-pagination .pagination div.pagination-current{
+    border: 1px solid #dddddd;
+    border-left: none;
+    float: left;
+    height: 24px;
+    min-width: 30px;
+    padding: 6px;
+    text-align: center;
+    line-height: 10px;
+}
+
+#entity-pagination .pagination input[type=number]::-webkit-inner-spin-button,
+#entity-pagination .pagination input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+#entity-pagination .pagination > ul > .disabled a,
+#entity-pagination .pagination > ul > .disabled a:active,
+#entity-pagination .pagination > ul > .disabled a:hover,
+#entity-pagination .pagination > ul > .disabled a:focus {
+    background-color: #f7f7f7;
+    background-image: linear-gradient(to bottom, #fdfdfd, #efefef);
+    background-repeat: repeat-x;
+    box-shadow: none;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+#entity-pagination .pagination ul > li > a {
+    padding: 1px 12px;
+}
+
+#entity-pagination .dib.pagination-total {
+    line-height: 24px;
+}
