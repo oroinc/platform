@@ -80,20 +80,19 @@ Backend processing
 ------------------
 
 When user comes from grid with enabled entity pagination to view or edit page, grid parameters (filters, sorters etc.)
-transmitted as url parameters in the browser address bar. Then entity pagination storage data collector send a query for
-get all records with this grid parameters considering ACL permissions (for example edit ACL permissions are more strict
-than view). There are two different scopes in storage for collect data. One scope for collect view  pagination entities
-identifiers and other scope for collect edit pagination entities identifiers.
-Then collector fill view or edit scope depending on which page user visit. If limit of records count is more than
-**Entity Pagination limit** collector set empty array for this scope. Next time, if storage has data for current scope
-for current grid parameters, collector will not be send request for get records. 
-When switching back to datagrid both storage's scopes will be cleared.
-There are ``EntityPaginationController`` actions for entity pagination navigation. Each action check is pagination
-identifier is available and accessible. If in time when storage has data for current scope, other user delete some
-entities which are in current scope. When user go by navigation to this entity the message ``not_available`` will
-be show and user see next available entity. If was changed ACL permissions for entities which are in current scope
-and user go by navigation to this entity the message ``not_accessible`` will be show. Not available or not accessible
-entity delete from storage, change entities identifier count and message ``stats_number_view_%count% `` will be show.
+transmitted as url parameters in the browser address bar. Then entity pagination storage data collector send a query to
+get all records with this grid parameters considering ACL permissions (for example edit ACL might be more strict
+than view). There are two different scopes in storage for collect data. One scope is used to collect view pagination entities
+identifiers and other scope to collect edit pagination entities identifiers.
+Then collector fill view or edit scope storage depending on which page user visit. If limit of records count is more than
+**Entity Pagination limit** collector set empty array for this scope. Next time if storage has data for current scope
+for current grid parameters, collector will not send request to get records. 
+After switching back to datagrid both storage scopes are cleared.
+There are ``EntityPaginationController`` actions for entity pagination navigation. Each action checks if pagination
+identifier available and accessible. During pagination over entities other user can delete some
+entities from the current scope. When user goes by navigation to this entity the message ``not_available`` will
+be show and user will see next available entity. If ACL permission for entitiy in current scope was changed
+and user goes by navigation to this entity the message ``not_accessible`` will be shown. Not available or not accessible entities deleted from storage, then entities identifier count refreshes and message ``stats_number_view_%count% `` is shown.
 
 Default entity view has placeholder used to add entity pagination section. When user came to entity view page this
 section shows pagination details (<M> of <N> entities, links to first, previous, next and last entities)
