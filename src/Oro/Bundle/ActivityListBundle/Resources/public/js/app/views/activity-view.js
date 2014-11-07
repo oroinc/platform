@@ -54,6 +54,7 @@ define([
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
             data.relatedEntityClass = _.escape(data.relatedEntityClass);
             data.relatedActivityClass = _.escape(data.relatedActivityClass);
+            data.actor_url = routing.generate('oro_user_view', {'id': data.owner_id});
 
             return data;
         },

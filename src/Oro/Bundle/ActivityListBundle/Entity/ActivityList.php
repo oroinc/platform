@@ -4,11 +4,9 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -45,6 +43,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ActivityList
 {
+    const ENTITY_NAME = 'OroActivityListBundle:ActivityList';
+
     /**
      * @var integer
      *
@@ -373,7 +373,7 @@ class ActivityList
     }
 
     /**
-     * @param UserInterface|null $owningUser
+     * @param User|null $owningUser
      *
      * @return ActivityList
      */
@@ -385,7 +385,7 @@ class ActivityList
     }
 
     /**
-     * @return UserInterface
+     * @return User
      */
     public function getOwner()
     {

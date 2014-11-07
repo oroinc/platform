@@ -3,6 +3,7 @@ parameters:
     oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
 
     # manager
+    oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro.activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
@@ -11,6 +12,14 @@ parameters:
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
 
 services:
+    oro_activity_list.manager:
+        class: %oro_activity_list.manager.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+            - @oro_datagrid.extension.pager.orm.pager
+
     oro.activity_list.event_listener.actitity_list_listener:
         class:  %oro.activity_list.event_listener.actitity_list_listener.class%
         arguments:

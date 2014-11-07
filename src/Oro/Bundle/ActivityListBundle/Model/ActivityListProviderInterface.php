@@ -26,6 +26,15 @@ interface ActivityListProviderInterface
      */
     public function getSubject($entity);
 
+//    /**
+//     * Should return User, the one who made changes (create/update) to activity instance
+//     *
+//     * @param object $entity
+//     *
+//     * @return mixed
+//     */
+//    public function getActor($entity);
+
     /**
      * @param object $entity
      *
