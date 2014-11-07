@@ -35,6 +35,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             loadingMaskContent: '.loading-content'
         },
 
+        /** @property {Object} */
         options: {
             eventsOptions: {
                 editable: true,
@@ -48,6 +49,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 collection: null,
                 containerTemplateSelector: null
             }
+        },
+
+        /** @property {Object} */
+        defaults: {
+            calendarAlias: 'user'
         },
 
         /**
@@ -86,7 +92,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
-            this.connectionsView.dispose.call(this);
+            if (this.connectionsView) {
+                this.connectionsView.dispose.call(this);
+            }
             Backbone.View.prototype.dispose.call(this);
         },
 
@@ -125,6 +133,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             return this.loadingMask;
         },
 
+        getCollection: function () {
+            return this.options.collection;
+        },
+
+        getConnectionCollection: function () {
+            return this.options.connectionsOptions.collection;
+        },
+
         getCalendarElement: function () {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
@@ -136,11 +152,31 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this.collection.add(eventModel);
         },
 
-        onEventAdded: function (eventModel) {
+        visibleDefaultCalendar: function (eventModel) {
+
+        },
+
+        renderEventAfterAdd: function (eventModel) {
             var fcEvent = eventModel.toJSON();
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+        },
+
+        onEventAdded: function (eventModel) {
+            // make sure that a calendar is visible when a new event is added to it
+            var model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+            if (!model.get('visible')) {
+                // show a calendar automatically if it is not visible now
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                    $visibleButton = this.connectionsView.$el.find(
+                        this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
+                    ).find(this.connectionsView.selectors.visibleButton);
+                this.connectionsView.showCalendar(model, $visibleButton, savingMsg);
+            } else {
+                // just render a new event if a calendar is already visible
+                this.renderEventAfterAdd(eventModel);
+            }
         },
 
         onEventChanged: function (eventModel) {
@@ -309,6 +345,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
+        showUpdateError: function (err) {
+            this._showError(__('Sorry, the calendar updating was failed'), err);
+        },
+
         _showError: function (message, err) {
             this._hideMask();
             messenger.showErrorMessage(message, err);
@@ -417,7 +457,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         loadConnectionColors: function () {
             var lastBackgroundColor = null;
-            this.options.connectionsOptions.collection.each(_.bind(function (connection) {
+            this.getConnectionCollection().each(_.bind(function (connection) {
                 var obj = connection.toJSON();
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;

@@ -23,7 +23,6 @@ oro:
 
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
-            exclude_calendar:            "Exclude this calendar"
 
         my_calendar_widget_descriptions: This widget displays a calendar for today.
         print: Print
@@ -33,7 +32,9 @@ oro:
             context: Context menu
 
         context:
-            hide: Hide this calenadr
+            remove: Remove calendar
+            hide: Hide calendar
+            show: Show calendar
 
         control:
             all_day: ""

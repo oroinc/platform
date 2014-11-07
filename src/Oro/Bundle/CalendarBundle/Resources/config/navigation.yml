@@ -1,7 +1,7 @@
 oro_menu_config:
     templates:
         calendar_menu:
-            template: 'OroCalendarBundle:Calendar:contextMenu.html.twig'
+            template: 'OroCalendarBundle:Calendar:Menu/contextMenu.html.twig'
             rootClass: 'dropdown-menu context-menu'
     items:
         oro_calendar_view_default:
@@ -10,12 +10,18 @@ oro_menu_config:
             extras:
                 position: 20
         oro_calendar_hide_action:
-            label: 'oro.calendar.context.hide'
+            label: 'oro.calendar.context.remove'
+            uri: '#'
+            extras:
+                position: 20
+                module: 'orocalendar/js/calendar/menu/hide-calendar-action'
+                template: 'OroCalendarBundle:Calendar:Menu/hideCalendar.html.twig'
+        oro_calendar_visible_action:
             uri: '#'
             extras:
                 position: 10
-                module: 'orocalendar/js/calendar/menu/hide-calendar-action'
-                template: 'OroCalendarBundle:Calendar:hideCalendar.html.twig'
+                module: 'orocalendar/js/calendar/menu/visible-calendar-action'
+                template: 'OroCalendarBundle:Calendar:Menu/visibleCalendar.html.twig'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
@@ -37,6 +43,7 @@ oro_menu_config:
             type: calendar_menu
             children:
                 oro_calendar_hide_action: ~
+                oro_calendar_visible_action: ~
 
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"
