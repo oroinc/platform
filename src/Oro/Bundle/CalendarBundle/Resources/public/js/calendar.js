@@ -134,6 +134,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             return this.options.collection;
         },
 
+        getConnectionCollection: function () {
+            return this.options.connectionsOptions.collection;
+        },
+
         getCalendarElement: function () {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
@@ -158,18 +162,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         onEventAdded: function (eventModel) {
-            //check that the calendar of new event is visible
-            var model = this.options.connectionsOptions.collection.findWhere({
-                calendarAlias: eventModel.get('calendarAlias'),
-                calendar: eventModel.get('calendar')
-            });
+            // make sure that a calendar is visible when a new event is added to it
+            var model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
             if (!model.get('visible')) {
-                //if the calendar is none visible show the calendar visible automatically
-                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
-                var $itemConnection = this.connectionsView.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid')));
-                this.connectionsView.showCalendar(model, $itemConnection.find(this.connectionsView.selectors.visibleButton),savingMsg);
+                // show a calendar automatically if it is not visible now
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                    $visibleButton = this.connectionsView.$el.find(
+                        this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
+                    ).find(this.connectionsView.selectors.visibleButton);
+                this.connectionsView.showCalendar(model, $visibleButton, savingMsg);
             } else {
-                //if the calendar is visible render only new event
+                // just render a new event if a calendar is already visible
                 this.renderEventAfterAdd(eventModel);
             }
         },
@@ -448,7 +451,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         loadConnectionColors: function () {
             var lastBackgroundColor = null;
-            this.options.connectionsOptions.collection.each(_.bind(function (connection) {
+            this.getConnectionCollection().each(_.bind(function (connection) {
                 var obj = connection.toJSON();
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;
