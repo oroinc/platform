@@ -58,16 +58,16 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function getData($entity)
     {
-        $strRecipients = [];
+        $recipientNames = [];
         $data = $entity->getRecipients();
         foreach ($data as $recipient) {
-            array_push($res, $recipient->getName());
+            array_push($recipientNames, $recipient->getName());
         }
 
         /** @var Email $entity */
         return [
             'oro.email.from_name.label'=> $entity->getFromName(),
-            'oro.email.to_name.label'  => join(', ', $strRecipients),
+            'oro.email.to_name.label'  => join(', ', $recipientNames),
         ];
     }
 
