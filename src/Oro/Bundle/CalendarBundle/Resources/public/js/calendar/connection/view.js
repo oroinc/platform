@@ -243,6 +243,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
                             this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
                             var dataOptions = $(e.target).attr('data-options') || {};
+                            $('.context-menu-button').css('display', '');
                             el.remove();
                             $(document).off('.' + this.cid);
                             actionModule.execute(model.get('calendarUid'), dataOptions);
