@@ -1,0 +1,4 @@
+oro_entity_pagination:
+    resource:     "@OroEntityPaginationBundle/Controller"
+    type:         annotation
+    prefix:       /entity-pagination
