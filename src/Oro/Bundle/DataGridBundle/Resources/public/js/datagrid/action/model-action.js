@@ -126,7 +126,7 @@ define([
             if (newQueryString !== "" && newQueryString !== '?') {
                 newQueryString += "&";
             }
-            newQueryString += parameterName + "=" + (parameterValue || '');
+            newQueryString += parameterName + "=" + encodeURIComponent(parameterValue || '');
             return urlParts[0] + newQueryString + urlHash;
         }
     });
