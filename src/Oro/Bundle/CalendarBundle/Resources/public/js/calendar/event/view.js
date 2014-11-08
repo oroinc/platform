@@ -51,8 +51,38 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         render: function () {
             var widgetOptions = this.options.widgetOptions || {},
-                eventForm = this.options.widgetRoute ? $('<div></div>') : this.getEventForm(),
-                onDelete = _.bind(function (e) {
+                defaultOptions = {
+                    title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
+                        modal: true,
+                        resizable: false,
+                        width: 475,
+                        autoResize: true,
+                        close: _.bind(this.remove, this)
+                    }),
+                    submitHandler: _.bind(this.saveModel, this)
+                };
+
+            if (this.options.widgetRoute) {
+                defaultOptions.el = $('<div></div>');
+                defaultOptions.url = routing.generate(this.options.widgetRoute, {id: this.model.originalId});
+                defaultOptions.type = 'Calendar';
+            } else {
+                defaultOptions.el = this.getEventForm();
+                defaultOptions.loadingMaskEnabled = false;
+            }
+
+            this.eventDialog = new DialogWidget(_.defaults(
+                _.omit(widgetOptions, ['dialogOptions']),
+                defaultOptions
+            ));
+            this.eventDialog.render();
+
+            // subscribe to 'delete event' event
+            this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+                deleteAction.on('click', _.bind(function (e) {
                     var el = $(e.target),
                         confirm = new DeleteConfirmation({
                             content: el.data('message')
@@ -60,59 +90,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     e.preventDefault();
                     confirm.on('ok', _.bind(this.deleteModel, this));
                     confirm.open();
-                }, this);
-
-            this.eventDialog = new DialogWidget(_.defaults(_.omit(widgetOptions, ['dialogOptions']), {
-                el: eventForm,
-                title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
-                stateEnabled: false,
-                incrementalPosition: false,
-                loadingMaskEnabled: false,
-                dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
-                    modal: true,
-                    resizable: false,
-                    width: 475,
-                    autoResize: true,
-                    close: _.bind(this.remove, this)
-                }),
-                submitHandler: _.bind(function () {
-                    this.saveModel();
-                }, this)
-            }));
-            this.eventDialog.render();
-
-            // subscribe to 'delete event' event
-            this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
-                deleteAction.on('click', onDelete);
+                }, this));
             });
 
             // init loading mask control
             this.loadingMask = new LoadingMask();
             this.eventDialog.$el.closest('.ui-dialog').append(this.loadingMask.render().$el);
-
-            if (this.options.widgetRoute) {
-                this.showLoadingMask();
-                try {
-                    $.ajax({
-                        url: routing.generate(this.options.widgetRoute, {id: this.model.originalId}),
-                        data: '_widgetContainer=dialog&_wid=' + this._getUniqueIdentifier(),
-                        success: _.bind(function (data) {
-                            this._hideMask();
-                            this.eventDialog.$el.html(data);
-                        }, this),
-                        error: _.bind(function (jqXHR) {
-                            this._hideMask();
-                            this.eventDialog.$el.html(
-                                '<div class="alert alert-error">' + __('oro.ui.widget_loading_filed') + '</div>'
-                            );
-                        }, this)
-                    });
-                } catch (err) {
-                    this.showError(err);
-                }
-            } else {
-                eventForm.find('[name]').uniform('update');
-            }
 
             return this;
         },
@@ -139,10 +122,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             } catch (err) {
                 this.showError(err);
             }
-        },
-
-        showLoadingMask: function () {
-            this._showMask(__('Loading...'));
         },
 
         showSavingMask: function () {
@@ -233,8 +212,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         getEventForm: function () {
-            var modelData = this.model.toJSON();
-            return this.fillForm(this.template(modelData), modelData);
+            var modelData = this.model.toJSON(),
+                form = this.fillForm(this.template(modelData), modelData);
+            form.find('[name]').uniform('update');
+            return form;
         },
 
         getEventFormData: function () {
@@ -284,14 +265,5 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
             return current;
         },
-
-        _getUniqueIdentifier: function () {
-            /*jslint bitwise:true */
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0,
-                    v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
     });
 });
