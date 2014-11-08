@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * This entity is used to store different kind of user's properties for a calendar.
  * The combination of calendarAlias and calendar is unique identifier of a calendar.
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarPropertyRepository")
  * @ORM\Table(
  *      name="oro_calendar_property",
  *      uniqueConstraints={
@@ -131,29 +131,6 @@ class CalendarProperty extends ExtendCalendarProperty
         $this->targetCalendar = $targetCalendar;
 
         return $this;
-    }
-
-    /**
-     * Gets unique id of a calendar.
-     *
-     * @return string
-     */
-    public function getCalendarUid()
-    {
-        return sprintf('%s:%d', $this->calendarAlias, $this->calendar);
-    }
-
-    /**
-     * Sets unique id of a calendar.
-     *
-     * @param string $calendarAlias An alias of the connected calendar
-     * @param int    $calendar      An id of the connected calendar
-     *
-     * @return self
-     */
-    public function setCalendarUid($calendarAlias, $calendar)
-    {
-        return $this->setCalendarAlias($calendarAlias)->setCalendar($calendar);
     }
 
     /**

@@ -1,8 +1,7 @@
 /*jslint nomen:true*/
 /*global define, console*/
-define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection'
-], function ($, _, BaseView, __, messenger, ConnectionCollection) {
+define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger'
+    ], function (_, BaseView, __, messenger) {
     'use strict';
 
     /**
@@ -17,42 +16,48 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
         },
 
         initialize: function (options) {
-            this.collection = options.collection || new ConnectionCollection();
-            this.collection.setCalendar(options.calendar);
             this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
+            this.defferedActionEnd = options.defferedActionEnd;
         },
 
         onModelDeleted: function (model) {
-            this.colorManager.removeCalendarColors(model.get('calendarUid'));
-            this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).remove();
+            var calendarUid = model.get('calendarUid');
+            this.colorManager.removeCalendarColors(calendarUid);
+            this.$el.find(this.connectionsView.selectors.findItemByCalendar(calendarUid)).remove();
             this.connectionsView.trigger('connectionRemove', model);
         },
 
-        execute: function (calendarUid, options) {
-            var model,
-                deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
+        execute: function (model, options) {
+            var deletingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
+                connectionSelector = this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid')),
+                $connection = this.$el.find(connectionSelector);
             try {
-                model = this.collection.findWhere({calendarUid: calendarUid});
+                $connection.hide();
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {
                         deletingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was excluded.'));
+                        messenger.notificationFlashMessage('success', __('The calendar was removed.'));
+                        this.defferedActionEnd.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         deletingMsg.close();
                         this.showDeleteError(response.responseJSON || {});
+                        this.defferedActionEnd.resolve();
+                        $connection.show();
                     }, this)
                 });
             } catch (err) {
                 deletingMsg.close();
                 this.showMiscError(err);
+                this.defferedActionEnd.resolve();
+                $connection.show();
             }
         },
 
         showDeleteError: function (err) {
-            this._showError(__('Sorry, the calendar excluding was failed'), err);
+            this._showError(__('Sorry, the calendar removing was failed'), err);
         },
 
         showMiscError: function (err) {

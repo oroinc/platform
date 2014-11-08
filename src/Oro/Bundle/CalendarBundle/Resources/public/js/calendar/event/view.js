@@ -1,8 +1,8 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
-], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation'
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation) {
     'use strict';
 
     var $ = Backbone.$;
@@ -14,19 +14,19 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
      */
     return Backbone.View.extend({
         /** @property {Object} */
+        options: {
+            widgetRoute: null,
+            widgetOptions: null
+        },
+
+        /** @property {Object} */
         selectors: {
             loadingMaskContent: '.loading-content'
         },
 
-        options: {
-            formTemplateSelector: null,
-            calendar: null
-        },
-
         initialize: function (options) {
-            this.options = _.defaults(options || {}, this.options);
-            var templateHtml = $(this.options.formTemplateSelector).html();
-            this.template = _.template(templateHtml);
+            this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
+            this.template = _.template($(options.formTemplateSelector).html());
 
             this.listenTo(this.model, 'sync', this.onModelSave);
             this.listenTo(this.model, 'destroy', this.onModelDelete);
@@ -50,50 +50,48 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         render: function () {
-            var modelData, eventForm, onDelete;
-            // create a dialog
-            if (!this.model) {
-                this.model = new EventModel();
-            }
-            modelData = this.model.toJSON();
-            eventForm = this.template(modelData);
-            eventForm = this.fillForm(eventForm, modelData);
+            var widgetOptions = this.options.widgetOptions || {},
+                defaultOptions = {
+                    title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
+                        modal: true,
+                        resizable: false,
+                        width: 475,
+                        autoResize: true,
+                        close: _.bind(this.remove, this)
+                    }),
+                    submitHandler: _.bind(this.saveModel, this)
+                };
 
-            this.eventDialog = new DialogWidget({
-                el: eventForm,
-                title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
-                stateEnabled: false,
-                incrementalPosition: false,
-                loadingMaskEnabled: false,
-                dialogOptions: {
-                    modal: true,
-                    resizable: false,
-                    width: 475,
-                    autoResize: true,
-                    close: _.bind(this.remove, this)
-                },
-                submitHandler: _.bind(function () {
-                    this.saveModel();
-                }, this)
-            });
+            if (this.options.widgetRoute) {
+                defaultOptions.el = $('<div></div>');
+                defaultOptions.url = routing.generate(this.options.widgetRoute, {id: this.model.originalId});
+                defaultOptions.type = 'Calendar';
+            } else {
+                defaultOptions.el = this.getEventForm();
+                defaultOptions.loadingMaskEnabled = false;
+            }
+
+            this.eventDialog = new DialogWidget(_.defaults(
+                _.omit(widgetOptions, ['dialogOptions']),
+                defaultOptions
+            ));
             this.eventDialog.render();
 
             // subscribe to 'delete event' event
-            onDelete = _.bind(function (e) {
-                var el, confirm;
-                e.preventDefault();
-                el = $(e.target);
-                confirm = new DeleteConfirmation({
-                    content: el.data('message')
-                });
-                confirm.on('ok', _.bind(this.deleteModel, this));
-                confirm.open();
-            }, this);
             this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
-                deleteAction.on('click', onDelete);
+                deleteAction.on('click', _.bind(function (e) {
+                    var el = $(e.target),
+                        confirm = new DeleteConfirmation({
+                            content: el.data('message')
+                        });
+                    e.preventDefault();
+                    confirm.on('ok', _.bind(this.deleteModel, this));
+                    confirm.open();
+                }, this));
             });
-
-            eventForm.find('[name]').uniform('update');
 
             // init loading mask control
             this.loadingMask = new LoadingMask();
@@ -105,12 +103,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         saveModel: function () {
             this.showSavingMask();
             try {
-                var data = this.getEventFormData();
-                data.calendar = this.options.calendar;
-                this.model.set(
-                    {reminders: {}}
-                );
-                this.model.save(data, {
+                this.model.save(this.getEventFormData(), {
                     wait: true,
                     error: _.bind(this._handleResponseError, this)
                 });
@@ -208,10 +201,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                         var prototype = container.data('prototype');
                         if (prototype) {
                             _.each(value, function (collectionValue, collectionKey) {
-                                var collectionContent = prototype.replace(/__name__/g, collectionKey);
-
-                                container.append(collectionContent);
-                            }, prototype);
+                                container.append(prototype.replace(/__name__/g, collectionKey));
+                            });
                         }
                     }
 
@@ -220,8 +211,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             });
         },
 
+        getEventForm: function () {
+            var modelData = this.model.toJSON(),
+                form = this.fillForm(this.template(modelData), modelData);
+            form.find('[name]').uniform('update');
+            return form;
+        },
+
         getEventFormData: function () {
-            var self = this;
             var fieldNameRegex = /\[(\w+)\]/g,
                 data = {},
                 formData = this.eventDialog.form.serializeArray();
@@ -236,21 +233,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 }
 
                 if (matches.length) {
-                    self.setValueByPath(data, dataItem.value, matches);
+                    this.setValueByPath(data, dataItem.value, matches);
                 }
-            });
+            }, this);
 
             return data;
         },
 
         setValueByPath: function (obj, value, path) {
-            var parent = obj;
+            var parent = obj, i;
 
-            for (var i = 0; i < path.length - 1; i += 1) {
+            for (i = 0; i < path.length - 1; i++) {
                 if (parent[path[i]] === undefined) {
                     parent[path[i]] = {};
                 }
-
                 parent = parent[path[i]];
             }
 
@@ -258,16 +254,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         getValueByPath: function (obj, path) {
-            var current = obj;
+            var current = obj, i;
 
-            for (var i = 0; i < path.length; ++i) {
+            for (i = 0; i < path.length; i++) {
                 if (current[path[i]] == undefined) {
                     return undefined;
-                } else {
-                    current = current[path[i]];
                 }
+                current = current[path[i]];
             }
+
             return current;
-        }
+        },
     });
 });

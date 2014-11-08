@@ -35,6 +35,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             loadingMaskContent: '.loading-content'
         },
 
+        /** @property {Object} */
         options: {
             eventsOptions: {
                 editable: true,
@@ -63,18 +64,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             // init event collection
-            this.options.collection = this.options.collection || new EventCollection();
-            this.options.collection.setCalendar(this.options.calendar);
-            this.options.collection.subordinate = this.options.eventsOptions.subordinate;
+            this.collection = this.collection || new EventCollection();
+            this.collection.setCalendar(this.options.calendar);
+            this.collection.subordinate = this.options.eventsOptions.subordinate;
 
             // set options for new events
             this.options.newEventEditable = this.options.eventsOptions.editable;
             this.options.newEventRemovable = this.options.eventsOptions.removable;
 
             // subscribe to event collection events
-            this.listenTo(this.getCollection(), 'add', this.onEventAdded);
-            this.listenTo(this.getCollection(), 'change', this.onEventChanged);
-            this.listenTo(this.getCollection(), 'destroy', this.onEventDeleted);
+            this.listenTo(this.collection, 'add', this.onEventAdded);
+            this.listenTo(this.collection, 'change', this.onEventChanged);
+            this.listenTo(this.collection, 'destroy', this.onEventDeleted);
 
             this.colorManager = new ColorManager();
         },
@@ -86,18 +87,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
-            this.connectionsView.dispose.call(this);
+            if (this.connectionsView) {
+                this.connectionsView.dispose.call(this);
+            }
             Backbone.View.prototype.dispose.call(this);
         },
 
-        getEventsView: function (model) {
+        getEventView: function (eventModel) {
             if (!this.eventView) {
+                var connectionModel = this.options.connectionsOptions.collection.findWhere(
+                        {calendarUid: eventModel.get('calendarUid')}
+                    ),
+                    options = _.pick(connectionModel.attributes, ['widgetRoute', 'widgetOptions']);
                 // create a view for event details
-                this.eventView = new EventView({
-                    model: model,
-                    calendar: this.options.calendar,
+                this.eventView = new EventView(_.extend(options, {
+                    model: eventModel,
                     formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector
-                });
+                }));
                 // subscribe to event view collection events
                 this.listenTo(this.eventView, 'addEvent', this.handleEventViewAdd);
                 this.listenTo(this.eventView, 'remove', this.handleEventViewRemove);
@@ -126,6 +132,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             return this.options.collection;
         },
 
+        getConnectionCollection: function () {
+            return this.options.connectionsOptions.collection;
+        },
+
         getCalendarElement: function () {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
@@ -134,20 +144,40 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         handleEventViewAdd: function (eventModel) {
-            this.getCollection().add(eventModel);
+            this.collection.add(eventModel);
         },
 
-        onEventAdded: function (eventModel) {
+        visibleDefaultCalendar: function (eventModel) {
+
+        },
+
+        renderEventAfterAdd: function (eventModel) {
             var fcEvent = eventModel.toJSON();
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
+        onEventAdded: function (eventModel) {
+            // make sure that a calendar is visible when a new event is added to it
+            var model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+            if (!model.get('visible')) {
+                // show a calendar automatically if it is not visible now
+                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                    $visibleButton = this.connectionsView.$el.find(
+                        this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
+                    ).find(this.connectionsView.selectors.visibleButton);
+                this.connectionsView.showCalendar(model, $visibleButton, savingMsg);
+            } else {
+                // just render a new event if a calendar is already visible
+                this.renderEventAfterAdd(eventModel);
+            }
+        },
+
         onEventChanged: function (eventModel) {
-            var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.get('id'))[0];
+            var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
             // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, _.pick(eventModel.attributes, _.keys(_.omit(fcEvent, ['id']))));
+            fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
             this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
         },
@@ -170,12 +200,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     // TODO: All date values must be in UTC representation according to config timezone,
                     // https://magecore.atlassian.net/browse/BAP-2203
                     var eventModel = new EventModel({
+                        calendarAlias: 'user',
+                        calendar: this.options.calendar,
                         start: this.formatDateTimeForModel(start),
                         end: this.formatDateTimeForModel(end),
                         editable: this.options.newEventEditable,
                         removable: this.options.newEventRemovable
                     });
-                    this.getEventsView(eventModel).render();
+                    this.getEventView(eventModel).render();
                 } catch (err) {
                     this.showMiscError(err);
                 }
@@ -185,8 +217,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         eventClick: function (fcEvent) {
             if (!this.eventView) {
                 try {
-                    var eventModel = this.getCollection().get(fcEvent.id);
-                    this.getEventsView(eventModel).render();
+                    var eventModel = this.collection.get(fcEvent.id);
+                    this.getEventView(eventModel).render();
                 } catch (err) {
                     this.showMiscError(err);
                 }
@@ -196,7 +228,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         eventDropOrResize: function (fcEvent) {
             this.showSavingMask();
             try {
-                this.getCollection()
+                this.collection
                     .get(fcEvent.id)
                     .save(
                         {
@@ -217,20 +249,22 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         loadEvents: function (start, end, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents = this.getCollection().toJSON();
-                _.each(fcEvents, this.prepareViewModel, this);
+                var fcEvents = this.collection.toJSON();
+                _.each(fcEvents, function (fcEvent) {
+                    this.prepareViewModel(fcEvent, false);
+                }, this);
                 this._hideMask();
                 callback(fcEvents);
             }, this);
 
             try {
-                this.getCollection().setRange(
+                this.collection.setRange(
                     this.formatDateTimeForModel(start),
                     this.formatDateTimeForModel(end)
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
-                    this.getCollection().fetch({
+                    this.collection.fetch({
                         reset: true,
                         success: onEventsLoad,
                         error: _.bind(function (collection, response) {
@@ -306,6 +340,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
+        showUpdateError: function (err) {
+            this._showError(__('Sorry, the calendar updating was failed'), err);
+        },
+
         _showError: function (message, err) {
             this._hideMask();
             messenger.showErrorMessage(message, err);
@@ -373,8 +411,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 self.setTimeline();
             };
 
-            options.eventAfterRender = function (event, element) {
-                var reminders = self.getCollection().get(event.id).get('reminders');
+            options.eventAfterRender = function (fcEvent, element) {
+                var reminders = self.collection.get(fcEvent.id).get('reminders');
                 if (reminders && _.keys(reminders).length) {
                     element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
                 } else {
@@ -414,7 +452,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         loadConnectionColors: function () {
             var lastBackgroundColor = null;
-            this.options.connectionsOptions.collection.each(_.bind(function (connection) {
+            this.getConnectionCollection().each(_.bind(function (connection) {
                 var obj = connection.toJSON();
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;

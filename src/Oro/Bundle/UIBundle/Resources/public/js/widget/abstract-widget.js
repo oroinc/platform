@@ -553,6 +553,21 @@ define(function (require) {
         },
 
         /**
+         * Updates content of a widget.
+         *
+         * @param {String} content
+         */
+        setContent: function (content) {
+            this.actionsEl = null;
+            this.actions = {};
+            this.setElement($(content).filter('.widget-content:first'));
+            this._show();
+            mediator.execute('layout:init', this.widget);
+            mediator.trigger('widget:contentLoad', this.widget);
+            mediator.trigger('layout:adjustHeight');
+        },
+
+        /**
          * Load content
          *
          * @param {Object=} data
@@ -612,13 +627,7 @@ define(function (require) {
         _onContentLoad: function(content) {
             this.loading = false;
             this.trigger('contentLoad', content, this);
-            this.actionsEl = null;
-            this.actions = {};
-            this.setElement($(content).filter('.widget-content:first'));
-            this._show();
-            mediator.execute('layout:init', this.widget);
-            mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            this.setContent(content);
         },
 
         /**

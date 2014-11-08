@@ -97,14 +97,15 @@ class CalendarManager
     /**
      * Gets the list of calendar events
      *
-     * @param int       $calendarId
-     * @param \DateTime $start
-     * @param \DateTime $end
-     * @param bool      $subordinate
+     * @param int       $userId      The id of an user requested this information
+     * @param int       $calendarId  The target calendar id
+     * @param \DateTime $start       A date/time specifies the begin of a time interval
+     * @param \DateTime $end         A date/time specifies the end of a time interval
+     * @param bool      $subordinate Determines whether events from connected calendars should be included or not
      *
      * @return array
      */
-    public function getCalendarEvents($calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
         // make sure input parameters have proper types
         $calendarId  = (int)$calendarId;
@@ -113,10 +114,16 @@ class CalendarManager
         $result = [];
 
         foreach ($this->providers as $alias => $provider) {
-            $events = $provider->getCalendarEvents($calendarId, $start, $end, $subordinate);
+            $events = $provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
             if (!empty($events)) {
                 foreach ($events as &$event) {
                     $event['calendarAlias'] = $alias;
+                    if (!isset($event['editable'])) {
+                        $event['editable'] = true;
+                    }
+                    if (!isset($event['removable'])) {
+                        $event['removable'] = true;
+                    }
                 }
                 $result = array_merge($result, $events);
             }
@@ -134,7 +141,6 @@ class CalendarManager
         $defaultValues = $this->getCalendarDefaultValues();
         foreach ($calendars as &$calendar) {
             $this->applyCalendarDefaultValues($calendar, $defaultValues);
-            $this->removeCalendarRedundantProperties($calendar, $defaultValues);
         }
 
         ArrayUtils::sortBy($calendars, false, 'position');
@@ -151,19 +157,6 @@ class CalendarManager
                 $calendar[$fieldName] = is_callable($val)
                     ? call_user_func($val, $fieldName)
                     : $val;
-            }
-        }
-    }
-
-    /**
-     * @param array $calendar
-     * @param array $defaultValues
-     */
-    protected function removeCalendarRedundantProperties(array &$calendar, array $defaultValues)
-    {
-        foreach (array_keys($calendar) as $fieldName) {
-            if (!isset($defaultValues[$fieldName]) && !array_key_exists($fieldName, $defaultValues)) {
-                unset($calendar[$fieldName]);
             }
         }
     }
