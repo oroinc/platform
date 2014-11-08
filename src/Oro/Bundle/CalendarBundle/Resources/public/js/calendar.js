@@ -51,11 +51,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
         },
 
-        /** @property {Object} */
-        defaults: {
-            calendarAlias: 'user'
-        },
-
         /**
          * this property is used to prevent loading of events from a server when the calendar object is created
          * @property {bool}
