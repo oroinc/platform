@@ -14,6 +14,9 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $reminderManager;
+
     /** @var CalendarEventNormalizer */
     protected $normalizer;
 
@@ -25,14 +28,21 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->reminderManager = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->normalizer = new CalendarEventNormalizer($this->doctrine, $this->securityFacade);
+        $this->normalizer = new CalendarEventNormalizer(
+            $this->doctrine,
+            $this->securityFacade,
+            $this->reminderManager
+        );
     }
 
     /**
      * @dataProvider getCalendarEventsProvider
      */
-    public function testGetCalendarEvents($events, $eventIds, $reminders, $expected)
+    public function testGetCalendarEvents($events, $eventIds, $expected)
     {
         $calendarId = 123;
         $qb         = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -49,18 +59,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getArrayResult')
             ->will($this->returnValue($events));
 
-        $reminderRepo = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
-            ->with('OroReminderBundle:Reminder')
-            ->will($this->returnValue($reminderRepo));
-        $reminderRepo->expects($this->once())
-            ->method('findRemindersByEntities')
-            ->with($eventIds, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
-            ->will($this->returnValue($reminders));
-
         if (!empty($events)) {
             $this->securityFacade->expects($this->exactly(2))
                 ->method('isGranted')
@@ -74,6 +72,10 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 );
         }
 
+        $this->reminderManager->expects($this->once())
+            ->method('applyReminders')
+            ->with($expected, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
         $result = $this->normalizer->getCalendarEvents($calendarId, $qb);
         $this->assertEquals($expected, $result);
     }
@@ -82,17 +84,11 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $startDate = new \DateTime();
         $endDate   = $startDate->add(new \DateInterval('PT1H'));
-        $reminder  = new Reminder();
-        $reminder
-            ->setRelatedEntityId(1)
-            ->setMethod('email')
-            ->setInterval(new ReminderInterval(10, ReminderInterval::UNIT_MINUTE));
 
         return [
             [
                 'events'    => [],
                 'eventIds'  => [],
-                'reminders' => [],
                 'expected'  => []
             ],
             [
@@ -106,7 +102,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'eventIds'  => [1],
-                'reminders' => [],
                 'expected'  => [
                     [
                         'calendar'  => 123,
@@ -115,8 +110,7 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'start'     => $startDate->format('c'),
                         'end'       => $endDate->format('c'),
                         'editable'  => true,
-                        'removable' => true,
-                        'reminders' => []
+                        'removable' => true
                     ],
                 ]
             ],
@@ -131,7 +125,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'eventIds'  => [1],
-                'reminders' => [$reminder],
                 'expected'  => [
                     [
                         'calendar'  => 123,
@@ -140,16 +133,7 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'start'     => $startDate->format('c'),
                         'end'       => $endDate->format('c'),
                         'editable'  => true,
-                        'removable' => true,
-                        'reminders' => [
-                            [
-                                'method'   => $reminder->getMethod(),
-                                'interval' => [
-                                    'number' => $reminder->getInterval()->getNumber(),
-                                    'unit'   => $reminder->getInterval()->getUnit(),
-                                ]
-                            ]
-                        ]
+                        'removable' => true
                     ],
                 ]
             ],

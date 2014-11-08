@@ -30,20 +30,6 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj->getVisible());
     }
 
-    public function testCalendarUid()
-    {
-        $obj = new CalendarProperty();
-
-        $obj->setCalendarUid('test', 123);
-        $this->assertEquals('test:123', $obj->getCalendarUid());
-
-        $obj->setCalendarAlias('other');
-        $this->assertEquals('other:123', $obj->getCalendarUid());
-
-        $obj->setCalendar(345);
-        $this->assertEquals('other:345', $obj->getCalendarUid());
-    }
-
     /**
      * @dataProvider propertiesDataProvider
      *

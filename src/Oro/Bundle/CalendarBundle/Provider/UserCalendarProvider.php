@@ -78,7 +78,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');

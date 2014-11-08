@@ -114,8 +114,8 @@ class RestCalendarEventTest extends WebTestCase
     {
         $request = array(
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
-            'start'       => date(DATE_RFC3339, strtotime('-1 day')),
-            'end'         => date(DATE_RFC3339, strtotime('+1 day')),
+            'page'        => 1,
+            'limit'       => 10,
             'subordinate' => false
         );
         $this->client->request(

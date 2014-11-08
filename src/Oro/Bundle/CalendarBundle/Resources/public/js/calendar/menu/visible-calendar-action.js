@@ -13,29 +13,24 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
     return BaseView.extend({
 
         initialize: function (options) {
-            this.collection = options.collection || new ConnectionCollection();
-            this.collection.setCalendar(options.calendar);
-            this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
         },
 
-        execute: function (calendarUid, options) {
-            var model,
-                savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+        execute: function (model, options) {
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                connectionSelector = this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid')),
+                $connection = this.$el.find(connectionSelector),
+                $visibleButton = $connection.find(this.connectionsView.selectors.visibleButton);
             try {
-                model = this.collection.findWhere({calendarUid: calendarUid});
-                var $target = this.connectionsView.$el.find(
-                    this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
-                ).find(this.connectionsView.selectors.visibleButton);
                 if (model.get('visible')) {
-                    this.connectionsView.hideCalendar(model, $target, savingMsg);
+                    this.connectionsView.hideCalendar(model, $visibleButton, savingMsg);
                 } else {
-                    this.connectionsView.showCalendar(model, $target, savingMsg);
+                    this.connectionsView.showCalendar(model, $visibleButton, savingMsg);
                 }
             } catch (err) {
                 savingMsg.close();
                 this.showMiscError(err);
-                this.$el.find(this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))).show();
+                $connection.show();
                 options.defferedActionEnd.resolve();
             }
         },

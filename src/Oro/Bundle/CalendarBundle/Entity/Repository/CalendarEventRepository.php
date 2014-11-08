@@ -12,11 +12,11 @@ class CalendarEventRepository extends EntityRepository
      * Returns a query builder which can be used to get a list of calendar events filtered by start and end dates
      *
      * @param int            $calendarId
-     * @param \DateTime      $startDate       Start date
-     * @param \DateTime      $endDate         End date
-     * @param bool           $withConnections If true events from connected calendars will be returned as well
-     * @param array|Criteria $filters         Additional filtering criteria, e.g. ['allDay' => true, ...]
-     *                                        or \Doctrine\Common\Collections\Criteria
+     * @param \DateTime      $startDate
+     * @param \DateTime      $endDate
+     * @param bool           $subordinate If true events from connected calendars will be returned as well
+     * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                    or \Doctrine\Common\Collections\Criteria
      *
      * @return QueryBuilder
      */
@@ -24,10 +24,10 @@ class CalendarEventRepository extends EntityRepository
         $calendarId,
         $startDate,
         $endDate,
-        $withConnections = false,
+        $subordinate = false,
         $filters = []
     ) {
-        $qb = $this->getEventListQueryBuilder($calendarId, $withConnections, $filters);
+        $qb = $this->getEventListQueryBuilder($calendarId, $subordinate, $filters);
 
         /** @var QueryBuilder $qb */
         $qb
@@ -47,15 +47,15 @@ class CalendarEventRepository extends EntityRepository
      * Returns a query builder which can be used to get a list of calendar events
      *
      * @param int            $calendarId
-     * @param bool           $withConnections If true events from connected calendars will be returned as well
-     * @param array|Criteria $filters         Additional filtering criteria, e.g. ['allDay' => true, ...]
-     *                                        or \Doctrine\Common\Collections\Criteria
+     * @param bool           $subordinate If true events from connected calendars will be returned as well
+     * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                    or \Doctrine\Common\Collections\Criteria
      *
      * @return QueryBuilder
      */
     public function getEventListQueryBuilder(
         $calendarId,
-        $withConnections = false,
+        $subordinate = false,
         $filters = []
     ) {
         /** @var QueryBuilder $qb */
@@ -75,9 +75,9 @@ class CalendarEventRepository extends EntityRepository
         if ($filters) {
             $qb->addCriteria($filters);
         }
-        if ($withConnections) {
-            $connectionRepo  = $this->getEntityManager()->getRepository('OroCalendarBundle:CalendarProperty');
-            $qbConnections = $connectionRepo->createQueryBuilder('connection')
+        if ($subordinate) {
+            $connectionRepo = $this->getEntityManager()->getRepository('OroCalendarBundle:CalendarProperty');
+            $qbConnections  = $connectionRepo->createQueryBuilder('connection')
                 ->select('connection.calendar')
                 ->where(
                     'connection.targetCalendar = :id'

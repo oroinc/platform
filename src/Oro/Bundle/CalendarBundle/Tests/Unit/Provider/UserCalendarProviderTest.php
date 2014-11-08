@@ -159,6 +159,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetCalendarEvents()
     {
         $calendarId  = 123;
+        $userId      = 123;
         $start       = new \DateTime();
         $end         = new \DateTime();
         $subordinate = true;
@@ -184,7 +185,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with($calendarId, $this->identicalTo($qb))
             ->will($this->returnValue($events));
 
-        $result = $this->provider->getCalendarEvents($calendarId, $start, $end, $subordinate);
+        $result = $this->provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
         $this->assertEquals($events, $result);
     }
 }
