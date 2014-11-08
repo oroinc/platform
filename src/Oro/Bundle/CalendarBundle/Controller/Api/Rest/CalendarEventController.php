@@ -69,7 +69,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      nullable=true,
      *      strict=true,
      *      default="false",
-     *      description="Determine whether events from connected calendars should be included or not."
+     *      description="Determines whether events from connected calendars should be included or not."
      * )
      * @QueryParam(
      *     name="createdAt",

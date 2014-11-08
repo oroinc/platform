@@ -37,11 +37,11 @@ interface CalendarProviderInterface
     /**
      * Gets the list of calendar events
      *
-     * @param int       $userId
-     * @param int       $calendarId
-     * @param \DateTime $start
-     * @param \DateTime $end
-     * @param bool      $subordinate
+     * @param int       $userId      The id of an user requested this information
+     * @param int       $calendarId  The target calendar id
+     * @param \DateTime $start       A date/time specifies the begin of a time interval
+     * @param \DateTime $end         A date/time specifies the end of a time interval
+     * @param bool      $subordinate Determines whether events from connected calendars should be included or not
      *
      * @return array Each item of this array should contains all properties of a calendar event.
      *               Also there are several additional properties you can return as well:
