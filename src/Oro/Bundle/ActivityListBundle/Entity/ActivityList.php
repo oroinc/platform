@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+
+use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,7 +15,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
- *     @ORM\Index(name="oro_activity_list_related_idx", columns={"related_entity_class", "related_entity_id"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -41,7 +42,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class ActivityList
+class ActivityList extends ExtendActivityList
 {
     const ENTITY_NAME = 'OroActivityListBundle:ActivityList';
 
@@ -86,21 +87,7 @@ class ActivityList
     /**
      * @var string
      *
-     * @ORM\Column(name="related_entity_class", type="string", length=255)
-     */
-    protected $relatedEntityClass;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="related_entity_id", type="integer", nullable=true)
-     */
-    protected $relatedEntityId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_activity_class", type="string", length=255)
+     * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
      */
     protected $relatedActivityClass;
 
@@ -162,7 +149,6 @@ class ActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @return string
      */
@@ -176,7 +162,6 @@ class ActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @param string $verb
      *
@@ -233,54 +218,6 @@ class ActivityList
     public function setData($data)
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity class name
-     *
-     * @return string
-     */
-    public function getRelatedEntityClass()
-    {
-        return $this->relatedEntityClass;
-    }
-
-    /**
-     * Set related entity class name
-     *
-     * @param string $relatedEntityClass
-     *
-     * @return self
-     */
-    public function setRelatedEntityClass($relatedEntityClass)
-    {
-        $this->relatedEntityClass = $relatedEntityClass;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity id
-     *
-     * @return integer
-     */
-    public function getRelatedEntityId()
-    {
-        return $this->relatedEntityId;
-    }
-
-    /**
-     * Set related entity id
-     *
-     * @param integer|null $relatedEntityId
-     *
-     * @return self
-     */
-    public function setRelatedEntityId($relatedEntityId)
-    {
-        $this->relatedEntityId = $relatedEntityId;
 
         return $this;
     }
@@ -373,11 +310,11 @@ class ActivityList
     }
 
     /**
-     * @param User|null $owningUser
+     * @param User $owningUser
      *
-     * @return ActivityList
+     * @return self
      */
-    public function setOwner($owningUser)
+    public function setOwner(User $owningUser)
     {
         $this->owner = $owningUser;
 
@@ -403,7 +340,7 @@ class ActivityList
     /**
      * @param $relatedActivityClass
      *
-     * @return $this
+     * @return self
      */
     public function setRelatedActivityClass($relatedActivityClass)
     {
@@ -423,7 +360,7 @@ class ActivityList
     /**
      * @param $relatedActivityId
      *
-     * @return $this
+     * @return self
      */
     public function setRelatedActivityId($relatedActivityId)
     {

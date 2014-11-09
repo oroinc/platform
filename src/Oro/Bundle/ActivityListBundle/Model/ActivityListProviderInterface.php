@@ -2,38 +2,26 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 interface ActivityListProviderInterface
 {
     /**
-     * return pairs of class name and id,
+     * returns true if given $configId is supported by activity
      *
-     * @return array
-     */
-    public function getTargets();
-
-    /**
-     * returns a class name of entity for which we monitor changes
+     * @param ConfigIdInterface $configId
+     * @param ConfigManager     $configManager
      *
-     * @return string
+     * @return bool
      */
-    public function getActivityClass();
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager);
 
     /**
      * @param object $entity
-     *
      * @return string
      */
     public function getSubject($entity);
-
-//    /**
-//     * Should return User, the one who made changes (create/update) to activity instance
-//     *
-//     * @param object $entity
-//     *
-//     * @return mixed
-//     */
-//    public function getActor($entity);
 
     /**
      * @param object $entity
@@ -60,7 +48,14 @@ interface ActivityListProviderInterface
     public function getRoutes();
 
     /**
-     * @param $entity
+     * returns a class name of entity for which we monitor changes
+     *
+     * @return string
+     */
+    public function getActivityClass();
+
+    /**
+     * @param object $entity
      *
      * @return integer
      */
@@ -69,8 +64,7 @@ interface ActivityListProviderInterface
     /**
      * Check if provider supports given entity
      *
-     * @param object|string $entity
-     *
+     * @param  $entity
      * @return bool
      */
     public function isApplicable($entity);

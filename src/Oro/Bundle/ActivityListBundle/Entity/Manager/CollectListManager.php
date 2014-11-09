@@ -34,20 +34,20 @@ class ActivityListManager
     protected $chainProvider;
 
     /**
-     * @param Registry       $doctrine
+     * @ param Registry       $doctrine
      * @param SecurityFacade $securityFacade
      * @param NameFormatter  $nameFormatter
      * @param Pager          $pager
      * @param ActivityListChainProvider $chainProvider
      */
     public function __construct(
-        Registry $doctrine,
+        //Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
         ActivityListChainProvider $chainProvider
     ) {
-        $this->em             = $doctrine->getManager();
+        //$this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
