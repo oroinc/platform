@@ -25,8 +25,7 @@ define(['underscore', 'backbone', 'routing'
             backgroundColor: null,
             calendarName: null,
             removable: true,
-            widgetRoute: null,
-            widgetOptions: null
+            options: null
         },
 
         initialize: function () {
@@ -56,7 +55,7 @@ define(['underscore', 'backbone', 'routing'
         },
 
         toJSON: function (options) {
-            return _.omit(Backbone.Model.prototype.toJSON.call(this, options), ['widgetRoute', 'widgetOptions']);
+            return _.omit(Backbone.Model.prototype.toJSON.call(this, options), ['options']);
         },
 
         _updateCalendarUidAttribute: function () {

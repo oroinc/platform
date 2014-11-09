@@ -98,9 +98,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 var connectionModel = this.getConnectionCollection().findWhere(
                         {calendarUid: eventModel.get('calendarUid')}
                     ),
-                    options = _.pick(connectionModel.attributes, ['widgetRoute', 'widgetOptions']);
+                    options = connectionModel.get('options') || {};
                 // create a view for event details
-                this.eventView = new EventView(_.extend(options, {
+                this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
                     formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector
                 }));
