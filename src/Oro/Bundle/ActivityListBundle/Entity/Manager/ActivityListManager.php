@@ -34,7 +34,7 @@ class ActivityListManager
     }
 
     /**
-     * @param               $deletedEntities
+     * @param array         $deletedEntities
      * @param EntityManager $entityManager
      */
     public function processDeletedEntities($deletedEntities, EntityManager $entityManager)
