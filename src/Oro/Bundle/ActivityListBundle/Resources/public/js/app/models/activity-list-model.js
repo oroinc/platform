@@ -17,8 +17,6 @@ define([
             data: '',
             configuration: '',
 
-            relatedEntityClass: '',
-            relatedEntityId: '',
             activityEntityClass: '',
             activityEntityId: '',
 

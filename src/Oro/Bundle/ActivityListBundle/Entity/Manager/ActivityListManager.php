@@ -127,12 +127,6 @@ class ActivityListManager
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
             'data'                 => $entity->getData(),
-
-            //'relatedEntityClass'   => $entity->getRelatedEntityClass(),
-            'relatedEntityClass'   => 'OroCRM\Bundle\ContactBundle\Entity\Contact',
-            //'relatedEntityId'      => $entity->getRelatedEntityId(),
-            'relatedEntityId'      => 52,
-
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
