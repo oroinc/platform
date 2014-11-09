@@ -298,7 +298,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $hasMethodBody[]     = 'return false;';
         $addMethodBody[]     = $throwStmt;
         $removeMethodBody[]  = $throwStmt;
-        $getRelationsMethodBody[] = "return \$relationEntities;";
+        $getAssociationsMethodBody[] = "return \$associationEntities;";
 
         $supportMethodDocblock = "/**\n"
             . " * Checks if an entity of the given type can be associated with this entity\n"
@@ -362,7 +362,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                     ->setDocblock($removeMethodDocblock)
             )->setMethod(
                 $this
-                    ->generateClassMethod($getAssociationsName, implode("\n", $getRelationsMethodBody))
+                    ->generateClassMethod($getAssociationsName, implode("\n", $getAssociationsMethodBody))
                     ->setDocblock($getAssociationsMethodDocblock)
             );
     }
