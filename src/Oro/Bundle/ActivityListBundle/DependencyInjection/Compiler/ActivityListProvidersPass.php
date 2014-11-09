@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ActivityListProvidersPass implements CompilerPassInterface
 {
-    const TAG = 'oro.activity_list.provider';
-    const PROVIDER_SERVICE_ID = 'oro.activity_list.provider.chain';
+    const TAG = 'oro_activity_list.provider';
+    const PROVIDER_SERVICE_ID = 'oro_activity_list.provider.chain';
 
     /**
      * {@inheritdoc}
