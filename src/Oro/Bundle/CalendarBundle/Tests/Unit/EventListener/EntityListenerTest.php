@@ -5,8 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Doctrine\ORM\PersistentCollection;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\EventListener\EntityListener;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
