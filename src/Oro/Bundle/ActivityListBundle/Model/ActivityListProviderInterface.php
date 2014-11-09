@@ -8,13 +8,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 interface ActivityListProviderInterface
 {
     /**
-     * return pairs of class name and id,
-     *
-     * @return array
-     */
-    public function getTargets($entity);
-
-    /**
      * returns true if given $configId is supported by activity
      *
      * @param ConfigIdInterface $configId
@@ -25,13 +18,6 @@ interface ActivityListProviderInterface
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager);
 
     /**
-     * returns a class name of entity for which we monitor changes
-     *
-     * @return string
-     */
-    public function getActivityClass();
-
-    /**
      * @param object $entity
      * @return string
      */
@@ -40,6 +26,13 @@ interface ActivityListProviderInterface
     public function getData($entity);
 
     public function getTemplate();
+
+    /**
+     * returns a class name of entity for which we monitor changes
+     *
+     * @return string
+     */
+    public function getActivityClass();
 
     public function getActivityId($entity);
 
