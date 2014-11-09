@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 interface ActivityListProviderInterface
