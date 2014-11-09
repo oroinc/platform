@@ -458,7 +458,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     return lastBackgroundColor;
                 });
                 this.colorManager.setCalendarColors(obj.calendarUid, obj.color, obj.backgroundColor);
-                lastBackgroundColor = obj.backgroundColor;
+                if (obj.calendarAlias === 'user') {
+                    lastBackgroundColor = obj.backgroundColor;
+                }
             }, this));
         },
 

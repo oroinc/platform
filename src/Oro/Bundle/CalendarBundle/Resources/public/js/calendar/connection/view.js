@@ -14,6 +14,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         /** @property {Object} */
         attrs: {
             calendarUid:     'data-calendar-uid',
+            calendarAlias:   'data-calendar-alias',
             color:           'data-color',
             backgroundColor: 'data-bg-color',
             visible:         'data-visible'
@@ -67,7 +68,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 viewModel = model.toJSON();
             // init text/background colors
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
-                return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
+                var $last = this.$el.find(this.selectors.lastItem);
+                return $last.attr(this.attrs.calendarAlias) === 'user' ? $last.attr(this.attrs.backgroundColor) : null;
             }, this));
             this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.color, viewModel.backgroundColor);
             model.set('color', viewModel.color);
