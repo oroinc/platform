@@ -86,7 +86,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @var string
      *
-     * @ORM\Column(name="related_activity_class", type="string", length=255)
+     * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
      */
     protected $relatedActivityClass;
 
@@ -148,7 +148,6 @@ class ActivityList extends ExtendActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @return string
      */
@@ -162,7 +161,6 @@ class ActivityList extends ExtendActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @param string $verb
      *
@@ -219,54 +217,6 @@ class ActivityList extends ExtendActivityList
     public function setData($data)
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity class name
-     *
-     * @return string
-     */
-    public function getRelatedEntityClass()
-    {
-        return $this->relatedEntityClass;
-    }
-
-    /**
-     * Set related entity class name
-     *
-     * @param string $relatedEntityClass
-     *
-     * @return self
-     */
-    public function setRelatedEntityClass($relatedEntityClass)
-    {
-        $this->relatedEntityClass = $relatedEntityClass;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity id
-     *
-     * @return integer
-     */
-    public function getRelatedEntityId()
-    {
-        return $this->relatedEntityId;
-    }
-
-    /**
-     * Set related entity id
-     *
-     * @param integer|null $relatedEntityId
-     *
-     * @return self
-     */
-    public function setRelatedEntityId($relatedEntityId)
-    {
-        $this->relatedEntityId = $relatedEntityId;
 
         return $this;
     }
@@ -359,11 +309,11 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * @param UserInterface|null $owningUser
+     * @param User $owningUser
      *
-     * @return ActivityList
+     * @return self
      */
-    public function setOwner($owningUser)
+    public function setOwner(User $owningUser)
     {
         $this->owner = $owningUser;
 
@@ -371,7 +321,7 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * @return UserInterface
+     * @return User
      */
     public function getOwner()
     {
@@ -389,7 +339,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @param $relatedActivityClass
      *
-     * @return $this
+     * @return self
      */
     public function setRelatedActivityClass($relatedActivityClass)
     {
@@ -409,7 +359,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @param $relatedActivityId
      *
-     * @return $this
+     * @return self
      */
     public function setRelatedActivityId($relatedActivityId)
     {
