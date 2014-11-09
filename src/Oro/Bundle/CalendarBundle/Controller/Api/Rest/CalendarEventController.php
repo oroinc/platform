@@ -253,6 +253,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
         }
 
         // remove auxiliary attributes if any
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
         unset($data['editable']);
         unset($data['removable']);
 
@@ -264,6 +266,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
      * @param bool $subordinate
      *
      * @return QueryBuilder
+     *
+     * @throws BadRequestHttpException
      */
     protected function getEventListQueryBuilder($calendarId, $subordinate)
     {

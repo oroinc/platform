@@ -141,5 +141,5 @@
     {{ UI.scrollData(id, data, form) }}
 
     {{ QD.query_designer_column_chain_template('column-chain-template') }}
-    {{ segmentQD.initJsWidgets(type, form, entities, metadata, {'with-relations': false}) }}
+    {{ segmentQD.initJsWidgets(type, form, entities, metadata) }}
 {% endblock content_data %}

@@ -3,6 +3,7 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
+            entity_pagination: true
         source:
             acl_resource: oro_user_user_view
             type: orm
@@ -129,6 +130,7 @@ datagrid:
     groups-grid:
         options:
             entityHint: group
+            entity_pagination: true
         source:
             acl_resource: oro_user_group_view
             type: orm
@@ -187,6 +189,7 @@ datagrid:
     roles-grid:
         options:
             entityHint: role
+            entity_pagination: true
         source:
             acl_resource: oro_user_role_view
             type: orm

@@ -9,6 +9,11 @@ define([
 
     var BaseView;
 
+    /**
+     * @export  oroui/js/app/views/base/view
+     * @class   oroui.app.views.BaseView
+     * @extends Chaplin.View
+     */
     BaseView = Chaplin.View.extend({
 
         getTemplateFunction: function () {

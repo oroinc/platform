@@ -11,7 +11,12 @@ define([
 
     componentOptions = ['model', 'collection'];
 
-    // base component's constructor
+    /**
+     * Base component's constructor
+     *
+     * @export oroui/js/app/components/base/component
+     * @class oroui.app.components.base.Component
+     */
     BaseComponent = function (options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
@@ -32,8 +37,8 @@ define([
             var Component, result;
             Component = this;
             result = new Component(options);
-            if (result.defer) {
-                result = result.defer.promise();
+            if (result.deferredInit) {
+                result = result.deferredInit.promise();
             }
             return result;
         },
@@ -45,15 +50,21 @@ define([
         extend: Backbone.Model.extend
     });
 
-    // defines prototype properties and  methods
-    _.extend(BaseComponent.prototype, Backbone.Events, Chaplin.EventBroker,
-        // copy useful methods Chaplin.View
+    _.extend(
+        BaseComponent.prototype,
+
+        // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
+        /** @lends {Backbone.Events} */ Backbone.Events,
+        /** @lends {Chaplin.EventBroker} */ Chaplin.EventBroker,
+        // lends useful methods Chaplin.View
         _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener']), {
+
+        // defines own properties and methods
         /**
          * Defer object, helps to notify environment that component is initialized
          * in case it work in asynchronous way
          */
-        defer: null,
+        deferredInit: null,
 
         /**
          * Flag shows if the component is disposed or not
@@ -95,6 +106,26 @@ define([
             }, this);
             this.disposed = true;
             return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
+        },
+
+        /**
+         * Create flag of deferred initialization
+         *
+         * @protected
+         */
+        _deferredInit: function () {
+            this.deferredInit = $.Deferred();
+        },
+
+        /**
+         * Resolves deferred initialization
+         *
+         * @protected
+         */
+        _resolveDeferredInit: function () {
+            if (this.deferredInit) {
+                this.deferredInit.resolve(this);
+            }
         }
     });
 

@@ -120,11 +120,10 @@ class AttributeGuesser
             $hasAssociation = $metadata->hasAssociation($field)
                 || $this->entityConfigProvider->hasConfig($rootClass, $field);
             if ($hasAssociation && $i < $elementsCount - 1) {
-                $metadata = $this->getMetadataForClass(
-                    $metadata->hasAssociation($field)
-                        ? $metadata->getAssociationTargetClass($field)
-                        : $this->entityConfigProvider->getConfig($rootClass, $field)->getId()->getClassName()
-                );
+                $className = $metadata->hasAssociation($field)
+                    ? $metadata->getAssociationTargetClass($field)
+                    : $this->entityConfigProvider->getConfig($rootClass, $field)->getId()->getClassName();
+                $metadata = $this->getMetadataForClass($className);
             } elseif (!$hasAssociation && !$metadata->hasField($field)) {
                 return null;
             }
@@ -328,7 +327,7 @@ class AttributeGuesser
                 $this->doctrineTypeMapping[$doctrineType]['type'],
                 $this->doctrineTypeMapping[$doctrineType]['options']
             );
-        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)){
+        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)) {
             $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
             $fieldType = $entityConfig->getId()->getFieldType();
             if (!FieldTypeHelper::isRelation($fieldType)) {
