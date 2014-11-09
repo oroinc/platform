@@ -95,7 +95,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         getEventView: function (eventModel) {
             if (!this.eventView) {
-                var connectionModel = this.options.connectionsOptions.collection.findWhere(
+                var connectionModel = this.getConnectionCollection().findWhere(
                         {calendarUid: eventModel.get('calendarUid')}
                     ),
                     options = _.pick(connectionModel.attributes, ['widgetRoute', 'widgetOptions']);
@@ -468,9 +468,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             // init views
             this.initCalendarContainer();
             if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
-                // connections management is not required - just load connections' colors and forged about connections
                 this.loadConnectionColors();
-                delete this.options.connectionsOptions;
             } else {
                 this.initializeConnectionsView();
             }
