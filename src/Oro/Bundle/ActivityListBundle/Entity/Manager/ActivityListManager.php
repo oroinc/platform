@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Manager;
+namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 

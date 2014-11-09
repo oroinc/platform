@@ -1,7 +1,7 @@
 parameters:
   oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
   oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
-  oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Manager\ActivityListManager
+  oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
   oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
   oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
   oro_activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
