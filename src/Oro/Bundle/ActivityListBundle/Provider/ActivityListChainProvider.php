@@ -4,18 +4,13 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Doctrine\ORM\PersistentCollection;
-use Oro\Bundle\ActivityListBundle\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class ActivityListChainProvider
 {
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -26,12 +21,10 @@ class ActivityListChainProvider
     protected $targetClasses = [];
 
     /**
-     * @param ServiceLink $securityFacadeLink
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ServiceLink $securityFacadeLink, DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->securityFacadeLink = $securityFacadeLink;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -104,6 +97,7 @@ class ActivityListChainProvider
                 'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
             ]
         );
+
         return $this->getActivityListEntityForEntity(
             $entity,
             $provider,
@@ -113,14 +107,14 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param ActivityList $list
-     * @param              $provider
-     * @param              $entity
-     * @param string       $state
+     * @param ActivityList                  $list
+     * @param ActivityListProviderInterface $provider
+     * @param object                        $entity
+     * @param string                        $state
      */
     protected function updateListEntity(
         ActivityList $list,
-        $provider,
+        ActivityListProviderInterface $provider,
         $entity,
         $state = ActivityListManager::STATE_UPDATE
     ) {
@@ -132,7 +126,7 @@ class ActivityListChainProvider
      * @param object                        $entity
      * @param ActivityListProviderInterface $provider
      * @param string                        $state
-     * @param null                          $list
+     * @param ActivityList|null             $list
      * @return ActivityList
      */
     protected function getActivityListEntityForEntity(

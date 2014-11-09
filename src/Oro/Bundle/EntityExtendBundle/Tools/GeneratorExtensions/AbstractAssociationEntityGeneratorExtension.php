@@ -221,7 +221,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $hasMethodName     = sprintf('has%sTarget', $prefix);
         $addMethodName     = sprintf('add%sTarget', $prefix);
         $removeMethodName  = sprintf('remove%sTarget', $prefix);
-        $getRelationsName  = sprintf('get%sTargetEntities', $prefix);
+        $getAssociationsName  = sprintf('get%sTargetEntities', $prefix);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
@@ -238,8 +238,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $removeMethodBody  = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
         ];
-        $getRelationsMethodBody = [
-            '$relationEntities = [];',
+        $getAssociationsMethodBody = [
+            '$associationEntities = [];',
         ];
 
         foreach ($schema['relationData'] as $relationData) {
@@ -280,16 +280,15 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 . "    if (\$this->{field}->contains(\$target)) { \$this->{field}->removeElement(\$target); }\n"
                 . "    return \$this;\n}"
             );
-            $getRelationsMethodBody[] = str_replace(
+            $getAssociationsMethodBody[] = str_replace(
                 ['{field}'],
                 [$fieldName],
                 "\$entities = \$this->{field}->toArray();\n"
                 . "if (!empty(\$entities)) {\n"
-                . "    \$relationEntities = array_merge(\$relationEntities, \$entities);\n"
+                . "    \$associationEntities = array_merge(\$associationEntities, \$entities);\n"
                 . "}"
             );
         }
-
 
         $throwStmt = 'throw new \RuntimeException('
             . 'sprintf(\'The association with "%s" entity was not configured.\', $className));';
@@ -331,8 +330,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return object This object\n"
             . " */";
-        $getRelationsMethodDocblock = "/**\n"
-            . " * Returns array with all related entities\n"
+        $getAssociationsMethodDocblock = "/**\n"
+            . " * Returns array with all associated entities\n"
             . " *\n"
             . " * @return array\n"
             . " */";
@@ -363,8 +362,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                     ->setDocblock($removeMethodDocblock)
             )->setMethod(
                 $this
-                    ->generateClassMethod($getRelationsName, implode("\n", $getRelationsMethodBody))
-                    ->setDocblock($getRelationsMethodDocblock)
+                    ->generateClassMethod($getAssociationsName, implode("\n", $getRelationsMethodBody))
+                    ->setDocblock($getAssociationsMethodDocblock)
             );
     }
 }

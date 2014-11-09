@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-
 interface ActivityListProviderInterface
 {
     /**
@@ -32,13 +31,9 @@ interface ActivityListProviderInterface
      */
     public function getSubject($entity);
 
-    public function getBriefData($entity);
-
     public function getData($entity);
 
-    public function getBriefTemplate();
-
-    public function getFullTemplate();
+    public function getTemplate();
 
     public function getActivityId($entity);
 

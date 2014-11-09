@@ -19,7 +19,6 @@ services:
   oro_activity_list.provider.chain:
       class: %oro_activity_list.provider.chain.class%
       arguments:
-         - @oro_security.security_facade.link
          - @oro_entity.doctrine_helper
 
   oro_activity_list.manager:

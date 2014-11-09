@@ -11,7 +11,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityListExtension  implements ExtendExtensionAwareInterface
 {
-
     /** @var ExtendExtension */
     protected $extendExtension;
 
@@ -27,13 +26,11 @@ class ActivityListExtension  implements ExtendExtensionAwareInterface
      * Adds the association between the given table and the activity list table
      *
      * @param Schema $schema
-     * @param string $targetTableName   Target entity table name
-     * @param bool   $immutable         Set TRUE to prohibit disabling the activity association from UI
+     * @param string $targetTableName Target entity table name
      */
     public function addActivityListAssociation(
         Schema $schema,
-        $targetTableName,
-        $immutable = false
+        $targetTableName
     ) {
         $targetTable = $schema->getTable($targetTableName);
 

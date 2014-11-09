@@ -12,7 +12,7 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     const ASSOCIATION_KIND = 'activityList';
-    const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
+    const ENTITY_CLASS     = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
 
     protected $targetEntityConfigs;
 
@@ -25,10 +25,18 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
     /** @var AssociationBuilder */
     protected $associationBuilder;
 
-    public function __construct(ActivityListChainProvider $listProvider, ConfigManager $configManager, AssociationBuilder $associationBuilder)
-    {
-        $this->listProvider = $listProvider;
-        $this->configManager = $configManager;
+    /**
+     * @param ActivityListChainProvider $listProvider
+     * @param ConfigManager             $configManager
+     * @param AssociationBuilder        $associationBuilder
+     */
+    public function __construct(
+        ActivityListChainProvider $listProvider,
+        ConfigManager $configManager,
+        AssociationBuilder $associationBuilder
+    ) {
+        $this->listProvider       = $listProvider;
+        $this->configManager      = $configManager;
         $this->associationBuilder = $associationBuilder;
     }
 
@@ -81,5 +89,4 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
 
         return $this->targetEntityConfigs;
     }
-
 }

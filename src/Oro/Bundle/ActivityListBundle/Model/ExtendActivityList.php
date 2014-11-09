@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-
 class ExtendActivityList
 {
     /**

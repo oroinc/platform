@@ -8,32 +8,29 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\PersistentCollection;
 
-use Oro\Bundle\ActivityListBundle\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActivityListListener
 {
-    /**  @var array */
+    /** @var array */
     protected $insertedEntities = [];
 
-    /**  @var array */
+    /** @var array */
     protected $updatedEntities = [];
 
-    /**  @var array */
+    /** @var array */
     protected $deletedEntities = [];
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var ActivityListManager
-     */
+    /** @var ActivityListManager */
     protected $activityListManager;
 
     /**
      * @param ActivityListManager $activityListManager
+     * @param DoctrineHelper      $doctrineHelper
      */
     public function __construct(ActivityListManager $activityListManager, DoctrineHelper $doctrineHelper)
     {
@@ -153,9 +150,8 @@ class ActivityListListener
             /** @var $collection PersistentCollection */
             $ownerEntity = $collection->getOwner();
             $entityHash = spl_object_hash($ownerEntity);
-            if ($this->activityListManager->isSupportedEntity(
-                    $ownerEntity
-                ) && empty($this->updatedEntities[$entityHash])
+            if ($this->activityListManager->isSupportedEntity($ownerEntity)
+                && empty($this->updatedEntities[$entityHash])
             ) {
                 $this->updatedEntities[$entityHash] = $ownerEntity;
             }
