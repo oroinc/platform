@@ -11,7 +11,6 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,20 +33,19 @@ class EntityListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof User) {
-                $assignedOrganizations = $entity->getOrganizations();
-                foreach ($assignedOrganizations as $organization) {
-                    $this->createCalendar($em, $uow, $entity, $organization);
-                }
+                $this->createCalendarsForNewUser($em, $uow, $entity);
             }
         }
         /** @var PersistentCollection $coll */
         foreach ($uow->getScheduledCollectionUpdates() as $coll) {
-            if ($coll->getOwner() instanceof User && $coll->getOwner()->getId()) {
+            $collOwner = $coll->getOwner();
+            if ($collOwner instanceof User
+                && $collOwner->getId()
+                && $coll->getMapping()['fieldName'] === 'organizations'
+            ) {
                 foreach ($coll->getInsertDiff() as $entity) {
-                    if ($entity instanceof Organization) {
-                        if (!$this->isCalendarExists($em, $coll->getOwner(), $entity)) {
-                            $this->createCalendar($em, $uow, $coll->getOwner(), $entity);
-                        }
+                    if (!$this->isCalendarExists($em, $collOwner, $entity)) {
+                        $this->createCalendar($em, $uow, $collOwner, $entity);
                     }
                 }
             }
@@ -60,7 +58,7 @@ class EntityListener
     public function postFlush(PostFlushEventArgs $event)
     {
         if (!empty($this->insertedCalendars)) {
-            $em  = $event->getEntityManager();
+            $em = $event->getEntityManager();
             foreach ($this->insertedCalendars as $calendar) {
                 // connect the calendar to itself
                 $calendarProperty = new CalendarProperty();
@@ -78,15 +76,32 @@ class EntityListener
     /**
      * @param EntityManager $em
      * @param UnitOfWork    $uow
-     * @param User          $entity
+     * @param User          $user
+     */
+    protected function createCalendarsForNewUser($em, $uow, $user)
+    {
+        $owningOrganization = $user->getOrganization();
+        $this->createCalendar($em, $uow, $user, $owningOrganization);
+        foreach ($user->getOrganizations() as $organization) {
+            if ($organization->getId() !== $owningOrganization->getId()) {
+                $this->createCalendar($em, $uow, $user, $organization);
+            }
+        }
+    }
+
+    /**
+     * @param EntityManager $em
+     * @param UnitOfWork    $uow
+     * @param User          $user
      * @param Organization  $organization
      */
-    protected function createCalendar($em, $uow, $entity, $organization)
+    protected function createCalendar($em, $uow, $user, $organization)
     {
         // create default user's calendar
         $calendar = new Calendar();
-        $calendar->setOwner($entity);
-        $calendar->setOrganization($organization);
+        $calendar
+            ->setOwner($user)
+            ->setOrganization($organization);
         $em->persist($calendar);
         $uow->computeChangeSet($this->getClassMetadata($calendar, $em), $calendar);
 
