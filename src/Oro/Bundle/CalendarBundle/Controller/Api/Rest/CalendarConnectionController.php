@@ -140,21 +140,4 @@ class CalendarConnectionController extends RestController implements ClassResour
 
         return true;
     }
-
-    /**
-     * @param CalendarProperty $entity
-     *
-     * @return array
-     */
-    protected function createResponseData($entity)
-    {
-        $data = parent::createResponseData($entity);
-
-        $data = array_merge(
-            $data,
-            $this->getManager()->getCalendarManager()->getCalendarInfo($entity)
-        );
-
-        return $data;
-    }
 }

@@ -126,36 +126,6 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetCalendarName()
-    {
-        $connection = new CalendarProperty();
-        $connection->setCalendar(123);
-
-        $calendar = new Calendar();
-        $user     = new User();
-        $calendar->setOwner($user);
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')
-            ->with('OroCalendarBundle:Calendar')
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($connection->getCalendar())
-            ->will($this->returnValue($calendar));
-
-        $this->nameFormatter->expects($this->at(0))
-            ->method('format')
-            ->with($this->identicalTo($user))
-            ->will($this->returnValue('John Doo'));
-
-        $result = $this->provider->getCalendarName($connection);
-        $this->assertEquals('John Doo', $result);
-    }
-
     public function testGetCalendarEvents()
     {
         $calendarId  = 123;

@@ -183,25 +183,6 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
         return 'def_opt';
     }
 
-    public function testGetCalendarInfo()
-    {
-        $connection = new CalendarProperty();
-        $connection->setCalendarAlias('provider1');
-
-        $this->provider1->expects($this->once())
-            ->method('getCalendarName')
-            ->with($this->identicalTo($connection))
-            ->will($this->returnValue('calendar1'));
-
-        $result = $this->manager->getCalendarInfo($connection);
-        $this->assertEquals(
-            [
-                'calendarName' => 'calendar1'
-            ],
-            $result
-        );
-    }
-
     public function testGetCalendarEvents()
     {
         $userId      = 123;

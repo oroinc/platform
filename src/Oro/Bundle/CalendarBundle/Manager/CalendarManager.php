@@ -79,22 +79,6 @@ class CalendarManager
     }
 
     /**
-     * Gets additional computed properties of a calendar is represented by the given connection
-     *
-     * @param CalendarProperty $connection
-     *
-     * @return array
-     */
-    public function getCalendarInfo(CalendarProperty $connection)
-    {
-        $provider = $this->providers[$connection->getCalendarAlias()];
-
-        return [
-            'calendarName' => $provider->getCalendarName($connection)
-        ];
-    }
-
-    /**
      * Gets the list of calendar events
      *
      * @param int       $userId      The id of an user requested this information

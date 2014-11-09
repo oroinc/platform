@@ -26,15 +26,6 @@ interface CalendarProviderInterface
     public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds);
 
     /**
-     * Gets a name of a calendar is represented by the given connection
-     *
-     * @param CalendarProperty $connection
-     *
-     * @return string
-     */
-    public function getCalendarName(CalendarProperty $connection);
-
-    /**
      * Gets the list of calendar events
      *
      * @param int       $userId      The id of an user requested this information
