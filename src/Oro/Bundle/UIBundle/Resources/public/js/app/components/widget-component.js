@@ -7,7 +7,7 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
-        mapWidgetModuleName = require('oroui/js/map-widget-module-name');
+        mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
      * @export oroui/js/app/components/widget-component
@@ -16,13 +16,13 @@ define(function (require) {
      */
     WidgetComponent = BaseComponent.extend({
         /**
-         * @type {oro.AbstractWidget}
+         * @property {oroui.widget.AbstractWidget}
          * @constructor
          */
         widget: null,
 
         /**
-         * @type {boolean}
+         * @property {boolean}
          */
         opened: false,
 
@@ -38,10 +38,15 @@ define(function (require) {
                 // widget is initialized from server, there's nothing to do
                 return;
             }
-            this.options = _.defaults(options, this.defaults);
+            this.options = $.extend(true, {}, this.defaults, options);
             this.$element = options._sourceElement;
 
-            this._bindOpenEvent();
+            if (this.$element) {
+                if (!this.options.options.url) {
+                    this.options.options.url = this.$element.data('url') || this.$element.attr('href');
+                }
+                this._bindOpenEvent();
+            }
         },
 
         /**
@@ -55,13 +60,17 @@ define(function (require) {
         },
 
         /**
-         * Bind handler to open widget event
+         * Bind handler to open widget event on source element if it exists
          *
          * @protected
          */
         _bindOpenEvent: function () {
-            var eventName = this.options.event || 'click',
-                handler = _.bind(this._openHandler, this);
+            var eventName, handler;
+            eventName = this.options.event || 'click';
+            handler = _.bind(function (e) {
+                e.preventDefault();
+                this.openWidget();
+            }, this);
             this.$element.on(eventName + '.' + this.cid, handler);
         },
 
@@ -69,13 +78,10 @@ define(function (require) {
          * Handles open widget action to
          *  - check if widget module is loaded before open widget
          *
-         * @param {jQuery.Event} e
          * @protected
          */
-        _openHandler: function (e) {
+        openWidget: function () {
             var widgetModuleName;
-            e.preventDefault();
-
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
@@ -103,10 +109,6 @@ define(function (require) {
                 return;
             }
 
-            if (!options.url) {
-                options.url = this.$element.data('url') || this.$element.attr('href');
-            }
-
             // Create and open widget
             widget = new Widget(options);
 
@@ -125,7 +127,7 @@ define(function (require) {
         /**
          * Binds widget instance to environment events
          *
-         * @param {oro.AbstractWidget} widget
+         * @param {oroui.widget.AbstractWidget} widget
          * @protected
          */
         _bindEnvironmentEvent: function (widget) {

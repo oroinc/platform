@@ -20,6 +20,8 @@ oro_menu_config:
             extras:
                 position: 105
                 routes: ['oro_segment_index', 'oro_segment_update', 'oro_segment_create', 'oro_segment_view']
+            attributes:
+                class: 'mobile-hide'
 
     tree:
         application_menu:

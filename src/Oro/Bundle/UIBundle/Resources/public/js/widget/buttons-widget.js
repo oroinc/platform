@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/widget/abstract'
+define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
     ], function (_, Backbone, AbstractWidget) {
     'use strict';
 
@@ -8,7 +8,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
     /**
      * @export  oro/buttons-widget
      * @class   oro.ButtonsWidget
-     * @extends oro.AbstractWidget
+     * @extends oroui.widget.AbstractWidget
      */
     return AbstractWidget.extend({
         options: _.extend(
