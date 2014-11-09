@@ -65,6 +65,25 @@ class Entity implements \Oro\Bundle\ActivityBundle\Model\ActivityInterface
     }
 
     /**
+     * Returns array with all associated entities
+     *
+     * @return array
+     */
+    public function getActivityTargetEntities()
+    {
+        $associationEntities = [];
+        $entities = $this->target_entity1_246e8211->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        $entities = $this->target_entity2_bd67d3ab->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        return $associationEntities;
+    }
+
+    /**
      * Associates the given entity with this entity
      *
      * @param object $target Any configurable entity that can be associated with this type of entity

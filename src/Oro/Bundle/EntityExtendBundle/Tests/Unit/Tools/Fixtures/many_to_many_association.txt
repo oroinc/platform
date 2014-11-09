@@ -65,6 +65,25 @@ class Entity
     }
 
     /**
+     * Returns array with all associated entities
+     *
+     * @return array
+     */
+    public function getTestTargetEntities()
+    {
+        $associationEntities = [];
+        $entities = $this->target_entity1_2ce134a6->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        $entities = $this->target_entity2_b5e8651c->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        return $associationEntities;
+    }
+
+    /**
      * Associates the given entity with this entity
      *
      * @param object $target Any configurable entity that can be associated with this type of entity

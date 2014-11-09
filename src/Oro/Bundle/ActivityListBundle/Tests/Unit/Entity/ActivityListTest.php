@@ -50,8 +50,8 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
             ['verb', 'testVerb'],
             ['subject', 'testSubject'],
             ['data', ['test' => 'val']],
-            ['relatedEntityClass', 'testRelatedEntityClass'],
-            ['relatedEntityId', 123],
+            ['relatedActivityClass', 'testRelatedActivityClass'],
+            ['relatedActivityId', 123],
             ['updatedAt', new \DateTime('now')],
             ['organization', new Organization()]
         ];

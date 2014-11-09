@@ -4,15 +4,18 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
- *     @ORM\Index(name="oro_activity_list_related_idx", columns={"related_entity_class", "related_entity_id"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -29,11 +32,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          }
  *      }
  * )
  */
-class ActivityList
+class ActivityList extends ExtendActivityList
 {
     /**
      * @var integer
@@ -43,6 +53,14 @@ class ActivityList
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @var string
@@ -68,16 +86,16 @@ class ActivityList
     /**
      * @var string
      *
-     * @ORM\Column(name="related_entity_class", type="string", length=255)
+     * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
      */
-    protected $relatedEntityClass;
+    protected $relatedActivityClass;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="related_entity_id", type="integer", nullable=true)
+     * @ORM\Column(name="related_activity_id", type="integer", nullable=false)
      */
-    protected $relatedEntityId;
+    protected $relatedActivityId;
 
     /**
      * @var \DateTime
@@ -130,7 +148,6 @@ class ActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @return string
      */
@@ -144,7 +161,6 @@ class ActivityList
      * For example:
      *  create - indicates that the actor has created the object
      *  update - indicates that the actor has modified the object
-     *  delete - indicates that the actor has deleted the object
      *
      * @param string $verb
      *
@@ -201,54 +217,6 @@ class ActivityList
     public function setData($data)
     {
         $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity class name
-     *
-     * @return string
-     */
-    public function getRelatedEntityClass()
-    {
-        return $this->relatedEntityClass;
-    }
-
-    /**
-     * Set related entity class name
-     *
-     * @param string $relatedEntityClass
-     *
-     * @return self
-     */
-    public function setRelatedEntityClass($relatedEntityClass)
-    {
-        $this->relatedEntityClass = $relatedEntityClass;
-
-        return $this;
-    }
-
-    /**
-     * Get related entity id
-     *
-     * @return integer
-     */
-    public function getRelatedEntityId()
-    {
-        return $this->relatedEntityId;
-    }
-
-    /**
-     * Set related entity id
-     *
-     * @param integer|null $relatedEntityId
-     *
-     * @return self
-     */
-    public function setRelatedEntityId($relatedEntityId)
-    {
-        $this->relatedEntityId = $relatedEntityId;
 
         return $this;
     }
@@ -338,5 +306,65 @@ class ActivityList
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param User $owningUser
+     *
+     * @return self
+     */
+    public function setOwner(User $owningUser)
+    {
+        $this->owner = $owningUser;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelatedActivityClass()
+    {
+        return $this->relatedActivityClass;
+    }
+
+    /**
+     * @param $relatedActivityClass
+     *
+     * @return self
+     */
+    public function setRelatedActivityClass($relatedActivityClass)
+    {
+        $this->relatedActivityClass = $relatedActivityClass;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelatedActivityId()
+    {
+        return $this->relatedActivityId;
+    }
+
+    /**
+     * @param $relatedActivityId
+     *
+     * @return self
+     */
+    public function setRelatedActivityId($relatedActivityId)
+    {
+        $this->relatedActivityId = $relatedActivityId;
+
+        return $this;
     }
 }
