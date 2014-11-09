@@ -92,18 +92,19 @@ class ActivityListChainProvider
     /**
      * @param               $entity
      * @param EntityManager $entityManager
-     * @return array|bool
+     * @return ActivityList
      */
-    public function getUpdatedActivityLists($entity, EntityManager $entityManager)
+    public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
         $provider = $this->getProviderForEntity($entity);
         $listEntities = [];
-        $existListEntities = $entityManager->getRepository('OroActivityListBundle:ActivityList')->findBy(
+        $existListEntity = $entityManager->getRepository('OroActivityListBundle:ActivityList')->findOneBy(
             [
                 'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
                 'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
             ]
         );
+        return $this->getNewActivityListEntityForEntity($entity, $provider, ActivityListManager::STATE_UPDATE, $existListEntity);
 
         $relatedEntities = $provider->getRelatedEntities($entity);
         if (!empty($relatedEntities)) {
@@ -164,9 +165,12 @@ class ActivityListChainProvider
      * @param $provider
      * @return ActivityList
      */
-    protected function getNewActivityListEntityForEntity($entity, ActivityListProviderInterface $provider, $state = ActivityListManager::STATE_CREATE)
+    protected function getNewActivityListEntityForEntity($entity, ActivityListProviderInterface $provider, $state = ActivityListManager::STATE_CREATE, $list = null)
     {
-        $list = new ActivityList();
+        if (!$list) {
+            $list = new ActivityList();
+        }
+
         $list->setOwner($entity->getOwner());
         $list->setOrganization($entity->getOrganization());
         $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
@@ -174,7 +178,9 @@ class ActivityListChainProvider
         $targets = $provider->getTargets($entity);
         if (!empty($targets)) {
             foreach ($targets as $target) {
-                $list->addActivityListTarget($target);
+                if ($list->supportActivityListTarget(get_class($target))) {
+                    $list->addActivityListTarget($target);
+                }
             }
         }
 

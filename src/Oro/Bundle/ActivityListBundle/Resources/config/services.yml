@@ -4,6 +4,7 @@ parameters:
   oro.activity_list.manager.class: Oro\Bundle\ActivityListBundle\Manager\ActivityListManager
   oro.activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
   oro.activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
+  oro.activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
 
 services:
   oro.activity_list.event_listener.actitity_list_listener:
@@ -36,8 +37,13 @@ services:
           - { name: oro_entity_extend.entity_config_dumper_extension }
 
   oro.activity_list.entity_generator.extension:
-          class: %oro.activity_list.entity_generator.extension.class%
-          arguments:
-              - @oro.activity_list.provider.chain
-          tags:
-              - { name: oro_entity_extend.entity_generator_extension }
+      class: %oro.activity_list.entity_generator.extension.class%
+      arguments:
+          - @oro.activity_list.provider.chain
+      tags:
+          - { name: oro_entity_extend.entity_generator_extension }
+
+  oro.activity_list.migration.extension.activity_list:
+      class: %oro.activity_list.migration.extension.activity_list%
+      tags:
+          - { name: oro_migration.extension, extension_name: activity_list }

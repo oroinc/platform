@@ -61,23 +61,8 @@ class ActivityListManager
     public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
     {
         if (!empty($updatedEntities)) {
-            foreach ($updatedEntities as $entity) {
-                list($updateEntities, $deleteEntities) = $this->chainProvider->getUpdatedActivityLists($entity, $entityManager);
-
-                if (!empty($updateEntities)) {
-                    foreach ($updateEntities as $entity) {
-                        $entityManager->persist($entity);
-                    }
-
-                }
-
-                if (!empty($deleteEntities)) {
-                    foreach ($updateEntities as $entity) {
-                        $entityManager->remove($entity);
-                    }
-
-                }
-
+            foreach ($updatedEntities['updates'] as $entity) {
+                $entityManager->persist($this->chainProvider->getUpdatedActivityList($entity, $entityManager));
             }
             return true;
         }

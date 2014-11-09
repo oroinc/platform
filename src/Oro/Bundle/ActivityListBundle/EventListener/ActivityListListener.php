@@ -134,30 +134,29 @@ class ActivityListListener
 
     protected function collectUpdates(UnitOfWork $uof)
     {
+        $this->updatedEntities['updates'] = [];
+        $this->updatedEntities['collection_updates'] = [];
+        $this->updatedEntities['collection_deletes'] = [];
         $entities = $uof->getScheduledEntityUpdates();
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities[$hash])) {
-                $updatedCollections = $uof->getScheduledCollectionUpdates();
-                //$deletedCollections = $uof->getScheduledCollectionDeletions();
-                $updatedCollectionsData = [];
-                foreach ($updatedCollections as $collection) {
-                    /** @var $collection PersistentCollection */
-                    if ($collection->getOwner() === $entity) {
-                        $updatedCollectionsData[$collection->getMapping()['fieldName']] = $collection;
-                    }
-                }
-                /*foreach ($deletedCollections as $collection) {
-                    /** @var $collection PersistentCollection */
-                   /* if ($collection->getOwner() === $entity) {
-                        $deletedCollectionsData[$collection->getMapping()['fieldName']] = $collection;
-                    }
-                }*/
-
-                $this->updatedEntities[$hash] = [
-                    'entity' => $entity,
-                    'updatedCollections' => $updatedCollectionsData,
-                    //'deletedCollections' => $deletedCollectionsData
+            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities['updates'][$hash])) {
+                $this->updatedEntities['updates'][$hash] = [
+                    $entity
                 ];
+            }
+        }
+        $updatedCollections = $uof->getScheduledCollectionUpdates();
+        $deletedCollections = $uof->getScheduledCollectionDeletions();
+        foreach ($updatedCollections as $collection) {
+            /** @var $collection PersistentCollection */
+            if ($this->activityListManager->isSupportedEntity($collection->getOwner())) {
+                $this->updatedEntities['collection_updates'][] = $collection;
+            }
+        }
+        foreach ($deletedCollections as $collection) {
+            /** @var $collection PersistentCollection */
+            if ($this->activityListManager->isSupportedEntity($collection->getOwner())) {
+                $this->updatedEntities['collection_deletes'][] = $collection;
             }
         }
     }

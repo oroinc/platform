@@ -16,7 +16,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
- *     @ORM\Index(name="oro_activity_list_related_idx", columns={"related_entity_class", "related_entity_id"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -83,20 +82,6 @@ class ActivityList extends ExtendActivityList
      * @ORM\Column(name="data", type="array", nullable=true)
      */
     protected $data;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="related_entity_class", type="string", length=255)
-     */
-    protected $relatedEntityClass;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="related_entity_id", type="integer", nullable=true)
-     */
-    protected $relatedEntityId;
 
     /**
      * @var string
